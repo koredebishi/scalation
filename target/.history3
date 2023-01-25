@@ -1,0 +1,25 @@
+1666214360050:compile
+1666214780344:runMain scalation.modeling.regressionTest
+1666214803464:runMain scalation.modeling.regressionTest5
+1666214921001:exit
+1666227203008:help
+1666227250727:plot
+1666227263068:clear
+1666227265964:exit
+1666238532529:help
+1668268335994:;set _root_.scala.collection.Seq(historyPath := None,shellPrompt := { _ => "" },SettingKey[_root_.scala.Option[_root_.sbt.File]]("sbtStructureOutputFile") in _root_.sbt.Global := _root_.scala.Some(_root_.sbt.file("/private/var/folders/qt/hkk8vv5920j9v2q78yyd3flh0000gn/T/sbt-structure.xml")),SettingKey[_root_.java.lang.String]("sbtStructureOptions") in _root_.sbt.Global := "download, resolveClassifiers");apply -cp "/Users/mac/Library/Application Support/JetBrains/IdeaIC2022.2/plugins/Scala/repo/org/jetbrains/scala/sbt-structure-extractor_2.12_1.0/2021.3.0/sbt-structure-extractor-2021.3.0.jar" org.jetbrains.sbt.CreateTasks;preferScala2;*/*:dumpStructure
+1668887059751:runMain scalation.simulation.event.example_1.runBank
+1673072734649:compile
+1673074792042:;set _root_.scala.collection.Seq(historyPath := None,shellPrompt := { _ => "" },SettingKey[_root_.scala.Option[_root_.sbt.File]]("sbtStructureOutputFile") in _root_.sbt.Global := _root_.scala.Some(_root_.sbt.file("/private/var/folders/qt/hkk8vv5920j9v2q78yyd3flh0000gn/T/sbt-structure.xml")),SettingKey[_root_.java.lang.String]("sbtStructureOptions") in _root_.sbt.Global := "download, resolveClassifiers");apply -cp "/Users/mac/Library/Application Support/JetBrains/IdeaIC2022.2/plugins/Scala/repo/org/jetbrains/scala/sbt-structure-extractor_2.12_1.0/2021.3.0/sbt-structure-extractor-2021.3.0.jar" org.jetbrains.sbt.CreateTasks;preferScala2;*/*:dumpStructure
+1673074909562:compile
+1673075003560:sbt compile
+1673075009875:scala
+1673075015512:sbt
+1673075032557:runMain
+1673075132096:runMain Bank.scala
+1673075194974:runmain BankModel
+1673075203706:runMain Bank
+1673075245190:runMain scalation.simulation.agent.example_1.runBank
+1673621433162:scala
+1673621448055:runMain
+1673621450452:clear

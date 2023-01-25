@@ -1,0 +1,103 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(compile, Some(21b9cd17-691e-404b-a5cb-55fffbac28b3), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / compile[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /Users/nancymiller/jam/software/scalation/scalation_2.0/target/scala-3.2.0/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:109:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m109 |[0m        [33mdo[0m g = genRandomGraph (size, nLabels, eLabels, avDegree, inverse, name) [33mwhile[0m (! g.isConnected)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m        ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m        end of toplevel definition expected but 'do' found[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E103] Syntax Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:110:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m110 |[0m        g[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m        Illegal start of toplevel definition[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m A statement is an import or export, a definition or an expression.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Some statements are only allowed in certain contexts[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mA statement is an import or export, a definition or an expression.[0m
+[0m[[0m[31merror[0m] [0m[0mSome statements are only allowed in certain contexts[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:211:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m211 |[0m        [33mwhile[0m (nodes.size < size && nRestarts < maxRestarts) {[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mThis construct is not allowed under -new-syntax.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mThis construct can be rewritten automatically under -rewrite -source 3.0-migration -new-syntax.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:212:15 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m212 |[0m            [33mif[0m (nRestarts % [31m100[0m == [31m0[0m) println ([31m"restarting "[0m + nRestarts)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m               ^^^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mThis construct is not allowed under -new-syntax.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mThis construct can be rewritten automatically under -rewrite -source 3.0-migration -new-syntax.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E040] Syntax Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:229:24 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m229 |[0m                        [33melse[0m cycle = [31mtrue[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                        ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                        'then' expected, but 'else' found[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:230:27 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m230 |[0m                        [33mif[0m (newChild != newNode) chs += newChild[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                           ^^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mThis construct is not allowed under -new-syntax.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mThis construct can be rewritten automatically under -rewrite -source 3.0-migration -new-syntax.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:237:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m237 |[0m        end [33mwhile[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m        ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m        misaligned end marker[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:261:4 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m261 |[0m    end genBFSQuery[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    misaligned end marker[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E018] Syntax Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:271:104 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m271 |[0m    [33mdef[0m [36mextractSubgraph[0m ([36msize[0m: [35mInt[0m, [36mg[0m: [35mMuGraph[0m, [36minverse[0m: [35mBoolean[0m = [31mfalse[0m, [36mname[0m: [35mString[0m = [31m"g"[0m): [35mMuGraph[0m =[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                                                        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                     expression expected but [31mval[0m found[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m An expression cannot start with [31mval[0m.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mAn expression cannot start with [31mval[0m.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E040] Syntax Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:294:20 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m294 |[0m                    end [33mfor[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                    ^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                    'then' expected, but 'end' found[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:303:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m303 |[0m        end [33mwhile[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m        ^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m        duplicate end marker[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E040] Syntax Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:316:33 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m316 |[0m        [33mval[0m [36melab[0m = Map [([35mInt[0m, [35mInt[0m}, SET [ValueType]] ()              [34m// FIX to be implemented[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                 ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                 ')' expected, but '}' found[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:316:34 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m316 |[0m        [33mval[0m [36melab[0m = Map [([35mInt[0m, [35mInt[0m}, SET [ValueType]] ()              [34m// FIX to be implemented[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                  ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                               end of statement expected but ',' found[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[0minfo[0m] [0m[0mshutting down sbt server[0m

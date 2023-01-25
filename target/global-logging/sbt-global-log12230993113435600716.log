@@ -1,0 +1,603 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(compile, Some(f9990887-4316-454e-85e6-088460d18349), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / compile[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /Users/nancymiller/jam/software/scalation/scalation_2.0/target/scala-3.2.0/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:109:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m109 |[0m        [33mdo[0m g = genRandomGraph (size, nLabels, eLabels, avDegree, inverse, name) [33mwhile[0m (! g.isConnected)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m        ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m        end of toplevel definition expected but 'do' found[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E103] Syntax Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:110:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m110 |[0m        g[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m        Illegal start of toplevel definition[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m A statement is an import or export, a definition or an expression.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Some statements are only allowed in certain contexts[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mA statement is an import or export, a definition or an expression.[0m
+[0m[[0m[31merror[0m] [0m[0mSome statements are only allowed in certain contexts[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E040] Syntax Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:162:4 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m162 |[0m    } [34m// genPowerLawGraph[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    eof expected, but '}' found[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:52:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m52 |[0m        typeSelector [33mmatch[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m        ^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m        Not found: typeSelector[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `typeSelector` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `typeSelector` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `typeSelector` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `typeSelector` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:56:20 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m56 |[0m        [33mcase[0m _   => flaw ([31m"setVariate"[0m, [31m"label type not supported"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                    ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                    Not found: flaw[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `flaw` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `flaw` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `flaw` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `flaw` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:91:21 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m91 |[0m        [33mval[0m [36mlabel[0m  = randDistLabels (size, nLabels)                [34m// randomly assigned vertex labels[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                     ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                     Not found: randDistLabels[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `randDistLabels` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `randDistLabels` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `randDistLabels` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `randDistLabels` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:92:21 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m92 |[0m        [33mval[0m [36melabel[0m = randDisteLabels (ch, eLabels)                 [34m// randomly assigned edge labels[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                     ^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                     Not found: randDisteLabels[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `randDisteLabels` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `randDisteLabels` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `randDisteLabels` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `randDisteLabels` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:108:29 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m108 |[0m        [33mvar[0m [36mg[0m: [35mMuGraph[0m = [31mnull[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                             ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                         Found:    Unit[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                         Required: scalation.database.graph_pm.MuGraph[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: [31m()[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   Unit[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.database.graph_pm.MuGraph[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> Unit  <:  scalation.database.graph_pm.MuGraph[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== Unit  <:  scalation.database.graph_pm.MuGraph = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: [31m()[0m[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  Unit[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.database.graph_pm.MuGraph[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> Unit  <:  scalation.database.graph_pm.MuGraph[0m
+[0m[[0m[31merror[0m] [0m[0m  <== Unit  <:  scalation.database.graph_pm.MuGraph = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:131:20 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m131 |[0m        [33mval[0m [36mlabel[0m = powDistLabels (size, nLabels, [31m2.1[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                    ^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                    Not found: powDistLabels[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `powDistLabels` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `powDistLabels` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `powDistLabels` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `powDistLabels` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:133:32 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m133 |[0m        [33mnew[0m [35mMuGraph[0m (ch, label, elab, inverse, name)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mFound:    [1m[31m([0m[1m[31melab[0m[1m[31m [0m[1m[31m:[0m[1m[31m [0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[1m[31m [0m[1m[31m [0mscala.collection.mutable.Map[(Int, Int), [0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[1m[31m [0m[1m[31m [0m[1m[31m [0m[1m[31m [0m[1m[31mcollection[0m[1m[31m.[0m[1m[31mmutable[0m[1m[31m.[0m[1m[31mSet[0m[1m[31m[[0mscalation.ValueType[1m[31m][0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[1m[31m [0m[1m[31m [0m][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[1m[31m)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mRequired: scala.collection.mutable.Map[(Int, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: elab[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   (elab : [0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scala.collection.mutable.Map[(Int, Int), [0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m )[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scala.collection.mutable.Map[(Int, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> (elab :    scala.collection.mutable.Map[(Int, Int),      collection.mutable.Set[scalation.ValueType]   ] )  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> (Int, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> scala.type  <:  (scala : scala.type)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== scala.type  <:  (scala : scala.type) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== (Int, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> (Int, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> (scala : scala.type)  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== (scala : scala.type)  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== (Int, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m             ==> Double | Int  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m               ==> Double  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m               <== Double  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m             <== Double | Int  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> scala.collection.mutable.Map[(Int, Int),    collection.mutable.Set[scalation.ValueType] ]  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> (Int, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> scala.type  <:  (scala : scala.type)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== scala.type  <:  (scala : scala.type) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== (Int, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> (Int, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> (scala : scala.type)  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== (scala : scala.type)  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== (Int, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m             ==> Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m               ==> Double | Int  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                 ==> Double  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                 <== Double  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m               <== Double | Int  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m             <== Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== scala.collection.mutable.Map[(Int, Int),    collection.mutable.Set[scalation.ValueType] ]  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== (elab :    scala.collection.mutable.Map[(Int, Int),      collection.mutable.Set[scalation.ValueType]   ] )  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: elab[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (elab : [0m
+[0m[[0m[31merror[0m] [0m[0m  scala.collection.mutable.Map[(Int, Int), [0m
+[0m[[0m[31merror[0m] [0m[0m    collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m  ][0m
+[0m[[0m[31merror[0m] [0m[0m)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scala.collection.mutable.Map[(Int, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (elab :    scala.collection.mutable.Map[(Int, Int),      collection.mutable.Set[scalation.ValueType]   ] )  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m    ==> (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type[0m
+[0m[[0m[31merror[0m] [0m[0m    <== (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> (Int, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> scala.type  <:  (scala : scala.type)[0m
+[0m[[0m[31merror[0m] [0m[0m      <== scala.type  <:  (scala : scala.type) = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m        <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m        <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m    <== (Int, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> (Int, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> (scala : scala.type)  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m      <== (scala : scala.type)  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m        <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m        <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m    <== (Int, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m      ==> Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m          ==> Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m            ==> Double | Int  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m              ==> Double  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m              <== Double  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m            <== Double | Int  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m          <== Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m      <== Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scala.collection.mutable.Map[(Int, Int),    collection.mutable.Set[scalation.ValueType] ]  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type[0m
+[0m[[0m[31merror[0m] [0m[0m      <== (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> (Int, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> scala.type  <:  (scala : scala.type)[0m
+[0m[[0m[31merror[0m] [0m[0m        <== scala.type  <:  (scala : scala.type) = true[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m          ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m          <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m          ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m          <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== (Int, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> (Int, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> (scala : scala.type)  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m        <== (scala : scala.type)  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m          ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m          <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m          ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m          <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== (Int, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m          ==> Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m            ==> Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m              ==> Double | Int  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m                ==> Double  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m                <== Double  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m              <== Double | Int  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m            <== Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m          <== Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m      <== scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scala.collection.mutable.Map[(Int, Int),    collection.mutable.Set[scalation.ValueType] ]  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (elab :    scala.collection.mutable.Map[(Int, Int),      collection.mutable.Set[scalation.ValueType]   ] )  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:155:25 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m155 |[0m            [33mval[0m [36mdegree[0m = powInt ([31m0[0m, maxDegree, distPow)                  [34m// out degree[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                         ^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                         Not found: powInt[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `powInt` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `powInt` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `powInt` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `powInt` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:159:20 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m159 |[0m        [33mval[0m [36mlabel[0m = randDistLabels (size, nLabels)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                    Not found: randDistLabels[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `randDistLabels` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `randDistLabels` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `randDistLabels` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `randDistLabels` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:160:25 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m160 |[0m        [33mval[0m [36melab[0m = Map [([35mint[0m, [35mInt[0m), [35mSET[0m [[35mValueType[0m]] ()                  [34m// FIX to be implemented[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                         ^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                         Not found: type int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `type int` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `int` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type int` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `int` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:161:32 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m161 |[0m        [33mnew[0m [35mMuGraph[0m (ch, label, elab, inverse, name)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mFound:    [1m[31m<[0m[1m[31mnonsensical[0m[1m[31m>[0m[1m[31m([0m[1m[31melab[0m[1m[31m [0m[1m[31m:[0m[1m[31m [0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[1m[31m [0m[1m[31m [0mscala.collection.mutable.Map[([1m[31m<[0m[1m[31merror[0m[1m[31m [0m[1m[31mNot[0m[1m[31m [0m[1m[31mfound[0m[1m[31m:[0m[1m[31m [0m[1m[31mtype[0m[1m[31m [0m[1m[31mint[0m[1m[31m>[0m, Int), [0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[1m[31m [0m[1m[31m [0m[1m[31m [0m[1m[31m [0m[1m[31mcollection[0m[1m[31m.[0m[1m[31mmutable[0m[1m[31m.[0m[1m[31mSet[0m[1m[31m[[0mscalation.ValueType[1m[31m][0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[1m[31m [0m[1m[31m [0m][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[1m[31m)[0m[1m[31m<[0m[1m[31m/[0m[1m[31mnonsensical[0m[1m[31m>[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mRequired: scala.collection.mutable.Map[([1m[32mInt[0m, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: elab[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   (elab : [0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scala.collection.mutable.Map[(<error Not found: type int>, Int), [0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m )[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scala.collection.mutable.Map[(Int, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> (elab :    scala.collection.mutable.Map[(<error Not found: type int>, Int),      collection.mutable.Set[scalation.ValueType]   ] )  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> (Int, Int)  <:  (<error Not found: type int>, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> scala.type  <:  (scala : scala.type)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== scala.type  <:  (scala : scala.type) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> Int  <:  <error Not found: type int>[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== Int  <:  <error Not found: type int> = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== (Int, Int)  <:  (<error Not found: type int>, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> (<error Not found: type int>, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> (scala : scala.type)  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== (scala : scala.type)  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> <error Not found: type int>  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== <error Not found: type int>  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== (<error Not found: type int>, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m             ==> Double | Int  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m               ==> Double  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m               <== Double  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m             <== Double | Int  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> scala.collection.mutable.Map[(<error Not found: type int>, Int),    collection.mutable.Set[scalation.ValueType] ]  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> (Int, Int)  <:  (<error Not found: type int>, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> scala.type  <:  (scala : scala.type)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== scala.type  <:  (scala : scala.type) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Int  <:  <error Not found: type int>[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Int  <:  <error Not found: type int> = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== (Int, Int)  <:  (<error Not found: type int>, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> (<error Not found: type int>, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> (scala : scala.type)  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== (scala : scala.type)  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> <error Not found: type int>  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== <error Not found: type int>  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== (<error Not found: type int>, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       ==> scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         ==> Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           ==> Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m             ==> Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m               ==> Double | Int  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                 ==> Double  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                 <== Double  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m               <== Double | Int  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m             <== Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           <== Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         <== Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       <== scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== scala.collection.mutable.Map[(<error Not found: type int>, Int),    collection.mutable.Set[scalation.ValueType] ]  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== (elab :    scala.collection.mutable.Map[(<error Not found: type int>, Int),      collection.mutable.Set[scalation.ValueType]   ] )  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: elab[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (elab : [0m
+[0m[[0m[31merror[0m] [0m[0m  scala.collection.mutable.Map[(<error Not found: type int>, Int), [0m
+[0m[[0m[31merror[0m] [0m[0m    collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m  ][0m
+[0m[[0m[31merror[0m] [0m[0m)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scala.collection.mutable.Map[(Int, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (elab :    scala.collection.mutable.Map[(<error Not found: type int>, Int),      collection.mutable.Set[scalation.ValueType]   ] )  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m    ==> (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type[0m
+[0m[[0m[31merror[0m] [0m[0m    <== (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> (Int, Int)  <:  (<error Not found: type int>, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> scala.type  <:  (scala : scala.type)[0m
+[0m[[0m[31merror[0m] [0m[0m      <== scala.type  <:  (scala : scala.type) = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> Int  <:  <error Not found: type int>[0m
+[0m[[0m[31merror[0m] [0m[0m      <== Int  <:  <error Not found: type int> = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m        <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m    <== (Int, Int)  <:  (<error Not found: type int>, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> (<error Not found: type int>, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> (scala : scala.type)  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m      <== (scala : scala.type)  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> <error Not found: type int>  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m      <== <error Not found: type int>  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m        <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m    <== (<error Not found: type int>, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m      ==> Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m          ==> Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m            ==> Double | Int  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m              ==> Double  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m              <== Double  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m            <== Double | Int  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m          <== Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m      <== Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scala.collection.mutable.Map[(<error Not found: type int>, Int),    collection.mutable.Set[scalation.ValueType] ]  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type[0m
+[0m[[0m[31merror[0m] [0m[0m      <== (scala.collection.mutable : scala.collection.mutable.type)  <:  scala.collection.mutable.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> (Int, Int)  <:  (<error Not found: type int>, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> scala.type  <:  (scala : scala.type)[0m
+[0m[[0m[31merror[0m] [0m[0m        <== scala.type  <:  (scala : scala.type) = true[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Int  <:  <error Not found: type int>[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Int  <:  <error Not found: type int> = true[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m          ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m          <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== (Int, Int)  <:  (<error Not found: type int>, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> (<error Not found: type int>, Int)  <:  (Int, Int)[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> (scala : scala.type)  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m        <== (scala : scala.type)  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> <error Not found: type int>  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m        <== <error Not found: type int>  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Int  <:  Int[0m
+[0m[[0m[31merror[0m] [0m[0m          ==> scala.type  <:  scala.type[0m
+[0m[[0m[31merror[0m] [0m[0m          <== scala.type  <:  scala.type = true[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Int  <:  Int = true[0m
+[0m[[0m[31merror[0m] [0m[0m      <== (<error Not found: type int>, Int)  <:  (Int, Int) = true[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m        ==> Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m          ==> Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m            ==> Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m              ==> Double | Int  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m                ==> Double  <:  collection.mutable.Set[scalation.ValueType][0m
+[0m[[0m[31merror[0m] [0m[0m                <== Double  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m              <== Double | Int  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m            <== Double | Int | Long  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m          <== Double | Int | Long | String  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m        <== Double | Int | Long | String | scalation.TimeNum  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m      <== scalation.ValueType  <:  collection.mutable.Set[scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scala.collection.mutable.Map[(<error Not found: type int>, Int),    collection.mutable.Set[scalation.ValueType] ]  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (elab :    scala.collection.mutable.Map[(<error Not found: type int>, Int),      collection.mutable.Set[scalation.ValueType]   ] )  <:  scala.collection.mutable.Map[(Int, Int), scalation.ValueType] = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/database/graph_pm/MuGraphGen.scala:29:4 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m29 |[0m    [33mprivate[0m [33mval[0m stream = [31m0[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m    ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m    Line is indented too far to the right, or a `{` or `:` is missing[0m
+[0m[[0m[31merror[0m] [0m[0m15 errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 1 s, completed Oct 3, 2022, 1:36:17 AM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(shell, None, None)[0m
