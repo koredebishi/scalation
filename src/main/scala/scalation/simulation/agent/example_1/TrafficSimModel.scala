@@ -28,6 +28,22 @@ import scala.collection.mutable.{ArrayBuffer, HashMap, ListBuffer, ListMap}
 import scala.math.{abs, min}
 import scala.util.control.Breaks.{break, breakable}
 
+/***
+ * I am creating this to learn
+ */
+//
+//var PDQ: Array[Int] = null
+//var stream:  Int = 0
+//var timeBegin: Int = 30
+//var timeEnd: Int = 31
+//var nt: Int = 288 //
+//var week: Int = 30
+//var arrival = OFFLINE
+//val numLanes = 5 // Lanes for the car
+//val (junx,juny) = convertCoordinate()
+
+
+
 var PDQ: Array[Int] = null  //setting for SARIMA model
 var stream: Int = 0
 var timeBegin: Int = 24     //for nhpp 24(No. 24 interval)x15(15 minutes interval) ->6 am, 72x15-> 6 pm
@@ -35,7 +51,7 @@ var timeEnd: Int = 25       //for nhpp
 var nt: Int = 96            // 25 hours was divided by the nt: the num of interval. 96-> 15 minutes interval. 288 is 5 minutes interval.
 var week: Int =25           //25, 30. each col is a day, row
 var arrival = OFFLINE
-val numLanes =3
+val numLanes =4    // Initial    3 creating 4 lane Korede
 val (junx,juny) = convertCoordinate()
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** TrafficSimulation companion objects prepares the data and arrival model for calibration.
@@ -159,8 +175,8 @@ object TrafficSimulation:
             c(i - t1) = (yy(i) / yy(i - 1)).mean
         end for
         c
+        println(s"The value of CalcPercentage is $c")
     end calcPercentages
-
 
     def calcDifferences(w: Int, t1: Int, t2: Int, y: MatrixD): VectorD =
 
@@ -170,6 +186,7 @@ object TrafficSimulation:
             c(i - t1) = (yy(i) - yy(i - 1)).mean
         end for
         c
+        println(s"The vale of CalcDifference is $c")
     end calcDifferences
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -187,6 +204,7 @@ object TrafficSimulation:
             val data = Array.ofDim[MatrixD](names.length)
         end if
         sc
+        println(s"The sink Choice is $sc")
     end createSinkChoice
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -247,7 +265,7 @@ end TrafficSimulation
  */
 class TrafficSimulation(name: String, nt: Int, anim: Boolean, strPath: String,
                         x: VectorD, numLanes: Int, t1: Int = timeBegin, t2: Int = timeEnd)
-    extends Model (name, animating = anim, aniRatio = 80.0): //, w = 10000, h = 7000, labels = false
+    extends Model (name, animating = anim, aniRatio = 300.0): //, w = 10000, h = 7000, labels = false
     import TrafficSimulation.*
 
     //val cars = Array.ofDim[ArrayBuffer[Vehicle]](numLanes)
@@ -273,11 +291,16 @@ class TrafficSimulation(name: String, nt: Int, anim: Boolean, strPath: String,
         nhpp._2, Source.at(junx(0),juny(0)), nt) //car() cannot be accessed in other class
     val sensor1 = Sensor(JuncInfo(1)(0), this, Junction.at(junx(1), juny(1)), nt)
     val sensor2 = Sensor(JuncInfo(2)(0), this, Junction.at(junx(2), juny(2)), nt)
-    val juncs = Array(sensor1, sensor2)
+    val sensor3 = Sensor(JuncInfo(3)(0), this, Junction.at(junx(3), juny(3)), nt)  // Korede added this
+   // val sensor4 = Sensor(JuncInfo(4)(0), this, Junction.at(junx(4), juny(4)), nt) // Korede added this
+    val juncs = Array(sensor1, sensor2, sensor3) //Korede increase the sensor (3 & 4)
     val exit = new Exit(JuncInfo(3)._1,this,pos= Sink.at(junx(3), juny(3)), mm=Double.MaxValue, nt=nt)
     val highway0 = new Highway("highway0",this, entry.vert, sensor1, numLanes,highway_vmax)
     val highway1 = new Highway("highway1",this, sensor1, sensor2, numLanes,highway_vmax)
     val highway2 = new Highway("highway2",this, sensor2, exit, numLanes,highway_vmax)
+    val highway3 = new Highway("highway3", this, sensor3, exit, numLanes, highway_vmax) // Korede added this
+  //  val highway4 = new Highway("highway4", this, sensor4, exit, numLanes, highway_vmax) // Korede added this
+
     //the rest component are constants in the companion object
     //addComponents(List(entry,sensor1,sensor2,exit,highway0,highway1,highway2))
 
@@ -377,7 +400,7 @@ class TrafficSimulation(name: String, nt: Int, anim: Boolean, strPath: String,
         //::::::::::::::::::::::::::::::::::::::::::::::::::
         /** Method to choose which lane the car should be in
          *
-         * @param ii the lane chosen randommly
+         * @param ii the lane chosen randomly
          */
         def chooseLane(): Int =
 
