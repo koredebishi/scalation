@@ -1,0 +1,25 @@
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] IncrementalCompile -----------[0m
+[0m[[0m[0mdebug[0m] [0m[0mIncrementalCompile.incrementalCompile[0m
+[0m[[0m[0mdebug[0m] [0m[0mprevious = Stamps for: 0 products, 0 sources, 0 libraries[0m
+[0m[[0m[0mdebug[0m] [0m[0mcurrent source = Set(${BASE}/src/test/scala/testing/Tester.scala, ${BASE}/src/test/scala/testing/mathstat/VectorD_T.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0m> initialChanges = InitialChanges(Changes(added = Set(${BASE}/src/test/scala/testing/mathstat/VectorD_T.scala, ${BASE}/src/test/scala/testing/Tester.scala), removed = Set(), changed = Set(), unmodified = ...),Set(),Set(),API Changes: Set())[0m
+[0m[[0m[0mdebug[0m] [0m[0mFull compilation, no sources in previous analysis.[0m
+[0m[[0m[0mdebug[0m] [0m[0mall 2 sources are invalidated[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: [0m
+[0m[[0m[0mdebug[0m] [0m[0mRecompiling all sources: number of invalidated sources > 50.0 percent of all sources[0m
+[0m[[0m[0mdebug[0m] [0m[0mcompilation cycle 1[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 2 Scala sources to /Users/mac/Desktop/scalation_2.0/target/scala-3.3.1/test-classes ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mReturning already retrieved and compiled bridge: /Users/mac/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-sbt-bridge/3.3.1/scala3-sbt-bridge-3.3.1.jar.[0m
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] Running cached compiler 703fa95 for Scala Compiler version 3.3.1[0m
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] The Scala compiler is invoked with:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-deprecation[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-explain[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-new-syntax[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-Wunused:imports[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-Xfatal-warnings[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-bootclasspath[0m
+[0m[[0m[0mdebug[0m] [0m[0m	/Users/mac/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.3.1/scala3-library_3-3.3.1.jar:/Users/mac/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-classpath[0m
+[0m[[0m[0mdebug[0m] [0m[0m	/Users/mac/Desktop/scalation_2.0/target/scala-3.3.1/test-classes:/Users/mac/Desktop/scalation_2.0/target/scala-3.3.1/classes:/Users/mac/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/code/gson/gson/2.10/gson-2.10.jar:/Users/mac/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-api/5.9.1/junit-jupiter-api-5.9.1.jar:/Users/mac/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/Users/mac/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/junit/platform/junit-platform-commons/1.9.1/junit-platform-commons-1.9.1.jar:/Users/mac/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0mScala compilation took 9.810964125 s[0m
+[0m[[0m[0mdebug[0m] [0m[0mdone compiling[0m
