@@ -1,0 +1,76 @@
+package scalation
+package database
+
+
+class DoublyLinkedList[T <: Comparable[T]]:
+
+  private val debug = debugf("DoublyLinkedList", true)
+  private val flow  = flawf("DoublyLinkedList")
+  private var head  = new nodeType()    // The head of this DLL
+
+  var keyCount = 0     // return the size of this DoublyLinkedList
+
+  def size () : Int =
+    if head = null && head.next = null then banner(s"This is an empty DDL with size $keyCount")
+
+    keyCount =1
+    var node = head.next
+    while head != null && head.next != null do
+      keyCount +=1
+      node = node.next
+
+
+
+
+
+
+
+
+
+
+
+  def search():
+
+  end search
+
+
+  def show(): Unit =
+
+
+  end show
+
+
+  def delete():
+
+  end delete
+
+
+
+end DoublyLinkedList
+
+
+class nodeType[T <: Comparable[T]]:
+  var info: T
+  var next: nodeType[T] = null
+  var prev: nodeType[T] = null
+end nodeType
+
+
+@main def DoublyText (): Unit =
+
+
+
+end DoublyText
+
+
+//def size(): Int =
+//  if head == null && head.info == null then
+//    banner(s"The size of this DLL is $keyCount")
+//  keyCount += 1
+//  var node = head.next
+//  while node != null do
+//    keyCount += 1
+//    node = node.next
+//  keyCount
+//end size
+

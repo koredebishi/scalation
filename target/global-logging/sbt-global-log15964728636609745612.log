@@ -1,0 +1,20 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(runMain scalation.modeling.simpleRegressionTest3, Some(c7ac1ae4-05e0-46a5-95e8-157484a82858), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / runMain[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /Users/nancymiller/jam/software/scalation/scalation_2.0/target/scala-3.2.2/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/modeling/SimpleRegression.scala:299:42 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m299 |[0m    [33mval[0m [36mtrg[0m = TranRegression (ox, y, tran = sqrt, itran = sq)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                     ^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[33mmethod[0m [35mapply[0m in [33mobject[0m [35mTranRegression[0m: (x: scalation.mathstat.MatrixD, y: scalation.mathstat.VectorD, fname: [0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  Array[String][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m, hparam: scalation.HyperParameter): scalation.modeling.TranRegression does not have a parameter tran[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/nancymiller/jam/software/scalation/scalation_2.0/src/main/scala/scalation/modeling/SimpleRegression.scala:299:56 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m299 |[0m    [33mval[0m [36mtrg[0m = TranRegression (ox, y, tran = sqrt, itran = sq)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                  ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[33mmethod[0m [35mapply[0m in [33mobject[0m [35mTranRegression[0m: (x: scalation.mathstat.MatrixD, y: scalation.mathstat.VectorD, fname: [0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  Array[String][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m, hparam: scalation.HyperParameter): scalation.modeling.TranRegression does not have a parameter itran[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 0 s, completed Apr 24, 2023, 6:39:59 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(shell, None, None)[0m
