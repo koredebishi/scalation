@@ -129,7 +129,7 @@ object RegressionTreeGB:
             null
         else
             val (x, y) = (xy.not (?, col), xy(?, col))
-            new RegressionTreeGB (x, y, fname, hparam) 
+            new RegressionTreeGB (x, y, fname, hparam)
         end if
     end apply
 
@@ -149,7 +149,7 @@ object RegressionTreeGB:
             null
         else
 // FIX - add rescale
-            new RegressionTreeGB (x, y, fname, hparam) 
+            new RegressionTreeGB (x, y, fname, hparam)
         end if
     end rescale
 
@@ -286,4 +286,8 @@ end regressionTreeGBTest3
 //  println (mod.summary ())                                         // parameter/coefficient statistics
 
 end regressionTreeGBTest4
+
+
+
+
 

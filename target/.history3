@@ -1,1 +1,11 @@
-1697220587178:;set _root_.scala.collection.Seq(historyPath := None,shellPrompt := { _ => "" },SettingKey[_root_.scala.Option[_root_.sbt.File]]("sbtStructureOutputFile") in _root_.sbt.Global := _root_.scala.Some(_root_.sbt.file("/private/var/folders/qt/hkk8vv5920j9v2q78yyd3flh0000gn/T/sbt-structure.xml")),SettingKey[_root_.java.lang.String]("sbtStructureOptions") in _root_.sbt.Global := "download, resolveClassifiers, resolveSbtClassifiers");apply -cp "/Users/mac/Library/Application Support/JetBrains/IdeaIC2023.1/plugins/Scala/repo/org/jetbrains/scala/sbt-structure-extractor_2.12_1.0/2023.1.0/sbt-structure-extractor-2023.1.0.jar" org.jetbrains.sbt.CreateTasks;preferScala2;*/*:dumpStructure
+1709130618519:compile
+1711995122953:runMain scalation.simulation.process.example_1.runOneWayVehicle
+1720288871485:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
+1720289848038:exit
+1720289907588:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
+1720312537762:exit
+1720312581999:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
+1720317522062:exit
+1720317573927:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
+1720317988082:runMain scalation.simulation.process.example_1.runOneWayVehicle3L
+1720319812175:runMain scalation.simulation.process.example_1.runOneWayVehicle2L

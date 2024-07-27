@@ -5,13 +5,14 @@
  *  @date    Wed Oct 20 14:54:48 EDT 2021
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   A Bus Is Used to Transport Several SimActors Together
+ *  @note    A Bus Is Used to Transport Several SimActors Together
  */
 
 package scalation
 package simulation
 package process
 
+import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
 
 import scalation.random.Variate
@@ -25,37 +26,44 @@ import scalation.random.Variate
  *  @param cap       the capacity of this bus
  */
 abstract class Bus (name: String, director: Model, lTime: Variate, cap: Int)
-     extends SimActor ("b", director):
+         extends SimActor ("bus_$name", director):
 
-    private val rider   = Array.ofDim [SimActor] (cap)           // seats on this bus 
-    private var nRiders = 0                                      // current number of riders
+    private val debug = debugf ("Resource", true)                  // debug function
+
+    private val rider   = Array.ofDim [SimActor] (cap)             // seats on this bus 
+    private var nRiders = 0                                        // current number of riders
+
+    debug ("init", s"name = bus_$name, located at ${stringOf (at)}")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Load actors/riders waiting for this bus in queue q.
+    /** Load actors/riders waiting for this bus in queue que.
      *  @param que  the wait queue where actors are waiting for the bus
      */
     def load (que: WaitQueue): Unit =
+        val delay = lTime.gen                                      // common loading delay for all riders
+        schedule (delay)                                           // bus delay for loading riders
         breakable {
-            for i <- 0 to cap if rider(i) == null do             // find next open seat
-                if que.isEmpty then break ()                     // break when queue empties
-                rider(i) = que.dequeue ()                        // rider from queue takes seat i
-                nRiders += 1                                     // increment the number of riders
+            for i <- 0 to cap if rider(i) == null do               // find next open seat
+                if que.isEmpty then break ()                       // break when queue empties
+                rider(i) = que.dequeue ()                          // rider from queue takes seat i
+                nRiders += 1                                       // increment the number of riders
             end for
         } // breakable
     end load
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Unload actors/riders from this bus onto transport t.
-     *  @param tran      the transport for actors departing this bus
+    /** Unload actors/riders from this bus onto transport tran.
+     *  @param tran  the transport for actors departing this bus
      */
     def unload (tran: Transport): Unit =
+        val delay = lTime.gen                                      // common unloading delay for all riders
+        schedule (delay)                                           // bus delay for unloading riders
         for i <- 0 until nRiders do
-            val r_i = rider(i)                                   // consider the i-th rider
-            if r_i.nextTransport == tran then                    // rider i wants to exit
-                r_i.schedule (i)                                 // FIX - use longer delay
-                rider(i) = null                                  // open seat i
-                nRiders -= 1                                     // decrement the number of riders
-            end if
+            val r_i = rider(i)                                     // consider the i-th rider
+            if r_i.nextTransport == tran then                      // rider i wants to exit the bus
+                r_i.schedule (i)                                   // assitional delay for each rider
+                rider(i) = null                                    // open seat i
+                nRiders -= 1                                       // decrement the number of riders
         end for
     end unload
 

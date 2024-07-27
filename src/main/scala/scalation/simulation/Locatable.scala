@@ -5,7 +5,7 @@
  *  @date    Wed Feb  5 17:41:18 EST 2014
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Locatable Objects Have a Location
+ *  @note    Locatable Objects Have a Location
  */
 
 package scalation
@@ -36,7 +36,7 @@ trait Locatable:
      */
     def at_= (at: Array [Double]): Unit =
         if _at == null && at != null then _at = at
-        else flaw ("at_=", "location may only be set once")
+        else flaw ("at_=", s"location may only be set once - $this ")
     end at_=
 
 end Locatable

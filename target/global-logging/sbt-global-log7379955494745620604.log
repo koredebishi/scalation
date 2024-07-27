@@ -1,0 +1,124 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading PlotM$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/PlotM$package.tasty[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading Probability$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/Probability$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading RTensor4D$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/RTensor4D$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading RTensorD$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/RTensorD$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading StatTable$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/StatTable$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading Statistic$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/Statistic$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading Stats4TS$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/Stats4TS$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading TensorD$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/TensorD$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading TimeStatistic$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/TimeStatistic$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading TnT_Split$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/TnT_Split$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading VMatrixD$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/VMatrixD$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading VectorD$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/VectorD$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading VectorI$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/VectorI$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading VectorL$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/VectorL$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading VectorS$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/VectorS$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading VectorT$package,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/VectorT$package.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading VectorD,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/VectorD.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading Source,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/simulation/process/Source.class[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/example_1/OneWayVehicle.scala:56:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m56 |[0m    [33mval[0m [36mlane[0m  = VTransport ([31m"lane"[0m, entry, exit, motion, [31mfalse[0m, [31m0.25[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                    ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0mFound:    [1m[31m([0m[1m[31mOneWayVehicleModel[0m[1m[31m.[0m[1m[31mthis[0m[1m[31m.[0m[1m[31mentry[0m[1m[31m [0m[1m[31m:[0m[1m[31m [0mscalation.simulation.process.[1m[31mVSource[0m[1m[31m)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0mRequired: scalation.simulation.process.[1m[32mComponent[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Tree: [33mthis[0m.entry[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   scalation.simulation.process.Component[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   ==> (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)  <:  scalation.simulation.process.Component[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     ==> scalation.simulation.process.VSource  <:  scalation.simulation.process.Component (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     <== scalation.simulation.process.VSource  <:  scalation.simulation.process.Component (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   <== (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)  <:  scalation.simulation.process.Component = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: [33mthis[0m.entry[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.simulation.process.Component[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)  <:  scalation.simulation.process.Component[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scalation.simulation.process.VSource  <:  scalation.simulation.process.Component (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scalation.simulation.process.VSource  <:  scalation.simulation.process.Component (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)  <:  scalation.simulation.process.Component = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading Recorder,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/simulation/process/Recorder.class[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/example_1/OneWayVehicle.scala:58:18 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m58 |[0m    addComponent (entry, exit, lane)                      [34m// Caveat: must add from and to before transport!![0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                  ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0mFound:    [1m[31m([0m[1m[31mOneWayVehicleModel[0m[1m[31m.[0m[1m[31mthis[0m[1m[31m.[0m[1m[31mentry[0m[1m[31m [0m[1m[31m:[0m[1m[31m [0mscalation.simulation.process.[1m[31mVSource[0m[1m[31m)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0mRequired: scalation.simulation.process.[1m[32mComponent[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Tree: [33mthis[0m.entry[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   scalation.simulation.process.Component[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   ==> (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)  <:  scalation.simulation.process.Component[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     ==> scalation.simulation.process.VSource  <:  scalation.simulation.process.Component (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     <== scalation.simulation.process.VSource  <:  scalation.simulation.process.Component (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   <== (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)  <:  scalation.simulation.process.Component = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: [33mthis[0m.entry[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.simulation.process.Component[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)  <:  scalation.simulation.process.Component[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scalation.simulation.process.VSource  <:  scalation.simulation.process.Component (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scalation.simulation.process.VSource  <:  scalation.simulation.process.Component (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (OneWayVehicleModel.this.entry : scalation.simulation.process.VSource)  <:  scalation.simulation.process.Component = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m21 errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 19 s, completed Apr 13, 2024, 9:15:11 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

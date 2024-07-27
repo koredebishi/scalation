@@ -5,14 +5,14 @@
  *  @date    Mon Sep  7 15:05:06 EDT 2009
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Source Creates Enitties/SimActors
+ *  @note    Source Creates Entities/SimActors
  */
 
 package scalation
 package simulation
 package process
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer => VEC}
 import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
 
@@ -36,14 +36,17 @@ import scalation.scala2d.Colors._
 class Source (name: String, director: Model, makeEntity: () => SimActor,
               esubtype: Int, units: Int,
               iArrivalTime: Variate, loc: Array [Double])
-      extends SimActor (name, director) with Component:
+    extends SimActor (name, director)
+        with Component
+        with Recorder ():
 
     initStats (name)
     at = loc
+    println(s"${Console.RED} initializing $this inside Source: ${stringOf (at)} ${Console.RESET}")
 
-    private val debug = debugf ("Source", true)                        // debug function
-    
-    debug ("Init", s"located at ${stringOf (at)}")
+    private val debug = debugf ("Source", true)                              // debug function
+
+    debug ("Init", s"name = $name with cor_id = $id, located at ${stringOf (at)}")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.
@@ -58,7 +61,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor,
     def this (name: String, director: Model, makeEntity: () => SimActor, esubtype: Int,
               units: Int, iArrivalTime: Variate, xy: (Double, Double)) =
         this (name, director, makeEntity, esubtype, units, iArrivalTime,
-              Array (xy._1, xy._2, 20.0, 20.0))
+            Array (xy._1, xy._2, 20.0, 20.0))
     end this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -72,43 +75,42 @@ class Source (name: String, director: Model, makeEntity: () => SimActor,
     /** The `Source`s as special `SimActor` will act over time to make entities
      *  (other `SimActor`s).
      */
-    def act (): Unit =
-        for rep <- 1 to director.reps do                                     // major loop - replications
+    override def act (): Unit =
+        for rep <- 1 to director.reps do                                     // MAJOR LOOP - replications
             actTime = director.clock                                         // set to model start time
 
             breakable {
                 debug ("act", s"start making $units SimActors")
-                for i <- 1 to units do                                       // minor loop - make actors
+                for i <- 1 to units do                                       // MINOR LOOP - make actors
                     if director.stopped then
                         println (s"Source.act: simulation unexpectedly ended at ${director.clock}")
-                        break ()                        // terminate source, simulation ended
-                    end if
+                        break ()                                             // terminate source, simulation ended
                     val actor = makeEntity ()                                // make new actor
                     actor.mySource = this                                    // actor's source
-                    actor.subtype  = esubtype                                // set the entity subtype 
+                    actor.subtype  = esubtype                                // set the entity subtype
                     director.numActors += 1                                  // number of actors created by all sources, so far
                     director.log.trace (this, "generates", actor, director.clock)
                     director.animate (actor, CreateToken, randomColor (actor.id), Ellipse (),
-                             Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
+                        Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
                     actor.schedule (0.0)
 
                     if i < units then
                         val duration = iArrivalTime.gen
-                        tally (duration)
+                        val ctime    = director.clock                        // clock time
+                        tally (duration)                                     // tally duration
+                        record (actor, ctime)                                // record actor flow
                         schedule (duration)
                         yieldToDirector ()                                   // yield and wait duration time units
-                    end if
                 end for
             } // breakable
 
             if rep < director.reps then
                 director.log.trace (this, "wait for next rep", director, director.clock)
-                yieldToDirector ()                                // yield and wait for next replication
-            end if
+                yieldToDirector ()                                           // yield and wait for next replication
         end for
 
         director.log.trace (this, "terminates", null, director.clock)
-        yieldToDirector (true)                                    // yield and terminate
+        yieldToDirector (true)                                               // yield and terminate
     end act
 
 end Source
@@ -130,9 +132,9 @@ object Source:
      *  @param xy            the (x, y) coordinates for the top-left corner of the source.
      */
     def apply (name: String, director: Model, makeEntity: () => SimActor, esubtype: Int, units: Int,
-              iArrivalTime: Variate, xy: (Int, Int)): Source =
+               iArrivalTime: Variate, xy: (Int, Int)): Source =
         new Source (name, director, makeEntity, esubtype, units, iArrivalTime,
-                    Array (xy._1.toDouble, xy._2.toDouble, 20.0, 20.0))
+            Array (xy._1.toDouble, xy._2.toDouble, 20.0, 20.0))
     end apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -145,9 +147,9 @@ object Source:
      */
     def group (director: Model, makeEntity: () => SimActor, units: Int, xy: (Int, Int),
                src: (String, Int, Variate, (Int, Int))*): List [Source] =
-        val sourceGroup = new ListBuffer [Source] ()
+        val sourceGroup = new VEC [Source] ()
         for s <- src do sourceGroup += Source (s._1, director, makeEntity, s._2, units, s._3,
-                                              (xy._1 + s._4._1, xy._2 + s._4._2))
+            (xy._1 + s._4._1, xy._2 + s._4._2))
         sourceGroup.toList
     end group
 
@@ -169,7 +171,7 @@ end Source
         addComponent (maker)
 
         case class Car () extends SimActor ("c", CarModel):
-            def act (): Unit = println ("act")
+            override def act (): Unit = println ("act")
         end Car
 
     end CarModel
@@ -179,4 +181,3 @@ end Source
     Model.shutdown ()
 
 end sourceTest
-

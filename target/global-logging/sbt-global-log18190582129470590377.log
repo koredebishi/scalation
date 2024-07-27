@@ -1,0 +1,113 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[31merror[0m] [0m[0m## Exception when compiling 465 sources to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes[0m
+[0m[[0m[31merror[0m] [0m[0mjava.lang.IllegalArgumentException: requirement failed: Source file '/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/scala2d/Shapes$package$Canvas$1.class' does not exist.[0m
+[0m[[0m[31merror[0m] [0m[0mscala.Predef$.require(Predef.scala:281)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.io.IO$.copyFile(IO.scala:896)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.io.IO$.move(IO.scala:1119)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.ClassFileManager$TransactionalClassFileManager.move(ClassFileManager.scala:249)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.ClassFileManager$TransactionalClassFileManager.$anonfun$deleteImpl$4(ClassFileManager.scala:211)[0m
+[0m[[0m[31merror[0m] [0m[0mscala.collection.Iterator.foreach(Iterator.scala:943)[0m
+[0m[[0m[31merror[0m] [0m[0mscala.collection.Iterator.foreach$(Iterator.scala:943)[0m
+[0m[[0m[31merror[0m] [0m[0mscala.collection.AbstractIterator.foreach(Iterator.scala:1431)[0m
+[0m[[0m[31merror[0m] [0m[0mscala.collection.IterableLike.foreach(IterableLike.scala:74)[0m
+[0m[[0m[31merror[0m] [0m[0mscala.collection.IterableLike.foreach$(IterableLike.scala:73)[0m
+[0m[[0m[31merror[0m] [0m[0mscala.collection.AbstractIterable.foreach(Iterable.scala:56)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.ClassFileManager$TransactionalClassFileManager.deleteImpl(ClassFileManager.scala:211)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.ClassFileManager$TransactionalClassFileManager.delete(ClassFileManager.scala:202)[0m
+[0m[[0m[31merror[0m] [0m[0mxsbti.compile.WrappedClassFileManager.delete(WrappedClassFileManager.java:45)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCommon$.pruneClassFilesOfInvalidations(IncrementalCommon.scala:862)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCommon$CycleState.next(IncrementalCommon.scala:93)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCommon$$anon$1.next(IncrementalCommon.scala:56)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCommon$$anon$1.next(IncrementalCommon.scala:52)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCommon.cycle(IncrementalCommon.scala:263)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.Incremental$.$anonfun$incrementalCompile$8(Incremental.scala:419)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.Incremental$.withClassfileManager(Incremental.scala:506)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.Incremental$.incrementalCompile(Incremental.scala:406)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.Incremental$.apply(Incremental.scala:172)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCompilerImpl.compileInternal(IncrementalCompilerImpl.scala:534)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileIncrementally$1(IncrementalCompilerImpl.scala:488)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCompilerImpl.handleCompilationError(IncrementalCompilerImpl.scala:332)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCompilerImpl.compileIncrementally(IncrementalCompilerImpl.scala:425)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.inc.IncrementalCompilerImpl.compile(IncrementalCompilerImpl.scala:137)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.Defaults$.compileIncrementalTaskImpl(Defaults.scala:2371)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.Defaults$.$anonfun$compileIncrementalTask$2(Defaults.scala:2321)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.server.BspCompileTask$.$anonfun$compute$1(BspCompileTask.scala:31)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.io.Retry$.apply(Retry.scala:47)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.io.Retry$.apply(Retry.scala:29)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.io.Retry$.apply(Retry.scala:24)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.server.BspCompileTask$.compute(BspCompileTask.scala:31)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.Defaults$.$anonfun$compileIncrementalTask$1(Defaults.scala:2319)[0m
+[0m[[0m[31merror[0m] [0m[0mscala.Function1.$anonfun$compose$1(Function1.scala:49)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.util.$tilde$greater.$anonfun$$u2219$1(TypeFunctions.scala:63)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.std.Transform$$anon$4.work(Transform.scala:69)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.Execute.$anonfun$submit$2(Execute.scala:283)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.internal.util.ErrorHandling$.wideConvert(ErrorHandling.scala:24)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.Execute.work(Execute.scala:292)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.Execute.$anonfun$submit$1(Execute.scala:283)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.ConcurrentRestrictions$$anon$4.$anonfun$submitValid$1(ConcurrentRestrictions.scala:265)[0m
+[0m[[0m[31merror[0m] [0m[0msbt.CompletionService$$anon$2.call(CompletionService.scala:65)[0m
+[0m[[0m[31merror[0m] [0m[0mjava.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)[0m
+[0m[[0m[31merror[0m] [0m[0mjava.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)[0m
+[0m[[0m[31merror[0m] [0m[0mjava.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)[0m
+[0m[[0m[31merror[0m] [0m[0mjava.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)[0m
+[0m[[0m[31merror[0m] [0m[0mjava.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)[0m
+[0m[[0m[31merror[0m] [0m[0mjava.base/java.lang.Thread.run(Thread.java:1583)[0m
+[0m[[0m[31merror[0m] [0m[0m           [0m
+[0m[[0m[0mdebug[0m] [0m[0mForcing garbage collection...[0m
+[0m[[0m[31merror[0m] [0m[0mjava.lang.IllegalArgumentException: requirement failed: Source file '/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/scala2d/Shapes$package$Canvas$1.class' does not exist.[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.Predef$.require(Predef.scala:281)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.io.IO$.copyFile(IO.scala:896)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.io.IO$.move(IO.scala:1119)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.ClassFileManager$TransactionalClassFileManager.move(ClassFileManager.scala:249)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.ClassFileManager$TransactionalClassFileManager.$anonfun$deleteImpl$4(ClassFileManager.scala:211)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.collection.Iterator.foreach(Iterator.scala:943)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.collection.Iterator.foreach$(Iterator.scala:943)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.collection.AbstractIterator.foreach(Iterator.scala:1431)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.collection.IterableLike.foreach(IterableLike.scala:74)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.collection.IterableLike.foreach$(IterableLike.scala:73)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.collection.AbstractIterable.foreach(Iterable.scala:56)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.ClassFileManager$TransactionalClassFileManager.deleteImpl(ClassFileManager.scala:211)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.ClassFileManager$TransactionalClassFileManager.delete(ClassFileManager.scala:202)[0m
+[0m[[0m[31merror[0m] [0m[0m	at xsbti.compile.WrappedClassFileManager.delete(WrappedClassFileManager.java:45)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCommon$.pruneClassFilesOfInvalidations(IncrementalCommon.scala:862)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCommon$CycleState.next(IncrementalCommon.scala:93)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCommon$$anon$1.next(IncrementalCommon.scala:56)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCommon$$anon$1.next(IncrementalCommon.scala:52)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCommon.cycle(IncrementalCommon.scala:263)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.Incremental$.$anonfun$incrementalCompile$8(Incremental.scala:419)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.Incremental$.withClassfileManager(Incremental.scala:506)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.Incremental$.incrementalCompile(Incremental.scala:406)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.Incremental$.apply(Incremental.scala:172)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCompilerImpl.compileInternal(IncrementalCompilerImpl.scala:534)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileIncrementally$1(IncrementalCompilerImpl.scala:488)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCompilerImpl.handleCompilationError(IncrementalCompilerImpl.scala:332)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCompilerImpl.compileIncrementally(IncrementalCompilerImpl.scala:425)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.inc.IncrementalCompilerImpl.compile(IncrementalCompilerImpl.scala:137)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Defaults$.compileIncrementalTaskImpl(Defaults.scala:2371)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Defaults$.$anonfun$compileIncrementalTask$2(Defaults.scala:2321)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.server.BspCompileTask$.$anonfun$compute$1(BspCompileTask.scala:31)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.io.Retry$.apply(Retry.scala:47)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.io.Retry$.apply(Retry.scala:29)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.io.Retry$.apply(Retry.scala:24)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.server.BspCompileTask$.compute(BspCompileTask.scala:31)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Defaults$.$anonfun$compileIncrementalTask$1(Defaults.scala:2319)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.Function1.$anonfun$compose$1(Function1.scala:49)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.util.$tilde$greater.$anonfun$$u2219$1(TypeFunctions.scala:63)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.std.Transform$$anon$4.work(Transform.scala:69)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Execute.$anonfun$submit$2(Execute.scala:283)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.util.ErrorHandling$.wideConvert(ErrorHandling.scala:24)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Execute.work(Execute.scala:292)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Execute.$anonfun$submit$1(Execute.scala:283)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.ConcurrentRestrictions$$anon$4.$anonfun$submitValid$1(ConcurrentRestrictions.scala:265)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.CompletionService$$anon$2.call(CompletionService.scala:65)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.lang.Thread.run(Thread.java:1583)[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) java.lang.IllegalArgumentException: requirement failed: Source file '/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/scala2d/Shapes$package$Canvas$1.class' does not exist.[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 9 s, completed Jul 12, 2024, 10:23:13 AM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m
