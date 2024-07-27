@@ -5,7 +5,7 @@
  *  @date    Mon Sep  7 15:05:06 EDT 2009
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Base Trait for Simulation Components
+ *  @note    Base Trait for Simulation Components
  */
 
 package scalation
@@ -16,6 +16,8 @@ import scala.collection.mutable.{ArrayBuffer => VEC}
 //import scala.collection.mutable.{ListBuffer => VEC}
 
 import scalation.mathstat.{Statistic, TimeStatistic}
+import scala.runtime.ScalaRunTime.stringOf
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Component` trait provides basic common feature for simulation components.
@@ -27,7 +29,16 @@ import scalation.mathstat.{Statistic, TimeStatistic}
 trait Component
       extends Identifiable with Locatable:
 
-    private val flaw = flawf ("Component")              // flaw function
+    private val flaw = flawf ("Component")                      // flaw function
+
+    private [process] val RAD     = 5.0                         // radius of a token (for animating entities)
+    private [process] val DIAM    = 2.0 * RAD                   // diameter of a token (for animating entities)
+    private [process] val subpart = VEC [Component] ()          // list of subparts of the Component
+                                                                // (empty for atomic components, nonempty for composites)
+
+    private var _durationStat: Statistic = null                 // collector of sample statistics (e.g., waiting time)
+    private var _persistentStat: TimeStatistic = null           // collector of time persistent statistics (e.g., number in queue)
+    private var _director: Model = null                         // director of the play/simulation model (to which this component belongs)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Initialize this component (all of its 'var's).
@@ -36,34 +47,12 @@ trait Component
      */
     def initComponent (label: String, loc: Array [Double]): Unit =
         name = label
+        println(s"(locComp:loc ${stringOf(loc)})")
         at   = loc
+        println(s"(InitComp:at ${stringOf(at)})")
         initStats (label)
-        //if at == null then flaw ("init", s"component '$name' has null location")
+        if at == null then flaw ("init", s"component '$name' has null location")
     end initComponent
-
-    /** Radius of a token (for animating entities)
-     */
-    val RAD = 5.0
-
-    /** Diameter of a token (for animating entities)
-     */
-    val DIAM = 2.0 * RAD
-
-    /** List of subparts of the Component (empty for atomic components, nonempty for composites)
-     */
-    val subpart = VEC [Component] ()
-
-    /** Collector of sample statistics (e.g., waiting time)
-     */
-    private var _durationStat: Statistic = null
-
-    /** Collector of time persistent statistics (e.g., number in queue)
-     */
-    private var _persistentStat: TimeStatistic = null
-
-    /** Director of the play/simulation model (to which this component belongs)
-     */
-    private var _director: Model = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the director who controls the play/simulation this component is in.
@@ -94,7 +83,6 @@ trait Component
         _durationStat   = new Statistic (name)
         if ! this.isInstanceOf [Source] && ! this.isInstanceOf [Sink] && ! this.isInstanceOf [Gate] then
             _persistentStat = new TimeStatistic ("p-" + name)
-        end if
     end initStats
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -1,0 +1,44 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/bptree/BpTreeMap.scala:381:32 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m381 |[0m        [33mif[0m left [33mthen[0m sib.mergeI (par.key(j-[31m1[0m), n)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                     Found:    Unit[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                     Required: Boolean[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: sib.mergeI(par.key.apply(j.-([31m1[0m)), n)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   Unit[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   Boolean[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> Unit  <:  Boolean[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== Unit  <:  Boolean = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: sib.mergeI(par.key.apply(j.-([31m1[0m)), n)[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  Unit[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  Boolean[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> Unit  <:  Boolean[0m
+[0m[[0m[31merror[0m] [0m[0m  <== Unit  <:  Boolean = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m
+[0m[[0m[0mdebug[0m] [0m[0mForcing garbage collection...[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 7 s, completed Feb 23, 2024, 6:34:34 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

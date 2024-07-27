@@ -5,7 +5,7 @@
  *  @date    Wed Oct 20 22:46:14 EDT 2021
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Example Model: UGA_Bus for Process-Interaction Simulation
+ *  @note    Example Model: UGA_Bus for Process-Interaction Simulation
  */
 
 // U N D E R   D E V E L O P M E N T
@@ -13,12 +13,11 @@
 package scalation
 package simulation
 package process
-package example_1                                     // One-Shot
+package example_1                                       // One-Shot
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer => VEC}
 
 import scalation.random.{Exponential, Randi, Uniform}
-import scalation.random.RandomSeeds.N_STREAMS
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `runUGA_Bus` function is used to launch the `UGA_BusModel` class.
@@ -39,14 +38,14 @@ import scalation.random.RandomSeeds.N_STREAMS
  *  @param stream     the base random number stream (0 to 999)
  */
 class UGA_BusModel (name: String = "UGA_Bus", reps: Int = 1, animating: Boolean = true,
-                 aniRatio: Double = 50.0, nStop: Int = 100, stream: Int = 0)
+                    aniRatio: Double = 50.0, nStop: Int = 100, stream: Int = 0)
       extends Model (name, reps, animating, aniRatio):
 
     //--------------------------------------------------
     // Initialize Model Constants
 
-    val lambda   = 10.0                               // rider arrival rate (per hour)
-    val cap      = 20                                 // bus capacity
+    val lambda   = 10.0                                 // rider arrival rate (per hour)
+    val cap      = 20                                   // bus capacity
     val NORTH    = 0
     val EAST     = 2
     val SOUTH    = 3
@@ -55,12 +54,12 @@ class UGA_BusModel (name: String = "UGA_Bus", reps: Int = 1, animating: Boolean 
     //--------------------------------------------------
     // Create Random Variables (RVs)
 
-    val iArrivalRV = Exponential (HOUR / lambda, stream)
-    val jTimeRV    = Uniform (4 * MINUTE, 6 * MINUTE, (stream + 1) % N_STREAMS)
-    val lTimeRV    = Uniform (4 * MINUTE, 6 * MINUTE, (stream + 2) % N_STREAMS)
-    val moveRV     = Uniform (4 * MINUTE, 6 * MINUTE, (stream + 3) % N_STREAMS)
-    val moveRV2    = Uniform (4 * MINUTE, 6 * MINUTE, (stream + 4) % N_STREAMS)
-    val destRV     = Randi (0, 3, (stream + 5) % N_STREAMS)
+    val iArrivalRV = Exponential (HOUR / lambda, stream)    // use different random number streams for independence
+    val jTimeRV    = Uniform (4 * MINUTE, 6 * MINUTE, stream + 1)
+    val lTimeRV    = Uniform (4 * MINUTE, 6 * MINUTE, stream + 2)
+    val moveRV     = Uniform (4 * MINUTE, 6 * MINUTE, stream + 3)
+    val moveRV2    = Uniform (4 * MINUTE, 6 * MINUTE, stream + 4)
+    val destRV     = Randi (0, 3, stream + 5)
 
     //--------------------------------------------------
     // Create Model Components
@@ -86,14 +85,13 @@ class UGA_BusModel (name: String = "UGA_Bus", reps: Int = 1, animating: Boolean 
                                        ("kSouth", (-30, 400)),
                                        ("kWest", (-230, 200)))
 
-    val road   = new ListBuffer [Transport] ()
-    val walkTo = new ListBuffer [Transport] ()
-    val walkFr = new ListBuffer [Transport] ()
+    val road   = new VEC [Transport] ()
+    val walkTo = new VEC [Transport] ()
+    val walkFr = new VEC [Transport] ()
     for i <- source.indices do
         road   += Transport ("rd" + i, junction(i), junction((i+1)%4), moveRV)
         walkTo += Transport ("wt" + i, source(i), busStop(i), moveRV2)
         walkFr += Transport ("wf" + i, junction(i), sink(i), moveRV2)
-    end for
 
     addComponents (source, busStop, junction, sink, road.toList, walkTo.toList, walkFr.toList)
 
@@ -102,35 +100,35 @@ class UGA_BusModel (name: String = "UGA_Bus", reps: Int = 1, animating: Boolean 
 
     case class Rider () extends SimActor ("r", this):
 
-        def act (): Unit =
-            val i = subtype                      // starting point, based on subtype
-            val j = destRV.igen                  // destination
-            walkTo(i).move ()                    // move from source to bus stop
-            nextTransport = walkFr (j)           // record destination transport
-            busStop(i).waitIn ()                 // wait at bus stop for bus
-            walkFr(j).move ()                    // depart the the bus and walk to building
-            sink(j).leave ()                     // leave the simulation
+        override def act (): Unit =
+            val i = subtype                             // starting point, based on subtype
+            val j = destRV.igen                         // destination
+            walkTo(i).move ()                           // move from source to bus stop
+            nextTransport = walkFr (j)                  // record destination transport
+            busStop(i).waitIn ()                        // wait at bus stop for bus
+            walkFr(j).move ()                           // depart the the bus and walk to building
+            sink(j).leave ()                            // leave the simulation
         end act
 
     end Rider
 
     case class UGA_Bus () extends Bus ("u", this, lTimeRV, cap):
 
-        def act (): Unit =
-            while simulating do
-                road(NORTH).move ()
-                unload (walkFr(NORTH))
-                load (busStop(NORTH))
+        override def act (): Unit =
+            while simulating do                         // bus circulates until simulation is over - FIX use operating time
+                road(NORTH).move ()                     // move to the NORTH bus stop
+                unload (walkFr(NORTH))                  // unload riders
+                load (busStop(NORTH))                   // load new riders
 
-                road(EAST).move ()
+                road(EAST).move ()                      // move to the EAST bus stop
                 unload (walkFr(EAST))
                 load (busStop(EAST))
 
-                road(SOUTH).move ()
+                road(SOUTH).move ()                     // move to the SOUTH bus stop
                 unload (walkFr(SOUTH))
                 load (busStop(SOUTH))
 
-                road(WEST).move ()
+                road(WEST).move ()                      // move to the WEST bus stop
                 unload (walkFr(WEST))
                 load (busStop(WEST))
             end while

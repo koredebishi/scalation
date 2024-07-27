@@ -1,0 +1,188 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:122:25 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m122 |[0m        [33mif[0m closestCar != actor [33mthen[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                         ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                         Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:123:41 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m123 |[0m            lane(l1).vtree.checkedRemove(actor.disp, actor)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                         ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                         Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:123:53 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m123 |[0m            lane(l1).vtree.checkedRemove(actor.disp, actor)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                     ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                     Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:124:44 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m124 |[0m            println([31ms"Removed Vehicle_id: [0m${actor.id}[31m  from lane [0m$l1[31m"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                            ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                            Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:126:31 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m126 |[0m            lane(l2).vtree.put(actor.disp, actor)                  [34m// Add this key (disp) and the actor (value) to the new lane (BpTree Node)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                               ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                               Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:126:43 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m126 |[0m            lane(l2).vtree.put(actor.disp, actor)                  [34m// Add this key (disp) and the actor (value) to the new lane (BpTree Node)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                           ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                           Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:127:32 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m127 |[0m            println([31ms"Vehicle [0m${actor.id}[31m and disp = [0m${actor.disp}[31m  successfully added to lane [0m$l2[31m"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:127:55 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m127 |[0m            println([31ms"Vehicle [0m${actor.id}[31m and disp = [0m${actor.disp}[31m  successfully added to lane [0m$l2[31m"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                       ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                      Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:128:70 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m128 |[0m            director.log.trace ([33mthis[0m, [31ms"change lane from [0m$l1[31m to [0m$l2[31m"[0m, actor, director.clock)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                      ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                      Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:130:80 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m130 |[0m            director.log.trace ([33mthis[0m, [31ms"unable to change lane from [0m$l1[31m to [0m$l2[31m"[0m, actor, director.clock)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                                ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                      Not found: actor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `actor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `actor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m10 errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 1 s, completed Jun 15, 2024, 6:29:55 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

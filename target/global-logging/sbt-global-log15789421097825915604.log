@@ -1,0 +1,8 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(runMain scalation.simulation.process.example_1.runOneWayVehicle, Some(1c7771c2-530a-40ed-b196-45342364fdc4), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / runMain[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 458 Scala sources to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[32msuccess[0m] [0m[0mTotal time: 188 s (03:08), completed Apr 13, 2024, 10:09:07 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(shell, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mForcing garbage collection...[0m
+[0m[[0m[0minfo[0m] [0m[0mshutting down sbt server[0m

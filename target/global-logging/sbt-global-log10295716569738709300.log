@@ -1,0 +1,170 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 506 Scala sources to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:369:24 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m369 |[0m    [33mval[0m [36myp[0m   = yyp.map (sq)               [34m// orginal[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                        ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m              missing argument list for [33mmethod[0m [35msq[0m in [33mpackage[0m [35mscalation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                [33minline[0m [33mdef[0m [36msq[0m([36mx[0m: [35mDouble[0m): [35mDouble[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E134] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:369:19 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m369 |[0m    [33mval[0m [36myp[0m   = yyp.map (sq)               [34m// orginal[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m               ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mNone of the overloaded alternatives of [33mmethod[0m [35mmap[0m in [33mclass[0m [35mVectorD[0m with types[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m (f: scalation.FunctionS2S): scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m [B](f: Double => B): scala.collection.mutable.IndexedSeq[B][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mmatch arguments (Double)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:383:70 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m383 |[0m    [33mval[0m [36mmod[0m = [33mnew[0m [35mTranRegression[0m (x, y, x_fname, Regression.hp, sqrt, sq)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                      ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m              missing argument list for [33mmethod[0m [35msq[0m in [33mpackage[0m [35mscalation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                [33minline[0m [33mdef[0m [36msq[0m([36mx[0m: [35mDouble[0m): [35mDouble[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:430:23 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m430 |[0m    [33mval[0m [36myp3[0m = yp2.map (sq)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                       ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m              missing argument list for [33mmethod[0m [35msq[0m in [33mpackage[0m [35mscalation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                [33minline[0m [33mdef[0m [36msq[0m([36mx[0m: [35mDouble[0m): [35mDouble[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E134] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:430:18 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m430 |[0m    [33mval[0m [36myp3[0m = yp2.map (sq)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m              ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mNone of the overloaded alternatives of [33mmethod[0m [35mmap[0m in [33mclass[0m [35mVectorD[0m with types[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m (f: scalation.FunctionS2S): scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m [B](f: Double => B): scala.collection.mutable.IndexedSeq[B][0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mmatch arguments (Double)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:466:67 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m466 |[0m    [33mval[0m [36mmod[0m = [33mnew[0m [35mTranRegression[0m (x, y, [31mnull[0m, Regression.hp, sqrt, sq)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                   ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m              missing argument list for [33mmethod[0m [35msq[0m in [33mpackage[0m [35mscalation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                [33minline[0m [33mdef[0m [36msq[0m([36mx[0m: [35mDouble[0m): [35mDouble[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:595:20 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m595 |[0m    [33mval[0m [36mf[0m = (sqrt,  sq,    [31m"sqrt"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                    ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m              missing argument list for [33mmethod[0m [35msq[0m in [33mpackage[0m [35mscalation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                [33minline[0m [33mdef[0m [36msq[0m([36mx[0m: [35mDouble[0m): [35mDouble[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:602:74 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m602 |[0m    [33mval[0m [36mmod[0m = [33mnew[0m [35mTranRegression[0m (ox, y, ox_fname, Regression.hp, f._1, f._2)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                        ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                       Found:    Double[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                       Required: scalation.FunctionS2S[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: f._2[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   Double[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.FunctionS2S[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> Double  <:  scalation.FunctionS2S[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> Double  <:  Double => Double[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== Double  <:  Double => Double = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== Double  <:  scalation.FunctionS2S = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: f._2[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  Double[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.FunctionS2S[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> Double  <:  scalation.FunctionS2S[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> Double  <:  Double => Double[0m
+[0m[[0m[31merror[0m] [0m[0m    <== Double  <:  Double => Double = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== Double  <:  scalation.FunctionS2S = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E045] Cyclic Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:610:9 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m610 |[0m    [33mval[0m (cols, rSq) = mod.forwardSelAll ()                         [34m// R^2, R^2 bar, R^2 cv[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m         ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m         Recursive [33mvalue[0m [35m$9$[0m needs type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The definition of [33mvalue[0m [35m$9$[0m is recursive and you need to specify its type.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe definition of [33mvalue[0m [35m$9$[0m is recursive and you need to specify its type.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E045] Cyclic Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:610:15 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m610 |[0m    [33mval[0m (cols, rSq) = mod.forwardSelAll ()                         [34m// R^2, R^2 bar, R^2 cv[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m               ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m               Recursive [33mvalue[0m [35m$9$[0m needs type[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The definition of [33mvalue[0m [35m$9$[0m is recursive and you need to specify its type.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe definition of [33mvalue[0m [35m$9$[0m is recursive and you need to specify its type.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/TranRegression.scala:666:72 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m666 |[0m    [33mval[0m [36mmod[0m = [33mnew[0m [35mTranRegression[0m (ox, y, ox_fname, Regression.hp, sqrt, sq)   [34m// sqrt Transformed Regression model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                        ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m              missing argument list for [33mmethod[0m [35msq[0m in [33mpackage[0m [35mscalation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                [33minline[0m [33mdef[0m [36msq[0m([36mx[0m: [35mDouble[0m): [35mDouble[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m11 errors found[0m
+[0m[[0m[0mdebug[0m] [0m[0mForcing garbage collection...[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 24 s, completed Jun 17, 2024, 11:46:47 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

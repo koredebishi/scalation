@@ -1,0 +1,68 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 8 Scala sources to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/SimActor.scala:112:16 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m112 |[0m    [33mval[0m [36malist[0m = DoublyLinkedList [[35mSimActor[0m] ()              [34m// actor list for ordering of actors[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                ^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                Not found: DoublyLinkedList[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `DoublyLinkedList` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `DoublyLinkedList` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `DoublyLinkedList` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `DoublyLinkedList` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/VTransport.scala:45:38 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m45 |[0m    [33mprivate[0m [process] [33mval[0m vList = [33mnew[0m DoublyLinkedList [Vehicle] ()            [34m// B+Tree map for finding vehicles by their displacement[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                      ^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                      Not found: type DoublyLinkedList[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type DoublyLinkedList` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `DoublyLinkedList` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type DoublyLinkedList` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `DoublyLinkedList` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
+[0m[[0m[31merror[0m] [0m[0mjava.nio.channels.OverlappingFileLockException[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/sun.nio.ch.FileLockTable.checkList(FileLockTable.java:229)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/sun.nio.ch.FileLockTable.add(FileLockTable.java:123)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/sun.nio.ch.FileChannelImpl.lock(FileChannelImpl.java:1475)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.nio.channels.FileChannel.lock(FileChannel.java:1240)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.jetbrains.plugins.scala.indices.protocol.sbt.Locking$.lock(Locking.scala:23)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.jetbrains.plugins.scala.indices.protocol.sbt.Locking$FileLockingExt$.lock$extension(Locking.scala:51)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.jetbrains.sbt.indices.SbtIntellijIndicesPlugin$.$anonfun$perConfig$4(SbtIntellijIndicesPlugin.scala:63)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.Function1.$anonfun$compose$1(Function1.scala:49)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.util.$tilde$greater.$anonfun$$u2219$1(TypeFunctions.scala:63)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.std.Transform$$anon$4.work(Transform.scala:69)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Execute.$anonfun$submit$2(Execute.scala:283)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.util.ErrorHandling$.wideConvert(ErrorHandling.scala:24)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Execute.work(Execute.scala:292)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Execute.$anonfun$submit$1(Execute.scala:283)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.ConcurrentRestrictions$$anon$4.$anonfun$submitValid$1(ConcurrentRestrictions.scala:265)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.CompletionService$$anon$2.call(CompletionService.scala:65)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.lang.Thread.run(Thread.java:1583)[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0m(Test / [31mnotifyIdeaCompilationStart[0m) java.nio.channels.OverlappingFileLockException[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 2 s, completed Jul 12, 2024, 9:42:46 AM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

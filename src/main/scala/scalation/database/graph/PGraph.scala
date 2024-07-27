@@ -5,7 +5,7 @@
  *  @date    Sat Aug 29 14:14:32 EDT 2020
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   PGraph - Property Graph Database
+ *  @note    PGraph - Property Graph Database
  */
 
 package scalation
@@ -183,11 +183,13 @@ class PGraph (val name: String,
 //              val at  = e.calcEndPoints                                    // logic replaced by move2Boundary
                 val at  = (e.from.pos(0 to 2), e.to.pos(0 to 2))
                 val att = (at._1 ++ at._2).toArray
+//              banner (s"PGraph: e = $e, at = $at")
                 aniQ.add (AnimateCommand (CreateEdge, e.id, et_j.newShapeObj, e.name, true, et_j.color, att, 0,
                                           e.from.id, e.to.id, e.shift))      // shift for bundle of edges
             end for
         end for
 
+//        assert (1 == 2)
         dgAni.animate (0, stop)
     end display
 
@@ -253,8 +255,6 @@ import SocialNetwork._
 
     val g = PGraph ("SocialNetwork", VEC (vt0), VEC (et0, et1), true)
     g.updateNameMaps ()                                              // update vmap and emap
-    val person = g.vmap("person")                                    // shorthand definition
-    val knows  = g.emap("knows")                                     // shorthand definition
 
     println (s"g = $g")                                              // via toString
     g.print ()                                                       // more readable version via internal println's

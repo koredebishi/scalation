@@ -1,0 +1,14 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading Monitor,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/simulation/Monitor.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading Statistic,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/Statistic.class[0m
+[0m[[0m[31merror[0m] [0m[0merror while loading TimeStatistic,[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes/scalation/mathstat/TimeStatistic.class[0m
+[0m[[0m[31merror[0m] [0m[0mthree errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 3 s, completed Apr 1, 2024, 2:06:18 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

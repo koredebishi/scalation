@@ -1,0 +1,9 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(runMain scalation.database.bptree.BpTreeMapTest, Some(efff179d-e3b8-41b1-9463-7c5ab58d19c8), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / runMain[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[31merror[0m] [0m[0mNonzero exit code returned from runner: 1[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mrunMain[0m) Nonzero exit code returned from runner: 1[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 1 s, completed Feb 1, 2024, 11:05:18 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(shell, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mForcing garbage collection...[0m
+[0m[[0m[0minfo[0m] [0m[0mshutting down sbt server[0m

@@ -1,0 +1,24 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 36 Scala sources to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Path.scala:79:53 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m79 |[0m            lane(l1).asInstanceOf [[35mVTransport[0m].vtree.checkedRemove (actor.disp, actor)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0mvalue checkedRemove is not a member of scalation.database.BpTreeMap[scalation.simulation.process.Vehicle][0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/Route.scala:64:85 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m64 |[0m    [33mdef[0m [36mgetFirst[0m ([36mi[0m: [35mInt[0m): [35mVehicle[0m = path([31m0[0m).lane(i).asInstanceOf [[35mVTransport[0m].vtree.getFirst[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0mvalue getFirst is not a member of scalation.database.BpTreeMap[scalation.simulation.process.Vehicle][0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/VTransport.scala:47:34 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m47 |[0m    [33mdef[0m [36mgetFirst[0m: [35mVehicle[0m = vtree.getFirst[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                            ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0mvalue getFirst is not a member of scalation.database.BpTreeMap[scalation.simulation.process.Vehicle][0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/VTransport.scala:74:27 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m74 |[0m                [33mif[0m ! vtree.checkedRemove (actor.disp, actor) [33mthen[0m      [34m// remove from vtree and check that it is the correct vehicle[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                     ^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0mvalue checkedRemove is not a member of scalation.database.BpTreeMap[scalation.simulation.process.Vehicle][0m
+[0m[[0m[31merror[0m] [0m[0mfour errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 6 s, completed Feb 28, 2024, 9:27:16 AM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

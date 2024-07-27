@@ -1,0 +1,1419 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 505 Scala sources to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/Table.scala:829:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m829 |[0m        [33mcase[0m [31m"=="[0m => tJoinTups (a1, equ, a2, r2)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                    ^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mmissing argument list for [33mmethod[0m [35mequ[0m in [33mpackage[0m [35mscalation.database[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  [33minline[0m [33mdef[0m [36mequ[0m([36mx[0m: scalation.ValueType, [36my[0m: scalation.ValueType): [35mBoolean[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/Table.scala:830:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m830 |[0m        [33mcase[0m [31m"!="[0m => tJoinTups (a1, neq, a2, r2)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                    ^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mmissing argument list for [33mmethod[0m [35mneq[0m in [33mpackage[0m [35mscalation.database[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  [33minline[0m [33mdef[0m [36mneq[0m([36mx[0m: scalation.ValueType, [36my[0m: scalation.ValueType): [35mBoolean[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/Table.scala:831:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m831 |[0m        [33mcase[0m [31m"<"[0m  => tJoinTups (a1, <,   a2, r2)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                    ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mmissing argument list for [33mmethod[0m [35m<[0m in [33mpackage[0m [35mscalation.database[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  [33minline[0m [33mdef[0m [36m<[0m([36mx[0m: scalation.ValueType, [36my[0m: scalation.ValueType): [35mBoolean[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/Table.scala:832:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m832 |[0m        [33mcase[0m [31m"<="[0m => tJoinTups (a1, <=,  a2, r2)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                    ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mmissing argument list for [33mmethod[0m [35m<=[0m in [33mpackage[0m [35mscalation.database[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  [33minline[0m [33mdef[0m [36m<=[0m([36mx[0m: scalation.ValueType, [36my[0m: scalation.ValueType): [35mBoolean[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/Table.scala:833:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m833 |[0m        [33mcase[0m [31m">"[0m  => tJoinTups (a1, >,   a2, r2)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                    ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mmissing argument list for [33mmethod[0m [35m>[0m in [33mpackage[0m [35mscalation.database[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  [33minline[0m [33mdef[0m [36m>[0m([36mx[0m: scalation.ValueType, [36my[0m: scalation.ValueType): [35mBoolean[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E178] Type Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/Table.scala:834:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m834 |[0m        [33mcase[0m [31m">="[0m => tJoinTups (a1, >=,  a2, r2)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                    ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mmissing argument list for [33mmethod[0m [35m>=[0m in [33mpackage[0m [35mscalation.database[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  [33minline[0m [33mdef[0m [36m>=[0m([36mx[0m: scalation.ValueType, [36my[0m: scalation.ValueType): [35mBoolean[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Unapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:27:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m27 |[0m      [33mextends[0m Predictor (MatrixD.one (y.dim), y, Array ([31m"one"[0m), [31mnull[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/RegressionTreeRF.scala:37:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m37 |[0m      [33mextends[0m Predictor (x, y, fname_, hparam)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_AutoMPG.scala:491:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m491 |[0m    mod.trainNtest ()()                                                [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.NullModel[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/SimplerRegression.scala:29:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m29 |[0m      [33mextends[0m Predictor (x, y, [33mif[0m fname_ == [31mnull[0m [33mthen[0m [31mnull[0m [33melse[0m fname_.slice ([31m0[0m, [31m1[0m), [31mnull[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_AutoMPG.scala:514:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m514 |[0m    mod.trainNtest ()()                                                [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue trainNtest is not a member of scalation.modeling.SimplerRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/SimpleRegression.scala:32:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m32 |[0m      [33mextends[0m Predictor (x, y, [33mif[0m fname_ == [31mnull[0m [33mthen[0m [31mnull[0m [33melse[0m fname_.slice ([31m0[0m, [31m2[0m), [31mnull[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_AutoMPG.scala:529:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m529 |[0m    mod.trainNtest ()()                                                [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue trainNtest is not a member of scalation.modeling.SimpleRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/SimpleRegression.scala:87:41 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m87 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                         ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                         Not found: getX[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/SimpleRegression.scala:87:73 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m87 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                                         ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                                        Not found: fname[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/SimpleRegression.scala:87:95 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m87 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                                                               ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                                            Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Regression.scala:46:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m46 |[0m      [33mextends[0m Predictor (x, y, fname_, hparam)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_AutoMPG.scala:548:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m548 |[0m    mod.trainNtest ()()                                                [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Regression.scala:116:41 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m116 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                         ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                         Not found: getX[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Regression.scala:116:73 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m116 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                         ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                      Not found: fname[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Regression.scala:116:95 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m116 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                                               ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                          Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_AutoMPG.scala:553:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m553 |[0m    mod.trainNtest ()()                                                [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_AutoMPG.scala:569:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m569 |[0m    mod.trainNtest ()()                                                [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_BPressure.scala:119:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m119 |[0m    mod.trainNtest ()()                                             [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_BPressure.scala:123:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m123 |[0m    mod.trainNtest ()()                                             [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_BasketBall.scala:116:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m116 |[0m    mod.trainNtest ()()                                       [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_BasketBall.scala:121:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m121 |[0m    mod.trainNtest ()()                                       [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_BasketBall.scala:126:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m126 |[0m    mod.trainNtest ()()                                       [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_BasketBall.scala:131:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m131 |[0m    mod.trainNtest ()()                                       [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_BasketBall.scala:136:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m136 |[0m    mod.trainNtest ()()                                       [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Example_BasketBall.scala:141:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m141 |[0m    mod.trainNtest ()()                                       [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:35:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m35 |[0m      [33mextends[0m Predictor (x, y, fname_, hparam)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:46:4 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m46 |[0m    modelName = [31m"ExpRegression"[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m    ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m    Not found: modelName[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:89:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m89 |[0m        b        = bfgs.solve (b0)._2                                    [34m// find optimal solution for parameters[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m        Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:92:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m92 |[0m        e = y_ - (x_ * b).map (exp)                                      [34m// residual/error vector e[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m        Not found: e[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `e` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `e` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `e` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `e` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:92:23 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m92 |[0m        e = y_ - (x_ * b).map (exp)                                      [34m// residual/error vector e[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                       ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                       Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:117:26 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m117 |[0m        [33mval[0m [36myp[0m = predict (x_)                                            [34m// make predictions[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                          ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                          Found:    [1m[31m([0m[1m[31mx[0m[1m[31m_[0m[1m[31m [0m[1m[31m:[0m[1m[31m [0mscalation.mathstat.[1m[31mMatrixD[0m[1m[31m)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                          Required: scalation.mathstat.[1m[32mVectorD[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: x_[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   (x_ : scalation.mathstat.MatrixD)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: x_[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (x_ : scalation.mathstat.MatrixD)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:129:41 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m129 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                         ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                         Not found: getX[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:129:73 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m129 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                         ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                      Not found: fname[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:129:95 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m129 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                                               ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                          Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:130:42 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m130 |[0m                          vifs: [35mVectorD[0m = vif ()): String =[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                          ^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                          Not found: vif[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `vif` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `vif` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `vif` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `vif` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:139:53 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m139 |[0m    [33moverride[0m [33mdef[0m predict (z: VectorD): Double = exp (b dot z)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                     ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                     Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:211:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m211 |[0m    mod.trainNtest ()()                                                  [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  value trainNtest is not a member of scalation.modeling.ExpRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:214:26 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m214 |[0m    [33mval[0m [36myp[0m = mod.predict (x)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                          ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                          Found:    [1m[31m([0m[1m[31mx[0m[1m[31m [0m[1m[31m:[0m[1m[31m [0mscalation.mathstat.[1m[31mMatrixD[0m[1m[31m)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                          Required: scalation.mathstat.[1m[32mVectorD[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: x[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   (x : scalation.mathstat.MatrixD)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> (x : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== (x : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: x[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (x : scalation.mathstat.MatrixD)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (x : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (x : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/ExpRegression.scala:256:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m256 |[0m        mod.trainNtest ()()                                               [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m        ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  value trainNtest is not a member of scalation.modeling.ExpRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Imputation.scala:207:21 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m207 |[0m        rg.train (rg.getX, xf)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                  ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue getX is not a member of scalation.modeling.SimpleRegression - did you mean rg.help?[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Imputation.scala:208:11 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m208 |[0m        rg.predict (VectorD ([31m1[0m, t(i)))[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m        ^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  value predict is not a member of scalation.modeling.SimpleRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:36:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m36 |[0m      [33mextends[0m Predictor (x, y, fname_, hparam)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:47:4 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m47 |[0m    modelName = [31m"KNN_Regression"[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m    ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m    Not found: modelName[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:94:26 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m94 |[0m        [33mval[0m [36myp[0m = predict (x_)                                                [34m// make predictions[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                          ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                          Found:    [1m[31m([0m[1m[31mx[0m[1m[31m_[0m[1m[31m [0m[1m[31m:[0m[1m[31m [0mscalation.mathstat.[1m[31mMatrixD[0m[1m[31m)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                          Required: scalation.mathstat.[1m[32mVectorD[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Tree: x_[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   (x_ : scalation.mathstat.MatrixD)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   ==> (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   <== (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: x_[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (x_ : scalation.mathstat.MatrixD)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:152:43 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m152 |[0m                 (idx : [35mIndexedSeq[0m [[35mInt[0m] = testIndices ((ratio * y.dim).toInt, rando)): [35mVectorD[0m =[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                           ^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                           Not found: testIndices[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `testIndices` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `testIndices` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `testIndices` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `testIndices` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:234:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m234 |[0m    mod.trainNtest ()()                                                   [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m value trainNtest is not a member of scalation.modeling.KNN_Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:246:33 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m246 |[0m    [33mval[0m [36myp[0m = mod.predict (xy.not (?, [31m2[0m))[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                          ^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                          Found:    scalation.mathstat.[1m[31mMatrixD[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                          Required: scalation.mathstat.[1m[32mVectorD[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: xy.not(scalation.?, [31m2[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.mathstat.MatrixD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: xy.not(scalation.?, [31m2[0m)[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.mathstat.MatrixD[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m  <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:276:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m276 |[0m    mod.trainNtest ()()                                                   [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m value trainNtest is not a member of scalation.modeling.KNN_Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:280:33 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m280 |[0m    [33mval[0m [36myp[0m = mod.predict (xy.not (?, [31m2[0m))[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                          ^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                          Found:    scalation.mathstat.[1m[31mMatrixD[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                          Required: scalation.mathstat.[1m[32mVectorD[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: xy.not(scalation.?, [31m2[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.mathstat.MatrixD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: xy.not(scalation.?, [31m2[0m)[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.mathstat.MatrixD[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m  <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:306:12 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m306 |[0m        mod.trainNtest ()()                                               [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m        ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m value trainNtest is not a member of scalation.modeling.KNN_Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/KNN_Regression.scala:307:45 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m307 |[0m        rSq(k) = Fit.qofVector (mod.fit, mod.crossValidate ())            [34m// use main model, knn[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                         ^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue crossValidate is not a member of scalation.modeling.KNN_Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:31:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m31 |[0m      [33mextends[0m Predictor (x, y, fname_, hparam)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:38:4 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m38 |[0m    modelName = [31m"LassoRegression"[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m    ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m    Not found: modelName[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:58:28 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m58 |[0m            [33mval[0m [36mstats[0m = rrg.crossValidate ()[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                        ^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0mvalue crossValidate is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:81:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m81 |[0m        b = LassoAdmm.solve (x_, y_, lambda)                             [34m// Alternating Direction Method of Multipliers[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m        Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:83:11 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m83 |[0m        [33mif[0m b([31m0[0m).isNaN [33mthen[0m flaw ([31m"train"[0m, [31ms"parameter b = [0m$b[31m"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m           ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m           Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:83:59 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m83 |[0m        [33mif[0m b([31m0[0m).isNaN [33mthen[0m flaw ([31m"train"[0m, [31ms"parameter b = [0m$b[31m"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                           ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                                           Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:84:61 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m84 |[0m        debug ([31m"train"[0m, [31ms"LassoAdmm estimates parameter b = [0m$b[31m"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                             ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                                            Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:96:17 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m96 |[0m        [33mval[0m [36myp[0m = predict (x_)                                            [34m// make predictions[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                 ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                 Not found: predict[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `predict` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `predict` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `predict` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `predict` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:108:41 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m108 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                         ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                         Not found: getX[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:108:73 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m108 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                         ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                      Not found: fname[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:108:95 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m108 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                                                                               ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                                          Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:109:42 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m109 |[0m                          vifs: [35mVectorD[0m = vif ()): String =[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                          ^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                                          Not found: vif[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The identifier for `vif` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m That can happen, for example, if `vif` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `vif` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `vif` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:191:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m191 |[0m    reg.trainNtest ()()                                            [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.Regression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:193:45 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m193 |[0m    println ([31ms"predict ([0m$z[31m) = [0m${reg.predict (z)}[31m"[0m)                 [34m// make an out-of-sample prediction[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                             ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                            Found:    [1m[31m([0m[1m[31mz[0m[1m[31m [0m[1m[31m:[0m[1m[31m [0mscalation.mathstat.[1m[31mVectorD[0m[1m[31m)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                            Required: scalation.mathstat.[1m[32mMatrixD[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Tree: z[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   (z : scalation.mathstat.VectorD)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.mathstat.MatrixD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> (z : scalation.mathstat.VectorD)  <:  scalation.mathstat.MatrixD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> scalation.mathstat.VectorD  <:  scalation.mathstat.MatrixD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     <== scalation.mathstat.VectorD  <:  scalation.mathstat.MatrixD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   <== (z : scalation.mathstat.VectorD)  <:  scalation.mathstat.MatrixD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: z[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (z : scalation.mathstat.VectorD)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.mathstat.MatrixD[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (z : scalation.mathstat.VectorD)  <:  scalation.mathstat.MatrixD[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scalation.mathstat.VectorD  <:  scalation.mathstat.MatrixD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scalation.mathstat.VectorD  <:  scalation.mathstat.MatrixD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (z : scalation.mathstat.VectorD)  <:  scalation.mathstat.MatrixD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:200:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m200 |[0m    mod.trainNtest ()()                                            [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue trainNtest is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:202:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m202 |[0m    println ([31ms"predict ([0m$z[31m) = [0m${mod.predict (z)}[31m"[0m)                 [34m// make an out-of-sample prediction[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                ^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   value predict is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:204:18 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m204 |[0m    [33mval[0m [36myyp[0m = mod.predict (x)                                      [34m// predict y for several points[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m              ^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   value predict is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:243:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m243 |[0m    mod.trainNtest ()()                                            [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue trainNtest is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:245:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m245 |[0m    println ([31ms"predict ([0m$z[31m) = [0m${mod.predict (z)}[31m"[0m)                 [34m// make an out-of-sample prediction[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                ^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   value predict is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:272:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m272 |[0m    mod.trainNtest ()()                                            [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue trainNtest is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:274:36 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m274 |[0m    println ([31ms"predict ([0m$z[31m) = [0m${mod.predict (z)}[31m"[0m)                 [34m// make an out-of-sample prediction[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                                ^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   value predict is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:277:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m277 |[0m    mod.forwardSelAll (cross = [31mfalse[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue forwardSelAll is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/LassoRegression.scala:280:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m280 |[0m    mod.backwardElimAll (cross = [31mfalse[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue backwardElimAll is not a member of scalation.modeling.LassoRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NoBuildModel.scala:31:38 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m31 |[0m    [33mdef[0m [36mbuildModel[0m ([36mx_cols[0m: [35mMatrixD[0m): [35mPredictor[0m [35m&[0m [35mFit[0m =[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                      ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                      Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NonlinearRegression.scala:40:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m40 |[0m      [33mextends[0m Predictor (x, y, fname_, hparam)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NonlinearRegression.scala:49:4 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m49 |[0m    modelName = [31m"NonlinearRegression"[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m    ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m    Not found: modelName[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NonlinearRegression.scala:77:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m77 |[0m        b          = result._2                                           [34m// optimal parameter vector[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m        Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NonlinearRegression.scala:89:26 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m89 |[0m        [33mval[0m [36myp[0m = predict (x_)                                            [34m// make predictions[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                          ^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                          Found:    [1m[31m([0m[1m[31mx[0m[1m[31m_[0m[1m[31m [0m[1m[31m:[0m[1m[31m [0mscalation.mathstat.[1m[31mMatrixD[0m[1m[31m)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                          Required: scalation.mathstat.[1m[32mVectorD[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Tree: x_[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   (x_ : scalation.mathstat.MatrixD)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   ==> (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   <== (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: x_[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (x_ : scalation.mathstat.MatrixD)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m    <== scalation.mathstat.MatrixD  <:  scalation.mathstat.VectorD (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (x_ : scalation.mathstat.MatrixD)  <:  scalation.mathstat.VectorD = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NonlinearRegression.scala:90:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m90 |[0m        e = y_ - yp                                                      [34m// RECORD the residuals/errors (@see `Predictor`)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m        Not found: e[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `e` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `e` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `e` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `e` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NonlinearRegression.scala:99:53 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m99 |[0m    [33moverride[0m [33mdef[0m predict (z: VectorD): Double = f(z, b)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                     ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                                     Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NonlinearRegression.scala:192:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m192 |[0m    mod.trainNtest ()()[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mvalue trainNtest is not a member of scalation.modeling.NonlinearRegression[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:31:4 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m31 |[0m    modelName = [31m"NullModel"[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m    ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m    Not found: modelName[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `modelName` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `modelName` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:40:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m40 |[0m        b = VectorD (y_.mean)                                            [34m// parameter vector [b0][0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m        Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:52:39 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m52 |[0m        [33mval[0m [36myp[0m = VectorD.fill (y_.dim)(b([31m0[0m))                             [34m// y predicted for (test/full)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                       ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                       Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:61:48 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m61 |[0m    [33moverride[0m [33mdef[0m predict (z: VectorD): Double = b([31m0[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                                Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:68:73 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m68 |[0m    [33moverride[0m [33mdef[0m predict (x_ : MatrixD): VectorD = VectorD.fill (x_.dim)(b([31m0[0m))[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                                         ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                                            Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:78:41 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m78 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                         ^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                         Not found: getX[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `getX` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `getX` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:78:73 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m78 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                                         ^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                                        Not found: fname[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `fname` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `fname` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:78:95 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m78 |[0m    [33moverride[0m [33mdef[0m summary (x_ : MatrixD = getX, fname_ : Array [String] = fname, b_ : VectorD = b,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                                                               ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                                            Not found: b[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `b` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `b` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:79:42 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m79 |[0m                          vifs: [35mVectorD[0m = vif ()): String =[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                          ^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                          Not found: vif[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `vif` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `vif` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `vif` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `vif` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:119:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m119 |[0m    mod.trainNtest ()()                                     [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.NullModel[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/NullModel.scala:140:8 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m140 |[0m    mod.trainNtest ()()                                     [34m// train and test the model[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m    ^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    value trainNtest is not a member of scalation.modeling.NullModel[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/modeling/Perceptron.scala:42:14 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m42 |[0m      [33mextends[0m Predictor (x, y, fname_, hparam)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: type Predictor[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m no declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m That can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m misspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe identifier for `type Predictor` is not bound, that is,[0m
+[0m[[0m[31merror[0m] [0m[0mno declaration for this identifier can be found.[0m
+[0m[[0m[31merror[0m] [0m[0mThat can happen, for example, if `Predictor` or its declaration has either been[0m
+[0m[[0m[31merror[0m] [0m[0mmisspelt or if an import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m752 errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 100 s (01:40), completed Jun 17, 2024, 9:39:46 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

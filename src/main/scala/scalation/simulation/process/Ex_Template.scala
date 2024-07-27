@@ -5,7 +5,7 @@
  *  @date    Sat Sep 11 15:17:56 EDT 2021
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Example Model: SOME for Process-Interaction Simulation (A Template)
+ *  @note    Example Model: SOME for Process-Interaction Simulation (A Template)
  */
 
 package scalation
@@ -13,7 +13,6 @@ package simulation
 package process
 
 import scalation.random.Exponential
-//import scalation.random.RandomSeeds.N_STREAMS
 
 /*******************************************************************************
 See Example Models in sub-directories:
@@ -51,7 +50,7 @@ class SOMEModel (name: String = "SOME", reps: Int = 1, animating: Boolean = true
     //--------------------------------------------------
     // Initialize Model Constants
 
-    val lambda = 6.0                                  // customer arrival rate (per hour)
+    val lambda = 6.0                                    // customer arrival rate (per hour)
 
     //--------------------------------------------------
     // Create Random Variables (RVs)
@@ -71,7 +70,7 @@ class SOMEModel (name: String = "SOME", reps: Int = 1, animating: Boolean = true
 
     case class SOMEActor () extends SimActor ("s", this):
 
-        def act (): Unit =
+        override def act (): Unit =
             println ("SOMEActor: please write the script for this actor")
             exit.leave ()
         end act

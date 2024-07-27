@@ -1,11 +1,12 @@
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
  *  @date    Mon Sep  7 15:05:06 EDT 2009
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Active Entity/Simulation Actor
+ *  @note    Active Entity/Simulation Actor
  */
 
 package scalation
@@ -23,34 +24,24 @@ package process
  */
 abstract class SimActor (label: String, director: Model,
                          val prop: Map [String, Double] = null)
-         extends Coroutine (label) with Temporal with Ordered [SimActor] with Locatable:
+    extends Coroutine (label)
+        with Temporal
+        with Ordered [SimActor]
+        with Locatable:
 
-    name = label                // set the name for this entity (`SimActor`)
+    name = label                                                  // set the name for this entity `SimActor`
 
-    /** The time at which this entity (`SimActor`) arrived
-     */
-    var arrivalT = director.clock
+    private val flaw = flawf ("SimActor")                         // flaw function
 
-    /** The indicator of subtype of this entity (`SimActor`), e.g., for turning choices 
-     */
-    var subtype = 0
+    var nextTransport: Transport = null                           // next `Transport` to move along for this entity `SimActor`
+    // must be specified, e.g.,, before entering a bus (PUBLIC access required)
+    var subtype = 0                                               // indicator of entity subtype `SimActor`, e.g., for turning choices (PUBLIC)
 
-    /** The `Source` that created this entity (`SimActor`)
-     */
-    var mySource: Source = null 
+    private [process] var arrivalT = director.clock               // time at which this entity `SimActor` arrived
+    private [process] var mySource: Source = null                 // `Source` that created this entity `SimActor`
+    private [process] var myNode: SimActor.alist.Node = null      // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
 
-    /** The next `Transport` to move along for this entity (`SimActor`)
-     *  Must be specified, for example, before entering a bus
-     */
-    var nextTransport: Transport = null 
-
-    /** The flaw function
-     */
-    private val flaw = flawf ("SimActor")
-
-    /** Value of the trajectory along the `QCurve` for this entity (`SimActor`)
-     */
-    private var _trajectory = 0.0
+    private var _trajectory = 0.0                                 // value of the trajectory along `QCurve` for this entity `SimActor`
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the current trajectory (along the `QCurve`) of this `SimActor`.
@@ -78,7 +69,7 @@ abstract class SimActor (label: String, director: Model,
     /** The abstract method, 'act', is defined in each subclass to provide specific
      *  behavior.
      */
-    def act (): Unit
+    def act (): Unit = println ("SimActor.act method should be overridden")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Schedule a reactivation of this `SimActor` delay time units in the future.
@@ -101,7 +92,81 @@ abstract class SimActor (label: String, director: Model,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the `SimActor`s full name and activation time.
      */
-    override def toString: String = s"SimActor ($me at $actTime)"
+    override def toString: String = s"SimActor ($me with cor_id $id at $actTime)"
 
 end SimActor
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SimActor` companion object holds the ACTOR LIST and provides methods for adding
+ *  and removing actors from the list.  These methods should be called in the application
+ *  models to give users full control.  For example, in a traffic model, if a car stays
+ *  in the same lane over a complete `Route` (multiple road segments), the car should
+ *  be added to the alist at the beginning of the route and removed only at the end.
+ *  Any lane changes or turns will require changes in the actor list.
+ *  @see `myNode` in `SimActor` class.
+ *  @see `routeTest` main function for example of use of alist.
+ */
+object SimActor:
+
+    val alist = DoublyLinkedList [SimActor] ()              // actor list for ordering of actors
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add the given actor AFTER the other actor in the alist, e.g., when beginning
+     *  a Route/VTransport.
+     *  @param actor  the given actor/vehicle to add
+     *  @param other  the other actor/vehicle (the one ahead, null if none)
+     */
+    def addToAlist (actor: SimActor, other: SimActor): Unit =
+        val new_node = alist.add(actor)
+        actor.myNode = new_node
+        val other_node = if actor.myNode != null then alist.getSucc(actor.myNode) else null
+        println(s"${Console.RED} adding car: ${actor.myNode}, other_node = $other_node, vlist=$alist ${Console.RESET}")
+    end addToAlist
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Remove the given actor from the alist, e.g., because of termination, lane change,
+     *  or turn.
+     *  @param actor  the given actor/vehicle to remove
+     */
+    def removeFromAlist (actor: SimActor): Unit =
+        alist.remove (actor.myNode)
+        //println(s"${Console.RED} vlist $alist ${Console.RESET}")
+    end removeFromAlist
+
+
+    /**
+     * @param disp: The current displacement of the actor, also the key
+     * insertion reference
+     * get other Cars displacement that is just less than the disp
+     * get the Cars displacement that is just higher than the disp
+     * insert disp (car ref) between this nodes
+     * @param actor The actor that needs to make the lane change
+     */
+    def addBeforeAlist(actor: SimActor, l2:Int, lane:Array[VTransport]): Unit =
+        println(s"The method to add actor $actor from exact displacement location")
+
+
+//        // Find the car with t_disp just larger than actor.t_disp
+//        val succCar = rangeCar.collect { case (disp, car) if disp > actor.asInstanceOf[Vehicle].t_disp => car}.minByOption(_.t_disp)
+//
+//        // Add the actor to the doubly linked list before the successor car
+//        if succCar.isDefined then
+//            actor.myNode = lane(l2).vList.addBefore(actor.asInstanceOf[Vehicle], succCar.get.myNode.succ)
+//        // If there is no successor car, add the actor to the end of the list
+//        else actor.myNode = lane(l2).vList.add(actor)
+    // Add the actor to the global DLL in the correct position
+
+        // to find out where you are use the B+tree
+        // to keep track of the car ahead of you use the DoublyLinkList
+        // insert based on the pn<--->nn<--->sn
+
+        // for each lanes make
+
+
+        //What car is ahead of me
+        //val carMin = {rangeCar.minBy { case (k, _) => (k.asInstanceOf[Double] - actor.asInstanceOf[Vehicle].t_disp).abs }._2}
+    end addBeforeAlist
+
+
+end SimActor

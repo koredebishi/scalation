@@ -5,7 +5,7 @@
  *  @date    Fri Sep 17 15:22:44 EDT 2021
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Base Model Class for Process Simulation - Method of Batch Means
+ *  @note    Base Model Class for Process Simulation - Method of Batch Means
  */
 
 package scalation
@@ -53,7 +53,7 @@ class Model_MBM (name: String, val nBatch: Int = 10, sizeB: Int = 100,
 
         debug ("act", s"before while nBatch = $nBatch, sizeB = $sizeB, maxAct = $maxAct")
 
-        while numActors <= maxAct && ! agenda.isEmpty do           // LOOP THROUGH BATCHES
+        while numActors <= maxAct && ! agenda.isEmpty do         // LOOP THROUGH BATCHES
 
 //          debug ("act", s"start while with numActors = $numActors")
             log.trace (this, s"starts batch $bat", null, _clock)

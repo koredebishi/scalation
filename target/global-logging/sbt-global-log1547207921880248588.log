@@ -1,0 +1,31 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(all {file:/Users/mac/simulation/scalation_2.0/}scalation/products {file:/Users/mac/simulation/scalation_2.0/}scalation/test:products, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / products, Test / products[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 2 Scala sources to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[0minfo[0m] [0m[0mdone compiling[0m
+[0m[[0m[31merror[0m] [0m[0mjava.nio.channels.OverlappingFileLockException[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/sun.nio.ch.FileLockTable.checkList(FileLockTable.java:229)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/sun.nio.ch.FileLockTable.add(FileLockTable.java:123)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/sun.nio.ch.FileChannelImpl.lock(FileChannelImpl.java:1475)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.nio.channels.FileChannel.lock(FileChannel.java:1240)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.jetbrains.plugins.scala.indices.protocol.sbt.Locking$.lock(Locking.scala:23)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.jetbrains.plugins.scala.indices.protocol.sbt.Locking$FileLockingExt$.lock$extension(Locking.scala:51)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.jetbrains.sbt.indices.SbtIntellijIndicesPlugin$.$anonfun$perConfig$4(SbtIntellijIndicesPlugin.scala:63)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.Function1.$anonfun$compose$1(Function1.scala:49)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.util.$tilde$greater.$anonfun$$u2219$1(TypeFunctions.scala:63)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.std.Transform$$anon$4.work(Transform.scala:69)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Execute.$anonfun$submit$2(Execute.scala:283)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.util.ErrorHandling$.wideConvert(ErrorHandling.scala:24)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Execute.work(Execute.scala:292)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Execute.$anonfun$submit$1(Execute.scala:283)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.ConcurrentRestrictions$$anon$4.$anonfun$submitValid$1(ConcurrentRestrictions.scala:265)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.CompletionService$$anon$2.call(CompletionService.scala:65)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.lang.Thread.run(Thread.java:1583)[0m
+[0m[[0m[31merror[0m] [0m[0m(Test / [31mnotifyIdeaCompilationStart[0m) java.nio.channels.OverlappingFileLockException[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 4 s, completed Jul 5, 2024, 2:05:41 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

@@ -1,9 +1,2 @@
-[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/mac/Desktop/scalation_2.0/src/test/scala/testing/mathstat/VectorD_T.scala:14:24 [0m[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m14 |[0m[33mimport[0m scala.math.{abs, max, min, sqrt}[0m
-[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                        ^^^[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                        unused import[0m
-[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: /Users/mac/Desktop/scalation_2.0/src/test/scala/testing/mathstat/VectorD_T.scala:14:29 [0m[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m14 |[0m[33mimport[0m scala.math.{abs, max, min, sqrt}[0m
-[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                             ^^^[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                             unused import[0m
-[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
+[0m[[0m[0mdebug[0m] [0m[0mAcquiring lock on file /Users/mac/simulation/scalation_2.0/project/target/.sbt-compilation-infos/scalation-test/.sbt-idea-lock ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mReleasing lock on file /Users/mac/simulation/scalation_2.0/project/target/.sbt-compilation-infos/scalation-test/.sbt-idea-lock.[0m

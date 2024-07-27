@@ -221,7 +221,7 @@ end banner
  *  @param message  the error message
  */
 def flawf (clsName: String)(method: String, message: String): Boolean =
-    println (s"ERROR @ $clsName.$method: $message")
+    println (s"${Console.RED} ERROR @ $clsName.$method: $message ${Console.RESET}")
     false
 end flawf
 

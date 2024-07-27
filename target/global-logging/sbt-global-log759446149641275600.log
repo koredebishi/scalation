@@ -1,0 +1,55 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(compile, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / compile[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 205 Scala sources to /Users/mac/simulation/scalation_2.0/target/scala-3.3.1/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E007] Type Mismatch Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/simulation/process/example_1/OneWayVehicle.scala:70:21 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m70 |[0m            myNode = carCurr[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                     ^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Found:    (carCurr : Car.this.carList.Node)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Required: scalation.simulation.process.SimActor.alist.Node[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Tree: carCurr[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m I tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   (carCurr : Car.this.carList.Node)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m conforms to[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   scalation.simulation.process.SimActor.alist.Node[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m but the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   ==> (carCurr : Car.this.carList.Node)  <:  scalation.simulation.process.SimActor.alist.Node[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     ==> Car.this.carList.Node  <:  scalation.simulation.process.SimActor.alist.Node (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m       ==> (Car.this.carList : scalation.DoublyLinkedList[OneWayVehicleModel.this.Car])  <:  (scalation.simulation.process.SimActor.alist :   scalation.DoublyLinkedList[scalation.simulation.process.SimActor])[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m         ==> scalation.DoublyLinkedList[OneWayVehicleModel.this.Car]  <:  (scalation.simulation.process.SimActor.alist :   scalation.DoublyLinkedList[scalation.simulation.process.SimActor]) (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m         <== scalation.DoublyLinkedList[OneWayVehicleModel.this.Car]  <:  (scalation.simulation.process.SimActor.alist :   scalation.DoublyLinkedList[scalation.simulation.process.SimActor]) (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m       <== (Car.this.carList : scalation.DoublyLinkedList[OneWayVehicleModel.this.Car])  <:  (scalation.simulation.process.SimActor.alist :   scalation.DoublyLinkedList[scalation.simulation.process.SimActor]) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m     <== Car.this.carList.Node  <:  scalation.simulation.process.SimActor.alist.Node (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m   <== (carCurr : Car.this.carList.Node)  <:  scalation.simulation.process.SimActor.alist.Node = false[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m The tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34mExplanation[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[34m===========[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mTree: carCurr[0m
+[0m[[0m[31merror[0m] [0m[0mI tried to show that[0m
+[0m[[0m[31merror[0m] [0m[0m  (carCurr : Car.this.carList.Node)[0m
+[0m[[0m[31merror[0m] [0m[0mconforms to[0m
+[0m[[0m[31merror[0m] [0m[0m  scalation.simulation.process.SimActor.alist.Node[0m
+[0m[[0m[31merror[0m] [0m[0mbut the comparison trace ended with `false`:[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  ==> (carCurr : Car.this.carList.Node)  <:  scalation.simulation.process.SimActor.alist.Node[0m
+[0m[[0m[31merror[0m] [0m[0m    ==> Car.this.carList.Node  <:  scalation.simulation.process.SimActor.alist.Node (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m      ==> (Car.this.carList : scalation.DoublyLinkedList[OneWayVehicleModel.this.Car])  <:  (scalation.simulation.process.SimActor.alist :   scalation.DoublyLinkedList[scalation.simulation.process.SimActor])[0m
+[0m[[0m[31merror[0m] [0m[0m        ==> scalation.DoublyLinkedList[OneWayVehicleModel.this.Car]  <:  (scalation.simulation.process.SimActor.alist :   scalation.DoublyLinkedList[scalation.simulation.process.SimActor]) (left is approximated)[0m
+[0m[[0m[31merror[0m] [0m[0m        <== scalation.DoublyLinkedList[OneWayVehicleModel.this.Car]  <:  (scalation.simulation.process.SimActor.alist :   scalation.DoublyLinkedList[scalation.simulation.process.SimActor]) (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m      <== (Car.this.carList : scalation.DoublyLinkedList[OneWayVehicleModel.this.Car])  <:  (scalation.simulation.process.SimActor.alist :   scalation.DoublyLinkedList[scalation.simulation.process.SimActor]) = false[0m
+[0m[[0m[31merror[0m] [0m[0m    <== Car.this.carList.Node  <:  scalation.simulation.process.SimActor.alist.Node (left is approximated) = false[0m
+[0m[[0m[31merror[0m] [0m[0m  <== (carCurr : Car.this.carList.Node)  <:  scalation.simulation.process.SimActor.alist.Node = false[0m
+[0m[[0m[31merror[0m] [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0mThe tests were made under the empty constraint[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 19 s, completed Mar 31, 2024, 12:43:04 AM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m
