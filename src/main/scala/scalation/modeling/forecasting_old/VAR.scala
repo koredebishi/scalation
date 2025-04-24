@@ -293,7 +293,7 @@ end varTest4
 //  for (c, r) <- imp do println (s"col = $c, \t ${header(c)}, \t importance = $r")
 
     banner ("Run TnT on Best model")
-    val bmod = mod.getBest._4                                               // get the best model from feature selection
+    val bmod = mod.getBest._3                                               // get the best model from feature selection
     val (x_, y_, xtest, ytest) = VAR.split_TnT (bmod.getX, bmod.getYY)
     val (yptest, qoftest) = bmod.asInstanceOf [RegressionMV].trainNtest (x_, y_)(xtest, ytest)          // train on (x_, y_) and test on (xtest, ytest)
     new Plot (null, ytest(?, 0), yptest(?, 0), s"${mod.modelName}, ytest vs. yptest", lines = true)
@@ -343,7 +343,7 @@ end varTest5
 //  for (c, r) <- imp do println (s"col = $c, \t ${header(c)}, \t importance = $r")
 
     banner ("Run Rolling Validation on VAR Best model")
-    val bmod = mod.getBest._4                                               // get the best model from feature selection
+    val bmod = mod.getBest._3                                               // get the best model from feature selection
     VAR.rollValidate (bmod.asInstanceOf [RegressionMV], 1)
 
 end varTest6

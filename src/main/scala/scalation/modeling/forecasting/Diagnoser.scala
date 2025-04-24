@@ -58,8 +58,7 @@ abstract class Diagnoser (dfm: Double, df: Double)
     override def diagnose (y: VectorD, yp: VectorD, w: VectorD = null): VectorD =
         println (s"diagnose: skip = $skip")
         if skip > 0 then
-            val yyp = yp.drop (skip-1)
-            super.diagnose (y.drop (skip), yyp(0 until yyp.dim-1),
+            super.diagnose (y.drop (skip), yp.drop (skip),
                             if w != null then w.drop (skip) else null)
         else super.diagnose (y, yp, w)
     end diagnose

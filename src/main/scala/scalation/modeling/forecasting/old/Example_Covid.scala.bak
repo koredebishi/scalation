@@ -10,7 +10,7 @@
 
 package scalation
 package modeling
-package forecasting
+package forecasting2
 
 import scala.math.min
 import scala.runtime.ScalaRunTime.stringOf
@@ -112,12 +112,11 @@ object Example_Covid:
 end Example_Covid
 
 import Example_Covid._
-import MakeMatrix4TS.hp
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `example_CovidTest` main function tests the `Example_Covid` object.
  *  Prints and plots the response column ("new_deaths").
- *  > runMain scalation.modeling.forecasting.example_CovidTest
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest
  */
 @main def example_CovidTest (): Unit =
 
@@ -134,7 +133,7 @@ end example_CovidTest
 /** The `example_CovidTest2` main function tests the `Example_Covid` object.
  *  Performs Exploratory Data Analysis (EDA) to find relationships between
  *  contemporaneous variables.
- *  > runMain scalation.modeling.forecasting.example_CovidTest2
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest2
  */
 @main def example_CovidTest2 (): Unit =
 
@@ -168,31 +167,79 @@ end example_CovidTest2
  *  Uses In-Sample Testing (In-ST), i.e., train and test on the same data.
  *  Runs several baseline models for horizons 1 to 6, see sMAPE metrics below:
  *
- *  55.1927,    53.9282,    52.7133,    51.8648,    51.9621,	52.0771  Null
- *  54.6045,    53.3254,    52.1120,    51.2903,    51.4475,    51.4937  Trend
- *  24.2641,    31.8588,    42.4430,    50.1029,    57.4933,    63.5406  SMA
- *  26.4055,    31.5936,    43.7356,    50.1744,    58.3506,    63.7234  WMA
- *  18.6934,    29.1811,    38.6542,    47.1281,    54.8713,    61.9944  SES
- *  19.0371,    29.5797,    39.0740,    47.4638,    55.1785,    62.1818  RW
- *  18.3265,    28.7734,    38.2039,    46.7814,    54.5563,    61.7930  RWS
- *  18.7298,    28.4908,    37.0997,    45.6487,    51.7248,    56.3708  AR(1)
+ *  56.1873,    54.9320,    53.6656,    52.4506,    51.6106,    51.7282  Null
+ *  55.6298,    54.4006,    53.1310,    51.9187,    51.1081,    51.2892  Trend
+ *  25.1598,    33.1616,    43.7944,    51.4347,    58.7755,    64.7805  SMA
+ *  27.1668,    32.9085,    45.0652,    51.5055,    59.6247,    64.9615  WMA
+ *  20.0526,    30.5979,    40.0663,    48.4903,    56.1782,    63.2487  SES
+ *  20.3933,    30.9930,    40.4824,    48.8231,    56.4826,    63.4345  RW  
+ *  19.7869,    30.1938,    39.6200,    48.1468,    55.8660,    63.0492  RWS
+ *  20.3547,    29.9510,    38.0585,    45.3859,    51.7718,    56.6248  AR(1)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest3
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest3
  */
 @main def example_CovidTest3 (): Unit =
 
-    val hh = 6                                                            // max forecasting horizon
+    val hh = 6                                                          // max forecasting horizon
+    var mod: Forecaster = null
 
     new Plot (null, y, null, s"y ($response)", lines = true)
 
-    new NullModel (y, hh).inSampleTest ()
-    new TrendModel (y, hh).inSampleTest ()
-    new SimpleMovingAverage (y, hh).inSampleTest ()
-    new WeightedMovingAverage (y, hh).inSampleTest ()
-    new SimpleExpSmoothing (y, hh).inSampleTest ()
-    new RandomWalk (y, hh).inSampleTest ()
-    new RandomWalkS (y, hh).inSampleTest ()
-    new AR (y, hh).inSampleTest ()
+    banner ("In-ST Test: Null Model")
+    mod = new NullModel (y, hh)
+    mod.trainNtest ()()
+    mod.forecastAll (y)
+    mod.diagnoseAll (y, mod.getYf)                                        // should agree with evalForecasts
+    Forecaster.evalForecasts (mod, mod.getYb, hh)
+
+    banner ("In-ST Test: Trend Model")
+    mod = new TrendModel (y, hh)
+    mod.trainNtest ()()
+    mod.forecastAll (y)
+    mod.diagnoseAll (y, mod.getYf)                                        // should agree with evalForecasts
+    Forecaster.evalForecasts (mod, mod.getYb, hh)
+
+    banner ("In-ST Test: Simple Moving Average Model")
+    mod = new SimpleMovingAverage (y, hh)
+    mod.trainNtest ()()
+    mod.forecastAll (y)
+    mod.diagnoseAll (y, mod.getYf)                                        // should agree with evalForecasts
+    Forecaster.evalForecasts (mod, mod.getYb, hh)
+
+    banner ("In-ST Test: Weighted Moving Average Model")
+    mod = new WeightedMovingAverage (y, hh)
+    mod.trainNtest ()()
+    mod.forecastAll (y)
+    mod.diagnoseAll (y, mod.getYf)                                        // should agree with evalForecasts
+    Forecaster.evalForecasts (mod, mod.getYb, hh)
+
+    banner ("In-ST Test: Simple Exponential Smoothing Model")
+    mod = new SimpleExpSmoothing (y, hh)
+    mod.trainNtest ()()
+    mod.forecastAll (y)
+    mod.diagnoseAll (y, mod.getYf)                                        // should agree with evalForecasts
+    Forecaster.evalForecasts (mod, mod.getYb, hh)
+
+    banner ("In-ST Test: Random Walk Model")
+    mod = new RandomWalk (y, hh)
+    mod.trainNtest ()()
+    mod.forecastAll (y)
+    mod.diagnoseAll (y, mod.getYf)                                        // should agree with evalForecasts
+    Forecaster.evalForecasts (mod, mod.getYb, hh)
+
+    banner ("In-ST Test: Random Walk Slope Adjusted Model")
+    mod = new RandomWalkS (y, hh)
+    mod.trainNtest ()()
+    mod.forecastAll (y)
+    mod.diagnoseAll (y, mod.getYf)                                        // should agree with evalForecasts
+    Forecaster.evalForecasts (mod, mod.getYb, hh)
+
+    banner ("In-ST Test: Auto-Regressive AR(1) Model")
+    mod = new AR (y, hh)
+    mod.trainNtest ()()
+    mod.forecastAll (y)
+    mod.diagnoseAll (y, mod.getYf)                                        // should agree with evalForecasts
+    Forecaster.evalForecasts (mod, mod.getYb, hh)
 
 end example_CovidTest3
 
@@ -211,7 +258,7 @@ end example_CovidTest3
  *  18.0855,    26.7084,    39.6941,    51.2218,    63.1873,    74.6834  RWS
  *  19.1590,    31.1975,    44.4850,    55.3120,    65.5536,    74.4969  AR(1)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest4
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest4
  */
 @main def example_CovidTest4 (): Unit =
 
@@ -286,18 +333,18 @@ end example_CovidTest4
  *  Runs Auto-Regressive AR(p) models for several p values and horizons 1 to 6,
  *  see sMAPE metrics below:
  *
- *  18.7298,    28.4908,    37.0997,    45.6487,    51.7248,    56.3708  AR(1)
- *  16.3579,    24.7155,    33.0480,    40.0707,    46.0049,    50.8265  AR(2)
- *  16.0114,    22.7408,    29.5631,    35.2773,    40.9870,    45.8408  AR(3)
- *  15.8988,    22.5738,    28.5298,    33.3360,    39.1586,    43.1606  AR(4)
- *  15.9279,    22.5769,    28.5035,    33.3019,    39.1381,    43.0520  AR(5)
- *  15.9647,    22.6143,    28.5229,    33.3735,    39.1651,    42.9640  AR(6)
- *  16.0207,    23.2172,    29.4751,    35.2827,    41.0976,    46.1932  AR(7)
- *  16.0501,    22.7281,    28.6740,    34.1866,    39.5963,    44.9223  AR(8)
- *  16.0196,    22.5269,    28.4223,    34.1619,    39.7297,    44.4649  AR(9)
- *  16.1069,    22.6213,    28.6435,    34.2722,    39.9638,    44.8023  AR(10)
+ *  20.3547,    29.9510,    38.0585,    45.3859,    51.7718,    56.6248  AR(1)
+ *  18.1684,    27.0930,    35.1466,    41.4030,    46.7556,    51.7624  AR(2)
+ *  17.7411,    24.9003,    31.8377,    37.3797,    42.1010,    47.4027  AR(3)
+ *  17.5993,    24.4001,    30.4701,    35.1507,    39.6652,    44.3065  AR(4)
+ *  17.7440,    24.3782,    30.2910,    34.6374,    39.2784,    43.5109  AR(5) 
+ *  18.0122,    24.6661,    30.5325,    34.8721,    39.2814,    43.0225  AR(6)
+ *  17.7321,    24.7313,    30.3868,    34.7377,    39.0677,    44.1712  AR(7)
+ *  17.7501,    25.1060,    30.9891,    35.6894,    40.2345,    45.3789  AR(8)
+ *  17.5918,    24.7878,    30.2912,    34.6213,    39.2452,    44.6205  AR(9)
+ *  17.6843,    24.6729,    29.9977,    34.6003,    38.6488,    43.8855  AR(10)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest5
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest5
  */
 @main def example_CovidTest5 (): Unit =
 
@@ -308,7 +355,13 @@ end example_CovidTest4
 
     for p <- 1 to 10 do                                                 // AR hyper-parameter settings
         hp("p") = p
-        new AR (y, hh).inSampleTest ()                                  // create and test an AR model
+        val mod = new AR (y, hh)                                        // create an AR model
+        banner (s"In-ST Test: ${mod.modelName} Model")
+        mod.trainNtest ()()
+
+        mod.forecastAll (y)
+        mod.diagnoseAll (y, mod.getYf)
+        Forecaster.evalForecasts (mod, mod.getYb, hh)
     end for
 
 end example_CovidTest5
@@ -331,7 +384,7 @@ end example_CovidTest5
  *  15.2112,    23.6265,    30.7560,    40.1489,    49.4426,    58.3781  AR(9)
  *  15.7954,    23.7332,    32.8467,    42.5300,    52.3179,    60.5518  AR(10)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest6
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest6
  */
 @main def example_CovidTest6 (): Unit =
 
@@ -371,7 +424,7 @@ end example_CovidTest6
  *  17.2044,    23.6396,    29.5609,    34.2834,    38.9406,    44.1984  ARMA(9, 0)
  *  17.2588,    23.6012,    29.4737,    34.3447,    39.0981,    44.1297  ARMA(10, 0)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest7
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest7
  */
 @main def example_CovidTest7 (): Unit =
 
@@ -388,7 +441,8 @@ end example_CovidTest6
         mod.trainNtest ()()
 
         mod.forecastAll ()
-        mod.diagnoseAll (mod.getY, mod.getYf)
+        mod.diagnoseAll (y, mod.getYf)
+        Forecaster.evalForecasts (mod, mod.getYb, hh)
     end for
 
 end example_CovidTest7
@@ -411,7 +465,7 @@ end example_CovidTest7
  *  15.5716,    24.2525,    34.1386,    44.2350,    55.1113,    60.8057  ARMA(9, 0)
  *  14.9008,    22.6571,    30.4335,    41.6601,    50.1669,    61.2246  ARMA(10, 0)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest8
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest8
  */
 @main def example_CovidTest8 (): Unit =
 
@@ -452,11 +506,12 @@ end example_CovidTest8
  *  17.1326,    23.4530,    29.4149,    34.1103,    38.8254,    44.3564  ARY(9)
  *  17.1791,    23.4175,    29.3213,    34.1509,    38.8917,    44.2659  ARY(10)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest9
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest9
  */
 @main def example_CovidTest9 (): Unit =
 
     val hh = 6                                                          // max forecasting horizon
+    val hp = ARY.hp
     hp("lambda") = 1.0                                                  // regularization parameter
 
     new Plot (null, y, null, s"y ($response)", lines = true)
@@ -468,7 +523,8 @@ end example_CovidTest8
         mod.trainNtest_x ()()                                           // needs x matrix => use _x version
 
         mod.forecastAll ()
-        mod.diagnoseAll (mod.getY, mod.getYf)
+        mod.diagnoseAll (y, mod.getYf)
+        Forecaster.evalForecasts (mod, mod.getYb, hh)
     end for
 
 end example_CovidTest9
@@ -493,11 +549,12 @@ end example_CovidTest9
  *
  *  FIX - discrepancy between rollValidate and diagnoseAll handled by sft parameter - why needed?
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest10
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest10
  */
 @main def example_CovidTest10 (): Unit =
 
     val hh = 6                                                          // max forecasting horizon
+    val hp = ARY.hp
     hp("lambda") = 1.0                                                  // regularization parameter
 
     new Plot (null, y, null, s"y ($response)", lines = true)
@@ -533,11 +590,12 @@ end example_CovidTest10
  *  16.9841,    23.1090,    29.2154,    34.1249,    39.2711,    44.7709  ARY_D(9)
  *  17.0676,    23.1089,    28.9425,    33.9046,    38.9082,    44.0469  ARY_D(10)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest11
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest11
  */
 @main def example_CovidTest11 (): Unit =
 
     val hh = 6                                                          // max forecasting horizon
+    val hp = ARY.hp
 //  hp("lambda") = 1.0                                                  // regularization parameter
 
     new Plot (null, y, null, s"y ($response)", lines = true)
@@ -549,7 +607,9 @@ end example_CovidTest10
         mod.trainNtest_x ()()                                           // note: suffix "_x" currently required
 
         mod.forecastAll (mod.getYy)                                     // forecast h-steps ahead (h = 1 to hh) for all y
-        mod.diagnoseAll (mod.getY, mod.getYf)
+        ARY_D.evalForecasts (mod, mod.getYy, hh)
+        mod.setSkip (0)                                                 // so evalForecast and diagnoseAll start at same place
+        mod.diagnoseAll (y, mod.getYf)
     end for
 
 end example_CovidTest11
@@ -572,11 +632,12 @@ end example_CovidTest11
  *  15.0875,    21.7912,    30.2152,    37.4165,    42.6637,    52.9831  ARY_D(9)
  *  14.7569,    22.2172,    30.9435,    40.5641,    46.2016,    57.6445  ARY_D(10)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest12
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest12
  */
 @main def example_CovidTest12 (): Unit =
 
     val hh = 6                                                          // max forecasting horizon
+    val hp = ARY.hp
 //  hp("lambda") = 1.0                                                  // regularization parameter
 
     new Plot (null, y, null, s"y ($response)", lines = true)
@@ -603,7 +664,7 @@ end example_CovidTest12
  *
  *  FIX - good for h = 1, but then sMAPE scores explode
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest13
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest13
  */
 @main def example_CovidTest13 (): Unit =
 
@@ -620,7 +681,8 @@ end example_CovidTest12
         mod.trainNtest ()()
 
         mod.forecastAll ()
-        mod.diagnoseAll (mod.getY, mod.getYf)
+        mod.diagnoseAll (y, mod.getYf)
+        Forecaster.evalForecasts (mod, mod.getYb, hh)
     end for
 
 end example_CovidTest13
@@ -634,7 +696,7 @@ end example_CovidTest13
  * 
  *  FIX - for all h sMAPE scores have exploded
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest14
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest14
  */
 @main def example_CovidTest14 (): Unit =
 
@@ -675,7 +737,7 @@ end example_CovidTest14
  *  15.3410,    19.6328,    25.6180,    32.6323,    39.8298,    46.6052  ARX(9, 2, 2)
  *  15.4446,    19.6831,    25.6035,    32.8968,    40.6220,    47.7878  ARX(10, 2, 2)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest15
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest15
  */
 @main def example_CovidTest15 (): Unit =
 
@@ -695,14 +757,16 @@ end example_CovidTest14
     new Plot (null, y, null, s"y ($response)", lines = true)
 
     for p <- 1 to 10 do                                                 // ARX hyper-parameter settings
-        hp("p") = p
-        hp("q") = min (2, p)
-        val mod = ARX (xe, y, hh)                                       // create model for time series data
+        ARY.hp("p") = p
+        ARY.hp("q") = min (2, p)
+        val mod = ARX (xe, y, hh, nonneg = true)                        // create model for time series data
         banner (s"In-ST Test: ${mod.modelName} Model")
         mod.trainNtest_x ()()                                           // train and test on full dataset
  
         mod.forecastAll ()
-        mod.diagnoseAll (mod.getY, mod.getYf)
+        Forecaster.evalForecasts (mod, mod.getYb, hh)
+        mod.setSkip (0)                                                 // so evalForecast and diagnoseAll start at same place
+        mod.diagnoseAll (y, mod.getYf)
     end for
 
 end example_CovidTest15
@@ -725,7 +789,7 @@ end example_CovidTest15
  *  11.1796,    19.3087,    23.7479,    33.1067,    42.8283,    47.6904  ARX(9, 2, 2)
  *  10.9499,    20.6255,    25.8116,    35.5139,    45.2163,    50.0280  ARX(10, 2, 2)
  *
- *  > runMain scalation.modeling.forecasting.example_CovidTest16
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest16
  */
 @main def example_CovidTest16 (): Unit =
 
@@ -745,9 +809,9 @@ end example_CovidTest15
     new Plot (null, y, null, s"y ($response)", lines = true)
 
     for p <- 1 to 10 do                                                 // ARX hyper-parameter settings
-        hp("p") = p
-        hp("q") = min (2, p)
-        val mod = ARX (xe, y, hh)                                       // create an ARX model
+        ARY.hp("p") = p
+        ARY.hp("q") = min (2, p)
+        val mod = ARX (xe, y, hh, nonneg = true)                        // create an ARX model
         banner (s"TnT Test: ${mod.modelName} Model")
         mod.trainNtest_x ()()                                           // use customized trainNtest_x
 
@@ -764,7 +828,7 @@ end example_CovidTest16
 /** The `example_CovidTest17` main function tests the `Example_Covid` object.
  *  Uses In-Sample Testing (In-ST), i.e., train and test on the same data.
  *  Runs Auto-Regressive, Exogenous ARX_D(p, q, n) models for several p values.
- *  > runMain scalation.modeling.forecasting.example_CovidTest17
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest17
  *
 @main def example_CovidTest17 (): Unit =
 
@@ -792,7 +856,7 @@ end example_CovidTest17
 /** The `example_CovidTest18` main function tests the `Example_Covid` object.
  *  Uses Train-n-Test Split (TnT) with Rolling Validation.
  *  Runs Auto-Regressive, Exogenous ARX_D(p, q, n) models for several p values.
- *  > runMain scalation.modeling.forecasting.example_CovidTest18
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest18
  *
 @main def example_CovidTest18 (): Unit =
 
@@ -821,7 +885,7 @@ end example_CovidTest18
 /** The `example_CovidTest19` main function tests the `Example_Covid` object.
  *  Uses In-Sample Testing (In-ST), i.e., train and test on the same data.
  *  Runs Auto-Regressive, Exogenous ARX_Quad_D(p, q, n) models for several p values.
- *  > runMain scalation.modeling.forecasting.example_CovidTest19
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest19
  *
 @main def example_CovidTest19 (): Unit =
 
@@ -850,7 +914,7 @@ end example_CovidTest19
 /** The `example_CovidTest20` main function tests the `Example_Covid` object.
  *  Uses Train-n-Test Split (TnT) with Rolling Validation.
  *  Runs Auto-Regressive, Exogenous ARX_Quad_D(p, q, n) models for several p values.
- *  > runMain scalation.modeling.forecasting.example_CovidTest20
+ *  > runMain scalation.modeling.forecasting2.example_CovidTest20
  *
 @main def example_CovidTest20 (): Unit =
 

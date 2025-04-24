@@ -48,7 +48,7 @@ trait FitM:
     protected var mae    = -1.0                              // mean absolute error (MAE or MAD)
     protected var smape  = -1.0                              // symmetric Mean Absolute Percentage Error (sMAPE)
 
-    private val flaw  = flawf ("FitM")                       // flaw function
+    private val flaw = flawf ("FitM")                        // flaw function
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the sum of the squares for error (sse).  Must call diagnose first.

@@ -13,10 +13,8 @@ package scalation
 package modeling
 package forecasting
 
-import scala.collection.mutable.LinkedHashSet
+//import scala.collection.mutable.LinkedHashSet
 import scala.math.{abs, max, round}
-//import scala.math.min
-//import scala.util.control.Breaks.{break, breakable}
 
 import scalation.mathstat._
 
@@ -35,7 +33,7 @@ abstract class Forecaster (y: VectorD, hh: Int, tRng: Range = null, hparam: Hype
          with ForecastMatrix (y, hh, tRng)
          with Model:
 
-    private val debug = debugf ("Forecaster", true)                        // debug function
+    private val debug = debugf ("Forecaster", false)                       // debug function
     private val flaw  = flawf ("Forecaster")                               // flaw function
 
     protected val yb = if bakcast then WeightedMovingAverage.backcast (y) +: y   // prepend by adding one backcasted value
@@ -188,7 +186,7 @@ abstract class Forecaster (y: VectorD, hh: Int, tRng: Range = null, hparam: Hype
      *  @param t   the time point being predicted
      *  @param y_  the actual values to use in making predictions
      */
-    def predict (t: Int, y_ : VectorD): Double = y_(t-1)
+    def predict (t: Int, y_ : VectorD): Double = y_(max0 (t-1))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict all values corresponding to the given time series vector y_.
@@ -203,7 +201,7 @@ abstract class Forecaster (y: VectorD, hh: Int, tRng: Range = null, hparam: Hype
             yf(?, 1)(0 until y_.dim-1)                                        // return yp: first horizon only
         else
 //          debug ("predictAll", s"y_.dim = ${y_.dim}, yf.dims = ${yf.dims}")
-            for t <- 1 until yf.dim+1 do yf(t-1, 1) = predict (t, y_)         // skip t = 0
+            for t <- 1 until yf.dim do yf(t, 1) = predict (t, y_)             // skip t = 0
             yf(?, 1)
     end predictAll
 
@@ -239,7 +237,8 @@ abstract class Forecaster (y: VectorD, hh: Int, tRng: Range = null, hparam: Hype
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Forecast values for all y_.dim time points at horizon h (h-steps ahead).
      *  Assign into FORECAST MATRIX and return the h-steps ahead forecast.
-     *  Note, `predictAll` provides predictions for h = 1.
+     *  Note, `predictAll` provides predictions for h = 1 and for random walk the
+     *  forecast across all horizons is the same.
      *  @param h   the forecasting horizon, number of steps ahead to produce forecasts
      *  @param y_  the actual values to use in making forecasts
      */
@@ -318,8 +317,8 @@ abstract class Forecaster (y: VectorD, hh: Int, tRng: Range = null, hparam: Hype
 
         val yf_ = yf(tr_size until y.dim)                                 // forecast matrix for test-set
         for h <- 1 to hh do
-            val yy_ = yy(h until yy.dim)                                  // trim the actual values
-            val yfh = yf_(?, h)(0 until yy.dim-h)                         // column h of the forecast matrix
+            val yy_ = yy(h-1 until yy.dim)                                // trim the actual values
+            val yfh = yf_(?, h)(0 until yy.dim-h+1)                       // column h of the forecast matrix
 
             new Plot (t, yy_, yfh, s"rollValidate: Plot yy_, yfh vs. t for $modelName @h = $h", lines = true)
             mod_resetDF (te_size - h)                                     // reset degrees of freedom
@@ -332,6 +331,21 @@ abstract class Forecaster (y: VectorD, hh: Int, tRng: Range = null, hparam: Hype
         yf
     end rollValidate
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform In-Sample Testing (In-ST), i.e. train and test on the full data set.
+     *  @param skip    the number of initial time points to skip (due to insufficient past)
+     *  @param showYf  whether to show the forecast matrix
+     */
+    def inSampleTest (skip: Int = 2, showYf: Boolean = false): Unit =
+        banner (s"In-ST Test: $modelName")
+        trainNtest ()()                                                   // train on full and test on full 
+        forecastAll ()                                                    // forecast over all horizons
+        setSkip (skip)                                                    // diagnose: skip the first 'skip' rows
+        diagnoseAll (getY, getYf)                                         // compute metrics for all horizons
+//      println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
+//      println (s"Final In-ST Forecast Matrix yf = ${mod.getYf.shiftDiag}")
+    end inSampleTest
+
 //  F E A T U R E   S E L E C T I O N
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -343,10 +357,11 @@ abstract class Forecaster (y: VectorD, hh: Int, tRng: Range = null, hparam: Hype
      *  Models supporting feature selection (e.g., `ARY`) should override this method.
      *  @param cols   the lags/columns currently included in the existing model (currently ignored)
      *  @param idx_q  index of Quality of Fit (QoF) to use for comparing quality
-     */
+     *
     def forwardSel (cols: LinkedHashSet [Int], idx_q: Int = QoF.rSqBar.ordinal): BestStep =
-        throw new UnsupportedOperationException ("forwardSel is only provide by some models that override this method")
+        throw new UnsupportedOperationException ("forwardSel is only provided by some models that override this method")
     end forwardSel
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform forward selection to find the most predictive variables to have
@@ -355,39 +370,10 @@ abstract class Forecaster (y: VectorD, hh: Int, tRng: Range = null, hparam: Hype
      *  @see `Fit` for index of QoF measures.
      *  @param idx_q  index of Quality of Fit (QoF) to use for comparing quality
      *  @param cross  whether to include the cross-validation QoF measure
-     */
+     *
     def forwardSelAll (idx_q: Int = QoF.rSqBar.ordinal, cross: Boolean = true):
                       (LinkedHashSet [Int], MatrixD) =
-        throw new UnsupportedOperationException ("forwardSelAll is only provide by some models that override this method")
-    end forwardSelAll
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform forward selection to find the most predictive lags/variables to have
-     *  in the model, returning the variables added and the new Quality of Fit (QoF)
-     *  measures for all steps.
-     *  @see `Fit` for index of QoF measures.
-     *  @param idx_q  index of Quality of Fit (QoF) to use for comparing quality
-     *  @param cross  whether to include the cross-validation QoF measure (currently ignored)
-    def forwardSelAll (idx_q: Int = QoF.rSq.ordinal, cross: Boolean = false):
-                      (LinkedHashSet [Int], MatrixD) =
-        val rSq  = new MatrixD (MAX_LAGS, 3)                              // R^2, R^2 Bar, R^2 cv
-        val cols = LinkedHashSet (1)                                      // start with lag1 in model
-
-        println (s"forwardSelAll (l = 0): cols = $cols")
-        breakable {
-            for l <- 2 until MAX_LAGS do
-                val (j, mod_j) = forwardSel (cols, idx_q)                 // add most predictive variable
-                if j == -1 then break ()
-                cols     += j                                             // add variable x_j
-//              val fit_j = mod_j.fit
-                val fit_j = mod_j.test (null, y)._2
-                rSq(l)    = Fit.qofVector (fit_j, null)                   // use new model, mod_j, no cross
-                val k     = cols.size - 1
-                println (s"==> forwardSelAll (l = $l): add (#$k) variable $j, cols = $cols, qof = ${fit_j(idx_q)}")
-            end for
-        } // breakable
-
-        (cols, rSq(0 until cols.size))
+        throw new UnsupportedOperationException ("forwardSelAll is only provided by some models that override this method")
     end forwardSelAll
      */
 
@@ -484,32 +470,6 @@ object Forecaster:
         if ! allow then assert (cnt == 0)
         cnt
     end differ
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Evaluate the quality of point and optionally interval forecast for horizon (h = 1 to hh).
-     *  @param mod   the forecasting model to be evaluated
-     *  @param y     the actual time series values (use `mod.getYb` for full time series with backcast)
-     *  @param hh    the maximum forecasting horizon (h = 1 to hh)
-     *  @param ints  whether to evaluate prediction interval forecasts as well as point forecasts
-     */
-    def evalForecasts (mod: Forecaster, y: VectorD, hh: Int, ints: Boolean = false): Unit =
-        val ftMat = new MatrixD (hh, Fit.N_QoF)
-        banner (s"Evaluate ${mod.modelName}'s QoF for horizons 1 to $hh:")
-
-        for h <- 1 to hh do
-            val (yy, yfh, qof) = mod.testF (h, y)                         // h-steps ahead forecast and its QoF
-            ftMat(h-1) = qof 
-//          println (FitM.fitMap (qof, qoF_names))                        // evaluate h-steps ahead forecasts
-
-            if ints then
-                val (low, up) = mod.forecastAtI (yy, yfh, h)              // prediction interval forecasts
-                val qof_all   = mod.diagnose_ (yy, yfh, low, up)          // fully evaluate h-steps ahead forecasts
-                mod.show_interval_forecasts (yy, yfh, low, up, qof_all, h)
-        end for
-
-        println ("fitMap     qof = ")
-        println (FitM.showFitMap (ftMat.transpose, QoF.values.map (_.toString)))
-    end evalForecasts
 
 end Forecaster
 

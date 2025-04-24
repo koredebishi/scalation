@@ -43,7 +43,6 @@ class SimpleExpSmoothing (y: VectorD, hh: Int, tRng: Range = null,
                           bakcast: Boolean = false)  
       extends Forecaster (y, hh, tRng, hparam, bakcast):
 
-    private val flaw  = flawf ("SimpleExpSmoothing")                     // flaw function
     private val TOL   = 1E-4                                             // tolerance
     private val lo_up = makeBounds (1, 0.0, 1.05)                        // lower & upper bounds on α for optimizer (1.0 + slack)
 
@@ -114,38 +113,6 @@ class SimpleExpSmoothing (y: VectorD, hh: Int, tRng: Range = null,
      */
     override def predict (t: Int, y_ : VectorD): Double = s(min (t, s.dim-1))
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Produce a vector of size hh, h = 1 to hh-steps ahead forecasts for the model,
-     *  i.e., forecast the following time points:  t+1, ..., t+h.
-     *  Intended to work with rolling validation (analog of predict method).
-     *  @param t   the time point from which to make forecasts
-     *  @param y_  the actual values to use in making predictions
-     */
-    override def forecast (t: Int, y_ : VectorD = yb): VectorD =
-        val yh = new VectorD (hh)                                       // hold forecasts for each horizon
-        for h <- 1 to hh do
-            val pred = s(min (t, s.dim-1))                              // slide in prior forecasted values
-            yf(t, h) = pred                                             // record in forecast matrix
-            yh(h-1)  = pred                                             // record forecasts for each horizon
-        yh                                                              // return forecasts for all horizons
-    end forecast
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Forecast values for all y_.dim time points at horizon h (h-steps ahead).
-     *  Assign into FORECAST MATRIX and return the h-steps ahead forecast.
-     *  Note, `predictAll` provides predictions for h = 1.
-     *  @see `forecastAll` method in `Forecaster` trait.
-     *  @param h   the forecasting horizon, number of steps ahead to produce forecasts
-     *  @param y_  the actual values to use in making forecasts
-     */
-    override def forecastAt (h: Int, y_ : VectorD = yb): VectorD =
-        if h < 2 then flaw ("forecastAt", s"horizon h = $h must be at least 2")
-
-        for t <- y_.indices do                                          // make forecasts over all time points for horizon h
-            yf(t, h) = s(min (t, s.dim-1))                              // record in forecast matrix
-        yf(?, h)                                                        // return the h-step ahead forecast vector
-    end forecastAt
-
 end SimpleExpSmoothing
 
 
@@ -190,7 +157,7 @@ end SimpleExpSmoothing
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end simpleExpSmoothingTest
@@ -235,7 +202,7 @@ end simpleExpSmoothingTest2
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end simpleExpSmoothingTest3

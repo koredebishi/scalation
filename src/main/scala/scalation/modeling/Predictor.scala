@@ -11,7 +11,7 @@
 package scalation
 package modeling
 
-import scala.collection.mutable.{ArrayBuffer, IndexedSeq, LinkedHashSet, Set}
+import scala.collection.mutable.{ArrayBuffer, IndexedSeq, LinkedHashSet => LSET, Set}
 import scala.math.{cbrt, min, sqrt}
 import scala.util.control.Breaks.{break, breakable}
 
@@ -209,13 +209,12 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** When the new best-step is better than theBest, replace theBest.
-     *  Note: for QoF where smaller if better, must switch to '<'.
      *  @param best  new best-step found during feature selection
      *  @param qk    index of Quality of Fit (QoF) to use for comparing quality
      */
-    private def updateBest (best: BestStep, qk: Int = QoF.rSqBar.ordinal): Unit =
+    private def updateBest (best: BestStep)(using qk: Int): Unit =
         if best.qof != null then
-            if theBest.qof == null || best.qof(qk) > theBest.qof(qk) then theBest = best
+            if theBest.qof == null || (best gt theBest.qof(qk)) then theBest = best
     end updateBest
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -242,11 +241,11 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
      *  @param cols  the columns of matrix x currently included in the existing model
      *  @param qk    index of Quality of Fit (QoF) to use for comparing quality
      */
-    def forwardSel (cols: LinkedHashSet [Int], qk: Int = QoF.rSqBar.ordinal): BestStep =
+    def forwardSel (cols: LSET [Int])(using qk: Int): BestStep =
         var best = BestStep ()()                                             // best step so far
 
         for j <- x.indices2 if ! (cols contains j) do
-            val cols_j = cols union LinkedHashSet (j)                        // try adding variable/column x_j
+            val cols_j = cols union LSET (j)                                 // try adding variable/column x_j
             val x_cols = x(?, cols_j)                                        // x projected onto cols_j columns
             val mod_j  = buildModel (x_cols)                                 // regress with x_j added
             mod_j.train ()                                                   // train model
@@ -260,13 +259,14 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Evalaute the model with only one column, e.g., intercept only model.
+     *  @param qk  index of Quality of Fit (QoF) to use for comparing quality
      */
     def select0 (qk: Int): BestStep =
-        val x_cols = x(?, LinkedHashSet (0))                                 // x projected onto columns {0}
+        val x_cols = x(?, LSET (0))                                          // x projected onto columns {0}
         val mod_0  = buildModel (x_cols)                                     // regress with x_0 added
         mod_0.train ()                                                       // train model
         val qof_0 = mod_0.test ()._2
-        BestStep (0, qk, qof_0, mod_0)(qof_0(qk))                            // result for intercept only
+        BestStep (0, qof_0, mod_0)(qof_0(qk))                                // result for intercept only
     end select0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -274,21 +274,20 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
      *  in the model, returning the variables added and the new Quality of Fit (QoF)
      *  measures for all steps.
      *  @see `Fit` for index of QoF measures.
-     *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      *  @param cross  whether to include the cross-validation QoF measure
+     *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    def forwardSelAll (qk: Int = QoF.rSqBar.ordinal, cross: Boolean = true):
-                      (LinkedHashSet [Int], MatrixD) =
+    def forwardSelAll (cross: Boolean = true)(using qk: Int): (LSET [Int], MatrixD) =
         resetBest ()
         val rSq  = new MatrixD (x.dim2, Fit.qofVectorSize)                   // QoF: R^2, R^2 Bar, sMAPE, R^2 cv
-        val cols = LinkedHashSet (0)                                         // start with x_0 in model (e.g., intercept)
+        val cols = LSET (0)                                                  // start with x_0 in model (e.g., intercept)
         updateQoF (rSq, 0, cross, select0 (qk))                              // update Qof results for 0-th variable
 
         banner (s"forwardSelAll: (l = 0) INITIAL variable (0, ${fname(0)}) => cols = $cols")
 
         breakable {
             for l <- 1 until x.dim2 do
-                val best = forwardSel (cols, qk)                             // add most predictive variable
+                val best = forwardSel (cols)                                 // add most predictive variable
                 if best.col == -1 then break ()                              // could not find variable to add
                 updateBest (best)
                 cols += best.col                                             // add variable x_j
@@ -303,7 +302,7 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the relative importance of selected variables, ordered highest to
-     *  lowest, resimport scala.collection.mutable.LinkedHashSetcaled so the highest is one.
+     *  lowest, rescaled so the highest is one.
      *  @param cols  the selected columns/features/variables
      *  @param rSq   the matrix R^2 values (stand in for sse)
      */
@@ -312,7 +311,7 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
         val imp = Array.ofDim [(Int, Double)] (r2.dim)                        // for variables, except intercept
         val sf  = 1.0 / (r2(1) - r2(0))                                       // scale factor, so most important = 1
         imp(0)  = (cols(0), -0.0)
-        for j <- 1 until imp.size do imp(j) = (cols(j), sf * (r2(j) - r2(j-1)))      // scaled improvement in R^2 (2 => cv)
+        for j <- 1 until imp.size do imp(j) = (cols(j), sf * (r2(j) - r2(j-1)))   // scaled improvement in R^2 (2 => cv)
         imp                                                                   // return the importance
     end importance
 
@@ -322,15 +321,15 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
      *  vector and the new Quality of Fit (QoF).  May be called repeatedly.
      *  @see `Fit` for index of QoF measures.
      *  @param cols   the columns of matrix x currently included in the existing model
-     *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      *  @param first  first variable to consider for elimination
      *                      (default (1) assume intercept x_0 will be in any model)
+     *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    def backwardElim (cols: LinkedHashSet [Int], qk: Int = QoF.rSqBar.ordinal, first: Int = 1): BestStep =
+    def backwardElim (cols: LSET [Int], first: Int = 1)(using qk: Int): BestStep =
         var best = BestStep ()()                                             // best step so far
 
         for j <- first until x.dim2 if cols contains j do
-            val cols_j = cols diff LinkedHashSet (j)                         // try removing variable/column x_j
+            val cols_j = cols diff LSET (j)                                  // try removing variable/column x_j
             val x_cols = x(?, cols_j)                                        // x projected onto cols_j columns
             val mod_j  = buildModel (x_cols)                                 // regress with x_j added
             mod_j.train ()                                                   // train model
@@ -339,19 +338,19 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
 
         if best.col == -1 then
             flaw ("backwardElim", "could not find a variable x_j to eliminate: best.col = -1")
-        end if
         best
     end backwardElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Run the full model before variable elimination as a starting point for
      *  backward elimination.
+     *  @param qk  index of Quality of Fit (QoF) to use for comparing quality
      */
-    private def fullModel (qk: Int): BestStep =
+    def fullModel (qk: Int): BestStep =
         val mod_a = buildModel (x)                                           // regress with all variables x_j
         mod_a.train ()                                                       // train model
         val qof_a = mod_a.test ()._2
-        BestStep (-1, qk, qof_a, mod_a)(qof_a(qk))                           // result for full only
+        BestStep (-1, qof_a, mod_a)(qof_a(qk))                               // result for full only
     end fullModel
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -359,15 +358,15 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
      *  from the full model, returning the variables left and the new Quality of Fit (QoF)
      *  measures for all steps.
      *  @see `Fit` for index of QoF measures.
-     *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      *  @param first  first variable to consider for elimination
      *  @param cross  whether to include the cross-validation QoF measure
+     *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    def backwardElimAll (qk: Int = QoF.rSqBar.ordinal, first: Int = 1, cross: Boolean = true):
-                        (LinkedHashSet [Int], MatrixD) =
+    def backwardElimAll (first: Int = 1, cross: Boolean = true)(using qk: Int):
+                        (LSET [Int], MatrixD) =
         resetBest ()
         val rSq  = new MatrixD (x.dim2, Fit.qofVectorSize)                   // R^2, R^2 Bar, sMAPE, R^2 cv
-        val cols = LinkedHashSet.range (0, x.dim2)                           // start with all x_j in model
+        val cols = LSET.range (0, x.dim2)                                    // start with all x_j in model
         val rem  = ArrayBuffer [Int] ()                                      // start with no columns removed
 
         val best0 = fullModel (qk)
@@ -377,7 +376,7 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
 
         breakable {
             for l <- 1 until x.dim2 - 1 do                                   // l indicates number of variables eliminated
-                val best = backwardElim (cols, qk, first)                    // remove least predictive variable
+                val best = backwardElim (cols, first)                        // remove least predictive variable
                 if best.col == -1 then break ()                              // could not find variable to remove
                 updateBest (best)
                 cols -= best.col                                             // remove variable x_j
@@ -392,7 +391,7 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
         rem += cols.max                                                      // remove last non-zero column
         rem += 0                                                             // remove column 0
 
-        (LinkedHashSet.from (rem.reverse), rSq.reverse)                      // reverse the order results
+        (LSET.from (rem.reverse), rSq.reverse)                               // reverse the order results
     end backwardElimAll 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -401,44 +400,43 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
      *  measures for all steps.  At each step it calls forwardSel and backwardElim
      *  and takes the best of the two actions.  Stops when neither action yields improvement.
      *  @see `Fit` for index of QoF measures.
-     *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      *  @param cross  whether to include the cross-validation QoF measure
      *  @param swap   whether to allow a swap step (swap out a feature for a new feature in one step)
+     *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    def stepwiseSelAll (qk: Int = QoF.rSqBar.ordinal, cross: Boolean = true, swap: Boolean = true):
-                       (LinkedHashSet [Int], MatrixD) =
+    def stepwiseSelAll (cross: Boolean = true, swap: Boolean = true)(using qk: Int):
+                       (LSET [Int], MatrixD) =
         resetBest ()
         val rSq    = new MatrixD (x.dim2 - 1, Fit.qofVectorSize)             // QoF: R^2, R^2 Bar, sMAPE, R^2 cv
-        val cols   = LinkedHashSet (0)                                       // start with x_0 in model
-        var last_q = if Fit.maxi.contains (qk) then -MAX_VALUE               // current best QoF
-                     else MAX_VALUE
+        val cols   = LSET (0)                                                // start with x_0 in model
+        var last_q = Fit.extreme (qk)                                        // current best QoF
         val vars   = ArrayBuffer [Int]()
 
         banner (s"stepwiseSelAll: (l = 0) INITIAL variable (0, ${fname(0)}) => cols = $cols")
 
         breakable {
             for l <- 1 until x.dim2 - 1 do
-                val bestf = forwardSel (cols, qk)                         // add most predictive variable OR
-                val bestb = backwardElim (cols, qk, 1)                    // remove least predictive variable
+                val bestf = forwardSel (cols)                                // add most predictive variable OR
+                val bestb = backwardElim (cols, 1)                           // remove least predictive variable
                 debug ("stepwiseSelAll", s"bestf = $bestf, bestb = $bestb")
 
-                if (bestb.col == -1 || bestf.qof(qk) >= bestb.qof(qk)) &&   // forward as good as backward
-                   (bestf.col != -1 && bestf.qof(qk) > last_q) then            // a better model has been found
+                if (bestb.col == -1 || (bestf ge bestb.qof(qk))) &&          // forward as good as backward
+                   (bestf.col != -1 && (bestf gt last_q)) then               // a better model has been found
                     updateBest (bestf)
                     vars  += bestf.col
-                    cols  += bestf.col                                            // ADD variable bestf.col
+                    cols  += bestf.col                                       // ADD variable bestf.col
                     last_q = bestf.qof(qk)
-                    updateQoF (rSq, l, cross, bestf)                              // update QoF results
+                    updateQoF (rSq, l, cross, bestf)                         // update QoF results
                     println (s"\nstepwiseSelAll: (l = $l) ADD variable $bestf")
                     val (jj, jj_qof) = (bestf.col, last_q)
                     banner (s"stepwiseSelAll: (l = $l) ADD variable ($jj, ${fname(jj)}) => cols = $cols @ $jj_qof")
 
-                else if bestb.col != -1 && bestb.qof(qk) > last_q then         // a better model has been found
+                else if bestb.col != -1 && (bestb gt last_q) then            // a better model has been found
                     updateBest (bestb)
                     vars  += bestb.col
-                    cols  -= bestb.col                                            // REMOVE variable bestb.col 
+                    cols  -= bestb.col                                       // REMOVE variable bestb.col 
                     last_q = bestb.qof(qk)
-                    updateQoF (rSq, l, cross, bestb)                              // update QoF results
+                    updateQoF (rSq, l, cross, bestb)                         // update QoF results
                     println (s"\nstepwiseSelAll: (l = $l) REMOVE variable $bestb")
                     val (jj, jj_qof) = (bestb.col, last_q)
                     banner (s"stepwiseSelAll: (l = $l) REMOVE variable ($jj, ${fname(jj)}) => cols = $cols @ $jj_qof")
@@ -448,7 +446,7 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
                     val (out, in) = (bestb.col, bestf.col)
                     val bestfb = swapVars (cols, out, in, qk)
                     updateBest (bestfb)
-                    if out != -1 && in != -1 && bestfb.qof(qk) > last_q then    // a better model has been found
+                    if out != -1 && in != -1 && (bestfb gt last_q) then      // a better model has been found
                         vars  += bestb.col
                         vars  += bestf.col
                         cols  -= bestb.col                                   // REMOVE variable bestb.col (swap out)
@@ -483,14 +481,15 @@ trait Predictor (x: MatrixD, y: VectorD, protected var fname: Array [String], hp
      *  @param cols  the columns of matrix x currently included in the existing model
      *  @param out   the variable to swap out
      *  @param in    the variable to swap in
+     *  @param qk    index of Quality of Fit (QoF) to use for comparing quality
      */
-    private def swapVars (cols: LinkedHashSet [Int], out: Int, in: Int, qk: Int): BestStep =
-        val cols_  = cols diff LinkedHashSet (out) union LinkedHashSet (in)  // swap out var with in var
+    def swapVars (cols: LSET [Int], out: Int, in: Int, qk: Int): BestStep =
+        val cols_  = cols diff LSET (out) union LSET (in)  // swap out var with in var
         val x_cols = x(?, cols_)                                             // x projected onto cols_j columns
         val mod_j  = buildModel (x_cols)                                     // regress with x_out removed and x_in added
         mod_j.train ()                                                       // train model
         val qof_in = mod_j.test ()._2
-        BestStep (in, qk, qof_in, mod_j)(qof_in(qk))                         // candidate step
+        BestStep (in, qof_in, mod_j)(qof_in(qk))                             // candidate step
     end swapVars
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

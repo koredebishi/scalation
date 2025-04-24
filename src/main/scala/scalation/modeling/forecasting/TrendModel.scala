@@ -76,7 +76,7 @@ class TrendModel (y: VectorD, hh: Int, tRng: Range = null,
     override def forecast (t: Int, y_ : VectorD = yb): VectorD =
         val yh = new VectorD (hh)                                       // hold forecasts for each horizon
         for h <- 1 to hh do
-            val pred = b(0) + b(1) * (t+h-1)                            // slide in prior forecasted values
+            val pred = predict (t+h-1, y_)                              // slide in prior forecasted values
             yf(t, h) = pred                                             // record in forecast matrix
             yh(h-1)  = pred                                             // record forecasts for each horizon
         yh                                                              // return forecasts for all horizons
@@ -94,7 +94,7 @@ class TrendModel (y: VectorD, hh: Int, tRng: Range = null,
         if h < 2 then flaw ("forecastAt", s"horizon h = $h must be at least 2")
 
         for t <- y_.indices do                                          // make forecasts over all time points for horizon h
-            yf(t, h) = b(0) + b(1) * (t+h+1)                            // record in forecast matrix
+            yf(t, h) = predict (t+h-1, y_)                              // record in forecast matrix
         yf(?, h)                                                        // return the h-step ahead forecast vector
     end forecastAt
 
@@ -136,7 +136,7 @@ end TrendModel
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end trendModelTest
@@ -181,7 +181,7 @@ end trendModelTest2
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end trendModelTest3

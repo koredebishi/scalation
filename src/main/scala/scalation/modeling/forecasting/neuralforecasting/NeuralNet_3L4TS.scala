@@ -21,7 +21,7 @@ import ActivationFun._
 import neuralnet.{NeuralNet_3L, Optimizer}
 
 import Example_Covid.{loadData, response}
-import MakeMatrix4TS.hp
+import MakeMatrix4TS._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NeuralNet_3L4TS` class provides basic time series analysis capabilities for
@@ -164,15 +164,11 @@ object NeuralNet_3L4TS extends Scaling:
                hparam: HyperParameter = hp ++ Optimizer.hp,
                f: AFF = f_tanh, f1: AFF = f_id, itran: FunctionV2V = null,
                bakcast: Boolean = false): NeuralNet_3L4TS =
-        val p       = hparam("p").toInt                               // use the last p endogenous values (p lags)
-        val q       = hparam("q").toInt                               // use the last q exogenous values (q lags)
-        val spec    = hparam("spec").toInt                            // trend terms: 0 - none, 1 - constant, 2 - linear, 3 - quadratic
-                                                                      //              4 - sine, 5 cosine
-        val lwave   = hparam("lwave").toDouble                        // wavelength (distance between peaks)
-        val (x, yy) = ARX_D.buildMatrix4TS (xe, y, p, q, spec, lwave, hh)   // column for each lag
+        val xy    = ARX.buildMatrix (xe, y, hparam, bakcast)
+        val yy    = makeMatrix4Y (y, hh, bakcast)
         val n_exo = if xe == null then 0 else xe.dim2
 
-        new NeuralNet_3L4TS (x, yy, hh, n_exo, fname, tRng, nz, hparam, f, f1, itran, bakcast)
+        new NeuralNet_3L4TS (xy, yy, hh, n_exo, fname, tRng, nz, hparam, f, f1, itran, bakcast)
     end apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

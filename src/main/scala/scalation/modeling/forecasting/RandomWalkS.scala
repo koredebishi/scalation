@@ -39,14 +39,13 @@ class RandomWalkS (y: VectorD, hh: Int, tRng: Range = null,
                    bakcast: Boolean = false)
       extends Forecaster (y, hh, tRng, hparam, bakcast):
 
-    private val flaw = flawf ("RandomWalkS")                             // flaw function
-    private val s    = hparam("s").toDouble                              // slope weight
+    private val sw = hparam("sw").toDouble                              // slope weight (same as RW when sw = 0
 
     modelName = s"RandomWalkS"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict a value for y_t using the 1-step ahead forecast based on the 
-     *  a slope (s) adjusted random walk.
+     *  a slope (S) adjusted random walk.
      *
      *      y_t+1 = y_t + s (y_t - y_t-1)
      *
@@ -54,8 +53,7 @@ class RandomWalkS (y: VectorD, hh: Int, tRng: Range = null,
      *  @param y_  the actual values to use in making predictions
      */
     override def predict (t: Int, y_ : VectorD): Double =
-        if t >= 1 then y_(t) + s * (y_(t) - y_(t-1))
-        else y_(t)
+        super.predict (t, y_) + sw * (y_(max0(t-1)) - y_(max0(t-2)))
     end predict
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -74,22 +72,6 @@ class RandomWalkS (y: VectorD, hh: Int, tRng: Range = null,
         yh                                                              // return forecasts for all horizons
     end forecast
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Forecast values for all y_.dim time points at horizon h (h-steps ahead).
-     *  Assign into FORECAST MATRIX and return the h-steps ahead forecast.
-     *  Note, `predictAll` provides predictions for h = 1.
-     *  @see `forecastAll` method in `Forecaster` trait.
-     *  @param h   the forecasting horizon, number of steps ahead to produce forecasts
-     *  @param y_  the actual values to use in making forecasts
-     */
-    override def forecastAt (h: Int, y_ : VectorD = yb): VectorD =
-        if h < 2 then flaw ("forecastAt", s"horizon h = $h must be at least 2")
-
-        for t <- y_.indices do                                          // make forecasts over all time points for horizon h
-            yf(t, h) = predict (max0 (t-1), y_)                         // record in forecast matrix
-        yf(?, h)                                                        // return the h-step ahead forecast vector
-    end forecastAt
-
 end RandomWalkS
 
 
@@ -102,7 +84,7 @@ object RandomWalkS:
     /** Base hyper-parameter specification for the `RandomWalkS` classes
      */
     val hp = new HyperParameter
-    hp += ("s", 0.1, 0.1)                           // weight used for slope adjustment
+    hp += ("sw", 0.1, 0.1)                           // slope weight (sw) used for slope adjustment
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a `RandomWalkS` object.
@@ -135,7 +117,7 @@ end RandomWalkS
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end randomWalkSTest
@@ -182,7 +164,7 @@ end randomWalkSTest2
         mod.trainNtest ()()                                               // train and test on full dataset
 
         mod.forecastAll ()                                                // forecast h-steps ahead (h = 1 to hh) for all y
-        Forecaster.evalForecasts (mod, mod.getYb, hh)
+        mod.diagnoseAll (y, mod.getYf)
         println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
     end for
 

@@ -13,12 +13,16 @@ package modeling
 package forecasting
 package neuralforecasting
 
+// FIX - recode to follow the NeuralNet_3L4TS pattern
+
 import scala.math.max
 
 import scalation.mathstat._
 
 import ActivationFun._
 import neuralnet.{NeuralNet_XL, Optimizer}
+
+import MakeMatrix4TS._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NeuralNet_XL4TS` object supports X-layer regression-like neural networks 
@@ -42,9 +46,12 @@ object NeuralNet_XL4TS:
     def apply (y: VectorD, lags: Int, h: Int, nz: Int = -1,
                hparam: HyperParameter = Optimizer.hp,
                f: Array [AFF] = Array (f_eLU, f_eLU, f_tanh)): NeuralNet_XL =
-        val (x, yy) = ARY_D.buildMatrix4TS (y, lags, h)                  // column for each lag
+        val hh  = 6 
+        val bakcast = false
+        val xy  = ARX.buildMatrix (null, y, hparam, bakcast)
+        val yy  = makeMatrix4Y (y, hh, bakcast)
 
-        val mod = NeuralNet_XL.rescale (x, yy, null, null, hparam, f)
+        val mod = NeuralNet_XL.rescale (xy, yy, null, null, hparam, f)
         mod.modelName = s"NeuralNet_XL4TS_$lags"
         mod
     end apply
@@ -68,12 +75,15 @@ object NeuralNet_XL4TS:
              hparam: HyperParameter = Optimizer.hp,
              f: Array [AFF] = Array (f_eLU, f_eLU, f_tanh))
             (elag1: Int = max (1, lags / 5), elag2: Int = max (1, lags)): NeuralNet_XL =
-        val (x, yy) = ARX_D.buildMatrix4TS (ex, y, lags, elag2, 1, 2, h)    // column for each lag
+        val hh  = 6 
+        val bakcast = false
+        val xy  = ARX.buildMatrix (ex, y, hparam, bakcast)
+        val yy  = makeMatrix4Y (y, hh, bakcast)
 
-        println (s"exo: x.dims = ${x.dims}, yy.dim = ${yy.dim}")
-//      println (s"exo: x = $x \n yy = $yy")
+        println (s"exo: xy.dims = ${xy.dims}, yy.dim = ${yy.dim}")
+//      println (s"exo: xy = $xy \n yy = $yy")
 
-        val mod = NeuralNet_XL.rescale (x, yy, null, null, hparam, f)
+        val mod = NeuralNet_XL.rescale (xy, yy, null, null, hparam, f)
         mod.modelName = s"NeuralNet_XL4TS_$lags"
         mod
     end exo
