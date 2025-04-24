@@ -460,7 +460,7 @@ end ARX_QuadTest4
 //  for (c, r) <- imp do println (s"col = $c, \t ${Example_Covid.header(c)}, \t importance = $r")
 
     banner ("Run TnT on Best model")
-//  val bmod = mod.getBest._4                                            // get the best model from feature selection
+//  val bmod = mod.getBest._3                                            // get the best model from feature selection
     val bmod = mod.getBest.mod.asInstanceOf [ARX_Quad]                   // get the best model from feature selection
     val (x_, y_, xtest, ytest) = ForecasterX.split_TnT (bmod.getX, bmod.getY)
     val (yptest, qoftest) = bmod.trainNtest (x_, y_)(xtest, ytest)       // train on (x_, y_) and test on (xtest, ytest)
@@ -514,7 +514,7 @@ end ARX_QuadTest5
 //  for (c, r) <- imp do println (s"col = $c, \t ${header(c)}, \t importance = $r")
 
     banner ("Run Rolling Validation on ARX_Quad Best model")
-//  val bmod = mod.getBest._4
+//  val bmod = mod.getBest._3
     val bmod = mod.getBest.mod.asInstanceOf [ARX_Quad]                    // get the best model from feature selection
     ForecasterX.rollValidate (bmod, rc, hh)
 

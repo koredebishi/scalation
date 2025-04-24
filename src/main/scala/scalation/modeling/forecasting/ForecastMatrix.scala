@@ -113,7 +113,7 @@ trait ForecastMatrix (y: VectorD, hh: Int, tRng: Range = null):
      *  @param showYf  the amount of shift for yfh (FIX - ideally unify the code and remove sft)
      */
     def diagnoseAll (y_ : VectorD, yf: MatrixD, tRng: Range = null, sft: Int = 0,
-                     showYf: Boolean = true): Unit =
+                     showYf: Boolean = false): Unit =
         val ftMat = new MatrixD (hh, Fit.N_QoF)
         val t1 = if tRng == null then 0 else tRng.start                    // first time point
         for h <- 1 to hh do
@@ -175,7 +175,7 @@ import Example_LakeLevels.y
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end forecastMatrixTest
@@ -220,8 +220,7 @@ end forecastMatrixTest2
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    mod.diagnoseAll (y, mod.getYf)                                        // should agree with evalForecasts
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end forecastMatrixTest3

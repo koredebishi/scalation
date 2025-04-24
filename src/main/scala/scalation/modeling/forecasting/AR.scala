@@ -14,10 +14,6 @@ package forecasting
 
 import scalation.mathstat._
 
-import Forecaster.rdot
-import Example_Covid.loadData_y
-import Example_LakeLevels.y
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `AR` class provides basic time series analysis capabilities for Auto-Regressive
  *  (AR) models.  AR models are often used for forecasting.
@@ -57,7 +53,7 @@ class AR (y: VectorD, hh: Int, tRng: Range = null,
      */
     override def train (x_null: MatrixD, y_ : VectorD): Unit =
         makeCorrelogram (y_)                                            // correlogram computes psi matrix
-        b = psiM(p)(1 until p+1)                                        // coefficients = p-th row, columns 1, 2, ... p
+        b = psiM(p)(1 until p+1).reverse                                // coefficients = p-th row, columns 1, 2, ... p
         δ = statsF.mu * (1 - b.sum)                                     // compute drift/intercept
     end train
 
@@ -74,7 +70,23 @@ class AR (y: VectorD, hh: Int, tRng: Range = null,
      *  @param t   the time point being predicted
      *  @param y_  the actual values to use in making predictions
      */
-    override def predict (t: Int, y_ : VectorD): Double = δ + rdot (b, y_, t-1)
+    override def predict (t: Int, y_ : VectorD): Double =
+//      δ + rdot (b, y_, t-1)                                          // old way
+        val x = y_.prior (p, t)                                        // x = [ y_t-p, ... y_t-1 ]
+        δ + (b dot x)
+    end predict
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Forge a vector from va;ues in the FORECAST MATRIX yf. 
+     *  @patam yf  the forecast matrix
+     *  @param t   the time point from which to make forecasts
+     *  @param h   the forecasting horizon
+     */
+    def forge (yf: MatrixD, t: Int, h: Int): VectorD =
+        val x_act   = yf(?, 0).prior (max0 (p-h+1), t)                 // get actual lagged y-values (endogenous)
+        val x_fcast = yf(t)(1 until h)                                 // get forecasted y-values
+        x_act ++ x_fcast
+    end forge
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Produce a vector of size hh, h = 1 to hh-steps ahead forecasts for the model,
@@ -86,7 +98,9 @@ class AR (y: VectorD, hh: Int, tRng: Range = null,
     override def forecast (t: Int, y_ : VectorD = yb): VectorD =
         val yh = new VectorD (hh)                                       // hold forecasts for each horizon
         for h <- 1 to hh do
-            val pred = δ + rdot (b, yf, t, h-1)                         // slide in prior forecasted values
+//          val pred = δ + rdot (b, yf, t, h-1)                         // slide in prior forecasted values
+            val x = forge (yf, t, h)
+            val pred = δ + (b dot x)
             yf(t, h) = pred                                             // record in forecast matrix
             yh(h-1)  = pred                                             // record forecasts for each horizon
         yh                                                              // return forecasts for all horizons
@@ -104,7 +118,9 @@ class AR (y: VectorD, hh: Int, tRng: Range = null,
         if h < 2 then flaw ("forecastAt", s"horizon h = $h must be at least 2")
 
         for t <- y_.indices do                                          // make forecasts over all time points for horizon h
-            yf(t, h) = δ + rdot (b, yf, t, h-1)                         // record in forecast matrix
+//          yf(t, h) = δ + rdot (b, yf, t, h-1)                         // record in forecast matrix (old way)
+            val x = forge (yf, t, h)
+            yf(t, h) = δ + (b dot x)                                    // record in forecast matrix
         yf(?, h)                                                        // return the h-step ahead forecast vector
     end forecastAt
 
@@ -143,6 +159,8 @@ object AR:
 
 end AR
 
+import Example_Covid.loadData_y
+import Example_LakeLevels.y
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `aRTest` main function tests the `AR` class on real data:
@@ -160,7 +178,7 @@ end AR
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end aRTest
@@ -210,7 +228,6 @@ end aRTest2
 //      mod.setSkip (p)                                                   // full AR-formula available when t >= p
         mod.forecastAll ()                                                // forecast h-steps ahead (h = 1 to hh) for all y
         mod.diagnoseAll (y, mod.getYf)
-//      Forecaster.evalForecasts (mod, mod.getYb, hh)
 //      println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 //      println (s"Final In-ST Forecast Matrix yf = ${mod.getYf.shiftDiag}")
     end for
@@ -235,8 +252,10 @@ end aRTest3
         AR.hp("p") = p                                                    // number of AR terms
         val mod = new AR (y, hh)                                          // create model for time series data
         banner (s"TnT Forecasts: ${mod.modelName} on COVID-19 Dataset")
+//      mod.setSkip (p)                                                   // may wish to skip until all p past values are available
         mod.trainNtest ()()
 
+        mod.setSkip (0)                                                   // can use values from training set to not skip any in test
         mod.rollValidate ()                                               // TnT with Rolling Validation
         println (s"Final TnT Forecast Matrix yf = ${mod.getYf}")
     end for

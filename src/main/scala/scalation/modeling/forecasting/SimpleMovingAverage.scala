@@ -51,7 +51,7 @@ class SimpleMovingAverage (y: VectorD, hh: Int, tRng: Range = null,
      *  @param t   the time point being predicted
      *  @param y_  the actual values to use in making predictions (mean (inclusive, exclusice))
      */
-    override def predict (t: Int, y_ : VectorD): Double = y_.mean (max0 (t-q+1), t+1)
+    override def predict (t: Int, y_ : VectorD): Double = y_.mean (max0 (t-q), t)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Produce a vector of size hh, h = 1 to hh-steps ahead forecasts for the model,
@@ -130,7 +130,7 @@ end SimpleMovingAverage
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end simpleMovingAverageTest
@@ -175,7 +175,7 @@ end simpleMovingAverageTest2
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end simpleMovingAverageTest3

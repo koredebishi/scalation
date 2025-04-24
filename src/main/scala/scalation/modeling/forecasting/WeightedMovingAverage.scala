@@ -52,7 +52,7 @@ class WeightedMovingAverage (y: VectorD, hh: Int, tRng: Range = null,
      *  @param t   the time point being predicted
      *  @param y_  the actual values to use in making predictions (mean (inclusive, exclusice))
      */
-    override def predict (t: Int, y_ : VectorD): Double = rdot (b, y_, t)
+    override def predict (t: Int, y_ : VectorD): Double = rdot (b, y_, t-1)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Produce a vector of size hh, h = 1 to hh-steps ahead forecasts for the model,
@@ -151,7 +151,7 @@ end WeightedMovingAverage
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end weightedMovingAverageTest
@@ -196,7 +196,7 @@ end weightedMovingAverageTest2
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    mod.diagnoseAll (y, mod.getYf)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end weightedMovingAverageTest3

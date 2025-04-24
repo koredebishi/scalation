@@ -295,13 +295,9 @@ object VAR:
      */
     def apply (y: MatrixD, hh: Int, fname: Array [String] = null, tRng: Range = null,
                hparam: HyperParameter = hp, bakcast: Boolean = false): VAR =   // backcasted values only used in `buildMatrix4TS`
-        val p     = hparam("p").toInt                                          // use the last p values for the main endogenous variable y_0
-        val q     = hparam("q").toInt                                          // use the last q values for other endogenous variables
-        val spec  = hparam("spec").toInt                                       // 0 - none, 1 - constant, 2 - linear, 3 -quadratic, 4 - sin, 5 = cos
-        val lwave = hparam("lwave").toDouble                                   // wavelength (distance between peaks)
         val y_0   = y(?, 0)                                                    // the main endogenous variable (column zero)
         val yy    = y(?, 1 until y.dim2)                                       // the other endogenous variables (rest of the columns)
-        val x     = ARX.buildMatrix4TS (yy, y_0, p, q, spec, lwave, bakcast)   // add spec trend columns and p|q lags for each column of y
+        val x     = ARX.buildMatrix (yy, y_0, hparam, bakcast)                 // add spec trend columns and p|q lags for each column of y
         new VAR (x, y, hh, fname, tRng, hparam)
     end apply
 

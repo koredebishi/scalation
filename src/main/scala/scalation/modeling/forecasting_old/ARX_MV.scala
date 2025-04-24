@@ -363,7 +363,7 @@ end aRX_MVTest4
 //  for (c, r) <- imp do println (s"col = $c, \t ${header(c)}, \t importance = $r")
 
     banner ("Run TnT on Best model")
-//  val bmod = mod.getBest._4                                               // get the best model from feature selection
+//  val bmod = mod.getBest._3                                               // get the best model from feature selection
     val bmod = mod.getBest.mod.asInstanceOf [RegressionMV]                  // get the best model from feature selection
     val (x_, y_, xtest, ytest) = ARX_MV.split_TnT (bmod.getX, bmod.getYY)
     val (yptest, qoftest) = bmod.asInstanceOf [PredictorMV].trainNtest (x_, y_)(xtest, ytest)          // train on (x_, y_) and test on (xtest, ytest)
@@ -414,7 +414,7 @@ end aRX_MVTest5
 //  for (c, r) <- imp do println (s"col = $c, \t ${header(c)}, \t importance = $r")
 
     banner ("Run Rolling Validation on ARX_MV Best model")
-//  val bmod = mod.getBest._4                                               // get the best model from feature selection
+//  val bmod = mod.getBest._3                                               // get the best model from feature selection
     val bmod = mod.getBest.mod.asInstanceOf [RegressionMV]                  // get the best model from feature selection
     ARX_MV.rollValidate (bmod.asInstanceOf [PredictorMV & Fit], rc)
 

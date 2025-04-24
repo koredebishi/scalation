@@ -465,7 +465,7 @@ end aRXTest5
 //  for (c, r) <- imp do println (s"col = $c, \t ${header(c)}, \t importance = $r")
 
     banner ("Run Rolling Validation on ARX Best model")
-    val bmod = mod.getBest._4.asInstanceOf [ARX]                         // get the best model from feature selection
+    val bmod = mod.getBest._3.asInstanceOf [ARX]                         // get the best model from feature selection
     ForecasterX.rollValidate (bmod, rc, h)
 
 end aRXTest6

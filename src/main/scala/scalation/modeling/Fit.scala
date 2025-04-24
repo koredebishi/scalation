@@ -29,34 +29,35 @@ import scalation.random.CDF.{fisherCDF, studentTCDF}
  */
 enum QoF (val name: String):
 
-    case rSq    extends QoF ("rSq")                         // index  0
-    case rSqBar extends QoF ("rSqBar")                      // index  1
-    case sst    extends QoF ("sst")                         // index  2
-    case sse    extends QoF ("sse")                         // index  3
+    case rSq     extends QoF ("rSq")                         // index  0
+    case rSqBar  extends QoF ("rSqBar")                      // index  1
+    case sst     extends QoF ("sst")                         // index  2
+    case sse     extends QoF ("sse")                         // index  3
 
-    case sde    extends QoF ("sde")                         // index  4
-    case mse0   extends QoF ("mse0")                        // index  5
-    case rmse   extends QoF ("rmse")                        // index  6
-    case mae    extends QoF ("mae")                         // index  7
-    case smape  extends QoF ("smape")                       // index  8
+    case sde     extends QoF ("sde")                         // index  4
+    case mse0    extends QoF ("mse0")                        // index  5
+    case rmse    extends QoF ("rmse")                        // index  6
+    case mae     extends QoF ("mae")                         // index  7
+    case smape   extends QoF ("smape")                       // index  8
 
-    case m      extends QoF ("m")                           // index  9
-    case dfm    extends QoF ("dfm")                         // index 10
-    case df     extends QoF ("df")                          // index 11
-    case fStat  extends QoF ("fStat")                       // index 12
-    case aic    extends QoF ("aic")                         // index 13
-    case bic    extends QoF ("bic")                         // index 14
+    case m       extends QoF ("m")                           // index  9
+    case dfm     extends QoF ("dfm")                         // index 10
+    case df      extends QoF ("df")                          // index 11
+    case fStat   extends QoF ("fStat")                       // index 12
+    case aic     extends QoF ("aic")                         // index 13
+    case bic     extends QoF ("bic")                         // index 14
 
-    case mape   extends QoF ("mape")                        // index 15
-//  case mase   extends QoF ("mase")                        // index 16
+    case mape    extends QoF ("mape")                        // index 15
+    case mase    extends QoF ("mase")                        // index 16
+    case smapeIC extends QoF ("smapeIC")                     // index 17
 
-    case picp   extends QoF ("picp")                        // index 17 
-    case pinc   extends QoF ("pinc")                        // index 18
-    case ace    extends QoF ("ace")                         // index 10
-    case pinaw  extends QoF ("pinaw")                       // index 20
-    case pinad  extends QoF ("pinad")                       // index 21
-    case iscore extends QoF ("iscore")                      // index 22
-    case wis    extends QoF ("wis")                         // index 23
+    case picp    extends QoF ("picp")                        // index 18 
+    case pinc    extends QoF ("pinc")                        // index 19
+    case ace     extends QoF ("ace")                         // index 20
+    case pinaw   extends QoF ("pinaw")                       // index 21
+    case pinad   extends QoF ("pinad")                       // index 22
+    case iscore  extends QoF ("iscore")                      // index 23
+    case wis     extends QoF ("wis")                         // index 24
 
 end QoF
 
@@ -84,38 +85,46 @@ object Fit:
     def help: String =
         """
 help: Quality of Fit (QoF) metrics/measures:
-    rSq    =  R-squared, the Coefficient of Determination (R^2)
-    rSqBar =  adjusted R-squared (R^2-bar)
-    sst    =  Sum of Squares Total (ssr + sse)
-    sse    =  Sum of Squares for Error (SSE = RSS)
+    rSq     =  R-squared, the Coefficient of Determination (R^2)
+    rSqBar  =  adjusted R-squared (R^2-bar)
+    sst     =  Sum of Squares Total (ssr + sse)
+    sse     =  Sum of Squares for Error (SSE = RSS)
 
-    sde    =  Standard Deviation of Errors
-    mse0   =  raw Mean Square Error (MSE = SSE / m)
-    rmse   =  Root Mean Square Error (RMSE)
-    mae    =  Mean Absolute Error (MAE)
-    smape  =  symmetric Mean Absolute Percentage Error (sMAPE)
+    sde     =  Standard Deviation of Errors
+    mse0    =  raw Mean Square Error (MSE = SSE / m)
+    rmse    =  Root Mean Square Error (RMSE)
+    mae     =  Mean Absolute Error (MAE)
+    smape   =  symmetric Mean Absolute Percentage Error (sMAPE)
 
-    m      =  Number of Observations
-    dfm    =  Degrees of Freedom taken by the model, e.g., one lost per parameter
-    df     =  Degrees of Freedom left for residuals/errors
-    fStat  =  Fisher's Statistic
-    aic    =  Akaike Information Criterion (AIC)
-    bic    =  Bayesian Information Criterion (BIC)
+    m       =  Number of Observations
+    dfm     =  Degrees of Freedom taken by the model, e.g., one lost per parameter
+    df      =  Degrees of Freedom left for residuals/errors
+    fStat   =  Fisher's Statistic
+    aic     =  Akaike Information Criterion (AIC)
+    bic     =  Bayesian Information Criterion (BIC)
 
-    mape   =  Mean Absolute Percentage Error (MAPE)
-    mase   =  Mean Absolute Scaled Error (optional)
+    mape    =  Mean Absolute Percentage Error (MAPE)
+    mase    =  Mean Absolute Scaled Error (MASE)
+    smapeIC =  symmetric Mean Absolute Percentage Error Information Criterion (sMAPE-IC)
 
-    picp   =  prediction interval coverage probability
-    pinc   =  prediction interval nominal coverage
-    ace    =  average coverage error
-    pinaw  =  prediction interval normalized average width
-    pinad  =  prediction interval normalized average deviation
-    iscore =  interval score
-    wis    =  weighted interval score
+    picp    =  prediction interval coverage probability
+    pinc    =  prediction interval nominal coverage
+    ace     =  average coverage error
+    pinaw   =  prediction interval normalized average width
+    pinad   =  prediction interval normalized average deviation
+    iscore  =  interval score
+    wis     =  weighted interval score
         """
     end help
 
     val maxi = Set (QoF.rSq.ordinal, QoF.rSqBar.ordinal)                    // maximize these QoF metrics (min the rest)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a contrary/starting value, -∞ for maximization, ∞ for minimization
+     *  @param qk  the QoF metric index/ordinal value
+     */
+    inline def extreme (qk: Int): Double = if maxi contains qk then NEGATIVE_INFINITY
+                                           else POSITIVE_INFINITY
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Collect QoF results for a model and return them in a vector.
@@ -270,37 +279,47 @@ import Fit._
 trait Fit (protected var dfm: Double, protected var df: Double)
       extends FitM:
 
-    private val debug = debugf ("Fit", false)                  // debug function
-    private val flaw  = flawf  ("Fit")                         // flaw function
+    private val debug   = debugf ("Fit", false)                 // debug function
+    private val flaw    = flawf  ("Fit")                        // flaw function
 
-    private var df_t   = dfm + df                              // total degrees of freedom
-    private var r_df   = if df > 1.0 then df_t / df            // ratio of degrees of freedom (total / error)
-                         else dfm + 1.0                        // case for for less than 1 dof error
+    private val pIC     = 2.0                                   // penalty multiplier for sMAPE IC
+    private var df_t    = dfm + df                              // total degrees of freedom
+    private var r_df    = if df > 1.0 then df_t / df            // ratio of degrees of freedom (total / error)
+                         else dfm + 1.0                         // case for for less than 1 dof error
 
-    private var mse    = -1.0                                  // mean of squares for error MSE (unbiased)
-    private var rse    = -1.0                                  // residual standard error (RSE)
-    private var msr    = -1.0                                  // mean of squares for regression/model (MSR)
+    private var mse     = -1.0                                  // mean of squares for error MSE (unbiased)
+    private var rse     = -1.0                                  // residual standard error (RSE)
+    private var msr     = -1.0                                  // mean of squares for regression/model (MSR)
 
-    private var rSqBar = -1.0                                  // adjusted R-squared (R^2 Bar)
-    private var fStat  = -1.0                                  // F statistic (Quality of Fit)
-    private var p_fS   = -1.0                                  // p-value for fStat 
-    private var aic    = -1.0                                  // Akaike Information Criterion (AIC)
-    private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
+    private var rSqBar  = -1.0                                  // adjusted R-squared (R^2 Bar)
+    private var fStat   = -1.0                                  // F statistic (Quality of Fit)
+    private var p_fS    = -1.0                                  // p-value for fStat 
+    private var aic     = -1.0                                  // Akaike Information Criterion (AIC)
+    private var bic     = -1.0                                  // Bayesian Information Criterion (BIC)
 
     // Measures used for time series @see www.forecastpro.com/Trends/forecasting101August2011.html
-    private var mape   = -1.0                                  // Mean Absolute Percentage Error (MAPE)
-//  private var mase   = -1.0                                  // Mean Absolute Scaled Error (MASE)
-//  private var nmae   = -1.0                                  // normalized MAE (MAD/Mean Ratio)
+    private var mape    = -1.0                                  // Mean Absolute Percentage Error (MAPE)
+    private var mase    = -1.0                                  // Mean Absolute Scaled Error (MASE)
+    private var smapeIC = -1.0                                  // symmetric Mean Absolute Percentage Error Information Criteria (sMAPE-IC)
+//  private var nmae    = -1.0                                  // normalized MAE (MAD/Mean Ratio)
 
-    private var picp   = -1.0                                  // prediction interval coverage probability
-    private var pinc   = -1.0                                  // prediction interval nominal coverage
-    private var ace    = -1.0                                  // average coverage error
-    private var pinaw  = -1.0                                  // prediction interval normalized average width
-    private var pinad  = -1.0                                  // prediction interval normalized average deviation
-    private var iscore = -1.0                                  // interval score
-    private var wis    = -1.0                                  // weighted interval score
+    private var picp    = -1.0                                  // prediction interval coverage probability
+    private var pinc    = -1.0                                  // prediction interval nominal coverage
+    private var ace     = -1.0                                  // average coverage error
+    private var pinaw   = -1.0                                  // prediction interval normalized average width
+    private var pinad   = -1.0                                  // prediction interval normalized average deviation
+    private var iscore  = -1.0                                  // interval score
+    private var wis     = -1.0                                  // weighted interval score
 
-    protected var sig2e = -1.0                                 // MLE estimate of the population variance on the residuals 
+    protected var sig2e = -1.0                                  // MLE estimate of the population variance on the residuals 
+
+    protected var yForm: Transform = null                      // optional transformation of the response variable y
+    protected var scaledMetrics: Boolean = false                // whether to use scaled metrics (otherwise use the default orifinal scale)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the the y-transformation.
+     */
+    def getYForm: Transform = yForm
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset the degrees of freedom to the new updated values.  For some models,
@@ -309,7 +328,6 @@ trait Fit (protected var dfm: Double, protected var df: Double)
      */
     def resetDF (df_update: (Double, Double)): Unit =
         dfm  = df_update._1; df = df_update._2                 // degrees of freedom
-        println (s"resetDF: dfm = $dfm, df = $df")
         df_t = dfm + df                                        // total degrees of freedom
         r_df = if df > 1.0 then df_t / df                      // ratio of degrees of freedom (total / error)
                else dfm + 1.0                                  // case for for less than 1 dof error
@@ -326,12 +344,15 @@ trait Fit (protected var dfm: Double, protected var df: Double)
      *  from the error/residual vector and the predicted & actual responses.
      *  For some models the instances may be weighted.
      *  @see `Regression_WLS`
-     *  @param y   the actual response/output vector to use (test/full)
-     *  @param yp  the predicted response/output vector (test/full)
-     *  @param w   the weights on the instances (defaults to null)
+     *  @param y_   the actual response/output vector to use (test/full)
+     *  @param yp_  the predicted response/output vector (test/full)
+     *  @param w    the weights on the instances (defaults to null)
      */
-    override def diagnose (y: VectorD, yp: VectorD, w: VectorD = null): VectorD =
+    override def diagnose (y_ : VectorD, yp_ : VectorD, w: VectorD = null): VectorD =
+        val (y, yp) = if scaledMetrics || yForm == null then (y_, yp_)
+                      else (yForm.fi(y_), yForm.fi(yp_))
         super.diagnose (y, yp, w)                                 // compute `FitM` metrics
+
         val e = y - yp                                            // FIX - avoid computing twice
 //      println (s"Fit.diagnose:\n y = $y,\n yp = $yp,\n e = $e")
 
@@ -357,7 +378,8 @@ trait Fit (protected var dfm: Double, protected var df: Double)
                                                                   //   an additional parameter to be estimated in MLE
         bic    = aic + (dfm + 1) * (ln_m - 2)                     // Bayesian Information Criterion
         mape   = 100 * (e.abs / y.abs).sum / m                    // mean absolute percentage error
-//      mase   = Fit.mase (y, yp)                                 // mean absolute scaled error
+        mase   = Fit.mase (y, yp)                                 // mean absolute scaled error
+        smapeIC = smape + pIC * (dfm + 1) / y.dim.toDouble        // sSMAPE Information Criterion
         fit
     end diagnose
 
@@ -429,7 +451,7 @@ trait Fit (protected var dfm: Double, protected var df: Double)
      *  Override to add more quality of fit measures.
      */
     override def fit: VectorD = VectorD (rSq, rSqBar, sst, sse, sde, mse0, rmse, mae,
-                                         smape, m, dfm, df, fStat, aic, bic, mape,
+                                         smape, m, dfm, df, fStat, aic, bic, mape, mase, smapeIC,
                                          picp, pinc, ace, pinaw, pinad, iscore, wis)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
