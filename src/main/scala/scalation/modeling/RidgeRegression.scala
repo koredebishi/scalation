@@ -5,7 +5,7 @@
  *  @date    Sat Jan 31 20:59:02 EST 2015
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model: Ridge Regression (L2 Shrinkage/Regularization)
+ *  @note    Model: Ridge Regression (L2 Shrinkage/Regularization)
  *
  *  @see math.stackexchange.com/questions/299481/qr-factorization-for-ridge-regression
  *  Ridge Regression using SVD
@@ -55,7 +55,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
          // no intercept => correct Degrees of Freedom (DoF); as lambda get larger, need effective DoF
 
     private val debug     = debugf ("RidgeRegression", false)            // debug function
-    private var lambda    = if hparam("lambda") <= 0.0 then findLambda._1
+    private val lambda    = if hparam("lambda") <= 0.0 then findLambda._1
                             else hparam ("lambda").toDouble
     private val algorithm = hparam("factorization")                      // factorization algorithm
 
@@ -79,7 +79,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
 
         algorithm match                                                  // select the factorization technique
         case "Fac_QR"       => val xx = x_ ++ (ey * sqrt (lambda))
-                               new Fac_QR (xx)                           // QR Factorization
+                               Fac_QR (xx)                               // QR/LQ Factorization
 //      case "Fac_SVD"      => new Fac_SVD (x_)                          // Singular Value Decomposition - FIX
         case "Fac_Cholesky" => new Fac_Cholesky (xtx_)                   // Cholesky Factorization
         case "Fac_LU"       => new Fac_LU (xtx_)                         // LU Factorization
@@ -133,7 +133,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
             val rrg = new RidgeRegression (x, y)
             val stats = rrg.crossValidate ()
             val sse2 = stats(QoF.sse.ordinal).mean
-            banner (s"RidgeRegession with lambda = ${rrg.lambda_} has sse = $sse2")
+            banner (s"RidgeRegression with lambda = ${rrg.lambda_} has sse = $sse2")
             if sse2 < sse then { sse = sse2; l_best = l }
 //          debug ("findLambda", showQofStatTable (stats))
             l *= 2
@@ -142,12 +142,12 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
     end findLambda
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find an optimal value for the shrinkage parameter 'λ' using Training to
+    /*  Find an optimal value for the shrinkage parameter 'λ' using Training to
      *  minimize 'sse'.
      *  FIX - try other QoF measures, e.g., sse_cv
      *  @param xx  the  data/input matrix (full or test)
      *  @param yy  the response/output vector (full or test)
-     */
+     *
     def findLambda2 (xx: MatrixD = x, yy: VectorD = y): Double =
 
         def f_sse (λ: Double): Double = 
@@ -160,10 +160,10 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
             sse
         end f_sse
 
-//      val gs = new GoldenSectionLS (f_sse _)
-//      gs.search ()
-        -0.0
+        val gs = new GoldenSectionLS (f_sse _)
+        gs.search ()
     end findLambda2
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of vector y = f(x_, b).  It is overridden for speed.
@@ -345,7 +345,8 @@ end ridgeRegressionTest
     println (s"predict ($z) = $yp")
 
     banner ("Optimize lambda")
-    println (s"findLambda2 = ${mod.findLambda2 ()}")
+    println (s"findLambda = ${mod.findLambda}")
+//  println (s"findLambda2 = ${mod.findLambda2 ()}")
 
 end ridgeRegressionTest2
 
@@ -366,7 +367,6 @@ end ridgeRegressionTest2
                              32.0,  53.0,
                               1.0, 101.0)
     val y = VectorD (745.0, 895.0, 442.0, 440.0, 1598.0)
-    val z = VectorD (20.0, 80.0)
 
     println (s"x = $x")
     println (s"y = $y")
@@ -403,7 +403,7 @@ end ridgeRegressionTest3
  */
 @main def ridgeRegressionTest4 (): Unit =
 
-    // 4 data points:             x_1  x_2    y
+    // 4 data points:         x_1  x_2    y
     val xy = MatrixD ((4, 3), 1.0, 1.0, 6.0,                           // 4-by-3 matrix
                               1.0, 2.0, 8.0,
                               2.0, 1.0, 7.0,
@@ -480,9 +480,68 @@ end ridgeRegressionTest5
 
     import Example_BPressure._
 
-    var mod = new RidgeRegression (x, y)                               // ridge regression model with no intercept
+    val mod = new RidgeRegression (x, y)                               // ridge regression model with no intercept
     mod.trainNtest ()()                                                // train and test the model
     println (mod.summary ())                                           // parameter/coefficient statistics
 
 end ridgeRegressionTest6
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ridgeRegressionTest7` main function tests the multi-collinearity method in
+ *  the `RidgeRegression` class using the following regression equation.
+ *      y  =  b dot x  =  b_1*x_1 + b_2*x_2
+ *  The determinant of the Gram Matrix X^TX as a measure of linear independence
+ *  > runMain scalation.modeling.ridgeRegressionTest7
+ */
+@main def ridgeRegressionTest7 (): Unit =
+
+    import Fac_LU.{det, inverse}
+    import MatrixD.eye
+
+    // 4 data points:        x_1   x_2
+    val x = MatrixD ((4, 2), 1.0,  1.0,                        // 4-by-2 matrix data matrix
+                             2.0,  2.0,
+                             3.0,  3.0,
+                             4.0,  3.99)
+    val y = VectorD (1.0, 3.0, 3.0, 4.0)                       // 4-dim response vector
+
+    val n   = x.dim2
+    val xt  = x.transpose
+    val xtx = xt * x
+    val b   = inverse (xtx)() * xt * y
+    val yp  = x * b
+    val sse = (y - yp).normSq
+
+    banner ("Regression")
+    println (s"Correlation Matrix: x.corr    = ${x.corr}")
+    println (s"Gram Matrix:        xtx       = $xtx")
+    println (s"Determinant:        det (xtx) = ${det (xtx)()}")
+    println (s"Parameters:         b         = $b")
+    println (s"Predictions:        yp        = $yp")
+    println (s"QoF:                sse       = $sse")
+
+// center the data
+
+    val l    = 1.0                                             // lambda - the shrinkage parameter
+    val mu_x = x.mean
+    val mu_y = y.mean
+    val x_   = x - mu_x                                        // center the data
+    val y_   = y - mu_y
+
+    val xt_  = x_.transpose
+    val xtx_ = xt_ * x_ + eye (n, n) * l
+    val b_   = inverse (xtx_)() * xt_ * y_
+    val yp_  = x_ * b_ + mu_y
+    val sse_ = (y - yp_).normSq
+
+    banner ("Ridge Regression")
+    println (s"Correlation Matrix: x_.corr    = ${x_.corr}")
+    println (s"Gram Matrix:        xtx_       = $xtx_")
+    println (s"Determinant:        det (xtx_) = ${det (xtx_)()}")
+    println (s"Parameters:         b_         = $b_")
+    println (s"Predictions:        yp_        = $yp_")
+    println (s"QoF:                sse_       = $sse_")
+
+end ridgeRegressionTest7
 

@@ -5,7 +5,7 @@
  *  @date    Sun Jun  9 16:42:16 EDT 2019
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model Framework: Base Trait for all Models
+ *  @note    Model Framework: Base Trait for all Models
  */
 
 package scalation
@@ -64,6 +64,24 @@ trait Model:
     /** The name for the model (or modeling technique).
      */
     var modelName: String = "Model"
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the used data matrix x.  Mainly for derived classes where x is expanded
+     *  from the given columns in x_, e.g., `SymbolicRegression.quadratic` adds squared columns.
+     */
+    def getX: MatrixD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the used response vector y.  Mainly for derived classes where y is
+     *  transformed, e.g., `TranRegression`, `ARX`.
+     */
+    def getY: VectorD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the used response matrix y, if needed.
+     *  @see `neuralnet.PredictorMV`
+     */
+    def getYY: MatrixD = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the feature/variable names.
@@ -150,6 +168,16 @@ REPORT
     ----------------------------------------------------------------------------
         """
     end report
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /*  Use k-fold cross-validation to compute test Quality of Fit (QoF) measures
+     *  by iteratively dividing the full dataset into a TRAINING and a TESTING set.
+     *  Each test set is defined by idx and the rest of the data is the training set.
+     *  @see showQofStatTable in `Fit` object for printing the returned stats.
+     *  @param k      the number of cross-validation iterations/folds (defaults to 5x).
+     *  @param rando  flag indicating whether to use randomized or simple cross-validation
+     */
+    def crossValidate (k: Int = 5, rando: Boolean = true): Array [Statistic]
 
 end Model
 

@@ -40,6 +40,7 @@ class LoopModel (name: String = "Loop", reps: Int = 1, animating: Boolean = true
     //--------------------------------------------------
     // Initialize Model Constants
 
+    val nt = 48
     val ia_time = (4000.0, 6000.0)                      // inter-arrival time range
     val mv_time = (2900.0, 3100.0)                      // move time range
 
@@ -55,8 +56,8 @@ class LoopModel (name: String = "Loop", reps: Int = 1, animating: Boolean = true
 
     val src1 = Source ("src1", this, () => Car1 (), 0, nStop, iArrivalRV, (400, 500))
     val src2 = Source ("src2", this, () => Car2 (), 0, nStop, iArrivalRV, (400, 420))
-    val jun1 = Junction ("jun1", Sharp (10.0), (850, 475))
-    val jun2 = Junction ("jun2", Sharp (10.0), (870, 475))
+    val jun1 = Junction ("jun1", Sharp (10.0), (850, 475), nt =nt)
+    val jun2 = Junction ("jun2", Sharp (10.0), (870, 475), nt=nt)
     val snk1 = Sink ("snk1", (400, 450))
     val snk2 = Sink ("snk2", (400, 530))
 

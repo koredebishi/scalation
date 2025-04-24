@@ -5,7 +5,7 @@
  *  @date    Sun Nov 19 12:27:00 EST 2017
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model Support: Statistical Test for Time Series Stationarity
+ *  @note    Model Support: Statistical Test for Time Series Stationarity
  *
  *  Kwiatkowski–Phillips–Schmidt–Shin (KPSS) Test
  *  Time Series Stationarity around a deterministic trend
@@ -259,8 +259,9 @@ end stationarity_KPSSTest2
 @main def stationarity_KPSSTest3 (): Unit =
 
     import Example_LakeLevels.y
+    import ARIMA_diff.Δ
 
-    val yd = del (y)                                                    // take first difference of y
+    val yd = Δ (y)                                                      // take first difference of y
 
     val test = new Stationarity_KPSS (yd, 0, "short", "c")              // init KPSS test with lags of type short and constant trend
     test.show ()                                                        // outputting test results

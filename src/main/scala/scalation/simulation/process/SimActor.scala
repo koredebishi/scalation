@@ -117,12 +117,27 @@ object SimActor:
      *  @param actor  the given actor/vehicle to add
      *  @param other  the other actor/vehicle (the one ahead, null if none)
      */
-    def addToAlist (actor: SimActor, other: SimActor): Unit =
-        val new_node = alist.add(actor)
-        actor.myNode = new_node
-        val other_node = if actor.myNode != null then alist.getSucc(actor.myNode) else null
-        println(s"${Console.RED} adding car: ${actor.myNode}, other_node = $other_node, vlist=$alist ${Console.RESET}")
+    def addToAlist(actor: SimActor, other: SimActor): Unit =
+        val other_node = if other != null then other.myNode else null
+        //actor.myNode = alist.add(actor, other_node)
+        actor.myNode = alist.add(actor)
     end addToAlist
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Add the given actor BEFORE the other actor in the alist, e.g., during a lane change
+     * where the actor must be placed before another actor.2000
+     *
+     * @param actor the given actor/vehicle to add
+     * @param other the other actor/vehicle (the one behind, null if none)
+     */
+    def addBeforeToAlist(actor: SimActor, other: SimActor): Unit =
+        val new_node = alist.addBefore(actor, other.myNode)
+        actor.myNode = new_node
+        val other_node = if actor.myNode != null then alist.getBehind(actor.myNode) else null
+        println(s"${Console.GREEN} Final state after insertion in alist: ${alist.toString()} ${Console.RESET}")
+    end addBeforeToAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Remove the given actor from the alist, e.g., because of termination, lane change,
@@ -130,43 +145,10 @@ object SimActor:
      *  @param actor  the given actor/vehicle to remove
      */
     def removeFromAlist (actor: SimActor): Unit =
+        println(s"${Console.RED} Remove car: ${actor.myNode}, from alist=${alist.toString()} ${Console.RESET}")
         alist.remove (actor.myNode)
-        //println(s"${Console.RED} vlist $alist ${Console.RESET}")
     end removeFromAlist
 
-
-    /**
-     * @param disp: The current displacement of the actor, also the key
-     * insertion reference
-     * get other Cars displacement that is just less than the disp
-     * get the Cars displacement that is just higher than the disp
-     * insert disp (car ref) between this nodes
-     * @param actor The actor that needs to make the lane change
-     */
-    def addBeforeAlist(actor: SimActor, l2:Int, lane:Array[VTransport]): Unit =
-        println(s"The method to add actor $actor from exact displacement location")
-
-
-//        // Find the car with t_disp just larger than actor.t_disp
-//        val succCar = rangeCar.collect { case (disp, car) if disp > actor.asInstanceOf[Vehicle].t_disp => car}.minByOption(_.t_disp)
-//
-//        // Add the actor to the doubly linked list before the successor car
-//        if succCar.isDefined then
-//            actor.myNode = lane(l2).vList.addBefore(actor.asInstanceOf[Vehicle], succCar.get.myNode.succ)
-//        // If there is no successor car, add the actor to the end of the list
-//        else actor.myNode = lane(l2).vList.add(actor)
-    // Add the actor to the global DLL in the correct position
-
-        // to find out where you are use the B+tree
-        // to keep track of the car ahead of you use the DoublyLinkList
-        // insert based on the pn<--->nn<--->sn
-
-        // for each lanes make
-
-
-        //What car is ahead of me
-        //val carMin = {rangeCar.minBy { case (k, _) => (k.asInstanceOf[Double] - actor.asInstanceOf[Vehicle].t_disp).abs }._2}
-    end addBeforeAlist
 
 
 end SimActor

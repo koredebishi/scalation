@@ -16,9 +16,10 @@ import scala.collection.mutable.ArrayBuffer as VEC
 import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
 import scalation.animation.CommandType.*
-import scalation.random.Variate
+import scalation.random.*
 import scalation.scala2d.Ellipse
 import scalation.scala2d.Colors.*
+import scalation.simulation.process.example_1.OneWayVehicle2L
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -47,7 +48,9 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
 //    at = loc
 //    println(s"${Console.RED} initializing $this again inside the VSource: ${stringOf (at)} ${Console.RESET}")
 
-    private val debug = debugf ("VSource", true)                             // debug function
+    private val debug = debugf ("VSource", false)                             // debug function
+
+    private[process] val ew = new EasyWriter("recorder", "VsourceWriter.txt")
 
 
     debug ("Init", s"name = $name, located at ${stringOf (at)}")
@@ -93,8 +96,9 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                     val actor = makeEntity ()                                // make new actor/vehicle
                     debug ("act", s"after make entity/vehicle $i: actor = $actor")
                     actor.mySource = this                                    // actor's source
-                    actor.subtype  = esubtype                                // set the entity subtype 
+                    actor.subtype  = esubtype                                // set the entity subtype
                     director.numActors += 1                                  // number of actors created by all sources, so far
+                    if director.isAnimating then director.dgAni.updateActorCount(director.numActors)  // korede
                     director.log.trace (this, "generates", actor, director.clock)
                     director.animate (actor, CreateToken, randomColor (actor.id), Ellipse (),
                                       Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
@@ -102,18 +106,41 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                     actor.schedule (0.0)
                     debug ("act", s"after schedule actor $i")
 
-                    if i < units then
-                        val duration = iArrivalTime.gen
-                        val ctime    = director.clock                        // clock time
-                        tally (duration)                                     // tally duration
-                        record (actor, ctime)                                // record actor flow
-                        schedule (duration)
-                        debug ("act", s"actor $i yields to director")
-                        yieldToDirector ()                                   // yield and wait duration time units
-                        debug ("act", s"after yield actor $i")
+                    //this mechanism helps the RowTimeLoader trait to conveniently switch to the next row of the dataset
+                    //Using this allows us to adjust the intensity rate of the Expo2 function
+                    if director.isInstanceOf[RowTimeLoader] then
+                        val rowManager = director.asInstanceOf[RowTimeLoader]
+                        println(s"I director clock executed at this time: ${director.clock}")
+                        rowManager.nextRow(director.clock)
+                        //ew.write(s"\n [VSource] directorclock: ${director.clock}: curRow = ${rowManager.curRow},mu:  ${iArrivalTime.mean}")
+                        println(s"I executed")
+                    end if
+
+                    if director.isInstanceOf[OneWayVehicle2L] then
+                        val rowManager = director.asInstanceOf[OneWayVehicle2L]
+                        println(s"I director OneWayVehicle2L clock executed at this time: ${director.clock}")
+                        rowManager.arrivalCount(rowManager.curRow) += 1 //just a count
+                        println("I worked too")
+                        if i < units then
+                            println(s"I worked too $i")
+                            val mu = rowManager.muVal(rowManager.curRow)// should be curRow
+                            ew.write(s"\n mu $mu and i_unit = \n")
+                            val gen = if iArrivalTime.isInstanceOf[Erlang] then iArrivalTime.gen1(mu/2) else iArrivalTime.gen1(mu)
+                            println("I worked too muchhh")
+                            val duration = gen
+                            //val duration = iArrivalTime
+                            val ctime    = director.clock                        // clock time
+                            tally (duration)                                     // tally duration
+
+                            //record (actor, ctime)                                // record actor flow
+                            schedule (duration)
+                            debug ("act", s"actor $i yields to director")
+                            yieldToDirector ()                                   // yield and wait duration time units
+                            debug ("act", s"after yield actor $i")
                 end for
             } // breakable
 
+            ew.flush()
             if rep < director.reps then
                 director.log.trace (this, "wait for next rep", director, director.clock)
                 yieldToDirector ()                                           // yield and wait for next replication

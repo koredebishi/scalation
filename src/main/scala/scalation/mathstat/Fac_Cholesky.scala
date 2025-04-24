@@ -5,7 +5,7 @@
  *  @date    Sun Sep 16 14:09:25 EDT 2012
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Cholesky Matrix Factorization
+ *  @note    Cholesky Matrix Factorization
  */
 
 package scalation
@@ -19,7 +19,7 @@ import scala.math.sqrt
  *      l   - an n-by-n left lower triangular matrix
  *      l.t - an n-by-n right upper triangular matrix - transpose of l
  *  such that a = l * l.t.
- *  @param a  the symmetric, positive definite matrix to be factor
+ *  @param a  the symmetric, positive definite matrix to be factored
  */
 class Fac_Cholesky (a: MatrixD)
       extends Factorization:
@@ -216,7 +216,7 @@ end fac_CholeskyTest
     println (s"b = $b")
 
     banner ("Cholesky Factorization: factor")
-    var chol = new Fac_Cholesky (a)
+    val chol = new Fac_Cholesky (a)
     chol.factor ()
     println ("factors = " + chol.factors)
     println ("solve   = " + chol.solve (b))
@@ -268,7 +268,7 @@ end fac_CholeskyTest2
     println (s"b = $b")
 
     banner ("Cholesky Factorization: factor")
-    var chol = new Fac_Cholesky (a)
+    val chol = new Fac_Cholesky (a)
     chol.factor ()
     println ("factors = " + chol.factors)
     println ("solve   = " + chol.solve (b))

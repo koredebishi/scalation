@@ -44,7 +44,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
     initComponent (name, Array ())
 
-    private val debug = debugf ("Model", true)                      // debug function
+    private val debug = debugf ("Model", false)                      // debug function
     private val flaw  = flawf ("Model")                             // flaw function
 
     private [process] val log       = Monitor ("simulation")        // log for model execution
@@ -54,16 +54,25 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     protected val agenda    = PriorityQueue.empty [SimActor]        // agenda of things to be done (time-ordered activation list)
     protected var _theActor: SimActor = null                        // currently acting actor (act one at a time)
 
+    def isAnimating:Boolean = animating             // getter for animating;
+
     director = this
     debug ("init", s"make ${director.name} with cor_id $id the director")
 
     private val statV    = LinkedHashMap [String, VectorD] ()       // map of stat-vectors recording means of each rep
-    private val stopTime = MAX_VALUE                                // max stop time for the model
+    //private val stopTime = MAX_VALUE                                // max stop time for the model
+    private var stopTime = MAX_VALUE                                // max stop time for the model
+
+    def setTime(sTime: Double):Unit =
+        stopTime =  sTime
+
+    def getStopTime: Double = stopTime
+
     private val parts    = VEC [Component] ()                       // List (VEC) of Components making up the model
 
     /** The animation engine
      */
-    private val dgAni = if animating then new DgAnimator ("Process Animator", black, white,
+    private [simulation] val dgAni = if animating then new DgAnimator ("Process Animator", black, white,
                                                           aniRatio, weight, height)
                         else null
 
@@ -172,45 +181,95 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
      *  and the agenda of actors until the simulation flag becomes false
      *  or the agenda (priority queue) becomes empty.
      */
-    override def act (): Unit =
-        log.trace (this, s"starts model for $reps replications", null, _clock)
+//    override def act (): Unit =
+//        log.trace (this, s"starts model for $reps replications", null, _clock)
+//
+//        for rep <- 1 to reps do                                     // LOOP THROUGH REPLICATIONS
+//            _clock = startTime
+//            if rep == 1 && animating then display ()                // turn animation on (true) off (false)
+//
+//            log.trace (this, s"starts rep $rep", null, _clock)
+////            simulating = _clock <= stopTime                         // simulate unless past stop time
 
-        for rep <- 1 to reps do                                     // LOOP THROUGH REPLICATIONS
-            _clock = startTime
-            if rep == 1 && animating then display ()                // turn animation on (true) off (false)
+//            while simulating && ! agenda.isEmpty do                 // INNER SCHEDULING LOOP
+//                _theActor = agenda.dequeue ()                       // next from priority queue
+//                if _theActor.actTime < clock then                   // out of order execution => QUIT
+//                    flaw ("act", s"actor $_theActor activation time < $_clock")
+//                    println ("QUIT")
+//                    simulating = false
+//                else
+//                    _clock    = _theActor.actTime                   // advance the time
+//                    if isAnimating then dgAni.updateActorCount(numActors) // send the total number of actors to the dgAnimator for display purpose.
+//                    debug ("act", s"${this.me} resumes ${_theActor} at clock= $clock")
+//                    log.trace (this, "resumes", _theActor, _clock)
+//                    debug ("act", s"before yyield at clock $clock")
+//                    yyield (_theActor)                              // director yields to actor
+//                    debug ("act", s"after yyield at clock $clock")
+//            end while
+//
+//            simulating = false
+//            log.trace (this, s"ends rep $rep", null, _clock)
+//
+//            fini (rep)                                              // post-run results
+//            if rep < reps then reset ()                             // reset for next replication
+//            resetStats (rep)                                        // reset and aggregate statistics
+//        end for
+//
+//        cleanup ()
+//        if reps > 1 then reportV ()
+//        println (s"coroutine counts = $counts")
+//        log.trace (this, "terminates model", null, _clock)
+//        hasFinished ()                                              // signal via semaphore that simulation is finished
+//        yyield (null, true)                                         // yield and terminate the director
+//    end act
 
-            log.trace (this, s"starts rep $rep", null, _clock)
-            simulating = _clock <= stopTime                         // simulate unless past stop time
+    override def act(): Unit =
+        log.trace(this, s"starts model for $reps replications", null, _clock)
 
-            while simulating && ! agenda.isEmpty do                 // INNER SCHEDULING LOOP
-                _theActor = agenda.dequeue ()                       // next from priority queue
-                if _theActor.actTime < clock then                   // out of order execution => QUIT
-                    flaw ("act", s"actor $_theActor activation time < $_clock")
-                    println ("QUIT")
-                    simulating = false
+        for rep <- 1 to reps do                                         // LOOP THROUGH REPLICATIONS
+            _clock = startTime                                          //Initialize the clock at StartTime
+            if rep == 1 && animating then display()                     // turn animation on (true) off (false)
+
+            log.trace(this, s"starts rep $rep", null, _clock)           // log this simulation
+
+            simulating = true                                           // Start the simulation as true,
+
+            while simulating && !agenda.isEmpty do                      // INNER SCHEDULING LOOP
+                _theActor = agenda.dequeue()                            // get next actor from priority queue
+                if _theActor.actTime < clock then
+                    flaw("act", s"actor $_theActor activation time < $_clock")
+                    println("QUIT")
+                    simulating = false                                  //stop the simulation and quit
                 else
-                    _clock    = _theActor.actTime                   // advance the time
-                    debug ("act", s"${this.me} resumes ${_theActor} at clock= $clock")
-                    log.trace (this, "resumes", _theActor, _clock)
-                    debug ("act", s"before yyield at clock $clock")
-                    yyield (_theActor)                              // director yields to actor
-                    debug ("act", s"after yyield at clock $clock")
+                    _clock = _theActor.actTime                          // advance time
+
+                    if _clock > stopTime && _theActor.isInstanceOf[Source] then
+                        println(s"Skipping Source actor due to time limit at clock = $clock")
+                    else
+                        if isAnimating then dgAni.updateActorCount(numActors)
+                        debug("act", s"${this.me} resumes ${_theActor} at clock= $clock")
+                        println(s"This RESUME @@@@@@")
+                        log.trace(this, "resumes", _theActor, _clock)
+                        yyield(_theActor) // yield to actor
+                        debug ("act", s"after yyield at clock $clock")
+                        println(s"After the yyield: RESUME @@@@@@")
+                end if
             end while
 
             simulating = false
-            log.trace (this, s"ends rep $rep", null, _clock)
+            log.trace(this, s"ends rep $rep", null, _clock)
 
-            fini (rep)                                              // post-run results
-            if rep < reps then reset ()                             // reset for next replication
-            resetStats (rep)                                        // reset and aggregate statistics
+            fini(rep)
+            if rep < reps then reset()
+            resetStats(rep)
         end for
 
-        cleanup ()
-        if reps > 1 then reportV ()
-        println (s"coroutine counts = $counts")
-        log.trace (this, "terminates model", null, _clock)
-        hasFinished ()                                              // signal via semaphore that simulation is finished
-        yyield (null, true)                                         // yield and terminate the director
+        cleanup()
+        if reps > 1 then reportV()
+        println(s"coroutine counts = $counts")
+        log.trace(this, "terminates model", null, _clock)
+        hasFinished()
+        yyield(null, true)
     end act
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -362,7 +421,10 @@ object Model:
      *  have finished (e.g., call `waitFinished`), not just the main thread.
      *  If `shutdown` is not called, the application may hang.
      */
-    def shutdown (): Unit = Coroutine.shutdown ()
+
+    def shutdown (): Unit =
+        Recorder.shutdownRecorder()
+        Coroutine.shutdown ()
 
 end Model
 

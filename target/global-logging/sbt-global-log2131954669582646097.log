@@ -1,0 +1,39 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(compile, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / compile[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 463 Scala sources and 2 Java sources to /Users/mac/simulation/scalation_2.0/target/scala-3.4.2/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0mCanceling execution...[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/CircularQueue.scala:49:21 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m49 |[0m    [33mprotected[0m [[33mthis[0m] [33mdef[0m newBuilder: Builder [A, CircularQueue [A]] = [41m???[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m   |[0m                     ^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m   |[0mIgnoring [this] qualifier.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m   |[0mThis syntax will be deprecated in the future; it should be dropped.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m   |[0mSee: https://docs.scala-lang.org/scala3/reference/dropped-features/this-qualifier.html[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m   |[0mThis construct can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/PriorityQueue.scala:423:23 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m423 |[0m        [33mprivate[0m [[33mthis[0m] [33mvar[0m i = resarr.p_size0 - [31m1[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                       ^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mIgnoring [this] qualifier.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThis syntax will be deprecated in the future; it should be dropped.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mSee: https://docs.scala-lang.org/scala3/reference/dropped-features/this-qualifier.html[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThis construct can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/PriorityQueue.scala:484:21 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m484 |[0m    [33mprotected[0m [[33mthis[0m] [33mdef[0m writeReplace (): AnyRef =[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                     ^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mIgnoring [this] qualifier.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThis syntax will be deprecated in the future; it should be dropped.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mSee: https://docs.scala-lang.org/scala3/reference/dropped-features/this-qualifier.html[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThis construct can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/PriorityQueue.scala:491:30 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m491 |[0m    [33moverride[0m [33mprotected[0m [[33mthis[0m] [33mdef[0m className = [31m"PriorityQueue"[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                              ^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mIgnoring [this] qualifier.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThis syntax will be deprecated in the future; it should be dropped.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mSee: https://docs.scala-lang.org/scala3/reference/dropped-features/this-qualifier.html[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThis construct can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0mfour warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mdone compiling[0m
+[0m[[0m[31merror[0m] [0m[0mCancelled: compile[0m
+[0m[[0m[31merror[0m] [0m[0mCancelled: compile[0m
+[0m[[0m[31merror[0m] [0m[0mUse 'last' for the full log.[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

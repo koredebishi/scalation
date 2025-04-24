@@ -5,7 +5,7 @@
  *  @date    Sun Feb  6 00:08:23 EST 2022
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Optimization: Stochastic Gradient Descent Optimizer
+ *  @note    Optimization: Stochastic Gradient Descent Optimizer
  */
 
 package scalation
@@ -26,7 +26,6 @@ import Optimizer._
 class Optimizer_SGD extends Optimizer:
 
     private val debug = debugf ("Optimizer_SGD", true)                    // debug function
-    private val flaw  = flawf ("Optimizer_SGD")                           // flaw function
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data x and y for a 2-layer, multi-output Neural Network, fit
@@ -83,7 +82,7 @@ class Optimizer_SGD extends Optimizer:
             val ε  = yp - y                                               // negative of error matrix
             val δ  = f.dM (yp) ⊙ ε                                        // delta matrix for y
 
-            x.Ƭ * δ * α                                                   // return change in parameters
+            x.𝐓 * δ * α                                                   // return change in parameters (transpose (𝐓))
         end updateWeight
 
         debug ("optimize2", s"parameters b = $b")
@@ -149,10 +148,10 @@ class Optimizer_SGD extends Optimizer:
             val yp = f1.fM (b * z)                                        // prediction:   Yp = f(ZB)
             val ε  = yp - y                                               // negative of the error matrix
             val δ1 = f1.dM (yp) ⊙ ε                                       // delta matrix for y
-            val δ0 = f.dM (z) ⊙ (δ1 * b.w.Ƭ)                              // delta matrix for z
+            val δ0 = f.dM (z) ⊙ (δ1 * b.w.𝐓)                              // delta matrix for z (transpose (𝐓))
     
-            (NetParam (x.Ƭ * δ0 * α, δ0.mean * η),                        // change to a parameters (weights and biases)
-             NetParam (z.Ƭ * δ1 * α, δ1.mean * η))                        // change to b parameters (weights and biases)
+            (NetParam (x.𝐓 * δ0 * α, δ0.mean * η),                        // change to a parameters (weights and biases)
+             NetParam (z.𝐓 * δ1 * α, δ1.mean * η))                        // change to b parameters (weights and biases)
         end updateWeight
 
         debug ("optimize3", s"parameters a = $a \n b = $b")
@@ -222,11 +221,11 @@ class Optimizer_SGD extends Optimizer:
             val ε   = yp - y                                              // -E where E is the error matrix
             δ(nl-1) = f.last.dM (yp) ⊙ ε                                  // delta for the last layer before output
             for l <- nl-2 to 0 by -1 do
-                δ(l) = f(l).dM (z(l+1)) ⊙ (δ(l+1) * b(l+1).w.Ƭ)           // deltas for all previous hidden layers
+                δ(l) = f(l).dM (z(l+1)) ⊙ (δ(l+1) * b(l+1).w.𝐓)           // deltas for all previous hidden layers (transpose (𝐓))
             end for
 
             for l <- layers do
-                b(l) -= (z(l).Ƭ * δ(l) * α,                               // update parameters (weights
+                b(l) -= (z(l).𝐓 * δ(l) * α,                               // update parameters (weights
                          δ(l).mean * η)                                   // and biases
             end for
 

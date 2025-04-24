@@ -5,7 +5,7 @@
  *  @date    Mon Jan 28 17:18:16 EST 2013
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Differential Calculus Operations and Functions
+ *  @note    Differential Calculus Operations and Functions
  *
  *  @see gwu.geverstine.com/pdenum.pdf
  */
@@ -26,7 +26,7 @@ object Differential:
     private var h   = 1E-6                     // default step size used for estimating derivatives
     private var h2  = h + h                    // twice the step size
     private var hh  = h * h                    // step size squared
-    private var hh4 = 4.0 * hh                 // step size squared
+    private var hh4 = 4.0 * hh                 // for times step size squared
     private var hl  = sqrt (h)                 // relative large step for finite difference
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -124,6 +124,7 @@ object Differential:
                    else          (f(x + (i, 1.0)) - f(x - (i, 1.0))) / 2.0    // difference
         end for
         c
+    end slope
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Jacobian matrix for a vector-valued function represented as
@@ -185,7 +186,7 @@ object Differential:
             (f(x + hi) - 2.0*f(x) + f(x - hi)) / hh
         else                                                                      // cross partial
             (f(x + hi + hj) - f(x + hi - hj) - f(x - hi + hj) + f(x - hi - hj)) / hh4
-        end if
+    end partial2
 
     inline def ∂∂ (i: Int, j: Int)(f: FunctionV2S, x: VectorD): Double = partial2 (i, j)(f, x)
 
@@ -202,6 +203,7 @@ object Differential:
             if j < i then h(j, i) = h(i, j)                                       // Hessian is symmetric
         end for
         h
+    end hessian
 
     inline def Η (f: FunctionV2S, x: VectorD): MatrixD = hessian (f, x)
 
@@ -215,6 +217,7 @@ object Differential:
         var sum = 0.0
         for i <- x.indices do sum += (f(x + (i, h)) - 2.0*f(x) + f(x - (i, h))) / hh
         sum
+    end laplacian
 
     inline def ∆ (f: FunctionV2S, x: VectorD): Double = laplacian (f, x)
 
@@ -288,7 +291,7 @@ end differentialTest
 
     def d (x: Double): Double = cos (x)      // its derivative
 
-    var x = Array (.0, .1, .2, .3, .4, .5, .6, .7, .8, .9)
+    val x = Array (.0, .1, .2, .3, .4, .5, .6, .7, .8, .9)
     for i <- x.indices do
         var hh = 1E-4
         println (" x \t\t h \t\t deriv \t\t 1-sided \t\t error \t\t 2-sided \t\t error")

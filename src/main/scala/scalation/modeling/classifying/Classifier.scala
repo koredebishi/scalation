@@ -5,7 +5,7 @@
  *  @date    Sun Mar 20 13:33:19 EDT 2022
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model Framework: Classifier for Matrix Input, Vector Output
+ *  @note    Model Framework: Classifier for Matrix Input, Vector Output
  */
 
 package scalation
@@ -71,7 +71,8 @@ trait Classifier (x: MatrixD, y: VectorI, protected var fname: Array [String],
     /** Return the used response vector y.  Mainly for derived classes where y is
      *  transformed, e.g., `TranRegression`, `Regression4TS`.
      */
-    def getY: VectorI = y
+    def getYi: VectorI = y
+    def getY: VectorD = y.toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the feature/variable names.
@@ -614,15 +615,6 @@ REPORT
     end crossValidate
 
 end Classifier
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SelectionTech` enumeration indicates the available feature selection
- *  techniques.
- */
-enum SelectionTech:
-     case Forward, Backward, Stepwise
-end SelectionTech
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -37,8 +37,8 @@ class Source (name: String, director: Model, makeEntity: () => SimActor,
               esubtype: Int, units: Int,
               iArrivalTime: Variate, loc: Array [Double])
     extends SimActor (name, director)
-        with Component
-        with Recorder ():
+        with Component:
+        //with Recorder ():
 
     initStats (name)
     at = loc
@@ -89,16 +89,23 @@ class Source (name: String, director: Model, makeEntity: () => SimActor,
                     actor.mySource = this                                    // actor's source
                     actor.subtype  = esubtype                                // set the entity subtype
                     director.numActors += 1                                  // number of actors created by all sources, so far
+                    //if director.isAnimating then director.dgAni.updateActorCount(director.numActors)
                     director.log.trace (this, "generates", actor, director.clock)
                     director.animate (actor, CreateToken, randomColor (actor.id), Ellipse (),
                         Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
                     actor.schedule (0.0)
+//
+//                    if director.isInstanceOf[RowTimeLoader] then
+//                        val rowManager = director.asInstanceOf[RowTimeLoader]
+//                        println(s"the director clock is ${director.clock}")
+//                        rowManager.nextRow(director.clock)
+//                    end if
 
                     if i < units then
                         val duration = iArrivalTime.gen
                         val ctime    = director.clock                        // clock time
                         tally (duration)                                     // tally duration
-                        record (actor, ctime)                                // record actor flow
+                        //record (actor, ctime)                                // record actor flow
                         schedule (duration)
                         yieldToDirector ()                                   // yield and wait duration time units
                 end for

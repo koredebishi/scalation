@@ -5,7 +5,7 @@
  *  @date    Thu Jun 17 19:29:23 EDT 2021
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   QR Matrix Factorization Using Householder Orthogonalization
+ *  @note    QR Matrix Factorization Using Householder Orthogonalization
  */
 
 package scalation
@@ -27,9 +27,9 @@ import MatrixD.eye
  *-------------------------------------------------------------------------------
  *  This implementation improves performance by working with the transpose the
  *  original matrix and reorders operations to facilitate parallelism (see par directory).
- *  Caveat: for m < n use `Fac_LQ`.
+ *  Caveat: for m < n use `Fac_LQ`, @see `Fac_QR.apply`
  *-------------------------------------------------------------------------------
- *  @param aa     the matrix to be factor into q and r
+ *  @param aa     the matrix to be factored into q and r
  *  @param needQ  flag indicating whether a full q matrix is needed
  */
 class Fac_QR (aa: MatrixD, needQ: Boolean = false)
@@ -44,6 +44,8 @@ class Fac_QR (aa: MatrixD, needQ: Boolean = false)
     protected val r     = MatrixD (n)                          // the right upper triangular r matrix
     private   val q     = if needQ then eye (m, n)
                           else null                            // the orthogonal q matrix
+
+    if m < n then flaw ("init", s"case of m = $m < n = $n => use Fac_LQ instead of Fac_QR")
 
     debug ("init", s"aa = ${aa.dims}, needQ = $needQ, q = ${if q == null then null else q.dims}, r = ${r.dims}")
 
@@ -187,9 +189,19 @@ end Fac_QR
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Fac_QR` companion object provides example matrices to factor.
+/** The `Fac_QR` companion object provides a factory method and example matrices to factor.
  */
 object Fac_QR:
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `Fac_QR` object when m >= n or a `Fac_LQ` object otherwise (more
+     *  column than rows).
+     *  @param aa     the matrix to be factored into q and r
+     *  @param needQ  flag indicating whether a full q matrix is needed
+     */
+    def apply (aa: MatrixD, needQ: Boolean = false): Factorization =
+        if aa.dim >= aa.dim2 then new Fac_QR (aa, needQ) else new Fac_LQ (aa)
+    end apply
 
     val a1 = MatrixD ((4, 3), 9.0,  0.0, 26.0,
                              12.0,  0.0, -7.0,
@@ -214,9 +226,9 @@ object Fac_QR:
                               0.9134, 0.9575, 0.4854,
                               0.6324, 0.9649, 0.8003)
 
-//  since m < n, use Fac_LQ instead
-//  val a6 = MatrixD ((2, 4), 1.0, 2.0, 3.0, 4.0,
-//                            5.0, 6.0, 7.0, 8.0)
+//  since m < n, use Fac_LQ
+    val a6 = MatrixD ((2, 4), 1.0, 2.0, 3.0, 4.0,
+                              5.0, 6.0, 7.0, 8.0)
 
 end Fac_QR
 

@@ -5,6 +5,8 @@
  *  @date    Fri Mar 28 14:14:24 EDT 2014
  *  @see     LICENSE (MIT style license file).
  *
+ *  @note    1000 Seeds for LCG Random Number Generator
+ *
  *  scala -cp <classpath> scalation.random.SeedFinder
  */
 
@@ -216,6 +218,8 @@ object RandomSeeds3:
                        	326121610,	744657853,	790908488,	781392942,	2088663004,
                        	1390898239,	474591648,	1454852522,	643747713,	806542186,
                        	1404680288,	163722861,	1132351814,	1010607803,	1590199521)
+
+    val N_STREAMS = seeds.length                                           // number of random number streams
 
 end RandomSeeds3
 

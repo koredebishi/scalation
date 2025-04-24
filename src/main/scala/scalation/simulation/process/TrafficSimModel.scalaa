@@ -1,0 +1,673 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Casey Bowman
+ *  @version 2.0
+ *  @date    Wed Feb 16 11:34:46 EST 2022
+ *  @see     LICENSE (MIT style license file).
+ *
+ */
+
+package scalation
+package simulation
+package process
+
+import java.io.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import scala.collection.mutable.{ArrayBuffer, HashMap, ListBuffer, ListMap}
+import scala.util.control.Breaks.{break, breakable}
+import scala.math.{abs,min}
+import scalation.mathstat.*
+import scalation.random.{Deterministic, Discrete, NHPoissonProcess, Uniform, Variate}
+import scalation.optimization.*
+import scalation.calculus.Differential.*
+import scalation.modeling.forecasting.{ARIMA, SARIMA}
+import scalation.modeling.Fit
+import Carfollowing.*
+import Arrivalmodel.*
+import TrafficJunction1011.*
+import Optimizers.*
+import scalation.modeling.MatrixI
+
+var PDQ: Array[Int] = null  //setting for SARIMA model
+var stream: Int = 0
+var timeBegin: Int = 24     //for nhpp 24(No. 24 interval)x15(15 minutes interval) ->6 am, 72x15-> 6 pm
+var timeEnd: Int = 25       //for nhpp
+var nt: Int = 96            // 25 hours was divided by the nt: the num of interval. 96-> 15 minutes interval. 288 is 5 minutes interval.
+var week: Int =25           //25, 30. each col is a day, row
+var arrival = OFFLINE
+val numLanes =3
+val (junx,juny) = convertCoordinate()
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** TrafficSimulation companion objects prepares the data and arrival model for calibration.
+ *  @param name        the name of the model
+ *  @param t1          the start time of the simulation (out of the day): 24x15(if nt==96) -> 6 am
+ *  @param t2          the end time of the simulation: 72x15(if nt==96) -> 6 pm
+ *  @param nt          the number of intervals of time (288 for 5 minutes, 96 for 15 minutes, etc.)
+ *  @param week        which week of data is being used
+ *  @param arrival     which arrival method to use
+ *  @param PDQ         setting for SARIMA model
+ *  @param stream      stream for variate
+ */
+object TrafficSimulation:
+
+    //val filePath =
+    val dataPath = "models/traffic/counts/101/2018/Tuesday/15minutes/" //DATA_DIR auto added
+    var indice = 0
+    val dataMatSrc = MatrixD.load(dataPath + JuncInfo(0)._1)
+    val dataValid  = for i <- JuncInfo.indices if JuncInfo(i)(2)
+        yield  (i,JuncInfo(i)(0))
+    //val dataMatVal = for (Num, fileNames) <- dataValid yield (Num, MatrixD.load(dataPath + fileNames))
+    //val ValidTuple = for ValidTuple <- dataValid yield (ValidTuple._1, MatrixD.load(dataPath + ValidTuple._2))
+    //val dataMatValPath = dataValid(1)
+    val dataMatVal = for ValidTuple <- dataValid yield MatrixD.load(dataPath + ValidTuple(1))
+
+    val sensor1 = Sensor(JuncInfo(1)(0), (junx(1), juny(1)), nt)
+    val sensor2 = Sensor(JuncInfo(2)(0), (junx(2), juny(2)), nt)
+    val juncs = Array(sensor1, sensor2)
+    val exit = new Exit(JuncInfo(3)._1, (junx(3), juny(3)), Double.MaxValue, nt)
+    val highway1 = new Highway("highway1", sensor1, sensor2, numLanes)
+    val highway2 = new Highway("highway2", sensor2, exit, numLanes)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Gets the NHPP
+     */
+    val nhpp =
+        arrival match
+            case Sarima => getNHPP2(dataMatSrc, PDQ, stream)
+            case _ => getNHPP(dataMatSrc, arrival, stream)
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Gets the Deterministic variate based on an NHPP, which is based on counts.
+     * Also returns the number of vehicles that will be created.
+     *
+     * @param path the path to the file where the counts are located.
+     * @param ind  the index of the initial day for the counts.
+     *             the rest of the data is from the same day of the week for
+     *             the rest of the year.
+     */
+    def getNHPP(data: MatrixD, adj: Arrivalmodel = OFFLINE, stream: Int = 0): (Int, Deterministic) =
+
+        val WT1 = 0.8
+        val WT2 = 0.2
+        val rat = 86400.0 / nt
+        //val data = MatrixD.load(path)  param path: String => data: MatrixD
+        val y = data(timeBegin until timeEnd, week - 4 until week)
+        var avg = new VectorD(y.dim)
+
+        for i <- avg.indices do avg(i) = y(i).mean
+        //println(s"avg = $avg")
+        adj match
+            case RATIO =>
+                val c = calcPercentages(week, timeBegin, timeEnd, data)
+                val yy = new VectorD(timeEnd - timeBegin)
+                for i <- c.indices do yy(i) = c(i) * data(timeBegin + i, week)
+                avg = avg * WT1 + yy * WT2
+            case DIFF =>
+                val c = calcDifferences(week, timeBegin, timeEnd, data)
+                val yy = new VectorD(timeEnd - timeBegin)
+                for i <- c.indices do yy(i) = c(i) + data(timeBegin + i, week)
+                avg = avg * WT1 + yy * WT2
+            case _ =>
+
+        val nhpp = NHPoissonProcess(avg / rat, rat)
+        //val nhpp  = NH_PoissonProcess(avg / rat.mkDouble, rat.mkDouble)
+        val times = new ArrayBuffer[Double]()
+        var done = false
+        var tlast = 0.0
+        while !done do
+            val t = nhpp.genTime
+
+            if t < 0.0 then done = true
+            else
+                //                if (t >= (t1 * rat) && t <= (t2 * rat))
+                times += (t - tlast)
+                tlast = t
+            end if
+        end while
+        (times.length, Deterministic(VectorD(times.toIndexedSeq)))
+    end getNHPP
+
+
+    def getNHPP2(data: MatrixD, pdq: Array[Int], stream: Int = 0): (Int, Deterministic) =
+
+        val rat = 86400.0 / nt
+        //val data = MatrixD.load(path)  param path: String => data: MatrixD
+        val x = data(?, week - 4)(timeBegin until data.dim) ++ data(?, week - 3)
+            ++ data(?, week - 2) ++ data(?, week - 1) ++ data(?, week)(0 until timeBegin)
+        ARIMA.hp("d") = pdq(1)
+        val model = new SARIMA(x, pdq(4), nt) //p difference q:order of moving avg term; P seasonals
+        model.setPQ(VectorI(pdq(0), pdq(2), pdq(3), pdq(5)))
+        model.train(null, x)
+        val y = model.forecast(h = (timeEnd - timeBegin))
+        val nhpp = NHPoissonProcess(y / rat, rat, stream)
+        val times = new ArrayBuffer[Double]()
+        var done = false
+        var tlast = 0.0
+        while !done do
+            val t = nhpp.genTime
+            if t < 0.0 then done = true
+            else
+                times += (t - tlast)
+                tlast = t
+            end if
+        end while
+        (times.length, Deterministic(VectorD(times.toArray.toIndexedSeq)))
+    end getNHPP2
+
+    def calcPercentages(w: Int, t1: Int, t2: Int, y: MatrixD): VectorD =
+
+        val c = new VectorD(t2 - t1)
+        val yy = y(?, w - 4 until w)
+        for i <- t1 until t2 do
+            c(i - t1) = (yy(i) / yy(i - 1)).mean
+        end for
+        c
+    end calcPercentages
+
+
+    def calcDifferences(w: Int, t1: Int, t2: Int, y: MatrixD): VectorD =
+
+        val c = new VectorD(t2 - t1)
+        val yy = y(?, w - 4 until w)
+        for i <- t1 until t2 do
+            c(i - t1) = (yy(i) - yy(i - 1)).mean
+        end for
+        c
+    end calcDifferences
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Method to create the sink choice if there are multiple sinks.
+     * Currently only works for one sink.
+     *
+     * @param names the names of the sinks
+     */
+    def createSinkChoice(names: Array[String]): Array[Discrete] =
+
+        val sc = Array.ofDim[Discrete](timeEnd - timeBegin)
+        if names.length == 1 then
+            for i <- 0 until sc.length do sc(i) = Discrete(VectorD(1.0))
+        else
+            val data = Array.ofDim[MatrixD](names.length)
+        end if
+        sc
+    end createSinkChoice
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Method to get Sources for the model based on the data
+     */
+    /*
+    def getSources(): (Array[String], Array[Double], Array[Entrance]) =
+
+        val src = new ArrayBuffer[Entrance]()
+        val x = new ArrayBuffer[Double]()
+        val n = new ArrayBuffer[String]()
+        var subtype = 0 //if  "OnRamp" then subtype = 1
+
+
+
+        src += ent
+        n += Trainfile
+        if OnRampX == null then x += 0.0
+        //else x += Source6
+        //subtype += 1
+        (n.toArray, x.toArray, src.toArray)
+    end getSources*/
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Method to get Sensors for the model based on the data
+     */
+    def getSensorsCoordinates(): Array[(Double, Double)] =
+        for dict <- JuncInfo yield dict(1)
+    end getSensorsCoordinates
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Method to get Exits for the model based on the data
+     */
+    /*
+    def getExits(): (Array[String], Array[Exit]) =
+        //one exit in Casey System scheme
+        val nameArray = Array(JuncInfo(3)._1)
+        val exitArr = Array(new Exit(JuncInfo(3)._1, (junx(3),juny(3)), Double.MaxValue, nt))
+        (nameArray, exitArr)
+    end getExits*/
+
+
+end TrafficSimulation
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Simulation class constitute all the components for a single corridor of traffic (one source to one sink) and car class.
+ *  @param name        the name of the model
+ *  @param nt          the number of intervals of time (288 for 5 minutes, 96 for 15 minutes, etc.)
+ *  @param anim        flag for showing animation or not
+ *  @param strPath     the file path for the road structure files
+ *  @param x           the vector of model parameters
+ *  @param numLanes    the number of lanes in the corridor.
+ *  @param t1          the start time of the simulation (out of the day)
+ *  @param t2          the end time of the simulation
+ */
+class TrafficSimulation(name: String, nt: Int, anim: Boolean, strPath: String,
+                        x: VectorD, numLanes: Int, t1: Int = timeBegin, t2: Int = timeEnd)
+    extends Model (name, animating = anim, aniRatio = 80.0): //, w = 10000, h = 7000, labels = false
+    import TrafficSimulation._
+
+    //val cars = Array.ofDim[ArrayBuffer[Vehicle]](numLanes)
+    //for i <- 0 until numLanes do cars(i) = new ArrayBuffer[Vehicle]()
+    var headCar = new Array[Vehicle](numLanes)
+    val laneTraffic = new Array[Int](numLanes) // to track how many cars in each lane currently
+
+    //val dir = this
+
+    val Init_len = x(0)
+    val Init_amax = x(1)
+    val Init_bmax = x(2)
+    val Init_vmax = x(3)
+    val Init_τ = x(4)
+    val Init_T = x(5)
+    val Init_s = x(6)
+    val Init_δ = x(7)
+    val laneChoice = createLaneChoice(numLanes)
+    var count = 1
+
+    //val highway_vmax = 34.0 // m/s
+    val entry = new Entrance(JuncInfo(0)._1, this, () => Car(), 0, nhpp._1,
+        nhpp._2, (junx(0),juny(0)), nt) //car() cannot be accessed in other class
+    val highway0 = new Highway("highway0", entry, sensor1, numLanes)
+    //the rest component are constants in the companion object
+    addComponents(List(entry,sensor1,sensor2,exit,highway0,highway1,highway2))
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ///Take a look @ this: 
+    /** Method to create a lane choice random variable (discrete variate).
+     * Currently assigns equal probability to each lane.
+     *
+     * @param n the number of lanes
+     */
+    def createLaneChoice(n: Int): Discrete =
+
+        val v = VectorD.fill(n)(1.0 / n)
+        Discrete(v)
+    end createLaneChoice
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Method to save the counts data from the simulation
+     */
+    def saveCounts(): (VectorD, MatrixD, VectorD) =
+        val jund = new MatrixD(nt, juncs.length)
+        for j <- jund.indices2 do jund(?, j) = countsToVector(juncs(j).getCounts)
+        (countsToVector(entry.getCounts), jund, countsToVector(exit.getCounts)) //was 3 matrices, the other two like jund
+    end saveCounts
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Utility method to convert data arrays of Ints to VectorDs
+     *
+     * @param d the array to convert to a VectorD
+     */
+    def countsToVector(d: VectorD): VectorD =
+
+        val v = new VectorD(nt)
+        for i <- 0 until (t2 - t1) do v(i + t1) = d(i)
+        v
+    end countsToVector
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Car actor. Gets assigned a lane choice (which currently
+     * does not change throughout the duration of the simulation)
+     * and moves down a corridor and leaves at a sink.
+     */
+    case class Car() extends Vehicle("c_" + count, this, VectorD(Init_τ, Init_amax,
+        Init_bmax, 0.0, Init_vmax, Init_T, Init_s, Init_len, Init_δ)) :
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::
+        /** act method for cars generated at the first
+         * source (these cars are already on the highway)
+         */
+        def act(): Unit =
+
+            val j = chooseLane() //lane number
+            lane = j
+            /*
+            this +=: cars(j)
+            if cars(j).length > 1 then
+                pred = cars(j)(1)
+                cars(j)(1).succ = this
+                velocity = min(vmax, 0.9 * pred.velocity)
+            */
+
+            if laneTraffic(j)==0 then //for empty lane
+                headCar(j) = this
+                velocity = vmax
+            else //for laneTraffic(j)>0  //for non empty lane to prepend the new car
+                pred = headCar(j)
+                headCar(j).succ = this
+                velocity = min(vmax,  0.999* pred.velocity ) // the sequel car speed is 0.95 as the previous car.
+                headCar(j) = this //so headCar only tracks the newest added car for adding into the link list
+            end if
+            laneTraffic(j)+=1
+            highway0.move(i=j) // to call highway.move(laneNum) to invoke the road.move(),
+            // otherwise may invoke transport.move() as road inherits transport
+            sensor1.jump()
+            highway1.move(j)
+            sensor2.jump()
+            highway2.move(j)
+            exit.leave(this)
+            //cars(j) -= this
+            laneTraffic(j)-=1
+            //headCar(j) = headCar(j).succ //no need
+            //headCar(j).succ  = null
+            if succ != null && pred != null then
+                succ.pred = pred
+                pred.succ = succ
+            else if succ != null then
+                succ.pred = null
+            else if pred != null then
+                pred.succ = null
+            end if
+            count +=1
+        end act
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::
+        /** Method to choose which lane the car should be in
+         *
+         * @param ii the lane chosen randommly
+         */
+        def chooseLane(): Int =
+
+            var j = 0 //previous ii, j are 0 and then for loop starts 1.
+            var n = laneTraffic(0)
+            for i <- 1 until laneTraffic.length do
+                val nn = laneTraffic(i)
+                if nn < n then
+                    n = nn
+                    j = i
+                end if
+            end for
+            //var n = laneTraffic(j)
+            j
+        end chooseLane
+
+    end Car
+
+    simulate ()
+    waitFinished ()
+    Model.shutdown ()
+
+end TrafficSimulation
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Calibrate class used the optimization algorithm and simulation data to calibrate the model
+ *  @param ParamVec    the vector of model parameters
+ *  @param week        which week of data is being used
+ *  @param t1          the start time of the simulation (out of the day)
+ *  @param t2          the end time of the simulation
+ *  @param stream      the stream of 6 random seeds
+ *  @param carfollow   the car following model
+ *  @param optzer      the Optimizers algorithm
+ *  @param metric      ?
+ */
+class TrafficCalibrate(ParamVec: VectorD,  week: Int =25, t1: Int = timeBegin, t2: Int = timeEnd,
+                       stream: Int =0, carfollow:Carfollowing = Gipps, optzer: Optimizers=SPSAAlg, metric:Int=1,
+                      ):
+    import TrafficCalibrate._
+
+    val CNTPATH = "models/traffic/counts/101/2018/Tuesday/15minutes/" //DATA_DIR auto added; the file path for the count data files
+    val STRPATH = DATA_DIR + "models/traffic/road_structure/101/1/" //the file path for the road structure files
+    val RANDVARS: Array[Variate] =
+        carfollow match
+            case IDM => Array(Uniform(1, 10, stream), Uniform(-10, -1, stream), Uniform(1, 3, stream))
+            case _ => Array(Uniform(1, 10, stream), Uniform(-10, -1, stream), Uniform(1, 3, stream),
+                Uniform(1, 3, stream), Uniform(3, 10, stream), Uniform(3, 8, stream))
+
+
+    val STEP = 0.5
+    val TOL = 0.05
+    val names = TrafficSimulation.dataValid // replace the getSensorNames() in Casey's Calibrate.scala
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Calibration method. Calls other more specific methods.
+     */
+    def calibrate(): FuncVec =
+        optzer match
+            case NelderMeade => NM()
+            case GeneticAlg => GA()
+            case SPSAAlg  => SPSA()
+            case _ => NoCalibModeling()
+    end calibrate
+
+    def NoCalibModeling(): FuncVec =
+        (f(ParamVec),ParamVec)
+    end NoCalibModeling
+
+
+    //def execute (): Double = f(x0)
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Calibration with NelderMead optimization algorithm.
+     */
+    def NM(): FuncVec =
+        val solver = new NelderMeadSimplex(f, ParamVec.dim)
+        solver.solve(ParamVec)
+    end NM
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Calibration with Genetic Algorithm optimization.
+     */
+    def GA(): FuncVec =
+        val solver = new GeneticAlgorithm(f, RANDVARS)
+        //val seeds = Array (VectorD (2.0, 0.0), VectorD (4.0, -2.0))
+        solver.solve2()
+    end GA
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Calibration with SPSA optimization algorithm.
+     */
+    def SPSA(): FuncVec =
+        val p = VectorD(1.0, 0.167, 2.0, 10.0, 0.5)
+        val solver = new SPSA(f)
+        solver.init(p)
+        solver.solve(ParamVec)
+    end SPSA
+
+
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Objective function. Runs the simulation and calls the
+     * analyze method to calculate the y-value.
+     *
+     * @param rawParam the parameter vector
+     */
+    def f(rawParam: VectorD): Double =
+        var pen = 0.0 // to give a penalty on the off edge numbers
+        val len = Uniform(5, 6).gen
+        var amax = 0.0
+        var bmax = 0.0
+        var vmax = 0.0
+        var τ = 0.0
+        var T = 0.0
+        var s = 0.0
+        var δ = 0.0
+
+        amax = if rawParam(0) > 0.0 then rawParam(0) else 2.0
+        bmax = if rawParam(1) < 0.0 then rawParam(1) else -2.0
+        vmax = 34.0
+        τ = if rawParam(2) > 0.0 then rawParam(2) else 0.5
+
+        if amax > 10.0 then pen += (amax - 10.0)
+        if bmax < -10.0 then pen += (-bmax - 10.0)
+        if τ > 5.0 then pen += (τ - 5.0)
+
+
+        carfollow match //needs to access the
+            case IDM =>
+
+                T = if rawParam(3) > 0.0 then rawParam(3) else 1.0
+                s = if rawParam(4) > 0.0 then rawParam(4) else 10.0
+                δ = if rawParam(5) > 2.0 then rawParam(5) else 2.0
+
+
+                if T > 8.0 then pen += (T - 8.0)
+                if s > 30.0 then pen += (s - 30.0)
+            case _ =>
+                T = 2.0
+                s = 10.0
+                δ = 4.0
+
+
+        val paramVecNeo =VectorD(len, amax, bmax, vmax, τ, T, s, δ) // the parameters to be calibrated
+        // println("x = " + x)
+        /*
+        //sim.complete ()
+        // println (c._2(1))
+        */
+        val sim = new TrafficSimulation("sim",  nt, false, STRPATH, paramVecNeo, numLanes,t1, t2)
+        sim.simulate()
+        sim.waitFinished()
+        val c = sim.saveCounts()
+        analyze(c._2) // + pen
+    end f
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Method to analyze the simulation output. Calculates the
+     * SMAPE value for the sensors and averages the result.
+     *
+     * @param c simulation count output
+     */
+    private def analyze(c: MatrixD): Double =
+
+        val yy = Array.ofDim[VectorD](names.length)
+        val inds = Array.ofDim[Int](names.length)
+        for i <- 0 until names.length do
+            yy(i) = TrafficSimulation.dataMatVal(i)(?, week)(t1 until t2) // use setup loaded data. no need to repeat loading
+            inds(i) = names(i)._1
+        end for
+
+        val yp = Array.ofDim[VectorD](inds.length)
+        for i <- inds.indices do
+            yp(i) = c(?, i)(t1 until t2) //seems only the 2nd element was used
+            //print("analyze ")
+            println(yp(i))
+        end for
+
+        val res = new VectorD(yy.length)
+        for i <- yy.indices do
+            if metric == 0 then res(i) = smape(yy(i), yp(i))
+            else res(i) = rmse(yy(i), yp(i))
+
+        res.mean
+    end analyze
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Smape calculation
+     */
+    def smape(yy: VectorD, yp: VectorD): Double =
+
+        val e = yy - yp
+        val m = yy.dim
+        200 * (e.abs / (yy.abs + yp.abs)).sum / m
+    end smape
+
+    def rmse(yy: VectorD, yp: VectorD): Double =
+        val e = yy - yp
+        val m = yy.dim
+        Math.sqrt((e * e).sum / m)
+    end rmse
+
+end TrafficCalibrate
+
+object TrafficCalibrate:
+
+    //the companion object is reserved for constants
+    println("test!")
+
+end TrafficCalibrate
+
+@main def configTest():Unit =
+    println(dist0_1)
+    println(dist1_2)
+    println(dist2_3)
+    println(dist0_1/34)
+    println(dist1_2/34)
+    println(dist2_3/34)
+    println(s"ratio is $scaleRatio") //100
+    println( latratio) // 10,10
+    println( longratio)
+    println(s"avarage ratio: $avgratio")
+    println(s"ratio of ratios: ${avgratio/scaleRatio}")
+end configTest
+
+@main def TrafficSimRun():Unit =
+    val x1 = VectorD(7.0, -3.5, 1.5, 3.0, 7.5, 4.0) //IDM
+    val x2 = VectorD(3.5, -7.0, 1.5, 3.0, 7.5, 4.0)
+    val x3 = VectorD(7.0, -7.0, 1.5, 3.0, 7.5, 4.0)
+    val x4 = VectorD(3.5, -3.5, 1.5, 3.0, 7.5, 4.0)
+    val x5 = VectorD(7.0, -3.5, 1.5) //Gipps
+    val x6 = VectorD(3.5, -7.0, 1.5)
+    val x7 = VectorD(7.0, -7.0, 1.5)
+    val x8 = VectorD(3.5, -3.5, 1.5)
+    val xs = Array(Array(x1, x2, x3, x4), Array(x5, x6, x7, x8)) //two different car follow models
+    val initVec = xs(0)(2)
+    val PDQs = Array(Array(2, 0, 2, 1, 1, 1), Array(1, 0, 0, 2, 1, 1))
+    PDQ = PDQs(0) //re-initialize the global variable
+    timeEnd = 34
+    val STRPATH = DATA_DIR + "models/traffic/road_structure/101/1/"
+    val paramVecNeo = VectorD(5.5, initVec(0), initVec(1), 34.0, initVec(2), 2.0, 10.0, 4.0) // the parameters to initialize
+
+    val sim = new TrafficSimulation("sim", nt, false, STRPATH, paramVecNeo, numLanes)
+    val counts = sim.saveCounts()
+    //println(counts)
+    val dataPath = "models/traffic/counts/101/2018/Tuesday/15minutes/" //DATA_DIR auto added
+    val rawData = MatrixD.load(dataPath + JuncInfo(2)._1)
+    val week2 = rawData(?, week)(timeBegin until timeEnd)
+    val senCnt = counts._2(?, 1)(timeBegin until timeEnd)
+    println(senCnt)
+    println(week2)
+    println("smape : " + Fit.smapeF(week2, senCnt))
+    println(s"ratio of ratios: $rRatio")
+end TrafficSimRun
+
+
+
+
+@main def TrafficCalibrateRun():Unit =
+    val x1 = VectorD(7.0, -3.5, 1.5, 3.0, 7.5, 4.0) //IDM
+    val x2 = VectorD(3.5, -7.0, 1.5, 3.0, 7.5, 4.0)
+    val x3 = VectorD(7.0, -7.0, 1.5, 3.0, 7.5, 4.0)
+    val x4 = VectorD(3.5, -3.5, 1.5, 3.0, 7.5, 4.0)
+    val x5 = VectorD(7.0, -3.5, 1.5) //Gipps
+    val x6 = VectorD(3.5, -7.0, 1.5)
+    val x7 = VectorD(7.0, -7.0, 1.5)
+    val x8 = VectorD(3.5, -3.5, 1.5)
+
+    val xs = Array(Array(x1, x2, x3, x4), Array(x5, x6, x7, x8)) //two different car follow models
+    val initVec = xs(0)(2)
+    val PDQs = Array (Array (2,0,2,1,1,1), Array (1,0,0,2,1,1))
+    PDQ=PDQs(0) //re-initialize the global variable
+    timeEnd = 34
+
+    val STRPATH = DATA_DIR + "models/traffic/road_structure/101/1/"
+    val paramVecNeo =VectorD(5.5, initVec(0), initVec(1), 34.0, initVec(2), 2.0, 10.0, 4.0) // the parameters to be calibrated
+
+    /*
+    for a <- 24 to 25 do // 24x15 ->6 am, 72x15-> 6 pm
+        println("---------------------------------------------------------------------")
+        println("\tWeek = " + 25 + ", T1 = " + a + ", T2 = " + (a+1) )
+        println("---------------------------------------------------------------------")
+        val trafficCalib = TrafficCalibrate(initVec,t1= a, t2=a+1,optzer = NoOpt)
+        trafficCalib.calibrate()
+        println("finished one time")
+    */
+    println("fnished")
+//Model.shutdown ()
+end TrafficCalibrateRun

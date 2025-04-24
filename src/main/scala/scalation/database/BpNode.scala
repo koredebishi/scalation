@@ -153,6 +153,14 @@ class BpNode (private [database] var keys: Int, val isLeaf: Boolean, DLINK: Bool
             ref(i+1) = ref(i)                                       // ref to the right of key
     end shiftR
 
+    def shiftIR(ip: Int): Unit =
+        ref(keys + 1) = ref(keys)
+        for i <- keys until ip by -1 do // make room by shifting keys right
+            key(i) = key(i - 1) // move key right
+            ref(i) = ref(i - 1) // ref to the right of key
+    end shiftIR
+
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add the new key k and value v into this node at the to be found insertion
      *  position (ip).  If a duplicate key is entered, return the OLD VALUE stored

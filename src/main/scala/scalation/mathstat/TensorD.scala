@@ -5,7 +5,7 @@
  *  @date    Thu May 10 15:50:15 EDT 2018
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Tensor (3D) Algebra
+ *  @note    Tensor (3D) Algebra
  *
  *  @see www.stat.uchicago.edu/~lekheng/work/icm1.pdf
  *  @see www.math.ias.edu/csdm/files/13-14/Gnang_Pa_Fi_2014.pdf
@@ -19,6 +19,15 @@ package mathstat
 import scala.collection.mutable.IndexedSeq
 import scala.math.round
 import scala.runtime.ScalaRunTime.stringOf
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Tensorize a vector function (V2V) by applying it to each (row, column) of a tensor.
+ *  @param f  the vector function to tensorize
+ *  @param x  the tensor to apply the function to
+ */
+def tensorize (f: FunctionV2V)(x: TensorD): TensorD =
+    TensorD (x.dim, for i <- x.indices; j <- x.indices2 yield f(x(i, j)))
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Return the complement of index positions idx, e.g.,
@@ -277,28 +286,80 @@ class TensorD (val dim: Int, val dim2: Int, val dim3: Int,
     end not
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update a single element of the tensor to the given value.
+    /** Update a single SCALAR element of the tensor to the given value.
+     *  Usage: z(i, j, k) = x
      *  @param i  1st dimension (row) index of the tensor
      *  @param j  2nd dimension (column) index of the tensor
      *  @param k  3rd dimension (sheet) index of the tensor
-     *  @param x  the value to be updated at the above position in the tensor
+     *  @param x  the value for updating the tensor at the above position
      */
     def update (i: Int, j: Int, k: Int, x: Double): Unit = v(i)(j)(k) = x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update a single vector of the tensor to the given vector.
+    /** Update a single VECTOR of the tensor to the given vector.
+     *  Usage: z(i, j) = x
      *  @param i  1st dimension (row) index of the tensor
      *  @param j  2nd dimension (column) index of the tensor
-     *  @param x  the vector to be updated at the above position in the tensor
+     *  @param x  the vector for updating the tensor at the above position
      */
     def update (i: Int, j: Int, x: VectorD): Unit = v(i)(j) = x.toArray
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update a single matrix of the tensor to the given matrix.
-     *  @param i  1st dimension (row) index of the tensor
-     *  @param x  the matrix to be updated at the above position in the tensor
+    /** Update a single VECTOR of the tensor to the given vector.
+     *  Usage: z(i, ?, k) = x
+     *  @param i    1st dimension (row) index of the tensor
+     *  @param all  use the all columns indicator ?
+     *  @param k    3rd dimension (sheet) index of the tensor
+     *  @param x    the vector for updating the tensor at the above position
      */
-    def update (i: Int, x: MatrixD): Unit = v(i) = null   // FIX x.toArray
+    def update (i: Int, all: Char, k: Int, x: VectorD): Unit =
+        for j <- indices2 do v(i)(j)(k) = x(j)
+    end update
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update a single VECTOR of the tensor to the given vector.
+     *  Usage: z(?, j, k) = x
+     *  @param all  use the all rows indicator ?
+     *  @param j    2nd dimension (column) index of the tensor
+     *  @param k    3rd dimension (sheet) index of the tensor
+     *  @param x    the vector for updating the tensor at the above position
+     */
+    def update (all: Char, j: Int, k: Int, x: VectorD): Unit =
+        for i <- indices do v(i)(j)(k) = x(i)
+    end update
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update a single MATRIX of the tensor (for ROW i) to the given matrix.
+     *  Usage: z(i) = x
+     *  @param i  1st dimension (row) index of the tensor
+     *  @param x  the matrix for updating the tensor at the above position
+     */
+    def update (i: Int, x: MatrixD): Unit =
+        for j <- indices2 do v(i)(j) = x(j).toArray
+    end update
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update a single MATRIX of the tensor (for COLUMN j) to the given matrix.
+     *  Usage: z(?, j) = x
+     *  @param all  use the all rows indicator ?
+     *  @param j    2nd dimension (column) index of the tensor
+     *  @param x    the matrix for updating the tensor at the above position 
+     */
+    def update (all: Char, j: Int, x: MatrixD): Unit =
+        for i <- indices; k <- indices3 do v(i)(j)(k) = x(i, k)
+    end update
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update a single MATRIX of the tensor (for SHEET k) to the given matrix.
+     *  Usage: z(?, ?, k) = x
+     *  @param all   use the all rows indicator ?
+     *  @param all2  use the all columns indicator ?
+     *  @param k     the 3rd dimension (sheet) index of the tensor
+     *  @param x     the matrix for updating the tensor at the above position
+     */
+    def update (all: Char, all2: Char, k: Int, x: MatrixD): Unit =
+        for i <- indices; j <- indices2 do v(i)(j)(k) = x(i, j)
+    end update
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set all the tensor element values to x.
@@ -406,6 +467,50 @@ class TensorD (val dim: Int, val dim2: Int, val dim3: Int,
     end *~ 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Map each row of this tensor by applying function f to each row matrix and
+     *  returning the collected result as a matrix.
+     *  @param f  the matrix to vector function to apply
+     */
+    def map (f: FunctionM2V): MatrixD =
+        MatrixD (for i <- indices yield f(apply(i)))
+    end map
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Map each row of this tensor by applying function f to each row matrix and
+     *  returning the collected result as a tensor.
+     *  @param f  the matrix to matrix function to apply
+     */
+    def mmap (f: FunctionM2M): TensorD =
+        TensorD (for i <- indices yield f(apply(i)))
+    end mmap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Map each element of this tensor by applying function f to each element and
+     *  returning the collected result as a tensor.
+     *  @param f  the scalar to scalar function to apply
+     */
+    def map_ (f: FunctionS2S): TensorD =
+        val x = new TensorD (dim, dim2, dim3)
+        for i <- indices; j <- indices2; k <- indices3 do x.v(i)(j)(k) =  f(v(i)(j)(k))
+        x
+    end map_
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Flatten this tensor in row-major fashion, returning a matrix containing
+     *  all the elements from the tensor.
+     */
+    def flatten: MatrixD =
+        val a = Array.ofDim [Double] (dim * dim2, dim3)
+        var k = 0
+        for i <- indices do
+            val v_i = v(i)
+            var j = 0
+            cfor (j < dim2, j += 1) { a(k) = v_i(j); k += 1 }
+        end for
+        new MatrixD (a.length, a(0).length, a)
+    end flatten
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether the dimensions of this tensor are less than or equal to
      *  le those of the other tensor b.
      *  @param b  the other matrix
@@ -461,13 +566,14 @@ end TensorD
  */
 object TensorD:
 
-    private val flaw = flawf ("TensorD")                               // flaw function
+//  private val flaw = flawf ("TensorD")                               // flaw function
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a tensor from the argument list x.
+    /** Build a tensor from the scaler argument list x.
      *  @param n1  the first dimension
      *  @param n2  the second dimension
      *  @param n3  the third dimension
+     *  @param x   the list/vararg of scacollection.immutable.IndexedSeq [MatrixD]lars
      */
     def apply (n: (Int, Int, Int), x: Double*): TensorD =
         val t = new TensorD (n._1, n._2, n._3)
@@ -478,6 +584,51 @@ object TensorD:
         end for
         t
     end apply 
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a tensor from the vector argument list x.
+     *  @param n   the first dimension
+     *  @param vs  the list/vararg of vectors
+     */
+    def apply (n: Int, vs: VectorD*): TensorD =
+        val t = new TensorD (n, vs.length, vs(0).dim)
+        var l = 0
+        for i <- t.indices; j <- t.indices2 do
+            t(i, j) = vs(l)
+            l += 1
+        end for
+        t
+    end apply
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a tensor from the vector argument list x.
+     *  @param n   the first dimension
+     *  @param vs  the indexed sequence of vectors
+     */
+    def apply (n: Int, vs: IndexedSeq [VectorD]): TensorD =
+        val t = new TensorD (n, vs.length, vs(0).dim)
+        var l = 0
+        for i <- t.indices; j <- t.indices2 do
+            t(i, j) = vs(l)
+            l += 1
+        end for
+        t
+    end apply
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a tensor from the vector argument list x.
+     *  @param n   the first dimension
+     *  @param vs  the indexed sequence of vectors
+     */
+    def apply (n: Int, vs: collection.immutable.IndexedSeq [VectorD]): TensorD =
+        val t = new TensorD (n, vs.length, vs(0).dim)
+        var l = 0
+        for i <- t.indices; j <- t.indices2 do
+            t(i, j) = vs(l)
+            l += 1
+        end for
+        t
+    end apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a tensor from a variable argument list of matrices (row-wise).

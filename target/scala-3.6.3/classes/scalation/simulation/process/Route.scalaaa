@@ -1,0 +1,259 @@
+//
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+///** @author  John Miller
+// *  @version 2.0
+// *  @date    Sat Jan 25 19:44:16 EST 2014
+// *  @see     LICENSE (MIT style license file).
+// *
+// *  @note    Path for Modeling Multi-Lane Pathway
+// */
+//
+//package scalation
+//package simulation
+//package process
+//
+//import scala.math.hypot
+//import scalation.animation.CommandType.*
+//import scalation.mathstat.VectorD
+//import scalation.random.Variate
+//import scalation.scala2d.Colors.*
+//import scala.reflect.ClassTag
+//import scala.collection.mutable.ArrayDeque
+//
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+///** The `Route` class provides a multi-lane pathway between two other components.
+// *  The components in a `Model` conceptually form a graph in which the edges
+// *  are `Transport`s or `VTransport`s and the nodes are other `Component`s.
+// *  A `Route` is a composite component that bundles several `Transport`s or `VTransport`s.
+// *  @param name      the name of the Route
+// *  @param k         the number of lanes/transports in the Route
+// *  @param from      the starting component
+// *  @param to        the ending component
+// *  @param motion    the variate or dynamics model for the speed/trip-time for motion down the `Path`
+// *  @param isSpeed   whether speed or trip-time is used for motion
+// *  @param bend      the bend or curvature of the `Path` (0 => line)
+// */
+//class Route(name: String = "Route", k: Int, val from: Component, val to: Component,
+//            motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0,
+//            laneDeque: Array[ArrayDeque[Vehicle]])
+//    extends Component:
+//
+//    private val debug = debugf("Route", false)              // debug function
+//    private val flaw = flawf("Route")                       // flaw function
+//
+//    val lane = Array.ofDim[VTransport](k)                   // Declare lane array
+
+//
+//    private val GAP = 20.0                                    // gap between lanes
+//    private val delta = calcShift                               // amount of shift in x and y directions
+//
+//    /** Calculate the amount of shift in the x and y directions. */
+//    private def calcShift: VectorD =
+//        val xdist = from.at(0) - to.at(0)
+//        val ydist = from.at(1) - to.at(1)
+//
+//        val hyp = hypot(xdist, ydist)
+//        println(s"${Console.RED} xdist= $xdist, ydist= $ydist, hyp=$hyp ${Console.RESET}")
+//        VectorD((ydist / hyp) * GAP, -(xdist / hyp) * GAP)
+//    end calcShift
+//
+//    debug("init", s"name = $name, from = ${from.name}, to = ${to.name}, delta = $delta")
+//
+//    for i <- lane.indices do
+//        val shift = VectorD((i - (k - 1) / 2.0) * delta(0), (i - (k - 1) / 2.0) * delta(1))
+//        lane(i) = new VTransport(s"${name}_$i", from, to, motion, isSpeed, bend, shift, shift)
+//        lane(i).laneID = i // Assign unique lane ID
+//        lane(i).vdeque = laneDeque(i) // Assign shared deque
+//        subpart += lane(i) // Add lanes to subpart
+//    end for
+//
+//    initComponent(name, Array())
+//
+//    def lanes: Int = k // Return number of lanes
+//
+//    override def at: Array[Double] = lane(0).at
+//
+//    def selector: Variate = lane(0).selector
+//
+//    def selector_=(selectorRV: Variate): Unit = lane(0).selector = selectorRV
+//
+//    def display(): Unit =
+//        for l <- lane do
+//            director.animate(l, CreateEdge, blue, l.curve, l.from, l.to,
+//                Array(l.p1(0), l.p1(1), l.pc(0), l.pc(1), l.p2(0), l.p2(1)))
+//    end display
+//
+//end Route
+
+
+
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 2.0
+ *  @date    Sat Jan 25 19:44:16 EST 2014
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @note    Route for Modeling Multi-Stage, Multi-Lane Pathway
+ */
+
+package scalation
+package simulation
+package process
+
+import scalation.animation.CommandType._
+import scalation.mathstat.VectorD
+import scalation.random.Variate
+import scalation.simulation.process.modeling.clustering.Coordinates
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Route` class provides a multi-stage, multi-lane pathway between two other
+ *  components where the `Path`s are stitched together with `Junction`s.
+ *  @param name      the name of the route
+ *  @param j         the number of paths in the route
+ *  @param k         the number of lanes/transports in the route
+ *  @param from      the starting component
+ *  @param to        the ending component
+ *  @param motion    the variate or dynamics model for the speed/trip-time for motion down the `Route`
+ *  @param isSpeed   whether speed or trip-time is used for motion
+ *  @param bend      the bend or curvature of the `Route` (0 => line)
+ */
+class Route (name: String, j: Int, k: Int, val from: Component, val to: Component,
+             motion: Variate | Dynamics, isSpeed: Boolean = false, bend: Double = 0.0)
+    extends Component:
+
+
+    val path = Array.ofDim[Path](j) // j paths/road segments (PUBLIC access required)
+    val junc = Array.ofDim[Junction](j - 1) // j-1 junctions (PUBLIC access required)
+    private val debug = debugf ("Route", true)                        // debug function
+
+    //private val disp = calcDisp                                       // displacement
+    private val (ani, sca) = getJunctions (DATA_DIR + "gps.txt", 500.0, 500.0)
+    debug ("init", s"name = $name, from = ${from.name}, to = ${to.name} with j = $j paths, k = $k lanes")
+
+    for i <- path.indices do
+        //val jPos = VectorD (from.at(0), from.at(1))
+        val jPos = VectorD (ani(i)._1 , ani(i)._2 )    // use the ani coodinates from getJunction
+        if i < path.length - 1 then
+            junc(i) = new Junction (s"${name}_j$i", xy = (jPos(0), jPos(1)))
+        path(i) = if i == 0 then
+            println(s"case1 $motion")
+            new Path (s"${name}_$i", k, from, junc(0), motion, isSpeed, bend)
+        else if i == junc.size then    //??
+            println(s"case2 $motion")
+            new Path (s"${name}_$i", k, junc.last, to, motion, isSpeed, bend)
+        else
+            println(s"case3 $motion")
+            new Path (s"${name}_$i", k, junc(i-1), junc(i), motion, isSpeed, bend)
+        subpart += path(i)
+        if i < junc.size then subpart += junc(i)
+        //jPos += disp
+    end for
+
+    initComponent(name, Array())
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the first vehicle in lane i of `Route` (the first element in vtree).
+     *  @param i  the i-th lane
+     */
+    //def getFirst (i: Int): Vehicle = path(0).lane(i).asInstanceOf [VTransport].vtree.getFirst
+
+    //def getFirst(i: Int): Vehicle = path(0).lane(i).asInstanceOf[VTransport].getFirst
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the number of segments/paths.
+     */
+    def segments: Int = j
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the number of lanes.
+     */
+    def lanes: Int = k
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Give the location of the curve to be its starting point.
+     */
+    override def at: Array [Double] = path(0).lane(0).at
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Calculate the amount of diplacement in the x and y directions between the
+     *  junctions assuming they are evenly spaced.
+     */
+//    private def calcDisp: VectorD =
+//        val xdist = from.at(0) - to.at(0)
+//        val ydist = from.at(1) - to.at(1)
+//        VectorD (xdist / k.toDouble, ydist / k.toDouble)
+//    end calcDisp
+
+    def getJunctions(path: String, aw: Double, ah: Double): (Array[(Double, Double)], Double) =
+
+        var gps: Array[(Double, Double)] = null
+        val data = scala.io.Source.fromFile(path).getLines.toArray
+        gps = Array.ofDim[(Double, Double)](data.length)
+
+        var count = 0
+        for line <- data do
+            val ll = line.split(",")
+            gps(count) = (ll(0).toDouble, ll(1).toDouble)
+            count += 1
+        end for
+        val coords = new Coordinates(aw, ah, gps)
+        coords.calcAniCoords()
+
+    end getJunctions
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Tell the animation engine to display this `Route`.
+     */
+    def display (): Unit =
+        for p <- path do p.display ()
+    end display
+
+end Route
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `routeTest` main function is used to test the `Route` class, which is a
+ *  composite class.  It simulates a two-segment, two-lane road in one direction.
+ *  > runMain scalation.simulation.process.routeTest
+ */
+@main def routeTest (): Unit =
+
+    import scalation.random.{Bernoulli, Uniform}
+
+    class RouteModel (name: String, nArrivals: Int, iArrivalRV: Variate, moveRV: Variate)
+        extends Model (name):
+
+        println(s"The director here is $director")
+        val rng     = Bernoulli ()
+        val onRamp  = new Source ("onRamp", this, () => Car (), 0, nArrivals, iArrivalRV, (200.0, 200.0))
+        val offRamp = new Sink ("offRamp", (600.0, 200.0))
+        val road    = new Route ("lane", 2, 2, onRamp, offRamp, moveRV, false, 0.25)
+
+        addComponent (onRamp, offRamp, road)
+
+        case class Car () extends SimActor ("c", this):
+
+            override def act (): Unit =
+                val i = rng.igen                              // choose a lane for the route
+                val carAhead = road.getFirst (i)              // find the car-ahead in lane i (the one to follow)
+                SimActor.addToAlist (this, carAhead)          // add this car after the car-ahead in alist
+                for j <- 0 until road.segments do
+                    road.path(j).lane(i).move ()              // move along the j-th path in the i-th lane
+                    if j < road.segments - 1 then
+                        road.junc(j).jump ()                  // enter the j-th junction
+                SimActor.removeFromAlist (this)               // remove this car from alist
+                offRamp.leave ()                              // exit
+            end act
+
+        end Car
+
+    end RouteModel
+
+    val rm = new RouteModel ("road", 10, Uniform (4000, 6000), Uniform (2900, 3100))
+    rm.simulate ()
+    rm.waitFinished ()
+    Model.shutdown ()
+
+end routeTest
+

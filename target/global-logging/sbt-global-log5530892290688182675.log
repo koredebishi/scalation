@@ -1,0 +1,80 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(compile, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / compile[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 463 Scala sources and 2 Java sources to /Users/mac/simulation/scalation_2.0/target/scala-3.4.3/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/relation/Relation.scala:2166:21 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m2166 |[0m    [33mval[0m [36mcross[0m = week product weekend[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m     |[0m                     ^^^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m     |[0mAlphanumeric method product is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m     |[0mInstead, use method syntax .product(...) or backticked identifier `product`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m     |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/relation/Relation.scala:2173:36 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m2173 |[0m    test ([31m"week join weekend"[0m, week join weekend)[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m     |[0m                                    ^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m     |[0mAlphanumeric method join is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m     |[0mInstead, use method syntax .join(...) or backticked identifier `join`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m     |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/GTable.scala:419:21 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m419 |[0m            [33mif[0m ! (r2 contains v.tuple) [33mthen[0m s.vertices += v[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                     ^^^^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mAlphanumeric method contains is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mInstead, use method syntax .contains(...) or backticked identifier `contains`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/GTable.scala:435:18 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m435 |[0m            [33mif[0m r2 contains v.tuple [33mthen[0m s.vertices += v[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                  ^^^^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mAlphanumeric method contains is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mInstead, use method syntax .contains(...) or backticked identifier `contains`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/GTable.scala:816:25 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m816 |[0m    [33mval[0m [36minters[0m = student intersect inAthens[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                         ^^^^^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mAlphanumeric method intersect is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mInstead, use method syntax .intersect(...) or backticked identifier `intersect`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/KGTable.scala:300:25 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m300 |[0m    [33mval[0m [36minters[0m = student intersect inAthens[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                         ^^^^^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mAlphanumeric method intersect is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mInstead, use method syntax .intersect(...) or backticked identifier `intersect`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/LTable.scala:319:28 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m319 |[0m    [33mval[0m [36mnotAthens[0m = student minus inAthens[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                            ^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mAlphanumeric method minus is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mInstead, use method syntax .minus(...) or backticked identifier `minus`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/LTable.scala:323:25 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m323 |[0m    [33mval[0m [36minters[0m = student intersect inAthens[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                         ^^^^^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mAlphanumeric method intersect is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mInstead, use method syntax .intersect(...) or backticked identifier `intersect`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/LTable.scala:327:24 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m327 |[0m    [33mval[0m [36munio[0m = inAthens union notAthens[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                        ^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mAlphanumeric method union is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mInstead, use method syntax .union(...) or backticked identifier `union`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/Table.scala:981:44 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m981 |[0m                    [33mif[0m ! ([33mthis[0m.contains (t) ++ u) [33mthen[0m { keep = [31mfalse[0m; break () }[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                          ^^^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                          value ++ is not a member of Boolean[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/Table.scala:953:33 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m953 |[0m        [33mfor[0m t <- tuples [33mif[0m ! (ss contains t) [33mdo[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m    |[0m                                 ^^^^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mAlphanumeric method contains is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mInstead, use method syntax .contains(...) or backticked identifier `contains`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m    |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /Users/mac/simulation/scalation_2.0/src/main/scala/scalation/database/table/Table.scala:1525:17 [0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m1525 |[0m    q = customer project (Array ([31m"street"[0m, [31m"ccity"[0m))[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m     |[0m                 ^^^^^^^[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m     |[0mAlphanumeric method project is not declared [33minfix[0m; it should not be used as infix operator.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m     |[0mInstead, use method syntax .project(...) or backticked identifier `project`.[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m     |[0mThe latter can be rewritten automatically under -rewrite -source 3.4-migration.[0m
+[0m[[0m[31merror[0m] [0m[0mNo warnings can be incurred under -Werror (or -Xfatal-warnings)[0m
+[0m[[0m[33mwarn[0m] [0m[0m11 warnings found[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 76 s (01:16), completed Aug 18, 2024, 8:37:16 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

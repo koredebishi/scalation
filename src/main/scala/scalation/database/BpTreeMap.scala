@@ -13,7 +13,7 @@
  *      [ . k1 . k2 . k3 . -- . ]
  *      [ . k4 . k5 . -- . -- . ]
  *  Rules: divider key (k4 added to parent in this case) is the smallest key
-               in the right subtree (SMALLEST RIGHT)
+             in the right subtree (SMALLEST RIGHT)
  *         split node n into (n, right_sibling_node) with larger half staying in n
  *         internal node split promotes middle key to parent as the divider key
  *
@@ -38,12 +38,13 @@ import BpNode._
 /** The `BpTreeMap` class provides sorted maps that use the B+Tree Data Structure.
  *  Inserts may cause the splitting of nodes, while deletes may cause borrowing
  *  if keys or merging of nodes.
- *  @tparam V  the type of the values assigned to keys in this sorted map
+ *  @tparam V     the type of the values assigned to keys in this sorted map
+ *  @param  name  the name of the B+Tree (used for indentification)
  */
-class BpTreeMap [V: ClassTag] ()
-    extends AbstractMap [ValueType, V]
-        with SortedMap [ValueType, V]
-        with Serializable:
+class BpTreeMap [V: ClassTag] (name: String = "BpTreeMap")
+      extends AbstractMap [ValueType, V]
+         with SortedMap [ValueType, V]
+         with Serializable:
 
     private val debug  = debugf ("BpTreeMap", true)                      // debug function
     private val flaw   = flawf ("BpTreeMap")                             // flaw function
@@ -52,12 +53,13 @@ class BpTreeMap [V: ClassTag] ()
     private [database] var count  = 0                                    // count # nodes accessed (performance)
     private var root   = new BpNode (0, true)                            // root node of this B+Tree (initially empty)
     private val first  = root                                            // first leaf node of this B+Tree
+    private var last_  = root                                            // lastleaf node of this B+Tree
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the first value in the B+Tree (note ref(0) points at next leaf node).
      */
     def getFirst: V = first.ref(1).asInstanceOf [V]
-
+    def getLast: V = last_.ref(last_.keys).asInstanceOf [V]
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The `SortedMap` trait requires `Ordering` with a compare method to be defined.
      *  @see https://scala-lang.org/api/3.3.0/scala/math/Ordering.html
@@ -82,10 +84,13 @@ class BpTreeMap [V: ClassTag] ()
      */
     class TreeIterator (ns: BpNode = first, js: Int = -1) extends Iterator [(ValueType, V)]:
         var (n, j) = (ns, js)
+
         def hasNext: Boolean = j < n.keys-1 || n.ref(0) != null
+
         def next (): (ValueType, V) =
-            debug ("next", s"node n = $n")
-            if j < n.keys-1 then j += 1 else { n = n.ref(0).asInstanceOf [BpNode]; j = 0 }
+            //          debug ("next", s"node n = $n, j = $j, n.keys = ${n.keys}")
+            if j < n.keys-1 then j += 1
+            else { n = n.ref(0).asInstanceOf [BpNode]; j = 0 }
             (n(j), n.ref(j+1).asInstanceOf [V])
         end next
     end TreeIterator
@@ -100,11 +105,13 @@ class BpTreeMap [V: ClassTag] ()
     /** Return an iterator for retrieving all the elements in this B+Tree starting
      *  from key start.  Returns null if all keys in tree are smaller than start.
      *  @see scala.collection.SortedMapOps
-     *  @param start  the key to start with
+     *  @param start  the key to start with (inclusive)
      */
     def iteratorFrom (start: ValueType): Iterator [(ValueType, V)] =
-        val (ns, js) = findp (start, root)
-        if ns != null then new TreeIterator (ns, js)
+        val (ns, js) = findp (start, root)                               // find position: node ns and key index js
+        debug ("iteratorFrom", s"(ns, js) = ($ns, $js)")
+        val jjs = math.max (js-1, -1)
+        if ns != null then new TreeIterator (ns, jjs)
         else null
     end iteratorFrom
 
@@ -125,17 +132,16 @@ class BpTreeMap [V: ClassTag] ()
      *  @param until  the ending key (exclusive)
      */
     def rangeImpl (from: Option [ValueType], until: Option [ValueType]): BpTreeMap [V] =
-        val subtree = new BpTreeMap [V] ()
+        val subtree = new BpTreeMap [V] (name + from)
         val it = if from.isDefined then iteratorFrom (from.get)
         else iterator
         var cont = true
         while cont && it.hasNext do
             val (k, v) = it.next ()
-            val (min, max) = (from.get, until.get)
-            if (!from.isDefined || k >= min) &&
-                (!until.isDefined || k < max) then
-                subtree.addOne ((k, v))
-            else cont = !until.isDefined || k < max
+            if ! until.isDefined || k < until.get then
+                if ! from.isDefined || k >= from.get then subtree.addOne ((k, v))
+            else
+                cont = false
         subtree
     end rangeImpl
 
@@ -166,6 +172,51 @@ class BpTreeMap [V: ClassTag] ()
         if n.isLeaf then (n, n.findEq (key))
         else findp (key, n.ref(n.find (key)).asInstanceOf [BpNode])
     end findp
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the first (key, value) pair whose key is larger than (beyond) the search key (skey).
+     *  @author Amily Chowdhury
+     *  @param skey  the search key
+     */
+    def findFirstBeyond (skey: ValueType): Option [(ValueType, V)] =
+        val (ln, ip) = findp (skey, root)                                // locate leaf node and index position for skey
+        if ln != null then
+            if ip >= 0 && ip < ln.keys - 1 then
+                // Case 1: If the key is found and not the last one, return the next key in the leaf node
+                Some ((ln(ip + 1), ln.ref(ip + 2).asInstanceOf[V]))      // use ip + 1 to get the next key
+            else
+                // Case 2: Move to the next leaf node and return the first key there
+                val nxLeaf = ln.ref(0).asInstanceOf [BpNode]             // move to the next leaf node
+                if nxLeaf != null && nxLeaf.keys > 0 then
+                    Some ((nxLeaf(0), nxLeaf.ref(1).asInstanceOf [V]))   // get first key and reference
+                else
+                    None
+        else
+            None
+    end findFirstBeyond
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the last (key, value) pair whose key is smaller than (below) the search key (skey).
+     *  @author Amily Chowdhury
+     *  @param skey  the search key
+     */
+    def findLastBelow (skey: ValueType): Option [(ValueType, V)] =
+        val (ln, ip) = findp (skey, root)                                // locate leaf node and index position for skey
+        if ln != null then
+            if ip > 0 then
+                // Case 1: If the key is found and not the first one, return the previous key in the leaf node
+                Some ((ln.key(ip - 1), ln.ref(ip).asInstanceOf [V]))     // use ip - 1 to get the previous key
+            else
+                // Case 2: Move to the previous leaf node and return the last key there
+                val pvLeaf = ln.pre                                      // move to the previous leaf node
+                if pvLeaf != null && pvLeaf.keys > 0 then
+                    val iLast = pvLeaf.keys - 1
+                    Some ((pvLeaf(iLast), pvLeaf.ref(pvLeaf.keys).asInstanceOf [V]))   // get last key and reference
+                else
+                    None
+        else
+            None
+    end findLastBelow
 
     //--------------------------------------------------------------------------
     // Add key-value pairs into the B+Tree
@@ -211,6 +262,7 @@ class BpTreeMap [V: ClassTag] ()
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add new key k and value v into LEAF node n.  Upon overflow, split node n,
      *  in which case the divider key and new right sibling node are returned.
+     *  If you split in leaf node and leaf node is last node, then newly created leaf node is last node
      *  @param n  the current node
      *  @param k  the new key
      *  @param v  the new value
@@ -220,7 +272,9 @@ class BpTreeMap [V: ClassTag] ()
         val duplicate = n.add (k, v)                                     // add into node n
         if duplicate == None then kCount += 1                            // increment the key count unless its a duplicate
         else flaw ("add", s"key $k is a duplicate, old value = $duplicate")
-        if n.overflow then k_r = n.split ()                              // its full, must split
+        if n.overflow then
+            k_r = n.split ()                              // its full, must split
+            if n == last_ then last_ = k_r._2
         k_r
     end add
 
@@ -297,7 +351,6 @@ class BpTreeMap [V: ClassTag] ()
                 val j = par.find (key)                                   // j-th index position in parent
                 val (sib, left) = richestSib (par, j)                    // richest sib and whether it's left
                 debug ("delete", s"needs to handle underflow of INTERNAL node n = $n, sib = $sib, left = $left")
-
                 if sib.rich then borrowI (n, sib, left, par, j)          // internal borrow a key from rich sib
                 else mergeI (n, sib, left, par, j)                       // internal merge nodes n and sib, may cause parent to underflow
             end if
@@ -339,7 +392,7 @@ class BpTreeMap [V: ClassTag] ()
         debug ("borrow", s"key $bkey from rich sib = $sib node for node n = $n having par = $par at j = $j, left=$left")
         val bref = sib.ref(i+1).asInstanceOf [V]
         sib.remove (i)
-        add (n, bkey, bref)
+        add (n, bkey, bref); kCount -= 1                                 // key is moved, not really added (=> -= 1)
         if left then par(j-1) = bkey else par(j) = sib(0)                // the divider key for parent node
     end borrow
 
@@ -357,14 +410,15 @@ class BpTreeMap [V: ClassTag] ()
     private def borrowI (n: BpNode, sib: BpNode, left: Boolean, par: BpNode, j: Int): Unit =
 
         if left then                                                     // borrow from LEFt sib
+            // j is incorrect when you are doing borrow on the left -- should be zero
             val ip = 0                                                   // node n's insertion position is 0
             debug ("borrowI", s"LEFT sib = $sib, n = $n [ip = $ip], par = $par [j = $j]")
-            n.shiftR (ip)                                                // shift right to make room in node n
-            n.key(ip) = par.key(j)                                       // move par key @ j to node n
-            n.ref(ip) = sib.ref(sib.keys)                                // move sib's last ref to node n
+            n.shiftIR (ip)                                               // shift right to make room in node n
+            n.key(ip) = par.key(j-1)                                     // move par key @ j to node n
             n.keys += 1
+            n.ref(ip) = sib.ref(sib.keys)                                // move sib's last ref to node n
 
-            par.key(j) = sib.key(sib.keys-1)                             // promote sib's last key to par @ j
+            par.key(j-1) = sib.key(sib.keys-1)                             // promote sib's last key to par @ j
             sib.keys -= 1                                                // effectively removes last key in sib
 
         else                                                             // borrow from RIGHT sib
@@ -381,6 +435,7 @@ class BpTreeMap [V: ClassTag] ()
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Merge LEAF node n with its sibling returning whether the parent node
      *  has underflowed.
+     *  If you delete, if it in last node, the merged node will be the new last node.
      *  @param n     the current node that has underflowed
      *  @param sib   the sibling node
      *  @param left  the whether the sib is left or right
@@ -389,8 +444,14 @@ class BpTreeMap [V: ClassTag] ()
      */
     private def merge (n: BpNode, sib: BpNode, left: Boolean, par: BpNode, j: Int): Boolean =
         debug ("merge", s"LEAF node n = $n that underflows with sib = $sib having par = $par at j = $j ,left=$left")
-        if left then {sib.merge (n); par.remove(j-1)}
-        else { n.merge (sib); par.remove (j) }                           // true means parent underflowed
+        if left then
+            sib.merge (n)
+            if n == last_ then last_ = sib
+            par.remove(j-1)
+        else
+            n.merge (sib)
+            if sib == last_ then last_ = n
+            par.remove (j)                           // true means parent underflowed
     end merge
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -422,16 +483,13 @@ class BpTreeMap [V: ClassTag] ()
      *  (in the same order) as another sorted map.
      *  @param that  the other sorted map
      */
-    def equals (that: SortedMap [ValueType, V]): Boolean =
-        banner ("equals called")
+    infix def equals (that: SortedMap [ValueType, V]): Boolean =
         println (s"this.size = ${this.size} ==? that.size = ${that.size}")
         if this.size != that.size then return false
-        println ("here")
         var same = true
         val it1  = this.iterator
         val it2  = that.iterator
         while same && it1.hasNext do
-            println ("here")
             val (k1, v1) = it1.next ()
             val (k2, v2) = it2.next ()
             debug ("equals", s"($k1, $v1) ==? ($k2, $v2)")
@@ -443,7 +501,7 @@ class BpTreeMap [V: ClassTag] ()
     /** Show/print this B+Tree.
      */
     def show (): Unit =
-        println ("BpTreeMap")
+        println (s"BpTreeMap_$name")
         printT (root, 0)
         println ("-" * 60)
     end show
@@ -452,7 +510,7 @@ class BpTreeMap [V: ClassTag] ()
     /** Show/print this B+Tree's leaf node links.
      */
     def showLink (): Unit =
-        println ("BpTreeMap Leaf Node Linkage")
+        println (s"BpTreeMap_$name Leaf Node Linkage")
         println("=" * 60)
         var n = first
         while n != null do { n.show (); n = n.ref(0).asInstanceOf [BpNode]}
@@ -483,7 +541,7 @@ end BpTreeMap
 
     banner ("Insert Increasing Integer Keys")
     val totKeys = 60
-    val tree    = new BpTreeMap [Int] ()
+    val tree    = new BpTreeMap [Int] ("Test")
 
     for i <- 1 until totKeys by 2 do
         banner (s"put ($i, ${i * i})")
@@ -496,19 +554,20 @@ end BpTreeMap
     for i <- 0 until totKeys do println (s"key = $i, value = ${tree.get(i)}")
     println ("-" * 60)
 
-
-    banner("Find Keys in Range")
-    println(s"Range 10 - 20 value = ${tree.range(10, 20)}")
-    println("-" * 60)
-
-
-
-
-
     banner ("Iterate Through the B+Tree")
     for it <- tree.iterator do println (it)
     println ("-" * 60)
     tree.foreach (println (_))
+
+    banner ("Iterate Through the B+Tree from Key = 11")
+    for it <- tree.iteratorFrom (11) do println (it)
+    println ("-" * 60)
+    tree.foreach (println (_))
+    println ("-" * 60)
+
+    banner ("Find Keys in Range")
+    println (s"Range Query 11 until 20: key-value pairs = ${tree.range (11, 20)}")
+    println ("-" * 60)
 
     banner ("Print Statistics")
     println (s"size = ${tree.size}")
@@ -516,8 +575,8 @@ end BpTreeMap
 
     banner ("Delete Keys")
     tree.show ()
-    val toRemove = Array (29, 31,27, 33, 35, 25, 23, 13, 7, 1, 3, 5, 9, 21, 17, 19, 21, 11, 15, 37, 39, 41, 43, 49, 47, 51, 45)
-    //  val toRemove = Array (7, 1, 3, 5, 9, 21, 17, 19, 21, 11, 15, 13, 29, 31, 27, 33, 35, 23, 39, 37, 41, 25)
+    val toRemove = Array (29, 31,27, 33, 35, 25, 23, 13, 7, 1, 59, 55, 47, 53, 3, 5, 9, 21, 17, 19, 21, 11, 15, 37, 39, 41, 43, 49, 47, 51, 45)
+//  val toRemove = Array (7, 1, 3, 5, 9, 21, 17, 19, 21, 11, 15, 13, 29, 31, 27, 33, 35, 23, 39, 37, 41, 25)
 
     for key <- toRemove do
         banner (s"remove ($key)")
@@ -525,8 +584,6 @@ end BpTreeMap
         tree.show ()
         tree.showLink()
     end for
-
-
 
 end bpTreeMapTest
 
@@ -545,7 +602,7 @@ end bpTreeMapTest
     val mx      = 10 * totKeys
     val seed    = 1
     val rng     = new Random (seed)
-    val tree    = new BpTreeMap [Int] ()
+    val tree    = new BpTreeMap [Int] ("Test2")
 
     for i <- 1 to totKeys do
         val key = rng.nextInt (mx)
@@ -564,7 +621,8 @@ end bpTreeMapTest2
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `bpTreeMapTest3` main function used for testing the `BpTreeMap` class by
- *  inserting keys and values into B+Trees, one representing each of two lanes.
+ *  inserting and removing keys and values into/from a B+Tree and a TreeMap.
+ *  Performs AUTOMATED TESTING.
  *  > runMain scalation.database.bpTreeMapTest3
  */
 @main def bpTreeMapTest3 (): Unit =
@@ -572,12 +630,12 @@ end bpTreeMapTest2
     import java.util.Random
     import scala.collection.mutable.TreeMap
 
-    banner ("Insert Random Integer Keys")
+    banner ("AutoTest: Insert Random Integer Keys into BpTreeMap and TreeMap")
     val totKeys = 60
     val mx      = 10 * totKeys
     val seed    = 1
     val rng     = new Random (seed)
-    val tree    = new BpTreeMap [Int] ()
+    val tree    = new BpTreeMap [Int] ("Test3")
     val tree2   = new TreeMap [ValueType, Int] ()(ValueTypeOrd)
 
     for i <- 1 to totKeys do
@@ -586,19 +644,88 @@ end bpTreeMapTest2
         tree2.put (key, 2 * key)
     end for
 
-    println (s"tree equals tree2 = ${tree equals tree2}")
+    var same = tree equals tree2
+    println (s"tree equals tree2 = $same")
+    assert (same)
 
     tree.show ()
+
+    banner ("AutoTest: Remove All Keys from BpTreeMap and TreeMap")
+    val toRemove = tree2.keys
+    for key <- toRemove do
+        banner (s"remove ($key)")
+        tree.remove (key)
+        tree2.remove (key)
+        tree.show ()
+        tree.showLink()
+        same = tree equals tree2
+        println (s"tree equals tree2 = $same")
+        assert (same)
+    end for
 
 end bpTreeMapTest3
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `bpTreeMapTest4` main function used for testing the `BpTreeMap` class by
- *  inserting keys and values into B+Trees, one representing each of two lanes.
+ *  inserting keys and values into B+Trees, and performing range queries.
+ *  @author Amily Chowdhury
  *  > runMain scalation.database.bpTreeMapTest4
  */
 @main def bpTreeMapTest4 (): Unit =
+
+    banner("Insert Increasing Integer Keys")
+    val tree = new BpTreeMap [String] ("Range_test")
+
+    tree.put (147.4, "C1")
+    tree.put (153.4, "C2")
+    tree.put (163.4, "C3")
+    tree.put (173.4, "C4")
+    tree.put (180.4, "C5")
+
+    tree.show ()
+    tree.showLink ()
+
+    banner ("Find Keys in Range")
+    //  val lb = 137.4
+    //  val ub = 180.4
+    var lb = 147.4
+    var ub = 163.4
+    println (s"Range Query lb = $lb: until up = $ub: key-value pairs")
+    println (s"Range Query lb = $lb: until up = $ub: key-value pairs = ${tree.range (lb, ub)}")
+    println ("-" * 60)
+
+    banner("Find First Key Beyond Upper Bound of Range")
+    println(s"Find First Key Beyond $ub")
+    var result = tree.findFirstBeyond (ub)
+    println(s"The first key-value pair beyond $ub is: $result")
+
+    ub = 180.4
+    println (s"Find First Key Beyond $ub")
+    result = tree.findFirstBeyond (ub)
+    println (s"The first key-value pair beyond $ub is: $result")
+
+    banner("Find Last Key Below Lower Bound")
+    lb = 163.4
+    println (s"Find Last Key Below $lb")
+    result = tree.findLastBelow (lb)
+    println(s"The last key-value pair below $lb is: $result")
+
+    lb = 147.4
+    println (s"Find Last Key Below $lb")
+    result = tree.findLastBelow (lb)
+    println(s"The last key-value pair below $lb is: $result")
+
+end bpTreeMapTest4
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `bpTreeMapTest5` main function used for testing the `BpTreeMap` class by
+ *  inserting keys and values into B+Trees, one representing each of two lanes.
+ *  Can be used for finding cars in a traffic simulation.
+ *  > runMain scalation.database.bpTreeMapTest5
+ */
+@main def bpTreeMapTest5 (): Unit =
 
     import java.util.Random
 
@@ -608,8 +735,8 @@ end bpTreeMapTest3
     val totKeys = 60
     val seed    = 1
     val rng     = new Random (seed)
-    val lane1   = new BpTreeMap [Car] ()               // index for lane1
-    val lane2   = new BpTreeMap [Car] ()               // index for lane2
+    val lane1   = new BpTreeMap [Car] ("lane1")        // index for lane1
+    val lane2   = new BpTreeMap [Car] ("lane2")        // index for lane2
 
     var dist = 0.0                                     // distance from end of lane
     var ord  = 0                                       // rank order from end of lane
@@ -643,4 +770,5 @@ end bpTreeMapTest3
 // if its distance is large enough, make the lane change
 // may need gaps in ord so lane changing car can get an ord without making all care reassign theirs
 
-end bpTreeMapTest4
+end bpTreeMapTest5
+

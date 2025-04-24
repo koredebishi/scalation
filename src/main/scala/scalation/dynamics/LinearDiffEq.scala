@@ -5,7 +5,7 @@
  *  @date    Fri Jan 29 18:36:48 EST 2010
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Linear Differential Equations Solver
+ *  @note    Linear Differential Equations Solver
  */
 
 package scalation
@@ -52,17 +52,10 @@ class LinearDiffEq (a: MatrixD, y0: VectorD):
      private val k = v *~ c
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Apply the exponential 'exp' function to each element of a vector.
+     /** Apply the exponential `exp` function to each element of a vector.
       *  @param v  the vector to apply the exp function to
       */
      def expV (v: VectorD): VectorD = v.map (exp (_))
-/*
-     {
-         val z = new VectorD (v.dim)
-         for (i <- 0 until z.dim) z(i) = exp (v(i))
-         z
-     } // expV
-*/
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      /** Evaluate the solution for y(t) at time t.
