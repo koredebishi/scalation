@@ -5,7 +5,7 @@
  *  @date    Mon Sep 21 15:05:06 EDT 2009
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Graph Structure Suitable for Animation
+ *  @note    Graph Structure Suitable for Animation
  */
 
 package scalation
@@ -18,7 +18,7 @@ import scalation.mathstat.VectorD
 import scalation.scala2d._
 import scalation.scala2d.Colors._
 
-import Counter.{nextE, nextN, nextT}
+import Counter.{nextE, nextN}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Dgraph` class is for defining graph structures suitable for animation.
@@ -33,10 +33,15 @@ import Counter.{nextE, nextN, nextT}
  *  labeled (nodes, edges and tokens as well as the graph itself).  Nodes and edges
  *  may be added to/removed from graphs, while tokens may be added to/removed from
  *  either nodes or edges.  Tokens may also be free (not bound to nodes or edges).
+ *  @param name       the name of the graph
+ *  @param bipartite  whether the graph is bipartite (edges only between 2 types of nodes)
  */
-class Dgraph (name: String = "Dgraph", bipartite: Boolean = false):
+class Dgraph (name: String, bipartite: Boolean = false):
 
-    private val flaw = flawf ("Dgraph")                           // flaw function
+    private val debug = debugf ("Dgraph", false)                  // debug function
+    private val flaw  = flawf ("Dgraph")                          // flaw function
+
+    debug ("init", s"create graph: name = $name, bipartite = $bipartite")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The `Node` class is used to represent nodes in the graph.
@@ -138,65 +143,28 @@ class Dgraph (name: String = "Dgraph", bipartite: Boolean = false):
         end if
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Move the edge endpoints so edge connects to vertex boundary, rather than center.
-         *  Edge is from p1 to p2:  p1 --> p2.
-         *  @param p1  the position of the center of the from vertex
-         *  @param p2  the position of the center of the to vertex
-         * 
-        def move2Boundary (p1: VectorD, p2: VectorD): Unit =
-            val angle   = atan2 (p2(1) - p1(1), p2(0) - p1(0))
-            val radius1 = (from.shape.getWidth () + from.shape.getHeight ()) / 4.0
-            val radius2 = (to.shape.getWidth ()   + to.shape.getHeight ()) / 4.0
-            
-            p1(0) += radius1 * cos (angle);    p1(1) += radius1 * sin (angle)
-            p2(0) += radius2 * cos (Pi+angle); p2(1) += radius2 * sin (Pi+angle)
-        end move2Boundary
-         */
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Move the edge endpoints so edge connects to vertex boundary, rather than center.
-         *  Edge is from p1 to p2:  p1 --> p2.
-         *  @param p1  the position of the leftop of the from vertex
-         *  @param p2  the position of the leftop of the to vertex
+        /** Move the edge endpoints, p1 and p2, so edge connects to node boundaries,
+         *  rather than centers.  Edge is from p1 to p2:  p1 --> p2.
+         *  @param p1  the initial edge starting position (center of the from node)
+         *  @param p2  the initial edge ending position (center of the to node)
          */
         def move2Boundary (p1: VectorD, p2: VectorD): Unit =
             val gapShift  = shift * gap
-            val toCenterX = to.x + to.w / 2                             // p1(0)
-            val toCenterY = to.y + to.h / 2                             // p1(1)
-            val fromCenterX = from.x + from.w / 2                       // p2(0)
-            val fromCenterY = from.y + from.h / 2                       // p2(1)
-            val angle     = atan2 (toCenterY - fromCenterY, toCenterX - fromCenterX)
+            val frCenterX = from.x + from.w / 2                         // p1(0)
+            val frCenterY = from.y + from.h / 2                         // p1(1)
+            val toCenterX = to.x + to.w / 2                             // p2(0)
+            val toCenterY = to.y + to.h / 2                             // p2(1)
+            val angle     = atan2 (toCenterY - frCenterY, toCenterX - frCenterX)
 
-            from.shape match
-                case _: Rectangle =>
-                    val p1Vec = pointOnRect (toCenterX, toCenterY, from.x, from.y, from.x + from.w, from.y + from.h)
-                    p1(0) = p1Vec(0)
-                    p1(1) = p1Vec(1)
-                    if shift != 0 then            // Yulong note: Either on top/bot shift or left/right shift
-                        if p1(0) == to.x || p1(0) == to.x + to.w then p1(1) += gapShift else p1(0) += gapShift
+            val radius1 = (from.shape.getWidth () + from.shape.getHeight ()) / 4.0
+            p1(0) += radius1 * cos (angle + gapShift)
+            p1(1) += radius1 * sin (angle + gapShift)
 
-                case _ =>
-                    // the circle is 'from' Yulong fixed the circle one way in case and shift
-                    // p1 is the left top
-                    val radius1 = (from.shape.getWidth () + from.shape.getHeight ()) / 4.0
-                    p1(0) += radius1 + radius1 * cos (angle + gapShift)
-                    p1(1) += radius1 + radius1 * sin (angle + gapShift)
+            val radius2 = (to.shape.getWidth() + to.shape.getHeight()) / 4.0
+            p2(0) += radius2 * cos (Pi + angle - gapShift)
+            p2(1) += radius2 * sin (Pi + angle - gapShift)
 
-            to.shape match
-                case _: Rectangle =>
-                    val p2Vec = pointOnRect (fromCenterX, fromCenterY, to.x, to.y, to.x + to.w, to.y + to.h)
-                    p2(0) = p2Vec(0)
-                    p2(1) = p2Vec(1)
-                    if shift != 0 then
-                        if p2(0) == from.x || p2(0) == from.x + from.w then p2(1) += gapShift else p2(0) += gapShift
-
-                case _ =>
-                    // the circle is 'to'
-                    // p2 is the left top
-                    val radius2 = (to.shape.getWidth() + to.shape.getHeight()) / 4.0
-                    p2(0) += radius2 + radius2 * cos (Pi + angle - gapShift)
-                    p2(1) += radius2 + radius2 * sin (Pi + angle - gapShift)
-
+            println (s"move2Boundary: from p1 = $p1, to p2 = $p2")
         end move2Boundary
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -278,7 +246,8 @@ class Dgraph (name: String = "Dgraph", bipartite: Boolean = false):
             val e = new Edge (shape, label, primary, color, from, to, 0.0, shift, false)
             //e.pc = pc
             e.move2Boundary (p1, p2)
-            e.shape.setLine (p1, pc, p2)
+//          e.shape.setLine (p1, p2)                     // no pc => straigt line
+            e.shape.setLine (p1, pc, p2)                 // pc => curve
             e
         end apply
 
@@ -315,7 +284,7 @@ class Dgraph (name: String = "Dgraph", bipartite: Boolean = false):
     case class Token (shape: RectangularShape, label: String, primary: Boolean, var color: Color,
                       var onNode: Node, val w: Double, val h: Double):
 
-        private val id = nextT ()                                // token identifier
+//      private val id = nextT ()                                // token identifier
 
         if onNode != null then
             onNode.addToken (this)

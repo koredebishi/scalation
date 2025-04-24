@@ -42,7 +42,7 @@ class Transport (name: String, val from: Component, val to: Component,
 
 
 
-    private val debug       = debugf ("Transport", true)                // debug function
+    private val debug       = debugf ("Transport", false)                // debug function
 
     private val EPSILON     = 1E-7                                      // number close to zero
     private val STEP_SIZE   = 5                                         // number of units/pixels to move per step
@@ -53,8 +53,7 @@ class Transport (name: String, val from: Component, val to: Component,
     private [process] val pc       = calcControlPoint2 (p1, p2, bend)   // control point (determines curvature)
 
     initComponent(name, (p1.toArray))
-//    println(s"@@@@@@P1 ${stringOf(p1.toArray)}")
-//    println(s"@@@@@@AT: ${stringOf(at)}")
+
 
     private [process] var selector: Variate = Discrete (VectorD (0.25, 0.5, 0.25))
             // Random variate for selecting next direction, defaults to left (.25), straight (.50), right (.25)
@@ -137,7 +136,9 @@ class Transport (name: String, val from: Component, val to: Component,
      *  will be created by the animation engine).
      */
     def move (): Unit =
+        println(s"The director in the Move Transport $director")
         val actor    = director.theActor
+
         debug ("move", s"actor = $actor this  = along the Transport")
         val duration = if isSpeed then curve.length / motion.gen else motion.gen
         tally (duration)

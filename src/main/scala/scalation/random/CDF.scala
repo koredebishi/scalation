@@ -4,6 +4,8 @@
  *  @version 2.0
  *  @date    Fri Jul 24 14:35:58 EDT 2015
  *  @see     LICENSE (MIT style license file).
+ *
+ *  @note    Cumulative Distribution Function (CDF)
  */
 
 package scalation
@@ -269,7 +271,6 @@ object CDF:
         var (del, temp) = (0.0, 0.0)
         var (xden, xnum, xsq) = (0.0, 0.0, 0.0)
 
-        var i = 0
         val y = abs (x)
 
         // 1st case: |x| <= qnorm(3/4)
@@ -535,7 +536,7 @@ object CDF:
      */
     def fisherCDF (x: Double, df1: Int, df2: Int): Double =
         if x < 0.0 then
-            flaw ("fisherCDF", "coordinate x should be nonnegative")
+            flaw ("fisherCDF", s"F(x) requires coordinate x = $x to be nonnegative")
             return 0.0
         end if
         if df1 <= 0 || df2 <= 0 then

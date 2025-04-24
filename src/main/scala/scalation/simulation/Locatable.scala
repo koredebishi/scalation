@@ -36,7 +36,7 @@ trait Locatable:
      */
     def at_= (at: Array [Double]): Unit =
         if _at == null && at != null then _at = at
-        else flaw ("at_=", s"location may only be set once - $this ")
+        else flaw ("at_=", "location may only be set once")
     end at_=
 
 end Locatable

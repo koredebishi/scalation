@@ -5,7 +5,7 @@
  *  @date    Sun May  7 18:20:18 EDT 2023 
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Extensions Method for `Boolean`: and, or, not, xor
+ *  @note    Extensions Method for `Boolean`: and, or, not, xor
  */
 
 package scalation
@@ -14,10 +14,10 @@ package scalation
 /** Extend `Boolean` to include an and, or, not, xor.  Note: they all have the same precedence.
  */
 extension (x: Boolean)
-    inline def and (y: Boolean): Boolean = x && y
-    inline def or (y: Boolean): Boolean  = x || y
-    inline def xor (y: Boolean): Boolean = x != y
-    inline def not: Boolean = ! x
+    inline infix def and (y: Boolean): Boolean = x && y
+    inline infix def or (y: Boolean): Boolean  = x || y
+    inline infix def xor (y: Boolean): Boolean = x != y
+    inline infix def not: Boolean = ! x
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

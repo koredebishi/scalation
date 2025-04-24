@@ -5,7 +5,7 @@
  *  @date    Wed Sep 30 18:41:26 EDT 2009
  *  @see     LICENSE (MIT style license file).
  *  
- *  @title   LCG (Linear Congruential Generator) using 64-bit Long's
+ *  @note    LCG (Linear Congruential Generator) using 64-bit Long's
  */
 
 package scalation
@@ -16,9 +16,9 @@ package random
  *  It implements, using 64-bit integers (Int's), the 'MINSTD' generator, which
  *  is a multiplicative Linear Congruential Generator (LCG).
  *  These generators were commonly used in the last century.
- *  <br>
+ *
  *      x_i = a x_i-1 % m
- *  <br>
+ * 
  *  @see http://random.mat.sbg.ac.at/results/karl/server/node4.html#SECTION00042000000000000000
  *  In case a better generator is needed, a Multiple Recursive Generator (MRG)
  *  or Composite Multiple Recursive Generator (CMRG) should be used.
@@ -29,12 +29,12 @@ package random
 case class Random3 (stream: Int = 0)
      extends RNG (stream):
 
-//  private val A     = 48271L                 // alternative multiplier for a popular 32-bit generator
-    private val A     = 16807L                 // multiplier for a popular 32-bit generator (7^5)
-    private val M     = 2147483647L            // modulus for a popular 32-bit generator (2^31 - 1)
-    private val NORM  = 1.0 / M.toDouble       // normalization to (0, 1)
-
-    private var x     = RandomSeeds3.seeds(stream).toLong   // set the stream value to its seed
+//  private val A     = 48271L                           // alternative multiplier for a popular 32-bit generator
+    private val A     = 16807L                           // multiplier for a popular 32-bit generator (7^5)
+    private val M     = 2147483647L                      // modulus for a popular 32-bit generator (2^31 - 1)
+    private val NORM  = 1.0 / M.toDouble                 // normalization to (0, 1)
+    private val strm  = stream % RandomSeeds3.N_STREAMS  // can't go beyond stream limit
+    private var x     = RandomSeeds3.seeds(strm).toLong  // set the stream value to its seed
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the modulus used by this random number generator.

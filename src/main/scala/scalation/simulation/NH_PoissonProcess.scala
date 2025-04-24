@@ -40,7 +40,7 @@ class NH_PoissonProcess (t: Double, lambdaf: FunctionS2S, stream: Int = 0)
         var now   = 0.0
         while now <= t do
             val lamb = lambdaf (now)                    // current value of the lambda function
-            println (s"lamb = $lamb")
+            //println (s"lamb = $lamb")
             now     += t_ia.gen / lamb                  // adjust by dividing current lambda
             atime   += now 
         end while

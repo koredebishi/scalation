@@ -5,7 +5,7 @@
  *  @date    Wed Sep  6 16:52:21 EDT 2023
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Random Variate Tensor (RVT) Generators
+ *  @note    Random Variate Tensor (RVT) Generators
  */
 
 package scalation
@@ -13,21 +13,23 @@ package random
 
 import scalation.mathstat._
 
+import RandomSeeds.N_STREAMS
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateTen` abstract class serves as a base class for all the Random
  *  Variate Tensor (RVT) generators. They use one of the Random Number Generators
  *  (RNG's) from Random.scala to generate numbers following their particular
  *  multivariate distribution.
  *-----------------------------------------------------------------------------
- *  @param stream  the random number stream
+ *  @param stream  the random number stream (0 until N_STREAMS)
  */
 abstract class VariateTen (stream: Int = 0):
 
     protected val flaw = flawf ("VariateTen")
 
-    /** Random number stream selected by the stream number
+    /** Random number stream selected by the stream number (can't be betond last stream)
      */
-    protected val r = Random (stream)
+    protected val r = Random (stream % N_STREAMS)
 
     /** Indicates whether the distribution is discrete or continuous (default)
      */

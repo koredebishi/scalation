@@ -5,7 +5,7 @@
  *  @date    Wed Feb 20 17:39:57 EST 2013
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model: Multiple Linear Regression with Multiple Response Variables
+ *  @note    Model: Multiple Linear Regression with Multiple Response Variables
  *                  Multi-variate Multiple Linear Regression
  */
 
@@ -68,7 +68,7 @@ class RegressionMV (x: MatrixD, y: MatrixD, fname_ : Array [String] = null,
         case "Fac_LU"       => new Fac_LU (x_.transpose * x_)            // LU Factorization
         case "Fac_Inverse"  => new Fac_Inverse (x_.transpose * x_)       // Inverse Factorization
         case "Fac_SVD"      => new Fac_SVD (x_)                          // Singular Value Decomposition
-        case _              => new Fac_QR (x_)                           // QR Factorization (default)
+        case _              => Fac_QR (x_)                               // QR/LQ Factorization (default)
         end match
     end solver
 

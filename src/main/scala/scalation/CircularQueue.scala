@@ -5,7 +5,7 @@
  *  @date    Sat Aug  4 15:06:28 EDT 2018
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Fixed Size Circular Queue
+ *  @note    Fixed Size Circular Queue
  *
  *  @see courses.cs.vt.edu/cs3114/Spring09/book.pdf
  */
@@ -46,7 +46,7 @@ class CircularQueue [A: ClassTag] (cap: Int):
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** FIX - TBD
      */
-    protected [this] def newBuilder: Builder [A, CircularQueue [A]] = ???
+    protected [CircularQueue] def newBuilder: Builder [A, CircularQueue [A]] = ???
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return whether the queue is empty (i.e., has no element).

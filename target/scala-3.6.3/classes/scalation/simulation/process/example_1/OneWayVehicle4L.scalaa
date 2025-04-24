@@ -1,0 +1,333 @@
+package scalation
+package simulation
+package process
+package example_1                                       // One-Shot
+
+import scalation.random.{Exponential2}
+import scalation.mathstat.*
+
+import scala.collection.mutable.ArrayBuffer as VEC
+import scala.collection.mutable.ArrayBuffer
+
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `runOneWayVehicle` function is used to launch the `OneWayVehicleModel` class.
+ *  > runMain scalation.simulation.process.example_1.runOneWayVehicle
+ */
+@main def runOneWayVehicle4L (): Unit = new OneWayVehicle4L ()
+
+
+
+
+class OneWayVehicle4L(name: String = "OneWayVehicle4L", reps: Int = 1, animating: Boolean = true,
+                      aniRatio: Double = 500.0, nStop: Int = 10, stream: Int = 0)
+    extends Model(name, reps, animating, aniRatio):
+
+    //--------------------------------------------------
+    // File path for the live data
+    val fileName = "/seven_sensors/402376.csv"
+    val data = MatrixD.load(fileName)
+
+    //--------------------------------------------------
+    //Initialize poisson process variables
+    val totalArrivalCount = Array.fill(4)(0)        // Initialize total arrival count for each lane
+    val totalFlowCount = Array.fill(4)(0.0)         // Initialize total flow count for each lane
+    val rowTime = 15 * MINUTE  * 60 * SECOND                     //each row data is a 15min interval dataset
+    val motion = GippsDynamics
+    //--------------------------------------------------
+    //Calculate flow rates for each lane from sensor data
+    /**
+     * Calculate flow rates for each lane from sensor data
+     * @param sensorData matrix of sensor data
+     * @return row vector(4lanes) of flow rates (lambda) for each lane
+     */
+    def flowRate(sensorData: MatrixD): Vector[VectorD] =
+        val sensorLambda = ArrayBuffer[VectorD]()       // A bucket to hold lane flow rates from sensor data
+        val flowIndices = Array(5, 8, 11, 14)           // Indices for lane flows in the sensor data (for lanes 1-4)
+
+        for row <- 0 until sensorData.dim do
+            val lambda = new VectorD(4)                 // An empty bucket vector to hold flow rates for 4 lanes in this row
+            for i <- flowIndices.indices do
+                val flow = sensorData(row, flowIndices(i))
+                lambda(i) = if flow > 0 then flow / rowTime else 0.0
+            sensorLambda += lambda
+        sensorLambda.toVector
+    end flowRate
+
+    val lambdaValues = flowRate(data)           // Calculate flow rates for each lane from sensor data
+
+    //Step2: Initialize Exponential2 instance for each lane to simulate inter-arrival times
+    val iArrivalTM = Array.tabulate(4)(i => Exponential2(1 / lambdaValues(0)(i), stream))  // Initialize Exponential2 instances for each lane
+
+    // This method updates "mu" values dynamically based on the current row in the dataset
+    def updateiArrivalTM(row: Int): Unit =
+        println(s"\n--- Updated Arrival info for row $row ---")
+        println(s"Updated arrival Rate (λ) for row $row: ${lambdaValues(row)}")
+        for i <- iArrivalTM.indices do
+            val newLambda = lambdaValues(row)(i)            // extract current row lambda value for that lane
+            iArrivalTM(i).setMu(1.0 / newLambda)            // update with the new lambda value by calling the setMu method to update itself
+            val newIarrivalTM = iArrivalTM(i).gen           // generate new inter-arrival time based on the updated mu value
+            //println(s"Lane $i: Inter-Arrival Time = $newIarrivalTM")
+    end updateiArrivalTM
+
+    // Simulation loop across each row of lambda values
+    for row <- lambdaValues.indices do
+        updateiArrivalTM(row)                               // call the update method to update the arrival rates for each lane
+
+//         Counting process usage
+//         Poisson processes using current lambda values for each lane in the row
+//         Generate Poisson processes for each lane based on updated arrival rates
+        val pp = lambdaValues(row).map(lambda => new PoissonProcess(rowTime, lambda, stream))
+
+        // Calculate count (num) and flow for each lane for this row
+        // Then tally the accumulated (num) and flow for verification of the accumulate totals
+        pp.zipWithIndex.foreach((pp, lane) =>
+            val eventCount = pp.num(rowTime) // Total arrivals in 15 minutes
+            val laneFlow = pp.flow(rowTime) // Flow over the 15-minute interval
+            totalArrivalCount(lane) += eventCount // Accumulate counts per lane
+            totalFlowCount(lane) += laneFlow.sum.toDouble) // Accumulate total flow per lane
+            //println(s"Lane ${lane + 1}: Arrivals in $rowTime mins = $eventCount, Flow per $rowTime mins = $laneFlow"))
+    end for
+
+    /**
+     * Printing the total arrival counts and flows across all rows
+     * This information is used to verify the total counts and flows for each lane.
+     * The total counts and flows should match the accumulated values from the simulation.
+     * The information is collected from the poisson process above.
+     */
+//    println("\n--- Total Arrival Counts and Flows across All Rows ---")
+//    totalArrivalCount.zipWithIndex.foreach((count, lane) => println(s"Lane ${lane + 1}: Total Arrivals = $count"))
+//    totalFlowCount.zipWithIndex.foreach((flow, lane) => println(s"Lane ${lane + 1}: Total Flow = $flow"))
+
+
+//nStop for each one.
+//Stop it based off time ---> this makes sense more.
+//nTime -->stopTime
+//Set it long for testing. What is the best stop time to calibrate my simulation model.
+
+    val entries = VSource.group(this, () => Car(), nStop, (50, 290),
+                            ("entry1", 0, iArrivalTM(0), (100, 290)),
+                            ("entry2", 1, iArrivalTM(1), (120, 290)),
+                            ("entry3", 2, iArrivalTM(2), (150, 290)),
+                            ("entry4", 3, iArrivalTM(3), (180, 290)))
+
+
+    val checkpt = new  Checkpoint("checkpt", xy = (450, 390) )
+    val exit = Sink("exit", (800, 190))
+
+    val route1 = Route("route1", 4, entries.head, checkpt, motion, false)
+    val route2 = Route("route2", 4, checkpt, exit, motion, false)
+    route1.setNextRoute(route2)
+
+    // Add Components
+    addComponents(entries, List(checkpt), List(exit), List(route1, route2))
+
+
+
+
+
+
+    //--------------------------------------------------
+
+    var car_ahead: Vehicle = null
+
+    case class Car() extends Vehicle("c", this):
+        override def act(): Unit =
+            // Print current car and car ahead
+            println(s"for car = $this the car_ahead = $car_ahead")
+            SimActor.addToAlist(this, car_ahead) // Add to global doubly linked list
+
+            // Update the car_ahead pointer to this car
+            car_ahead = this
+
+            val i = subtype  // Find the lane with the car
+
+            route1.lane(i).move()
+            route2.lane(i).move()
+
+            // Determine if a lane change will occur (50% chance)
+            if Math.random() < 0.5 then
+                val j = (i + 1) % 4 // Attempt to change lanes
+
+                // Attempt lane change; move in lane j if successful, otherwise stay in current lane
+                if checkpt.jump(i, j, route1) then
+                    route1.lane(j).move() // Lane change successful
+                else
+                    route1.lane(j).move() // Lane change failed, stay in current lane
+            else
+                route2.lane(i).move() // No lane change, continue in current lane
+
+                // Remove car from the global list and exit
+                SimActor.removeFromAlist(this)
+                exit.leave() // Exit the simulation
+                println(s"Vehicle: me = $this terminate Car ")
+        end act
+    end Car
+
+
+    simulate()
+    waitFinished()
+    Model.shutdown()
+
+end OneWayVehicle4L
+
+
+
+//---------VDEQUE AS VTRANSPORT
+
+//
+//package scalation
+//package simulation
+//package process
+//package example_1                                       // One-Shot
+//
+//import scalation.random.{Bernoulli, Exponential, Uniform}
+////import scala.math.random
+//
+//
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+///** The `runOneWayVehicle` function is used to launch the `OneWayVehicleModel` class.
+// *  > runMain scalation.simulation.process.example_1.runOneWayVehicle
+// */
+//@main def runOneWayVehicle4L (): Unit = new OneWayVehicle4L ()
+//
+//
+//
+//class OneWayVehicle4L (name: String = "OneWayVehicle5L", reps: Int = 1, animating: Boolean = true,
+//                       aniRatio: Double = 500.0, nStop: Int = 40, stream: Int = 0)
+//    extends Model (name, reps, animating, aniRatio):
+//    //--------------------------------------------------
+//    // Initialize Model Constants
+//
+//    val lambda = 6.0 // car arrival rate (per hour)
+//
+//    //--------------------------------------------------
+//    // Create Random Variables (RVs)
+//
+//    val iArrivalRV = Exponential(MINUTE / lambda, stream)
+//    val motion     = GippsDynamics
+//
+//    // Randomly assign a car to one of 5 lanes using Uniform distribution
+//    val laneRV = Uniform(0, 4, stream + 4)
+////    val laneRV = Bernoulli(stream = stream + 4)
+//
+//    //--------------------------------------------------
+//    // Create Model Components
+//
+//    // Update source and exits for 5 lanes
+//    val entry = VSource("entry", this, () => Car(), 0, nStop, iArrivalRV, (100, 290))
+//    val checkpt = new Checkpoint("checkpt", xy = (450, 290))
+//    val exit = Sink("exit", (800, 290))
+//
+//    // Create 5 lanes for each route
+//    val route1 = Route("route1:lane", 4, entry, checkpt, motion, false)
+//    val route2 = Route("route2:lane", 4, checkpt, exit, motion, false)
+//    val coin = Bernoulli(0.5)
+//
+//
+//    addComponent(entry, checkpt, exit, route1, route2)
+//
+//    var car_ahead: Vehicle = null
+//
+//
+//
+//    case class Car() extends Vehicle("c", this):
+//        override def act(): Unit =
+//            // Print current car and car ahead
+//            println(s"for car = $this the car_ahead = $car_ahead")
+//            SimActor.addToAlist(this, car_ahead) // Add to global doubly linked list
+//
+//            // Update the car_ahead pointer to this car
+//            car_ahead = this
+//
+//            // Select lane using Uniform distribution for 5 lanes
+//            val i = if route1.lane.length == 1 then 0 else laneRV.igen % 4
+//
+//            println(s"This car $this is in lane $i")
+//            println( s"nStop =  $nStop " )
+//
+//            // Move the car in the selected lane
+//            route1.lane(i).move()
+//
+//            if coin.igen == 1 then
+//                val j = (i + 1) % 4 // Change to one of the other 5 lanes
+//                if checkpt.jump(i, j, route1) then
+//                    route2.lane(j).move()                                                       // Lane change successful
+//                else route2.lane(i).move()                                                      // Lane change failed, stay in current lane
+//
+//            else route2.lane(i).move() // No lane change, continue in current lane
+//
+//            end if
+//            //Remove car from the global list and exit
+//            SimActor.removeFromAlist(this)
+//            exit.leave() // Exit the lane or street
+//            println(s"Vehicle: me = $this terminate Car ")
+//        end act
+//    end Car
+//
+//    simulate()
+//    waitFinished()
+//    Model.shutdown()
+//
+//end OneWayVehicle4L
+
+
+
+
+/**
+ * Source ---------junc1------------junc2------C7junc3--C5------junc4-----C3junc5------C1----Sink: Pway1:
+ * Source ---------junc1------------junc2-------junc3--C6------junc4---C4--junc5---C2-------Sink: Pway2
+ * Source ---------junc1------------junc2---C8--junc3----------junc4-------junc5------------Sink: Pway3
+ * Source ---------junc1------------junc2--C9---junc3----------junc4-------junc5------------Sink: Pway4
+ *
+ *
+ * C3 ---change pway(i)(junc(j)   to: pway(i+1)(transportj+1)------dll: pway(i)---pway(i+1)
+ * C7
+ *
+ *
+ * Tasks:
+ * the sensors needs to be aware of the cars that passed through them.
+ * the sensors needs to hold a count of the vehicles that passed through them and the lane those cars belongs to
+ * Optionally we also need to get the average speed of these vehicles: this is secondary for now
+ * Since source and Sink are also sensors: We need to increase the Array of sensors to 7 from 5
+ * Now, the 1st and last sensor will be position very close to the source and sink respectively,
+ *      we will ensure that we do not have a transport from Source to sensor 1 since they are logically the
+ *      same, same goes for Sink and last sensor. the idea is that we need to ensure that all vehicles are counted
+ *      passing through our sensors. Our Source and Sink are natural course for us since that's how we produce and
+ *      absorb vehicles even though they are sensors logically themselves.
+ *
+ *      to make the implementation simple and not overtly complex, we might use the jump method inside the Junction class
+ *      as though: sensor(i).jump. cars enters a sensor; jump to the next Vtransport
+ *      Inside the jump method; we take account of our counts of cars
+ *      We keep a Matrix inside the jump method that records these occurence and give us a tally at the end
+ *      of simulation. Matrix(i)[car_id, count]: So we can get sensor(i) counts of total cars that flows through it.
+ *      ---> We do have partial implementation here and there for this situation but we need to develop it using matrix.
+ *
+ *      May be useful >>>
+ * //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * /** Method to save the counts data from the simulation
+ * */
+ * def saveCounts(): (VectorD, MatrixD, VectorD) =
+ * val jund = new MatrixD(nt, juncs.length)
+ * for j <- jund.indices2 do jund(?, j) = countsToVector(juncs(j).getCounts)
+ * (countsToVector(entry.getCounts), jund, countsToVector(exit.getCounts)) //was 3 matrices, the other two like jund
+ * end saveCounts
+ *
+ * //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ *
+ * /** Utility method to convert data arrays of Ints to VectorDs
+ * *
+ * * @param d the array to convert to a VectorD
+ * */
+ * def countsToVector(d: VectorD): VectorD =
+ *
+ * val v = new VectorD(nt)
+ * for i <- 0 until (t2 - t1) do v(i + t1) = d(i)
+ * v
+ * end countsToVector
+ */
+
+
+
+

@@ -5,7 +5,7 @@
  *  @date    Sat Sep  8 13:53:16 EDT 2012
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model: Integer-Based TAN Bayes Classifier
+ *  @note    Model: Integer-Based TAN Bayes Classifier
  *           Tree-Augmented Naive (TAN)
  *
  *  @see eric.univ-lyon2.fr/~ricco/tanagra/fichiers/en_Tanagra_TAN_Bayes_Classifier_Explained.pdf
@@ -66,9 +66,9 @@ class TANBayes (x: MatrixD, y: VectorI, fname_ : Array [String] = null,
     private var nu_Xy: RTensorD = null                                   // Joint Frequency Tables (JFTs)
     private var nu_Xpy_ : RTensor4D = null                               // Joint Frequency Tables (JFTs)
 
-    private var p_Xy: Array [MatrixD] = null                             // Conditional Probability Tables (CPTs) one per feature
+//  private var p_Xy: Array [MatrixD] = null                             // Conditional Probability Tables (CPTs) one per feature
     private var p_Xpy: Array [Array [MatrixD]] = null                    // extended Conditional Probability Tables (CPTs) one per feature
-//  private var p_Xpy_ : RTensor4D = null                    // extended Conditional Probability Tables (CPTs) one per feature
+//  private var p_Xpy_ : RTensor4D = null                                // extended Conditional Probability Tables (CPTs) one per feature
 
     private var parent: VectorI = null                                   // parent of each feature/variable
     private var vc_p: VectorI = null                                     // parent value count
@@ -447,7 +447,7 @@ end tANBayesTest3
     // x2. Astigmatic:     (1) no, (2) yes
     // x3. Tear production rate:  (1) reduced, (2) normal
     // features:              x0  x1  x2  x3   y
-    var xy = MatrixI ((24, 5), 1,  1,  1,  1,  3,           // 1
+    val xy = MatrixI ((24, 5), 1,  1,  1,  1,  3,           // 1
                                1,  1,  1,  2,  2,           // 2
                                1,  1,  2,  1,  3,           // 3
                                1,  1,  2,  2,  1,           // 4

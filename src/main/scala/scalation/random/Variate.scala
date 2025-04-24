@@ -5,7 +5,7 @@
  *  @date    Wed Sep 30 18:41:26 EDT 2009
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Random Variate (RV) Generators
+ *  @note    Random Variate (RV) Generators
  *
  *  Many of the algorithms used are from:
  *    Averill M. Law and W. David Kelton
@@ -22,6 +22,8 @@ import scala.runtime.ScalaRunTime.stringOf
 import scalation.mathstat.{Histogram, Plot, VectorD}
 import scalation.mathstat.Combinatorics.{betaF, choose, fac, gammaF}
 
+import RandomSeeds.N_STREAMS
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Variate` abstract class serves as a base class for all the Random Variate
  *  (RV) generators.  They use one of the Random Number Generators (RNG's) from
@@ -31,15 +33,15 @@ import scalation.mathstat.Combinatorics.{betaF, choose, fac, gammaF}
  *  @see http://www.math.uah.edu/stat/special/index.html
  *  @see `VariateVec` for Random MultiVariate Generators (RMVG's).
  *-----------------------------------------------------------------------------
- *  @param  stream  the random number stream
+ *  @param  stream  the random number stream (0 until N_STREAMS)
  */
 abstract class Variate (stream: Int = 0):
 
     protected val flaw = flawf ("Variate")
 
-    /** Random number stream selected by the stream number
+    /** Random number stream selected by the stream number (can't be beyond last stream)
      */
-    protected val r = Random (stream)
+    protected val r = Random (stream % N_STREAMS)
 
     /** Allow (lax) calling igen on continuous distributions
      */
@@ -416,7 +418,6 @@ case class DiscreteF (f: Array [Double => Double] = Array ((x: Double) => x), st
 end DiscreteF
  */
 
-
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates `Erlang` random variates.
  *  This continuous RV models the time until k stages complete.
@@ -474,6 +475,29 @@ case class Exponential (mu: Double = 1.0, stream: Int = 0)
     def gen1 (z: Double): Double = -z * log (r.gen)
 
 end Exponential
+
+
+case class Exponential2(mu_ : Double = 1.0, stream: Int = 0)
+    extends Variate(stream):
+
+    var mu = mu_
+
+    def setMu(mu2: Double): Unit =
+        mu = mu2
+
+    if mu <= 0.0 then flaw("init", "parameter mu must be positive")
+
+    inline def λ = 1.0 / mu // lambda, the rate parameter
+
+    val mean = mu
+
+    def pf(z: Double): Double = if z >= 0 then λ * exp(-λ * z) else 0.0
+
+    def gen: Double = -mu * log(r.gen)
+
+    def gen1(z: Double): Double = -z * log(r.gen)
+
+end Exponential2
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1353,7 +1377,7 @@ case class Trinomial (p: Double = 1.0/3.0, q: Double = 1.0/3.0, n: Int = 5, stre
     _discrete = true
 
     private val qq   = 1.0 - p - q               // the probability of low (0)
-    private val p_qq = p / qq                    // the ratio of high to low
+//  private val p_qq = p / qq                    // the ratio of high to low
     private val q_qq = q / qq                    // the ratio of medium to low
     private val dice = Dice (Array (qq, qq+q, 1.0), stream)
 
@@ -1637,9 +1661,9 @@ end diceTest
     val x   = VectorD (for i <- 0 until 100000 yield rvg.gen + rvg.gen + rvg.gen + rvg.gen)
     new Histogram (x)
 
-    var nrm = Normal ()
-    var y   = VectorD (for i <- 0 until 100 yield (i/20.0 - 2.5))
-    var p   = VectorD (for i <- 0 until 100 yield nrm.pf (y(i)))
+    val nrm = Normal ()
+    val y   = VectorD (for i <- 0 until 100 yield (i/20.0 - 2.5))
+    val p   = VectorD (for i <- 0 until 100 yield nrm.pf (y(i)))
     new Plot (y, p)
 
     val snr = StdNormal ()

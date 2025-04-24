@@ -5,7 +5,7 @@
  *  @date    Fri Mar 16 15:13:38 EDT 2018
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Example Dataset: Concrete Production
+ *  @note    Example Dataset: Concrete Production
  *
  *  @see archive.ics.uci.edu/ml/datasets/Concrete+Slump+Test
  *  @see pdfs.semanticscholar.org/2aba/047471e3e1eef6fa0319b4a63d3dfceafb0b.pdf
@@ -224,7 +224,8 @@ end example_ConcreteTest
 
         banner (s"Perceptron: trainNtest for $j th column")
         pt.trainNtest ()()                                       // try train vs. train0
-        val e = pt.residual
+        val yp  = pt.predict (x)                                 // predicted output values
+        val e   = yj - yp
         val sse = e dot e
         val sst = (yj dot yj) - yj.sum~^2 / yj.dim
         println ("sse = " + sse)
@@ -232,7 +233,6 @@ end example_ConcreteTest
         sst_all += sst
 
         banner ("predicted output")
-        val yp = pt.predict (x)                                  // predicted output values
 //      println ("diff: y - yp = " + (y - yp))
         new Plot (null, yj, yp, s"y vs yp for $j th column")
     end for

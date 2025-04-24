@@ -53,7 +53,7 @@ class UGA_BusModel (name: String = "UGA_Bus", reps: Int = 1, animating: Boolean 
 
     //--------------------------------------------------
     // Create Random Variables (RVs)
-
+    val nt = 48
     val iArrivalRV = Exponential (HOUR / lambda, stream)    // use different random number streams for independence
     val jTimeRV    = Uniform (4 * MINUTE, 6 * MINUTE, stream + 1)
     val lTimeRV    = Uniform (4 * MINUTE, 6 * MINUTE, stream + 2)
@@ -75,7 +75,7 @@ class UGA_BusModel (name: String = "UGA_Bus", reps: Int = 1, animating: Boolean 
                                                ("bSouth", (30, 70)),
                                                ("bWest", (-20, 50)))
 
-    val junction = Junction.group (jTimeRV, (800, 430), ("jNorth", (0, 0)),
+    val junction = Junction.group (jTimeRV, (800, 430),nt=nt, ("jNorth", (0, 0)),
                                                         ("jEast", (50, 20)),
                                                         ("jSouth", (30, 70)),
                                                         ("jWest", (-20, 50)))

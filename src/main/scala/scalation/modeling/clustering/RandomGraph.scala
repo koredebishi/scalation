@@ -5,7 +5,7 @@
  *  @date    Wed Jun  6 14:30:32 EDT 2012
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Random Graph Generator
+ *  @note    Random Graph Generator (generates adjacency matrices)
  */
 
 package scalation
@@ -60,7 +60,7 @@ end RandomGraph
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `randomGraphTest` object is used to test the `RandomGraph` class.
- *  > runMain scalation.modeling.clutering.randomGraphTest
+ *  > runMain scalation.modeling.clustering.randomGraphTest
  */
 @main def randomGraphTest (): Unit =
 

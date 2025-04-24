@@ -5,7 +5,7 @@
  *  @date    Thu Dec 23 13:54:30 EST 2021
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model: Symbolic Lasso Regression, including Quadratic and Cubic Lasso Regression
+ *  @note    Model: Symbolic Lasso Regression, including Quadratic and Cubic Lasso Regression
  */
 
 package scalation
@@ -52,7 +52,7 @@ object SymLassoRegression:
                      else x.indices2.map ("x" + _).toArray                // default feature/variable names
 
         val (xx, f_name) = SymbolicRegression.buildMatrix (x, fname_, powers, intercept,
-                                                           cross, cross3, terms :_*)
+                                                           cross, cross3, terms*)
         val mod       = new LassoRegression (xx, y, f_name, hparam)
         mod.modelName = "SymLassoRegression" + (if cross then "X" else "") +
                                                (if cross3 then "XX" else "")
@@ -80,7 +80,7 @@ object SymLassoRegression:
                  hparam: HyperParameter = Regression.hp,
                  terms: Array [Xj2p]*): LassoRegression =
         val xn = normalize ((x.mean, x.stdev)) (x)
-        apply (xn, y, fname, powers, intercept, cross, cross3, hparam, terms :_*)
+        apply (xn, y, fname, powers, intercept, cross, cross3, hparam, terms*)
     end rescale
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

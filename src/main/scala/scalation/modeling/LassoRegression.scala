@@ -5,7 +5,7 @@
  *  @date    Tue Apr 18 14:24:14 EDT 2017
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model: Lasso Regression (L1 Shrinkage/Regularization)
+ *  @note    Model: Lasso Regression (L1 Shrinkage/Regularization)
  */
 
 package scalation
@@ -33,7 +33,7 @@ class LassoRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
 
     private val flaw   = flawf ("LassoRegression")                       // flaw function
     private val debug  = debugf ("LassoRegression", true)                // debug function
-    private var lambda = hparam ("lambda").toDouble                      // weight to put on regularization
+    private val lambda = hparam ("lambda").toDouble                      // weight to put on regularization
 
     modelName = "LassoRegression"
 
@@ -57,7 +57,7 @@ class LassoRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
             val rrg   = new LassoRegression (x, y)
             val stats = rrg.crossValidate ()
             val sse2  = stats(QoF.sse.ordinal).mean
-            banner (s"LassoRegession with lambda = ${rrg.lambda_} has sse = $sse2")
+            banner (s"LassoRegression with lambda = ${rrg.lambda_} has sse = $sse2")
             if sse2 < sse then
                 sse = sse2; l_best = l
             end if
@@ -167,7 +167,7 @@ end LassoRegression
  *  the following regression equation.
  *      y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.
  *  It comapres `LassoRegression` to `Regression`.
- *  @see http://statmaster.sdu.dk/courses/st111/module03/index.html
+ *  @see statmaster.sdu.dk/courses/st111/module03/index.html
  *  > runMain scalation.modeling.lassoRegressionTest
  */
 @main def lassoRegressionTest (): Unit =

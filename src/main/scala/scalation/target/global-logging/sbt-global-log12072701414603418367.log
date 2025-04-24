@@ -1,0 +1,113 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(compile, Some(509378a1-be64-410b-a02d-9d4c5c60b5e3), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / compile[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 27 Scala sources to C:\Simulation\scalation\target\scala-3.6.3\classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: C:\Simulation\scalation\CommonFunctions.scala:238:11 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m238 |[0m   [33mval[0m [36mt[0m = mathstat.VectorD.range ([31m1[0m until [31m100[0m) / [31m20.0[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m           ^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           Not found: mathstat[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Each identifier in Scala needs a matching declaration. There are two kinds of[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m identifiers: type identifiers and value identifiers. Value identifiers are introduced[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m `class`, `enum`, or `trait` declarations.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Identifiers refer to matching declarations in their environment, or they can be[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m imported from elsewhere.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Possible reasons why no matching declaration was found:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - The declaration or the use is mis-spelt.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - An import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: C:\Simulation\scalation\CommonFunctions.scala:239:7 -[0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m239 |[0m   [33mnew[0m mathstat.Plot (t, t.map (log (_)), t.map (log1p (_)), [31m"log vs. log1p (red)"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m       ^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       Not found: mathstat[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Each identifier in Scala needs a matching declaration. There are two kinds of[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m identifiers: type identifiers and value identifiers. Value identifiers are introduced[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m `class`, `enum`, or `trait` declarations.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Identifiers refer to matching declarations in their environment, or they can be[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m imported from elsewhere.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Possible reasons why no matching declaration was found:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - The declaration or the use is mis-spelt.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - An import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: C:\Simulation\scalation\CommonFunctions.scala:240:7 -[0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m240 |[0m   [33mnew[0m mathstat.Plot (t, t.map (log (_)), t.map (ihs (_)), [31m"log vs. ihs (red)"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m       ^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       Not found: mathstat[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Each identifier in Scala needs a matching declaration. There are two kinds of[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m identifiers: type identifiers and value identifiers. Value identifiers are introduced[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m `class`, `enum`, or `trait` declarations.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Identifiers refer to matching declarations in their environment, or they can be[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m imported from elsewhere.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Possible reasons why no matching declaration was found:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - The declaration or the use is mis-spelt.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - An import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: C:\Simulation\scalation\CommonFunctions.scala:241:7 -[0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m241 |[0m   [33mnew[0m mathstat.Plot (t, t.map (log (_)), t.map (log10 (_)), [31m"log vs. log10 (red)"[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m       ^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m       Not found: mathstat[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Each identifier in Scala needs a matching declaration. There are two kinds of[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m identifiers: type identifiers and value identifiers. Value identifiers are introduced[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m `class`, `enum`, or `trait` declarations.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Identifiers refer to matching declarations in their environment, or they can be[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m imported from elsewhere.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Possible reasons why no matching declaration was found:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - The declaration or the use is mis-spelt.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - An import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: C:\Simulation\scalation\Fib.scala:57:14 -------------[0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m57 |[0m    [33mval[0m [36mrig[0m = random.Randi0 ([31m100000[0m)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m              ^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m              Not found: random[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Each identifier in Scala needs a matching declaration. There are two kinds of[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m identifiers: type identifiers and value identifiers. Value identifiers are introduced[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m `class`, `enum`, or `trait` declarations.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Identifiers refer to matching declarations in their environment, or they can be[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m imported from elsewhere.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m Possible reasons why no matching declaration was found:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m  - The declaration or the use is mis-spelt.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m  - An import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    ----------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E172] Type Error: C:\Simulation\scalation\Fib.scala:58:59 ------------------[0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m58 |[0m    [33mval[0m [36ma[0m = ([33mfor[0m i <- [31m0[0m until [31m10023[0m [33myield[0m rig.igen).toArray     [34m// 10023 works, 10024 stack overflow[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m   |[0m                                                           ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                          No ClassTag available for B[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m   |[0m                                          where:    B is a type variable[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E008] Not Found Error: C:\Simulation\scalation\MergeSortIndirect.scala:115:21 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m115 |[0m    [33mimport[0m scalation.mathstat.MatrixI                          [34m// WARNING: package inversion (but only for testing)[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m           ^^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m           value mathstat is not a member of scalation[0m
+[0m[[0m[31merror[0m] [0m[0m7 errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 7 s, completed Jan 25, 2025, 12:25:40 AM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(shell, None, None)[0m

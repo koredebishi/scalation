@@ -5,7 +5,7 @@
  *  @date    Fri Mar 16 15:13:38 EDT 2018
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model: Neural Network with 4 Layers (input, hidden(+) and output layers)
+ *  @note    Model: Neural Network with 4 Layers (input, hidden(+) and output layers)
  *
  *  @see     hebb.mit.edu/courses/9.641/2002/lectures/lecture03.pdf
  */
@@ -22,6 +22,10 @@ import scalation.mathstat._
 import ActivationFun._
 import Initializer._
 import Optimizer._
+
+//import neuralnet.{Optimizer_SGD  => OPTIMIZER}
+import neuralnet.{Optimizer_SGDM => OPTIMIZER}
+//import neuralnet.{Optimizer_Adam => OPTIMIZER}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NeuralNet_XL` class supports multi-output, X-layer (input, hidden(+) and output)
@@ -55,17 +59,13 @@ class NeuralNet_XL (x: MatrixD, y: MatrixD, fname_ : Array [String] = null,
       extends PredictorMV (x, y, fname_, hparam)
          with Fit (dfm = x.dim2, df = x.dim - x.dim2):                    // under-estimate of degrees of freedom
 
-    private   val debug     = debugf ("NeuralNet_XL", false)              // debug function
-    private   val flaw      = flawf ("NeuralNet_XL")                      // flaw function
-    private   val eta       = hp("eta").toDouble                          // learning rate
-    private   val bSize     = hp("bSize").toInt                           // batch size
-    private   val maxEpochs = hp("maxEpochs").toInt                       // maximum number of training epochs/iterations
-    private   val lambda    = hp ("lambda").toDouble                      // regularization hyper-parameter
-    private   val nl        = f.length                                    // number of ACTIVE layers (i.e., with activation function)
-    private   var flayer    = -1                                          // the layer to freeze (no changes to parameters)
-    protected val layers    = 0 until nl                                  // range for active layers
-//            val opti      = new Optimizer_SGD ()                        // parameter optimizer SGD
-              val opti      = new Optimizer_SGDM ()                       // parameter optimizer SGDM
+    private   val flaw    = flawf ("NeuralNet_XL")                        // flaw function
+    private   val eta     = hp("eta").toDouble                            // learning rate
+//  private   val lambda  = hp("lambda").toDouble                         // regularization hyper-parameter
+    private   val nl      = f.length                                      // number of ACTIVE layers (i.e., with activation function)
+    private   var flayer  = -1                                            // the layer to freeze (no changes to parameters)
+    protected val layers  = 0 until nl                                    // range for active layers
+              val opti    = new OPTIMIZER ()                              // parameter optimizer
 
     // Guidelines for setting the number of nodes in hidden layer:
     if nz == null then nz = compute_nz                                    // default number of nodes for each hidden layers
@@ -372,24 +372,24 @@ end neuralNet_XLTest2
     import Example_AutoMPG.{x, yy, x_fname}                      // don't include intercept, uses biases instead
 
 //  println (s"x  = $x")
-//  println (s"yy = $yy")Navya 
+//  println (s"yy = $yy")
     println (s"x_fname = ${stringOf (x_fname)}")
  
-    Optimizer.hp("eta") = 5.0
+    Optimizer.hp("eta") = 0.25                                   // try 0.2 for SGDM, 0.25 for Adam
     val f3 = Array (f_sigmoid, f_id)                             // this makes it a 3 layer network
 //  val mod = new NeuralNet_XL (x, yy, x_fname)                  // create model without intercept
     val mod = NeuralNet_XL.rescale (x, yy, x_fname, f = f3)      // create model without intercept - rescales
 
-    banner ("AutoMPG - NeuralNet_XL: trainNtest")
+    banner ("AutoMPG - NeuralNet_XL: In-Sample trainNtest")
     mod.trainNtest ()()                                          // train and test the model
     mod.opti.plotLoss ("NeuralNet_XL")                           // loss function vs epochs
 
-    banner ("AutoMPG - NeuralNet_XL: trainNtest2")
+    banner ("AutoMPG - NeuralNet_XL: In-Sample trainNtest2 - auto-tunes")
     mod.trainNtest2 ()()                                         // train and test the model - with auto-tuning
     println (mod.summary2 ())                                    // parameter/coefficient statistics
     mod.opti.plotLoss ("NeuralNet_XL")                           // loss function vs epochs
 
-    banner ("AutoMPG - NeuralNet_XL: validate")
+    banner ("AutoMPG - NeuralNet_XL: TnT validate")
     println (FitM.showFitMap (mod.validate ()(), QoF.values.map (_.toString)))
 
 /*
@@ -484,7 +484,7 @@ end neuralNet_XLTest5
 //  println (s"yy = $yy")
     println (s"x_fname = ${stringOf (x_fname)}")
 
-    Optimizer.hp ("eta") = 0.025                                 // some activation functions need smaller eta
+    Optimizer.hp ("eta") = 0.05                                  // some activation functions need smaller eta
     for f <- f_aff; f2 <- f_aff do                               // try all activation functions for first two layers
         banner (s"AutoMPG NeuralNet_XL with ${f.name}")
         val mod = NeuralNet_XL.rescale (x, yy, x_fname,
@@ -512,7 +512,6 @@ end neuralNet_XLTest6
     val x  = MatrixD ((10, 1), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     val y  = VectorD (5.56, 5.70, 5.91, 6.40, 6.80, 7.05, 8.90, 8.70, 9.00, 9.05)
     val ox = VectorD.one (x.dim) +^: x
-    val fname = Array ("x")
 
     banner (s"Regression with intercept")
     val reg = new Regression (ox, y)

@@ -5,7 +5,8 @@
  *  @date    Sat Mar 22 14:39:30 EDT 2014
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   CMRG (Combined Multiple Recursive Generator) using 64-bit Long's
+ *  @note    CMRG (Combined Multiple Recursive Generator) using 64-bit Long's
+ *           MRG31k3p
  */
 
 package scalation
@@ -20,10 +21,10 @@ package random
  *  performance and statistical properties for simulations.  It has a period of
  *  about 2^185 and is considered to be a faster alternative to the popular
  *  'MRG32k3' generator.  MRG31k3p combines MRG1 and MRG2.
- *  <br>
+ *
  *      MRG1: x_i = (0          + a_12 x_i-2 + a_13 x_i-3) % M1
  *      MRG2: x_i = (a_21 x_i-1 + 0          + a_23 x_i-3) % M2
- *  <br>
+ *
  *  where a_12 = 2^22, a_13 = 2^7+1, a_21 = 2^15 and a_23 = 2^15+1.
  *  @see http://www.informs-sim.org/wsc00papers/090.PDF
  *  @see http://www.iro.umontreal.ca/~simardr/ssj/doc/pdf/guiderng.pdf
@@ -32,21 +33,22 @@ package random
 case class Random (stream: Int = 0)
      extends RNG (stream):
 
-    private val M1     = 2147483647L                   // modulus for MRG1 (2^31 - 1)
-    private val M2     = 2147462579L                   // modulus for MRG2 (2^31 - 21069)
-    private val MASK12 = 511L                          // mask to extract  9 lsb's (2^9 - 1)
-    private val MASK13 = 16777215L                     // mask to extract 24 lsb's (s^24 - 1)
-    private val MASK21 = 65535L                        // mask to extract 16 lsb's (s^16 - 1)
-    private val MULT2  = 21069L                        // multiplier
-    private val NORM   = 4.656612873077393e-10         // 1.0 / (M1 + 1.0) normalization to (0, 1)
-    private val x      = RandomSeeds.seeds (stream)    // 6-dimensional vector of seed values
+    private val M1     = 2147483647L                     // modulus for MRG1 (2^31 - 1)
+    private val M2     = 2147462579L                     // modulus for MRG2 (2^31 - 21069)
+    private val MASK12 = 511L                            // mask to extract  9 lsb's (2^9 - 1)
+    private val MASK13 = 16777215L                       // mask to extract 24 lsb's (s^24 - 1)
+    private val MASK21 = 65535L                          // mask to extract 16 lsb's (s^16 - 1)
+    private val MULT2  = 21069L                          // multiplier
+    private val NORM   = 4.656612873077393e-10           // 1.0 / (M1 + 1.0) normalization to (0, 1)
+    private val strm   = stream % RandomSeeds.N_STREAMS  // can't go beyond stream limit
+    private val x      = RandomSeeds.seeds (strm)        // 6-dimensional vector of seed values
 
-    private var x11    = x(0).toLong                   // x_i-1 for MRG1
-    private var x12    = x(1).toLong                   // x_i-2 for MRG1
-    private var x13    = x(2).toLong                   // x_i-3 for MRG1
-    private var x21    = x(3).toLong                   // x_i-1 for MRG2
-    private var x22    = x(4).toLong                   // x_i-2 for MRG2
-    private var x23    = x(5).toLong                   // x_i-3 for MRG2
+    private var x11    = x(0).toLong                     // x_i-1 for MRG1
+    private var x12    = x(1).toLong                     // x_i-2 for MRG1
+    private var x13    = x(2).toLong                     // x_i-3 for MRG1
+    private var x21    = x(3).toLong                     // x_i-1 for MRG2
+    private var x22    = x(4).toLong                     // x_i-2 for MRG2
+    private var x23    = x(5).toLong                     // x_i-3 for MRG2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the next random number as a real (Double) in the interval (0, 1).

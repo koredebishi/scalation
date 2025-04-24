@@ -5,7 +5,7 @@
  *  @date    Sat Mar  9 19:19:53 EST 2013
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Random Variate Vector (RVV) Generators
+ *  @note    Random Variate Vector (RVV) Generators
  */
 
 package scalation
@@ -16,21 +16,23 @@ import scala.math.{abs, exp, sqrt}
 import scalation.mathstat.{Fac_Cholesky, Fac_LU, MatrixD, VectorD, VectorI, VectorS}
 import scalation.mathstat.Combinatorics.{choose, fac, gammaF}
 
+import RandomSeeds.N_STREAMS
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateVec` abstract class serves as a base class for all the Random
  *  Variate Vector (RVV) generators. They use one of the Random Number Generators
  *  (RNG's) from Random.scala to generate numbers following their particular
  *  multivariate distribution.
  *-----------------------------------------------------------------------------
- *  @param stream  the random number stream
+ *  @param stream  the random number stream (0 until N_STREAMS)
  */
 abstract class VariateVec (stream: Int = 0):
 
     protected val flaw = flawf ("VariateVec")
 
-    /** Random number stream selected by the stream number
+    /** Random number stream selected by the stream number (can't be beyond last stream)
      */
-    protected val r = Random (stream)
+    protected val r = Random (stream % N_STREAMS)
 
     /** Indicates whether the distribution is discrete or continuous (default)
      */
@@ -159,7 +161,7 @@ case class NormalVec_ (mu: VectorD, sig: VectorD, stream: Int = 0)
     def pf (z: VectorD): Double =
         var d = 1.0                                          // density f(z)
         for i <- 0 until z.dim do
-            var v = (z(i) - mu(i)) / sig(i)                  // normalize
+            val v = (z(i) - mu(i)) / sig(i)                  // normalize
             d *= sqrt_2Pi * sig(i) * exp (-.5 * v*v)
         end for
         d
@@ -435,9 +437,9 @@ case class RandomVecI (dim: Int = 10, max: Int = 20, min: Int = 10, skip: Int = 
 
     _discrete = true
 
-    if unique && max < dim-1 then
-        flaw ("int", "requires max >= dim-1")
-        throw new IllegalArgumentException ("RandomVecI: max too small")
+    if unique && (max-min) < dim-1 then
+        flaw ("init", "requires range max-min = ${max-min) >= dim-1 = ${dim-1}")
+        throw new IllegalArgumentException ("RandomVecI: range max-min is too small for unique")
     end if
 
     private val mu  = (max - min) / 2.0                 // mean

@@ -5,7 +5,7 @@
  *  @date    Sun Mar 11 15:12:46 EDT 2018
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Model Support: Quality of Fit (QoF) and Confusion Matrix
+ *  @note    Model Support: Quality of Fit (QoF) and Confusion Matrix
  */
 
 package scalation
@@ -21,8 +21,9 @@ import Probability.centropy
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QoFC` enum defines the Quality of Fit (QoF) measures for classifiers.
+ *  @param name  the name of ther QoF measure/metric
  */
-enum QoFC (name: String):
+enum QoFC (val name: String):
 
     case rSq    extends QoFC ("rSq")                        // index  0 - R-squared
     case p_rSq  extends QoFC ("p_rSq")                      // index  1 - pseudo R-squared (Efron's or McFadden's)
@@ -51,8 +52,8 @@ end QoFC
 import QoFC._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `FitC` companion object records the indices and labels for the
- *  base Quality of Fit (QoF) measures for the classification techniques.
+/** The `FitC` companion object records the indices and labels for the base
+ *  Quality of Fit (QoF) metrics/measures for the classification techniques.
  */
 object FitC:
 
@@ -197,7 +198,6 @@ trait FitC (k: Int = 2)
       extends FitM:
 
     private val debug   = debugf ("FitC", false)                     // debug function
-    private val flaw    = flawf ("FitC")                             // flaw function
     private val cThresh = Classifier.hp ("cThresh").toDouble         // classification/decision threshold
 
 //  from FitM: m, sse, ssr, sst, mse0, rmse, mae, rSq
@@ -207,7 +207,7 @@ trait FitC (k: Int = 2)
     private var cent  = -1.0                                         // cross entropy
 
     private val cmat  = new MatrixI (k, k)                           // confusion matrix
-    private var tcmat = new MatrixI (k, k)                           // total cumulative confusion matrix
+    private val tcmat = new MatrixI (k, k)                           // total cumulative confusion matrix
     private val rsum  = new VectorI (k)                              // vector of row sums of cmat
     private val csum  = new VectorI (k)                              // vector of column sums of cmat
 
@@ -389,7 +389,7 @@ trait FitC (k: Int = 2)
     /** Return the Quality of Fit (QoF) measures corresponding to the labels given
      *  above in the fitLabel method.
      */
-    def fit: VectorD =
+    override def fit: VectorD =
         val (p, r, s) = (pv.last, rv.last, sv.last)                       // ordinary precision, recall and specificity
 
         VectorD (rSq, p_rSq, sst, sse, mse0, rmse, mae,                   // general QoF measures
@@ -414,7 +414,7 @@ trait FitC (k: Int = 2)
     /** Return the help string that describes the Quality of Fit (QoF) measures
      *  provided by the `FitC` class.  Override to correspond to fitLabel.
      */
-    def help: String = FitC.help
+    override def help: String = FitC.help
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the Quality of Fit (QoF) measures. Override to
@@ -430,12 +430,12 @@ trait FitC (k: Int = 2)
      *  @param b      the parameters/pmf for the model
      *  @param vifs   the Variance Inflation Factors (VIFs)
      */
-    def summary (x_ : MatrixD = null, fname: Array [String] = null,
-                 b: VectorD = null, vifs: VectorD = null): String =
+    override def summary (x_ : MatrixD = null, fname: Array [String] = null,
+                          b: VectorD = null, vifs: VectorD = null): String =
         val fit1 = FitM.fitMap (fit, QoFC.values.map (_.toString))
         val fit2 = fitMicroMap
 
-        var sb = new StringBuilder ("-" * 58 + "\nSUMMARY")
+        val sb = new StringBuilder ("-" * 58 + "\nSUMMARY")
         sb.append ("\n" + "-" * 58)
         sb.append ("\nparameter = " + b)
         sb.append ("\n" + "-" * 58)

@@ -5,7 +5,7 @@
  *  @date    Sun Feb  6 00:08:23 EST 2022
  *  @see     LICENSE (MIT style license file).
  *
- *  @title   Optimization: Stochastic Gradient Descent with Momentum Optimizer
+ *  @note    Optimization: Stochastic Gradient Descent with Momentum Optimizer
  */
 
 package scalation
@@ -26,7 +26,6 @@ import Optimizer._
 class Optimizer_SGDM extends Optimizer:
 
     private val debug = debugf ("Optimizer_SGDM", false)                  // debug function
-    private val flaw  = flawf ("Optimizer_SGDM")                          // flaw function
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data x and y for a 2-layer, multi-output Neural Network, fit
@@ -86,7 +85,7 @@ class Optimizer_SGDM extends Optimizer:
             val yp = f.fM (b * x)                                         // prediction: Yp = f(XB)
             val ε  = yp - y                                               // negative of error matrix
             val δ  = f.dM (yp) ⊙ ε                                        // delta matrix for y
-            val g  = x.Ƭ * δ                                              // gradient matrix
+            val g  = x.𝐓 * δ                                              // gradient matrix (transpose (𝐓))
 
             p = g * (1 - β) + p * β                                       // update momentum-based aggregated gradient
             (g * (1 - ν) + p * ν) * α                                     // parameter update amount (to be subtracted)
@@ -109,7 +108,6 @@ class Optimizer_SGDM extends Optimizer:
      */
     def optimize3 (x: MatrixD, y: MatrixD,
                    bb: NetParams, eta: Double, ff: Array [AFF]): (Double, Int) =
-        val idx       = VectorI.range (0, x.dim)                          // instance index range
         val permGen   = permGenerator (x.dim)                             // permutation vector generator
         val (a, b)    = (bb(0), bb(1))                                    // two sets of net-parameters
         val (f, f1)   = (ff(0), ff(1))                                    // two activation functions
@@ -161,9 +159,9 @@ class Optimizer_SGDM extends Optimizer:
             val yp = f1.fM (b * z)                                        // prediction:   Yp = f(ZB)
             val ε  = yp - y                                               // negative of the error matrix
             val δ1 = f1.dM (yp) ⊙ ε                                       // delta matrix for y
-            val δ0 = f.dM (z) ⊙ (δ1 * b.w.Ƭ)                              // delta matrix for z
-            val g1 = z.Ƭ * δ1                                             // gradient matrix for y to z
-            val g0 = x.Ƭ * δ0                                             // gradient matrix for z to x
+            val δ0 = f.dM (z) ⊙ (δ1 * b.w.𝐓)                              // delta matrix for z (transpose (𝐓))
+            val g1 = z.𝐓 * δ1                                             // gradient matrix for y to z
+            val g0 = x.𝐓 * δ0                                             // gradient matrix for z to x
 
             pa = g0 * (1 - β) + pa * β                                    // update momentum-based aggregated gradient
             pb = g1 * (1 - β) + pb * β                                    // update momentum-based aggregated gradient
@@ -206,7 +204,7 @@ class Optimizer_SGDM extends Optimizer:
         val z      = Array.ofDim [MatrixD] (nl+1)                         // array to store activations, layer by layer
         val δ      = Array.ofDim [MatrixD] (nl)                           // array to store all delta matrices
         val g      = Array.ofDim [MatrixD] (nl)                           // array to store all gradiant matrices
-        var p      = Array.ofDim [MatrixD] (nl)                           // momentum array
+        val p      = Array.ofDim [MatrixD] (nl)                           // momentum array
         for l <- layers do p(l) = new MatrixD (b(l).w.dim, b(l).w.dim2)
 
         var sse_best_   = -0.0
@@ -243,10 +241,10 @@ class Optimizer_SGDM extends Optimizer:
             val yp  = z.last                                              // predicted value of y
             val ε   = yp - y                                              // negative of the error matrix
             δ(nl-1) = f.last.dM (yp) ⊙ ε                                  // delta for the last layer before output
-            g(nl-1) = z(nl-1).Ƭ * δ(nl-1)                                 // gradient for the last layer before output
+            g(nl-1) = z(nl-1).𝐓 * δ(nl-1)                                 // gradient for the last layer before output (transpose (𝐓))
             for l <- nl-2 to 0 by -1 do
-                δ(l) = f(l).dM (z(l+1)) ⊙ (δ(l+1) * b(l+1).w.Ƭ)           // deltas for all previous hidden layers
-                g(l) = z(l).Ƭ * δ(l)                                      // corresponding gradient matrices
+                δ(l) = f(l).dM (z(l+1)) ⊙ (δ(l+1) * b(l+1).w.𝐓)           // deltas for all previous hidden layers
+                g(l) = z(l).𝐓 * δ(l)                                      // corresponding gradient matrices
             end for
 
             for l <- layers do

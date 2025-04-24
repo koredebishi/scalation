@@ -1,11 +1,13 @@
-1709130618519:compile
-1711995122953:runMain scalation.simulation.process.example_1.runOneWayVehicle
-1720288871485:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
-1720289848038:exit
-1720289907588:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
-1720312537762:exit
-1720312581999:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
-1720317522062:exit
-1720317573927:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
-1720317988082:runMain scalation.simulation.process.example_1.runOneWayVehicle3L
-1720319812175:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
+1723954023801:clean
+1723954029489:compile
+1723954234390:exit
+1723957368077:"scalac -rewrite -source:3.5-migration"
+1723957438252:sbt clean compile -rewrite -source:3.5-migration
+1723957441535:clear
+1723957443893:exit
+1737790052745:runMain scalation.simulation.process.example_1.runOneWayVehicle
+1737790406771:exit
+1737795617917:runMain scalation.simulation.process.example_1.runOneWayVehicle
+1738818221330:exit
+1738818277405:runMain scalation.simulation.process.example_1.runOneWayVehicle
+1738818419967:runMain scalation.simulation.process.example_1.runOneWayVehicle2L
