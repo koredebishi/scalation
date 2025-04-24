@@ -89,6 +89,8 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the elements in range r of this vector, making sure not to go beyond
      *  the end of vector.
+     *  Usage: x(2 until 5)
+     *  Caveat:  Only verified for "a until b" ranges, not "a to b" ranges
      *  @param r  the index range of elements to return
      */
     def apply (r: Range): VectorD = 
@@ -198,6 +200,18 @@ class VectorD (val dim: Int,
         pieces(k-1) = this ((k-1)*size until dim)
         pieces
     end chop
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the p prior values that come before t [ v(t-p), ..., v(t-1) ].
+     *  When the index is negative, just return v(0).
+     *  @param p  the number of prior values to return
+     *  @param t  the index from which prior values are sought (exclusive)
+     */
+    def prior (p: Int, t: Int): VectorD =
+        val a = Array.ofDim [Double] (p)
+        cfor (t-p, t) { j => a(j+p-t) = if j <= 0 then v(0) else v(j) }
+        new VectorD (p, a)
+    end prior
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Update the i-th element (or in range) of this vector.
@@ -420,6 +434,11 @@ class VectorD (val dim: Int,
     override def distinct: VectorD = { val a = v.distinct; new VectorD (a.size, a) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of unique/distinct values in this vector.
+     */
+    def countDistinct: Int = v.distinct.size
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reverse the elements in this vector.
      */
     override def reverse: VectorD = new VectorD (dim, v.reverse)
@@ -600,6 +619,11 @@ class VectorD (val dim: Int,
     infix def minv (y: IndexedSeq [Double]): VectorD =
         new VectorD (dim, cfor (dim) { i => if v(i) <= y(i) then v(i) else y(i) })
     end minv
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the range (min to max) of values in this vector.
+     */
+    def min_max: VectorD = VectorD (min, max)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument maximum of this vector (index of maximum element).
@@ -1041,6 +1065,11 @@ class VectorD (val dim: Int,
     def stdev_ : Double = math.sqrt (variance_)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the coefficient of variations.
+     */
+    def cv: Double = stdev / mean
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute Pearson's correlation of this vector with vector y.
      *  If either variance is zero, will result in Not-a-Number (NaN), return
      *  one if the vectors are the same, or -0 (indicating undefined).
@@ -1212,6 +1241,11 @@ class VectorD (val dim: Int,
     def standardize: VectorD = (this - mean) / stdev
     def standardize2: VectorD = (this - mean) / (stdev + EPSILON)
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the first 2 moments (mean mu and standard deviation sig).
+     */
+    def mu_sig: VectorD = VectorD (mean, stdev)
+
 end VectorD
 
 
@@ -1231,6 +1265,12 @@ object VectorD:
      *  @param xs  the sequence/array of the `Double` numbers
      */
     def apply (xs: IndexedSeq [Double]): VectorD = new VectorD (xs.size, xs.toArray)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `VectorD` from an aeeay of `Double`s.
+     *  @param xs  the sequence/array of the `Double` numbers
+     */
+    def apply (xs: Array [Double]): VectorD = new VectorD (xs.length, xs)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a `VectorD` from one or more values (repeated values `Double`*).
@@ -1320,6 +1360,26 @@ end VectorD
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `VectorDOps` object provides extension methods to support scalar op vector
+ *  operations, so that one can write 2.0 + x as well as x + 2.0.
+ */
+object VectorDOps:
+    extension (a: Double)
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        /** Compute the element-wise sum (or difference, product, quotient) of scalar a and vector x.
+         *  @param a  the scalar first operand
+         *  @param x  the vector second operand
+         */
+        def + (x: VectorD): VectorD = x + a
+        def - (x: VectorD): VectorD = -x + a
+        def * (x: VectorD): VectorD = x * a
+        def / (x: VectorD): VectorD = x.recip * a
+
+end VectorDOps
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `vectorDTest` main function tests the operations provided by the `VectorD` class.
  *  Only the most commonly used inherited operations are shown.
  *  @see mutable.IndexedSeq for a complete list
@@ -1327,12 +1387,15 @@ end VectorD
  */
 @main def vectorDTest (): Unit =
 
+    import VectorDOps._
+
     val x = VectorD (1, 2, 3)
     val y = VectorD (4, 6, 5)
     val z = VectorD (4, 6, 5)
     val w = VectorD (3, 4, 5, 5)
     val u = VectorD ("1", "2", "3", "4")
     val a = 2
+    val b = 3.0
 
     banner ("Given Vectors:")
     println (s"x = $x")
@@ -1369,7 +1432,7 @@ end VectorD
     banner ("Implemented Operations:")
 
     println (s"x(2)                = ${x(2)}")                   // value at index
-    println (s"x(0 to 2)           = ${x(0 to 2)}")              // values in exclusive range
+    println (s"x(0 until 2)        = ${x(0 until 2)}")           // values in exclusive range
 
     println (s"-x                  = ${-x}")                     // unary minus
     println (s"x + y               = ${x + y}")                  // element-wise vector addition
@@ -1385,6 +1448,11 @@ end VectorD
     println (s"x ~^ a              = ${x ~^ a}")                 // raise to power of scalar a
     println (s"a +: y              = ${a +: x}")                 // prepend scalar a
     println (s"x :+ a              = ${x :+ a}")                 // append scalar a
+
+    println (s"b + x               = ${b + x}")                  // add scalar b and x
+    println (s"b - x               = ${b - x}")                  // subtract from scalar b, x
+    println (s"b * x               = ${b * x}")                  // multiply by scalar b and x
+    println (s"b / x               = ${b / x}")                  // divide scalar b by x
 
     println (s"(x-y).abs           = ${(x-y).abs}")              // absolute value
     println (s"x.cnormSq           = ${x.cnormSq}")              // center norm squared

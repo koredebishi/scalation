@@ -322,6 +322,11 @@ class VectorS (val dim: Int,
     override def distinct: VectorS = { val a = v.distinct; new VectorS (a.size, a) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of unique/distinct values in this vector.
+     */
+    def countDistinct: Int = v.distinct.size
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reverse the elements in this vector.
      */
     override def reverse: VectorS = { val a = v.reverse; new VectorS (a.size, a) }

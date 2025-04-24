@@ -59,11 +59,11 @@ class Fac_QR (aa: MatrixD, needQ: Boolean = false)
     def factor (): Fac_QR =
         if factored then return this
 
-        for k <- at.indices do colHouse (k)                    // perform k-th factoring step
-        for j <- 1 until p do                                  // fill in rest of r matrix
+        cfor (0, at.dim) { k => colHouse (k) }                 // perform k-th factoring step
+        cfor (1, p) { j =>                                     // fill in rest of r matrix
             val at_j = at.v(j)
-            for i <- 0 until j do r(i, j) = at_j(i)
-        end for
+            cfor (0, j) { i => r(i, j) = at_j(i) }
+        } // cfor
         if needQ then computeQ ()
 //      r.clean (TOL)                                          // comment out to avoid cleaning r matrix
 
@@ -81,19 +81,19 @@ class Fac_QR (aa: MatrixD, needQ: Boolean = false)
         var _norm = at(k)(k until m).norm                      // norm of A(k:m, k) column vector
         if _norm != 0.0 then
             if at_k(k) < 0.0 then _norm = -_norm               // make k-th Householder vector
-            for i <- k until m do at_k(i) /= _norm
+            cfor (k, m) { i => at_k(i) /= _norm }
             at_k(k) += 1.0
         end if
         r(k, k) = -_norm                                       // set the diagonal of r matrix
 
-        for j <- k + 1 until p do                              // transform all the rest of aa matrix
+        cfor (k+1, p) { j =>                                   // transform all the rest of aa matrix
             val at_k = at.v(k)                                 // k-th column of aa matrix
             val at_j = at.v(j)                                 // j-th column of aa matrix
             var sum = 0.0
-            for i <- k until m do sum += at_k(i) * at_j(i)
+            cfor (k, m) { i => sum += at_k(i) * at_j(i) }
             if at_k(k) != 0.0 then sum /= - at_k(k)
-            for i <- k until m do at_j(i) += sum * at_k(i)
-        end for
+            cfor (k, m) { i => at_j(i) += sum * at_k(i) }
+        } // cfor
     end colHouse
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -107,13 +107,13 @@ class Fac_QR (aa: MatrixD, needQ: Boolean = false)
     def computeQ (): Unit =
         for k <- p-1 to 0 by -1 do
             if ! (at(k, k) =~ 0.0) then                           // nearly equal =~
-                for j <- k until n do
+                cfor (k, n) { j =>
                     val at_k = at.v(k)                            // k-th column of a is k-th row of at
                     var sum  = 0.0                                // update the elements in j column of q matrix
-                    for i <- k until m do sum += q(i, j) * at_k(i)
+                    cfor (k, m) { i => sum += q(i, j) * at_k(i) }
                     sum /= - at_k(k) 
-                    for i <- k until m do q(i, j) += sum * at_k(i)
-                end for
+                    cfor (k, m) { i => q(i, j) += sum * at_k(i) }
+                } // cfor
             end if
         end for
     end computeQ
@@ -145,13 +145,13 @@ class Fac_QR (aa: MatrixD, needQ: Boolean = false)
     private def transformB (b: VectorD): VectorD =  
         val qt_b = b.copy                                      // the result vector of q.t * b
 
-        for j <- 0 until n do                                  // calculate the result of q.t * b
+        cfor (0, n) { j =>                                     // calculate the result of q.t * b
             val at_j = at.v(j)                                 // get the j-th Householder vector
             var sum  = 0.0                                 
-            for i <- j until m do sum += qt_b(i) * at_j(i)   
+            cfor (j, m) { i => sum += qt_b(i) * at_j(i) }  
             sum /= - at_j(j)
-            for i <- j until m do qt_b(i) += sum * at_j(i)
-        end for
+            cfor (j, m) { i => qt_b(i) += sum * at_j(i) }
+        } // cfor
         qt_b
     end transformB
  
@@ -177,7 +177,7 @@ class Fac_QR (aa: MatrixD, needQ: Boolean = false)
     def nullspaceV (x: VectorD): VectorD =
         x(n-1) = 1.0                                           // vector to solve for
         val b  = new VectorD (n)                               // new rhs as -r_i, n-1          
-        for i <- 0 until n do b(i) = -r(i, n-1)
+        cfor (0, n) { i => b(i) = -r(i, n-1) }
         val rr = r(?, 0 to n-2)                                // drop last column
         for k <- n-2 to 0 by -1 do                             // solve for x in rr*x = b
             x(k) = (b(k) - (rr(k) dot x)) / rr(k, k)
@@ -238,7 +238,7 @@ import Fac_QR._
 /** The `fac_QRTest` main function is used to test the `Fac_QR` classes.
  *  @see www.ee.ucla.edu/~vandenbe/103/lectures/qr.pdf
  *  @see www.math.usm.edu/lambers/mat610/sum10/lecture9.pdf
- *  FIX: the nullspaceV function need to be fixed.
+ *  FIX: the nullspaceV function needs to be fixed.
  *  > runMain scalation.mathstat.fac_QRTest
  */
 @main def fac_QRTest (): Unit =
