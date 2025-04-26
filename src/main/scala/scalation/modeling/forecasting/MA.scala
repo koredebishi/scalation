@@ -14,6 +14,7 @@
 package scalation
 package modeling
 package forecasting
+package forecasting_old
 
 import scala.math.{abs, sqrt}
 
@@ -209,7 +210,7 @@ end MA
     mod.trainNtest ()()                                                   // train and test on full dataset
 
     mod.forecastAll ()                                                    // forecast h-steps ahead (h = 1 to hh) for all y
-    Forecaster.evalForecasts (mod, mod.getYb, hh)
+    //Forecaster.evalForecasts (mod, mod.getYb, hh)
     println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
 
 end mATest
@@ -256,7 +257,7 @@ end mATest2
         mod.trainNtest ()()                                               // train and test on full dataset
 
         mod.forecastAll ()                                                // forecast h-steps ahead (h = 1 to hh) for all y
-        Forecaster.evalForecasts (mod, mod.getYb, hh)
+        //Forecaster.evalForecasts (mod, mod.getYb, hh)
         println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
     end for
 

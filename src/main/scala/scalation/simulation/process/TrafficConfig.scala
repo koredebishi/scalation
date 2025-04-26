@@ -175,3 +175,67 @@ end TrafficConfig
 //    @inline def computeMu(row: Int): Double =
 //        if totalArrivalsPerRow(row) > 0 then rowTime / totalArrivalsPerRow(row) else 1.0
 //
+
+/**
+ * --> Make it an optimization problem with
+ *   ---> Make the smape as the objective function
+ *   
+ *   ---> create a function where the input of the function is the 
+ *   parameters we want to optimized on and the output is the smape
+ *   
+ *   
+ *   take the function and through it at our optimization operation. 
+ *   
+ *   
+ *   the optimizer will run the simulation maybe like 1000s of time with different parameters
+ *   ------choose 3 or 4 parameters as though to be changes. We will give a starting values to these params
+ *   ---Optimizer will help to run, tune and run this operation 
+ *   
+ *   ----Create a file
+ *   -- create a function: 
+ *      input --> subSet of parameters from Gipps models ge (amax, bmax, s)
+ *      Assumes all vehicles are same ( not entirely realistic though)
+ *      
+ *      funct: create a simulation: (single sim) these parameters will be used to drive one simulation one at a time 
+ *      then calculate the sMAPE
+ *      
+ *      return the sMAPE; 
+ *      
+ *      
+ *      Basically raping a function around our simulation. Abstracting our simulation with parameters and returning an SMAPE
+ *      ----this fucntion is what the optimizer takes. 
+ *      fucntion2V: Make the function this function2V type. 
+ *      
+ *      
+ *      ----- later 
+ *          give the function to the optimizer (None derivative optimizer)
+ *          --- Neldermeed 
+ *          --- Genetic Algo
+ *          ---- SPSA
+ *          
+ *          
+ *    --------------------------------------------------------------------------------------------------
+ *    ----- lookback window to calculate future times; next maybe day or two: 
+ *    ----- Use the forecast as the value we sent to the arrival models 
+ *    ---------process via forecasting model first and feed into simulation model
+ *    
+ *          
+ *          
+ */
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

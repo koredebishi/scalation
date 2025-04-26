@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 2.0 
+ *  @version 2.0
  *  @date    Sat Aug 29 14:14:32 EDT 2020
  *  @see     LICENSE (MIT style license file).
  *
@@ -76,6 +76,10 @@ val _2Pi = 2.0 * Pi
 /** The number 2/π (needed in common calculations)
  */
 val _2byPi = 2.0 / Pi
+
+/** The number π/2 (90 degrees) (needed in common calculations)
+ */
+val Piby2 = Pi / 2.0
 
 /** The number srqt 2π (needed in common calculations)
  */
@@ -248,7 +252,7 @@ extension (x: String)
  */
 def safe_toDouble (s: String): Double =
     var d: Double = NO_DOUBLE
-    try 
+    try
         d = java.lang.Double.parseDouble (s)
     catch
         case ex: java.lang.NullPointerException =>
@@ -327,7 +331,7 @@ def typeOfStr (str: String): Char =
         if long < MIN_INTEGER || long > MAX_INTEGER then 'L'
         else 'I'
     else if regexD.matches (str) then 'D'
-//  else if regexT.matches (str) then 'T'                 // FIX - need regex or other means of recognizing date-time (@sse `TimeNum`)
+    //  else if regexT.matches (str) then 'T'                 // FIX - need regex or other means of recognizing date-time (@sse `TimeNum`)
     else 'S'
 end typeOfStr
 
@@ -336,40 +340,40 @@ end typeOfStr
  */
 extension (x: ValueType)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The toDouble extension method converts a `ValueType` to a `Double`.
      */
-    def toDouble: Double = 
+    def toDouble: Double =
         x match
-        case _: Double  => x.asInstanceOf [Double]
-        case _: Int     => x.asInstanceOf [Int].toDouble
-        case _: Long    => x.asInstanceOf [Long].toDouble
-        case _: String  => x.asInstanceOf [String].mkDouble
-        case _: TimeNum => x.asInstanceOf [TimeNum].toDouble
+            case _: Double  => x.asInstanceOf [Double]
+            case _: Int     => x.asInstanceOf [Int].toDouble
+            case _: Long    => x.asInstanceOf [Long].toDouble
+            case _: String  => x.asInstanceOf [String].mkDouble
+            case _: TimeNum => x.asInstanceOf [TimeNum].toDouble
     end toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The toInt extension method converts a `ValueType` to an `Int`.
      */
-    def toInt: Int = 
+    def toInt: Int =
         x match
-        case _: Double  => x.asInstanceOf [Double].toInt
-        case _: Int     => x.asInstanceOf [Int]
-        case _: Long    => x.asInstanceOf [Long].toInt
-        case _: String  => x.asInstanceOf [String].mkInt
-        case _: TimeNum => x.asInstanceOf [TimeNum].toInt
+            case _: Double  => x.asInstanceOf [Double].toInt
+            case _: Int     => x.asInstanceOf [Int]
+            case _: Long    => x.asInstanceOf [Long].toInt
+            case _: String  => x.asInstanceOf [String].mkInt
+            case _: TimeNum => x.asInstanceOf [TimeNum].toInt
     end toInt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The toLong extension method converts a `ValueType` to an `Long`.
      */
-    def toLong: Long = 
+    def toLong: Long =
         x match
-        case _: Double  => x.asInstanceOf [Double].toLong
-        case _: Int     => x.asInstanceOf [Int].toLong
-        case _: Long    => x.asInstanceOf [Long]
-        case _: String  => x.asInstanceOf [String].mkLong
-        case _: TimeNum => x.asInstanceOf [TimeNum].toLong
+            case _: Double  => x.asInstanceOf [Double].toLong
+            case _: Int     => x.asInstanceOf [Int].toLong
+            case _: Long    => x.asInstanceOf [Long]
+            case _: String  => x.asInstanceOf [String].mkLong
+            case _: TimeNum => x.asInstanceOf [TimeNum].toLong
     end toLong
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -377,11 +381,11 @@ extension (x: ValueType)
      */
     def < (y: ValueType): Boolean =
         x match
-        case _: Double  => x.asInstanceOf [Double]  < y.asInstanceOf [Double]
-        case _: Int     => x.asInstanceOf [Int]     < y.asInstanceOf [Int]
-        case _: Long    => x.asInstanceOf [Long]    < y.asInstanceOf [Long]
-        case _: String  => StringOps (x.asInstanceOf [String]) < y.asInstanceOf [String]
-        case _: TimeNum => x.asInstanceOf [TimeNum] < y.asInstanceOf [TimeNum]
+            case _: Double  => x.asInstanceOf [Double]  < y.asInstanceOf [Double]
+            case _: Int     => x.asInstanceOf [Int]     < y.asInstanceOf [Int]
+            case _: Long    => x.asInstanceOf [Long]    < y.asInstanceOf [Long]
+            case _: String  => StringOps (x.asInstanceOf [String]) < y.asInstanceOf [String]
+            case _: TimeNum => x.asInstanceOf [TimeNum] < y.asInstanceOf [TimeNum]
     end <
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -389,11 +393,11 @@ extension (x: ValueType)
      */
     def <= (y: ValueType): Boolean =
         x match
-        case _: Double  => x.asInstanceOf [Double]  <= y.asInstanceOf [Double]
-        case _: Int     => x.asInstanceOf [Int]     <= y.asInstanceOf [Int]
-        case _: Long    => x.asInstanceOf [Long]    <= y.asInstanceOf [Long]
-        case _: String  => StringOps (x.asInstanceOf [String]) <= y.asInstanceOf [String]
-        case _: TimeNum => x.asInstanceOf [TimeNum] <= y.asInstanceOf [TimeNum]
+            case _: Double  => x.asInstanceOf [Double]  <= y.asInstanceOf [Double]
+            case _: Int     => x.asInstanceOf [Int]     <= y.asInstanceOf [Int]
+            case _: Long    => x.asInstanceOf [Long]    <= y.asInstanceOf [Long]
+            case _: String  => StringOps (x.asInstanceOf [String]) <= y.asInstanceOf [String]
+            case _: TimeNum => x.asInstanceOf [TimeNum] <= y.asInstanceOf [TimeNum]
     end <=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -401,11 +405,11 @@ extension (x: ValueType)
      */
     def > (y: ValueType): Boolean =
         x match
-        case _: Double  => x.asInstanceOf [Double]  > y.asInstanceOf [Double]
-        case _: Int     => x.asInstanceOf [Int]     > y.asInstanceOf [Int]
-        case _: Long    => x.asInstanceOf [Long]    > y.asInstanceOf [Long]
-        case _: String  => StringOps (x.asInstanceOf [String]) > y.asInstanceOf [String]
-        case _: TimeNum => x.asInstanceOf [TimeNum] > y.asInstanceOf [TimeNum]
+            case _: Double  => x.asInstanceOf [Double]  > y.asInstanceOf [Double]
+            case _: Int     => x.asInstanceOf [Int]     > y.asInstanceOf [Int]
+            case _: Long    => x.asInstanceOf [Long]    > y.asInstanceOf [Long]
+            case _: String  => StringOps (x.asInstanceOf [String]) > y.asInstanceOf [String]
+            case _: TimeNum => x.asInstanceOf [TimeNum] > y.asInstanceOf [TimeNum]
     end >
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -413,11 +417,11 @@ extension (x: ValueType)
      */
     def >= (y: ValueType): Boolean =
         x match
-        case _: Double  => x.asInstanceOf [Double]  >= y.asInstanceOf [Double]
-        case _: Int     => x.asInstanceOf [Int]     >= y.asInstanceOf [Int]
-        case _: Long    => x.asInstanceOf [Long]    >= y.asInstanceOf [Long]
-        case _: String  => StringOps (x.asInstanceOf [String]) >= y.asInstanceOf [String]
-        case _: TimeNum => x.asInstanceOf [TimeNum] >= y.asInstanceOf [TimeNum]
+            case _: Double  => x.asInstanceOf [Double]  >= y.asInstanceOf [Double]
+            case _: Int     => x.asInstanceOf [Int]     >= y.asInstanceOf [Int]
+            case _: Long    => x.asInstanceOf [Long]    >= y.asInstanceOf [Long]
+            case _: String  => StringOps (x.asInstanceOf [String]) >= y.asInstanceOf [String]
+            case _: TimeNum => x.asInstanceOf [TimeNum] >= y.asInstanceOf [TimeNum]
     end >=
 
 
@@ -430,7 +434,7 @@ type Property = Map [String, ValueType]
 /** The +++ extension method concatenates properties and renames to avoid ambiguity.
  */
 extension (p: Property)
-    def +++ (q: Property): Property = 
+    def +++ (q: Property): Property =
         val pq = p.clone
         for qe <- q do pq += (if p contains qe._1 then (qe._1 + "2", qe._2) else qe)
         pq
@@ -447,7 +451,7 @@ extension (p: Property)
     println (s"store = $store")
     println (s"store(0) == 1: ${store(0) == 1}")
     println (s"store(0) < 1: ${store(0) < 1}")
-    //println (s"store(0) > 1: ${store(0) > 1}")
+//println (s"store(0) > 1: ${store(0) > 1}")
 
 end valueTypeTest
 
