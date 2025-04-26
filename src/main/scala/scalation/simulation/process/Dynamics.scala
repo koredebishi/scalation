@@ -142,6 +142,7 @@ object GippsDynamics
         if cp == null then
             println(s"vehicle_ahead value $cp, current_vehicle value = $cn")
             //The cn.t_disp + 1000 represents a theoretical vehicle that is way ahead.
+            //amax, bmax, 
             gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, rt)   // All vehicles initialized should use this first (that means every vehicle needs to keep track of his ahead vehicle
         else
             gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, rt) //fix < -- fix this part

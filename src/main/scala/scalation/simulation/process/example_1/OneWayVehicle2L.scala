@@ -122,10 +122,11 @@ class OneWayVehicle2L (name: String = "OneWayVehicle2L", reps: Int = 1, animatin
     //var l1:Int = -1, var seg:Int = -1
     case class Car() extends Vehicle("c", this):
         override def act(): Unit =
+            
             debug("Act::: ", s"For $this actor in: lane: ${this.laneID}: No laneID Yet")
 
             Vehicle.setInitialSpeed(68.0/2.24694)                                             // Speed initialization
-
+            //---> setting these params here 
 
             //::::::::::::::::::::::::::::::::::::::
             //lane and path information assignment
