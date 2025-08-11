@@ -63,9 +63,7 @@ val SP = ','
 
 /** Base directory for ScalaTion (pick one, comment out the rest)
  */
-//val BASE = System.getProperty ("user.dir")                  // absolute path
-val BASE = "C:\\Simulation\\scalation_2.0"
-
+val BASE = System.getProperty ("user.dir")                  // absolute path
 // val BASE = "."                                           // relative path
 
 /** File system path for input/output data directory
@@ -106,15 +104,15 @@ def getFromURL_File (path: String): Iterator [String] =
     val urlPat = "(?i)((https?|ftp|file)://|file:/).*"     // (?i) => case insensitive
     if path.matches (urlPat) then
         try
-//          return fromURL (new URL (path)).getLines ()
+            //          return fromURL (new URL (path)).getLines ()
             return fromURL (new URI (path).toURL).getLines ()
         catch
-            case mue: MalformedURLException => 
-        end try    
+            case mue: MalformedURLException =>
+        end try
     end if
 
     val file = new File (path)
-//  if file.isAbsolute () then fromFile (file).getLines ()
+    //  if file.isAbsolute () then fromFile (file).getLines ()
     if file.exists ()     then fromFile (file).getLines ()
     else
         println (s"getFromURL_File: file '$path' does not exist, try prefixing DATA-DIR")
@@ -147,7 +145,7 @@ end banner
  *  @param method   the method where the error occurred
  *  @param message  the error message
  */
-def flawf (clsName: String)(method: String, message: String): Boolean =
+inline def flawf (clsName: String)(method: String, message: String): Boolean =
     import scala.Console.{RED, RESET}
     println (s"${RED}ERROR @ $clsName.$method: $message ${RESET}")
     false
@@ -162,7 +160,7 @@ end flawf
  *  @param method   the method where the error occurred
  *  @param message  the error message
  */
-def debugf (clsName: String, enabled: Boolean)(method: String, message: String): Unit =
+inline def debugf (clsName: String, enabled: Boolean)(method: String, message: String): Unit =
     if enabled then
         println (s"DEBUG @ $clsName.$method: $message")
 end debugf
@@ -176,7 +174,7 @@ def typeOf (o: Any): String = o.getClass.getSimpleName
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Remove 'n' characters starting at position 'i' in string 'str' and
  *  return the new string.
- *  @param str  the source string 
+ *  @param str  the source string
  *  @param i    the starting position for character removal
  *  @param n    the number of characters to remove
  */
@@ -210,9 +208,9 @@ end cfor
  *  @param step  increment step
  *  @param body  main body of the loop
  *
-inline def cfor (init: => Unit, pred: => Boolean, step: => Unit) (inline body: => Unit): Unit =
+                 inline def cfor (init: => Unit, pred: => Boolean, step: => Unit) (inline body: => Unit): Unit =
     init; while pred do { body; step }
-end cfor
+                 end cfor
  */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -243,7 +241,7 @@ end cfor
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** C/Java style for loop (0 until n) collecting results in an array provides improved performance.
- *  Faster replacement: for ... yield 
+ *  Faster replacement: for ... yield
  *  usage: cfor (10) { i => 2 * i }
  *  @param n        the number of elements/results
  *  @param formula  the formula to apply, repeatedly
@@ -289,7 +287,7 @@ inline def Σ (r: Range)(inline formula: Int => Double): Double =
     var sum_ = 0.0
     var i = r.start; while i < r.end do { sum_ += formula (i); i += r.step }
     sum_
-end Σ 
+end Σ
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Summation of the formula applied n times.
@@ -329,9 +327,9 @@ end swap
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Find the median of three unordered numbers.
- *  @param a1  the first number 
- *  @param a2  the second number 
- *  @param a3  the third number 
+ *  @param a1  the first number
+ *  @param a2  the second number
+ *  @param a3  the third number
  */
 @inline def median3 (a1: Double, a2: Double, a3: Double): Double =
     max (min (a1, a2), min (max (a1, a2), a3))
@@ -356,7 +354,7 @@ end median3
     val sums = Array.ofDim [Double] (9)
     var sum  = 0.0
 
-// Collect results
+    // Collect results
 
     tims(0) = gauge (n, skip) {
         sum = 0.0
@@ -391,7 +389,7 @@ end median3
     tims(6) = gauge (n, skip) {
         sum = sumAll (0, 100000) { i => sqrt (i) } }
     sums(6) = sum
-    
+
     tims(7) = gauge (n, skip) {
         sum = Σ (0, 100000) { i => sum + sqrt (i) } }
     sums(7) = sum
@@ -400,12 +398,12 @@ end median3
         sum = (0 until 100000).foldLeft (0.0) { (sum, i) => sum + sqrt (i) } }
     sums(8) = sum
 
-// Show results
+    // Show results
 
     banner ("var i = 0; while i < 100000 do { sum += sqrt (i); i += 1 }")
     println (s"case 0: sum  = ${sums(0)}")
     println (s"case 0: time = ${tims(0)}")
-    
+
     banner ("for i <- 0 until 100000 do sum += sqrt (i)")
     println (s"case 1: sum  = ${sums(1)}")
     println (s"case 1: time = ${tims(1)}")
@@ -452,67 +450,66 @@ end cforTest
 @main def cforTest2 (): Unit =
 
     import scala.math.sqrt
-    import scalation.mathstat.VectorD
+      import scalation.mathstat.VectorD
 
-    val n    = 1                          // number of repeats to get average time (gauge's amplify parameter)
-    val skip = false                      // whether to skip timing the first time through code (slow due to JIT)
+      val n    = 1                          // number of repeats to get average time (gauge's amplify parameter)
+      val skip = false                      // whether to skip timing the first time through code (slow due to JIT)
 
-    val tims = Array.ofDim [Double] (6)
-    val sums = Array.ofDim [Double] (6)
-    var x: VectorD = null
+      val tims = Array.ofDim [Double] (6)
+      val sums = Array.ofDim [Double] (6)
+      var x: VectorD = null
 
-// Collect results
+      // Collect results
 
-    tims(0) = gauge (n, skip) {
-        x = new VectorD (10000); var i = 0; while i < 10000 do { x(i) = sqrt (i); i += 1 } }
-    sums(0) = x.sum
+      tims(0) = gauge (n, skip) {
+      x = new VectorD (10000); var i = 0; while i < 10000 do { x(i) = sqrt (i); i += 1 } }
+      sums(0) = x.sum
 
-    tims(1) = gauge (n, skip) {
-        x = VectorD ((0 until 10000).map { i => sqrt (i) }) }
-    sums(1) = x.sum
+      tims(1) = gauge (n, skip) {
+      x = VectorD ((0 until 10000).map { i => sqrt (i) }) }
+      sums(1) = x.sum
 
-    tims(2) = gauge (n, skip) {
-        x = VectorD (for i <- 0 until 10000 yield sqrt (i)) }
-    sums(2) = x.sum
+      tims(2) = gauge (n, skip) {
+      x = VectorD (for i <- 0 until 10000 yield sqrt (i)) }
+      sums(2) = x.sum
 
-    tims(3) = gauge (n, skip) {
-        val a = Array.ofDim [Double] (10000); cfor (0, 10000) { i => a(i) = sqrt (i) }; x = new VectorD (10000, a) }
-    sums(3) = x.sum
+      tims(3) = gauge (n, skip) {
+      val a = Array.ofDim [Double] (10000); cfor (0, 10000) { i => a(i) = sqrt (i) }; x = new VectorD (10000, a) }
+      sums(3) = x.sum
 
-    tims(4) = gauge (n, skip) {
-        x = new VectorD (10000); cfor (0, 10000) { i => x(i) = sqrt (i) } }
-    sums(4) = x.sum
+      tims(4) = gauge (n, skip) {
+      x = new VectorD (10000); cfor (0, 10000) { i => x(i) = sqrt (i) } }
+      sums(4) = x.sum
 
-    tims(5) = gauge (n, skip) {
-        x = new VectorD (10000, cfor (10000) { i => sqrt (i) }) }
-    sums(5) = x.sum
+      tims(5) = gauge (n, skip) {
+      x = new VectorD (10000, cfor (10000) { i => sqrt (i) }) }
+      sums(5) = x.sum
 
-// Show results
+      // Show results
 
-    banner ("x = new VectorD (10000); var i = 0; while i < 10000 do { x(i) = sqrt (i); i += 1 } }")
-    println (s"case 0: sum  = ${sums(0)}")
-    println (s"case 0: time = ${tims(0)}")
+      banner ("x = new VectorD (10000); var i = 0; while i < 10000 do { x(i) = sqrt (i); i += 1 } }")
+      println (s"case 0: sum  = ${sums(0)}")
+      println (s"case 0: time = ${tims(0)}")
 
-    banner ("x = VectorD ((0 until 10000).map { i => sqrt (i) }) }")
-    println (s"case 1: sum  = ${sums(1)}")
-    println (s"case 1: time = ${tims(1)}")
+      banner ("x = VectorD ((0 until 10000).map { i => sqrt (i) }) }")
+      println (s"case 1: sum  = ${sums(1)}")
+      println (s"case 1: time = ${tims(1)}")
 
-    banner ("x = VectorD (for i <- 0 until 10000 yield sqrt (i)) }")
-    println (s"case 2: sum  = ${sums(2)}")
-    println (s"case 2: time = ${tims(2)}")
+      banner ("x = VectorD (for i <- 0 until 10000 yield sqrt (i)) }")
+      println (s"case 2: sum  = ${sums(2)}")
+      println (s"case 2: time = ${tims(2)}")
 
-    banner ("val a = Array.ofDim [Double] (10000); cfor (0, 10000) { i => a(i) = sqrt (i) }; x = new VectorD (10000, a) }")
-    println (s"case 3: sum  = ${sums(3)}")
-    println (s"case 3: time = ${tims(3)}")
+      banner ("val a = Array.ofDim [Double] (10000); cfor (0, 10000) { i => a(i) = sqrt (i) }; x = new VectorD (10000, a) }")
+      println (s"case 3: sum  = ${sums(3)}")
+      println (s"case 3: time = ${tims(3)}")
 
-    banner ("x = new VectorD (10000); cfor (0, 10000) { i => x(i) = sqrt (i) } }")
-    println (s"case 4: sum  = ${sums(4)}")
-    println (s"case 4: time = ${tims(4)}")
+      banner ("x = new VectorD (10000); cfor (0, 10000) { i => x(i) = sqrt (i) } }")
+      println (s"case 4: sum  = ${sums(4)}")
+      println (s"case 4: time = ${tims(4)}")
 
-    banner ("x = new VectorD (10000, cfor (10000) { i => sqrt (i) })")
-    println (s"case 5: sum  = ${sums(5)}")
-    println (s"case 5: time = ${tims(5)}")
+      banner ("x = new VectorD (10000, cfor (10000) { i => sqrt (i) })")
+      println (s"case 5: sum  = ${sums(5)}")
+      println (s"case 5: time = ${tims(5)}")
 
-end cforTest2
+      end cforTest2
  */
-

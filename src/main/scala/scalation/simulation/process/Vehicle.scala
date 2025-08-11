@@ -16,6 +16,7 @@ package process
 
 import scala.collection.mutable.Map
 import scalation.random.Uniform
+import scalation.mathstat.VectorD
 
 
 
@@ -32,10 +33,11 @@ abstract class Vehicle (name_ : String, director: Model)
     var key  = -0.0
     var laneID: Int = -1
     var pathInfo : String = ""
+    var segIndex : Int = -1
 
-    //var myPathNode: Pathway = null   // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
 
-    var myPathway: Pathway = null // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
+    var myRamp      : Ramp = null // my (the actor's) node in the RAMP pred <-> me <-> succ
+    var myPathway   : Pathway = null // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
     private [process] var myPathNode: DoublyLinkedList[Vehicle]#Node = null // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -96,12 +98,34 @@ object Vehicle:
 
     def setInitialSpeed(v0: Double):Unit =
         prop("v0")  = v0
+    end setInitialSpeed
+
+
+    //the parameters to be optimized by the objective function
+    //s:Double, amax:Double, bmax:Double, T:Double ,τ:Double
+    def setParams(params:VectorD):Map[String, Double] =
+        //println("setParams called @@@@@")
+
+        val new_prop = Map("rt" -> params(4), // driver reaction time
+            "amax" -> params(1), // max acceleration
+            "bmax" -> params(2), // max deceleration
+            "v0" -> def_prop("v0"), // starting velocity // v0 should be adjustable to 0
+            "vmax" -> def_prop("vmax"), // max velocity
+            "T" -> params(3), // safe min time headway
+            "s" -> params(0), // safe min distance headway
+            "len" -> def_prop("len"), // length of the vehicles
+            "del" -> def_prop("del")) // acceleration exponent (delta)
+
+        new_prop
+    end setParams
+
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the driver/vehicle characteristics/properties to the new property values.
      *  @param new_prop  the new property values
      */
-    private def setProps (new_prop: Map [String, Double]): Unit = prop = new_prop
+    private [process] def setProps (new_prop: Map [String, Double]): Unit = prop = new_prop
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Butcher's Method (fifth order) for numerically solving an ordinary differential equation.
@@ -130,24 +154,5 @@ object Vehicle:
 
 end Vehicle
 
-
-
-
-//    //Return the position of the vehicle on the lane
-//    def getPosOnLane(): Double = t_disp
-//
-//    //Return the length of the lane
-//    def getLaneLength(lane: Int): Double = lane
-//
-//    //Return the speed of the vehicle
-//    def getVehicleAhead(vehicle: Vehicle): Vehicle = vehicle
-//
-//    //Return the vehicle behind using the B+Tree
-//    //Get your position in the B+tree lane, then check behind you for
-//    //the vehicle behind you on same lane
-//    def getVehicleBehind(vehicle: Vehicle): Vehicle = vehicle
-//
-//    //Return true if a vehicle needs to change lane
-//    def needLaneChange(vehicle: Vehicle): Boolean = false
 
 

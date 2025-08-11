@@ -248,14 +248,15 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
                     else
                         if isAnimating then dgAni.updateActorCount(numActors)
                         debug("act", s"${this.me} resumes ${_theActor} at clock= $clock")
-                        println(s"This RESUME @@@@@@")
                         log.trace(this, "resumes", _theActor, _clock)
                         yyield(_theActor) // yield to actor
                         debug ("act", s"after yyield at clock $clock")
                         println(s"After the yyield: RESUME @@@@@@")
                 end if
+                println(s"After the yyield: before the while RESUME @@@@@@")
             end while
 
+            println(s"After the while loop")
             simulating = false
             log.trace(this, s"ends rep $rep", null, _clock)
 

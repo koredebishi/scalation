@@ -105,7 +105,9 @@ trait Recorder(nt: Int):
         Recorder.ew.write(s"\n the clock time is $ctime and the timeConv is $timeConv i: $i \n")
         println(s"[Recorder] recording for: $this")
 
+
         if actor.isInstanceOf[Vehicle] then
+
             val vehicle = actor.asInstanceOf[Vehicle]
             val laneID = vehicle.laneID
             val cnt = r_counts(j, laneID).toInt + 1

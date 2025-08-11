@@ -1,6 +1,3 @@
-
-
-
 package scalation
 package simulation
 package process
@@ -11,80 +8,210 @@ import scalation.random.*
 import scalation.simulation.process.modeling.clustering.Coordinates
 
 
+///**
+// * @param fileName : the data file Pemps for this simulation
+// * @param rowTime : the time interval for this simulation: 15min window
+// * @param stream  : the stream value
+// */
+//class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
+//
+//    //--------------------------------------------------
+//    // Load Data
+//    private[process] val ew = new EasyWriter("recorder", "TrafficConfigText.txt")
+//
+//    val t1 = 1
+//    val t2 = 2
+////
+////    val t1 = 2 * 96 + 16
+////    val t2 = 3 * 96 // Just a few rows (for debugging)
+//
+//
+//    val rowOffset = t1
+//
+//
+//    val data = MatrixD.load(fileName, t1, t2)
+//
+//
+//
+//    //val data = MatrixD.load(fileName)
+//    //println(s"\n the loaded data is: $data \n")
+//
+//    val laneIdx = VectorI(5, 8, 11, 14)                 // Indices for the four lanes
+//
+//    val arrivalCounts = data(?, laneIdx)                // data extract based on the flow/lanes
+//    val totalArrivalsPerRow = arrivalCounts.sumVr // Sum of flows across the 4 lanes
+//
+//    val mu = totalArrivalsPerRow.map(rowTime / _) // the mu Vectors for each row. the intensity Vector.
+//
+//    val laneProbPerRow = arrivalCounts.mmap(_.toProbability)
+//    //--------------------------------------------------
+//    val laneRVPerRow = Vector.tabulate(data.dim)(row => Discrete(laneProbPerRow(row)))    // laneRV per roll stored here
+//    //--------------------------------------------------
+//    // Function to Get LaneRV for a Specific Row
+//    @inline def getLaneRV(row: Int): Discrete = laneRVPerRow(row)                 // method to get the current laneRV for the current dataIndex
+//
+//    /**
+//     * This method uses the Coodinate class to calculate the scales real data (Pims) to
+//     * Animation coodinate for the simulation
+//     *
+//     * @param w_h   the width of the animation window
+//     * @param path an array of lat-long coordinates from the file
+//     */
+//    def getJunctions(path: String, w_h: (Double, Double)): Array[(Double, Double)] =
+//
+//        val data = scala.io.Source.fromFile(path).getLines.toArray
+//        val gps = Array.ofDim[(Double, Double)](data.length)
+//
+//        for i <- data.indices do
+//            val ll = data(i).split(",")
+//            val lat = ll(0).toDouble
+//            val long = ll(1).toDouble
+//            gps(i) = (lat, long)
+//        end for
+//        val coords = new Coordinates(w_h._1, w_h._2, gps)
+//        coords.calcAniCoords()
+//
+//        for (lat, long) <- gps do println(s"the gps $lat and $long")
+//        for (x, y) <- coords.aniCoords do println(s"the scaled coordinate is x: $x : y $y")
+//
+//        coords.aniCoords
+//    end getJunctions
+//
+//
+//end TrafficConfig
+//
+//
+//
+//
+//@main def TrafficConfigTest(): Unit =
+//    val rowTime = 15 * MINUTE
+//    val stream = 0
+//    val trafficData = new TrafficConfig("/seven_sensors/402376.csv", rowTime, stream)
+//
+//
+//    println(s"the total arrival ${trafficData.mu}")
+
+
 class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 
-
-    //--------------------------------------------------
-    // Load Data
     private[process] val ew = new EasyWriter("recorder", "TrafficConfigText.txt")
+    private val t1 = 1
+    private val t2 = 2
+    private val rowOffset = t1
 
-//    val t1 = 0
-//    val t2 = 6
+    // DEBUG: Segment length adjustment variables (set to 1.0 for real GPS accuracy)
+    private val firstSegmentScale = 2.0   // Scale factor for first segment (sensor 0 to 1)
+    private val lastSegmentScale = 2.0    // Scale factor for last segment (sensor 5 to 6)
+    private val debugScaling = true       // Enable/disable debug scaling
 
-//    val t1 = 40
-//    val t2 = 65
+    private val mainlineCoords = getJunctions(s"$DATA_DIR/15min_US101_N_Willow_to_Marsh_2miles_ML/gps_mainline.txt", (1000, 800))
+    private val rampCoords = getJunctions(s"$DATA_DIR/15Min_US101_N_Willow_to_Marsh_Ramps/gps_ramp.txt", (1000, 800))
+//
+//    val srcNames = Array("Vsrc", "srcRamp1", "srcRamp2", "srcRamp3")
+//    val srcToJunc = Map(0 -> 0, 1 -> 1, 2 -> 2, 3 -> 4)
+//
+//    val sinkNames = Array("Sink", "OffRampSink")
+//    val sinkToJunction = Map(0 -> 6, 1 -> 3)
 
+    private[process] val data = MatrixD.load(fileName, t1, t2)
+    private[process] val laneIdx = VectorI(5, 8, 11, 14)
+    private[process] val arrivalCounts = data(?, laneIdx)
+    private[process] val totalArrivalsPerRow = arrivalCounts.sumVr
+    private[process] val muMain = totalArrivalsPerRow.map(rowTime / _)
+    private[process] val laneProbPerRow = arrivalCounts.mmap(_.toProbability)
+    private[process] val laneRVPerRow = Vector.tabulate(data.dim)(r => Discrete(laneProbPerRow(r)))
 
-    val t1 = 2 * 96 + 16
-    val t2 = 3 * 96 // Just a few rows (for debugging)
+    private val onRampData = Array.fill(3)(MatrixD.load("15Min_US101_N_Willow_to_Marsh_2miles_ML/400981.csv", t1, t2))
 
+    private val muRamps = onRampData.map { mat =>
+        val counts = mat(?, laneIdx).sumVr
+        counts.map(rowTime / _)
+    }
 
-    val rowOffset = t1
+    private def calcTotalArrivals(mat: MatrixD): VectorD = mat(?, laneIdx).sumVr
 
+    lazy val nStopArray = Array(2, 2, 2, 2)
 
-    val data = MatrixD.load(fileName, t1, t2)
+    val muPerSource: Array[VectorD] = Array(muMain) ++ muRamps
 
+    def getMuForSource(idx: Int): VectorD = muPerSource(idx)
 
+    @inline def getLaneRV(row: Int): Discrete = laneRVPerRow(row)
 
-    //val data = MatrixD.load(fileName)
-    //println(s"\n the loaded data is: $data \n")
-
-    val laneIdx = VectorI(5, 8, 11, 14)                 // Indices for the four lanes
-
-    val arrivalCounts = data(?, laneIdx)                // data extract based on the flow/lanes
-    val totalArrivalsPerRow = arrivalCounts.sumVr // Sum of flows across the 4 lanes
-
-    val mu = totalArrivalsPerRow.map(rowTime / _) // the mu Vectors for each row. the intensity Vector.
-
-    val laneProbPerRow = arrivalCounts.mmap(_.toProbability)
-    //--------------------------------------------------
-    val laneRVPerRow = Vector.tabulate(data.dim)(row => Discrete(laneProbPerRow(row)))    // laneRV per roll stored here
-    //--------------------------------------------------
-    // Function to Get LaneRV for a Specific Row
-    @inline def getLaneRV(row: Int): Discrete = laneRVPerRow(row)                 // method to get the current laneRV for the current dataIndex
-
-    /**
-     * This method uses the Coodinate class to calculate the scales real data (Pims) to
-     * Animation coodinate for the simulation
-     *
-     * @param aw   the width of the animation window
-     * @param ah   the height of the animation window
-     * @param path an array of lat-long coordinates from the file
-     */
     def getJunctions(path: String, w_h: (Double, Double)): Array[(Double, Double)] =
-
         val data = scala.io.Source.fromFile(path).getLines.toArray
-        val gps = Array.ofDim[(Double, Double)](data.length)
-
-        for i <- data.indices do
-            val ll = data(i).split(",")
-            val lat = ll(0).toDouble
-            val long = ll(1).toDouble
-            gps(i) = (lat, long)
-        end for
+        val gps = data.map { line =>
+            val Array(lat, long) = line.split(",").map(_.toDouble)
+            (lat, long)
+        }
         val coords = new Coordinates(w_h._1, w_h._2, gps)
         coords.calcAniCoords()
-
-        for (lat, long) <- gps do println(s"the gps $lat and $long")
-        for (x, y) <- coords.aniCoords do println(s"the scaled coordinate is x: $x : y $y")
-
         coords.aniCoords
     end getJunctions
 
+    def getMainlineCoordinates(dims: (Double, Double)): Array[(Double, Double)] =
+        if debugScaling then
+            val coords = mainlineCoords.toArray
+
+            // Scale first segment: move sensor 1 further from sensor 0
+            if coords.length > 1 then
+                val (x0, y0) = coords(0)
+                val (x1, y1) = coords(1)
+                val dx = (x1 - x0) * (firstSegmentScale - 1.0)
+                val dy = (y1 - y0) * (firstSegmentScale - 1.0)
+                coords(1) = (x1 + dx, y1 + dy)
+
+            // Scale last segment: move sensor 6 further from sensor 5
+            if coords.length > 2 then
+                val lastIdx = coords.length - 1
+                val prevIdx = coords.length - 2
+                val (xPrev, yPrev) = coords(prevIdx)
+                val (xLast, yLast) = coords(lastIdx)
+                val dx = (xLast - xPrev) * (lastSegmentScale - 1.0)
+                val dy = (yLast - yPrev) * (lastSegmentScale - 1.0)
+                coords(lastIdx) = (xLast + dx, yLast + dy)
+
+            coords
+        else
+            mainlineCoords
+            
+    end getMainlineCoordinates
+    //def getRampCoordinates(dims: (Double, Double)): Array[(Double, Double)] = rampCoords
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Ramp animation coords (apply your small nudge here, NOT at call site). */
+    def getRampCoordinates(dims: (Double, Double)): Array[(Double, Double)] =
+        // start from precomputed rampCoords; just bake in the +45/-50 shift
+        val (sx, sy) = (45.0, -50.0)
+        rampCoords.map { case (x, y) => (x + sx, y + sy) }
+    end getRampCoordinates
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** VSource layout: center position and per-source offsets (clean & centralized). */
+    def getVSourceCenterAndOffsets(dims: (Double, Double))
+    : ((Int, Int), Array[(Int, Int)]) =
+        val main = getMainlineCoordinates(dims)
+        val ramps = getRampCoordinates(dims)
+
+        // center: a light nudge from the first main sensor (your convention)
+        val centerPos = ((main(0)._1 + 100.0).toInt, (main(0)._2 + 100.0).toInt)
+
+        // unified ramp-source shift (what you had inline before)
+        val (dx, dy) = (130.0, -300.0)
+
+        val offsets = Array(
+            (0, 0),
+            ((ramps(0)._1 + dx).toInt - centerPos._1, (ramps(0)._2 + dy).toInt - centerPos._2),
+            ((ramps(1)._1 + dx).toInt - centerPos._1, (ramps(1)._2 + dy).toInt - centerPos._2),
+            ((ramps(2)._1 + dx).toInt - centerPos._1, (ramps(2)._2 + dy).toInt - centerPos._2)
+        )
+        (centerPos, offsets)
+    end getVSourceCenterAndOffsets
+
 
 end TrafficConfig
-
-
 
 
 @main def TrafficConfigTest(): Unit =
@@ -92,150 +219,44 @@ end TrafficConfig
     val stream = 0
     val trafficData = new TrafficConfig("/seven_sensors/402376.csv", rowTime, stream)
 
-
-    println(s"the total arrival ${trafficData.mu}")
-
-//    // Verify lane probabilities sum to 1
-//    println("\nValidating lane probability normalization...")
-//    for row <- 0 until 20 do
-//        val probSum = trafficData.laneProbPerRow(row).sum
-//        println(f"Row $row Probability Sum: $probSum%.6f (should be ~1.0)")
 //
-//    // Validate LaneRV correctness
-//    println("\nValidating laneRV generation...")
-//    for row <- 0 until 20 do
-//        val laneRV = trafficData.getLaneRV(row)
-//        println(s"Row $row LaneRV: $laneRV")
+//    //println(s"the total arrival ${trafficData.mu}")
+//    def createSources(model: Model, car: () => Vehicle): Array[VSource] =
+//        val mainPos = mainlineCoords(0)
+//        val centerPos = ((mainPos._1 + 100.0).toInt, (mainPos._2 + 100.0).toInt)
+//        val offsets = Array(
+//            (0, 0),
+//            ((rampCoords(0)._1 + 230.0).toInt - centerPos._1, (rampCoords(0)._2 - 300.0).toInt - centerPos._2),
+//            ((rampCoords(1)._1 + 230.0).toInt - centerPos._1, (rampCoords(1)._2 - 300.0).toInt - centerPos._2),
+//            ((rampCoords(2)._1 + 230.0).toInt - centerPos._1, (rampCoords(2)._2 - 300.0).toInt - centerPos._2)
+//        )
 //
-//    // Validate lane selection using `igen`
-//    println("\nValidating lane selection using Discrete.igen...")
-//    for row <- 0 until 20 do
-//        val laneRV = trafficData.getLaneRV(row)
-//        val sampledLane = laneRV.igen // Generate lane selection
-//        println(s"Row $row Sampled Lane: $sampledLane")
+//        VSource.group(model, car, centerPos,
+//            (srcNames(0), 0, Erlang(), nStopArray(0), offsets(0)),
+//            (srcNames(1), 1, Erlang(), nStopArray(1), offsets(1)),
+//            (srcNames(2), 2, Erlang(), nStopArray(2), offsets(2)),
+//            (srcNames(3), 3, Erlang(), nStopArray(3), offsets(3))
+//        ).toArray
+//    end createSources
 //
-//    // Validate iArrivalRV initialization and values
-//    println("\nValidating inter-arrival time distributions...")
-//    for row <- 0 until 20 do
-//        val iArrivalRV = trafficData.getIArrivalRV(row)
-//        val sampledIArrival = iArrivalRV.igen
-//        println(f"Row $row iArrivalRV: Mean=${iArrivalRV.mean}%.6f, Sampled Inter-Arrival=${sampledIArrival}%.6f")
+//def createSinks(): Array[Sink] =
+//    sinkNames.indices.map { i =>
+//        val pos = if i == 0 then
+//            val (x, y) = mainlineCoords.last
+//            ((x - 100.0).toInt, (y - 100.0).toInt)
+//        else
+//            val (x, y) = rampCoords(3)
+//            ((x + 230.0).toInt, (y - 300.0).toInt)
+//        Sink(sinkNames(i), pos)
+//    }.toArray
+//end createSinks
 //
-
-
-
-
-
-
-
-
-
-
-
-
-//Plan is to beat Dr Casey's result
-//lane change is a more realistics
-//May/ exit and entry ramp
-//Empirical creation of arrivals (I did it using the main datasets: )
-//Calibration: I need to tune the Gipps Models Hyperparameter
-//Optimization: SPSA, GA, NM (Already in scalation)
-//lane change probability: A more robust one
-
-
-//Model is trying to predict the traffic flow; then I have the traffic flow: then I have to measure
-//the MSE of the simulated data vs the main dataset
-//each of the location where there is a sensor: the model will say the flow in this lane is X
-//PEMS Says Y; How big is the difference
-// Use SMAPE(hoping for 6%) OR RSquared( hope for 90%)
-// Will also need to tune the Gipps Model before getting the error rate
-//change lane based on what I see in the data
-
-
-//    val iArrivalRVPerRow = Vector.tabulate(data.dim) ( row =>
-//        val mu = if totalArrivalsPerRow(row) > 0 then rowTime / totalArrivalsPerRow(row) else 1.0  // 15 /
-//        ew.write(s"\n row $row => : $mu and rowtime is $rowTime \n ")
-//        Exponential2(mu, stream + row)
-//        //Erlang(mu/2)
-//    )
-//    ew.flush()
-
-
-// We will use this to access each interArrival (precomputer per row)
-//@inline def getIArrivalRV(row: Int): Erlang = iArrivalRVPerRow(row - rowOffset) // method to get the current iArrivalRV for the current dataIndex
-
-//    //
-////    // We will use this to access each interArrival (precomputer per row)
-//    @inline def getIArrivalRV(row: Int): Exponential2 = iArrivalRVPerRow(row - rowOffset) // method to get the current iArrivalRV for the current dataIndex
-
-//    // We will use this to access each interArrival (precomputer per row)
-//def ArrivalRV(row:Int,mu:Double, variate: Variate): Unit =
-
-//        val gen = if variate.isInstanceOf[Erlang] then variate.gen1(mu/2) else variate.gen1(mu)
-
-//    @inline def computeMu(row: Int): Double =
-//        if totalArrivalsPerRow(row) > 0 then rowTime / totalArrivalsPerRow(row) else 1.0
-//
-
-/**
- * --> Make it an optimization problem with
- *   ---> Make the smape as the objective function
- *   
- *   ---> create a function where the input of the function is the 
- *   parameters we want to optimized on and the output is the smape
- *   
- *   
- *   take the function and through it at our optimization operation. 
- *   
- *   
- *   the optimizer will run the simulation maybe like 1000s of time with different parameters
- *   ------choose 3 or 4 parameters as though to be changes. We will give a starting values to these params
- *   ---Optimizer will help to run, tune and run this operation 
- *   
- *   ----Create a file
- *   -- create a function: 
- *      input --> subSet of parameters from Gipps models ge (amax, bmax, s)
- *      Assumes all vehicles are same ( not entirely realistic though)
- *      
- *      funct: create a simulation: (single sim) these parameters will be used to drive one simulation one at a time 
- *      then calculate the sMAPE
- *      
- *      return the sMAPE; 
- *      
- *      
- *      Basically raping a function around our simulation. Abstracting our simulation with parameters and returning an SMAPE
- *      ----this fucntion is what the optimizer takes. 
- *      fucntion2V: Make the function this function2V type. 
- *      
- *      
- *      ----- later 
- *          give the function to the optimizer (None derivative optimizer)
- *          --- Neldermeed 
- *          --- Genetic Algo
- *          ---- SPSA
- *          
- *          
- *    --------------------------------------------------------------------------------------------------
- *    ----- lookback window to calculate future times; next maybe day or two: 
- *    ----- Use the forecast as the value we sent to the arrival models 
- *    ---------process via forecasting model first and feed into simulation model
- *    
- *          
- *          
- */
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+//def createRamps(sources: Array[VSource], rampJunctions: Array[Junction],
+//                sinks: Array[Sink], motion: Dynamics): Array[Ramp] =
+//    println(s"Creating ramps using Ramp.group")
+//    Ramp.group(motion,
+//        ("onRamp1", sources(1), rampJunctions(0), RampMode.On, 0.15, 30.0),
+//        ("onRamp2", sources(2), rampJunctions(1), RampMode.On, 0.15, 30.0),
+//        ("onRamp3", sources(3), rampJunctions(2), RampMode.On, 0.15, 30.0),
+//        ("offRamp", rampJunctions(3), sinks(1), RampMode.Off, 0.15, 30.0))
+//end createRamps

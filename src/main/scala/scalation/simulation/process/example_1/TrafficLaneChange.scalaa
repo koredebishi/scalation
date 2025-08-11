@@ -137,3 +137,35 @@ class TrafficLaneChangeModel (name: String = "TrafficLaneChange", reps: Int = 1,
     Model.shutdown ()
 
 end TrafficLaneChangeModel
+
+
+   override def act(): Unit =
+            Vehicle.setInitialSpeed(68.0 / 2.24694) // set initial speed in m/s
+            val laneRV = trafficData.getLaneRV((clock.toInt / rowTime.toInt) % nt)
+            val i = subtype
+            val j = if i == 0 then laneRV.igen else 0
+            this.laneID = j
+            println(s"Who creared this vehicle ${subtype} entered the act method with laneIdx = $i at clock = $clock, with subtype =")
+            debug("act", s"Vehicle created at row ${(clock.toInt / rowTime.toInt) % nt} on lane $i")
+
+
+            val mainSrc = 0     // main source index
+            val interState = mainRoute.pathway(mainSrc)
+            val interStateExit = sinks(0)
+            if i == mainSrc then
+                val carAhead = interState.getLast  // the car ahead of you is the last car in the least
+                interState.addToAlist(this, carAhead) // add this car to the alist of the pathway
+                interState.seg(i).move()   // move the segment of the pathway
+                interState.removeFromAlist(this) // remove this car from the alist of the
+                interStateExit.leave()
+            else
+                val k = i - 1    // ramp index is subtype - 1
+                val ramp = ramps(k)
+                val carAhead = ramp.getLast    // the car ahead of you is the last car in the least
+                ramp.addToAlist(this, carAhead) // add this car to the alist of the ramp
+                println(s"Vehicle added to list {this")
+                ramp.lane.move()  // move in this ramp lane
+                debug("act", s"Vehicle ${this.id} on ramp $k with laneID = $laneID at clock = $clock")
+                ramp.removeFromAlist(this)
+                //continue into the segment of the mainInterState you are joining
+                if ramp.mode == RampMode.Off then sinks(1).leave()
