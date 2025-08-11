@@ -97,6 +97,17 @@ class Ramp(name: String, val from: Component, val to: Component,motion: Dynamics
      */
     override def at: Array[Double] = lane.at
 
+
+    //ramp metering according to literature
+    /** Ramp metering logic to control vehicle flow.
+     *  This is a placeholder for future implementation.
+     *  How does vehicles at the offramps merge into the main road? such that there is no accident and collision?
+     *  What algorith is the state of the art for ramp metering? and merging for micro-simulation? such that it is realistic?
+     *  eg headway-based, gap-acceptance, queue-based, speed-based reduction methods
+     *  @param ctime the current simulation time
+     *
+     */
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Display this ramp visually using animation.
      */

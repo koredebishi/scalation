@@ -106,31 +106,48 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 
     private val mainlineCoords = getJunctions(s"$DATA_DIR/15min_US101_N_Willow_to_Marsh_2miles_ML/gps_mainline.txt", (1000, 800))
     private val rampCoords = getJunctions(s"$DATA_DIR/15Min_US101_N_Willow_to_Marsh_Ramps/gps_ramp.txt", (1000, 800))
-//
-//    val srcNames = Array("Vsrc", "srcRamp1", "srcRamp2", "srcRamp3")
-//    val srcToJunc = Map(0 -> 0, 1 -> 1, 2 -> 2, 3 -> 4)
-//
-//    val sinkNames = Array("Sink", "OffRampSink")
-//    val sinkToJunction = Map(0 -> 6, 1 -> 3)
+
 
     private[process] val data = MatrixD.load(fileName, t1, t2)
     private[process] val laneIdx = VectorI(5, 8, 11, 14)
     private[process] val arrivalCounts = data(?, laneIdx)
-    private[process] val totalArrivalsPerRow = arrivalCounts.sumVr
+    private[process] val totalArrivalsPerRow = arrivalCounts.sumVr        // Sum of flows across the 4 lanes for mainline only
     private[process] val muMain = totalArrivalsPerRow.map(rowTime / _)
     private[process] val laneProbPerRow = arrivalCounts.mmap(_.toProbability)
-    private[process] val laneRVPerRow = Vector.tabulate(data.dim)(r => Discrete(laneProbPerRow(r)))
+    private[process] val laneRVPerRow = Vector.tabulate(data.dim)(r => Discrete(laneProbPerRow(r)))     // need to use this ??
 
-    private val onRampData = Array.fill(3)(MatrixD.load("15Min_US101_N_Willow_to_Marsh_2miles_ML/400981.csv", t1, t2))
+    //private val onRampData = Array.fill(3)(MatrixD.load("15Min_US101_N_Willow_to_Marsh_2miles_ML/400981.csv", t1, t2))
+
+    val onRampData = Array(
+                                MatrixD.load(s"15Min_US101_N_Willow_to_Marsh_Ramps/408267.csv", t1, t2),
+                                MatrixD.load(s"15Min_US101_N_Willow_to_Marsh_Ramps/408264.csv", t1, t2),
+                                MatrixD.load(s"15Min_US101_N_Willow_to_Marsh_Ramps/412783.csv", t1, t2)
+    )
 
     private val muRamps = onRampData.map { mat =>
         val counts = mat(?, laneIdx).sumVr
         counts.map(rowTime / _)
     }
 
-    private def calcTotalArrivals(mat: MatrixD): VectorD = mat(?, laneIdx).sumVr
 
-    lazy val nStopArray = Array(2, 2, 2, 2)
+    //helper method to get sensor data for smape calculation
+    def getSensorData(sensorId: String): VectorD =
+        val sensorData = MatrixD.load(s"/15Min_US101_N_Willow_to_Marsh_2miles_ML/$sensorId.csv", t1, t2)
+        val sensorArrivals = sensorData(?, laneIdx)
+        sensorArrivals.sumVr
+    end getSensorData
+
+
+
+    def calcTotalArrivals(mat: MatrixD): VectorD = mat(?, laneIdx).sumVr
+
+    //lazy val nStopArray = Array(2, 2, 2, 2)      // just a temp to help test the code
+
+    lazy val nStopArray: Array[Int] =
+        val mainStop = calcTotalArrivals(data).sum.toInt
+        val rampStops = onRampData.map(m => calcTotalArrivals(m).sum.toInt)
+        Array(mainStop) ++ rampStops
+    end nStopArray
 
     val muPerSource: Array[VectorD] = Array(muMain) ++ muRamps
 
@@ -211,6 +228,146 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
     end getVSourceCenterAndOffsets
 
 
+
+
+//
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//    /** Full time-of-day × day-of-week imputation (vectorized where it matters).
+//     * Implements historical profile imputation and preserves lane shares.
+//     */
+//    private def fullTimeOfDayImputation(): Array[MatrixD] =
+//        val binsPerDay = (1440.0 / rowTime).toInt
+//
+//        inline def dayOfWeek(r: Int) = (r / binsPerDay) % 7
+//
+//        inline def binOfDay(r: Int) = r % binsPerDay
+//
+//        // Precompute row index buckets for each (dow, bin)
+//        val R0 = onRampData.head.dim1
+//        val buck = Array.ofDim[IVector](7, binsPerDay)
+//        for dow <- 0 until 7 do
+//            for b <- 0 until binsPerDay do
+//                val rows = for r <- 0 until R0 if dayOfWeek(r) == dow && binOfDay(r) == b yield r
+//                buck(dow)(b) = VectorI(rows: _*)
+//            end for
+//        end for
+//
+//        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//        /** Build historical profiles (means) for one ramp */
+//        def histProfiles(m: MatrixD): (MatrixD, MatrixD) =
+//            val C = laneIdx.dim
+//            val tot = new MatrixD(7, binsPerDay)
+//            val shr = new MatrixD(7, binsPerDay * C)
+//
+//            val lanesMat = m(?, laneIdx) // rows × C (lane slice)
+//
+//            for dow <- 0 until 7 do
+//                for b <- 0 until binsPerDay do
+//                    val idx = buck(dow)(b)
+//                    if idx.dim > 0 then
+//                        val sub = lanesMat(idx, ?) // |idx| × C
+//                        val rowSum = sub.sumVr // |idx|-vector: per-row totals
+//                        val keep = for i <- 0 until rowSum.dim if rowSum(i) > 0.0 yield i
+//                        if keep.nonEmpty then
+//                            val subK = sub(VectorI(keep: _*), ?) // keep only informative rows
+//                            val meanTot = subK.sum().sum / subK.dim1 // (sum over all lanes & rows) / rows
+//                            tot(dow, b) = meanTot
+//
+//                            if meanTot > 0.0 then
+//                                val meanLane = subK.mean // 1 × C mean per lane
+//                                val base = b * C
+//                                for j <- 0 until C do
+//                                    shr(dow, base + j) = meanLane(j) / meanTot
+//                                end for
+//                            else
+//                                val base = b * C
+//                                for j <- 0 until C do shr(dow, base + j) = 1.0 / C
+//                            end if
+//                        else
+//                            tot(dow, b) = 0.0
+//                            val base = b * C
+//                            for j <- 0 until C do shr(dow, base + j) = 1.0 / C
+//                        end if
+//                    else
+//                        tot(dow, b) = 0.0
+//                        val base = b * C
+//                        for j <- 0 until C do shr(dow, base + j) = 1.0 / C
+//                    end if
+//                end for
+//            end for
+//            (tot, shr)
+//        end histProfiles
+//
+//        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//        /** Impute one ramp using profiles */
+//        def imputeOne(m: MatrixD): MatrixD =
+//            val (tot, shr) = histProfiles(m)
+//            val out = m.copy
+//            val C = laneIdx.dim
+//            val R = m.dim1
+//
+//            val lanesMat = out(?, laneIdx) // view on lanes
+//            val rowTot = lanesMat.sumVr // current totals per row
+//
+//            for r <- 0 until R do
+//                if rowTot(r) == 0.0 then
+//                    val dow = (r / binsPerDay) % 7
+//                    val bin = r % binsPerDay
+//                    val mean = tot(dow, bin)
+//                    if mean > 1e-9 then
+//                        val base = bin * C
+//                        // write lane vector = mean * share(dow,bin,:)
+//                        for j <- 0 until C do
+//                            lanesMat(r, j) = mean * shr(dow, base + j)
+//                        end for
+//                    end if
+//                end if
+//            end for
+//            out
+//        end imputeOne
+//
+//        onRampData.map(imputeOne)
+//    end fullTimeOfDayImputation
+//
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//    /** Simple mean imputation for test datasets (lane-wise means). */
+//    private def simpleZeroImputation(): Array[MatrixD] =
+//        onRampData.map: mat =>
+//            val out = mat.copy
+//            val lanes = out(?, laneIdx) // rows × C
+//            val C = laneIdx.dim
+//
+//            // compute lane means over non-zero rows (vectorized per lane)
+//            val nonZero = lanes.sumVr // per-row totals
+//            val keep = for i <- 0 until nonZero.dim if nonZero(i) > 0.0 yield i
+//            if keep.nonEmpty then
+//                val Lk = lanes(VectorI(keep: _*), ?) // kept rows
+//                val meanLane = Lk.mean // 1 × C
+//
+//                // replace zeros row-wise where total==0 with meanLane
+//                val zero = for i <- 0 until nonZero.dim if nonZero(i) == 0.0 yield i
+//                if zero.nonEmpty then
+//                    val Zi = VectorI(zero: _*)
+//                    for j <- 0 until C do
+//                        for i <- 0 until Zi.dim do lanes(Zi(i), j) = meanLane(j)
+//                    end for
+//                end if
+//            end if
+//            out
+//    end simpleZeroImputation
+//
+//
+//    def imputeOnRampData(): Array[MatrixD] =
+//        val rows = onRampData.headOption.map(_.dim1).getOrElse(0)
+//        val bins = (1440.0 / rowTime).toInt
+//        if rows >= bins * 7 then fullTimeOfDayImputation() else simpleZeroImputation()
+//    end imputeOnRampData
+
+
 end TrafficConfig
 
 
@@ -219,44 +376,3 @@ end TrafficConfig
     val stream = 0
     val trafficData = new TrafficConfig("/seven_sensors/402376.csv", rowTime, stream)
 
-//
-//    //println(s"the total arrival ${trafficData.mu}")
-//    def createSources(model: Model, car: () => Vehicle): Array[VSource] =
-//        val mainPos = mainlineCoords(0)
-//        val centerPos = ((mainPos._1 + 100.0).toInt, (mainPos._2 + 100.0).toInt)
-//        val offsets = Array(
-//            (0, 0),
-//            ((rampCoords(0)._1 + 230.0).toInt - centerPos._1, (rampCoords(0)._2 - 300.0).toInt - centerPos._2),
-//            ((rampCoords(1)._1 + 230.0).toInt - centerPos._1, (rampCoords(1)._2 - 300.0).toInt - centerPos._2),
-//            ((rampCoords(2)._1 + 230.0).toInt - centerPos._1, (rampCoords(2)._2 - 300.0).toInt - centerPos._2)
-//        )
-//
-//        VSource.group(model, car, centerPos,
-//            (srcNames(0), 0, Erlang(), nStopArray(0), offsets(0)),
-//            (srcNames(1), 1, Erlang(), nStopArray(1), offsets(1)),
-//            (srcNames(2), 2, Erlang(), nStopArray(2), offsets(2)),
-//            (srcNames(3), 3, Erlang(), nStopArray(3), offsets(3))
-//        ).toArray
-//    end createSources
-//
-//def createSinks(): Array[Sink] =
-//    sinkNames.indices.map { i =>
-//        val pos = if i == 0 then
-//            val (x, y) = mainlineCoords.last
-//            ((x - 100.0).toInt, (y - 100.0).toInt)
-//        else
-//            val (x, y) = rampCoords(3)
-//            ((x + 230.0).toInt, (y - 300.0).toInt)
-//        Sink(sinkNames(i), pos)
-//    }.toArray
-//end createSinks
-//
-//def createRamps(sources: Array[VSource], rampJunctions: Array[Junction],
-//                sinks: Array[Sink], motion: Dynamics): Array[Ramp] =
-//    println(s"Creating ramps using Ramp.group")
-//    Ramp.group(motion,
-//        ("onRamp1", sources(1), rampJunctions(0), RampMode.On, 0.15, 30.0),
-//        ("onRamp2", sources(2), rampJunctions(1), RampMode.On, 0.15, 30.0),
-//        ("onRamp3", sources(3), rampJunctions(2), RampMode.On, 0.15, 30.0),
-//        ("offRamp", rampJunctions(3), sinks(1), RampMode.Off, 0.15, 30.0))
-//end createRamps

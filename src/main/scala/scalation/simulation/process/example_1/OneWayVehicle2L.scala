@@ -276,17 +276,38 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
     /** Compute SMAPE between simulation and PEMS data
      *Need to add the ramp sensors to this
      */
-    def simRunVsPemsRun(): Double =
-        val ytrue = trafficData.totalArrivalsPerRow
-        val scores = for sensor <- main_sensors ++ ramp_sensors yield smapeF(ytrue, sensor.getCountMatrix.sumVr)
-        scores.sum / scores.length
+//    def simRunVsPemsRun(): Double =
+//        val sensor3Arrival = trafficData.totalArrivalsPerRow     // no need for this for now
+//
+//        val scores = for sensor <- main_sensors ++ ramp_sensors yield smapeF(ytrue, sensor.getCountMatrix.sumVr)
+//        scores.sum / scores.length
+//    end simRunVsPemsRun
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Compute SMAPE between simulation and PEMS data at key measurement points */
+    def simRunVsPemsRun(): Array[Double] =
+        // SMAPE 1: After 2 onramps (sensor 3) - compare against sensor 402398 data
+        val sensor3Expected = trafficData.getSensorData("402398")
+        val smape1 = smapeF(sensor3Expected, main_sensors(3).getCountMatrix.sumVr)
+        // SMAPE 2: After offramp (sensor 5) - compare against sensor 401927 data
+        val sensor5Expected = trafficData.getSensorData("401927")
+        val smape2 = smapeF(sensor5Expected, main_sensors(5).getCountMatrix.sumVr)
+        // SMAPE 3: Final measurement (sensor 6) - compare against sensor 401653 data
+        val sensor6Expected = trafficData.getSensorData("401653")
+        val smape3 = smapeF(sensor6Expected, main_sensors(6).getCountMatrix.sumVr)
+        Array(smape1, smape2, smape3)
     end simRunVsPemsRun
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     /** Write stats and finalize simulation */
     override def fini(rep: Int): Unit =
         Recorder.writeAllSensorStats(main_sensors.toList ++ ramp_sensors.toList)
-        simRunVsPemsRun()
+        val smapeResults = simRunVsPemsRun()
+        println(f"SMAPE after 2 onramps: ${smapeResults(0)}")
+        println(f"SMAPE after offramp: ${smapeResults(1)}")
+        println(f"SMAPE after last onramp: ${smapeResults(2)}")
         super.fini(rep)
     end fini
 
