@@ -24,15 +24,6 @@ trait RowTimeLoader:
         end if
     end nextRow
     
-//    def simRunTime(week:Int, dayOfW: Int, ts:Int, te:Int):(Int, Int)=
-//        //the timeslice of Pems DataSet
-//        //to be implemented 
-//        //Fix <---
-//        banner("The Simulation time sliced value ")
-//
-//        (10, 20)
-//    end simRunTime    
-
 
 end RowTimeLoader
 

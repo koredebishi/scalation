@@ -123,21 +123,21 @@ object SimActor:
         actor.myNode = alist.add(actor)
     end addToAlist
 
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    /** Add the given actor BEFORE the other actor in the alist, e.g., during a lane change
-     * where the actor must be placed before another actor.2000
-     *
-     * @param actor the given actor/vehicle to add
-     * @param other the other actor/vehicle (the one behind, null if none)
-     */
-    def addBeforeToAlist(actor: SimActor, other: SimActor): Unit =
-        val new_node = alist.addBefore(actor, other.myNode)
-        actor.myNode = new_node
-        val other_node = if actor.myNode != null then alist.getBehind(actor.myNode) else null
-        println(s"${Console.GREEN} Final state after insertion in alist: ${alist.toString()} ${Console.RESET}")
-    end addBeforeToAlist
+//
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//    /** Add the given actor BEFORE the other actor in the alist, e.g., during a lane change
+//     * where the actor must be placed before another actor.2000
+//     *
+//     * @param actor the given actor/vehicle to add
+//     * @param other the other actor/vehicle (the one behind, null if none)
+//     */
+//    def addBeforeToAlist(actor: SimActor, other: SimActor): Unit =
+//        val new_node = alist.addBefore(actor, other.myNode)
+//        actor.myNode = new_node
+//        val other_node = if actor.myNode != null then alist.getBehind(actor.myNode) else null
+//        println(s"${Console.GREEN} Final state after insertion in alist: ${alist.toString()} ${Console.RESET}")
+//    end addBeforeToAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Remove the given actor from the alist, e.g., because of termination, lane change,
