@@ -118,11 +118,13 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create ramps inline to preserve subtype mapping */
     val ramps: Array[Ramp] = Ramp.group(motion,
-                            ("onRamp1", sources(1), ramp_sensors(0), RampMode.On, 0.0, 0.0),
-                            ("onRamp2", sources(2), ramp_sensors(1), RampMode.On, 0.0, 0.0),
-                            ("onRamp3", sources(3), ramp_sensors(2), RampMode.On, 0.0, 0.0),
+                            ("onRamp1", sources(1), ramp_sensors(0), RampMode.On, 0.0, 0.0, RampControl.Metered, 540, 30),
+                            ("onRamp2", sources(2), ramp_sensors(1), RampMode.On, 0.0, 0.0, RampControl.Metered, 720, 40),
+                            ("onRamp3", sources(3), ramp_sensors(2), RampMode.On, 0.0, 0.0, RampControl.Freemerged),
                             ("offRamp", ramp_sensors(3), sinks(1), RampMode.Off, 0.0, 0.0)
     )
+    
+    
 
     private val intermediateJunctions = main_sensors.slice(1, main_sensors.length - 1)
     private val mainRoute = Route("Rte", numLanes, intermediateJunctions, main_sensors(0), main_sensors.last, motion)
@@ -225,6 +227,9 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
                 val rampId = i - 1
                 val ramp = ramps(rampId)
                 val carAhead = ramp.getLast
+
+                if (ramp.isOn) ramp.waitAtLimit()
+
                 ramp.addToAlist(this, carAhead) // enter ramp
                 ramp_sensors(rampId).jump()
                 ramp.lane.move()
