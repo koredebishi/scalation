@@ -36,7 +36,7 @@ import scala.collection.mutable.ArrayDeque
 class VTransport (name: String, from_ : Component, to_ : Component,
                   motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0,
                   shift1: VectorD = VectorD (0, 0), shift2: VectorD = VectorD (0, 0))
-  extends Transport (name, from_, to_, null, isSpeed, bend, shift1, shift2):
+    extends Transport (name, from_, to_, null, isSpeed, bend, shift1, shift2):
 
     private val debug = debugf ("VTransport", true)                     // debug function
     debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
@@ -126,6 +126,5 @@ class VTransport (name: String, from_ : Component, to_ : Component,
         val y = p1(1) + (p2(1) - p1(1)) * prop
         Array(x - RAD, y - RAD)
     end calcPoint
-    
-end VTransport
 
+end VTransport

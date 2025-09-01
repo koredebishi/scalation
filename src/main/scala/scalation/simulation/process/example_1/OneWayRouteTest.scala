@@ -117,7 +117,7 @@ import scalation.random.{Exponential, Uniform, Bernoulli}
 @main def runOneWayRouteTest(): Unit = new OneWayRouteTest()
 
 class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating: Boolean = true,
-                      aniRatio: Double = 500.0, nStop: Int = 0, stream: Int = 0)
+                      aniRatio: Double = 500.0, nStop: Int = 2, stream: Int = 0)
     extends Model(name, reps, animating, aniRatio):
 
     // Configuration parameters
@@ -128,15 +128,67 @@ class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating
     val exDec = Bernoulli()
     val rowTime = 100.0
 
+
+
+
+    /**
+     * Use RoadCood to load all GPS coordinates and convert them to screen coordinates
+     * Returns:
+     *  - mainline: sensor1..sensor6
+     *  - ramps: onramp1,onramp2,offramp
+     */
+    def getRoadCoordinates(dims: (Double, Double)): Map[String, Array[(Double, Double)]] =
+        val allLatLongs = Roadcood.latlong
+        val coordsArray = allLatLongs.values.toArray
+        val keys = allLatLongs.keys.toArray
+
+        val coordinates = new scalation.Coordinates(dims._1, dims._2, coordsArray)
+        val screenCoords = coordinates.aniCoords
+
+        val coordMap = keys.zip(screenCoords).toMap
+
+        val mainline = Array(
+            coordMap("sensor1"),
+            coordMap("sensor2"), // offramp merge before sensor2
+            coordMap("sensor3"),
+            coordMap("sensor4"),
+            coordMap("sensor5"),
+            coordMap("sensor6")
+        )
+
+        val ramps = Array(
+            coordMap("onramp1"),
+            coordMap("onramp2"),
+            coordMap("offramp")
+        )
+        Map(
+            "mainline" -> mainline,
+            "ramps" -> ramps
+        )
+    end getRoadCoordinates
+
+
+    val (w, h) = (1500, 1500.0) // width and height of animation window
+
     // Important coordinate system
-    val trafficData = new TrafficConfig("/seven_sensors_old_data/402376.csv", rowTime, stream)
-    val aniCoords = trafficData.getJunctions(DATA_DIR + "gps_mainline.txt", (1000, 800))
+    //val trafficData = new TrafficConfig("/seven_sensors_old_data/402376.csv", rowTime, stream)
+
+
+
+//    val aniCoords = getRoadCoordinates((w, h))
+//    val aniCoords_Ramp = getRampCoordinates((w, h)) // already nudged
+
+    private val allGpsCoords = getRoadCoordinates((1500, 1500))
+    private val aniCoords = allGpsCoords("mainline")
+    private val aniCoords_Ramp = allGpsCoords("ramps")
 
     private val debug = debugf("OneWayVehicle2L", true) // debug function
 
     val numJunc = 4
     val numLane = 4
     val laneRV = Uniform(0, numLane, stream + numLane)
+
+
 
     // Use the coordinate system for component placement
     val entry = VSource("entry", this, () => Car(), 0, nStop, iArrival, (aniCoords(0)._1.toInt, aniCoords(0)._2.toInt))
@@ -151,10 +203,10 @@ class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating
     val route = Route("route", numLane, junc, entry, exit, motion)
 
     // Add on-ramp and off-ramp using appropriate coordinates
-    val onRampEntry = VSource("orEntry", this, () => Car(), 0, 2, iArrival, (aniCoords(1)._1.toInt + 200, aniCoords(1)._2.toInt - 20))
+    val onRampEntry = VSource("orEntry", this, () => Car(), 0, 2, iArrival, (aniCoords(1)._1.toInt + 800, aniCoords(1)._2.toInt - 200))
     val onRamp = Ramp("onRamp", onRampEntry, junc(0), motion, RampMode.On)
 
-    val offRampExit = Sink("offrExit", (aniCoords(4)._1.toInt , aniCoords(4)._2.toInt - 300))
+    val offRampExit = Sink("offrExit", (aniCoords(4)._1.toInt , aniCoords(4)._2.toInt - 800))
     val offRamp = Ramp("offRamp", junc(3), offRampExit, motion, RampMode.Off)
 
     addComponents(List(entry, onRampEntry), junc.toList, List(exit, offRampExit))
@@ -268,3 +320,9 @@ class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating
     waitFinished()
     Model.shutdown()
 end OneWayRouteTest
+
+
+
+//Want to verify that the car ahead is correct
+//this code that works using arrival rate then swap for data driven process
+// adjust the positioning of the offsets.

@@ -135,7 +135,7 @@ object Vehicle:
      *  @param rt     the time difference (reaction time)
      *
      *  FIX - integrate into Dynamics package
-//     */
+                      //     */
 
     def butcher(Ft: Double, ft: Double, ft_rt: Double, rt: Double): Double =
         val _1_by_90 = 1.0 / 90.0
@@ -153,6 +153,3 @@ object Vehicle:
 
 
 end Vehicle
-
-
-

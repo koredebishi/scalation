@@ -35,7 +35,7 @@ import scala.math.{min,abs}
 class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component, to: Component,
              motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0)
     extends Component ():
-    
+
 
     private val debug = debugf("Route", true)     // debug function
 
@@ -72,7 +72,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         val toPath = pathway(l2)                                       // target Pathway   (lane l2)
 
         // disallow LC on first and last segment
-        
+
         val nSeg = toPath.seg.length
         if seg == 0 || seg == nSeg - 1 then return false
 
@@ -112,7 +112,9 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         end if
         success
     end changeLane
- 
+    
+    //def merge
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the first vehicle in the specified lane.

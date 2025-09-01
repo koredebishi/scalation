@@ -151,35 +151,6 @@ class DoublyLinkedList [A: ClassTag]
             n
     end add
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add a new element BEFORE the given successor node `nn` and return the new node `n`.
-     *  Relink:  pn <-> nn  TO  pn <-> n <-> nn
-     *  The predecessor (`pn`) of the successor node `nn` is relinked to point to the new node `n`.
-     *  Similarly, the new node `n` links back to `pn` and forward to `nn`. If `nn` is `null`,
-     *  this method adds the element as the first element in the list.
-     *  @param elm the element to be added
-     *  @param nn  the successor node (defaults to `null` if not provided)
-     *  @return the newly created node `n` inserted before node `nn`
-     *
-    def addBefore (elm: A, pn: Node): Node =
-        val nn = pn.behind // Get the behind node (car behind `pn`)
-
-        if nn == null then
-            // Case 1: `pn` is the head, so insert BEHIND it and assume tail.
-            val n = Node(elm, pn, null) // New node's ahead = pn, behind = null
-            pn.behind = n // Fix behind linkage
-            tail_ = n // Update the tail pointer
-            debug("addBefore", s"Inserted node $n behind head $pn (new tail)")
-            n
-        else
-            // Case 2: `pn` has a behind node (normal case, inserting between two nodes)
-            val n = Node(elm, pn, nn) // Insert between `pn` (ahead) and `nn` (behind)
-            pn.behind = n // Fix pn's behind pointer
-            nn.ahead = n // Fix nn's ahead pointer
-            debug("addBefore", s" pn= $pn n=$n and $nn")
-            n
-    end addBefore
-     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Remove the node `n` from the linked list.
@@ -278,48 +249,32 @@ end doublyLinkedListTest2
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `doublyLinkedListTest` main function tests the `DoublyLinkedList` class.
- *  > runMain scalation.doublyLinkedListTest3
+/** Add a new element BEFORE the given successor node `nn` and return the new node `n`.
+ * Relink:  pn <-> nn  TO  pn <-> n <-> nn
+ * The predecessor (`pn`) of the successor node `nn` is relinked to point to the new node `n`.
+ * Similarly, the new node `n` links back to `pn` and forward to `nn`. If `nn` is `null`,
+ * this method adds the element as the first element in the list.
  *
-@main def doublyLinkedListTest3 (): Unit =
-
-    banner("Test the add and addBefore methods")
-
-    // Create DoublyLinkedList
-    val dll = DoublyLinkedList[Int]()
-
-    dll.add(98) // DLL now contains [ 98 ] (single node)
-    val head = dll.headNode
-    dll.addBefore(99, head) // Insert 99 before Node(98)
-    dll.addBefore(95, head) // Insert 99 before Node(98)
-    println(dll)
-
-@main def doublyLinkedListTest4(): Unit =
-    banner("Test the add and addBefore methods")
-
-    // Case 1: Insert normally at the tail (Default behavior)
-    val dll = DoublyLinkedList[Int]()
-    for i <- 0 until 5 do dll.add(i)
-    println("After normal insertion:")
-    println(dll)
-
-    // Case 2: Insert before a given node (Middle of list)
-    val refNode = dll.headNode.behind // Second node in the list
-    println(s"Inserting before $refNode")
-    dll.addBefore(99, refNode)
-    println("After inserting 99 before the second node:")
-    println(dll)
-
-    // Case 3: Insert before head (Becomes new head)
-    dll.addBefore(77, dll.headNode)
-    println("After inserting 77 before head:")
-    println(dll)
-
-    // Case 4: Insert when list is empty (Should work with addFirst)
-    val emptyDll = DoublyLinkedList[Int]()
-    emptyDll.addBefore(55, null)
-    println("After inserting 55 into empty list:")
-    println(emptyDll)
-
+ * @param elm the element to be added
+ * @param nn  the successor node (defaults to `null` if not provided)
+ * @return the newly created node `n` inserted before node `nn`
+ *
+ *         def addBefore (elm: A, pn: Node): Node =
+ *         val nn = pn.behind // Get the behind node (car behind `pn`)
+ *
+ *         if nn == null then
+ *         // Case 1: `pn` is the head, so insert BEHIND it and assume tail.
+ *         val n = Node(elm, pn, null) // New node's ahead = pn, behind = null
+ *         pn.behind = n // Fix behind linkage
+ *         tail_ = n // Update the tail pointer
+ *         debug("addBefore", s"Inserted node $n behind head $pn (new tail)")
+ *         n
+ *         else
+ *         // Case 2: `pn` has a behind node (normal case, inserting between two nodes)
+ *         val n = Node(elm, pn, nn) // Insert between `pn` (ahead) and `nn` (behind)
+ *         pn.behind = n // Fix pn's behind pointer
+ *         nn.ahead = n // Fix nn's ahead pointer
+ *         debug("addBefore", s" pn= $pn n=$n and $nn")
+ *         n
+ *         end addBefore
  */
-

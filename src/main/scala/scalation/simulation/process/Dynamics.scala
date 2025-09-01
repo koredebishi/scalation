@@ -68,13 +68,15 @@ object GippsDynamics
     def updateM(car: Vehicle, length: Double): Unit =
         //debug("updateM", s"car = $car with car.myNode = ${car.myPathNode}")
         //val ref = car.myNode.ahead
+        println(s"this is where I stopped $car with car.myPathNode = ${car.myPathNode}")
         val ref = car.myPathNode.ahead
-        //val car_ahead = if ref == null then null else ref.elem
+        println(s"this is where I stopped this $ref")
 
-        val car_ahead =
+        val car_ahead = {
             if car.myPathNode.ahead != null && car.myPathNode.ahead.elem.pathInfo == car.pathInfo then
                 car.myPathNode.ahead.elem
             else null
+        }
 
         debug("updateM", s"car = ${car.id} (velocity and position) based on car_ahead = $car_ahead")
 

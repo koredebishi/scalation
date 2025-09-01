@@ -59,6 +59,8 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
 
 
     debug ("Init", s"name = $name, located at ${stringOf (at)}")
+    
+    val nStop: Int = units     // need this nStop/Unit for ramp metering gate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.

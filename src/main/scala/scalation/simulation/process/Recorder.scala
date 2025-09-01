@@ -59,7 +59,7 @@ trait Recorder(nt: Int):
     //private val timeConv = 86400.0 / nt  // Convert seconds in a day into time intervals
     val rowTime = 15.0 * MINUTE
     private val timeConv = rowTime
-    val nl = 4                           // Number of lanes for the model. May need to be dynamic
+    val nl = 5                           // Number of lanes for the model. May need to be dynamic
 
     protected val r_counts = new MatrixD(nt, nl)   // Count matrix [time_intervals × lanes] [nt, number of lanes]  
     protected val r_speeds = new MatrixD(nt, nl)   // Speed matrix [time_intervals × lanes]
@@ -110,7 +110,9 @@ trait Recorder(nt: Int):
 
             val vehicle = actor.asInstanceOf[Vehicle]
             val laneID = vehicle.laneID
+            println(s"Inside recorder: laneID = $laneID")
             val cnt = r_counts(j, laneID).toInt + 1
+            println(s"Inside recorder: count = $cnt")
             r_counts(j, laneID) = cnt
             val speed = if vehicle.velocity.isNaN then 0.0 else vehicle.velocity
             r_speeds(j, laneID) = (r_speeds(j, laneID) * (cnt - 1) + (speed * 2.24694) ) / cnt // Compute running avg speed

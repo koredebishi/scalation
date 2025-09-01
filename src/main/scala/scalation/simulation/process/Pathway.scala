@@ -31,10 +31,15 @@ import scalation.scala2d.Colors._
 class Pathway (name: String, val junc: Array [Junction], val from: Component, val to: Component,
                motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0, 
                laneShift: VectorD = VectorD(0.0, 0.0))
-    extends Component:
+    extends Component with Joinable:
 
     private val debug = debugf ("Pathway", true)             // debug function
     val vList = DoublyLinkedList [Vehicle]                   // one lane = one doubly linked list
+
+    // Enhanced DLL identification for debugging
+    val dllId = s"DLL_${name}_Lane"
+    private def logDLLOperation(operation: String, vehicle: Vehicle, details: String = ""): Unit =
+        debug(s"$operation", s"[$dllId] Vehicle ${vehicle.id} $details | DLL size: ${vList.size}")
 
     val points = from +: junc.toList :+ to
     val seg = Array.ofDim[VTransport](points.length - 1)
@@ -59,9 +64,10 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     def addToAlist (actor: Vehicle, other: Vehicle): Unit =
         val otherNode = if other != null then other.myPathNode.asInstanceOf [vList.Node]
         else null
-        debug ("addToList", s"actor = $actor follows otherNode = $otherNode")
+        logDLLOperation("ADD_TO_DLL", actor, s"following ${if other != null then other.name else "NONE"}")
         actor.myPathway = this
         actor.myPathNode = vList.add (actor, otherNode)
+        actor.pathInfo = s"${dllId}" // Update path info with clear DLL identifier
     end addToAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -69,6 +75,7 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
      *  @param actor  the vehicle to remove
      */
     def removeFromAlist (actor: Vehicle): Unit =
+        logDLLOperation("REMOVE_FROM_DLL", actor)
         vList.remove (actor.myPathNode.asInstanceOf [vList.Node])
         actor.myPathNode = null
         actor.myPathway  = null

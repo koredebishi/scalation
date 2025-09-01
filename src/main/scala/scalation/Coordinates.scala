@@ -9,10 +9,6 @@
  */
 
 package scalation
-package simulation
-package process
-package modeling
-package clustering
 
 
 import scalation.mathstat.*

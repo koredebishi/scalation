@@ -3,14 +3,10 @@
   <component name="DisplayModuleName">
     <option name="name" value="scalation" />
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_23" inherit-compiler-output="true">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_25" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../..">
-      <excludeFolder url="file://$MODULE_DIR$/../../../.bsp" />
-      <excludeFolder url="file://$MODULE_DIR$/../.." />
-      <excludeFolder url="file://$MODULE_DIR$/../../../data" />
-      <excludeFolder url="file://$MODULE_DIR$/../../../log" />
-      <excludeFolder url="file://$MODULE_DIR$/../../../old" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
