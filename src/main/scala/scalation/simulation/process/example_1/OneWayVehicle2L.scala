@@ -106,14 +106,14 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
         override def act(): Unit =
             Vehicle.setInitialSpeed(68.0 / 2.24694)
             val laneRV = config.getLaneRV((clock.toInt / rowTime.toInt) % nt)
-            val laneChangeRV = Bernoulli(0.8) // 80% chance to attempt lane change
-            val offRampRV = Bernoulli(0.1) // 10% chance to exit at offramp
+            val laneChangeRV = Bernoulli() // 80% chance to attempt lane change
+            val offRampRV = Bernoulli() // 50% chance to take off-ramp
             var laneIdx = laneRV.igen % numLanes // pick an initial lane
             this.laneID = laneIdx
 
             if subtype == 0 then
                 // Main entry vehicles - decide route at the beginning
-                val useOffRamp = offRampRV.igen < 0.5
+                val useOffRamp = offRampRV.igen > 0.5
 
                 println(s"I passed this face $laneIdx")
                 // ------------------ enter chosen lane ----------------------------
@@ -125,7 +125,8 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
                 println(s"I passed this face")
                 // ------------------ drive through segments up to junction 2 ------
                 val offRampJunction = 1
-                for seg <- 0 until offRampJunction do
+                val highway_length = junc.length - 1
+                for seg <- 0 until highway_length do      // this is the problem
                     if laneChangeRV.igen == 1 then
                         val target = (laneIdx + 1) % numLanes // simple rule
                         if route.changeLane(laneIdx, target, this, seg) then
@@ -134,7 +135,7 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
                         end if
                     end if
                     route.path(laneIdx).seg(seg).move()
-                    if seg < junc.length then junc(seg).jump()
+                    if seg < highway_length then junc(seg+1).jump()
                 end for
 
                 // At junction 2, decide whether to take off-ramp

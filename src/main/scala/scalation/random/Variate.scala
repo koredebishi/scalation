@@ -140,7 +140,7 @@ end Variate
  *  @param p       the probability of success
  *  @param stream  the random number stream
  */
-case class Bernoulli (p: Double = .5, stream: Int = 0)
+case class Bernoulli (p: Double = 0.5, stream: Int = 0)
      extends Variate (stream):
 
     if p < 0.0 || p > 1.0 then flaw ("init", "parameter p must be in [0, 1]")
