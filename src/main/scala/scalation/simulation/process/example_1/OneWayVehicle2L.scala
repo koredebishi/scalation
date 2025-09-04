@@ -240,3 +240,20 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
     waitFinished()
     Model.shutdown()       // to be removed when TrafficOptimization is used
 end OneWayVehicle2L
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//Very important notes to self:
+//Plot the arrival rates of my date with time.
+//Number of vehicle vs Time. <-----: y-axis vs x-axis
+//Use the data from the csv file to plot the graph.
+//Also measure the departure rate from the sink.
+//Compare the arrival rate and departure rate.
+//per lane arrival rate and departure rate.
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//y = probability density function;
+//x = inter-arrival time
+//mean = average inter-arrival time
+//variance = variance of inter-arrival time
+//standard deviation = standard deviation of inter-arrival time

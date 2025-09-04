@@ -184,8 +184,8 @@ class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating
 
     private val debug = debugf("OneWayVehicle2L", true) // debug function
 
-    val numJunc = 4
-    val numLane = 4
+    val numJunc = 5
+    val numLane = 5
     val laneRV = Uniform(0, numLane, stream + numLane)
 
 
