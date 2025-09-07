@@ -40,6 +40,8 @@ abstract class Vehicle (name_ : String, director: Model)
     var myPathway   : Pathway = null // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
     private [process] var myPathNode: DoublyLinkedList[Vehicle]#Node = null // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
 
+
+ 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The abstract method, 'act', is defined in each subclass to provide specific
      *  behavior.
@@ -150,6 +152,11 @@ object Vehicle:
         Ft + _1_by_90 * (7 * k1 + 32 * k3 + 12 * k4 + 32 * k5 + 7 * k6) * rt
 
     end butcher
+
+    inline def getCarAhead(car: Vehicle): Vehicle =
+        val ref = car.myPathNode.ahead
+        if ref != null then ref.elem else null
+    end getCarAhead
 
 
 end Vehicle

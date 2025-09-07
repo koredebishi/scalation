@@ -69,14 +69,16 @@ object GippsDynamics
         //debug("updateM", s"car = $car with car.myNode = ${car.myPathNode}")
         //val ref = car.myNode.ahead
         println(s"this is where I stopped $car with car.myPathNode = ${car.myPathNode}")
-        val ref = car.myPathNode.ahead
-        println(s"this is where I stopped this $ref")
-
-        val car_ahead = {
-            if car.myPathNode.ahead != null && car.myPathNode.ahead.elem.pathInfo == car.pathInfo then
-                car.myPathNode.ahead.elem
-            else null
-        }
+//        val ref = car.myPathNode.ahead
+//        println(s"this is where I stopped this $ref")
+//
+//        val car_ahead = {
+//            if car.myPathNode.ahead != null && car.myPathNode.ahead.elem.pathInfo == car.pathInfo then
+//                car.myPathNode.ahead.elem
+//            else null
+//        }
+        
+        val car_ahead = Vehicle.getCarAhead(car)
 
         debug("updateM", s"car = ${car.id} (velocity and position) based on car_ahead = $car_ahead")
 
@@ -89,6 +91,15 @@ object GippsDynamics
         car.o_velocity = car.velocity // save the old velocity
         car.velocity = v // assign new velocity
 
+//        // get the differencial of the velocity to get the acceleration
+//        car.o_acc = car.acc // save the old acceleration
+//        car.acc = (car.velocity - car.o_velocity) / prop("rt") // assign
+//        
+//        println(s" the old ACCELERATION was: ${car.o_acc}")
+//        println(s" the new ACCELERATION is: ${car.acc}")
+//        
+        
+        
         car.o_t_disp = car.t_disp // save old car position
         val dx = x - car.t_disp // change in car's position
         val new_disp = if car.disp + dx <= length then car.disp + dx // new car displacement on road

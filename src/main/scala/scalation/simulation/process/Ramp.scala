@@ -28,7 +28,7 @@ end RampMode
  */
 class Ramp(name: String, val from: Component, val to: Component,motion: Dynamics, val mode: RampMode, isSpeed: Boolean = false,
            bend: Double = 0.10, offset: Double = 0.0)
-    extends Component with Joinable:
+    extends Component:
 
     private val debug = debugf("Ramp", true)
     debug("init", s"Ramp [$name] direction: ${from.name} → ${to.name} , $mode")

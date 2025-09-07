@@ -71,11 +71,6 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         val fromPath = pathway(l1)                                     // current Pathway  (lane l1)
         val toPath = pathway(l2)                                       // target Pathway   (lane l2)
 
-        // disallow LC on first and last segment
-
-        val nSeg = toPath.seg.length
-        if seg == 0 || seg == nSeg - 1 then return false
-
         val safeDisp = fromPath.seg(seg).safetydist
 
         // vehicle behind in target lane, on same segment
