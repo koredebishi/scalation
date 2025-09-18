@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -12,11 +11,16 @@ package scalation
 package animation
 
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.swing.{JButton, JToolBar, JComponent, JLabel}
+import javax.swing.KeyStroke
+import java.awt.BorderLayout
 import scala.math.round
 import scala.util.control.Breaks.{break, breakable}
 import scalation.scala2d.*
 import scalation.scala2d.Colors.*
 import CommandType.*
+import scala.collection.mutable.ArrayBuffer
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -69,11 +73,94 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     /** Flag to indicate that the animation is complete
      */
     private var aniDone = false
-  
+ 
+     //================================================================================
+     // Recording and Replay
+     //================================================================================
+     /** Lightweight frame wrapper for executed animation commands. */
+     private case class Frame(cmd: AnimateCommand)
+
+    /** Buffer of executed animation commands for replay. */
+    private val frames = new ArrayBuffer[Frame](1 << 18)   // ~262k capacity
+
+    /** Whether a replay is currently running (prevents concurrent replays). */
+    private val replaying = new AtomicBoolean(false)
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the animation complete flag to true.
-     */
-    def setAniDone () = aniDone = true
+    /** Clear all recorded frames from the last run.
+      * Use before starting a new simulation to avoid mixing runs.
+      */
+    def clearRecording(): Unit = frames.clear()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset the scene to an empty canvas for a clean replay.
+      * Clears graph containers and resets counters/clock (UI only).
+      */
+    private def resetSceneForReplay(): Unit =
+        graph.nodes.clear()
+        graph.edges.clear()
+        graph.freeTokens.clear()
+        actorCount = 0
+        clock = 0.0
+        repaint()
+    end resetSceneForReplay
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Replay the last recorded animation without re-running the simulation.
+      * Respects current aniRatio and Animator.timeDilationFactor to pace frames.
+      * - No interaction with the live command queue; draws directly via invokeCommand.
+      * - Safe to invoke multiple times; ignored if already replaying or nothing recorded.
+      */
+    def replay(): Unit =
+        if frames.isEmpty || replaying.get() then return
+        new Thread(() =>
+            replaying.set(true)
+            resetSceneForReplay()
+            val td    = ani.timeDilationFactor
+            var lastT = frames.head.cmd.time
+            var i     = 0
+            while i < frames.length && replaying.get() do
+                val f  = frames(i).cmd
+                val dt = math.max(0.0, (f.time - lastT) * aniRatio * td)
+                if dt > 0 then Thread.sleep(math.round(dt))
+                invokeCommand(f)
+                if f.action == CreateToken then actorCount += 1
+                repaint()
+                lastT = f.time
+                i += 1
+            end while
+            replaying.set(false)
+        ).start()
+    end replay
+
+     //================================================================================
+     // Playback Rate Control
+     //================================================================================
+     private var speedFactor = 1.0                     // user-facing speed multiplier (1.0x default)
+     private val speedLbl    = new JLabel("Speed 1.00x")
+     private val slowerBtn   = new JButton("–")       // halve speed (slower animation)
+     private val fasterBtn   = new JButton("+")       // double speed (faster animation)
+     private val resetBtn    = new JButton("1x")      // reset to 1.0x
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the playback speed multiplier and update Animator time dilation.
+      * Mapping: dilation (>1 slows, <1 speeds) = 1.0 / speedFactor.
+      * @param speed  desired speed multiplier (clamped to [0.25, 8.0])
+      * @since 2025-09-18  Added playback rate control.
+      */
+    private def setSpeedFactor(speed: Double): Unit =
+        val s  = math.max(0.25, math.min(8.0, speed))      // clamp for stability
+        speedFactor = s
+        // Convert user speed to animator dilation factor
+        val dilation = 1.0 / s
+        ani.timeDilation(Array(dilation))                   // update underlying animator
+        speedLbl.setText(f"Speed ${s}%.2fx")               // update UI label
+     end setSpeedFactor
+ 
+     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     /** Set the animation complete flag to true.
+      */
+     def setAniDone () = aniDone = true
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Save the graphics into an image file.
@@ -89,6 +176,43 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
         private val fsize = 18    // was originally @ 12; increased to 18.
         private val f     = new Font ("Serif", Font_BOLD, fsize)
+
+        /** Overlay a small PAUSED stamp (optional visual cue).
+          * @since 2025-09-16  Added along with Play/Pause controls.
+          */
+        private def drawPausedOverlay(g2d: Graphics2D): Unit =
+            if paused.get() then
+                g2d.setPaint (red)
+                g2d.drawString ("PAUSED", getW - 100, 30)
+            end if
+        end drawPausedOverlay
+
+        /** Draw a token label centered on the token shape.
+          * @param g2d   hi-res graphics context used by the animator canvas
+          * @param token the token whose label should be rendered (uses token.label)
+          * Notes:
+          * - Font size adapts to token height for readability (clamped 10..24).
+          * - Centers text over the token "head"; does not rotate with heading.
+          * - Used by: Canvas.paintComponent after each token is filled (node-bound,
+          *   edge-bound, and free tokens).
+          * @since 2025-09-16  Documented; rendering logic unchanged.
+          */
+        private def drawTokenLabel (g2d: Graphics2D, token: graph.Token): Unit =
+            val lbl = token.label
+            if lbl != null && lbl.nonEmpty then
+                val b      = token.shape.getBounds2D
+                val size   = math.max(10, math.min(24, (b.getHeight * 0.8).toInt))
+                val prevF  = g2d.getFont
+                val dynF   = new Font ("SansSerif", Font_BOLD, size)
+                g2d.setFont (dynF)
+                val fm     = g2d.getFontMetrics
+                val x      = (b.getCenterX - fm.stringWidth(lbl) / 2.0).toFloat
+                val y      = (b.getCenterY + fm.getAscent / 3.5).toFloat
+                g2d.setPaint (black)
+                g2d.drawString (lbl, x, y)
+                g2d.setFont (prevF)
+            end if
+        end drawTokenLabel
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /** Paint the display panel component.
@@ -110,10 +234,10 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             //g2d.drawString(s"ACTORS = $actorCount" , baseX, baseY + 20)
             g2d.drawString(s"ACTORS = $actorCount / $totalActorCount", clockWH._1, getH - clockWH._2 - 20)
 
-
+            // Optional PAUSED overlay
+            drawPausedOverlay(g2d)
 
             //:: Display all nodes in graph and tokens bound to these nodes.
-
             debug ("paintComponent", s"paint ${graph.nodes.length} nodes")
             val nodes = graph.nodes.toList                                         // avoid ConcurrentModificationException
             for node <- nodes do
@@ -128,11 +252,11 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                 for token <- node_tokens do
                     g2d.setPaint (token.color)
                     g2d.fill (token.shape)
+                    drawTokenLabel (g2d, token)                  // render vehicle number/label on token head
                 end for
             end for
 
             //:: Display all edges in graph and tokens bound to these edges.
-
             debug ("paintComponent", s"paint ${graph.edges.length} edges")
             val edges = graph.edges.toList
             for edge <- edges do
@@ -145,23 +269,111 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                 for token <- edge_tokens if token.shape.getWidth () > 0.0 do
                     g2d.setPaint (token.color)
                     g2d.fill (token.shape)
+                    drawTokenLabel (g2d, token)                  //NEW render vehicle number/label on token head
                 end for
             end for
 
             //:: Display all free tokens in the graph.
-
             debug ("paintComponent" , s"paint ${graph.freeTokens.length} free tokens")
             val free_tokens = graph.freeTokens.toList            // copy to avoid Exception
             for token <- free_tokens if token.shape.getWidth () > 0.0 do
                 g2d.setPaint (token.color)
                 g2d.fill (token.shape)
+                drawTokenLabel (g2d, token)                      //NEW render vehicle number/label on token head
             end for
         end paintComponent
 
     end Canvas
 
+    //================================================================================
+    // Playback controls (Play/Pause/Step)
+    //================================================================================
+    /** Thread-safe flags for playback control.
+      * @since 2025-09-16  Added Play/Pause/Step controls to DgAnimator.
+      */
+    private val paused    = new AtomicBoolean(false)  // true => run loop waits
+    private val stepOnce  = new AtomicBoolean(false)  // true => process one command, then re-pause
+    private val pauseLock = new Object()              // monitor for wait/notify
+
+    /** UI: small toolbar buttons for playback control.
+      * @since 2025-09-16  Added toolbar with Play/Pause and Step.
+      */
+    private val playPauseBtn = new JButton("Pause")   // toggles to "Play" when paused
+    private val stepBtn      = new JButton("Step")
+    private val replayBtn    = new JButton("Replay")
+
+    /** Build a minimal toolbar and keyboard shortcuts.
+     *  - Space toggles Play/Pause, N steps once when paused.
+     *  @since 2025-09-16  New.
+     */
+    private def buildControls(): Unit =
+        val bar = new JToolBar()
+        bar.setFloatable(false)
+        playPauseBtn.addActionListener(_ => togglePause())
+        stepBtn.addActionListener(_ => step())
+        replayBtn.setToolTipText("Replay the last run without re-simulating")
+        replayBtn.addActionListener(_ => replay())
+        bar.add(playPauseBtn)
+        bar.add(stepBtn)
+        bar.add(replayBtn)
+        // Speed controls: – 1x +  and live label
+        slowerBtn.setToolTipText("Slow down (halve speed)")
+        fasterBtn.setToolTipText("Speed up (double speed)")
+        resetBtn.setToolTipText("Reset speed to 1.0x")
+        slowerBtn.addActionListener(_ => setSpeedFactor(speedFactor / 2.0))
+        resetBtn.addActionListener(_ => setSpeedFactor(1.0))
+        fasterBtn.addActionListener(_ => setSpeedFactor(speedFactor * 2.0))
+        bar.add(slowerBtn)
+        bar.add(resetBtn)
+        bar.add(fasterBtn)
+        bar.add(speedLbl)
+        getContentPane().add(bar, BorderLayout.NORTH)
+
+        // Keyboard shortcuts
+        val rp = getRootPane()
+        rp.registerKeyboardAction(_ => togglePause(), KeyStroke.getKeyStroke("SPACE"), JComponent.WHEN_IN_FOCUSED_WINDOW)
+        rp.registerKeyboardAction(_ => step(),        KeyStroke.getKeyStroke("N"),     JComponent.WHEN_IN_FOCUSED_WINDOW)
+        // Optional: map R to replay
+        rp.registerKeyboardAction(_ => replay(),      KeyStroke.getKeyStroke("R"),     JComponent.WHEN_IN_FOCUSED_WINDOW)
+        // Initialize speed to 1.0x
+        setSpeedFactor(1.0)
+    end buildControls
+
+    /** Pause the animation thread.
+      * @since 2025-09-16  New.
+      */
+    private def pause(): Unit =
+        if paused.compareAndSet(false, true) then playPauseBtn.setText("Play")
+    end pause
+
+    /** Resume the animation thread.
+      * @since 2025-09-16  New.
+      */
+    private def resume(): Unit =
+        if paused.compareAndSet(true, false) then
+            playPauseBtn.setText("Pause")
+            pauseLock.synchronized { pauseLock.notifyAll() }
+        end if
+    end resume
+
+    /** Toggle between Play and Pause.
+      * @since 2025-09-16  New.
+      */
+    private def togglePause(): Unit = if paused.get() then resume() else pause()
+
+    /** Step a single command when paused, then re-pause.
+      * @since 2025-09-16  New.
+      */
+    private def step(): Unit =
+        if paused.get() then
+            stepOnce.set(true)
+            pauseLock.synchronized { pauseLock.notifyAll() }
+        end if
+    end step
+
     {
         getContentPane ().add (new Canvas)
+        buildControls()                       // mount playback controls toolbar and shortcuts
         setVisible (true)
         setBackground (bgColor)
     } // primary constructor
@@ -233,6 +445,11 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         breakable {
             while clock < stopTime do
 
+                // PAUSE GATE: block the animation thread while paused (unless stepping once)
+                pauseLock.synchronized {
+                    while paused.get() && ! stepOnce.get() do pauseLock.wait()
+                }
+
                 //:: Get the next animation command from the shared queue.
 
                 if cmdQ.isEmpty && aniDone then
@@ -249,6 +466,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
                     //:: set the animation clock and invoke the animation command
 
+                    // Record executed command for replay
+                    frames += Frame(cmd)
                     clock  = when
                     nCmds += 1
                     invokeCommand (cmd)
@@ -259,6 +478,12 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                     //:: Repaint the canvas.
 
                     repaint ()
+
+                    // If stepping, consume one command and re-enter pause
+                    if stepOnce.compareAndSet(true, false) then
+                        paused.set(true)
+                        playPauseBtn.setText("Play")
+                    end if
                 end if
             end while
         } // breakable
@@ -412,7 +637,7 @@ end dgAnimatorTest2
     val dga  = new DgAnimator ("DgAnimator")
     val aniQ = dga.getCommandQueue
 
-    println ("Make a triangle and zoom in and out")
+    println ("Make a triangle and zoom in and zoom out")
     println ("print zooming instructions")
 
     //:: Place the nodes into graph.

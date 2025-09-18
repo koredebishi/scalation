@@ -1,5 +1,3 @@
-
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
  *  @version 2.0
@@ -35,13 +33,28 @@ abstract class Vehicle (name_ : String, director: Model)
     var pathInfo : String = ""
     var segIndex : Int = -1
 
+    // Add cumulative odometer for total distance traveled (never resets)
+    var odo: Double = 0.0
+
+    // Human-friendly label to use in logs/console; animator label should match this.
+    private[process] var displayLabel: String = ""
+    def setDisplayLabel(lbl: String): Unit =
+        if lbl != null then displayLabel = lbl
+    end setDisplayLabel
+
 
     var myRamp      : Ramp = null // my (the actor's) node in the RAMP pred <-> me <-> succ
     var myPathway   : Pathway = null // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
     private [process] var myPathNode: DoublyLinkedList[Vehicle]#Node = null // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
 
 
- 
+
+    inline def getCarAhead(car: Vehicle): Vehicle =
+        val ref = car.myPathNode.ahead
+        if ref != null then ref.elem else null
+    end getCarAhead
+
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The abstract method, 'act', is defined in each subclass to provide specific
      *  behavior.
@@ -51,7 +64,15 @@ abstract class Vehicle (name_ : String, director: Model)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the `SimActor`s full name and activation time.
      */
-    override def toString: String = s"Vehicle ($me at $actTime:sec, actor_id= $id, disp:$disp:m, lane:$laneID, path:$pathInfo)"
+    // OLD:
+    // override def toString: String =
+    //     val label = if displayLabel != null && displayLabel.nonEmpty then displayLabel else me
+    //     s"Vehicle ($label at $actTime:sec, actor_id= $id, disp:$disp:m, t_disp:$t_disp lane:$laneID, path:$pathInfo)"
+
+    // NEW: clarify segment-local vs path-local and include odometer
+    override def toString: String =
+        val label = if displayLabel != null && displayLabel.nonEmpty then displayLabel else me
+        s"Vehicle ($label at $actTime:sec, actor_id= $id, segDisp=$disp m, pathDisp=$t_disp m, odo=$odo m, lane=$laneID, path=$pathInfo)"
 
 
 end Vehicle
@@ -69,7 +90,7 @@ object Vehicle:
      *  @see https://en.wikipedia.org/wiki/Intelligent_driver_model
      */
 
-    val def_prop = Map ("rt"   -> 1.0,                       // driver reaction time
+    val def_prop = Map ("rt"   -> 0.5,                       // driver reaction time
         "amax" -> 4.0,                       // max acceleration
         "bmax" -> -1.5,                      // max deceleration
         "v0"   -> 4.0,                       // starting velocity // v0 should be adjustable to 0
@@ -152,11 +173,5 @@ object Vehicle:
         Ft + _1_by_90 * (7 * k1 + 32 * k3 + 12 * k4 + 32 * k5 + 7 * k6) * rt
 
     end butcher
-
-    inline def getCarAhead(car: Vehicle): Vehicle =
-        val ref = car.myPathNode.ahead
-        if ref != null then ref.elem else null
-    end getCarAhead
-
 
 end Vehicle

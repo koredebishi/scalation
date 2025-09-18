@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
  *  @version 2.0
@@ -69,16 +68,11 @@ object GippsDynamics
         //debug("updateM", s"car = $car with car.myNode = ${car.myPathNode}")
         //val ref = car.myNode.ahead
         println(s"this is where I stopped $car with car.myPathNode = ${car.myPathNode}")
-//        val ref = car.myPathNode.ahead
-//        println(s"this is where I stopped this $ref")
-//
-//        val car_ahead = {
-//            if car.myPathNode.ahead != null && car.myPathNode.ahead.elem.pathInfo == car.pathInfo then
-//                car.myPathNode.ahead.elem
-//            else null
-//        }
+
+        val ref = car.myPathNode.ahead
+        val car_ahead = if ref != null then ref.elem else null
         
-        val car_ahead = Vehicle.getCarAhead(car)
+//        val car_ahead = getCarAhead(car)
 
         debug("updateM", s"car = ${car.id} (velocity and position) based on car_ahead = $car_ahead")
 
@@ -88,26 +82,32 @@ object GippsDynamics
         val x = butcher(car.t_disp, v, car.velocity, prop("rt")) // new proposed position for car
         debug("updateM", s"car = $car \t the new POSITION is: $x")
 
-        car.o_velocity = car.velocity // save the old velocity
-        car.velocity = v // assign new velocity
-
-//        // get the differencial of the velocity to get the acceleration
-//        car.o_acc = car.acc // save the old acceleration
-//        car.acc = (car.velocity - car.o_velocity) / prop("rt") // assign
-//        
-//        println(s" the old ACCELERATION was: ${car.o_acc}")
-//        println(s" the new ACCELERATION is: ${car.acc}")
-//        
+        // save old velocity and assign new velocity
+        car.o_velocity = car.velocity
+        car.velocity = v
         
-        
-        car.o_t_disp = car.t_disp // save old car position
-        val dx = x - car.t_disp // change in car's position
-        val new_disp = if car.disp + dx <= length then car.disp + dx // new car displacement on road
-        else length
+        // OLD: position/displacement update (kept for reference)
+        // car.o_t_disp = car.t_disp // save old car position
+        // val dx = x - car.t_disp // change in car's position
+        // val new_disp = if car.disp + dx <= length then car.disp + dx // new car displacement on road
+        // else length
+        // car.t_disp += new_disp - car.disp // new car position
+        // car.disp = new_disp // displacement on road
+        // debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
 
-        car.t_disp += new_disp - car.disp // new car position
-        car.disp = new_disp // displacement on road
-        debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
+        // NEW: clamped per-segment update with odometer
+        val prevDisp = car.disp                    // segment-local displacement before update
+        car.o_t_disp = car.t_disp                  // save previous path-local position
+
+        val dxRaw    = x - car.t_disp              // integrator-proposed increment
+        val new_disp = if prevDisp + dxRaw <= length then prevDisp + dxRaw else length
+        val dSeg     = new_disp - prevDisp         // realized motion within this segment (>= 0)
+
+        car.disp    = new_disp                     // segment-local displacement
+        car.t_disp += dSeg                         // path-local cumulative displacement
+        car.odo    += dSeg                         // cumulative odometer (never resets)
+
+        debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}, car.odo = ${car.odo}")
     end updateM
 
 
@@ -140,8 +140,7 @@ object GippsDynamics
     private def gipps (an: Double, bn: Double, sp: Double, Vn: Double, xn: Double,
                        vn: Double, xp: Double, vp: Double, rt: Double): Double =
         val free = vn + (2.5 * an * rt * (1.0 - vn / Vn)) * sqrt (0.025 + vn / Vn)
-        //println(s"@@@@@@PARAMS $bn ,rt: $rt , xp: $xp sp: $sp , xn: $xn vn: $vn  vp: $vp, sp: $sp")
-        //var right_side = bn * bn * rt * rt
+
         val left_1 = 2 * (xp - sp - xn)
         val left_2 = (vn * rt) - (vp * vp / bn)
         var right_side  =  bn * (2 * (xp - sp - xn) - (vn * rt) - (vp * vp / bn))
@@ -203,6 +202,11 @@ end GippsDynamics
         car.t_disp   = x
     end updateM
 
+
+    // How far into the segment is any Car.  //
+    //From where you started, how far have you travelled?  //
+    //Given that they started from different places, is that going to cause a problem?
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the acceleration of the vehicle based on the Intelligent Driver Model
      *  for a vehicle and its predecessor.
@@ -254,5 +258,3 @@ end GippsDynamics
     end iDMFree
 
 end IDMDynamics
-
-
