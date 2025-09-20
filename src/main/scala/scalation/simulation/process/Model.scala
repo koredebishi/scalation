@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -287,11 +286,39 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
                  at: Array [Double]): Unit =
         if animating then
             val eid   = who.id
-            val label = who.name
+            //val = label = who.name
+            // Use numeric id as label for tokens so vehicle/car tokens show their number
+            val label = if what == CommandType.CreateToken then eid.toString else who.name
             debug ("animate", s"$label.$eid, $what, $color, $shape, ${stringOf (at)}")
             aniQ.add (AnimateCommand (what, eid, shape, label, true, color, at, _clock))
         end if
     end animate
+
+    // Convenience: explicit-label variant to avoid overload ambiguity
+    /** Enqueue an animation command with an explicit display label. NEW
+      * @param who    Identifiable being animated (provides unique id used as eid)
+      * @param what   Animation command (e.g., CreateToken)
+      * @param color  Paint color for the node/token
+      * @param shape  Shape to render (Ellipse, Rectangle, etc.)
+      * @param at     Location/size array for the shape (x, y, w, h) or variant
+      * @param label  The display label to show on the token/node (overrides name)
+      * Behavior:
+      * - Uses the supplied label for AnimateCommand.label; falls back to who.name
+      *   if the supplied label is null/empty.
+      * - Leaves internal ids and simulation logic unchanged; this is display-only.
+      * Used by:
+      * - VSource when creating vehicle tokens so the animator shows compact
+      *   per-source labels (e.g., M-1, R1-7) on token heads for visual validation.
+      */
+    def animateWithLabel (who: Identifiable, what: CommandType, color: Color, shape: Shape,
+                          at: Array [Double], label: String): Unit =
+        if animating then
+            val eid = who.id
+            val lbl = if label != null && label.nonEmpty then label else who.name
+            debug ("animateWithLabel", s"$lbl.$eid, $what, $color, $shape, ${stringOf (at)}")
+            aniQ.add (AnimateCommand (what, eid, shape, lbl, true, color, at, _clock))
+        end if
+    end animateWithLabel
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Put a edge command on the animation queue.
@@ -425,4 +452,3 @@ object Model:
         Coroutine.shutdown ()
 
 end Model
-

@@ -62,7 +62,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
      */
     def getLast: Vehicle =
         val last: Vehicle = if vdeque.isEmpty then null else vdeque.last
-        debug ("getLast", s"the last vehivle = $last")
+        debug ("getLast", s"the last vehicle = $last")
         last
     end getLast
 

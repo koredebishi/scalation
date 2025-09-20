@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -64,7 +63,9 @@ class PGraph (val name: String,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the animation flag (that is private) to done.
      */
-    def setAniDone () = dgAni.setAniDone ()
+    def setAniDone(): Unit =
+        if animating && dgAni != null then dgAni.setAniDone()
+    end setAniDone
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Update the name maps, vmap and emap, after constructing this property graph.
@@ -509,4 +510,3 @@ end pGraphTest
     query32.show ()
 
 end pGraphTest2
-

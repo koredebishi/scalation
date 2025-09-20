@@ -33,8 +33,7 @@ abstract class Vehicle (name_ : String, director: Model)
     var pathInfo : String = ""
     var segIndex : Int = -1
 
-    // Add cumulative odometer for total distance traveled (never resets)
-    var odo: Double = 0.0
+
 
     // Human-friendly label to use in logs/console; animator label should match this.
     private[process] var displayLabel: String = ""

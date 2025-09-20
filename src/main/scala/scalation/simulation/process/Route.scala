@@ -130,14 +130,17 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     def path(i: Int): Pathway = pathway(i)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Return the shared junctions.
+     */
+    def junctions: Array[Junction] = junc
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the number of segments (same for all Pathways).
      */
     def segments: Int = pathway(0).seg.length
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the shared junctions.
-     */
-    def junctions: Array[Junction] = junc
 
     // 90-degree unit vector to the road centre-line
     /** Calculate the amount of shift in the x and y directions.

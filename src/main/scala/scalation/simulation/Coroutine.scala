@@ -30,7 +30,7 @@ abstract class Coroutine (label: String = "cor")
 
     import Coroutine._
 
-    private val debug   = debugf ("Coroutine", true)           // debug function
+    private val debug   = debugf ("Coroutine", false)           // debug function
     private val _sema   = new Semaphore (0)                    // waiting semaphore
     private var started = false                                // whether this coroutine has started
 

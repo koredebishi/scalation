@@ -47,7 +47,7 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
 /*
       extends SimActor (name, director)
          with Component
-         with Recorder ():
+         with Recorder (()):
 */
 //    initStats (name)
 //    at = loc
@@ -56,6 +56,24 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
     private val debug = debugf ("VSource", false)                             // debug function
 
     private[process] val ew = new EasyWriter("recorder", "VsourceWriter.txt")
+
+    // Per-source sequence for human-readable labels (e.g., M-1, R1-3): NEW
+    /** Monotonic per-source counter used solely for display labels on tokens.
+      * Example: for mainline (M), the sequence produces M-1, M-2, ...; for ramp 1,
+      * R1-1, R1-2, ...
+      * Notes:
+      * - This does NOT affect simulation ids or logic (purely presentation).
+      * - Reset occurs on JVM restart; not reset between replications by default.
+      */
+    private var seq = 0
+
+    /** Derive a short source prefix from the entity subtype. NEW
+      * @return "M" for mainline (subtype == 0), else "R<subtype>" (e.g., R1, R2)
+      * Used by: label construction below to preserve origin after merging.
+      */
+    private def srcPrefix: String = esubtype match
+        case 0 => "M"
+        case n => s"R$n"
 
 
     debug ("Init", s"name = $name, located at ${stringOf (at)}")
@@ -104,11 +122,17 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                     debug ("act", s"after make entity/vehicle $i: actor = $actor")
                     actor.mySource = this                                    // actor's source
                     actor.subtype  = esubtype                                // set the entity subtype
+                    // assign human-friendly label per source (e.g., R1-7)
+                    seq += 1                         // advance per-source counter (display only)
+                    val displayLabel = s"${srcPrefix}-$seq"  // token label shown by animator (e.g., M-3)
+                    if actor != null then actor.setDisplayLabel(displayLabel) // ensure logs/toString use same label as animation
                     director.numActors += 1                                  // number of actors created by all sources, so far
                     if director.isAnimating then director.dgAni.updateActorCount(director.numActors)  // korede
                     director.log.trace (this, "generates", actor, director.clock)
-                    director.animate (actor, CreateToken, randomColor (actor.id), Ellipse (),
-                                      Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
+                    // pass explicit label so animator shows M-#, R1-# instead of the class name
+                    director.animateWithLabel (actor, CreateToken, randomColor (actor.id), Ellipse (),
+                                      Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD),
+                                      displayLabel)             // explicit label used by DgAnimator.drawTokenLabel
                     debug ("act", s"schedule actor $i")
                     actor.schedule (0.0)
                     debug ("act", s"after schedule actor $i")
@@ -189,11 +213,11 @@ object VSource:
      *  @param src           repeated source specific info: name, subtype, distribution, offset
      */
 //    def group (director: Model, makeEntity: () => Vehicle, units: Int, xy: (Int, Int),
-//               src: (String, Int, Variate, (Int, Int))*): List [VSource] =
+///               src: (String, Int, Variate, (Int, Int))*): List [VSource] =
 //        val sourceGroup = new VEC [VSource] ()
 //        for s <- src do sourceGroup += VSource (s._1, director, makeEntity, s._2, units, s._3,
 //                                              (xy._1 + s._4._1, xy._2 + s._4._2))
-//        sourceGroup.toList
+///        sourceGroup.toList
 //    end group
 
     def group(director: Model, makeEntity: () => Vehicle, xy: (Int, Int),
@@ -273,7 +297,7 @@ end vSourceTest
 //    /*
 //          extends SimActor (name, director)
 //             with Component
-//             with Recorder ():
+//             with Recorder (()):
 //    */
 //    initStats (name)
 //    at = loc

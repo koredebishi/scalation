@@ -69,24 +69,26 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int)
 
     end jump
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    /** Forward a vehicle through this junction into a next component.
-     * Right now, Car.act chooses the next component (mainline, ramp, sink, etc.)
-     * and simply tells the junction where to forward it.
-     */
-    def forward(actor: Vehicle, next: Component): Unit =
-        next match
-            case r: Joinable =>
-                val carAhead = r.getLast
-                r.addToAlist(actor, carAhead)
-                jump() // Record AFTER successful merge
-            case s: Sink =>
-                jump() // Record before leaving simulation
-                s.leave()
-            case _ =>
-                println(s"[warn] Junction $name got unknown forward target $next")
-    end forward
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//    /** Forward a vehicle through this junction into a next component.
+//     * Right now, Car.act chooses the next component (mainline, ramp, sink, etc.)
+//     * and simply tells the junction where to forward it.
+//     */
+//    def forward(actor: Vehicle, next: Component): Unit =
+//        next match
+//            case r: Joinable =>
+//                val carAhead = r.getLast
+//                r.addToAlist(actor, carAhead)
+//                jump() // Record AFTER successful merge
+//            case s: Sink =>
+//                jump() // Record before leaving simulation
+//                s.leave()
+//            case _ =>
+//                println(s"[warn] Junction $name got unknown forward target $next")
+//    end forward
+//
+    
 
 end Junction
 

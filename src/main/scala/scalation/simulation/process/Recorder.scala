@@ -130,15 +130,49 @@ trait Recorder(nt: Int):
     /** Get recorded speeds per lane & time */
     def getSpeedMatrix: MatrixD = r_speeds
 
-    def writeIntervalLaneStats(): Unit =
+    def writeLaneIntervalStats(): Unit =
         Recorder.ew.write(s"\n================== ROW-WISE LANE STATS FOR SENSOR $this : ${r_counts.sum} ==================\n")
+//        for i <- 0 until r_counts.dim do
+//            val flowStr = r_counts(i).mkString(",\t")
+//            val speedStr = r_speeds(i).mkString(",\t")
+//            Recorder.ew.write(s"per_lane_flow | ${i + 1}: $flowStr | $speedStr : sum_of_flow:${r_counts(i).sum}\n")
+//
+//            //Recorder.ew.write(s"per_lane_flow | ${i + 1}: ${r_counts(i)}: sum_of_flow:${r_counts(i).sum} \n")
+//            //val speedStr = r_speeds(i).mkString(",\t")
+//            //Recorder.ew.write(s"per_lane_speed| ${i + 1}: $speedStr : \n")
+//            //Recorder.ew.write(s"per_lane_speed| ${i + 1}: ${r_speeds(i)}: \n")
+//        end for
         for i <- 0 until r_counts.dim do
-            Recorder.ew.write(s"MatrixD Row ${i + 1}: ${r_counts(i)}: totalcount:${r_counts(i).sum} \n")
-            //Recorder.ew.write(s"MatrixD AVERAGE SPEED ${i + 1}: ${r_speeds(i)}: \n")
+            val counts = r_counts(i)
+            val speeds = r_speeds(i)
+
+            // Weighted average speed
+            var weighted, total = 0.0
+            var j = 0
+            while j < counts.dim do
+                val c = counts(j)
+                if c > 0 then
+                    weighted += speeds(j) * c
+                    total += c
+                end if
+                j += 1
+            end while
+            val avgSpeed = if total > 0 then weighted / total else 0.0
+
+            // Format
+            val countsStr = counts.map(_.toInt).mkString(", ")
+            val speedsStr = speeds.map(s => f"$s%2.1f").mkString(", ")
+
+            Recorder.ew.write(
+                s" lane_flow: [$countsStr] : lane_speed: [$speedsStr] : flow_total: [${total.toInt}] : ave_speed = [${f"$avgSpeed%2.1f"}]\n"
+            )
         end for
+
         Recorder.ew.write(s"\n================== ROW-WISE LANE STATS FOR SENSOR==================\n")
         //Recorder.ew.flush()
-    end writeIntervalLaneStats
+    end writeLaneIntervalStats
+
+
 
 
 
@@ -155,7 +189,7 @@ object Recorder:
 
     def writeAllSensorStats(sensors: List[Recorder]): Unit =
         ew.write("\n================== FINAL SENSOR STATS ==================\n")
-        for s <- sensors do s.writeIntervalLaneStats()
+        for s <- sensors do s.writeLaneIntervalStats()
         ew.finish()                                     // finalize the writer after logging everything
     end writeAllSensorStats
     

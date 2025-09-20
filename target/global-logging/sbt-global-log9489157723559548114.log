@@ -1,0 +1,6 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(runMain scalation.simulation.process.example_1.runOneWayVehicle2L, Some(45c2408c-5290-4f28-9059-ac7ed29a8039), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / runMain[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[32msuccess[0m] [0m[0mTotal time: 8 s, completed Sep 14, 2025, 9:32:29 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(shell, None, None)[0m
+[0m[[0m[31merror[0m] [0m[0mserver failed to start on local:sbt-server-7af198be049850a7140c. java.io.IOException: Could not create lock for \\.\pipe\sbt-server-7af198be049850a7140c_lock, error 5[0m

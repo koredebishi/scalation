@@ -12,7 +12,7 @@ package simulation
 package process
 
 
-import scala.math.{log, sqrt, min}
+import scala.math.{log, sqrt, min, max}
 
 import Vehicle._
 
@@ -30,7 +30,8 @@ trait Dynamics:
     private [process] var o_velocity = velocity                     // set initial old velocity to velocity
     private [process] var acc        = 0.0                          // set initial acceleration to 0
     private [process] var o_acc      = acc                          // set initial old acceleration acc
-
+    private [process] var odo        = 0.0                          // odometer - total distance travelled (never resets)
+    private [process] var s_abs      = 0.0                          // lane-local longitudinal coordinate, use for gaps calculation in Gipps
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Update the values of the vehicle: velocity, displacement, lane according
      *  to the car-following model being used.
@@ -85,7 +86,7 @@ object GippsDynamics
         // save old velocity and assign new velocity
         car.o_velocity = car.velocity
         car.velocity = v
-        
+
         // OLD: position/displacement update (kept for reference)
         // car.o_t_disp = car.t_disp // save old car position
         // val dx = x - car.t_disp // change in car's position
@@ -99,9 +100,9 @@ object GippsDynamics
         val prevDisp = car.disp                    // segment-local displacement before update
         car.o_t_disp = car.t_disp                  // save previous path-local position
 
-        val dxRaw    = x - car.t_disp              // integrator-proposed increment
-        val new_disp = if prevDisp + dxRaw <= length then prevDisp + dxRaw else length
-        val dSeg     = new_disp - prevDisp         // realized motion within this segment (>= 0)
+        val dx    = x - car.t_disp              // integrator-proposed increment from butcher
+        val new_disp = if prevDisp + dx <= length then prevDisp + dx else length
+        val dSeg     = new_disp - prevDisp         // realized motion within this segment, the actual increment
 
         car.disp    = new_disp                     // segment-local displacement
         car.t_disp += dSeg                         // path-local cumulative displacement
@@ -146,11 +147,10 @@ object GippsDynamics
         var right_side  =  bn * (2 * (xp - sp - xn) - (vn * rt) - (vp * vp / bn))
         val inner_exp = (bn * bn * rt * rt) - bn * (2 * (xp - sp - xn) - (vn * rt) - (vp * vp / bn))
         if inner_exp < 0 then println(s"Shouldn't be negative: $inner_exp , $right_side, left_1: $left_1, left_2: $left_2")
-        val cong = (bn * rt) + sqrt (inner_exp)
+        val cong = (bn * rt) + sqrt(max(0.0, inner_exp))
 
         println(s"The free $free and the Cong $cong")
-        //val safeCong = if cong.isNaN then 0.0 else cong
-        min (free, cong)    // Fix < --------
+        min (free, cong)
     end gipps
 
 

@@ -58,7 +58,7 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 
     //val nStopArray: Array[Int] = Array(sensor1Total, onramp1Total, onramp2Total)
 
-    val nStopArray: Array[Int] = Array(20,20,20)
+    val nStopArray: Array[Int] = Array(5,5,5)
 
     val muPerSource: Array[VectorD] = Array(muMain) ++ muRamps
 

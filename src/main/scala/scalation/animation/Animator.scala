@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -46,6 +45,10 @@ class Animator (graph: Dgraph)
     /** Map allowing tokens to looked up based on their id's.
      */
     private val tokenMap = HashMap [Int, graph.Token] ()
+    /** Reverse map from token instance to eid for hit-testing/selection.
+     *  Read-only access via getTokenId.
+     */
+    private val tokenRevMap = HashMap [graph.Token, Int] ()
 
     /** Time dilation factor for speeding up/slowing down animations
      */
@@ -199,6 +202,7 @@ class Animator (graph: Dgraph)
         end if
 
         tokenMap.put (eid, token)
+        tokenRevMap.put (token, eid)
     end createToken
         
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -258,6 +262,7 @@ class Animator (graph: Dgraph)
         end if
 
         tokenMap.remove (eid)
+        tokenRevMap.remove (token)
     end destroyToken
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -571,6 +576,15 @@ class Animator (graph: Dgraph)
         else _timeDilationFactor = pts(0)
     end timeDilation 
 
+    // Removed getToken and getTokenId with path-dependent types to avoid exposing private graph in signatures.
+    /** Get the eid for a given token instance reference if known.
+     *  Accepts AnyRef to avoid path-dependent type exposure.
+     */
+    def getTokenIdByRef(token: AnyRef): Option[Int] = token match
+        case t: graph.Token => tokenRevMap.get(t)
+        case _              => None
+    end getTokenIdByRef
+
 end Animator
 
 
@@ -587,4 +601,3 @@ object EidCounter:
     def next (): Int = { count += 1; count }
 
 end EidCounter
-
