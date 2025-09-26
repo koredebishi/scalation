@@ -32,9 +32,8 @@ abstract class Vehicle (name_ : String, director: Model)
     var laneID: Int = -1
     var pathInfo : String = ""
     var segIndex : Int = -1
-
-
-
+    
+    
     // Human-friendly label to use in logs/console; animator label should match this.
     private[process] var displayLabel: String = ""
     def setDisplayLabel(lbl: String): Unit =
@@ -63,16 +62,9 @@ abstract class Vehicle (name_ : String, director: Model)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the `SimActor`s full name and activation time.
      */
-    // OLD:
-    // override def toString: String =
-    //     val label = if displayLabel != null && displayLabel.nonEmpty then displayLabel else me
-    //     s"Vehicle ($label at $actTime:sec, actor_id= $id, disp:$disp:m, t_disp:$t_disp lane:$laneID, path:$pathInfo)"
-
-    // NEW: clarify segment-local vs path-local and include odometer
     override def toString: String =
         val label = if displayLabel != null && displayLabel.nonEmpty then displayLabel else me
-        s"Vehicle ($label at $actTime:sec, actor_id= $id, segDisp=$disp m, pathDisp=$t_disp m, odo=$odo m, lane=$laneID, path=$pathInfo)"
-
+        s"Vehicle ($label at $actTime:sec, actor_id= $id, segDisp=$disp m, pathDisp=$t_disp m, seg=$segIndex m, lane=$laneID, path=$pathInfo)"
 
 end Vehicle
 

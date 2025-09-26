@@ -141,6 +141,10 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
      */
     def segments: Int = pathway(0).seg.length
 
+    
+          
+     // reurn the pathway of this lane
+
 
     // 90-degree unit vector to the road centre-line
     /** Calculate the amount of shift in the x and y directions.

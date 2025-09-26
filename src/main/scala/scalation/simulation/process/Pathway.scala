@@ -50,9 +50,20 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
         val shift = laneShift
         
         seg(i) = new VTransport (s"${name}_seg${i}", p1, p2, motion, isSpeed, bend, shift, shift)
-        
         subpart  += seg(i)                                   // add to the subpart
     end for
+
+    // -----------jun-------------jun-----------jun------------jun
+    // An array of the highway segment length
+    //get the length of each road segment, add and make it an array
+    // if a car is on this segment and I need the length of (behind segment and ahead segment)
+    // Index of the
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//    /** Return the number of segments (same for all Pathways).
+//     */
+//    def segments: Int = pathway(0).seg.length
+
 
     initComponent(name, Array())
 
@@ -101,6 +112,21 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     override def at: Array[Double] =
         val xy = seg(0).at // (x,y) for the first curve end-point
         Array(xy(0), xy(1), 0.0, 0.0) // add dummy width & height
+
+//
+//    def segLength(laneId: Int , car: Vehicle): Array[Double] =
+//        val pathInfo = car.pathInfo     // return the pathInfo
+//        // the length of this current segment
+//        // the length of the previous segment
+//        //the length of the ahead segment
+//        // prevSeg(lenght) current seglenght  (nextSeglenght)
+//
+//        Array(0.0)
+//    end segLength
+
+    def getSeglength: Int = seg.length
+
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the direction/turn random variate to determine next the direction.

@@ -30,8 +30,6 @@ trait Dynamics:
     private [process] var o_velocity = velocity                     // set initial old velocity to velocity
     private [process] var acc        = 0.0                          // set initial acceleration to 0
     private [process] var o_acc      = acc                          // set initial old acceleration acc
-    private [process] var odo        = 0.0                          // odometer - total distance travelled (never resets)
-    private [process] var s_abs      = 0.0                          // lane-local longitudinal coordinate, use for gaps calculation in Gipps
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Update the values of the vehicle: velocity, displacement, lane according
      *  to the car-following model being used.
@@ -77,7 +75,7 @@ object GippsDynamics
 
         debug("updateM", s"car = ${car.id} (velocity and position) based on car_ahead = $car_ahead")
 
-        val v = gipps(car, car_ahead) + EPSILON // determine new velocity
+        val v = gipps(car, car_ahead, length) + EPSILON // determine new velocity
         debug("updateM", s"car = $car \t the new VELOCITY is: $v")
 
         val x = butcher(car.t_disp, v, car.velocity, prop("rt")) // new proposed position for car
@@ -87,28 +85,26 @@ object GippsDynamics
         car.o_velocity = car.velocity
         car.velocity = v
 
-        // OLD: position/displacement update (kept for reference)
-        // car.o_t_disp = car.t_disp // save old car position
-        // val dx = x - car.t_disp // change in car's position
-        // val new_disp = if car.disp + dx <= length then car.disp + dx // new car displacement on road
-        // else length
-        // car.t_disp += new_disp - car.disp // new car position
-        // car.disp = new_disp // displacement on road
-        // debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
+        car.o_t_disp = car.t_disp // save old car position
+        val dx = x - car.t_disp // change in car's position
+        val new_disp = if car.disp + dx <= length then car.disp + dx else length
+        car.t_disp += new_disp - car.disp // new car position
+        car.disp = new_disp // displacement on road
+        debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
 
-        // NEW: clamped per-segment update with odometer
-        val prevDisp = car.disp                    // segment-local displacement before update
-        car.o_t_disp = car.t_disp                  // save previous path-local position
+//        // NEW: clamped per-segment update with odometer
+//        val prevDisp = car.disp                    // segment-local displacement before update
+//        car.o_t_disp = car.t_disp                  // save previous path-local position
+//
+//        val dx    = x - car.t_disp              // integrator-proposed increment from butcher
+//        val new_disp = if prevDisp + dx <= length then prevDisp + dx else length
+//        val dSeg     = new_disp - prevDisp         // realized motion within this segment, the actual increment
+//
+//        car.disp    = new_disp                     // segment-local displacement
+//        car.t_disp += dSeg                         // path-local cumulative displacement
+//        car.odo    += dSeg                         // cumulative odometer (never resets)
 
-        val dx    = x - car.t_disp              // integrator-proposed increment from butcher
-        val new_disp = if prevDisp + dx <= length then prevDisp + dx else length
-        val dSeg     = new_disp - prevDisp         // realized motion within this segment, the actual increment
-
-        car.disp    = new_disp                     // segment-local displacement
-        car.t_disp += dSeg                         // path-local cumulative displacement
-        car.odo    += dSeg                         // cumulative odometer (never resets)
-
-        debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}, car.odo = ${car.odo}")
+        debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
     end updateM
 
 
@@ -118,12 +114,14 @@ object GippsDynamics
      *  @param cn  the current vehicle
      *  @param cp  the predecessor of the current vehicle
      */
-    def gipps (cn: Vehicle, cp: Vehicle): Double =
+    def gipps (cn: Vehicle, cp: Vehicle, length: Double): Double =
         if cp == null then
             println(s"vehicle_ahead value $cp, current_vehicle value = $cn ${prop("rt")} prop")
             gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))   // All vehicles initialized should use this first (that means every vehicle needs to keep track of his ahead vehicle
         else
-            gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, prop("rt")) //fix < -- fix this part
+            val cp_r_disp = if cp.segIndex == cn.segIndex then cp.disp
+                            else length + cp.disp
+            gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cp_r_disp, cp.velocity, prop("rt"))
     end gipps
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

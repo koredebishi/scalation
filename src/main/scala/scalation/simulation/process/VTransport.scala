@@ -44,6 +44,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
     var length = 0.0    //  The actual length of the road segment.
     if length <= 0.0 then length = curve.length
     val safetydist = 20.0
+    
 
 
     private [process] val vdeque = ArrayDeque [Vehicle] ()               // Array Deque for finding vehicles based on entry order
@@ -81,7 +82,9 @@ class VTransport (name: String, from_ : Component, to_ : Component,
 
         actor.disp = 0
         actor.pathInfo = this.name     //update the current actor's lane_ID with the Vtransport_ID it is moving in
-
+        actor.segIndex = this.id
+        
+        
         debug("move", s"actor = $actor, disp=${actor.disp} along the VTransport")
         vdeque += actor
 
