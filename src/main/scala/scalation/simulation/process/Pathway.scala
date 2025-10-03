@@ -33,7 +33,7 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
                laneShift: VectorD = VectorD(0.0, 0.0))
     extends Component with Joinable:
 
-    private val debug = debugf ("Pathway", true)             // debug function
+    private val debug = debugf ("Pathway", false)             // debug function
     val vList = DoublyLinkedList [Vehicle]                   // one lane = one doubly linked list
 
     // Enhanced DLL identification for debugging
@@ -49,7 +49,7 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
         val p2 = points(i + 1)
         val shift = laneShift
         
-        seg(i) = new VTransport (s"${name}_seg${i}", p1, p2, motion, isSpeed, bend, shift, shift)
+        seg(i) = new VTransport (s"${name}_seg${i}", p1, p2, motion, isSpeed, bend, shift, shift, i)
         subpart  += seg(i)                                   // add to the subpart
     end for
 
@@ -75,7 +75,7 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     def addToAlist (actor: Vehicle, other: Vehicle): Unit =
         val otherNode = if other != null then other.myPathNode.asInstanceOf [vList.Node]
         else null
-        logDLLOperation("ADD_TO_DLL", actor, s"following ${if other != null then other.name else "NONE"}")
+//        logDLLOperation("ADD_TO_DLL", actor, s"following ${if other != null then other.name else "NONE"}")
         actor.myPathway = this
         actor.myPathNode = vList.add (actor, otherNode)
         actor.pathInfo = s"${dllId}" // Update path info with clear DLL identifier
@@ -86,7 +86,7 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
      *  @param actor  the vehicle to remove
      */
     def removeFromAlist (actor: Vehicle): Unit =
-        logDLLOperation("REMOVE_FROM_DLL", actor)
+//        logDLLOperation("REMOVE_FROM_DLL", actor)
         vList.remove (actor.myPathNode.asInstanceOf [vList.Node])
         actor.myPathNode = null
         actor.myPathway  = null
@@ -103,7 +103,9 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     /** Get the last vehicle in this pathway.
      */
     def getLast: Vehicle =
-        if vList.isEmpty then null else vList.last           // return last vehicle in this doubly linked list
+//        println(s"I only executed up to this point and the reason is,vlistSize= ${vList.size}, ${vList.toList}")
+        val car =  if vList.isEmpty then null else vList.last // return last vehicle in this doubly linked list
+        car
     end getLast
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

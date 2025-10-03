@@ -34,7 +34,7 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int)
 
     initComponent(name, at)
 
-    private val debug = debugf("Junction", true)
+    private val debug = debugf("Junction", false)
     debug("init", s"name = $name, located at ${stringOf(at)}")
 
     private var onJunction = 0
@@ -56,7 +56,7 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int)
         val ctime = director.clock
         tally(duration)
         accum(onJunction)
-        println(s"Taking record at the Junction:$name")
+        //println(s"Taking record at the Junction:$name")
         record(actor, ctime)
         onJunction += 1
         director.log.trace(this, s"jump for $duration", actor, director.clock)
@@ -68,27 +68,6 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int)
         onJunction -= 1
 
     end jump
-
-//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//
-//    /** Forward a vehicle through this junction into a next component.
-//     * Right now, Car.act chooses the next component (mainline, ramp, sink, etc.)
-//     * and simply tells the junction where to forward it.
-//     */
-//    def forward(actor: Vehicle, next: Component): Unit =
-//        next match
-//            case r: Joinable =>
-//                val carAhead = r.getLast
-//                r.addToAlist(actor, carAhead)
-//                jump() // Record AFTER successful merge
-//            case s: Sink =>
-//                jump() // Record before leaving simulation
-//                s.leave()
-//            case _ =>
-//                println(s"[warn] Junction $name got unknown forward target $next")
-//    end forward
-//
-    
 
 end Junction
 

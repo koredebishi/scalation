@@ -31,9 +31,17 @@ abstract class Vehicle (name_ : String, director: Model)
     var key  = -0.0
     var laneID: Int = -1
     var pathInfo : String = ""
-    var segIndex : Int = -1
-    
-    
+    var segId : Int = -1
+
+    var prevSegId: Int = -1                // previous segment id (before current segId)
+    var segmentEnterTime: Double = -1.0    // simulation clock when entering current segment
+
+    // Derived: live time spent on current segment (call with director.clock)
+    def segmentTravelTime(now: Double): Double =
+        if segmentEnterTime >= 0.0 then now - segmentEnterTime else 0.0
+    end segmentTravelTime
+
+
     // Human-friendly label to use in logs/console; animator label should match this.
     private[process] var displayLabel: String = ""
     def setDisplayLabel(lbl: String): Unit =
@@ -51,6 +59,17 @@ abstract class Vehicle (name_ : String, director: Model)
         val ref = car.myPathNode.ahead
         if ref != null then ref.elem else null
     end getCarAhead
+    
+    inline def getCarBehind(car: Vehicle): Vehicle =
+        val ref = car.myPathNode.behind
+        if ref != null then ref.elem else null
+    end getCarBehind
+    
+    inline def gapToLeader: Double =
+        val leader = getCarAhead(this)
+        if leader != null then leader.disp - this.disp - Vehicle.len else 0.0
+    end gapToLeader
+        
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -64,8 +83,7 @@ abstract class Vehicle (name_ : String, director: Model)
      */
     override def toString: String =
         val label = if displayLabel != null && displayLabel.nonEmpty then displayLabel else me
-        s"Vehicle ($label at $actTime:sec, actor_id= $id, segDisp=$disp m, pathDisp=$t_disp m, seg=$segIndex m, lane=$laneID, path=$pathInfo)"
-
+        s"Vehicle($label)" //id=$id segId=$segId prevSeg=$prevSegId disp=$disp tDisp=$t_disp  enterT=$segmentEnterTime path=$pathInfo)"
 end Vehicle
 
 

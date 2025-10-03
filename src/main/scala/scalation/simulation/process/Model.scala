@@ -46,6 +46,8 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     private val debug = debugf ("Model", false)                      // debug function
     private val flaw  = flawf ("Model")                             // flaw function
 
+
+
     private [process] val log       = Monitor ("simulation")        // log for model execution
     private [process] var numActors = 0                             // number of actors created so far
 
@@ -57,6 +59,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
     director = this
     debug ("init", s"make ${director.name} with cor_id $id the director")
+
 
     private val statV    = LinkedHashMap [String, VectorD] ()       // map of stat-vectors recording means of each rep
     //private val stopTime = MAX_VALUE                                // max stop time for the model

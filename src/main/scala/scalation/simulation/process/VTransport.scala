@@ -10,6 +10,8 @@
 package scalation
 package simulation
 package process
+//import scalation.animation.DgAnimator.VehicleState
+
 
 //import scala.collection.mutable.ArrayDeque
 import scala.runtime.ScalaRunTime.stringOf
@@ -35,10 +37,10 @@ import scala.collection.mutable.ArrayDeque
  */
 class VTransport (name: String, from_ : Component, to_ : Component,
                   motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0,
-                  shift1: VectorD = VectorD (0, 0), shift2: VectorD = VectorD (0, 0))
+                  shift1: VectorD = VectorD (0, 0), shift2: VectorD = VectorD (0, 0), segIndex: Int = -1)
     extends Transport (name, from_, to_, null, isSpeed, bend, shift1, shift2):
 
-    private val debug = debugf ("VTransport", true)                     // debug function
+    private val debug = debugf ("VTransport", false)                     // debug function
     debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
 
     var length = 0.0    //  The actual length of the road segment.
@@ -48,6 +50,9 @@ class VTransport (name: String, from_ : Component, to_ : Component,
 
 
     private [process] val vdeque = ArrayDeque [Vehicle] ()               // Array Deque for finding vehicles based on entry order
+
+    private[process] val easyW = new EasyWriter("simulation", "OnewayVehicle2LModel.txt")
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the first vehicle in `Vtransport` (the first element in vtree).
@@ -79,24 +84,46 @@ class VTransport (name: String, from_ : Component, to_ : Component,
 
 
         val actor = director.theActor.asInstanceOf[Vehicle]
+        val lastSeg        = actor.segId                 // segment before entering this one
+        val lastEnterTime  = actor.segmentEnterTime      // time entered previous segment
+        val now            = director.clock
+        actor.segmentEnterTime = now                      // update the current actor's segmentEnterTime with now
 
-        actor.disp = 0
+
+        actor.prevSegId    = lastSeg
+        actor.segId        = this.segIndex                // update the current actor's segment_ID with
+        actor.disp = 0.0
         actor.pathInfo = this.name     //update the current actor's lane_ID with the Vtransport_ID it is moving in
-        actor.segIndex = this.id
-        
-        
-        debug("move", s"actor = $actor, disp=${actor.disp} along the VTransport")
+
+        //val segTT = if lastSeg >= 0 then f"${now - actor.segmentEnterTime}%.2f" else "N/A"
+        easyW.println(s"[t=$now] Vehicle ${actor.displayLabel} enters seg=${actor.segId} (from seg=$lastSeg), enterT=$now")
+
+        //debug("move", s"actor = $actor, disp=${actor.disp} along the VTransport")
         vdeque += actor
 
         tally(Vehicle.rt)
 
         var done = false
         while actor.disp < length && !done do
-            director.log.trace(this, "moves for " + Vehicle.rt, actor, director.clock)
+            //director.log.trace(this, "moves for " + Vehicle.rt, actor, director.clock)
 
             motion.updateV(actor, length) // update actor/vehicle's motion/position
+
+//            val vs = VehicleState(
+//                actorId = actor.id,
+//                label = actor.displayLabel,
+//                laneId = actor.laneID.toString,
+//                pathInfo = actor.pathInfo,
+//                segDisp = actor.disp,
+//                pathDisp = actor.t_disp,
+//                velocity = actor.velocity,
+//                segmentIndex = actor.segId
+//            )
+//            director.animator.updateVehicleState(actor.id, vs)
+
+
             val cp = calcPoint2(actor.disp)
-            debug ("move", s"${actor.name}, check if actor.disp = ${actor.disp} >= curve.length = ${curve.length}")
+            //debug ("move", s"${actor.displayLabel}, check if actor.disp = ${actor.disp} >= curve.length = ${curve.length}")
             if actor.disp >= length then
                 done = true
                 vdeque -= actor
@@ -108,7 +135,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
             actor.yieldToDirector()
         end while
 
-        debug("moveFinal", s" $actor: Final actor displacement: t_disp = ${actor.t_disp}")
+        //debug("moveFinal", s" $actor: Final actor displacement: t_disp = ${actor.t_disp}")
     end move
 
     def calcPoint2(s: Double): Array[Double] =

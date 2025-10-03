@@ -22,7 +22,7 @@ import scala.math.abs   //, max, min}
 
 @main def runOneWayVehicle2L(): Unit = new OneWayVehicle2L()
 
-class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Boolean = true,
+class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Boolean = false,
                       aniRatio: Double = 500.0, stream: Int = 0)
     extends Model(name, reps, animating, aniRatio)
         with RowTimeLoader
@@ -32,27 +32,34 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
     // ::
     /** Debugging and traffic data loading */
     val debug       = debugf("OneWayVehicle2L", false)
-    val config = new TrafficConfig("/Mainline_VDS_Redwood_Creek_US101-N/404532ML.csv", rowTime, stream)
+    val config      = new TrafficConfig("/Mainline_VDS_Redwood_Creek_US101-N/1-404532ML.csv", rowTime, stream)
     val nt          = config.data.dim
 
+    val rand = Uniform(0.0, 1.0)              // probability uniform in [0,1)
+    // val offrampFraction = config.exitFraction  // FIXED fraction (deprecated - replaced by dynamic per-row fraction below)
+    // Dynamic off-ramp fraction will be computed inside Car.act using current simulation row index.
+    val offRampMAWindow = 5  // Simple Moving Average window m; MA_t = (1/m) * Σ_{j=0}^{m-1} f_{t-j}
 
 
 
 
     private [process] val easyW = new EasyWriter("simulation", "OnewayVehicle2LModel.txt")
 
+
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Simulation dynamics and random variables */
     val motion         = GippsDynamics
     val numLanes        = 5
     val iArrivalRV     = Erlang()
-//    val nStop          = trafficData.totalArrivalsPerRow.sum.toInt
     val nStop          = config.nStopArray
+    val laneChangeRV       = Bernoulli(0.6)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     /** Delegate per‑source μ lookup to TrafficConfig */
     def getMuForSource(idx: Int): VectorD =
-        config.getMuForSource(idx)
+        // TrafficConfig now returns Array[Double]; wrap in VectorD
+        VectorD(config.getMuForSource(idx).toIndexedSeq)
 
     setTime(nt * rowTime)     // I need my time stamp formatted for easy passing for time calculations and advancement.
     // 00:00:00  ----> 00.00, 00.15
@@ -128,19 +135,32 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
             Vehicle.setInitialSpeed(68.0 / 2.24694)
 
 
-            val laneChangeRV = Bernoulli(0.0) // 80% chance to attempt lane change
-            val offRampRV = Bernoulli() // 50% chance to take off-ramp
+            //val offRampRV = Bernoulli() // 50% chance to take off-ramp
 
 
 
             // ------------------ handle main entry vehicles -------------------
             if subtype == 0 then
-                val useOffRamp = offRampRV.igen == 1  // 50% chance to take off-ram
-                laneID = laneRV.igen % numLanes
-                // join the lane
-                val carAhead = route.path(laneID).getLast
-                route.path(laneID).addToAlist(this, carAhead)
+                // ------------------------------------------------------------------
+                // FIXED OFF-RAMP DECISION (OLD IMPLEMENTATION - KEPT FOR ROLLBACK)
+                // val u = rand.gen                           // single draw in [0,1)
+                // val useOffRamp = u <= offrampFraction      // probability decision using fixed threshold
+                // easyW.println(s"Mainline Vehicle ${this.displayLabel} (FIXED) useOffRamp=$useOffRamp draw=$u threshold=$offrampFraction")
+                // ------------------------------------------------------------------
+                // DYNAMIC OFF-RAMP DECISION (NEW): fraction varies with time row
+                // Row index within cropped matrix based on current clock
+                val rowIdx = ((clock / rowTime).toInt) % nt
+                val currentOfframpFractionRaw = config.computeExitFraction(rowIdx)
+                val currentOfframpFractionMA  = config.computeExitFractionMA(rowIdx, offRampMAWindow)
+                val currentOfframpFraction = currentOfframpFractionMA
+                val u = rand.gen
+                val useOffRamp = u <=  currentOfframpFraction
+//                easyW.println(s"Mainline Vehicle ${this.displayLabel} (DYNAMIC) rowIdx=$rowIdx frac=$currentOfframpFraction draw=$u useOffRamp=$useOffRamp")
 
+                laneID = laneRV.igen % numLanes
+                val carAhead = route.path(laneID).getLast
+
+                route.path(laneID).addToAlist(this, carAhead)
 
                 // drive until off-ramp junction// Universal for all vehicles.
                 for seg <- 0 until offRampJunction do
@@ -154,54 +174,102 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
                     junc(offRampJunction).jump() // take recording at the sensor before offramp
                     route.path(laneID).removeFromAlist(this)   // take offramp, leave highway
                     driveRamp(ramps(2)) //
-                else
-                    driveHighway(this)
-                // continue on highway driving.
+                else 
+                    driveRamp(this)
+                    driveHighway(this) // continue on highway driving.
                 end if
             // ------------------ handle on-ramp entry vehicles -------------------
             else
                 val onRamp = ramps(subtype - 1) // subtype 1,2 = onRamp1, onRamp2
 
-                laneID = 0 //
-                driveRamp(onRamp)     // drive the ramp first
+                laneID = 0 // FORCED lane for ramp vehicles; consider delaying lane selection until merge.
                 driveHighway(this)    // then drive the highway
         end act
 
         private def driveHighway(car: Car): Unit =
-            var lastLaneChange = 20.0 //seconds
-            println(s"Inside the DH method to check me again ${this}:  laneID =$laneID")
-            //val highway = route.path(this.laneID) // mainline path for current lane, does does this worl for a vehicle that is just joining from onramp
-
+            var lastLaneChange = 20.0 // seconds
             val joinSeg = if subtype == 0 then offRampJunction else pos(subtype - 1)
 
-            //for on-ramp vehicles, joinSeg = pos(subtype - 1)
+            // for on-ramp vehicles, joinSeg = pos(subtype - 1)
             if subtype > 0 then
-                val insertLane = 0   //  laneRV.igen % numLanes    // using laneRV to help spread out vehicles joining from onramp
-                laneID = insertLane               // set the onramp car laneID to this random lane ID
+                val insertLane = 0 // laneRV.igen % numLanes
+                laneID = insertLane
 
-                val carAhead = route.path(laneID).seg(joinSeg).getLast  //get the carAhead inside the joined segment based on the random laneID
-
-                easyW.println(s"Onramp Vehicle $this join at seg $joinSeg and CarAhead = $carAhead and laneID = $laneID")
-
-                route.path(laneID).addToAlist(this, carAhead)   // add to the alist of the joined segment
-                junc(joinSeg).jump() // take recording at the sensor where it joins
-
-                easyW.println(s"Onramp vehicle added to highway list $this join at seg $joinSeg and CarAhead = $carAhead and laneID = $laneID")
+                val carAhead = route.path(laneID).seg(joinSeg).getLast
+                route.path(laneID).addToAlist(this, carAhead)
+                junc(joinSeg).jump()
             end if
 
             easyW.flush()
             val startSeg = joinSeg
+            var seg = startSeg
 
-            for seg <- startSeg until highway_length do
+            while seg < highway_length do
                 // --- lane change at segment boundaries ---
-                easyW.println(s"Highway and moving $this join at seg $joinSeg and CarAhead = ${this.getCarAhead(this)} and laneID = $laneID")
+                if clock - lastLaneChange >= 20.0 then
+                    val carAhead = getCarAhead(this)
+                    if carAhead != null && carAhead.velocity < 0.9 * vmax then
+                        val target =
+                            if laneID == 0 then 1
+                            else if laneID == numLanes - 1 then numLanes - 2
+                            else if laneChangeRV.igen == 1 then laneID + 1
+                            else laneID - 1
+
+                        val currentLane = laneID
+                        route.changeLane(currentLane, target, this, seg)
+                        lastLaneChange = clock
+                    end if
+                end if
+
+                // --- advance vehicle along highway ---
+                route.path(laneID).seg(seg).move()
+                junc(seg + 1).jump()
+
+                seg += 1
+            end while
+
+            route.path(laneID).removeFromAlist(this)
+            println(s"To  mainline sink: count ${this.displayLabel}")
+            easyW.println(s"Highway exit: $this leaving seg=$segId lane=$laneID at clock=$clock")
+            sinks(0).leave()
+        end driveHighway
+
+
+        //        private def driveHighway(car: Car): Unit =
+//            var lastLaneChange = 20.0 //seconds
+//            //easyW.println(s"Inside the DH method to check me again ${this}:  laneID =$laneID")
+//            //val highway = route.path(this.laneID) // mainline path for current lane, does does this worl for a vehicle that is just joining from onramp
+//
+//            val joinSeg = if subtype == 0 then offRampJunction else pos(subtype - 1)
+//
+//            //for on-ramp vehicles, joinSeg = pos(subtype - 1)
+//            if subtype > 0 then
+//                val insertLane = 0   //  laneRV.igen % numLanes    // using laneRV to help spread out vehicles joining from onramp
+//                laneID = insertLane               // set the onramp car laneID to this random lane ID
+//
+//                val carAhead = route.path(laneID).seg(joinSeg).getLast  //get the carAhead inside the joined segment based on the random laneID
+//
+//                //easyW.println(s"Onramp Vehicle $this join at seg $joinSeg and CarAhead = $carAhead and laneID = $laneID")
+//                route.path(laneID).addToAlist(this, carAhead)
+//
+//                junc(joinSeg).jump() // take recording at the sensor where it joins
+//
+//                easyW.println(s"Onramp vehicle added to highway list $this join at seg $joinSeg and CarAhead = $carAhead and laneID = $laneID")
+//            end if
+//
+//            easyW.flush()
+//            val startSeg = joinSeg
+//
+//            for seg <- startSeg until highway_length do
+//                // --- lane change at segment boundaries ---
+//                //easyW.println(s"Highway and moving $this join at seg $joinSeg and CarAhead = ${this.getCarAhead(this)} and laneID = $laneID")
 //                if clock - lastLaneChange >= 20.0 then
 //                    val carAhead = getCarAhead(this)
 //                    if carAhead != null && carAhead.velocity < 0.9 * vmax then
 //                        val target =
 //                            if laneID == 0 then 1
 //                            else if laneID == numLanes - 1 then numLanes - 2
-//                            else if Bernoulli(0.6).igen == 1 then laneID + 1
+//                            else if laneChangeRV.igen == 1 then laneID + 1
 //                            else laneID - 1
 //
 //                        val currentLane = laneID
@@ -210,47 +278,39 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
 //                        lastLaneChange = clock
 //                    end if
 //                end if
-
-                // --- advance vehicle along highway ---
-                route.path(laneID).seg(seg).move()
-                junc(seg + 1).jump()
-
-            end for
-
-            route.path(laneID).removeFromAlist(this)
-            sinks(0).leave()
-        end driveHighway
+//
+//                // --- advance vehicle along highway ---
+//                route.path(laneID).seg(seg).move()
+//                junc(seg + 1).jump()
+//
+//            end for
+//
+//            //println(s"Before removal from mainline: count ${this.displayLabel}")
+//            route.path(laneID).removeFromAlist(this)
+//            easyW.println(s"Highway exit: $this leaving seg=$segId lane=$laneID at clock=$clock")
+//            println(s"To  mainline sink: count ${this.displayLabel}")
+//            sinks(0).leave()
+//
+//        end driveHighway
 
 
         private def driveRamp(comp: Component): Unit = comp match
             case r: Ramp =>
-                println(s"--> ${this.name} entering Ramp: ${r.name} this: ${this.laneID}")
-
-                val carAhead = r.getLast
+                val carAhead = r.getLast                  // always null because ramp.vList empty
                 r.addToAlist(this, carAhead)
 
-
-
                 if r.mode == RampMode.On then
-
                     r.lane.move()
                     r.to.asInstanceOf[Junction].jump()
                 else if r.mode == RampMode.Off then
-
                     r.from.asInstanceOf[Junction].jump()
                     r.lane.move()
                 end if
-
-
                 r.removeFromAlist(this)
-
                 r.to match
                     case s: Sink => s.leave()
-                    case _ => // For off-ramps, this should be a Sink
-
-            case s: Sink =>
-                println(s"==> ${this.name} reached Sink: ${s.name}")
-                s.leave()
+                    case _ =>
+            case s: Sink => s.leave()
         end driveRamp
 
 
@@ -259,15 +319,20 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute SMAPE between simulation and PEMS data at 3 fixed sensors */
+    /** Compute SMAPE between simulation and PEMS data at 3 fixed sensors, using upstream sensor data
+     * 2-401834ML", "3-401833ML", "5-401652ML */
+
     def simRunVsPemsRun(): Array[Double] =
         val ytrue = config.evalArrivalsPerRow
+        val onRampTotalsPerRow = config.onRampTotalsPerRow
         Array(
-            smapeF(ytrue(0), junc(1).getCountMatrix.sumVr), // 401834ML
-            smapeF(ytrue(1), junc(2).getCountMatrix.sumVr), // 401833ML
-            smapeF(ytrue(2), junc(3).getCountMatrix.sumVr) // 401929ML
+            smapeF(VectorD(ytrue(0)), junc(1).getCountMatrix.sumVr), // 2-401834ML, after offramp
+            smapeF(VectorD(ytrue(1)), junc(2).getCountMatrix.sumVr), // 3-401833ML, after onramp1
+            smapeF(VectorD(ytrue(2)), junc(4).getCountMatrix.sumVr), // 5-401652ML, upstream sensor After all ramps
+            smapeF(VectorD(onRampTotalsPerRow(0)), ramp_sensors(0).getCountMatrix.sumVr), // onramp1 inflow
+            smapeF(VectorD(onRampTotalsPerRow(1)), ramp_sensors(1).getCountMatrix.sumVr) // onramp2 inflow
         )
-    end simRunVsPemsRun
+
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -276,9 +341,12 @@ class OneWayVehicle2L(name: String = "OneWayVehicle2L", reps: Int = 1, animating
     override def fini(rep: Int): Unit =
         Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
         val smapeResults = simRunVsPemsRun()
-        println(f"SMAPE after offramp1: ${smapeResults(0)}")
-        println(f"SMAPE after onramp1 : ${smapeResults(1)}")
-        println(f"SMAPE after onramp2 : ${smapeResults(2)}")
+        easyW.println(f"SMAPE after offramp1: ${smapeResults(0)}")
+        easyW.println(f"SMAPE after onramp1 : ${smapeResults(1)}")
+        easyW.println(f"SMAPE after onramp2 : ${smapeResults(2)}")
+        easyW.println(f"SMAPE onramp1 inflow: ${smapeResults(3)}")
+        easyW.println(f"SMAPE onramp2 inflow: ${smapeResults(4)}")
+        easyW.flush()
         super.fini(rep)
     end fini
 
@@ -293,26 +361,7 @@ end OneWayVehicle2L
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//To do list: 1. See the smape values generated and compare it with normal
+// 2. Once 1 is achieved, go to the objective function part and see if it works from there.
+//3. Once 1 & 2 is achieved, add the optimizer part and see if that works too.
+//4. Setup the sapello two work order for this simulation. Might be cutting out the library you need for this project from scalation.

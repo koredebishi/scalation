@@ -1,0 +1,49 @@
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\animation\DgAnimator.scala:274:16 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m274 |[0m                clock = f.time              [34m// NEW: advance animation clock for UI during replay (was stuck at 0.0)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mThe start of this line does not match any of the previous indentation widths.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mIndentation width of current line : 16 spaces[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0mThis falls between previous widths: 13 spaces and 17 spaces[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\animation\DgAnimator.scala:278:13 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m278 |[0m             end [33mwhile[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m             ^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m             misaligned end marker[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\animation\DgAnimator.scala:274:24 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m274 |[0m                clock = f.time              [34m// NEW: advance animation clock for UI during replay (was stuck at 0.0)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                        Not found: f[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Each identifier in Scala needs a matching declaration. There are two kinds of[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m identifiers: type identifiers and value identifiers. Value identifiers are introduced[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m `class`, `enum`, or `trait` declarations.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Identifiers refer to matching declarations in their environment, or they can be[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m imported from elsewhere.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Possible reasons why no matching declaration was found:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - The declaration or the use is mis-spelt.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - An import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E006] Not Found Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\animation\DgAnimator.scala:276:24 [0m[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m276 |[0m                lastT = f.time              [34m// update last timestamp for pacing[0m
+[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                        ^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m                        Not found: f[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Each identifier in Scala needs a matching declaration. There are two kinds of[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m identifiers: type identifiers and value identifiers. Value identifiers are introduced[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m `class`, `enum`, or `trait` declarations.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Identifiers refer to matching declarations in their environment, or they can be[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m imported from elsewhere.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Possible reasons why no matching declaration was found:[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - The declaration or the use is mis-spelt.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  - An import is missing.[0m
+[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
+[0m[[0m[31merror[0m] [0m[0mfour errors found[0m

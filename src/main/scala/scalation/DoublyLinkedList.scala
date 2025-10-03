@@ -30,7 +30,7 @@ class DoublyLinkedList [A: ClassTag]
       extends AbstractIterable [A]
          with Serializable:
 
-    private val debug = debugf ("DoublyLinkedList", true)           // debug  function
+    private val debug = debugf ("DoublyLinkedList", false)           // debug  function
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The `Node` inner case class wraps elements in nodes for double linkage.
@@ -101,7 +101,12 @@ class DoublyLinkedList [A: ClassTag]
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the trail/last node in the list (e.g, node holding the trail car).
      */
-    inline override def last: A = tail_.elem
+    //inline override def last: A = tail_.elem
+
+    inline override def last: A =
+        if tail_ == null then null.asInstanceOf[A]
+        else tail_.elem
+
 
     inline def lastNode: Node = tail_
 
@@ -123,7 +128,6 @@ class DoublyLinkedList [A: ClassTag]
         if tail_ == null then                                       // if the list was empty (tail is null)
             tail_ = n                                               // set tail to the new node
         debug ("addFirst", s"added node $n as the first element in list")
-        println(s"I also executed inside the addFirst $this")
         n
     end addFirst
 
@@ -214,12 +218,12 @@ end DoublyLinkedList
         else dll.add (i)
 
     banner ("Test the toString method")
-    println (s"dll = $dll")
+//    println (s"dll = $dll")
 
     banner ("Test the remove method")
     while ! dll.isEmpty do
         dll.remove ()
-        println (s"dll = $dll")
+//        println (s"dll = $dll")
 
 end doublyLinkedListTest
 

@@ -16,7 +16,6 @@ import javax.swing.{JButton, JToolBar, JComponent, JLabel}
 import javax.swing.KeyStroke
 import java.awt.BorderLayout
 import scala.math.round
-import scala.util.control.Breaks.{break, breakable}
 import scalation.scala2d.*
 import scalation.scala2d.Colors.*
 import CommandType.*
@@ -87,26 +86,25 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     /** Buffer of executed animation commands for replay. */
     private val frames = new ArrayBuffer[Frame](1 << 18)   // ~262k capacity
 
-    /** Whether a replay is currently running (prevents concurrent replays). */
-    private val replaying = new AtomicBoolean(false)
+    //================================ Unified Playback Mode ==============================
+    /** Playback modes: Idle (no loop active), Live (consuming cmdQ), Replay (consuming frames). */
+    private enum PlaybackMode:
+        case Idle, Live, Replay
+    private var playbackMode: PlaybackMode = PlaybackMode.Idle      // current playback mode
+    private val running = new AtomicBoolean(false)                  // true while run loop thread active
+    // Replay iteration state
+    private var replayIndex  = 0
+    private var replayLength = 0
+    private var lastTime     = 0.0                                  // last processed command time (for pacing)
+    // Track when the live queue first became empty (for auto-finalization if aniDone not set)
+    private var emptySince: Long = -1L
 
     //=========================== Vehicle Inspector (Steps 1+2) ==========================
-    /** Lightweight immutable snapshot of vehicle state for the inspector. */
-    case class VehicleState(
-        actorId: Int,
-        label: String,
-        laneId: String,
-        pathInfo: String,
-        segDisp: Double,
-        pathDisp: Double,
-        odo: Double,
-        velocity: Double,
-        carAheadLabel: String,
-        segmentIndex: Int = -1,
-        laneGroupId: String = ""
-    )
+    /** Lightweight immutable snapshot of vehicle state for the inspector.
+      *  Defined in the DgAnimator companion object (see bottom of file).
+      */
+    import DgAnimator.VehicleState
 
-    /** Concurrent-like registry keyed by actorId with latest snapshots (guarded by vsLock). */
     private val vehicleStateRegistry = new HashMap[Int, VehicleState]()
 
     /** Map token eid -> actorId (defaults to identity when unknown). */
@@ -127,12 +125,6 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         if inspectorVisible && actorId == selectedActorId then SwingUtilities.invokeLater(() => inspectorPanel.refresh())
     end updateVehicleState
 
-    /** Compute a simple same-lane/segment gap; else None. */
-    private def computeGap(me: VehicleState, ahead: VehicleState, vehicleLen: Double = 4.5): Option[Double] =
-        val sameLane   = (me.laneId == ahead.laneId) && (me.laneGroupId == ahead.laneGroupId)
-        val sameSeg    = me.segmentIndex >= 0 && me.segmentIndex == ahead.segmentIndex
-        if sameLane && sameSeg then Some(math.max(0.0, (ahead.segDisp - me.segDisp) - vehicleLen)) else None
-    end computeGap
 
     /** Inspector visibility and UI. */
     @volatile private var inspectorVisible = false
@@ -194,20 +186,10 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             idLbl.setText(s"${st.label} (#${st.actorId})")
             laneLbl.setText(st.laneId)
             pathLbl.setText(st.pathInfo)
-            segDispLbl.setText(f"${st.segDisp}%.2f")
-            pathDispLbl.setText(f"${st.pathDisp}%.2f")
-            odoLbl.setText(f"${st.odo}%.2f")
-            velLbl.setText(f"${st.velocity}%.2f")
-            aheadLbl.setText(st.carAheadLabel)
+            segDispLbl.setText(s"${st.segDisp}")
+            pathDispLbl.setText(s"${st.pathDisp}")
+            velLbl.setText(s"${st.velocity}")
             var gapTxt = "N/A"
-            if st.carAheadLabel != null && st.carAheadLabel.nonEmpty then
-                val idOpt = try { Some(st.carAheadLabel.filter(_.isDigit).toInt) } catch { case _: Throwable => None }
-                idOpt.foreach { aid =>
-                    val ahead = vsLock.synchronized { vehicleStateRegistry.get(aid).orNull }
-                    if ahead != null then computeGap(st, ahead).foreach(g => gapTxt = f"$g%.2f")
-                }
-            end if
-            gapLbl.setText(gapTxt)
         end refresh
 
     /** Toggle inspector visibility. */
@@ -244,25 +226,41 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
       * - Safe to invoke multiple times; ignored if already replaying or nothing recorded.
       */
     def replay(): Unit =
-        if frames.isEmpty || replaying.get() then return
-        new Thread(() =>
-            replaying.set(true)
-            resetSceneForReplay()
-            val td    = ani.timeDilationFactor
-            var lastT = frames.head.cmd.time
-            var i     = 0
-            while i < frames.length && replaying.get() do
-                val f  = frames(i).cmd
-                val dt = math.max(0.0, (f.time - lastT) * aniRatio * td)
-                if dt > 0 then Thread.sleep(math.round(dt))
-                invokeCommand(f)
-                if f.action == CreateToken then actorCount += 1
-                repaint()
-                lastT = f.time
-                i += 1
-            end while
-            replaying.set(false)
-        ).start()
+        // Unified replay entry point: switches run loop to Replay mode (no separate thread logic)
+        if frames.isEmpty then
+            println("Replay: no recorded frames (frames buffer empty). Run a simulation first.")
+            return
+        end if
+        // Disallow starting replay while live playback still consuming queue
+        if playbackMode == PlaybackMode.Live && running.get() then
+            if !cmdQ.isEmpty then
+                println("Replay: live animation still in progress (commands remaining).")
+                return
+            else if !aniDone then
+                // Queue empty but aniDone not set: auto-finalize live mode
+                println("Replay: live mode idle with empty queue; auto-finalizing to allow replay.")
+                aniDone = true
+                playbackMode = PlaybackMode.Idle
+                running.set(false)
+                // Small wait to allow loop to exit cleanly
+                Thread.sleep(20)
+            end if
+        end if
+        // If a previous run loop thread finished, we will start a new one; if still running in Idle, reuse
+        resetSceneForReplay()                                    // clear canvas for fresh reconstruction
+        playbackMode  = PlaybackMode.Replay
+        replayIndex   = 0
+        replayLength  = frames.length
+        clock         = 0.0                                      // normalize display clock for replay start
+        lastTime      = 0.0
+        println(s"Replay: entering Replay mode with $replayLength frames")
+        if !running.get() then
+            running.set(true)
+            new Thread(this).start()                             // start unified run loop in Replay mode
+        else
+            // If thread somehow still running (Idle spin not expected), it will pick up mode switch next cycle
+            ()
+        end if
     end replay
 
      //================================================================================
@@ -621,64 +619,102 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Repeatedly execute animation commands, sleep and repaint. */
     def run (): Unit =
-        var cmd: AnimateCommand = null
-        var when  = 0.0
-        var delay = 0L
+        println(s"DgAnimator.run: unified loop start (mode=$playbackMode)")
         var nCmds = 0
+        lastTime = clock
+        while running.get() do
+            // PAUSE GATE (shared for Live & Replay)
+            pauseLock.synchronized {
+                while paused.get() && !stepOnce.get() do pauseLock.wait()
+            }
 
-        println (s"DgAnimator.run: start animation at time $clock")
-        printCommandQueue (clock)
-
-        breakable {
-            while clock < stopTime do
-
-                // PAUSE GATE: block the animation thread while paused (unless stepping once)
-                pauseLock.synchronized {
-                    while paused.get() && ! stepOnce.get() do pauseLock.wait()
-                }
-
-                // Get the next animation command from the shared queue.
-                if cmdQ.isEmpty && aniDone then
-                    println ("DgAnimator.run: command queue is empty")
-                    break ()
-                else if ! cmdQ.isEmpty then
-                    cmd   = cmdQ.poll ()
-                    when  = cmd.time
-                    delay = round ((when - clock) * aniRatio * ani.timeDilationFactor)
-
-                    // Sleep for the given number (delay) of milliseconds.
-                    Thread.sleep (delay)
-
-                    // Set the animation clock and invoke the animation command
+            playbackMode match
+            case PlaybackMode.Live =>
+                // Termination conditions for Live mode
+                if cmdQ.isEmpty then
+                    if aniDone then
+                        println("DgAnimator.run: Live mode complete (queue empty & aniDone)")
+                        running.set(false)
+                        emptySince = -1L
+                    else
+                        // Start or continue idle timing
+                        if emptySince < 0 then emptySince = System.nanoTime()
+                        else
+                            val idleNanos = System.nanoTime() - emptySince
+                            if idleNanos > 250_000_000L then   // > 250 ms idle with empty queue => auto-finalize
+                                println("DgAnimator.run: auto-finalizing Live mode after idle empty queue.")
+                                aniDone = true
+                                running.set(false)
+                                playbackMode = PlaybackMode.Idle
+                                emptySince = -1L
+                            end if
+                        end if
+                        if running.get() then Thread.sleep(5)   // brief idle wait only if still running
+                    end if
+                else
+                    // Queue has commands: reset idle timer
+                    emptySince = -1L
+                    val cmd = cmdQ.poll()
+                    val when = cmd.time
+                    val dt   = math.max(0.0, (when - lastTime) * aniRatio * ani.timeDilationFactor)
+                    if dt > 0 then Thread.sleep(round(dt))
                     clock  = when
                     nCmds += 1
-                    invokeCommand (cmd)
-
-                    // If the command is to create a new token, then increment the actor count
+                    invokeCommand(cmd)
+                    // Record only during Live mode
+                    frames += Frame(cmd)
                     if cmd.action == CreateToken then actorCount += 1
-
-                    // Repaint the canvas.
-                    repaint ()
-
-                    // If stepping, consume one command and re-enter pause
+                    repaint()
+                    lastTime = clock
                     if stepOnce.compareAndSet(true, false) then
-                        paused.set(true)
-                        playPauseBtn.setText("Play")
+                        paused.set(true); playPauseBtn.setText("Play")
                     end if
                 end if
-            end while
-        } // breakable
 
-        println (s"DgAnimator.run: end animation at time $clock with $nCmds commands invoked")
+            case PlaybackMode.Replay =>
+                if replayIndex >= replayLength then
+                    println("DgAnimator.run: Replay mode complete")
+                    playbackMode = PlaybackMode.Idle
+                    running.set(false)
+                else
+                    val f    = frames(replayIndex).cmd
+                    val dt   = math.max(0.0, (f.time - lastTime) * aniRatio * ani.timeDilationFactor)
+                    if dt > 0 then Thread.sleep(round(dt))
+                    clock = f.time
+                    invokeCommand(f)
+                    if f.action == CreateToken then actorCount += 1
+                    repaint()
+                    lastTime = clock
+                    replayIndex += 1
+                    if stepOnce.compareAndSet(true, false) then
+                        paused.set(true); playPauseBtn.setText("Play")
+                    end if
+                end if
+
+            case PlaybackMode.Idle =>
+                // Idle should not spin indefinitely; shut down if reached
+                running.set(false)
+            end match
+        end while
+        println(s"DgAnimator.run: unified loop end (processed=$nCmds, finalMode=$playbackMode, clock=$clock)")
     end run
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Start the animation by staring the animation thread. */
     def animate (tStart: Double, tStop: Double): Unit =
+        // Prepare Live mode run
+        clearRecording()                  // discard any prior run's frames
+        playbackMode = PlaybackMode.Live  // enter Live mode
         clock    = tStart
-        stopTime = tStop
-        new Thread (this).start ()
-    end animate
+        stopTime = tStop                  // retained for external reference (not hard loop condition now)
+        lastTime = clock
+        if !running.get() then
+            running.set(true)
+            new Thread(this).start()
+        else
+            println("animate: run loop already active; ignoring duplicate animate() call")
+        end if
+     end animate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invoke animation command cmd immediately (useful for testing). */
@@ -716,6 +752,20 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
      */
     def saveImage (fname: String): Unit = writeImage (fname, this)
 
+end DgAnimator
+
+// Companion object added only to define VehicleState for inspector usage.
+object DgAnimator:
+    case class VehicleState(
+        actorId: Int,
+        label: String,
+        laneId: String,
+        pathInfo: String,
+        segDisp: Double,
+        pathDisp: Double,
+        velocity: Double,
+        segmentIndex: Int = -1,
+    )
 end DgAnimator
 
 // ...tests (dgAnimatorTest, dgAnimatorTest2, dgAnimatorTest3) can follow below if present...

@@ -38,9 +38,9 @@ trait Dynamics:
  
      */
     def updateV (car: Vehicle, maxDisp: Double): Unit =
-        println (s"Dynamics.updateV: called $car")
+//        println (s"Dynamics.updateV: called $car")
         this match
-            case GippsDynamics => { println ("Gipps"); GippsDynamics.updateM (car, maxDisp) }
+            case GippsDynamics => { GippsDynamics.updateM (car, maxDisp) }
             case _             => { println ("IDM");   IDMDynamics.updateM (car,  maxDisp) }
     end updateV
 
@@ -54,7 +54,8 @@ end Dynamics
 object GippsDynamics
     extends Dynamics:
 
-    private val debug = debugf ("GippsDynamics", true)              // debug function
+    private val debug = debugf ("GippsDynamics", false)              // debug function
+    private[process] val easyW = new EasyWriter("simulation", "OnewayVehicle2LModel.txt")
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     /** Update the vehicle's velocity and position using Gipps' Model (located in `Motion`)
@@ -62,49 +63,38 @@ object GippsDynamics
      *
      * @param car the car/vehicle whose velocity and position is being updated
      */
-
     def updateM(car: Vehicle, length: Double): Unit =
         //debug("updateM", s"car = $car with car.myNode = ${car.myPathNode}")
         //val ref = car.myNode.ahead
-        println(s"this is where I stopped $car with car.myPathNode = ${car.myPathNode}")
-
         val ref = car.myPathNode.ahead
-        val car_ahead = if ref != null then ref.elem else null
-        
-//        val car_ahead = getCarAhead(car)
+        //val car_ahead = if ref == null then null else ref.elem
 
-        debug("updateM", s"car = ${car.id} (velocity and position) based on car_ahead = $car_ahead")
+        val car_ahead = if ref != null then ref.elem else null
+
+        //debug("updateM", s"car = ${car.displayLabel} (velocity and position) based on car_ahead = $car_ahead")
+        //easyW.println(s"updateM car = ${car.displayLabel} (velocity and position) based on car_ahead = $car_ahead")
 
         val v = gipps(car, car_ahead, length) + EPSILON // determine new velocity
-        debug("updateM", s"car = $car \t the new VELOCITY is: $v")
+        //debug("updateM", s"car = $car \t the new VELOCITY is: $v")
+        easyW.println(s"UpdateM car = $car  \t the new VELOCITY is: $v")
+
+
 
         val x = butcher(car.t_disp, v, car.velocity, prop("rt")) // new proposed position for car
-        debug("updateM", s"car = $car \t the new POSITION is: $x")
+        //debug("updateM", s"car = $car \t the new POSITION is: $x")
+        easyW.println(s"UpdateM car = $car  \t the new POSITION is: $x")
 
-        // save old velocity and assign new velocity
-        car.o_velocity = car.velocity
-        car.velocity = v
+        car.o_velocity = car.velocity // save the old velocity
+        car.velocity = v // assign new velocity
 
         car.o_t_disp = car.t_disp // save old car position
         val dx = x - car.t_disp // change in car's position
-        val new_disp = if car.disp + dx <= length then car.disp + dx else length
+        val new_disp = if car.disp + dx <= length then car.disp + dx // new car displacement on road
+        else length
+
         car.t_disp += new_disp - car.disp // new car position
         car.disp = new_disp // displacement on road
-        debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
-
-//        // NEW: clamped per-segment update with odometer
-//        val prevDisp = car.disp                    // segment-local displacement before update
-//        car.o_t_disp = car.t_disp                  // save previous path-local position
-//
-//        val dx    = x - car.t_disp              // integrator-proposed increment from butcher
-//        val new_disp = if prevDisp + dx <= length then prevDisp + dx else length
-//        val dSeg     = new_disp - prevDisp         // realized motion within this segment, the actual increment
-//
-//        car.disp    = new_disp                     // segment-local displacement
-//        car.t_disp += dSeg                         // path-local cumulative displacement
-//        car.odo    += dSeg                         // cumulative odometer (never resets)
-
-        debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
+        //debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
     end updateM
 
 
@@ -116,10 +106,10 @@ object GippsDynamics
      */
     def gipps (cn: Vehicle, cp: Vehicle, length: Double): Double =
         if cp == null then
-            println(s"vehicle_ahead value $cp, current_vehicle value = $cn ${prop("rt")} prop")
+            //easyW.println(s"vehicle_ahead value $cp, current_vehicle value = $cn ${prop("rt")} prop")
             gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))   // All vehicles initialized should use this first (that means every vehicle needs to keep track of his ahead vehicle
         else
-            val cp_r_disp = if cp.segIndex == cn.segIndex then cp.disp
+            val cp_r_disp = if cp.segId == cn.segId then cp.disp
                             else length + cp.disp
             gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cp_r_disp, cp.velocity, prop("rt"))
     end gipps
@@ -144,10 +134,10 @@ object GippsDynamics
         val left_2 = (vn * rt) - (vp * vp / bn)
         var right_side  =  bn * (2 * (xp - sp - xn) - (vn * rt) - (vp * vp / bn))
         val inner_exp = (bn * bn * rt * rt) - bn * (2 * (xp - sp - xn) - (vn * rt) - (vp * vp / bn))
-        if inner_exp < 0 then println(s"Shouldn't be negative: $inner_exp , $right_side, left_1: $left_1, left_2: $left_2")
+        if inner_exp < 0 then easyW.println(s"Shouldn't be negative: $inner_exp , $right_side, left_1: $left_1, left_2: $left_2")
         val cong = (bn * rt) + sqrt(max(0.0, inner_exp))
 
-        println(s"The free $free and the Cong $cong")
+        easyW.println(s"The free $free and the Cong $cong")
         min (free, cong)
     end gipps
 

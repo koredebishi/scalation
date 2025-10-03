@@ -74,50 +74,30 @@ trait Recorder(nt: Int):
      *  @param speed  the speed at which entity entered the component (e.g., Sink)
      *  @param actor  the actor to be recorded
      */
-//    def record(actor: SimActor, ctime: Double): Unit =
-//
-//        println(s"the clock time is $ctime and the timeConv is $timeConv")
-//        val i = floor(ctime / timeConv).toInt  // Time bucket index //Fix this time conversion thing.
-//
-//        println(s"[Recorder] recording for: $this")
-//
-//        if actor.isInstanceOf[Vehicle] then
-//            val vehicle = actor.asInstanceOf[Vehicle]
-//            val laneID = vehicle.laneID
-//            r_counts(i, laneID) += 1
-//            val speed = if vehicle.velocity.isNaN then 0.0 else vehicle.velocity
-//            val cnt = r_counts(i, laneID).toInt
-//
-//            if cnt > 0 then
-//                r_speeds(i, laneID) = (r_speeds(i, laneID) * (cnt - 1) + speed) / cnt  // Compute running avg speed
-//            recordedVehicles += vehicle.name
-//        else
-//            r_counts(i, 0) += 1           //None vehicle actors records
-//    end record
-
     def record(actor: SimActor, ctime: Double): Unit =
 
-        println(s"the clock time is $ctime and the timeConv is $timeConv")
+//        println(s"the clock time is $ctime and the timeConv is $timeConv")
 
         val i = floor(ctime / timeConv).toInt // Time bucket index //Fix this time conversion thing.
         val j = if i >= nt then nt - 1 else i // cap the last time bucker for overflow
 
-        Recorder.ew.write(s"\n the clock time is $ctime and the timeConv is $timeConv i: $i \n")
-        println(s"[Recorder] recording for: $this")
+        //Recorder.ew.write(s"\n the clock time is $ctime and the timeConv is $timeConv i: $i \n")
+        //println(s"[Recorder] recording for: $this")
 
 
         if actor.isInstanceOf[Vehicle] then
 
             val vehicle = actor.asInstanceOf[Vehicle]
             val laneID = vehicle.laneID
-            println(s"Inside recorder: laneID = $laneID")
+//            println(s"Inside recorder: laneID = $laneID")
             val cnt = r_counts(j, laneID).toInt + 1
-            println(s"Inside recorder: count = $cnt")
+            //println(s"Inside recorder: count = $cnt")
             r_counts(j, laneID) = cnt
             val speed = if vehicle.velocity.isNaN then 0.0 else vehicle.velocity
             r_speeds(j, laneID) = (r_speeds(j, laneID) * (cnt - 1) + (speed * 2.24694) ) / cnt // Compute running avg speed
 
             recordedVehicles += vehicle.name
+
         else
             r_counts(j, 0) += 1 //None vehicle actors records
     end record
@@ -132,16 +112,6 @@ trait Recorder(nt: Int):
 
     def writeLaneIntervalStats(): Unit =
         Recorder.ew.write(s"\n================== ROW-WISE LANE STATS FOR SENSOR $this : ${r_counts.sum} ==================\n")
-//        for i <- 0 until r_counts.dim do
-//            val flowStr = r_counts(i).mkString(",\t")
-//            val speedStr = r_speeds(i).mkString(",\t")
-//            Recorder.ew.write(s"per_lane_flow | ${i + 1}: $flowStr | $speedStr : sum_of_flow:${r_counts(i).sum}\n")
-//
-//            //Recorder.ew.write(s"per_lane_flow | ${i + 1}: ${r_counts(i)}: sum_of_flow:${r_counts(i).sum} \n")
-//            //val speedStr = r_speeds(i).mkString(",\t")
-//            //Recorder.ew.write(s"per_lane_speed| ${i + 1}: $speedStr : \n")
-//            //Recorder.ew.write(s"per_lane_speed| ${i + 1}: ${r_speeds(i)}: \n")
-//        end for
         for i <- 0 until r_counts.dim do
             val counts = r_counts(i)
             val speeds = r_speeds(i)
@@ -167,7 +137,6 @@ trait Recorder(nt: Int):
                 s" lane_flow: [$countsStr] : lane_speed: [$speedsStr] : flow_total: [${total.toInt}] : ave_speed = [${f"$avgSpeed%2.1f"}]\n"
             )
         end for
-
         Recorder.ew.write(s"\n================== ROW-WISE LANE STATS FOR SENSOR==================\n")
         //Recorder.ew.flush()
     end writeLaneIntervalStats

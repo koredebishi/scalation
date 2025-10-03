@@ -37,7 +37,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     extends Component ():
 
 
-    private val debug = debugf("Route", true)     // debug function
+    private val debug = debugf("Route", false)     // debug function
 
     val pathway = Array.ofDim[Pathway](numLanes)      // create array of parallel Pathways
     private val GAP = 50.0     // pixel between lanes
@@ -66,48 +66,48 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
 
         var success = abs(l1 - l2) == 1
         if !success then return success
-        //if abs(l1 - l2) != 1 then return false
 
-        val fromPath = pathway(l1)                                     // current Pathway  (lane l1)
-        val toPath = pathway(l2)                                       // target Pathway   (lane l2)
+        val fromPath = pathway(l1) // current Pathway  (lane l1)
+        val toPath = pathway(l2) // target Pathway   (lane l2)
 
         val safeDisp = fromPath.seg(seg).safetydist
 
-        // vehicle behind in target lane, on same segment
-        val vBehind = toPath.seg(seg).getFirst
-        // vehicle ahead is the node behind’s successor (if any)
-        val vAhead = if vBehind != null && vBehind.myPathNode.ahead != null then vBehind.myPathNode.ahead.elem else null
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // vehicles to check in target lane
+        val vBehind = toPath.seg(seg).getFirst // car behind in same seg
+        val vAhead = if seg + 1 < toPath.seg.length
+            then toPath.seg(seg + 1).getLast else null
 
-        // distance from vBehind’s bumper to the actor’s current bumper
-        // bumper to bumper calculation.
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        val gapBehind =
-            if vBehind != null && actor.disp > vBehind.disp
-            then actor.disp - vBehind.disp                          // bumper-to-bumper
-            else safeDisp                                           // no car behind or overlap guard
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // compute bumper-to-bumper gaps
+        val gapBehind = if vBehind != null then actor.disp - vBehind.disp else safeDisp
 
         val nextSeg = min(seg + 1, toPath.seg.length - 1)
+
         val gapAhead =
-            if vAhead != null
-            then abs(vAhead.t_disp - toPath.seg(nextSeg).length)
+            if vAhead != null then toPath.seg(nextSeg).length - vAhead.disp - Vehicle.len
             else safeDisp
 
         val gap = min(gapBehind, gapAhead)
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        // update overall feasibility
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // feasibility check
         success &&= gapBehind >= safeDisp && gapAhead >= safeDisp
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        // --- perform the lane change ------------------------------------------
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // --- perform the lane change --------------------------------------------
         if success then
-            fromPath.removeFromAlist(actor)                             // detach from old lane
-            actor.laneID = l2                                           //update the laneID of the actor
-            actor.pathInfo = toPath.seg(seg).name                       //update the pathinfo of the actor
-            toPath.addToAlist(actor, vAhead)                            // insert into target lane
+            fromPath.removeFromAlist(actor) // detach from old lane
+            assert(actor.myPathNode == null, s"Vehicle $this not cleared before lane-change insertion!")
+
+            actor.laneID = l2 // update laneID
+            actor.pathInfo = toPath.seg(seg).name // update pathInfo
+            toPath.addToAlist(actor, vAhead) // insert before vAhead in target lane
         end if
+
         success
     end changeLane
-    
+
+
     //def merge
 
 
