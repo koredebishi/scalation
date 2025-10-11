@@ -16,144 +16,17 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 
     private val loadStart: Long = System.nanoTime()
 
-//
+//full day 6AM to 6PM Tuesday  ; make sure it's not an holiday
 //    val t1: Int = 2 * 96 + 16
 //    val t2: Int = 3 * 96
 
-    val t1: Int = 16
-    val t2: Int = 40
+    val t1: Int = 25    // target 6am
+    val t2: Int = 72    // target 6pm
 
 
     private val rowOffset = t1
 
-    // ----------------------------------------------------------------------
-    // Index definitions (COLUMN POSITIONS in the CSV-derived MatrixD)
-    // laneIdx holds the per-lane FLOW columns for the MAINLINE. These columns are spaced
-    // by 3 (flow, other-metric, speed) in the raw file. We only take the FLOW positions.
-    //   laneIdx(0) = first mainline lane FLOW column (used as denominator in exitFraction)
-    // ramplaneIdx holds the (single) ramp/offramp TOTAL FLOW column. Because ramps have
-    // only one lane, the lane flow column (e.g., 4) and the total flow column (1) carry
-    // the same numeric value; we consciously use column 1 to emphasize it is a total.
-    // exitFraction definition implemented below:
-    //   offramp total flow (ramplaneIdx(0)) / mainline lane 0 flow (laneIdx(0))
-//    private val laneIdx     = VectorI(4, 7, 10, 13, 16) // mainline lane FLOW columns
-//    private val ramplaneIdx = VectorI(1)                // ramp/offramp TOTAL FLOW column
-//
-//    // ----------------------------------------------------------------------
-//    // Sensor IDs
-//    private val sensorIds = Array(
-//        "1-404532ML", "2-401834ML", "3-401833ML", "4-401929ML", "5-401652ML", // mainline
-//        "1-410095OR","2-410093OR", "1-410094FR"              // ramps (2 on, 1 off)
-//    )
-//
-//    private val baseDirMain = "Mainline_VDS_Redwood_Creek_US101-N"
-//    private val baseDirRamp = "Ramp_VDS_"
-//
-//    // ----------------------------------------------------------------------
-//    // Load all sensor data once
-//    private val allSensorData: Map[String, MatrixD] =
-//        sensorIds.map { id =>
-//            val path = if id.endsWith("ML") then s"$baseDirMain/$id.csv"
-//            else s"$baseDirRamp/$id.csv"
-//            id -> MatrixD.load(path, t1, t2)
-//        }.toMap
-//
-//    // ----------------------------------------------------------------------
-//    // Anchor dataset
-//    private val anchorId = fileName.split("/").last.split("\\.")(0)
-//    val data: MatrixD = allSensorData(anchorId)
-//
-//    // ----------------------------------------------------------------------
-//    // Mainline: use raw arrays for hot path
-//    private val mainlineCols: Array[Array[Double]] =
-//        laneIdx.map(c => data(?, c).toArray).toArray   // extract columns as arrays
-//
-//    val arrivalCount: Array[Array[Double]] = mainlineCols   // name preserved
-//    val totalArrivalsPerRow: Array[Double] =
-//        Array.tabulate(data.dim)(r => mainlineCols.map(_(r)).sum)
-//
-//    val muMain: Array[Double] = totalArrivalsPerRow.map(rowTime / _)
-//    val laneProbPerRow: Array[Array[Double]] =
-//        Array.tabulate(data.dim)(r => {
-//            val row = laneIdx.map(c => data(r, c))
-//            val sum = row.sum
-//            row.map(_ / sum).toArray
-//        })
-//    val laneRVPerRow: Array[Discrete] =
-//        laneProbPerRow.map(p => Discrete(VectorD(p)))
-//
-//    // ----------------------------------------------------------------------
-//    // Ramps
-//    private val onRampIds = Array("1-410095OR","2-410093OR" )   // why this again when we already have sensorIds?
-//    private val offrampId = "1-410094FR"        // why this too??
-//
-//    private val offrampData = allSensorData(offrampId) // cached ref
-//
-//
-//    val onRampTotalsPerRow: Array[Array[Double]] =
-//        onRampIds.map(id => allSensorData(id)(?, ramplaneIdx(0)).toArray)
-//
-//    private val muRamps: Array[Array[Double]] =
-//        onRampTotalsPerRow.map(_.map(rowTime / _))
-//
-//    // ----------------------------------------------------------------------
-//    // Evaluation sensors (mainline + offramp)
-//    private val evalMainIds = Array("2-401834ML", "3-401833ML", "5-401652ML", offrampId)
-//    val evalArrivalsPerRow: Array[Array[Double]] =
-//        evalMainIds.map(id => allSensorData(id)(?, ramplaneIdx(0)).toArray)
-//
-//    // ----------------------------------------------------------------------
-//    // Totals
-//    lazy val sensor1Total: Int = totalArrivalsPerRow.sum.toInt
-//    lazy val onramp1Total: Int = onRampTotalsPerRow(0).sum.toInt
-//    lazy val onramp2Total: Int = onRampTotalsPerRow(1).sum.toInt
-//    lazy val offrampTotal: Int = offrampData(?, ramplaneIdx(0)).sum.toInt
-//
-//    // ----------------------------------------------------------------------
-//    // Sources
-//    val nStopArray: Array[Int] = Array(sensor1Total, onramp1Total, onramp2Total)
-//
-//    val muPerSource: Array[Array[Double]] = Array(muMain) ++ muRamps
-//
-//    def getMuForSource(i: Int): Array[Double] = muPerSource(i)
-//    @inline def getLaneRV(row: Int): Discrete = laneRVPerRow(row)
-//
-//    // ----------------------------------------------------------------------
-//    // Exit fraction (offramp row0 / mainline lane0 row0)
-//    // Helper to compute the fraction for any given (cropped) row index, if needed by callers.
-//    def computeExitFraction(row: Int): Double =
-//        val mainlineLane0 = mainlineCols(0)(row)                 // denominator: laneIdx(0)
-//        val rampTotal     = offrampData(row, ramplaneIdx(0))     // numerator: ramplaneIdx(0)
-//        if mainlineLane0 == 0.0 then 0.0 else rampTotal / mainlineLane0
-//    end computeExitFraction
-//
-//    /**
-//     * Moving Average (simple) of exit fractions ending at a given row index.
-//     * Formula (clipped at row 0):MA_t = (1/m) * Σ_{j=0}^{m-1} f_{t-j}, where f_k = computeExitFraction(k)
-//     * If t < m-1, the summation lower bound becomes 0 and the divisor is (t+1)
-//     * @param row     current (cropped) row index t
-//     * @param window  window size m (>= 1)
-//     */
-//    def computeExitFractionMA(row: Int, window: Int): Double =
-//        if window <= 1 then return computeExitFraction(row)
-//        val start = math.max(0, row - window + 1)
-//        val count = row - start + 1
-//        var sum = 0.0
-//        var i = start
-//        while i <= row do
-//            sum += computeExitFraction(i)
-//            i += 1
-//        end while
-//        sum / count
-//    end computeExitFractionMA
-//
-//    def exitFraction: Double =
-//        val average = computeExitFraction(0) // row 0 of CROPPED matrix (starts at original t1)
-//        ew.println(s"offramp exit fraction = $average")
-//        println(s"offramp exit fraction =${mainlineCols(0)(0)}, ${offrampData(0, ramplaneIdx(0))},  $average")
-//        average
-//    end exitFraction
-
+    println(s"TrafficConfig: loading data from row $t1 to $t2 (offset $rowOffset)")
 
     private val laneIdx = VectorI(4, 7, 10, 13, 16) // mainline lane FLOW columns
     private val ramplaneIdx = VectorI(1) // ramp/offramp TOTAL FLOW column
@@ -193,7 +66,32 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
     val totalArrivalsPerRow: Array[Double] =
         Array.tabulate(data.dim)(r => mainlineCols.map(_(r)).sum)
 
-    val muMain: Array[Double] = totalArrivalsPerRow.map(rowTime / _)
+    /**
+     * Compute mean inter-arrival time (mu) for the mainline source across all time rows.
+     *
+     * Literature-based approach (Highway Capacity Manual, PeMS standards):
+     * - Uses carry-forward (LOCF - Last Observation Carried Forward) for zero-count intervals
+     * - When a time window reports zero vehicles, the previous valid mu is maintained
+     * - This prevents division by zero and reflects traffic flow reality: zero counts typically
+     *   represent brief gaps between vehicle platoons, not a complete cessation of traffic
+     *
+     * Formula (when count > 0): mu = rowTime / vehicleCount
+     * Formula (when count = 0): mu = previous valid mu (carry forward)
+     *
+     * Default fallback: If the first row has zero count, assumes 1 vehicle/period as baseline
+     *
+     * @return Array of mu values (mean inter-arrival time in seconds) for each time row
+     */
+    val muMain: Array[Double] =
+        var lastValidMu = rowTime / 1.0  // default fallback: assume 1 vehicle per period
+        totalArrivalsPerRow.map: count =>
+            if count > 0.0 then
+                lastValidMu = rowTime / count  // update and use new mu value
+                lastValidMu
+            else
+                lastValidMu  // carry forward last valid value when count = 0
+    end muMain
+
     val laneProbPerRow: Array[Array[Double]] =
         Array.tabulate(data.dim)(r => {
             val row = laneIdx.map(c => data(r, c))
@@ -213,8 +111,34 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
     val onRampTotalsPerRow: Array[Array[Double]] =
         onRampIds.map(id => allSensorData(id)(?, ramplaneIdx(0)).toArray)
 
+    /**
+     * Compute mean inter-arrival time (mu) for each on-ramp source across all time rows.
+     *
+     * Literature-based approach (Traffic Flow Theory, Poisson Process estimation):
+     * - Applies carry-forward (LOCF) independently for each ramp to handle zero-count intervals
+     * - Each ramp maintains its own last valid mu value for temporal continuity
+     * - Prevents Infinity/NaN when CSV data contains rows like: 5.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+     * - Ensures VSource always receives valid, finite mu values for inter-arrival generation
+     *
+     * Implementation:
+     * - For each ramp (onramp1, onramp2), independently track lastValidMu
+     * - When count > 0: calculate and update mu = rowTime / count
+     * - When count = 0: reuse previous valid mu (no traffic generation freeze)
+     *
+     * Default fallback per ramp: If first row is zero, assumes 1 vehicle/period as baseline
+     *
+     * @return 2D Array where muRamps(i)(j) = mu for ramp i at time row j
+     */
     private val muRamps: Array[Array[Double]] =
-        onRampTotalsPerRow.map(_.map(rowTime / _))
+        onRampTotalsPerRow.map: rampData =>
+            var lastValidMu = rowTime / 1.0  // default fallback per ramp
+            rampData.map: count =>
+                if count > 0.0 then
+                    lastValidMu = rowTime / count
+                    lastValidMu
+                else
+                    lastValidMu  // carry forward last valid value
+    end muRamps
 
     // ----------------------------------------------------------------------
     // Evaluation sensors (mainline + offramp)
@@ -233,9 +157,14 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
     // Sources
     val nStopArray: Array[Int] = Array(sensor1Total, onramp1Total, onramp2Total)
 
-    val muPerSource: Array[Array[Double]] = Array(muMain) ++ muRamps
+    val muPerSource: Array[Array[Double]] =
+        Array(muMain) ++ muRamps
 
-    def getMuForSource(i: Int): Array[Double] = muPerSource(i)
+
+    def getMuForSource(i: Int): Array[Double] =
+        println(s"the saferow: $i")
+        muPerSource(i)
+
 
     @inline def getLaneRV(row: Int): Discrete = laneRVPerRow(row)
 
@@ -356,8 +285,5 @@ end TrafficConfig
 
 // Scala
 @main def TrafficConfigTest(): Unit =
-    val rowTime = 15 * MINUTE
-    // test instantiation (anchor file must match one of the sensor IDs)
-    val file    = "/Mainline_VDS_Redwood_Creek_US101-N/404532ML.csv"
-    val cfg     = new TrafficConfig(file, rowTime, 0)
-    println(s"exitFraction=${cfg.exitFraction}")
+    val file    = "data/Tuesday-June-2025/d04_text_station_5min_2025_06_03.csv"
+

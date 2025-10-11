@@ -52,6 +52,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
     private [process] val vdeque = ArrayDeque [Vehicle] ()               // Array Deque for finding vehicles based on entry order
 
     private[process] val easyW = new EasyWriter("simulation", "OnewayVehicle2LModel.txt")
+    easyW.off()
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -90,10 +91,10 @@ class VTransport (name: String, from_ : Component, to_ : Component,
         actor.segmentEnterTime = now                      // update the current actor's segmentEnterTime with now
 
 
-        actor.prevSegId    = lastSeg
-        actor.segId        = this.segIndex                // update the current actor's segment_ID with
+        //actor.prevSegId    = lastSeg
+        actor.segId        = segIndex                // update the current actor's segment_ID with
         actor.disp = 0.0
-        actor.pathInfo = this.name     //update the current actor's lane_ID with the Vtransport_ID it is moving in
+        actor.pathInfo = name     //update the current actor's lane_ID with the Vtransport_ID it is moving in
 
         //val segTT = if lastSeg >= 0 then f"${now - actor.segmentEnterTime}%.2f" else "N/A"
         easyW.println(s"[t=$now] Vehicle ${actor.displayLabel} enters seg=${actor.segId} (from seg=$lastSeg), enterT=$now")
@@ -108,19 +109,6 @@ class VTransport (name: String, from_ : Component, to_ : Component,
             //director.log.trace(this, "moves for " + Vehicle.rt, actor, director.clock)
 
             motion.updateV(actor, length) // update actor/vehicle's motion/position
-
-//            val vs = VehicleState(
-//                actorId = actor.id,
-//                label = actor.displayLabel,
-//                laneId = actor.laneID.toString,
-//                pathInfo = actor.pathInfo,
-//                segDisp = actor.disp,
-//                pathDisp = actor.t_disp,
-//                velocity = actor.velocity,
-//                segmentIndex = actor.segId
-//            )
-//            director.animator.updateVehicleState(actor.id, vs)
-
 
             val cp = calcPoint2(actor.disp)
             //debug ("move", s"${actor.displayLabel}, check if actor.disp = ${actor.disp} >= curve.length = ${curve.length}")

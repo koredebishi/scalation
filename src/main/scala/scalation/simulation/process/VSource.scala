@@ -20,10 +20,8 @@ import scalation.random.*
 import scalation.scala2d.Ellipse
 import scalation.scala2d.Colors.*
 
-
-//
 //::::::::::::::::::for my model::::::::::::::::::::::::::::
-import scalation.simulation.process.example_1.OneWayVehicle2L
+import scalation.simulation.process.example_1.CalRoute101
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -95,90 +93,68 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
               Array (xy._1, xy._2, 20.0, 20.0))
     end this
      */
+    override def act(): Unit =
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Display this source as a node on the animation canvas.
-    def display (): Unit =
-        director.animate (this, CreateNode, limegreen, Ellipse (), at)
-    end display
-     */
+        val sourceType = s"SRC$esubtype"
+        this.subtype = esubtype   // ensure source subtype is set
+        ew.write(f"\n[$sourceType] STARTED | Budget=$units vehicles\n")
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The `VSource`s as special `Vehicle` will act over time to make entities
-     *  (other `Vehicle`s).
-     */
-    override def act (): Unit =
-        for rep <- 1 to director.reps do                                     // MAJOR LOOP - replications
-            actTime = director.clock                                         // set to model start time
+        val rep = 1
+        //for rep <- 1 to director.reps do // MAJOR LOOP - replications
+        actTime = director.clock // set to model start time
 
-            breakable {
-                debug ("act", s"start making $units Vehicles")
-                for i <- 1 to units do                                       // MINOR LOOP - make actors
-                    if director.stopped then
-                        println (s"VSource.act: simulation unexpectedly ended at ${director.clock}")
-                        break ()                                             // terminate source, simulation ended
-                    debug ("act", s"make entity/vehicle $i")
-                    val actor = makeEntity ()                                // make new actor/vehicle
-                    debug ("act", s"after make entity/vehicle $i: actor = $actor")
-                    actor.mySource = this                                    // actor's source
-                    actor.subtype  = esubtype                                // set the entity subtype
-                    // assign human-friendly label per source (e.g., R1-7)
-                    seq += 1                         // advance per-source counter (display only)
-                    val displayLabel = s"${srcPrefix}-$seq"  // token label shown by animator (e.g., M-3)
-                    if actor != null then actor.setDisplayLabel(displayLabel) // ensure logs/toString use same label as animation
-                    director.numActors += 1                                  // number of actors created by all sources, so far
-                    if director.isAnimating then director.dgAni.updateActorCount(director.numActors)  // korede
-                    director.log.trace (this, "generates", actor, director.clock)
-                    // pass explicit label so animator shows M-#, R1-# instead of the class name
-                    director.animateWithLabel (actor, CreateToken, randomColor (actor.id), Ellipse (),
-                                      Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD),
-                                      displayLabel)             // explicit label used by DgAnimator.drawTokenLabel
-                    debug ("act", s"schedule actor $i")
-                    actor.schedule (0.0)
-                    debug ("act", s"after schedule actor $i")
+        breakable {
+            debug("act", s"start making $units Vehicles")
+            cfor (1 , units + 1) { i => // MINOR LOOP - make actors
+                if director.stopped then
+                    println(s"VSource.act: simulation unexpectedly ended at ${director.clock}")
+                    break() // terminate source, simulation ended
+                debug("act", s"make entity/vehicle $i")
+                val actor = makeEntity() // make new actor/vehicle
+                debug("act", s"after make entity/vehicle $i: actor = $actor")
+                actor.mySource = this // actor's source
+                actor.subtype = esubtype // set the entity subtype
+                director.numActors += 1 // number of actors created by all sources, so far
+                if director.isAnimating then director.dgAni.updateActorCount(director.numActors) // korede
+                director.log.trace(this, "generates", actor, director.clock)
+                director.animate(actor, CreateToken, randomColor(actor.id), Ellipse(),
+                    Array(at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
+                debug("act", s"schedule actor $i")
+                actor.schedule(0.0)
+                debug("act", s"after schedule actor $i")
 
-                    //this mechanism helps the RowTimeLoader trait to conveniently switch to the next row of the dataset
-                    //Using this allows us to adjust the intensity rate of the Expo2 function
-                    if director.isInstanceOf[RowTimeLoader] then
-                        val rowManager = director.asInstanceOf[RowTimeLoader]
-                        //println(s"I director clock executed at this time: ${director.clock}")
-                        rowManager.nextRow(director.clock)
-                        //ew.write(s"\n [VSource] directorclock: ${director.clock}: curRow = ${rowManager.curRow},mu:  ${iArrivalTime.mean}")
-                        //println(s"I executed")
-                    end if
+                if director.isInstanceOf[CalRoute101] then
+                    val rowManager = director.asInstanceOf[CalRoute101]
+                    if i < units then
 
-                    if director.isInstanceOf[OneWayVehicle2L] then
-                        val rowManager = director.asInstanceOf[OneWayVehicle2L]
-                        //println(s"I director OneWayVehicle2L clock executed at this time: ${director.clock}")
-                        //rowManager.arrivalCount(rowManager.curRow) += 1 //just a count// does not affect any logic
-                        //println("I worked too")
-                        if i < units then
-                            val mu = rowManager.getMuForSource(this.subtype)(rowManager.curRow)
-                            //val mu = rowManager.muVal(rowManager.curRow)// use the mu value of the current row
-                            //ew.write(s"\n mu $mu and i_unit = \n")
-                            val gen = if iArrivalTime.isInstanceOf[Erlang] then iArrivalTime.gen1(mu/2) else iArrivalTime.gen1(mu)
-                            val duration = gen
-                            //val duration = iArrivalTime
-                            val ctime    = director.clock                        // clock time
-                            tally (duration)                                     // tally duration
+                        val currentRow = rowManager.getCurrentRow(director.clock)
+                        val safeRow = math.min(currentRow, rowManager.config.data.dim - 1)
+                        val mu = rowManager.getMuForSource(this.subtype)(safeRow)
 
-                            //record (actor, ctime)                                // record actor flow
-                            schedule (duration)
-                            debug ("act", s"actor $i yields to director")
-                            yieldToDirector ()                                   // yield and wait duration time units
-                            debug ("act", s"after yield actor $i")
-                end for
-            } // breakable
+                        //val mu = rowManager.getMuForSource(this.subtype)(rowManager.curRow)
+                        val gen = if iArrivalTime.isInstanceOf[Erlang] then iArrivalTime.gen1(mu) else iArrivalTime.gen1(mu)
+                        val duration = gen
+                        val ctime = director.clock // clock time
+                        tally(duration) // tally duration
 
-            ew.flush()
-            if rep < director.reps then
-                director.log.trace (this, "wait for next rep", director, director.clock)
-                yieldToDirector ()                                           // yield and wait for next replication
-        end for
+                        //record (actor, ctime)                                // record actor flow
+                        schedule(duration)
+                        debug("act", s"actor $i yields to director")
+                        yieldToDirector() // yield and wait duration time units
+                        debug("act", s"after yield actor $i")
+            }
+        } // breakable
 
-        director.log.trace (this, "terminates", null, director.clock)
-        yieldToDirector (true)                                               // yield and terminate
+        ew.flush()
+        if rep < director.reps then
+            director.log.trace(this, "wait for next rep", director, director.clock)
+            yieldToDirector() // yield and wait for next replication
+        //end for
+
+        director.log.trace(this, "terminates", null, director.clock)
+        yieldToDirector(true) // yield and terminate
     end act
+
 
 end VSource
 

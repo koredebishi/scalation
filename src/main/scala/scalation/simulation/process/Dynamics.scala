@@ -56,6 +56,8 @@ object GippsDynamics
 
     private val debug = debugf ("GippsDynamics", false)              // debug function
     private[process] val easyW = new EasyWriter("simulation", "OnewayVehicle2LModel.txt")
+    easyW.off()
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     /** Update the vehicle's velocity and position using Gipps' Model (located in `Motion`)

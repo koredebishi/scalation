@@ -228,41 +228,42 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     override def act(): Unit =
         log.trace(this, s"starts model for $reps replications", null, _clock)
 
-        for rep <- 1 to reps do                                         // LOOP THROUGH REPLICATIONS
-            _clock = startTime                                          //Initialize the clock at StartTime
-            if rep == 1 && animating then display()                     // turn animation on (true) off (false)
+        //for rep <- 1 to reps do                                         // LOOP THROUGH REPLICATIONS
+        val rep = 1
+        _clock = startTime                                          //Initialize the clock at StartTime
+        if rep == 1 && animating then display()                     // turn animation on (true) off (false)
 
-            log.trace(this, s"starts rep $rep", null, _clock)           // log this simulation
+        log.trace(this, s"starts rep $rep", null, _clock)           // log this simulation
 
-            simulating = true                                           // Start the simulation as true,
+        simulating = true                                           // Start the simulation as true,
 
-            while simulating && !agenda.isEmpty do                      // INNER SCHEDULING LOOP
-                _theActor = agenda.dequeue()                            // get next actor from priority queue
-                if _theActor.actTime < clock then
-                    flaw("act", s"actor $_theActor activation time < $_clock")
-                    println("QUIT")
-                    simulating = false                                  //stop the simulation and quit
+        while simulating && !agenda.isEmpty do                      // INNER SCHEDULING LOOP
+            _theActor = agenda.dequeue()                            // get next actor from priority queue
+            if _theActor.actTime < clock then
+                flaw("act", s"actor $_theActor activation time < $_clock")
+                println("QUIT")
+                simulating = false                                  //stop the simulation and quit
+            else
+                _clock = _theActor.actTime                          // advance time
+
+                if _clock > stopTime && _theActor.isInstanceOf[Source] then
+                    println(s"Skipping Source actor due to time limit at clock = $clock")
                 else
-                    _clock = _theActor.actTime                          // advance time
+                    if isAnimating then dgAni.updateActorCount(numActors)
+                    //debug("act", s"${this.me} resumes ${_theActor} at clock= $clock")
+                    //log.trace(this, "resumes", _theActor, _clock)
+                    yyield(_theActor) // yield to actor
+                    //debug ("act", s"after yyield at clock $clock")
+            end if
+        end while
 
-                    if _clock > stopTime && _theActor.isInstanceOf[Source] then
-                        println(s"Skipping Source actor due to time limit at clock = $clock")
-                    else
-                        if isAnimating then dgAni.updateActorCount(numActors)
-                        debug("act", s"${this.me} resumes ${_theActor} at clock= $clock")
-                        log.trace(this, "resumes", _theActor, _clock)
-                        yyield(_theActor) // yield to actor
-                        debug ("act", s"after yyield at clock $clock")
-                end if
-            end while
+        simulating = false
+        log.trace(this, s"ends rep $rep", null, _clock)
 
-            simulating = false
-            log.trace(this, s"ends rep $rep", null, _clock)
-
-            fini(rep)
-            if rep < reps then reset()
-            resetStats(rep)
-        end for
+        fini(rep)
+        if rep < reps then reset()
+        resetStats(rep)
+        //end for
 
         cleanup()
         if reps > 1 then reportV()

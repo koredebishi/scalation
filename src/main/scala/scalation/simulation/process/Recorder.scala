@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
  *  @version 2.0
@@ -65,6 +64,9 @@ trait Recorder(nt: Int):
     protected val r_speeds = new MatrixD(nt, nl)   // Speed matrix [time_intervals × lanes]
 
     private val recordedVehicles = new ArrayBuffer[String]()
+    
+    // Track the last row index to detect transitions
+    private var lastRecordedRow: Int = -1
 
 
 
@@ -76,30 +78,41 @@ trait Recorder(nt: Int):
      */
     def record(actor: SimActor, ctime: Double): Unit =
 
-//        println(s"the clock time is $ctime and the timeConv is $timeConv")
+        val i = floor(ctime / timeConv).toInt // Time bucket index
+        val j = if i >= nt then nt - 1 else i // cap the last time bucket for overflow
+        
+        // ===== DETECT ROW TRANSITION =====
+        if j != lastRecordedRow then
+            val rowStartTime = j * timeConv
+            val rowEndTime = (j + 1) * timeConv
+            Recorder.ew.write(f"\n╔═══════════════════════════════════════════════════════════════════════════════╗\n")
+            Recorder.ew.write(f"║ ROW TRANSITION DETECTED: Row $lastRecordedRow%2d → Row $j%2d at clock=$ctime%8.2f sec\n")
+            Recorder.ew.write(f"║ Row $j%2d time window: [$rowStartTime%8.2f - $rowEndTime%8.2f) seconds\n")
+            Recorder.ew.write(f"║ Sensor: $this\n")
+            Recorder.ew.write(f"╚═══════════════════════════════════════════════════════════════════════════════╝\n")
+            lastRecordedRow = j
+        end if
 
-        val i = floor(ctime / timeConv).toInt // Time bucket index //Fix this time conversion thing.
-        val j = if i >= nt then nt - 1 else i // cap the last time bucker for overflow
-
-        //Recorder.ew.write(s"\n the clock time is $ctime and the timeConv is $timeConv i: $i \n")
-        //println(s"[Recorder] recording for: $this")
-
+        // ===== LOG EVERY RECORDING EVENT =====
+        Recorder.ew.write(f"\n[RECORD] Sensor=$this | Clock=$ctime%8.2f | Row=$j%2d | timeConv=$timeConv%6.1f | CalcRow_i=$i%2d")
 
         if actor.isInstanceOf[Vehicle] then
 
             val vehicle = actor.asInstanceOf[Vehicle]
             val laneID = vehicle.laneID
-//            println(s"Inside recorder: laneID = $laneID")
             val cnt = r_counts(j, laneID).toInt + 1
-            //println(s"Inside recorder: count = $cnt")
             r_counts(j, laneID) = cnt
             val speed = if vehicle.velocity.isNaN then 0.0 else vehicle.velocity
             r_speeds(j, laneID) = (r_speeds(j, laneID) * (cnt - 1) + (speed * 2.24694) ) / cnt // Compute running avg speed
 
             recordedVehicles += vehicle.name
 
+            // Enhanced vehicle recording log
+            Recorder.ew.write(f" | Vehicle=${vehicle.displayLabel}%-8s | Lane=$laneID%d | Speed=$speed%5.2f | Count_in_row=$cnt%3d\n")
         else
             r_counts(j, 0) += 1 //None vehicle actors records
+            Recorder.ew.write(f" | Actor=${actor.name}%-8s | Type=Non-Vehicle\n")
+        end if
     end record
 
 
@@ -167,29 +180,3 @@ object Recorder:
         ew.finish()
 
 end Recorder
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

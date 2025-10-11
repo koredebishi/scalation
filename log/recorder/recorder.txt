@@ -1,254 +1,664 @@
 
-================== FINAL SENSOR STATS ==================
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║ ROW TRANSITION DETECTED: Row -1 → Row  0 at clock=    0.00 sec
+║ Row  0 time window: [    0.00 -   900.00) seconds
+║ Sensor: ssor0
+╚═══════════════════════════════════════════════════════════════════════════════╝
 
-================== ROW-WISE LANE STATS FOR SENSOR ssor0 : 16377.0 ==================
- lane_flow: [57, 88, 72, 47, 75] : lane_speed: [68.0, 68.0, 68.0, 66.7, 68.0] : flow_total: [339] : ave_speed = [67.8]
- lane_flow: [70, 101, 70, 39, 77] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [357] : ave_speed = [68.0]
- lane_flow: [55, 99, 72, 48, 86] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [360] : ave_speed = [68.0]
- lane_flow: [56, 91, 96, 53, 92] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [388] : ave_speed = [68.0]
- lane_flow: [61, 95, 86, 43, 76] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [361] : ave_speed = [68.0]
- lane_flow: [89, 117, 89, 42, 91] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [428] : ave_speed = [68.0]
- lane_flow: [74, 123, 84, 53, 103] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [437] : ave_speed = [68.0]
- lane_flow: [82, 130, 92, 52, 89] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [445] : ave_speed = [68.0]
- lane_flow: [80, 130, 97, 43, 110] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [460] : ave_speed = [68.0]
- lane_flow: [100, 145, 96, 66, 111] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [518] : ave_speed = [68.0]
- lane_flow: [117, 154, 112, 69, 130] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [582] : ave_speed = [68.0]
- lane_flow: [127, 158, 124, 85, 140] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [634] : ave_speed = [68.0]
- lane_flow: [121, 161, 118, 78, 146] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [624] : ave_speed = [68.0]
- lane_flow: [137, 193, 143, 87, 185] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [745] : ave_speed = [68.0]
- lane_flow: [141, 213, 176, 78, 165] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [773] : ave_speed = [68.0]
- lane_flow: [122, 193, 162, 77, 179] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [733] : ave_speed = [68.0]
- lane_flow: [137, 195, 168, 93, 180] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [773] : ave_speed = [68.0]
- lane_flow: [144, 249, 174, 106, 199] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [872] : ave_speed = [68.0]
- lane_flow: [184, 269, 230, 109, 238] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [1030] : ave_speed = [68.0]
- lane_flow: [200, 281, 249, 124, 229] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [1083] : ave_speed = [68.0]
- lane_flow: [175, 273, 211, 130, 260] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [1049] : ave_speed = [68.0]
- lane_flow: [203, 259, 239, 137, 231] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [1069] : ave_speed = [68.0]
- lane_flow: [193, 321, 234, 145, 279] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [1172] : ave_speed = [68.0]
- lane_flow: [204, 311, 234, 142, 254] : lane_speed: [68.0, 68.0, 68.0, 68.0, 68.0] : flow_total: [1145] : ave_speed = [68.0]
+[RECORD] Sensor=ssor0 | Clock=    0.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=30.26 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR==================
+[RECORD] Sensor=ssor0 | Clock=    1.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR ssor1 : 19323.0 ==================
- lane_flow: [112, 88, 72, 47, 74] : lane_speed: [24.1, 27.9, 49.6, 58.6, 55.6] : flow_total: [393] : ave_speed = [39.7]
- lane_flow: [141, 100, 70, 38, 78] : lane_speed: [22.6, 34.3, 52.3, 64.6, 57.8] : flow_total: [427] : ave_speed = [40.3]
- lane_flow: [109, 100, 70, 49, 84] : lane_speed: [32.1, 32.1, 45.6, 35.8, 57.4] : flow_total: [412] : ave_speed = [40.0]
- lane_flow: [62, 105, 105, 63, 104] : lane_speed: [18.7, 25.7, 44.1, 45.7, 51.2] : flow_total: [439] : ave_speed = [38.0]
- lane_flow: [71, 113, 94, 56, 96] : lane_speed: [22.2, 25.5, 43.9, 45.5, 61.4] : flow_total: [430] : ave_speed = [39.6]
- lane_flow: [107, 145, 109, 50, 106] : lane_speed: [24.6, 18.0, 53.3, 56.7, 56.6] : flow_total: [517] : ave_speed = [38.4]
- lane_flow: [84, 147, 102, 59, 120] : lane_speed: [23.7, 26.1, 43.8, 53.4, 52.9] : flow_total: [512] : ave_speed = [38.7]
- lane_flow: [102, 155, 105, 59, 103] : lane_speed: [23.6, 20.8, 49.7, 48.9, 58.0] : flow_total: [524] : ave_speed = [37.6]
- lane_flow: [97, 151, 118, 51, 127] : lane_speed: [19.1, 17.4, 52.8, 51.0, 51.3] : flow_total: [544] : ave_speed = [36.4]
- lane_flow: [122, 169, 113, 79, 130] : lane_speed: [26.3, 15.6, 39.6, 52.8, 54.6] : flow_total: [613] : ave_speed = [35.2]
- lane_flow: [140, 189, 130, 87, 151] : lane_speed: [31.0, 17.8, 28.9, 53.8, 49.5] : flow_total: [697] : ave_speed = [33.9]
- lane_flow: [153, 185, 154, 100, 169] : lane_speed: [53.2, 39.6, 43.5, 49.6, 49.8] : flow_total: [761] : ave_speed = [46.7]
- lane_flow: [134, 193, 143, 87, 181] : lane_speed: [42.2, 42.0, 41.7, 48.0, 51.9] : flow_total: [738] : ave_speed = [45.1]
- lane_flow: [168, 236, 172, 102, 214] : lane_speed: [46.5, 34.1, 41.3, 40.3, 43.5] : flow_total: [892] : ave_speed = [40.8]
- lane_flow: [169, 240, 207, 95, 202] : lane_speed: [50.1, 31.4, 44.0, 48.5, 48.4] : flow_total: [913] : ave_speed = [43.3]
- lane_flow: [140, 227, 186, 91, 208] : lane_speed: [52.1, 43.8, 44.5, 48.2, 41.3] : flow_total: [852] : ave_speed = [45.2]
- lane_flow: [152, 235, 213, 110, 206] : lane_speed: [48.1, 38.0, 38.1, 44.9, 52.8] : flow_total: [916] : ave_speed = [43.8]
- lane_flow: [173, 291, 202, 122, 230] : lane_speed: [42.4, 42.5, 36.1, 37.2, 41.0] : flow_total: [1018] : ave_speed = [40.2]
- lane_flow: [203, 324, 279, 126, 279] : lane_speed: [35.2, 36.6, 35.6, 36.7, 42.4] : flow_total: [1211] : ave_speed = [37.5]
- lane_flow: [226, 336, 291, 152, 272] : lane_speed: [38.3, 30.7, 34.0, 40.5, 39.4] : flow_total: [1277] : ave_speed = [35.8]
- lane_flow: [216, 326, 244, 147, 299] : lane_speed: [43.3, 34.7, 26.9, 30.5, 38.9] : flow_total: [1232] : ave_speed = [35.2]
- lane_flow: [231, 297, 295, 161, 287] : lane_speed: [42.8, 31.5, 30.8, 40.3, 36.2] : flow_total: [1271] : ave_speed = [35.6]
- lane_flow: [235, 366, 264, 177, 327] : lane_speed: [33.0, 34.9, 25.0, 31.9, 37.7] : flow_total: [1369] : ave_speed = [32.9]
- lane_flow: [240, 372, 281, 173, 299] : lane_speed: [43.9, 31.1, 33.5, 38.2, 39.8] : flow_total: [1365] : ave_speed = [36.7]
+[RECORD] Sensor=ssor0 | Clock=    6.16 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR==================
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║ ROW TRANSITION DETECTED: Row -1 → Row  0 at clock=   10.50 sec
+║ Row  0 time window: [    0.00 -   900.00) seconds
+║ Sensor: ssor1
+╚═══════════════════════════════════════════════════════════════════════════════╝
 
-================== ROW-WISE LANE STATS FOR SENSOR ssor2 : 18067.0 ==================
- lane_flow: [346, 80, 65, 79, 49] : lane_speed: [67.7, 19.1, 40.2, 59.9, 54.0] : flow_total: [619] : ave_speed = [56.5]
- lane_flow: [362, 98, 63, 68, 52] : lane_speed: [67.8, 27.6, 50.3, 65.3, 54.8] : flow_total: [643] : ave_speed = [58.6]
- lane_flow: [376, 83, 60, 90, 53] : lane_speed: [67.4, 23.3, 41.5, 50.7, 49.6] : flow_total: [662] : ave_speed = [55.8]
- lane_flow: [420, 92, 70, 84, 50] : lane_speed: [63.4, 22.8, 38.1, 49.5, 46.2] : flow_total: [716] : ave_speed = [52.9]
- lane_flow: [398, 83, 76, 79, 29] : lane_speed: [63.1, 19.4, 40.1, 56.8, 52.9] : flow_total: [665] : ave_speed = [53.8]
- lane_flow: [483, 112, 54, 74, 43] : lane_speed: [62.1, 17.8, 49.0, 64.4, 46.5] : flow_total: [766] : ave_speed = [54.1]
- lane_flow: [483, 100, 81, 82, 57] : lane_speed: [62.7, 24.4, 44.2, 58.6, 47.6] : flow_total: [803] : ave_speed = [54.6]
- lane_flow: [490, 121, 68, 86, 44] : lane_speed: [63.1, 19.3, 47.8, 55.9, 53.5] : flow_total: [809] : ave_speed = [54.0]
- lane_flow: [506, 144, 47, 86, 56] : lane_speed: [63.1, 15.5, 49.6, 57.9, 40.0] : flow_total: [839] : ave_speed = [52.1]
- lane_flow: [572, 132, 78, 86, 65] : lane_speed: [62.8, 17.0, 38.6, 61.2, 48.0] : flow_total: [933] : ave_speed = [53.1]
- lane_flow: [605, 147, 98, 83, 74] : lane_speed: [62.7, 24.6, 26.0, 55.9, 44.6] : flow_total: [1007] : ave_speed = [51.7]
- lane_flow: [79, 130, 95, 123, 75] : lane_speed: [41.7, 41.0, 41.3, 51.3, 44.9] : flow_total: [502] : ave_speed = [44.3]
- lane_flow: [79, 134, 108, 112, 67] : lane_speed: [38.6, 44.9, 37.1, 58.3, 36.0] : flow_total: [500] : ave_speed = [44.0]
- lane_flow: [84, 166, 112, 143, 106] : lane_speed: [41.4, 38.3, 37.0, 51.4, 36.2] : flow_total: [611] : ave_speed = [41.2]
- lane_flow: [91, 193, 129, 151, 68] : lane_speed: [40.7, 30.6, 39.0, 56.5, 41.9] : flow_total: [632] : ave_speed = [41.2]
- lane_flow: [71, 164, 127, 140, 100] : lane_speed: [53.7, 43.4, 43.5, 49.9, 28.4] : flow_total: [602] : ave_speed = [43.6]
- lane_flow: [88, 162, 154, 166, 73] : lane_speed: [37.3, 40.3, 36.9, 50.3, 47.6] : flow_total: [643] : ave_speed = [42.5]
- lane_flow: [112, 170, 161, 164, 118] : lane_speed: [35.8, 38.2, 44.5, 44.7, 37.5] : flow_total: [725] : ave_speed = [40.6]
- lane_flow: [127, 214, 186, 194, 123] : lane_speed: [27.7, 39.6, 31.0, 44.5, 39.7] : flow_total: [844] : ave_speed = [37.0]
- lane_flow: [145, 242, 181, 190, 118] : lane_speed: [37.2, 32.3, 29.4, 46.1, 28.1] : flow_total: [876] : ave_speed = [34.9]
- lane_flow: [118, 200, 213, 187, 159] : lane_speed: [36.2, 34.3, 24.6, 41.3, 25.6] : flow_total: [877] : ave_speed = [32.1]
- lane_flow: [133, 228, 196, 163, 142] : lane_speed: [36.5, 35.1, 28.4, 46.5, 26.2] : flow_total: [862] : ave_speed = [34.5]
- lane_flow: [146, 228, 242, 199, 162] : lane_speed: [31.3, 27.9, 25.3, 38.7, 30.2] : flow_total: [977] : ave_speed = [30.4]
- lane_flow: [128, 282, 194, 208, 142] : lane_speed: [36.7, 30.5, 30.1, 40.9, 30.5] : flow_total: [954] : ave_speed = [33.5]
+[RECORD] Sensor=ssor1 | Clock=   10.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=34.47 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR==================
+[RECORD] Sensor=ssor0 | Clock=   11.93 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row=  2
 
-================== ROW-WISE LANE STATS FOR SENSOR ssor3 : 18176.0 ==================
- lane_flow: [374, 160, 66, 77, 49] : lane_speed: [61.3, 40.4, 39.2, 64.1, 50.3] : flow_total: [726] : ave_speed = [54.2]
- lane_flow: [269, 190, 64, 69, 51] : lane_speed: [58.3, 44.8, 43.0, 68.4, 52.9] : flow_total: [643] : ave_speed = [53.4]
- lane_flow: [287, 168, 66, 88, 51] : lane_speed: [56.2, 44.3, 39.7, 51.7, 49.6] : flow_total: [660] : ave_speed = [50.4]
- lane_flow: [316, 190, 74, 80, 51] : lane_speed: [52.9, 41.2, 32.3, 51.2, 45.0] : flow_total: [711] : ave_speed = [46.9]
- lane_flow: [301, 183, 74, 82, 31] : lane_speed: [53.4, 39.1, 39.0, 56.1, 55.0] : flow_total: [671] : ave_speed = [48.3]
- lane_flow: [361, 235, 54, 74, 43] : lane_speed: [51.4, 36.4, 50.0, 66.4, 45.9] : flow_total: [767] : ave_speed = [47.9]
- lane_flow: [360, 219, 87, 80, 58] : lane_speed: [50.3, 42.0, 40.7, 54.6, 48.9] : flow_total: [804] : ave_speed = [47.3]
- lane_flow: [345, 260, 70, 84, 46] : lane_speed: [54.6, 33.9, 46.3, 59.2, 53.1] : flow_total: [805] : ave_speed = [47.6]
- lane_flow: [379, 274, 47, 83, 57] : lane_speed: [52.2, 31.4, 47.3, 59.2, 38.3] : flow_total: [840] : ave_speed = [44.9]
- lane_flow: [432, 271, 85, 84, 63] : lane_speed: [52.4, 37.0, 34.4, 63.1, 45.9] : flow_total: [935] : ave_speed = [46.8]
- lane_flow: [463, 289, 97, 87, 72] : lane_speed: [48.6, 34.8, 22.8, 56.4, 43.8] : flow_total: [1008] : ave_speed = [42.5]
- lane_flow: [77, 127, 97, 122, 78] : lane_speed: [39.9, 42.6, 39.2, 50.9, 40.7] : flow_total: [501] : ave_speed = [43.3]
- lane_flow: [82, 124, 113, 113, 67] : lane_speed: [35.9, 48.3, 35.3, 58.0, 33.7] : flow_total: [499] : ave_speed = [43.5]
- lane_flow: [80, 169, 114, 144, 107] : lane_speed: [41.4, 37.7, 31.9, 52.0, 35.9] : flow_total: [614] : ave_speed = [40.1]
- lane_flow: [88, 194, 127, 155, 67] : lane_speed: [39.1, 28.6, 40.6, 54.8, 42.6] : flow_total: [631] : ave_speed = [40.4]
- lane_flow: [70, 161, 129, 140, 102] : lane_speed: [52.4, 47.1, 41.6, 51.9, 26.2] : flow_total: [602] : ave_speed = [44.1]
- lane_flow: [87, 162, 151, 169, 71] : lane_speed: [38.0, 41.5, 35.6, 50.7, 48.1] : flow_total: [640] : ave_speed = [42.8]
- lane_flow: [114, 160, 161, 168, 121] : lane_speed: [34.3, 38.7, 41.0, 44.6, 35.4] : flow_total: [724] : ave_speed = [39.3]
- lane_flow: [128, 213, 184, 196, 126] : lane_speed: [27.3, 39.6, 30.2, 43.6, 39.0] : flow_total: [847] : ave_speed = [36.5]
- lane_flow: [139, 239, 184, 192, 120] : lane_speed: [35.0, 32.6, 26.0, 46.1, 27.3] : flow_total: [874] : ave_speed = [33.8]
- lane_flow: [116, 199, 212, 191, 162] : lane_speed: [33.2, 36.0, 22.0, 42.5, 23.7] : flow_total: [880] : ave_speed = [31.4]
- lane_flow: [125, 228, 196, 169, 138] : lane_speed: [36.5, 35.8, 25.9, 45.6, 25.5] : flow_total: [856] : ave_speed = [33.9]
- lane_flow: [153, 221, 238, 205, 164] : lane_speed: [29.9, 28.5, 24.4, 38.0, 29.0] : flow_total: [981] : ave_speed = [29.8]
- lane_flow: [125, 280, 199, 211, 142] : lane_speed: [37.7, 29.1, 28.9, 41.6, 29.0] : flow_total: [957] : ave_speed = [32.9]
+[RECORD] Sensor=ssor1 | Clock=   12.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=32.87 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR==================
+[RECORD] Sensor=ssor0 | Clock=   13.10 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.26 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR ssor4 : 18176.0 ==================
- lane_flow: [356, 175, 66, 74, 47] : lane_speed: [5.8, 11.2, 23.0, 49.0, 44.3] : flow_total: [718] : ave_speed = [15.6]
- lane_flow: [263, 192, 63, 68, 53] : lane_speed: [4.7, 18.0, 29.0, 45.3, 37.3] : flow_total: [639] : ave_speed = [18.1]
- lane_flow: [280, 174, 68, 91, 50] : lane_speed: [10.1, 14.6, 26.6, 24.6, 40.7] : flow_total: [663] : ave_speed = [17.3]
- lane_flow: [297, 193, 76, 82, 51] : lane_speed: [4.7, 10.3, 17.3, 26.7, 32.2] : flow_total: [699] : ave_speed = [12.2]
- lane_flow: [301, 188, 75, 82, 32] : lane_speed: [5.2, 11.0, 16.9, 27.2, 47.8] : flow_total: [678] : ave_speed = [12.8]
- lane_flow: [356, 248, 55, 70, 43] : lane_speed: [9.8, 10.3, 31.7, 43.0, 39.0] : flow_total: [772] : ave_speed = [16.1]
- lane_flow: [351, 226, 83, 81, 58] : lane_speed: [6.5, 11.6, 14.7, 33.2, 41.0] : flow_total: [799] : ave_speed = [14.0]
- lane_flow: [321, 272, 73, 85, 45] : lane_speed: [6.7, 6.9, 27.5, 38.8, 48.3] : flow_total: [796] : ave_speed = [14.4]
- lane_flow: [351, 298, 48, 87, 58] : lane_speed: [7.3, 5.7, 29.3, 33.1, 31.1] : flow_total: [842] : ave_speed = [12.3]
- lane_flow: [429, 271, 86, 78, 60] : lane_speed: [14.0, 8.3, 16.5, 31.6, 37.4] : flow_total: [924] : ave_speed = [15.6]
- lane_flow: [455, 305, 100, 91, 73] : lane_speed: [17.9, 6.2, 10.1, 33.8, 36.5] : flow_total: [1024] : ave_speed = [16.4]
- lane_flow: [80, 129, 102, 122, 76] : lane_speed: [30.4, 25.9, 24.0, 20.6, 26.9] : flow_total: [509] : ave_speed = [25.1]
- lane_flow: [80, 120, 113, 109, 71] : lane_speed: [20.8, 27.6, 14.6, 32.4, 27.2] : flow_total: [493] : ave_speed = [24.5]
- lane_flow: [79, 171, 112, 150, 105] : lane_speed: [23.4, 19.8, 16.8, 12.5, 23.3] : flow_total: [617] : ave_speed = [18.5]
- lane_flow: [90, 195, 129, 146, 68] : lane_speed: [23.6, 10.9, 23.7, 27.2, 33.1] : flow_total: [628] : ave_speed = [21.5]
- lane_flow: [68, 161, 129, 144, 101] : lane_speed: [45.3, 29.4, 17.7, 15.3, 16.0] : flow_total: [603] : ave_speed = [23.1]
- lane_flow: [86, 162, 147, 174, 70] : lane_speed: [27.4, 23.5, 19.7, 23.6, 36.3] : flow_total: [639] : ave_speed = [24.6]
- lane_flow: [113, 158, 155, 170, 119] : lane_speed: [16.6, 20.8, 19.2, 11.5, 19.7] : flow_total: [715] : ave_speed = [17.4]
- lane_flow: [130, 214, 190, 194, 123] : lane_speed: [14.9, 21.0, 13.1, 16.5, 24.4] : flow_total: [851] : ave_speed = [17.8]
- lane_flow: [139, 232, 181, 185, 122] : lane_speed: [19.4, 15.6, 15.9, 16.0, 16.9] : flow_total: [859] : ave_speed = [16.6]
- lane_flow: [120, 192, 219, 202, 162] : lane_speed: [20.0, 15.8, 4.7, 13.2, 13.0] : flow_total: [895] : ave_speed = [12.5]
- lane_flow: [125, 227, 200, 167, 138] : lane_speed: [21.4, 19.6, 10.2, 24.1, 15.8] : flow_total: [857] : ave_speed = [17.9]
- lane_flow: [153, 222, 241, 215, 162] : lane_speed: [10.2, 9.9, 4.9, 5.0, 14.1] : flow_total: [993] : ave_speed = [8.3]
- lane_flow: [123, 281, 205, 211, 143] : lane_speed: [26.3, 15.7, 11.7, 15.3, 17.8] : flow_total: [963] : ave_speed = [16.4]
+[RECORD] Sensor=ssor0 | Clock=   13.55 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row=  2
 
-================== ROW-WISE LANE STATS FOR SENSOR==================
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║ ROW TRANSITION DETECTED: Row -1 → Row  0 at clock=   16.00 sec
+║ Row  0 time window: [    0.00 -   900.00) seconds
+║ Sensor: ssor2
+╚═══════════════════════════════════════════════════════════════════════════════╝
 
-================== ROW-WISE LANE STATS FOR SENSOR ssor5 : 18176.0 ==================
- lane_flow: [248, 273, 82, 61, 54] : lane_speed: [1.4, 5.5, 25.8, 47.2, 49.6] : flow_total: [718] : ave_speed = [13.3]
- lane_flow: [188, 248, 86, 49, 64] : lane_speed: [3.7, 5.6, 34.0, 57.7, 38.8] : flow_total: [635] : ave_speed = [16.3]
- lane_flow: [204, 243, 78, 85, 54] : lane_speed: [6.6, 5.2, 25.6, 19.4, 43.3] : flow_total: [664] : ave_speed = [12.9]
- lane_flow: [232, 246, 86, 71, 61] : lane_speed: [0.9, 5.6, 22.0, 20.0, 34.6] : flow_total: [696] : ave_speed = [10.0]
- lane_flow: [229, 245, 96, 75, 36] : lane_speed: [3.3, 5.5, 21.7, 18.1, 58.8] : flow_total: [681] : ave_speed = [11.3]
- lane_flow: [273, 316, 76, 56, 53] : lane_speed: [4.3, 4.8, 34.8, 46.0, 44.7] : flow_total: [774] : ave_speed = [13.3]
- lane_flow: [291, 268, 105, 80, 55] : lane_speed: [3.4, 8.1, 20.0, 34.1, 41.0] : flow_total: [799] : ave_speed = [12.8]
- lane_flow: [207, 383, 84, 71, 50] : lane_speed: [4.0, 3.6, 31.6, 34.8, 48.7] : flow_total: [795] : ave_speed = [12.3]
- lane_flow: [241, 397, 60, 75, 66] : lane_speed: [3.0, 3.6, 26.1, 33.3, 32.8] : flow_total: [839] : ave_speed = [10.0]
- lane_flow: [324, 348, 112, 71, 62] : lane_speed: [7.2, 8.6, 18.7, 33.4, 30.5] : flow_total: [917] : ave_speed = [12.7]
- lane_flow: [318, 432, 130, 75, 78] : lane_speed: [7.2, 6.6, 10.4, 24.8, 36.1] : flow_total: [1033] : ave_speed = [10.8]
- lane_flow: [80, 114, 109, 118, 90] : lane_speed: [24.7, 22.0, 25.5, 22.7, 25.2] : flow_total: [511] : ave_speed = [23.9]
- lane_flow: [88, 84, 139, 82, 95] : lane_speed: [18.2, 23.4, 15.6, 31.5, 27.8] : flow_total: [488] : ave_speed = [22.5]
- lane_flow: [77, 164, 122, 148, 108] : lane_speed: [21.2, 19.6, 18.0, 8.9, 24.3] : flow_total: [619] : ave_speed = [17.7]
- lane_flow: [89, 194, 126, 140, 81] : lane_speed: [24.8, 8.2, 21.3, 20.3, 34.8] : flow_total: [630] : ave_speed = [19.3]
- lane_flow: [70, 137, 156, 119, 122] : lane_speed: [42.1, 24.2, 20.7, 16.0, 14.1] : flow_total: [604] : ave_speed = [21.7]
- lane_flow: [93, 145, 157, 162, 82] : lane_speed: [23.6, 17.2, 18.8, 19.7, 32.5] : flow_total: [639] : ave_speed = [21.1]
- lane_flow: [115, 149, 150, 176, 121] : lane_speed: [12.5, 19.9, 12.7, 9.8, 20.9] : flow_total: [711] : ave_speed = [14.8]
- lane_flow: [131, 191, 194, 201, 129] : lane_speed: [11.7, 16.1, 15.3, 11.4, 26.4] : flow_total: [846] : ave_speed = [15.7]
- lane_flow: [130, 228, 203, 164, 138] : lane_speed: [17.5, 16.0, 15.9, 11.0, 20.9] : flow_total: [863] : ave_speed = [16.0]
- lane_flow: [131, 165, 227, 202, 173] : lane_speed: [17.0, 12.5, 6.4, 8.5, 11.2] : flow_total: [898] : ave_speed = [10.5]
- lane_flow: [130, 203, 229, 159, 134] : lane_speed: [18.1, 18.3, 11.9, 22.1, 14.8] : flow_total: [855] : ave_speed = [16.7]
- lane_flow: [159, 223, 226, 230, 160] : lane_speed: [6.6, 9.7, 3.5, 5.5, 10.0] : flow_total: [998] : ave_speed = [6.9]
- lane_flow: [124, 264, 230, 186, 159] : lane_speed: [19.7, 13.2, 12.6, 8.7, 19.3] : flow_total: [963] : ave_speed = [14.0]
+[RECORD] Sensor=ssor2 | Clock=   16.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=34.65 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR==================
+[RECORD] Sensor=ssor2 | Clock=   17.93 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=32.95 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR ramp1 : 0.0 ==================
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
+[RECORD] Sensor=ssor0 | Clock=   20.19 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row=  3
 
-================== ROW-WISE LANE STATS FOR SENSOR==================
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║ ROW TRANSITION DETECTED: Row -1 → Row  0 at clock=   20.50 sec
+║ Row  0 time window: [    0.00 -   900.00) seconds
+║ Sensor: ssor3
+╚═══════════════════════════════════════════════════════════════════════════════╝
 
-================== ROW-WISE LANE STATS FOR SENSOR ramp2 : 0.0 ==================
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
- lane_flow: [0, 0, 0, 0, 0] : lane_speed: [0.0, 0.0, 0.0, 0.0, 0.0] : flow_total: [0] : ave_speed = [0.0]
+[RECORD] Sensor=ssor3 | Clock=   20.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=34.69 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR==================
+[RECORD] Sensor=ssor1 | Clock=   20.66 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=22.18 | Count_in_row=  1
 
-================== ROW-WISE LANE STATS FOR SENSOR ramp3 : 2946.0 ==================
- lane_flow: [56, 0, 0, 0, 0] : lane_speed: [24.1, 0.0, 0.0, 0.0, 0.0] : flow_total: [56] : ave_speed = [24.1]
- lane_flow: [70, 0, 0, 0, 0] : lane_speed: [22.7, 0.0, 0.0, 0.0, 0.0] : flow_total: [70] : ave_speed = [22.7]
- lane_flow: [55, 0, 0, 0, 0] : lane_speed: [31.8, 0.0, 0.0, 0.0, 0.0] : flow_total: [55] : ave_speed = [31.8]
- lane_flow: [6, 15, 9, 12, 13] : lane_speed: [9.6, 18.8, 43.3, 54.0, 51.8] : flow_total: [55] : ave_speed = [37.3]
- lane_flow: [9, 18, 7, 11, 18] : lane_speed: [13.3, 21.7, 47.2, 39.9, 63.4] : flow_total: [63] : ave_speed = [38.4]
- lane_flow: [18, 28, 19, 9, 16] : lane_speed: [26.3, 18.3, 48.8, 53.9, 55.1] : flow_total: [90] : ave_speed = [36.4]
- lane_flow: [10, 23, 19, 5, 16] : lane_speed: [18.8, 16.5, 45.3, 46.0, 57.9] : flow_total: [73] : ave_speed = [35.4]
- lane_flow: [21, 26, 12, 7, 14] : lane_speed: [23.7, 20.0, 47.6, 51.6, 61.2] : flow_total: [80] : ave_speed = [35.1]
- lane_flow: [16, 20, 21, 8, 18] : lane_speed: [24.9, 20.9, 47.4, 47.2, 52.1] : flow_total: [83] : ave_speed = [37.7]
- lane_flow: [23, 26, 18, 14, 17] : lane_speed: [24.2, 13.6, 28.6, 51.4, 57.5] : flow_total: [98] : ave_speed = [31.8]
- lane_flow: [23, 34, 20, 17, 23] : lane_speed: [26.7, 13.5, 25.8, 59.6, 49.3] : flow_total: [117] : ave_speed = [31.9]
- lane_flow: [26, 31, 28, 15, 28] : lane_speed: [61.1, 39.5, 42.1, 56.8, 49.0] : flow_total: [128] : ave_speed = [48.6]
- lane_flow: [15, 30, 28, 11, 34] : lane_speed: [34.7, 48.3, 44.5, 46.7, 55.4] : flow_total: [118] : ave_speed = [47.6]
- lane_flow: [29, 43, 25, 13, 32] : lane_speed: [42.7, 35.4, 37.9, 42.7, 43.5] : flow_total: [142] : ave_speed = [39.8]
- lane_flow: [28, 27, 34, 17, 35] : lane_speed: [52.7, 28.9, 45.9, 51.2, 42.0] : flow_total: [141] : ave_speed = [43.7]
- lane_flow: [20, 33, 29, 14, 29] : lane_speed: [47.7, 49.0, 46.0, 50.5, 46.9] : flow_total: [125] : ave_speed = [47.8]
- lane_flow: [16, 39, 38, 17, 26] : lane_speed: [48.6, 34.3, 47.5, 41.7, 52.0] : flow_total: [136] : ave_speed = [44.0]
- lane_flow: [25, 44, 30, 16, 30] : lane_speed: [48.8, 39.1, 28.9, 30.5, 37.0] : flow_total: [145] : ave_speed = [37.3]
- lane_flow: [23, 53, 48, 17, 43] : lane_speed: [35.6, 31.2, 35.1, 37.5, 37.5] : flow_total: [184] : ave_speed = [34.8]
- lane_flow: [29, 59, 41, 28, 43] : lane_speed: [35.3, 31.8, 30.7, 40.1, 41.7] : flow_total: [200] : ave_speed = [35.4]
- lane_flow: [37, 53, 34, 17, 38] : lane_speed: [48.6, 34.9, 33.6, 35.3, 45.7] : flow_total: [179] : ave_speed = [39.8]
- lane_flow: [28, 37, 56, 26, 55] : lane_speed: [40.8, 30.3, 32.7, 38.6, 40.6] : flow_total: [202] : ave_speed = [36.3]
- lane_flow: [40, 48, 29, 31, 50] : lane_speed: [34.3, 36.3, 31.1, 31.3, 38.0] : flow_total: [198] : ave_speed = [34.8]
- lane_flow: [35, 54, 46, 30, 43] : lane_speed: [43.9, 36.6, 39.1, 43.5, 41.1] : flow_total: [208] : ave_speed = [40.3]
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║ ROW TRANSITION DETECTED: Row -1 → Row  0 at clock=   21.66 sec
+║ Row  0 time window: [    0.00 -   900.00) seconds
+║ Sensor: ramp3
+╚═══════════════════════════════════════════════════════════════════════════════╝
 
-================== ROW-WISE LANE STATS FOR SENSOR==================
+[RECORD] Sensor=ramp3 | Clock=   21.66 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=22.18 | Count_in_row=  1
+
+[RECORD] Sensor=ssor3 | Clock=   22.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=32.97 | Count_in_row=  1
+
+[RECORD] Sensor=ssor1 | Clock=   23.10 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=38.66 | Count_in_row=  1
+
+[RECORD] Sensor=ssor1 | Clock=   23.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.65 | Count_in_row=  2
+
+[RECORD] Sensor=ssor0 | Clock=   23.64 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=30.26 | Count_in_row=  1
+
+[RECORD] Sensor=ssor0 | Clock=   24.51 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=30.26 | Count_in_row=  2
+
+[RECORD] Sensor=ssor1 | Clock=   25.05 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=32.97 | Count_in_row=  2
+
+[RECORD] Sensor=ramp3 | Clock=   26.05 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=32.97 | Count_in_row=  2
+
+[RECORD] Sensor=ssor0 | Clock=   26.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=30.26 | Count_in_row=  3
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║ ROW TRANSITION DETECTED: Row -1 → Row  0 at clock=   27.50 sec
+║ Row  0 time window: [    0.00 -   900.00) seconds
+║ Sensor: ramp2
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+[RECORD] Sensor=ramp2 | Clock=   27.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=32.28 | Count_in_row=  1
+
+[RECORD] Sensor=ssor2 | Clock=   28.10 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=39.26 | Count_in_row=  1
+
+[RECORD] Sensor=ssor3 | Clock=   28.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=32.28 | Count_in_row=  1
+
+[RECORD] Sensor=ssor0 | Clock=   29.38 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row=  4
+
+[RECORD] Sensor=ssor2 | Clock=   29.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.66 | Count_in_row=  2
+
+[RECORD] Sensor=ssor0 | Clock=   31.58 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row=  3
+
+[RECORD] Sensor=ssor3 | Clock=   32.10 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=39.43 | Count_in_row=  1
+
+[RECORD] Sensor=ssor1 | Clock=   32.19 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=28.84 | Count_in_row=  3
+
+[RECORD] Sensor=ssor3 | Clock=   33.93 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.66 | Count_in_row=  2
+
+[RECORD] Sensor=ssor0 | Clock=   37.26 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.26 | Count_in_row=  2
+
+[RECORD] Sensor=ssor2 | Clock=   38.69 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=28.82 | Count_in_row=  3
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║ ROW TRANSITION DETECTED: Row -1 → Row  0 at clock=   39.00 sec
+║ Row  0 time window: [    0.00 -   900.00) seconds
+║ Sensor: ramp1
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+[RECORD] Sensor=ramp1 | Clock=   39.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=22.20 | Count_in_row=  1
+
+[RECORD] Sensor=ssor1 | Clock=   39.14 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=21.12 | Count_in_row=  1
+
+[RECORD] Sensor=ramp1 | Clock=   39.86 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.49 | Count_in_row=  2
+
+[RECORD] Sensor=ssor1 | Clock=   39.88 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=34.69 | Count_in_row=  4
+
+[RECORD] Sensor=ssor2 | Clock=   40.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=22.20 | Count_in_row=  1
+
+[RECORD] Sensor=ssor1 | Clock=   40.01 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=19.90 | Count_in_row=  2
+
+[RECORD] Sensor=ssor2 | Clock=   40.86 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.49 | Count_in_row=  2
+
+[RECORD] Sensor=ssor1 | Clock=   41.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=18.78 | Count_in_row=  3
+
+[RECORD] Sensor=ramp1 | Clock=   43.51 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.30 | Count_in_row=  3
+
+[RECORD] Sensor=ssor3 | Clock=   43.69 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=28.82 | Count_in_row=  3
+
+[RECORD] Sensor=ssor1 | Clock=   44.08 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=27.25 | Count_in_row=  3
+
+[RECORD] Sensor=ssor2 | Clock=   44.51 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.30 | Count_in_row=  3
+
+[RECORD] Sensor=ramp3 | Clock=   45.08 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=27.25 | Count_in_row=  3
+
+[RECORD] Sensor=ssor2 | Clock=   45.38 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=35.64 | Count_in_row=  2
+
+[RECORD] Sensor=ssor3 | Clock=   46.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.87 | Count_in_row=  2
+
+[RECORD] Sensor=ssor3 | Clock=   46.36 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=26.29 | Count_in_row=  3
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║ ROW TRANSITION DETECTED: Row -1 → Row  0 at clock=   47.00 sec
+║ Row  0 time window: [    0.00 -   900.00) seconds
+║ Sensor: ssor4
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+[RECORD] Sensor=ssor4 | Clock=   47.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=28.41 | Count_in_row=  1
+
+[RECORD] Sensor=ssor0 | Clock=   47.14 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row=  5
+
+[RECORD] Sensor=ssor2 | Clock=   47.14 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=21.12 | Count_in_row=  1
+
+[RECORD] Sensor=ssor2 | Clock=   48.01 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=23.79 | Count_in_row=  2
+
+[RECORD] Sensor=ssor2 | Clock=   48.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=30.12 | Count_in_row=  3
+
+[RECORD] Sensor=ssor4 | Clock=   48.93 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=29.36 | Count_in_row=  1
+
+[RECORD] Sensor=ssor3 | Clock=   49.01 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=34.45 | Count_in_row=  2
+
+[RECORD] Sensor=ssor1 | Clock=   49.26 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=28.09 | Count_in_row=  2
+
+[RECORD] Sensor=ssor3 | Clock=   49.38 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=35.84 | Count_in_row=  3
+
+[RECORD] Sensor=ssor0 | Clock=   51.42 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=30.26 | Count_in_row=  2
+
+[RECORD] Sensor=ssor3 | Clock=   52.93 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=31.68 | Count_in_row=  2
+
+[RECORD] Sensor=ssor3 | Clock=   53.51 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=24.58 | Count_in_row=  3
+
+[RECORD] Sensor=ramp1 | Clock=   53.63 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=35.42 | Count_in_row=  4
+
+[RECORD] Sensor=ssor3 | Clock=   53.64 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=21.12 | Count_in_row=  1
+
+[RECORD] Sensor=ssor2 | Clock=   54.63 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=35.42 | Count_in_row=  4
+
+[RECORD] Sensor=ramp1 | Clock=   54.88 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=34.78 | Count_in_row=  5
+
+[RECORD] Sensor=ssor2 | Clock=   55.76 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=28.07 | Count_in_row=  3
+
+[RECORD] Sensor=ssor2 | Clock=   55.88 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=34.78 | Count_in_row=  5
+
+[RECORD] Sensor=ssor0 | Clock=   56.66 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=30.26 | Count_in_row=  3
+
+[RECORD] Sensor=ssor1 | Clock=   58.14 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=31.65 | Count_in_row=  5
+
+[RECORD] Sensor=ssor0 | Clock=   58.45 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=30.26 | Count_in_row=  4
+
+[RECORD] Sensor=ssor3 | Clock=   58.63 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=35.42 | Count_in_row=  4
+
+[RECORD] Sensor=ssor3 | Clock=   59.88 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=34.83 | Count_in_row=  5
+
+[RECORD] Sensor=ssor3 | Clock=   60.76 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=28.06 | Count_in_row=  4
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║ ROW TRANSITION DETECTED: Row -1 → Row  0 at clock=   61.00 sec
+║ Row  0 time window: [    0.00 -   900.00) seconds
+║ Sensor: ssor5
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+[RECORD] Sensor=ssor5 | Clock=   61.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=34.59 | Count_in_row=  1
+
+[RECORD] Sensor=ramp1 | Clock=   61.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=29.58 | Count_in_row=  6
+
+[RECORD] Sensor=ssor0 | Clock=   62.21 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.26 | Count_in_row=  3
+
+[RECORD] Sensor=ssor2 | Clock=   62.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=29.58 | Count_in_row=  6
+
+[RECORD] Sensor=ssor4 | Clock=   62.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.66 | Count_in_row=  2
+
+[RECORD] Sensor=ssor5 | Clock=   63.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=32.93 | Count_in_row=  2
+
+[RECORD] Sensor=ssor2 | Clock=   64.14 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=31.69 | Count_in_row=  4
+
+[RECORD] Sensor=ssor1 | Clock=   64.92 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=24.91 | Count_in_row=  2
+
+[RECORD] Sensor=ssor0 | Clock=   66.71 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row=  6
+
+[RECORD] Sensor=ssor3 | Clock=   67.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=29.58 | Count_in_row=  6
+
+[RECORD] Sensor=ssor4 | Clock=   68.60 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=25.66 | Count_in_row=  1
+
+[RECORD] Sensor=ssor3 | Clock=   68.64 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=31.70 | Count_in_row=  4
+
+[RECORD] Sensor=ssor1 | Clock=   69.45 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=33.60 | Count_in_row=  4
+
+[RECORD] Sensor=ssor0 | Clock=   69.60 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.26 | Count_in_row=  4
+
+[RECORD] Sensor=ssor4 | Clock=   70.36 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  1
+
+[RECORD] Sensor=ssor4 | Clock=   70.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  2
+
+[RECORD] Sensor=ssor4 | Clock=   70.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  3
+
+[RECORD] Sensor=ssor5 | Clock=   71.86 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  1
+
+[RECORD] Sensor=ssor4 | Clock=   71.88 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  2
+
+[RECORD] Sensor=ssor2 | Clock=   71.92 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=24.89 | Count_in_row=  4
+
+[RECORD] Sensor=ssor5 | Clock=   72.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  1
+
+[RECORD] Sensor=ssor5 | Clock=   72.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  2
+
+[RECORD] Sensor=ssor5 | Clock=   72.10 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  3
+
+[RECORD] Sensor=ssor4 | Clock=   72.51 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  3
+
+[RECORD] Sensor=ssor1 | Clock=   72.66 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=20.15 | Count_in_row=  3
+
+[RECORD] Sensor=ssor4 | Clock=   72.76 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  4
+
+[RECORD] Sensor=ssor1 | Clock=   73.21 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  3
+
+[RECORD] Sensor=ssor5 | Clock=   73.38 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  4
+
+[RECORD] Sensor=ssor1 | Clock=   73.60 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  4
+
+[RECORD] Sensor=ssor5 | Clock=   74.01 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  5
+
+[RECORD] Sensor=ssor4 | Clock=   74.19 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=28.82 | Count_in_row=  3
+
+[RECORD] Sensor=ssor5 | Clock=   74.26 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  6
+
+[RECORD] Sensor=ssor2 | Clock=   74.71 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  4
+
+[RECORD] Sensor=ssor0 | Clock=   74.79 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row=  7
+
+[RECORD] Sensor=ssor2 | Clock=   74.95 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=33.71 | Count_in_row=  5
+
+[RECORD] Sensor=ssor2 | Clock=   75.10 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  5
+
+[RECORD] Sensor=ssor3 | Clock=   76.21 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  5
+
+[RECORD] Sensor=ssor3 | Clock=   76.60 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  6
+
+[RECORD] Sensor=ssor1 | Clock=   76.71 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=37.44 | Count_in_row=  6
+
+[RECORD] Sensor=ramp1 | Clock=   77.08 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.02 | Count_in_row=  7
+
+[RECORD] Sensor=ssor3 | Clock=   77.42 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=24.89 | Count_in_row=  4
+
+[RECORD] Sensor=ssor5 | Clock=   77.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.66 | Count_in_row=  3
+
+[RECORD] Sensor=ssor4 | Clock=   77.71 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  5
+
+[RECORD] Sensor=ssor2 | Clock=   78.08 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.02 | Count_in_row=  7
+
+[RECORD] Sensor=ssor4 | Clock=   78.10 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  6
+
+[RECORD] Sensor=ssor5 | Clock=   79.21 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  7
+
+[RECORD] Sensor=ssor3 | Clock=   79.45 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=33.73 | Count_in_row=  5
+
+[RECORD] Sensor=ssor5 | Clock=   79.60 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  8
+
+[RECORD] Sensor=ssor4 | Clock=   79.93 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=32.40 | Count_in_row=  2
+
+[RECORD] Sensor=ssor2 | Clock=   81.16 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=20.15 | Count_in_row=  6
+
+[RECORD] Sensor=ssor2 | Clock=   81.71 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=34.62 | Count_in_row=  7
+
+[RECORD] Sensor=ssor3 | Clock=   83.08 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.02 | Count_in_row=  7
+
+[RECORD] Sensor=ssor0 | Clock=   85.07 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row=  8
+
+[RECORD] Sensor=ssor4 | Clock=   85.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  4
+
+[RECORD] Sensor=ssor4 | Clock=   85.63 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  5
+
+[RECORD] Sensor=ssor3 | Clock=   85.71 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=36.59 | Count_in_row=  6
+
+[RECORD] Sensor=ssor4 | Clock=   85.88 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  6
+
+[RECORD] Sensor=ssor5 | Clock=   86.93 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  2
+
+[RECORD] Sensor=ssor5 | Clock=   87.13 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  3
+
+[RECORD] Sensor=ssor5 | Clock=   87.38 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  4
+
+[RECORD] Sensor=ssor3 | Clock=   87.66 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=20.15 | Count_in_row=  7
+
+[RECORD] Sensor=ssor0 | Clock=   88.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.26 | Count_in_row=  5
+
+[RECORD] Sensor=ssor4 | Clock=   88.51 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=24.70 | Count_in_row=  3
+
+[RECORD] Sensor=ssor1 | Clock=   88.79 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=23.18 | Count_in_row=  7
+
+[RECORD] Sensor=ssor5 | Clock=   90.19 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=28.82 | Count_in_row=  4
+
+[RECORD] Sensor=ssor0 | Clock=   92.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row=  4
+
+[RECORD] Sensor=ramp1 | Clock=   92.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=23.44 | Count_in_row=  8
+
+[RECORD] Sensor=ramp1 | Clock=   93.27 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=22.62 | Count_in_row=  9
+
+[RECORD] Sensor=ssor2 | Clock=   93.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=23.44 | Count_in_row=  8
+
+[RECORD] Sensor=ssor2 | Clock=   94.27 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=22.62 | Count_in_row=  9
+
+[RECORD] Sensor=ssor5 | Clock=   94.43 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=32.40 | Count_in_row=  1
+
+[RECORD] Sensor=ssor4 | Clock=   94.64 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=21.12 | Count_in_row=  1
+
+[RECORD] Sensor=ssor1 | Clock=   96.07 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.18 | Count_in_row=  8
+
+[RECORD] Sensor=ssor4 | Clock=   96.14 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=31.70 | Count_in_row=  4
+
+[RECORD] Sensor=ssor2 | Clock=   96.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=23.17 | Count_in_row=  5
+
+[RECORD] Sensor=ssor0 | Clock=   97.03 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row=  5
+
+[RECORD] Sensor=ssor3 | Clock=   99.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=23.09 | Count_in_row=  8
+
+[RECORD] Sensor=ssor3 | Clock=   99.77 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=28.85 | Count_in_row=  9
+
+[RECORD] Sensor=ssor0 | Clock=  100.34 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row=  9
+
+[RECORD] Sensor=ssor1 | Clock=  101.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=24.59 | Count_in_row=  5
+
+[RECORD] Sensor=ssor2 | Clock=  102.07 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=33.22 | Count_in_row=  6
+
+[RECORD] Sensor=ssor1 | Clock=  102.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=36.89 | Count_in_row=  4
+
+[RECORD] Sensor=ssor3 | Clock=  102.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=23.17 | Count_in_row=  5
+
+[RECORD] Sensor=ramp1 | Clock=  103.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.18 | Count_in_row= 10
+
+[RECORD] Sensor=ramp3 | Clock=  103.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=36.89 | Count_in_row=  4
+
+[RECORD] Sensor=ssor0 | Clock=  104.07 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=30.26 | Count_in_row=  4
+
+[RECORD] Sensor=ssor2 | Clock=  104.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.18 | Count_in_row= 10
+
+[RECORD] Sensor=ssor0 | Clock=  104.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row=  6
+
+[RECORD] Sensor=ramp1 | Clock=  104.73 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=20.12 | Count_in_row= 11
+
+[RECORD] Sensor=ssor4 | Clock=  105.45 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=33.74 | Count_in_row=  4
+
+[RECORD] Sensor=ssor2 | Clock=  105.73 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=20.12 | Count_in_row= 11
+
+[RECORD] Sensor=ssor0 | Clock=  106.23 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row=  7
+
+[RECORD] Sensor=ramp1 | Clock=  106.42 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.68 | Count_in_row= 12
+
+[RECORD] Sensor=ssor3 | Clock=  106.57 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=33.77 | Count_in_row=  7
+
+[RECORD] Sensor=ssor5 | Clock=  107.01 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=24.70 | Count_in_row=  2
+
+[RECORD] Sensor=ssor2 | Clock=  107.42 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.68 | Count_in_row= 12
+
+[RECORD] Sensor=ssor0 | Clock=  107.96 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=30.26 | Count_in_row=  5
+
+[RECORD] Sensor=ssor2 | Clock=  108.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=24.58 | Count_in_row=  7
+
+[RECORD] Sensor=ssor4 | Clock=  109.21 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=36.42 | Count_in_row=  5
+
+[RECORD] Sensor=ssor0 | Clock=  110.54 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.26 | Count_in_row=  6
+
+[RECORD] Sensor=ssor5 | Clock=  110.64 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=31.70 | Count_in_row=  5
+
+[RECORD] Sensor=ssor3 | Clock=  110.79 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.18 | Count_in_row= 10
+
+[RECORD] Sensor=ssor3 | Clock=  111.23 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=26.55 | Count_in_row=  8
+
+[RECORD] Sensor=ssor1 | Clock=  111.34 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=31.83 | Count_in_row=  9
+
+[RECORD] Sensor=ssor0 | Clock=  111.69 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=30.26 | Count_in_row=  6
+
+[RECORD] Sensor=ssor1 | Clock=  112.03 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.48 | Count_in_row=  5
+
+[RECORD] Sensor=ssor4 | Clock=  112.42 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=24.89 | Count_in_row=  6
+
+[RECORD] Sensor=ssor3 | Clock=  112.42 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.66 | Count_in_row=  9
+
+[RECORD] Sensor=ramp3 | Clock=  113.03 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=21.48 | Count_in_row=  5
+
+[RECORD] Sensor=ssor3 | Clock=  114.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=24.58 | Count_in_row= 10
+
+[RECORD] Sensor=ssor0 | Clock=  114.11 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=30.26 | Count_in_row=  5
+
+[RECORD] Sensor=ssor5 | Clock=  116.14 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=21.03 | Count_in_row=  1
+
+[RECORD] Sensor=ssor1 | Clock=  116.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=28.00 | Count_in_row=  6
+
+[RECORD] Sensor=ssor2 | Clock=  116.84 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=34.13 | Count_in_row=  8
+
+[RECORD] Sensor=ramp3 | Clock=  117.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=28.00 | Count_in_row=  6
+
+[RECORD] Sensor=ssor1 | Clock=  118.23 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=28.05 | Count_in_row=  7
+
+[RECORD] Sensor=ramp3 | Clock=  119.23 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=28.05 | Count_in_row=  7
+
+[RECORD] Sensor=ssor5 | Clock=  119.45 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=33.74 | Count_in_row=  3
+
+[RECORD] Sensor=ssor1 | Clock=  120.07 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=20.16 | Count_in_row=  4
+
+[RECORD] Sensor=ssor1 | Clock=  120.46 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=27.43 | Count_in_row=  5
+
+[RECORD] Sensor=ssor3 | Clock=  121.34 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=34.65 | Count_in_row=  8
+
+[RECORD] Sensor=ssor5 | Clock=  121.71 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=38.06 | Count_in_row=  2
+
+[RECORD] Sensor=ssor4 | Clock=  122.22 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  7
+
+[RECORD] Sensor=ssor4 | Clock=  122.58 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  8
+
+[RECORD] Sensor=ssor0 | Clock=  123.35 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row=  8
+
+[RECORD] Sensor=ssor5 | Clock=  123.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  9
+
+[RECORD] Sensor=ssor4 | Clock=  123.73 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  7
+
+[RECORD] Sensor=ssor4 | Clock=  124.07 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  8
+
+[RECORD] Sensor=ssor5 | Clock=  124.08 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 10
+
+[RECORD] Sensor=ssor4 | Clock=  124.42 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  9
+
+[RECORD] Sensor=ssor4 | Clock=  124.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 10
+
+[RECORD] Sensor=ssor1 | Clock=  124.54 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  6
+
+[RECORD] Sensor=ssor5 | Clock=  125.23 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 11
+
+[RECORD] Sensor=ssor0 | Clock=  125.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=30.26 | Count_in_row=  6
+
+[RECORD] Sensor=ssor5 | Clock=  125.57 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 12
+
+[RECORD] Sensor=ssor5 | Clock=  125.92 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 13
+
+[RECORD] Sensor=ssor5 | Clock=  126.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 14
+
+[RECORD] Sensor=ssor2 | Clock=  126.04 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  8
+
+[RECORD] Sensor=ssor1 | Clock=  126.11 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=25.90 | Count_in_row=  5
+
+[RECORD] Sensor=ssor1 | Clock=  126.19 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=22.44 | Count_in_row=  6
+
+[RECORD] Sensor=ramp1 | Clock=  126.81 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=22.32 | Count_in_row= 13
+
+[RECORD] Sensor=ssor2 | Clock=  126.96 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=27.41 | Count_in_row=  2
+
+[RECORD] Sensor=ssor3 | Clock=  127.54 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 11
+
+[RECORD] Sensor=ssor2 | Clock=  127.81 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=22.32 | Count_in_row= 13
+
+[RECORD] Sensor=ssor2 | Clock=  128.57 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=20.15 | Count_in_row=  9
+
+[RECORD] Sensor=ssor4 | Clock=  129.04 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 11
+
+[RECORD] Sensor=ssor5 | Clock=  130.54 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 15
+
+[RECORD] Sensor=ssor4 | Clock=  130.66 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=20.15 | Count_in_row=  7
+
+[RECORD] Sensor=ssor5 | Clock=  130.92 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=24.89 | Count_in_row=  4
+
+[RECORD] Sensor=ssor3 | Clock=  131.96 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=27.41 | Count_in_row=  2
+
+[RECORD] Sensor=ssor2 | Clock=  132.61 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=30.74 | Count_in_row=  3
+
+[RECORD] Sensor=ssor0 | Clock=  133.33 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row=  9
+
+[RECORD] Sensor=ssor3 | Clock=  133.81 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=22.32 | Count_in_row= 11
+
+[RECORD] Sensor=ssor2 | Clock=  134.19 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=22.43 | Count_in_row=  4
+
+[RECORD] Sensor=ssor3 | Clock=  135.07 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=20.15 | Count_in_row=  9
+
+[RECORD] Sensor=ssor4 | Clock=  136.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  9
+
+[RECORD] Sensor=ssor1 | Clock=  136.35 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=26.15 | Count_in_row=  8
+
+[RECORD] Sensor=ssor4 | Clock=  136.77 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row= 10
+
+[RECORD] Sensor=ssor3 | Clock=  137.11 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=31.39 | Count_in_row=  3
+
+[RECORD] Sensor=ramp3 | Clock=  137.35 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=26.15 | Count_in_row=  8
+
+[RECORD] Sensor=ssor5 | Clock=  137.79 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  5
+
+[RECORD] Sensor=ramp1 | Clock=  138.10 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=32.79 | Count_in_row= 14
+
+[RECORD] Sensor=ssor5 | Clock=  138.27 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  6
+
+[RECORD] Sensor=ssor1 | Clock=  138.33 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  9
+
+[RECORD] Sensor=ssor1 | Clock=  139.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=22.68 | Count_in_row=  6
+
+[RECORD] Sensor=ssor2 | Clock=  139.10 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=32.79 | Count_in_row= 14
+
+[RECORD] Sensor=ramp3 | Clock=  139.33 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row=  9
+
+[RECORD] Sensor=ssor4 | Clock=  139.79 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=23.17 | Count_in_row=  5
+
+[RECORD] Sensor=ssor3 | Clock=  140.19 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=22.43 | Count_in_row=  4
+
+[RECORD] Sensor=ssor0 | Clock=  140.24 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.26 | Count_in_row=  7
+
+[RECORD] Sensor=ssor0 | Clock=  142.70 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=30.26 | Count_in_row=  7
+
+[RECORD] Sensor=ssor3 | Clock=  143.60 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=32.79 | Count_in_row= 12
+
+[RECORD] Sensor=ssor0 | Clock=  144.30 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row= 10
+
+[RECORD] Sensor=ssor2 | Clock=  146.50 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=24.68 | Count_in_row=  6
+
+[RECORD] Sensor=ssor4 | Clock=  146.84 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=34.92 | Count_in_row=  8
+
+[RECORD] Sensor=ssor0 | Clock=  146.90 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=30.26 | Count_in_row=  7
+
+[RECORD] Sensor=ssor0 | Clock=  147.57 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row= 11
+
+[RECORD] Sensor=ssor0 | Clock=  147.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.26 | Count_in_row=  8
+
+[RECORD] Sensor=ssor0 | Clock=  149.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row= 10
+
+[RECORD] Sensor=ramp1 | Clock=  150.18 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.34 | Count_in_row= 15
+
+[RECORD] Sensor=ssor2 | Clock=  151.18 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.34 | Count_in_row= 15
+
+[RECORD] Sensor=ssor1 | Clock=  151.74 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=31.26 | Count_in_row=  7
+
+[RECORD] Sensor=ssor3 | Clock=  152.00 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=24.78 | Count_in_row=  6
+
+[RECORD] Sensor=ssor1 | Clock=  153.20 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=34.98 | Count_in_row=  7
+
+[RECORD] Sensor=ssor5 | Clock=  153.66 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=19.77 | Count_in_row=  5
+
+[RECORD] Sensor=ssor1 | Clock=  154.80 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=36.25 | Count_in_row= 10
+
+[RECORD] Sensor=ssor0 | Clock=  154.88 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=30.26 | Count_in_row=  9
+
+[RECORD] Sensor=ssor3 | Clock=  155.68 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.34 | Count_in_row= 13
+
+[RECORD] Sensor=ramp3 | Clock=  155.80 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=36.25 | Count_in_row= 10
+
+[RECORD] Sensor=ssor0 | Clock=  156.12 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row= 12
+
+[RECORD] Sensor=ssor1 | Clock=  156.90 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=38.37 | Count_in_row=  7
+
+[RECORD] Sensor=ramp1 | Clock=  157.04 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=38.93 | Count_in_row= 16
+
+[RECORD] Sensor=ssor1 | Clock=  157.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=36.62 | Count_in_row=  8
+
+[RECORD] Sensor=ssor2 | Clock=  157.74 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed=31.28 | Count_in_row=  9
+
+[RECORD] Sensor=ssor2 | Clock=  158.04 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=38.93 | Count_in_row= 16
+
+[RECORD] Sensor=ssor4 | Clock=  158.31 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row= 11
+
+[RECORD] Sensor=ssor1 | Clock=  158.57 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row= 11
+
+[RECORD] Sensor=ssor1 | Clock=  158.62 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row= 12
+
+[RECORD] Sensor=ssor2 | Clock=  158.70 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=35.19 | Count_in_row= 10
+
+[RECORD] Sensor=ssor5 | Clock=  159.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=23.17 | Count_in_row=  6
+
+[RECORD] Sensor=ramp3 | Clock=  159.57 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row= 11
+
+[RECORD] Sensor=ramp3 | Clock=  159.62 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed= 0.00 | Count_in_row= 12
+
+[RECORD] Sensor=ssor5 | Clock=  159.81 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 16
+
+[RECORD] Sensor=ssor3 | Clock=  160.24 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 12
+
+[RECORD] Sensor=ssor5 | Clock=  160.34 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=34.86 | Count_in_row=  6
+
+[RECORD] Sensor=ssor1 | Clock=  160.38 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row=  9
+
+[RECORD] Sensor=ssor1 | Clock=  160.79 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.81 | Count_in_row= 10
+
+[RECORD] Sensor=ssor4 | Clock=  161.74 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 12
+
+[RECORD] Sensor=ssor2 | Clock=  161.88 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 10
+
+[RECORD] Sensor=ssor2 | Clock=  161.90 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=38.93 | Count_in_row=  7
+
+[RECORD] Sensor=ssor3 | Clock=  162.04 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=38.97 | Count_in_row= 14
+
+[RECORD] Sensor=ssor2 | Clock=  162.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=38.46 | Count_in_row= 17
+
+[RECORD] Sensor=ssor3 | Clock=  163.20 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed=35.24 | Count_in_row= 10
+
+[RECORD] Sensor=ssor5 | Clock=  163.24 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 17
+
+[RECORD] Sensor=ssor3 | Clock=  163.38 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 13
+
+[RECORD] Sensor=ssor0 | Clock=  163.64 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row= 11
+
+[RECORD] Sensor=ramp1 | Clock=  163.75 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=34.63 | Count_in_row= 17
+
+[RECORD] Sensor=ssor0 | Clock=  164.42 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=30.26 | Count_in_row= 13
+
+[RECORD] Sensor=ssor2 | Clock=  164.75 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=34.63 | Count_in_row= 18
+
+[RECORD] Sensor=ssor4 | Clock=  164.88 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 13
+
+[RECORD] Sensor=ssor4 | Clock=  164.96 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=27.41 | Count_in_row=  2
+
+[RECORD] Sensor=ssor4 | Clock=  165.11 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=4 | Speed=31.67 | Count_in_row=  3
+
+[RECORD] Sensor=ssor4 | Clock=  165.57 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed= 0.00 | Count_in_row=  9
+
+[RECORD] Sensor=ssor3 | Clock=  165.90 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=39.09 | Count_in_row=  7
+
+[RECORD] Sensor=ssor5 | Clock=  166.38 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=1 | Speed= 0.00 | Count_in_row= 18
+
+[RECORD] Sensor=ssor3 | Clock=  166.72 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=38.99 | Count_in_row= 15
+
+[RECORD] Sensor=ssor2 | Clock=  166.79 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.82 | Count_in_row=  8
+
+[RECORD] Sensor=ssor5 | Clock=  167.07 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=3 | Speed= 0.00 | Count_in_row=  7
+
+[RECORD] Sensor=ssor0 | Clock=  168.32 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.26 | Count_in_row= 12
+
+[RECORD] Sensor=ssor3 | Clock=  169.25 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=0 | Speed=34.63 | Count_in_row= 16
+
+[RECORD] Sensor=ssor3 | Clock=  171.29 | Row= 0 | timeConv= 900.0 | CalcRow_i= 0 | Vehicle=         | Lane=2 | Speed=30.82 | Count_in_row=  8
+
+[RECORD] 

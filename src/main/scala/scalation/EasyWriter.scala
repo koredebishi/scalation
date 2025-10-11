@@ -41,6 +41,10 @@ class EasyWriter (project: String, filename: String, private var toFile: Boolean
 
     private val debug = debugf ("EasyWriter", true)                    // debug function
 
+    var on = true                                                      // whether writing is enabled
+
+    def off (): Unit = on = false
+
     /** The file path for the (log) file
      */
     private val LOG_PATH = LOG_DIR + project + ⁄ + filename
@@ -65,12 +69,16 @@ class EasyWriter (project: String, filename: String, private var toFile: Boolean
     /** Print/write the string s and add a newline ('\n') at the end.
      *  @param s  the string to printed/written
      */
-    def println (s: String): Unit = if toFile then pw.println (s) else Console.println (s)
+    def println (s: String): Unit = {
+        if on then if toFile then pw.println (s) else Console.println (s)
+    }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print/write a newline ('\n').
      */
-    def println (): Unit = if toFile then pw.println ("") else Console.println ()
+    def println (): Unit = {
+        if on then if toFile then pw.println ("") else Console.println ()
+    }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Write the character buffer.
