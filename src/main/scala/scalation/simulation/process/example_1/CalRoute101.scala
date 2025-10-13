@@ -19,7 +19,7 @@ import scalation.mathstat.*
 
 @main def runCalRoute101(): Unit = new CalRoute101()
 
-class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Boolean = false,
+class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolean = false,
                       aniRatio: Double = 500.0, stream: Int = 0)
     extends Model(name, reps, animating, aniRatio)
         with RowTimeLoader
@@ -28,7 +28,7 @@ class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Bo
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // ::
     /** Debugging and traffic data loading */
-    val debug       = debugf("OneWayVehicle2L", false)
+    val debug       = debugf("CalRoute101", false)
     val config      = new TrafficConfig("/Mainline_VDS_Redwood_Creek_US101-N/1-404532ML.csv", rowTime, stream)
     val nt          = config.data.dim
 
@@ -38,11 +38,11 @@ class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Bo
     val offRampMAWindow = 5  // Simple Moving Average window m; MA_t = (1/m) * Σ_{j=0}^{m-1} f_{t-j}
 
     // Override RowTimeLoader's rowTimeSlice to explicitly document this model's time granularity
-    // Purpose: OneWayVehicle2L uses 15-minute observation windows matching PEMS traffic data
+    // Purpose: CalRoute101 uses 15-minute observation windows matching PEMS traffic data
     // Note: This is optional since trait default is already 15*MINUTE, but explicit is better
     override def rowTimeSlice: Double = 15 * MINUTE
 
-    private [process] val easyW = new EasyWriter("simulation", "OnewayVehicle2LModel.txt")
+    private [process] val easyW = new EasyWriter("simulation", "CalRoute101Model.txt")
 
 
 
@@ -89,11 +89,6 @@ class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Bo
                                 ("srcRamp1", 1, Erlang(), nStop(1), offsets(1)),
                                 ("srcRamp2", 2, Erlang(), nStop(2), offsets(2))
     )
-
-
-    println(s"nStop = ${nStop.mkString(", ")}")
-
-
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create Sinks locally for correct mapping and final routing */
@@ -155,7 +150,7 @@ class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Bo
                 cfor (0 , offRampJunction) { seg =>
                     junc(seg).jump() // take recording at the first sensor (almost like the Vsource)
                     route.path(laneID).seg(seg).move() // move at seg0 sensor0-------seg0
-                    junc(seg + 1).jump() //record all vehicle (Some vehicle will use offramp after here)
+                    //junc(seg + 1).jump() //record all vehicle (Some vehicle will use offramp after here)
                 }
 
                 // at junction 2, decide whether to take off-ramp
@@ -164,6 +159,7 @@ class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Bo
                     route.path(laneID).removeFromAlist(this)   // take offramp, leave highway
                     driveRamp(ramps(2)) //
                 else
+                    junc(offRampJunction).jump() // take recording at the sensor before offramp
                     driveHighway() // continue on highway driving.
                 end if
             // ------------------ handle on-ramp entry vehicles -------------------
@@ -185,11 +181,11 @@ class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Bo
                 route.path(laneID).addToAlist(this, carAhead)
                 junc(joinSeg).jump() // take recording at the sensor where it joins
 
-                easyW.println(s"Onramp vehicle added to highway list $this join at seg $joinSeg and CarAhead = $carAhead and laneID = $laneID")
+                //easyW.println(s"Onramp vehicle added to highway list $this join at seg $joinSeg and CarAhead = $carAhead and laneID = $laneID")
             end if
 
             cfor (joinSeg , highway_length) { seg =>
-                easyW.println(s"Highway and moving $this join at seg $joinSeg and CarAhead = ${this.getCarAhead(this)} and laneID = $laneID")
+                //easyW.println(s"Highway and moving $this join at seg $joinSeg and CarAhead = ${this.getCarAhead(this)} and laneID = $laneID")
 
                 //------------ lane change at segment boundaries ---
                 if clock - lastLaneChange >= 20.0 then
@@ -215,7 +211,7 @@ class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Bo
             }
 
             route.path(laneID).removeFromAlist(this)
-            easyW.println(s"Highway exit: $this leaving seg=$segId lane=$laneID at clock=$clock")
+            //easyW.println(s"Highway exit: $this leaving seg=$segId lane=$laneID at clock=$clock")
             println(s"To  mainline sink: count ${this.displayLabel}")
             sinks(0).leave()
 
@@ -269,16 +265,71 @@ class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Bo
         val ytrue = config.evalArrivalsPerRow
         val onRampTotalsPerRow = config.onRampTotalsPerRow
         Array(
-            //smapeF(VectorD(ytrue(0)), junc(1).getCountMatrix.sumVr), // 2-401834ML, after offramp
-            //smapeF(VectorD(ytrue(1)), junc(2).getCountMatrix.sumVr), // 3-401833ML, after onramp1
+            smapeF(VectorD(ytrue(0)), junc(1).getCountMatrix.sumVr), // 2-401834ML, after offramp
+            smapeF(VectorD(ytrue(1)), junc(2).getCountMatrix.sumVr), // 3-401833ML, after onramp1
             smapeF(VectorD(ytrue(2)), junc(4).getCountMatrix.sumVr), // 5-401652ML, after onramp2 (final evaluation)
             smapeF(VectorD(onRampTotalsPerRow(0)), ramp_sensors(0).getCountMatrix.sumVr), // onramp1 inflow
             smapeF(VectorD(onRampTotalsPerRow(1)), ramp_sensors(1).getCountMatrix.sumVr) // onramp2 inflow
         )
     end simRunVsPemsRun
-    
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute all QoF metrics (including RMSE, MAE, SMAPE) using ScalaTion's built-in FitM.diagnose().
+     *  Returns a map of sensor names to their QoF vectors.
+     *  QoF vector format: VectorD(rSq, sst, sse, sde, mse0, rmse, mae, smape, m)
+     *  Indices: rmse=5, smape=7
+     */
+    def getQoFMetrics(): Array[VectorD] =
+        val ytrue = config.evalArrivalsPerRow
+        val onRampTotalsPerRow = config.onRampTotalsPerRow
+        
+        Array(
+            diagnose(VectorD(ytrue(0)), junc(1).getCountMatrix.sumVr), // 2-401834ML, after offramp
+            diagnose(VectorD(ytrue(1)), junc(2).getCountMatrix.sumVr), // 3-401833ML, after onramp1
+            diagnose(VectorD(ytrue(2)), junc(4).getCountMatrix.sumVr), // 5-401652ML, after onramp2
+            diagnose(VectorD(onRampTotalsPerRow(0)), ramp_sensors(0).getCountMatrix.sumVr), // onramp1 inflow
+            diagnose(VectorD(onRampTotalsPerRow(1)), ramp_sensors(1).getCountMatrix.sumVr) // onramp2 inflow
+        )
+    end getQoFMetrics
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute RMSE values for all evaluation sensors.
+     *  Extracts RMSE (index 5) from the QoF metrics for use in optimization.
+     *  @return Array of RMSE values: [afterOfframp1, afterOnramp1, afterOnramp2, onramp1Inflow, onramp2Inflow]
+     */
+    def simRunVsPemsRunRMSE(): Array[Double] =
+        val qofMetrics = getQoFMetrics()
+        qofMetrics.map(qof => qof(5))  // Extract RMSE (index 5) from each QoF vector
+    end simRunVsPemsRunRMSE
+
     override def fini(rep: Int): Unit =
         Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
+        
+        val qofMetrics = getQoFMetrics()
+        val names = Array("afterOfframp1", "afterOnramp1", "afterOnramp2", "onramp1Inflow", "onramp2Inflow")
+        val pemIds = Array("2-401834ML", "3-401833ML", "5-401652ML", "ramp1", "ramp2")
+        val simCounts = Array(
+            junc(1).getCountMatrix.sumVr.sum,
+            junc(2).getCountMatrix.sumVr.sum,
+            junc(4).getCountMatrix.sumVr.sum,
+            ramp_sensors(0).getCountMatrix.sumVr.sum,
+            ramp_sensors(1).getCountMatrix.sumVr.sum
+        )
+        val pemsCounts = Array(
+            config.evalArrivalsPerRow(0).sum,
+            config.evalArrivalsPerRow(1).sum,
+            config.evalArrivalsPerRow(2).sum,
+            config.onRampTotalsPerRow(0).sum,
+            config.onRampTotalsPerRow(1).sum
+        )
+
+        for i <- names.indices do
+            val rmse = qofMetrics(i)(5)   // rmse is at index 5 in QoF vector
+            //val smape = qofMetrics(i)(7)  // smape is at index 7 in QoF vector
+            
+            easyW.println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} | SMAPE ${names(i)}: ${smape} | RMSE: ${rmse} | MAE: ${mae}")
+            println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} | SMAPE ${names(i)}: ${smape} | RMSE: ${rmse} | MAE: ${mae}")
+
         super.fini(rep)
     end fini
 
@@ -286,7 +337,7 @@ class CalRoute101(name: String = "OneWayVehicle2L", reps: Int = 1, animating: Bo
     /** Run the simulation */
     simulate()
     waitFinished()
-    //Model.shutdown()       // to be removed when TrafficOptimization is used
+    Model.shutdown()       // to be removed when TrafficOptimization is used
 end CalRoute101
 
 
@@ -368,5 +419,3 @@ end CalRoute101
 //
 //    super.fini(rep)
 //end fini
-
-

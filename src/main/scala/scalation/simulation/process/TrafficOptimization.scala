@@ -3,8 +3,7 @@ package simulation
 package process
 
 
-import scalation.mathstat.*
-import scalation.optimization.NelderMeadSimplex2
+import scalation.mathstat._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** General-purpose optimization framework for calibrating simulation models.
@@ -55,6 +54,7 @@ class TrafficOptimization(model: CalibratableModel):
         
         println(s"Fitness value: $fitness")
         fitness  // return fitness (objective to minimize)
+        
     end objFunc
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

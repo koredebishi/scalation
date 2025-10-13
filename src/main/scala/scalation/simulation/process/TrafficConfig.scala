@@ -20,16 +20,18 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 //    val t1: Int = 2 * 96 + 16
 //    val t2: Int = 3 * 96
 
-    val t1: Int = 25    // target 6am
-    val t2: Int = 72    // target 6pm
+//    val t1: Int = 25    // target 6am
+//    val t2: Int = 72    // target 6pm
+
+    val t1: Int = 0 // target 6am
+    val t2: Int = 48 // target 6pm
 
 
     private val rowOffset = t1
 
-    println(s"TrafficConfig: loading data from row $t1 to $t2 (offset $rowOffset)")
+    //println(s"TrafficConfig: loading data from row $t1 to $t2 (offset $rowOffset)")
 
-    //private val laneIdx = VectorI(4, 7, 10, 13, 16) // mainline lane FLOW columns
-    private val laneIdx = VectorI(5, 8, 11, 14, 17) // mainline lane FLOW columns
+    private val laneIdx = VectorI(4, 7, 10, 13, 16) // mainline lane FLOW columns
     private val ramplaneIdx = VectorI(1) // ramp/offramp TOTAL FLOW column
 
     // ----------------------------------------------------------------------
@@ -43,9 +45,9 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
         "5-401652ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/5-401652ML.csv", // final eval
 
         // ramps
-        "1-410095OR" -> s"Ramp_VDS_/1-410095OR.csv", // onramp1
-        "2-410093OR" -> s"Ramp_VDS_/2-410093OR.csv", // onramp2
-        "1-410094FR" -> s"Ramp_VDS_/1-410094FR.csv" // offramp
+        "1-410095OR" -> s"Ramps_VDS_Redwood_Creek_US101-N/1-410095OR.csv", // onramp1
+        "2-410093OR" -> s"Ramps_VDS_Redwood_Creek_US101-N/2-410093OR.csv", // onramp2
+        "1-410094FR" -> s"Ramps_VDS_Redwood_Creek_US101-N/1-410094FR.csv" // offramp
     )
 
     // ----------------------------------------------------------------------
@@ -163,7 +165,7 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 
 
     def getMuForSource(i: Int): Array[Double] =
-        println(s"the saferow: $i")
+        //println(s"the saferow: $i")
         muPerSource(i)
 
 
@@ -192,8 +194,8 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 
     def exitFraction: Double =
         val average = computeExitFraction(0)
-        ew.println(s"offramp exit fraction = $average")
-        println(s"offramp exit fraction =${mainlineCols(0)(0)}, ${offrampData(0, ramplaneIdx(0))},  $average")
+        //ew.println(s"offramp exit fraction = $average")
+        //println(s"offramp exit fraction =${mainlineCols(0)(0)}, ${offrampData(0, ramplaneIdx(0))},  $average")
         average
     end exitFraction
 

@@ -12,7 +12,7 @@ package simulation
 package process
 
 
-import scala.math.{log, sqrt, min, max}
+import scala.math.{log, sqrt, abs, max, min}//, min, max, abs}
 
 import Vehicle._
 
@@ -55,9 +55,8 @@ object GippsDynamics
     extends Dynamics:
 
     private val debug = debugf ("GippsDynamics", false)              // debug function
-    private[process] val easyW = new EasyWriter("simulation", "OnewayVehicle2LModel.txt")
-    easyW.off()
-
+    private[process] val easyW = new EasyWriter("simulation", "CalRoute101Model.txt")
+    //easyW.off()
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     /** Update the vehicle's velocity and position using Gipps' Model (located in `Motion`)
@@ -66,10 +65,7 @@ object GippsDynamics
      * @param car the car/vehicle whose velocity and position is being updated
      */
     def updateM(car: Vehicle, length: Double): Unit =
-        //debug("updateM", s"car = $car with car.myNode = ${car.myPathNode}")
-        //val ref = car.myNode.ahead
         val ref = car.myPathNode.ahead
-        //val car_ahead = if ref == null then null else ref.elem
 
         val car_ahead = if ref != null then ref.elem else null
 
@@ -78,16 +74,17 @@ object GippsDynamics
 
         val v = gipps(car, car_ahead, length) + EPSILON // determine new velocity
         //debug("updateM", s"car = $car \t the new VELOCITY is: $v")
-        easyW.println(s"UpdateM car = $car  \t the new VELOCITY is: $v")
+        easyW.println(s"UpdateM car = ${car.displayLabel}  \t the new VELOCITY is: $v")
 
 
 
         val x = butcher(car.t_disp, v, car.velocity, prop("rt")) // new proposed position for car
         //debug("updateM", s"car = $car \t the new POSITION is: $x")
-        easyW.println(s"UpdateM car = $car  \t the new POSITION is: $x")
+        easyW.println(s"UpdateM car = ${car.displayLabel}  \t the new POSITION is: $x")
 
         car.o_velocity = car.velocity // save the old velocity
         car.velocity = v // assign new velocity
+
 
         car.o_t_disp = car.t_disp // save old car position
         val dx = x - car.t_disp // change in car's position
@@ -128,19 +125,64 @@ object GippsDynamics
      *  @param vp  the current velocity of the predecessor
      *  @param rt  the reaction time of drivers
      */
-    private def gipps (an: Double, bn: Double, sp: Double, Vn: Double, xn: Double,
-                       vn: Double, xp: Double, vp: Double, rt: Double): Double =
-        val free = vn + (2.5 * an * rt * (1.0 - vn / Vn)) * sqrt (0.025 + vn / Vn)
+//    private def gipps (an: Double, bn: Double, sp: Double, Vn: Double, xn: Double,
+//                       vn: Double, xp: Double, vp: Double, rt: Double): Double =
+//        val free = vn + (2.5 * an * rt * (1.0 - vn / Vn)) * sqrt (0.025 + vn / Vn)
+//
+//        val left_1 = 2 * (xp - sp - xn)
+//        val left_2 = (vn * rt) - (vp * vp / bn)
+//        var right_side  =  bn * (2 * (xp - sp - xn) - (vn * rt) - (vp * vp / bn))
+//        val inner_exp = (bn * bn * rt * rt) - bn * (2 * (xp - sp - xn) - (vn * rt) - (vp * vp / bn))
+//        if inner_exp < 0 then easyW.println(s"Shouldn't be negative: $inner_exp , $right_side, left_1: $left_1, left_2: $left_2")
+//        val cong = (bn * rt) + sqrt(max(0.0, inner_exp))
+//
+//        easyW.println(s"The free $free and the Cong $cong")
+//        min (free, cong)
+//    end gipps
 
-        val left_1 = 2 * (xp - sp - xn)
-        val left_2 = (vn * rt) - (vp * vp / bn)
-        var right_side  =  bn * (2 * (xp - sp - xn) - (vn * rt) - (vp * vp / bn))
-        val inner_exp = (bn * bn * rt * rt) - bn * (2 * (xp - sp - xn) - (vn * rt) - (vp * vp / bn))
-        if inner_exp < 0 then easyW.println(s"Shouldn't be negative: $inner_exp , $right_side, left_1: $left_1, left_2: $left_2")
-        val cong = (bn * rt) + sqrt(max(0.0, inner_exp))
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        easyW.println(s"The free $free and the Cong $cong")
-        min (free, cong)
+    /** Return the velocity of the vehicle based on Gipps' model.
+     *
+     * @param an the max acceleration of drivers
+     * @param bn the max deceleration of drivers (may be negative)
+     * @param sp the size of vehicles
+     * @param Vn the desired velocity of driver n
+     * @param xn the current position of driver n
+     * @param vn the current velocity of driver n
+     * @param xp the current position of the predecessor (ahead)
+     * @param vp the current velocity of the predecessor
+     * @param rt the reaction time of drivers
+     */
+    private def gipps(an: Double, bn: Double, sp: Double, Vn: Double, xn: Double,
+                      vn: Double, xp: Double, vp: Double, rt: Double): Double =
+        // --------------- Parameters ---------------------
+        val b = abs(bn) // use positive magnitude of deceleration
+        val b_hat = b * 1.8 // expected braking ability of leader (default 0.8×b)   b_hat >= b
+
+        // --------------- Free-flow branch ---------------
+        // v_free = v_n + 2.5 * a_n * τ * (1 - v_n/V_n) * sqrt(0.025 + v_n/V_n)
+        val free = vn + (2.5 * an * rt * (1.0 - vn / Vn)) * sqrt(0.025 + vn / Vn)
+
+        // --------------- Congested (safety) branch -------
+        // v_cong = b * τ + sqrt(b^2 * τ^2 - b[2(gap) - v_nτ - v_p^2/b̂])
+        val gap = xp - sp - xn                                          // effective front-to-front gap
+        val phi = 2.0 * gap - (vn * rt) - (vp * vp / b_hat)             // safety term inside brackets
+
+        // When phi >= 0, spacing is large enough that braking constraint is inactive.
+        // In that case, use free-flow velocity directly (skip sqrt computation).
+        if phi >= 0.0 then return free
+
+        // Otherwise, apply the congested/safety branch.
+        val inner_exp = (b * b * rt * rt) - b * phi // value inside sqrt
+        if inner_exp < 0.0 then
+            easyW.println(s"[WARN] Negative sqrt term: $inner_exp") // numerical safety check
+
+        val cong = (b * rt) + sqrt(max(0.0, inner_exp)) // braking (congested) velocity
+
+        // --------------- Result --------------------------
+        // The next-step velocity is the smaller of free-flow and safety-limited speeds.
+        min(free, cong)
     end gipps
 
 

@@ -54,6 +54,7 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
     private val debug = debugf ("VSource", false)                             // debug function
 
     private[process] val ew = new EasyWriter("recorder", "VsourceWriter.txt")
+    ew.off()
 
     // Per-source sequence for human-readable labels (e.g., M-1, R1-3): NEW
     /** Monotonic per-source counter used solely for display labels on tokens.
@@ -114,6 +115,10 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                 debug("act", s"after make entity/vehicle $i: actor = $actor")
                 actor.mySource = this // actor's source
                 actor.subtype = esubtype // set the entity subtype
+                seq += 1   // increment per-source sequence labeller
+                actor.setDisplayLabel(s"$srcPrefix-$seq") // NEW: set human-friendly display label
+
+
                 director.numActors += 1 // number of actors created by all sources, so far
                 if director.isAnimating then director.dgAni.updateActorCount(director.numActors) // korede
                 director.log.trace(this, "generates", actor, director.clock)
@@ -132,7 +137,7 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                         val mu = rowManager.getMuForSource(this.subtype)(safeRow)
 
                         //val mu = rowManager.getMuForSource(this.subtype)(rowManager.curRow)
-                        val gen = if iArrivalTime.isInstanceOf[Erlang] then iArrivalTime.gen1(mu) else iArrivalTime.gen1(mu)
+                        val gen = if iArrivalTime.isInstanceOf[Erlang] then iArrivalTime.gen1(mu/2) else iArrivalTime.gen1(mu)
                         val duration = gen
                         val ctime = director.clock // clock time
                         tally(duration) // tally duration
@@ -155,9 +160,7 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
         yieldToDirector(true) // yield and terminate
     end act
 
-
 end VSource
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VSource` companion object provides a builder method for sources.

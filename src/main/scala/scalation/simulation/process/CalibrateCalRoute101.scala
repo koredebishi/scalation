@@ -39,15 +39,15 @@ class CalibrateCalRoute101 extends CalibratableModel:
     end runSimulation
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute average SMAPE across all sensors.
-     *  @return average SMAPE value (placeholder until simRunVsPemsRun is re-enabled)
+    /** Compute average RMSE across mainline sensors only.
+     *  Uses only the first 3 sensors (afterOfframp1, afterOnramp1, afterOnramp2) for optimization.
+     *  @return average RMSE value for mainline sensors
      */
     def computeFitness(): Double =
-         //Future implementation (when simRunVsPemsRun is uncommented in CalRoute101):
-         val smapeArray = model.simRunVsPemsRun()
-         val avgSmape = smapeArray.sum / smapeArray.length
-         avgSmape
-        //val avgSmape = 0.0  // Placeholder - allows optimizer to run and suggest parameters
+         val rmseArray = model.simRunVsPemsRunRMSE()  // Get RMSE values for all 5 sensors
+         val mainlineRMSE = rmseArray.slice(0, 3)     // Take only first 3 mainline sensors
+         val avgRMSE = mainlineRMSE.sum / mainlineRMSE.length  // Average RMSE
+         avgRMSE
     end computeFitness
 
 end CalibrateCalRoute101

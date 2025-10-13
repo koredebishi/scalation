@@ -83,7 +83,7 @@ abstract class Vehicle (name_ : String, director: Model)
      */
     override def toString: String =
         val label = if displayLabel != null && displayLabel.nonEmpty then displayLabel else me
-        s"Vehicle($label)" //id=$id segId=$segId prevSeg=$prevSegId disp=$disp tDisp=$t_disp  enterT=$segmentEnterTime path=$pathInfo)"
+        s"Vehicle($label )"//=$id segId=$segId prevSeg=$prevSegId disp=$disp tDisp=$t_disp  enterT=$segmentEnterTime path=$pathInfo)"
 end Vehicle
 
 
