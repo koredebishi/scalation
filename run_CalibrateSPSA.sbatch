@@ -1,4 +1,5 @@
 #!/bin/bash
+#SBATCH --partition=batch
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
@@ -25,7 +26,7 @@ chmod 700 $XDG_RUNTIME_DIR
 #   rsync -av $HOME/scalation_2.0/ $SCRATCH/scalation_2.0/
 # Make sure data and sbt build files are in /scratch/krb84578/scalation_2.0 before job starts.
 
-cd /scratch/krb84578/scalation_2.0
+cd /scratch/krb84578/workDir/scalation
 echo "Running from: $(pwd)"
 ls -lh
 

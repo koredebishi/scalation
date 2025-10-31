@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2426cf4f-6eea-44af-aca5-0ef65eba64ed" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/run_CalibrateSPSA_Mo.sbatch" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_optimizer_array.sbatch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/CalibrateCalRoute101.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/CalibrateCalRoute101.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/example_1/CalRoute101.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/example_1/CalRoute101.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_CalibrateSPSA.sbatch" beforeDir="false" afterPath="$PROJECT_DIR$/run_CalibrateSPSA.sbatch" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -320,7 +317,7 @@
       <workItem from="1760481619710" duration="47211000" />
       <workItem from="1760747820434" duration="24368000" />
       <workItem from="1761491827367" duration="33750000" />
-      <workItem from="1761879983465" duration="10701000" />
+      <workItem from="1761879983465" duration="13563000" />
     </task>
     <servers />
   </component>
