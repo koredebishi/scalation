@@ -206,7 +206,7 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 
             route.path(laneID).removeFromAlist(this)
             //easyW.println(s"Highway exit: $this leaving seg=$segId lane=$laneID at clock=$clock")
-            println(s"To  mainline sink: count ${this.displayLabel}")
+            //println(s"To  mainline sink: count ${this.displayLabel}")
             sinks(0).leave()
 
         end driveHighway
@@ -335,5 +335,5 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     /** Run the simulation */
     simulate()
     waitFinished()
-    Model.shutdown()       // to be removed when TrafficOptimization is used
+    //Model.shutdown()       // to be removed when TrafficOptimization is used
 end CalRoute101
