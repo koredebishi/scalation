@@ -14,7 +14,7 @@ package simulation
 package process
 
 import scala.collection.mutable.{ArrayBuffer => VEC}
-import scala.runtime.ScalaRunTime.stringOf
+//import scala.runtime.ScalaRunTime.stringOf
 
 import scalation.animation.CommandType._
 import scalation.scala2d.Ellipse
@@ -31,9 +31,9 @@ class Sink (name: String, at: Array [Double])
 
     initComponent (name, at)
 
-    private val debug = debugf ("Sink", true)                          // debug function 
+    private val debug = debugf ("Sink", false)                          // debug function
 
-    debug ("init", s"name = $name, located at ${stringOf (at)}")
+    //debug ("init", s"name = $name, located at ${stringOf (at)}")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.
@@ -59,7 +59,7 @@ class Sink (name: String, at: Array [Double])
         val ctime = director.clock                                     // clock timeA
         tally (ctime - actor.arrivalT)                                 // tally actor time in system
         //record (actor, ctime)                                          // record actor flow
-        director.log.trace (this, "terminates", actor, director.clock)
+        //director.log.trace (this, "terminates", actor, director.clock)
         director.animate (actor, MoveToken, null, null, Array (at(0) + DIAM, at(1) + at(3) / 2.0 - RAD))
 
         actor.yieldToDirector (true)                                   // yield and terminate

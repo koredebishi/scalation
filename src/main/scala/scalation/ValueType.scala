@@ -256,9 +256,9 @@ def safe_toDouble (s: String): Double =
         d = java.lang.Double.parseDouble (s)
     catch
         case ex: java.lang.NullPointerException =>
-            println ("safe_toDouble: can't parse null string")
+            //println ("safe_toDouble: can't parse null string")
         case ex: java.lang.NumberFormatException =>
-            println (s"safe_toDouble: can't parse '$s' to create a Double")
+            //println (s"safe_toDouble: can't parse '$s' to create a Double")
     end try
     d
 end safe_toDouble

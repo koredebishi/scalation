@@ -29,12 +29,7 @@ trait RowTimeLoader:
         if clock >= rowTime then
             curRow += 1
             rowTime += 15 * MINUTE
-            ew.write(s"\n Director clock advanced: $clock and new rowtime $rowTime and curRow $curRow \n ")
-            //println(s"[RowManager] Advanced to row $curRow at clock = $clock")
-            ew.flush()
         end if
-
-        ew.flush()
     end nextRow
     
 

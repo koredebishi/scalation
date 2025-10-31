@@ -74,13 +74,13 @@ object GippsDynamics
 
         val v = gipps(car, car_ahead, length) + EPSILON // determine new velocity
         //debug("updateM", s"car = $car \t the new VELOCITY is: $v")
-        easyW.println(s"UpdateM car = ${car.displayLabel}  \t the new VELOCITY is: $v")
+        //easyW.println(s"UpdateM car = ${car.displayLabel}  \t the new VELOCITY is: $v")
 
 
 
         val x = butcher(car.t_disp, v, car.velocity, prop("rt")) // new proposed position for car
         //debug("updateM", s"car = $car \t the new POSITION is: $x")
-        easyW.println(s"UpdateM car = ${car.displayLabel}  \t the new POSITION is: $x")
+        //easyW.println(s"UpdateM car = ${car.displayLabel}  \t the new POSITION is: $x")
 
         car.o_velocity = car.velocity // save the old velocity
         car.velocity = v // assign new velocity
@@ -175,8 +175,8 @@ object GippsDynamics
 
         // Otherwise, apply the congested/safety branch.
         val inner_exp = (b * b * rt * rt) - b * phi // value inside sqrt
-        if inner_exp < 0.0 then
-            easyW.println(s"[WARN] Negative sqrt term: $inner_exp") // numerical safety check
+//        if inner_exp < 0.0 then
+//            easyW.println(s"[WARN] Negative sqrt term: $inner_exp") // numerical safety check
 
         val cong = (b * rt) + sqrt(max(0.0, inner_exp)) // braking (congested) velocity
 
@@ -206,9 +206,9 @@ end GippsDynamics
      *  @param car  the car/vehicle whose acceleration, velocity, and position is being updated
      */
     def updateM (car: Vehicle, length: Double): Unit =
-        debug ("updateM", s"car = $car")
+        //debug ("updateM", s"car = $car")
         var a = iDM (car, car.myNode.ahead.asInstanceOf [Vehicle], del)
-        debug ("updateM", s"car = $car \t the new ACCELERATION is: $a")
+        //debug ("updateM", s"car = $car \t the new ACCELERATION is: $a")
         if a.isNaN then         a = 0.0
         if a.isNegInfinity then a = bmax                            // max braking acceleration
         if a.isPosInfinity then a = amax                            // max forward acceleration
@@ -218,11 +218,11 @@ end GippsDynamics
         if a > 0.0 && a > amax then a = amax
 
         var v = butcher (car.velocity, a, car.acc, rt)
-        debug ("updateM", s"car = $car \t the new VELOCITY is: $v")
+        //debug ("updateM", s"car = $car \t the new VELOCITY is: $v")
         if v < 0.0 then v = 1.0                                     // move slowly, not stopped
 
         val x = butcher (car.t_disp, v, car.velocity, rt)
-        debug ("updateM", s"car = $car \t the new POSITION is: $x")
+        //debug ("updateM", s"car = $car \t the new POSITION is: $x")
 
         car.o_acc = car.acc
         car.acc   = a

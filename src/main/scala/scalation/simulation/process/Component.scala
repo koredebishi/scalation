@@ -16,7 +16,7 @@ import scala.collection.mutable.{ArrayBuffer => VEC}
 //import scala.collection.mutable.{ListBuffer => VEC}
 
 import scalation.mathstat.{Statistic, TimeStatistic}
-import scala.runtime.ScalaRunTime.stringOf
+//import scala.runtime.ScalaRunTime.stringOf
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -47,9 +47,9 @@ trait Component
      */
     def initComponent (label: String, loc: Array [Double]): Unit =
         name = label
-        println(s"(locComp:loc ${stringOf(loc)})")
+        //println(s"(locComp:loc ${stringOf(loc)})")
         at   = loc
-        println(s"(InitComp:at ${stringOf(at)})")
+        //println(s"(InitComp:at ${stringOf(at)})")
         initStats (label)
         if at == null then flaw ("init", s"component '$name' has null location")
     end initComponent

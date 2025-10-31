@@ -8,7 +8,8 @@ import scalation.random.{Uniform, Variate}
 import scalation.simulation.process.example_1.CalRoute101
 
 
-val easyW = new EasyWriter("simulation", "CalibrateCalRoute101.txt")
+val easyW = new EasyWriter("simulation", "Home_14-CalibrateCalRoute101.txt")
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Adapter to make CalRoute101 compatible with CalibratableModel trait.
@@ -26,8 +27,6 @@ class CalibrateCalRoute101 extends CalibratableModel:
     def applyParameters(params: VectorD): Unit =
         // Map parameter vector to Vehicle properties
         Vehicle.setProps(Vehicle.setParams(params))       // The parameters to be optimized from the vehicle
-        easyW.println(s"Vehicle properties set to: ${Vehicle.prop}")   // Debug print to verify properties
-
         // Create new model instance with updated Vehicle settings
         model = new CalRoute101()       // Re-instantiate model to apply new vehicle properties
     end applyParameters
@@ -41,14 +40,31 @@ class CalibrateCalRoute101 extends CalibratableModel:
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute average RMSE across mainline sensors only.
      *  Uses only the first 3 sensors (afterOfframp1, afterOnramp1, afterOnramp2) for optimization.
-     *  @return average RMSE value for mainline sensors
+     *  Also computes SMAPE for monitoring (not logged in hot path to avoid I/O overhead).
+     *  @return average RMSE value for mainline sensors (used by optimizer)
      */
     def computeFitness(): Double =
-         val rmseArray = model.simRunVsPemsRunRMSE()  // Get RMSE values for all 5 sensors
-         val mainlineRMSE = rmseArray.slice(0, 3)     // Take only first 3 mainline sensors
-         val avgRMSE = mainlineRMSE.sum / mainlineRMSE.length  // Average RMSE
-         avgRMSE
+         val qofMetrics = model.getQoFMetrics()  // Get full QoF metrics for all 5 sensors
+
+         // Extract RMSE (index 5) from first 3 mainline sensors
+         val mainlineRMSE = qofMetrics.slice(0, 3).map(qof => qof(5))
+         val avgRMSE = mainlineRMSE.sum / mainlineRMSE.length
+
+         avgRMSE  // Return RMSE for optimization (SMAPE available at index 7 if needed)
     end computeFitness
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get final metrics summary (RMSE and SMAPE) for reporting after optimization.
+     *  @return tuple of (avgRMSE, Array of individual SMAPE values for 3 mainline sensors)
+     *          SMAPE array: [afterOfframp1, afterOnramp1, afterOnramp2]
+     */
+    def getFinalMetrics(): (Double, Array[Double]) =
+        val qofMetrics = model.getQoFMetrics()
+        val mainlineRMSE = qofMetrics.slice(0, 3).map(qof => qof(5))
+        val mainlineSMAPE = qofMetrics.slice(0, 3).map(qof => qof(7))
+        val avgRMSE = mainlineRMSE.sum / mainlineRMSE.length
+        (avgRMSE, mainlineSMAPE.toArray)  // Return avg RMSE and individual SMAPE values
+    end getFinalMetrics
 
 end CalibrateCalRoute101
 
@@ -104,35 +120,37 @@ end CalibrateCalRoute101
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Initial parameter guess for Gipps model: [s, amax, bmax, T, τ] */
     val params: VectorD = VectorD(5.0, 4.0, -1.5, 3.0, 1.0)  // shared params
+    //4.99888,      3.99888,        -1.49888,       2.99888,        1.00112
+
     
-    
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Evaluate initial fitness before optimization */
-    val smapeValue: Double = simOpt.func(params)
-    easyW.println(s"The smape value for the 7 sensor is : $smapeValue")
+    //val smapeValue: Double = simOpt.func(params)
+    //easyW.println(s"The smape value for the 7 sensor is : $smapeValue")
 
      //:::::::::::::::::::::::::::::::::::::::::::::::::
     val optimizer1 = new SPSA(simOpt.func, params.dim).solve(params)
-    easyW.println(s"optimal solution = (f(x), x) = $optimizer1")
+    //easyW.println(s"optimal solution = (f(x), x) = $optimizer1")
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    val optimizer2 = new NelderMeadSimplex2(simOpt.func, params.dim).solve(params)
-    easyW.println(s"optimal solution = (f(x), x) = $optimizer2")
+    //val optimizer2 = new NelderMeadSimplex2(simOpt.func, params.dim).solve(params)
+    //easyW.println(s"optimal solution = (f(x), x) = $optimizer2")
 
 
 
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Genetic Algorithm Optimizer - Population-based global search
-    // Random variates define search bounds for each parameter
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    easyW.println("\n[3/3] Running Genetic Algorithm Optimizer...")
-    easyW.println("-" * 80)
-    val gaOptimizer = new GeneticAlgorithm(simOpt.func, randVars)
-    val gaResult = gaOptimizer.solve2() // Note: GA uses solve2() method
-    easyW.println(s"Genetic Algorithm Result: fitness = ${gaResult._1}, params = ${gaResult._2}")
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    // Genetic Algorithm Optimizer - Population-based global search
+//    // Random variates define search bounds for each parameter
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    easyW.println("\n[3/3] Running Genetic Algorithm Optimizer...")
+//    easyW.println("-" * 80)
+//    val gaOptimizer = new GeneticAlgorithm(simOpt.func, randVars)
+//    val gaResult = gaOptimizer.solve2() // Note: GA uses solve2() method
+//    easyW.println(s"Genetic Algorithm Result: fitness = ${gaResult._1}, params = ${gaResult._2}")
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::a:::::::
@@ -142,56 +160,100 @@ end CalibrateCalRoute101
 end runCalibrateCalRoute101
 
 
-@main def runCalibrateCalROute101_OptimizerCompare():Unit =
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Run SPSA Optimizer Only - For SLURM Job Array
+ *  > runMain scalation.simulation.process.runCalibrate_SPSA
+ */
+@main def runCalibrate_SPSA(): Unit =
+    banner("SPSA OPTIMIZER - CalRoute101 Calibration")
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create CalRoute101 model adapter (implements CalibratableModel trait) */
     val modelAdapter = new CalibrateCalRoute101()
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create general optimizer with CalRoute101 model adapter */
     val simOpt = new TrafficOptimization(modelAdapter)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Initial parameter guess for Gipps model: [s, amax, bmax, T, τ] */
     val params: VectorD = VectorD(5.0, 4.0, -1.5, 3.0, 1.0)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Evaluate initial fitness before optimization */
-    val smapeValue: Double = simOpt.func(params)
-    easyW.println(s"Initial SMAPE value for the 7 sensors: $smapeValue\n")
+    println(s"Starting SPSA Optimization at ${java.time.LocalDateTime.now()}")
+    println(s"Initial parameters: $params")
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Run multiple optimizers and compare results */
-    easyW.println("\n" + "="*80)
-    easyW.println("MULTI-OPTIMIZER CALIBRATION COMPARISON")
-    easyW.println("="*80 + "\n")
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // SPSA Optimizer - Fast stochastic approximation
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    easyW.println("\n[1/3] Running SPSA Optimizer...")
-    easyW.println("-" * 80)
     val spsaOptimizer = new SPSA(simOpt.func, params.dim)
-    val spsaResult = spsaOptimizer.solve(params)
-    easyW.println(s"SPSA Result: fitness = ${spsaResult._1}, params = ${spsaResult._2}")
-    
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Nelder-Mead Simplex Optimizer - Robust derivative-free method
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    easyW.println("\n[2/3] Running Nelder-Mead Simplex Optimizer...")
-    easyW.println("-" * 80)
+    val startTime = System.currentTimeMillis()
+    val result = spsaOptimizer.solve(params)
+    val endTime = System.currentTimeMillis()
+    val duration = (endTime - startTime) / 1000.0
+
+    // Get final metrics (RMSE and individual SMAPE values)
+    val (finalRMSE, smapeArray) = modelAdapter.getFinalMetrics()
+
+    println("\n" + "="*80)
+    println("SPSA OPTIMIZATION COMPLETE")
+    println("="*80)
+    println(s"Best Fitness (RMSE): ${result._1}")
+    println(s"SMAPE - afterOfframp1: ${smapeArray(0)}")
+    println(s"SMAPE - afterOnramp1:  ${smapeArray(1)}")
+    println(s"SMAPE - afterOnramp2:  ${smapeArray(2)}")
+    println(s"Best Parameters: ${result._2}")
+    println(s"Execution Time: $duration seconds")
+    println("="*80)
+
+    easyW.println(s"SPSA: RMSE=${result._1}, SMAPE=[${smapeArray(0)},${smapeArray(1)},${smapeArray(2)}], params=${result._2}, time=${duration}s")
+
+    Model.shutdown()
+end runCalibrate_SPSA
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Run Nelder-Mead Simplex Optimizer Only - For SLURM Job Array
+ *  > runMain scalation.simulation.process.runCalibrate_NelderMead
+ */
+@main def runCalibrate_NelderMead(): Unit =
+    banner("NELDER-MEAD SIMPLEX OPTIMIZER - CalRoute101 Calibration")
+
+    val modelAdapter = new CalibrateCalRoute101()
+    val simOpt = new TrafficOptimization(modelAdapter)
+    val params: VectorD = VectorD(5.0, 4.0, -1.5, 3.0, 1.0)
+
+    println(s"Starting Nelder-Mead Optimization at ${java.time.LocalDateTime.now()}")
+    println(s"Initial parameters: $params")
+
     val nelderMeadOptimizer = new NelderMeadSimplex2(simOpt.func, params.dim)
-    val nelderMeadResult = nelderMeadOptimizer.solve(params)
-    easyW.println(s"Nelder-Mead Result: fitness = ${nelderMeadResult._1}, params = ${nelderMeadResult._2}")
-    
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Genetic Algorithm Optimizer - Population-based global search
-    // Random variates define search bounds for each parameter
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    easyW.println("\n[3/3] Running Genetic Algorithm Optimizer...")
-    easyW.println("-" * 80)
-    
+    val startTime = System.currentTimeMillis()
+    val result = nelderMeadOptimizer.solve(params)
+    val endTime = System.currentTimeMillis()
+    val duration = (endTime - startTime) / 1000.0
+
+    // Get final metrics (RMSE and individual SMAPE values)
+    val (finalRMSE, smapeArray) = modelAdapter.getFinalMetrics()
+
+    println("\n" + "="*80)
+    println("NELDER-MEAD OPTIMIZATION COMPLETE")
+    println("="*80)
+    println(s"Best Fitness (RMSE): ${result._1}")
+    println(s"SMAPE - afterOfframp1: ${smapeArray(0)}")
+    println(s"SMAPE - afterOnramp1:  ${smapeArray(1)}")
+    println(s"SMAPE - afterOnramp2:  ${smapeArray(2)}")
+    println(s"Best Parameters: ${result._2}")
+    println(s"Execution Time: $duration seconds")
+    println("="*80)
+
+    easyW.println(s"NelderMead: RMSE=${result._1}, SMAPE=[${smapeArray(0)},${smapeArray(1)},${smapeArray(2)}], params=${result._2}, time=${duration}s")
+
+    Model.shutdown()
+end runCalibrate_NelderMead
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Run Genetic Algorithm Optimizer Only - For SLURM Job Array
+ *  > runMain scalation.simulation.process.runCalibrate_GA
+ */
+@main def runCalibrate_GA(): Unit =
+    banner("GENETIC ALGORITHM OPTIMIZER - CalRoute101 Calibration")
+
+    val modelAdapter = new CalibrateCalRoute101()
+    val simOpt = new TrafficOptimization(modelAdapter)
+    val params: VectorD = VectorD(5.0, 4.0, -1.5, 3.0, 1.0)
+
+    println(s"Starting Genetic Algorithm Optimization at ${java.time.LocalDateTime.now()}")
+    println(s"Initial parameters: $params")
+
     // Define search ranges for GA: [s, amax, bmax, T, τ]
     val randVars: Array[Variate] = Array(
         Uniform(3.0, 10.0),   // s:    safe distance headway (3-10 meters)
@@ -200,42 +262,29 @@ end runCalibrateCalRoute101
         Uniform(1.0, 5.0),    // T:    safe time headway (1-5 seconds)
         Uniform(0.5, 3.0)     // τ:    reaction time (0.5-3 seconds)
     )
-    
+
     val gaOptimizer = new GeneticAlgorithm(simOpt.func, randVars)
-    val gaResult = gaOptimizer.solve2()  // Note: GA uses solve2() method
-    easyW.println(s"Genetic Algorithm Result: fitness = ${gaResult._1}, params = ${gaResult._2}")
-    
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Compare results and identify best optimizer
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    easyW.println("\n" + "="*80)
-    easyW.println("OPTIMIZATION RESULTS SUMMARY")
-    easyW.println("="*80)
-    
-    // Collect all results
-    val results = Array(
-        ("SPSA", spsaResult._1, spsaResult._2),
-        ("Nelder-Mead", nelderMeadResult._1, nelderMeadResult._2),
-        ("Genetic Algorithm", gaResult._1, gaResult._2)
-    )
-    
-    // Find best result (lowest fitness/SMAPE)
-    val bestResult = results.minBy(_._2)
-    
-    easyW.println(s"\n${"Algorithm"} ${"Fitness (SMAPE)"}")
-    easyW.println("-" * 80)
-    for (name, fitness, _) <- results do
-        val marker = if name == bestResult._1 then " ← BEST" else ""
-        easyW.println(s"$name $fitness  $marker")
-    
-    easyW.println("\n" + "="*80)
-    easyW.println(s"Best Algorithm: ${bestResult._1}")
-    easyW.println(s"Best Fitness:   ${bestResult._2}")
-    easyW.println(s"Best Parameters: ${bestResult._3}")
-    easyW.println("="*80 + "\n")
+    val startTime = System.currentTimeMillis()
+    val result = gaOptimizer.solve2()
+    val endTime = System.currentTimeMillis()
+    val duration = (endTime - startTime) / 1000.0
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Clean up simulation resources */
+    // Get final metrics (RMSE and individual SMAPE values)
+    val (finalRMSE, smapeArray) = modelAdapter.getFinalMetrics()
+
+    println("\n" + "="*80)
+    println("GENETIC ALGORITHM OPTIMIZATION COMPLETE")
+    println("="*80)
+    println(s"Best Fitness (RMSE): ${result._1}")
+    println(s"SMAPE - afterOfframp1: ${smapeArray(0)}")
+    println(s"SMAPE - afterOnramp1:  ${smapeArray(1)}")
+    println(s"SMAPE - afterOnramp2:  ${smapeArray(2)}")
+    println(s"Best Parameters: ${result._2}")
+    println(s"Execution Time: $duration seconds")
+    println("="*80)
+
+    easyW.println(s"GA: RMSE=${result._1}, SMAPE=[${smapeArray(0)},${smapeArray(1)},${smapeArray(2)}], params=${result._2}, time=${duration}s")
+
     Model.shutdown()
+end runCalibrate_GA
 
-end runCalibrateCalROute101_OptimizerCompare

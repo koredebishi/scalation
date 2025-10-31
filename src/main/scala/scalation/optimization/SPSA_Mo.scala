@@ -1,26 +1,27 @@
-
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  Yulong Wang
+/** @author  Yulong Wang, Korede Bishi
  *  @version 2.0
- *  @date    Thursday Feb 17 13:32:52 EDT 2022
+ *  @date    Thursday October 17 13:32:52 EDT 2022
  *  @see     LICENSE (MIT style license file).
  *
- *  @note    Simultaneous Perturbation Stochastic Approximation
+ *  @note    Simultaneous Perturbation Stochastic Approximation with Momentum
  */
 
 package scalation
 package optimization
 
 import scala.math.pow
+import Minimize.hp
 
 import scalation.mathstat.{FunctionV2S, VectorD}
 import scalation.random.{Bernoulli, Uniform}
 //import scalation.random.{Bernoulli, Normal, Uniform}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SPSA` class implements the Simultaneous Perturbation Stochastic Approximation
+/** The `SPSA_Mo` class implements the Simultaneous Perturbation Stochastic Approximation wihh Momentum
  *  algorithm for rough approximation of gradients.
- *  @see https://www.jhuapl.edu/spsa/PDF-SPSA/Matlab-SPSA_Alg.pdf
+ *  @see https://www.jhuapl.edu/SPSA_Mo/PDF-SPSA_Mo/Matlab-SPSA_Mo_Alg.pdf
+ *  @see
  *
  *      minimize f(x)
  *
@@ -30,15 +31,17 @@ import scalation.random.{Bernoulli, Uniform}
  *  @param lower     the lower bounds vector
  *  @param upper     the upper bounds vector
  *  @param debug_    the whether to call in debug mode (does tracing)j
+ *  @param hparam    the momentum hyper-parameters
  */
-class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
+class SPSA_Mo (f: FunctionV2S, max_iter: Int = 100,hparam: HyperParameter = hp, checkCon: Boolean = false,
             lower: VectorD = null, upper: VectorD = null, debug_ : Boolean = false)
-      extends Minimizer
-         with BoundsConstraint (lower, upper)
-         with MonitorEpochs:
+    extends Minimizer
+        with BoundsConstraint (lower, upper)
+        with StoppingRule (hparam("upLimit").toInt)
+        with MonitorEpochs:
 
-    private val debug = debugf ("SPSA", debug_)                        // debug function
-    private val flaw  = flawf ("SPSA")                                 // flaw function
+    private val debug = debugf ("SPSA_Mo", debug_)                        // debug function
+    private val flaw  = flawf ("SPSA_Mo")                                 // flaw function
 
     private val EPS   = 1E-6
     private val coin  = Bernoulli ()                                   // Bernoulli (0/1) RVG
@@ -47,6 +50,12 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
     private var A     = 100.0
     private var a     = 0.16       // these numbers are from Spall (1998) DOI: 10.1109/7.705889
     private var c     = 1.0
+
+
+    // Added by Korede for momentum
+    private val β     = hparam("beta").toDouble                         // momentum hyper-parameter
+    private val v     = hparam("nu").toDouble                           // 0 => SGD, 1 => (normalized) SHB
+
 
     private var f_best = Double.MaxValue
 
@@ -80,6 +89,7 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for an optimal point by moving a distance ak in the -ghat direction.
+     *  Uses hybrid monitoring system with automatic progress tracking.
      *  @param x0     initial point
      *  @param step   steps for iteration
      *  @param toler  tolerance
@@ -91,7 +101,14 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
         val x      = x0.copy                                           // new point
 
         var (k, go) = (1, true)
+
+        var p = new VectorD (x0.dim)                                 // momentum-based aggregated gradient
+
+        // Start timing
         val startTime = System.nanoTime()
+
+        // Initialize monitoring )
+        initializeMonitoring (max_iter)                       // Called at start of solve(), from the MonitorEpochs trait
 
         cfor (k <= max_iter && go, k += 1) {
             val ak      = a / pow (A + k + 1, alpha)                   // how far to move along gradient
@@ -102,9 +119,11 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
             val y_plus  = f(x_plus)                                    // functional value for x_plus
             val y_minus = f(x_minus)                                   // functional value for x_minus
 
-            val ghat = delta * (y_plus - y_minus) / (2 * ck)           // rough/approx. gradient
-            x_old    = x.copy                                          // save previous location x
-            x       -= ghat * ak                                       // update x: move opposite gradient
+            //Momentum update by Korede 10/16/2025
+            val ghat = delta * (y_plus - y_minus) / (2 * ck)            // rough/approx. gradient
+            p = ghat * (1 - β) + p * β                                  // accumulate momentum
+            x_old = x.copy                                              // save previous location x
+            x -= (ghat * (1 - v) + p * v) * ak                          // update x with momentum
 
             if checkCon then constrain (x)                             // enforce contraints, may move x
 
@@ -116,69 +135,66 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
                 f_best = f_x
             end if
 
-            updateMonitoring(k, f_best)                           // Called once per epoch, from the MonitorEpochs trait
+            // Update monitoring (replaces manual printEpoch/printProgressBar calls)
+            updateMonitoring (k, f_best)                           // Called once per epoch, from the MonitorEpochs trait
+
             if (x - x_old).norm < toler then go = false                // stopping rule
         } // cfor
 
-        val endTime       = System.nanoTime()
-        val elapsedTimeMs = (endTime - startTime) / 1E6
-        val elapsedTimeSec= elapsedTimeMs / 1E3
+        // Calculate elapsed time
+        val endTime = System.nanoTime()
+        val elapsedTimeMs = (endTime - startTime) / 1e6  // Convert nanoseconds to milliseconds
+        val elapsedTimeSec = elapsedTimeMs / 1000.0      // Convert to seconds
 
-        finalizeMonitoring()
-        //printFooter()
+        // Finalize monitoring (replaces manual printFooter call)
+        finalizeMonitoring ()
 
-//
-//        println (s"x_last is $x and y(x_last) at the end is ${f(x)} and \n " +
-//                 s"lowest is $x_best and $f_best")
         // Print clean, formatted optimization summary
-        println()
-        println(sline(70).trim)
-        println("SPSA: OPTIMIZATION SUMMARY")
-        println(sline(70).trim)
-        println(f"${"Metric"}%-25s | ${"Value"}%s")
-        println(sline(70).trim)
-        println(f"${"Final position (x_last)"}%-25s | $x")
-        println(f"${"Loss at final position"}%-25s | ${f(x)}%.8f")
-        println(f"${"Best position found"}%-25s | $x_best")
-        println(f"${"Best loss achieved"}%-25s | $f_best%.8f")
-        println(f"${"Total iterations"}%-25s | ${epochLoss.size}")
-        println(f"${"Elapsed time"}%-25s | ${elapsedTimeSec}%.4f seconds (${elapsedTimeMs}%.2f ms)")
-        println(f"${"Time per iteration"}%-25s | ${elapsedTimeMs / epochLoss.size}%.2f ms")
-        println(sline(70).trim)
+        println ()
+        println (sline (70).trim)
+        println ("SPSA_MO: OPTIMIZATION SUMMARY")
+        println (sline (70).trim)
+        println (f"${"Metric"}%-25s | ${"Value"}%s")
+        println (sline (70).trim)
+        println (f"${"Final position (x_last)"}%-25s | $x")
+        println (f"${"Loss at final position"}%-25s | ${f(x)}%.8f")
+        println (f"${"Best position found"}%-25s | $x_best")
+        println (f"${"Best loss achieved"}%-25s | $f_best%.8f")
+        println (f"${"Total iterations"}%-25s | ${epochLoss.size}")
+        println (f"${"Elapsed time"}%-25s | ${elapsedTimeSec}%.4f seconds (${elapsedTimeMs}%.2f ms)")
+        println (f"${"Time per iteration"}%-25s | ${elapsedTimeMs / epochLoss.size}%.2f ms")
+        println (sline (70).trim)
 
         (f_best, x_best)
     end solve
 
-end SPSA
+end SPSA_Mo
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `sPSATest` main function tests the `SPSA` class.
- *  > runMain scalation.optimization.sPSATest
+/** The `SPSA_MoTest` main function tests the `SPSA_Mo` class with hybrid monitoring.
+ *  Demonstrates both simple usage (verbose flag) and advanced usage (custom callbacks).
+ *  > runMain scalation.optimization.SPSA_MoTest
  */
-@main def sPSATest (): Unit =
+@main def SPSA_MoTest (): Unit =
 
     banner ("Minimize: (x_0 - 3)^2 + (x_1 - 4)^2 + 1")
 
-//  val noisen = Normal (0.0, 0.1)
-    val noise  = Uniform (-0.1, 0.1)    // must feed it a bounded value. 
+    val noise = Uniform (-0.1, 0.1)    // noise term for stochastic objective
 
-    def f (x: VectorD): Double = (x(0) - 3)~^2 + (x(1) - 4)~^2 + 1 + noise.gen     // the function you seak to optimize
+    def f (x: VectorD): Double = (x(0) - 3)~^2 + (x(1) - 4)~^2 + 1 + noise.gen
 
-    val x0 = VectorD (1, 2)        // initial starting value for the optimizer to look at 
-    
+    val x0 = VectorD (1, 2)            // initial starting point
+
     println ("\n=== Example 2: Advanced usage with custom callbacks ===")
-    val optimizer2 = new SPSA (f)
-    optimizer2.reset ()
-    optimizer2.setVerbose (1)          // Disable built-in output
-    optimizer2.setPrintEvery (20)      // Print every 10 epochs
-    val opt = optimizer2.solve (x0)
+    val optimizer1 = new SPSA_Mo (f)
+    optimizer1.reset ()
+    optimizer1.setVerbose (1)          // Disable built-in output
+    optimizer1.setPrintEvery (20)      // Print every 10 epochs
+    val opt1 = optimizer1.solve (x0)
 
 
+    // Plot the loss convergence
+    //optimizer1.plotLoss ()
 
-//    println (s"][ optimal solution (f(x), x) = $opt")
-
-    //optimizer.plotLoss ()
-
-end sPSATest
-
+end SPSA_MoTest

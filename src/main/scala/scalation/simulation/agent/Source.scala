@@ -44,10 +44,10 @@ class Source (name: String, director: Model, _time: Double, iArrivalRV: Variate,
             val vert  = new Vertex (name, prop, pos)                 // internal vertex
     Source.add (this)
     director.statList += this                                        // add to director's variable to keep track of
-    
-    debug ("init", s"name = $me, director = ${director.me}, time = $time, iArrivalRV = $iArrivalRV, " +
-                   s"makeEntity = $makeEntity, units = $units, subtype = $subtype, " +
-                   s"prop = $prop, pos = $pos")
+//
+//    debug ("init", s"name = $me, director = ${director.me}, time = $time, iArrivalRV = $iArrivalRV, " +
+//                   s"makeEntity = $makeEntity, units = $units, subtype = $subtype, " +
+//                   s"prop = $prop, pos = $pos")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare two spatial objects based on their space coordinates.
@@ -65,7 +65,7 @@ class Source (name: String, director: Model, _time: Double, iArrivalRV: Variate,
     def act (): Unit =
         var prevAgent: SimAgent = null
         for i <- 1 to units do
-            debug ("act", s"$me makes SimAgent $i")
+            //debug ("act", s"$me makes SimAgent $i")
             val agent     = makeEntity ()                            // make new agent
             agent.subtype = subtype                                  // set the agent's subtype
             agent.time    = director.clock                           // set the agent's time to now
@@ -76,7 +76,7 @@ class Source (name: String, director: Model, _time: Double, iArrivalRV: Variate,
             if prevAgent != null then prevAgent.aft = agent
             prevAgent     = agent
 
-            director.log.trace (this, "generates", agent, director.clock)
+            //director.log.trace (this, "generates", agent, director.clock)
             director.animate (agent, CreateToken, randomColor (agent.id), Ellipse ())
             director.schedule (agent)
             debug ("act", s"$me schedules $agent")
@@ -90,7 +90,7 @@ class Source (name: String, director: Model, _time: Double, iArrivalRV: Variate,
             end if
         end for
 
-        director.log.trace (this, "terminates", null, director.clock)
+        //director.log.trace (this, "terminates", null, director.clock)
         yieldToDirector (true)                                       // yield and terminate
     end act
 
@@ -108,7 +108,7 @@ object Source
     Model.add (Source)
 
             val sources = VEC [Source] ()                            // collection of sources
-    private val debug   = debugf ("Source_", true)                   // debug function
+    private val debug   = debugf ("Source_", false)                   // debug function
     private val wh      = (22.0, 22.0)                               // default display size
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -122,7 +122,7 @@ object Source
      *  @param source  the source vertex to add
      */
     def add (source: Source): Unit =
-        debug ("add", s"add vertex $source to vertex type $Source")
+        //debug ("add", s"add vertex $source to vertex type $Source")
         verts   += source.vert
         sources += source
     end add

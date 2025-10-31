@@ -124,7 +124,7 @@ end getFromURL_File
 /** Make a string for use in printing a line of '-'s.
  *  @param n  the number of '-'s to use
  */
-def sline (n: Int = 60): String = "-" * n + "\n"
+def sline (n: Int = 60): String = "=" * n + "\n"
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Print a banner, i.e., a string in a box.

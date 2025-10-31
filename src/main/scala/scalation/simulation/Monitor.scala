@@ -24,6 +24,7 @@ case class Monitor (project: String = "simulation"):
     /** Use `EasyWriter` to make it easy to switch from standard out to a (log) file
      */
     private val ew = new EasyWriter (project, "monitor.log")
+    ew.off()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Toggle output destination from default of (log) file to standard output. etc.

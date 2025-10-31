@@ -39,7 +39,7 @@ end redirectOutTest
 class EasyWriter (project: String, filename: String, private var toFile: Boolean = true)
     extends Writer ():
 
-    private val debug = debugf ("EasyWriter", true)                    // debug function
+    private val debug = debugf ("EasyWriter", false)                    // debug function
 
     var on = true                                                      // whether writing is enabled
 

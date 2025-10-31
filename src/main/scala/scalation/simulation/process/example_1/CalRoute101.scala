@@ -33,17 +33,6 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     val nt          = config.data.dim
 
     val rand = Uniform(0.0, 1.0)              // probability uniform in [0,1)
-    // val offrampFraction = config.exitFraction  // FIXED fraction (deprecated - replaced by dynamic per-row fraction below)
-    // Dynamic off-ramp fraction will be computed inside Car.act using current simulation row index.
-    val offRampMAWindow = 5  // Simple Moving Average window m; MA_t = (1/m) * Σ_{j=0}^{m-1} f_{t-j}
-
-    // Override RowTimeLoader's rowTimeSlice to explicitly document this model's time granularity
-    // Purpose: CalRoute101 uses 15-minute observation windows matching PEMS traffic data
-    // Note: This is optional since trait default is already 15*MINUTE, but explicit is better
-    override def rowTimeSlice: Double = 15 * MINUTE
-
-    private [process] val easyW = new EasyWriter("simulation", "CalRoute101Model.txt")
-
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -53,8 +42,8 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     val iArrivalRV     = Erlang()
     val nStop          = config.nStopArray
     val laneChangeRV       = Bernoulli(0.6)
-    val rowIdx = ((clock / rowTime).toInt) % nt
-    val currentOfframpFractionMA = config.computeExitFractionMA(rowIdx, offRampMAWindow)
+
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     /** Delegate per‑source μ lookup to TrafficConfig */
@@ -90,6 +79,7 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
                                 ("srcRamp2", 2, Erlang(), nStop(2), offsets(2))
     )
 
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create Sinks locally for correct mapping and final routing */
     val (x0, y0) = (aniCoords_Main.last._1 - 100.0, aniCoords_Main.last._2 - 100.0)
@@ -120,7 +110,7 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
      * Example: ramp1 ↦ seg0, ramp2 ↦ seg1, ramp3 ↦ seg5
      */
 
-    val rampJoinSeg = Array(2, 3)    // hardcoded part needs generalization for the ramp joining segment.
+    val rampJoinSeg = Array(3, 4)    // hardcoded part needs generalization for the ramp joining segment.
     @inline def pos(rampIdx: Int): Int = rampJoinSeg(rampIdx)
     var carAhead: Vehicle = null
 
@@ -129,7 +119,9 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     case class Car() extends Vehicle("c", this):
 
 
-        val offRampJunction = 1
+        val offRampJunction = 2
+
+
         val highway_length = junc.length - 1
         val laneRV = config.getLaneRV((clock.toInt / rowTime.toInt) % nt)
 
@@ -137,9 +129,11 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 
             // ------------------ handle main entry vehicles -------------------
             if subtype == 0 then       // subtype 0 = mainline vehicle
+                val currentOfframpFractionMA = config.exitFractionMA(curRow)
 
                 val u = rand.gen
-                val useOffRamp = u <=  currentOfframpFractionMA
+                //println(s"NEW: RowIdx: $curRow | OfframpFraction: $currentOfframpFractionMA | RandomU: $u ")
+                val useOffRamp = u <= currentOfframpFractionMA
 
                 laneID = laneRV.igen
                 val carAhead = route.path(laneID).getLast
@@ -241,37 +235,47 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 
 
 
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute SMAPE between simulation and PEMS data at co-located evaluation sensors.
-     *
-     * Validation Strategy (Apple-to-Apple Comparison):
-     *  - Each PEMS sensor is matched with the simulation junction at the SAME physical location
-     *  - This ensures we compare traffic state at identical points in the network after merge/diverge events
-     *
-     * Mainline Sensors (co-located PEMS : Simulation):
-     *  - ytrue(0) = 2-401834ML (PEMS after offramp)  : junc(1) = ssor1 (Sim after offramp)
-     *  - ytrue(1) = 3-401833ML (PEMS after onramp1)  : junc(2) = ssor2 (Sim after onramp1)
-     *  - ytrue(2) = 5-401652ML (PEMS after onramp2)  : junc(4) = ssor4 (Sim after onramp2)
-     *
-     * Ramp Inflow Sensors (at ramp entrance, upstream of merge point):
-     *  - onRampTotalsPerRow(0) = 1-410095OR (PEMS) : ramp_sensors(0) (Sim onramp1 entrance)
-     *  - onRampTotalsPerRow(1) = 2-410093OR (PEMS) : ramp_sensors(1) (Sim onramp2 entrance)
-     *
-     * Note: Sensor 1-404532ML drives the simulation (mainline source) but is NOT used for validation
-     * since it's the input, not an output to be validated.
-     */
-    def simRunVsPemsRun(): Array[Double] =
-        val ytrue = config.evalArrivalsPerRow
-        val onRampTotalsPerRow = config.onRampTotalsPerRow
-        Array(
-            smapeF(VectorD(ytrue(0)), junc(1).getCountMatrix.sumVr), // 2-401834ML, after offramp
-            smapeF(VectorD(ytrue(1)), junc(2).getCountMatrix.sumVr), // 3-401833ML, after onramp1
-            smapeF(VectorD(ytrue(2)), junc(4).getCountMatrix.sumVr), // 5-401652ML, after onramp2 (final evaluation)
-            smapeF(VectorD(onRampTotalsPerRow(0)), ramp_sensors(0).getCountMatrix.sumVr), // onramp1 inflow
-            smapeF(VectorD(onRampTotalsPerRow(1)), ramp_sensors(1).getCountMatrix.sumVr) // onramp2 inflow
-        )
-    end simRunVsPemsRun
+//
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    /** Compute SMAPE between simulation and PEMS data at co-located evaluation sensors.
+//     *
+//     * Validation Strategy (Apple-to-Apple Comparison):
+//     *  - Each PEMS sensor is matched with the simulation junction at the SAME physical location
+//     *  - This ensures we compare traffic state at identical points in the network after merge/diverge events
+//     *
+//     * Mainline Sensors (co-located PEMS : Simulation):
+//     *  - ytrue(0) = 2-401834ML (PEMS after offramp)  : junc(1) = ssor1 (Sim after offramp)
+//     *  - ytrue(1) = 3-401833ML (PEMS after onramp1)  : junc(2) = ssor2 (Sim after onramp1)
+//     *  - ytrue(2) = 5-401652ML (PEMS after onramp2)  : junc(4) = ssor4 (Sim after onramp2)
+//     *
+//     * Ramp Inflow Sensors (at ramp entrance, upstream of merge point):
+//     *  - onRampTotalsPerRow(0) = 1-410095OR (PEMS) : ramp_sensors(0) (Sim onramp1 entrance)
+//     *  - onRampTotalsPerRow(1) = 2-410093OR (PEMS) : ramp_sensors(1) (Sim onramp2 entrance)
+//     *
+//     * Note: Sensor 1-404532ML drives the simulation (mainline source) but is NOT used for validation
+//     * since it's the input, not an output to be validated.
+//     */
+////    def simRunVsPemsRun(): Array[Double] =
+////        val ytrue = config.evalArrivalsPerRow
+////        val onRampTotalsPerRow = config.onRampTotalsPerRow
+////        Array(
+////            smapeF(VectorD(ytrue(0)), junc(2).getCountMatrix.sumVr), // 2-401834ML, after offramp
+////            smapeF(VectorD(ytrue(1)), junc(3).getCountMatrix.sumVr), // 3-401833ML, after onramp1
+////            smapeF(VectorD(ytrue(2)), junc(5).getCountMatrix.sumVr), // 5-401652ML, after onramp2 (final evaluation)
+////            smapeF(VectorD(onRampTotalsPerRow(0)), ramp_sensors(0).getCountMatrix.sumVr), // onramp1 inflow
+////            smapeF(VectorD(onRampTotalsPerRow(1)), ramp_sensors(1).getCountMatrix.sumVr) // onramp2 inflow
+////        )
+////    end simRunVsPemsRun
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    /** Compute RMSE values for all evaluation sensors.
+//     * Extracts RMSE (index 5) from the QoF metrics for use in optimization.
+//     *
+//     * @return Array of RMSE values: [afterOfframp1, afterOnramp1, afterOnramp2, onramp1Inflow, onramp2Inflow]
+//     */
+//    //    def simRunVsPemsRunRMSE(): Array[Double] =
+//    //        val qofMetrics = getQoFMetrics()
+//    //        qofMetrics.map(qof => qof(5))  // Extract RMSE (index 5) from each QoF vector
+//    //    end simRunVsPemsRunRMSE
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute all QoF metrics (including RMSE, MAE, SMAPE) using ScalaTion's built-in FitM.diagnose().
@@ -284,34 +288,27 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
         val onRampTotalsPerRow = config.onRampTotalsPerRow
         
         Array(
-            diagnose(VectorD(ytrue(0)), junc(1).getCountMatrix.sumVr), // 2-401834ML, after offramp
-            diagnose(VectorD(ytrue(1)), junc(2).getCountMatrix.sumVr), // 3-401833ML, after onramp1
-            diagnose(VectorD(ytrue(2)), junc(4).getCountMatrix.sumVr), // 5-401652ML, after onramp2
+            diagnose(VectorD(ytrue(0)), junc(2).getCountMatrix.sumVr), // 2-404532ML, after offramp
+            diagnose(VectorD(ytrue(1)), junc(3).getCountMatrix.sumVr), // 3-401834ML, after onramp1
+            diagnose(VectorD(ytrue(2)), junc(5).getCountMatrix.sumVr), // 5-401929ML, after onramp2
             diagnose(VectorD(onRampTotalsPerRow(0)), ramp_sensors(0).getCountMatrix.sumVr), // onramp1 inflow
             diagnose(VectorD(onRampTotalsPerRow(1)), ramp_sensors(1).getCountMatrix.sumVr) // onramp2 inflow
         )
     end getQoFMetrics
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute RMSE values for all evaluation sensors.
-     *  Extracts RMSE (index 5) from the QoF metrics for use in optimization.
-     *  @return Array of RMSE values: [afterOfframp1, afterOnramp1, afterOnramp2, onramp1Inflow, onramp2Inflow]
-     */
-    def simRunVsPemsRunRMSE(): Array[Double] =
-        val qofMetrics = getQoFMetrics()
-        qofMetrics.map(qof => qof(5))  // Extract RMSE (index 5) from each QoF vector
-    end simRunVsPemsRunRMSE
+
 
     override def fini(rep: Int): Unit =
         Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
         
         val qofMetrics = getQoFMetrics()
         val names = Array("afterOfframp1", "afterOnramp1", "afterOnramp2", "onramp1Inflow", "onramp2Inflow")
-        val pemIds = Array("2-401834ML", "3-401833ML", "5-401652ML", "ramp1", "ramp2")
+        val pemIds = Array("3-401834ML", "4-401833ML", "5-401929ML", "ramp1", "ramp2")
         val simCounts = Array(
-            junc(1).getCountMatrix.sumVr.sum,
-            junc(2).getCountMatrix.sumVr.sum,
-            junc(4).getCountMatrix.sumVr.sum,
+            junc(2).getCountMatrix.sumVr.sum,        // taking reading @ sensor 532|second junction.
+            junc(3).getCountMatrix.sumVr.sum,        // no sensor here, we only have a joining point to take reading for offramps
+            //junc(4).getCountMatrix.sumVr.sum,        // Onramp1 with sensor 834
+            junc(5).getCountMatrix.sumVr.sum,        // Onramp2 with sensor 929
             ramp_sensors(0).getCountMatrix.sumVr.sum,
             ramp_sensors(1).getCountMatrix.sumVr.sum
         )
@@ -324,11 +321,12 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
         )
 
         for i <- names.indices do
-            val rmse = qofMetrics(i)(5)   // rmse is at index 5 in QoF vector
-            //val smape = qofMetrics(i)(7)  // smape is at index 7 in QoF vector
+            val rSq   = qofMetrics(i)(0)    // rSq is at index 0 in QoF vector
+            val rmse  = qofMetrics(i)(5)   // rmse is at index 5 in QoF vector
+            val smape = qofMetrics(i)(7)  // smape is at index 7 in QoF vector
             
-            easyW.println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} | SMAPE ${names(i)}: ${smape} | RMSE: ${rmse} | MAE: ${mae}")
-            println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} | SMAPE ${names(i)}: ${smape} | RMSE: ${rmse} | MAE: ${mae}")
+            //easyW.println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} | SMAPE ${names(i)}: ${smape} | RMSE: ${rmse} ")
+            println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} |R^2 ${names(i)}: $rSq | SMAPE ${names(i)}: ${smape} | RMSE: ${rmse} ")
 
         super.fini(rep)
     end fini
@@ -339,83 +337,3 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     waitFinished()
     Model.shutdown()       // to be removed when TrafficOptimization is used
 end CalRoute101
-
-
-//
-////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-///** Compute SMAPE between simulation and PEMS data at co-located evaluation sensors.
-// *
-// * Validation Strategy (Apple-to-Apple Comparison):
-// *  - Each PEMS sensor is matched with the simulation junction at the SAME physical location
-// *  - This ensures we compare traffic state at identical points in the network after merge/diverge events
-// *
-// * Mainline Sensors (co-located PEMS : Simulation):
-// *  - ytrue(0) = 2-401834ML (PEMS after offramp)  : junc(1) = ssor1 (Sim after offramp)
-// *  - ytrue(1) = 3-401833ML (PEMS after onramp1)  : junc(2) = ssor2 (Sim after onramp1)
-// *  - ytrue(2) = 5-401652ML (PEMS after onramp2)  : junc(4) = ssor4 (Sim after onramp2)
-// *
-// * Ramp Inflow Sensors (at ramp entrance, upstream of merge point):
-// *  - onRampTotalsPerRow(0) = 1-410095OR (PEMS) : ramp_sensors(0) (Sim onramp1 entrance)
-// *  - onRampTotalsPerRow(1) = 2-410093OR (PEMS) : ramp_sensors(1) (Sim onramp2 entrance)
-// *
-// * Note: Sensor 1-404532ML drives the simulation (mainline source) but is NOT used for validation
-// * since it's the input, not an output to be validated.
-// */
-////    def simRunVsPemsRun(): Array[Double] =
-////        val ytrue = config.evalArrivalsPerRow
-////        val onRampTotalsPerRow = config.onRampTotalsPerRow
-////        Array(
-////            smapeF(VectorD(ytrue(0)), junc(1).getCountMatrix.sumVr), // 2-401834ML, after offramp
-////            smapeF(VectorD(ytrue(1)), junc(2).getCountMatrix.sumVr), // 3-401833ML, after onramp1
-////            smapeF(VectorD(ytrue(2)), junc(4).getCountMatrix.sumVr), // 5-401652ML, after onramp2 (final evaluation)
-////            smapeF(VectorD(onRampTotalsPerRow(0)), ramp_sensors(0).getCountMatrix.sumVr), // onramp1 inflow
-////            smapeF(VectorD(onRampTotalsPerRow(1)), ramp_sensors(1).getCountMatrix.sumVr) // onramp2 inflow
-////        )
-////    end simRunVsPemsRun
-//
-////
-////    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-////
-////    /** Write stats and finalize simulation */
-////    override def fini(rep: Int): Unit =
-////        Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
-////        val smapeResults = simRunVsPemsRun()
-////        easyW.println(f"SMAPE after offramp1: ${smapeResults(0)}")
-////        println(f"SMAPE after offramp1: ${smapeResults(0)}")
-////        easyW.println(f"SMAPE after onramp1 : ${smapeResults(1)}")
-////        println(f"SMAPE after onramp1 : ${smapeResults(1)}")
-////        easyW.println(f"SMAPE after onramp2 : ${smapeResults(2)}")
-////        println(f"SMAPE after onramp2 : ${smapeResults(2)}")
-////        easyW.println(f"SMAPE onramp1 inflow: ${smapeResults(3)}")
-////        println(f"SMAPE onramp1 inflow: ${smapeResults(3)}")
-////        easyW.println(f"SMAPE onramp2 inflow: ${smapeResults(4)}")
-////        println(f"SMAPE onramp2 inflow: ${smapeResults(4)}")
-////        super.fini(rep)
-////    end fini
-//override def fini(rep: Int): Unit =
-//    Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
-//    //val smapeResults = simRunVsPemsRun()
-//
-//    //        val names = Array("afterOfframp1", "afterOnramp1", "afterOnramp2", "onramp1Inflow", "onramp2Inflow")
-//    //        val pemIds = Array("2-401834ML", "3-401833ML", "5-401652ML", "ramp1", "ramp2")
-//    //        val simCounts = Array(
-//    //            junc(1).getCountMatrix.sumVr.sum,
-//    //            junc(2).getCountMatrix.sumVr.sum,
-//    //            junc(4).getCountMatrix.sumVr.sum,
-//    //            ramp_sensors(0).getCountMatrix.sumVr.sum,
-//    //            ramp_sensors(1).getCountMatrix.sumVr.sum
-//    //        )
-//    //        val pemsCounts = Array(
-//    //            config.evalArrivalsPerRow(0).sum,
-//    //            config.evalArrivalsPerRow(1).sum,
-//    //            config.evalArrivalsPerRow(2).sum,
-//    //            config.onRampTotalsPerRow(0).sum,
-//    //            config.onRampTotalsPerRow(1).sum
-//    //        )
-//    //
-//    //        for i <- names.indices do
-//    //            easyW.println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} | SMAPE ${names(i)} : ${smapeResults(i)}")
-//    //            println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} | SMAPE ${names(i)} : ${smapeResults(i)}")
-//
-//    super.fini(rep)
-//end fini

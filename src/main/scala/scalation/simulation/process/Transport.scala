@@ -13,7 +13,7 @@ package simulation
 package process
 
 import scala.math.{abs, floor}
-import scala.runtime.ScalaRunTime.stringOf
+//import scala.runtime.ScalaRunTime.stringOf
 import scalation.animation.CommandType.*
 import scalation.mathstat.VectorD
 import scalation.random.{Discrete, Variate}
@@ -58,7 +58,7 @@ class Transport (name: String, val from: Component, val to: Component,
     private [process] var selector: Variate = Discrete (VectorD (0.25, 0.5, 0.25))
             // Random variate for selecting next direction, defaults to left (.25), straight (.50), right (.25)
 
-    debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
+    //debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
 
     if abs (bend) < EPSILON then
         curve.setLine (p1, p2)
@@ -72,7 +72,7 @@ class Transport (name: String, val from: Component, val to: Component,
     /** Give the location of the curve to be its starting point.
      */
     override def at: Array [Double] =
-       println (s"at: curve = $curve")
+       //println (s"at: curve = $curve")
        p1.toArray
 //       val p1 = curve.getFirst
 //       Array (p1.x, p1.y)
@@ -93,7 +93,7 @@ class Transport (name: String, val from: Component, val to: Component,
         val y2 = to.at(1) + 0.5 * h2 + shift2(1)
 
 //      if x1 < x2 then x1 += w1 else x2 += w2
-        println(s"Vector(x1,y1)= ${VectorD(x1,y1)} : Vector(x2,y2)= ${VectorD(x2, y2)}")
+        //println(s"Vector(x1,y1)= ${VectorD(x1,y1)} : Vector(x2,y2)= ${VectorD(x2, y2)}")
         (VectorD (x1, y1), VectorD (x2, y2))
     end calcEndPoints
 
@@ -136,10 +136,10 @@ class Transport (name: String, val from: Component, val to: Component,
      *  will be created by the animation engine).
      */
     def move (): Unit =
-        println(s"The director in the Move Transport $director")
+        //println(s"The director in the Move Transport $director")
         val actor    = director.theActor
 
-        debug ("move", s"actor = $actor this  = along the Transport")
+        //debug ("move", s"actor = $actor this  = along the Transport")
         val duration = if isSpeed then curve.length / motion.gen else motion.gen
         tally (duration)
         accum (onTransport)

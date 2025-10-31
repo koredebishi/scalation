@@ -1864,7 +1864,7 @@ object MatrixD:
         var n = -1 // number of values in a row (TBD)
 
 
-        println(s"the end value: $end")
+        //println(s"the end value: $end")
         cfor(skip, end) { i =>
             val j = i - skip
             a(j) = for str <- lines(i).split(sp).drop(skipCol) yield str.mkDouble
@@ -1872,7 +1872,7 @@ object MatrixD:
             if n < 0 then n = a(j).length
             else if a(j).length != n then flaw("load", s"row $j has the wrong length ${a(j).length} != $n")
         } // cfor
-        println(s"load: read in an $mm-by-$n matrix from $fileName")
+        //println(s"load: read in an $mm-by-$n matrix from $fileName")
         new MatrixD(mm, n, a)
     end load
 

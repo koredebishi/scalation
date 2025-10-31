@@ -58,7 +58,7 @@ end readFile
 def readFileIntoArray (fileName: String, fullPath: Boolean = false, limit: Int = -1): Array [String] =
     val path = if fullPath then fileName
                else DATA_DIR + fileName                                // relative to DATA_DIR
-    println (s"readFileIntoArray: $path")
+    //println (s"readFileIntoArray: $path")
     var buffer: BufferedSource = null
     try
         buffer = Source.fromFile (path)                                // @see BufferedSource
@@ -80,9 +80,9 @@ def readFileIntoArray (fileName: String, fullPath: Boolean = false, limit: Int =
     end lineArr
 
     buffer.close
-    println (s"readFileIntoArray: number lines = ${lineArr.size}")     // check number of lines
-    println (s"readFileIntoArray: lines 0 = ${lineArr (0)}")           // and first two lines
-    println (s"readFileIntoArray: lines 1 = ${lineArr (1)}")
+    //println (s"readFileIntoArray: number lines = ${lineArr.size}")     // check number of lines
+    //println (s"readFileIntoArray: lines 0 = ${lineArr (0)}")           // and first two lines
+    //println (s"readFileIntoArray: lines 1 = ${lineArr (1)}")
     lineArr
 end readFileIntoArray
 
@@ -99,7 +99,7 @@ end readFileIntoArray
 def readFileIter (fileName: String, fullPath: Boolean = false): (Iterator [String], BufferedSource) =
     val path = if fullPath then fileName
                else DATA_DIR + fileName                                // relative to DATA_DIR
-    println (s"readFileIterator: $path")
+    //println (s"readFileIterator: $path")
     var buffer: BufferedSource = null
     try
         buffer = Source.fromFile (path)                                // @see BufferedSource

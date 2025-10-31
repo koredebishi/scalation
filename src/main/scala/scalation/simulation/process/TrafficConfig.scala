@@ -24,25 +24,27 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 //    val t2: Int = 72    // target 6pm
 
     val t1: Int = 0 // target 6am
-    val t2: Int = 48 // target 6pm
+    val t2: Int = 49 // target 6pm
 
 
     private val rowOffset = t1
 
     //println(s"TrafficConfig: loading data from row $t1 to $t2 (offset $rowOffset)")
 
-    private val laneIdx = VectorI(4, 7, 10, 13, 16) // mainline lane FLOW columns
+    //private val laneIdx = VectorI(4, 7, 10, 13, 16) // mainline lane FLOW columns
+    private val laneIdx = VectorI(3, 5, 7, 9, 11) // mainline lane FLOW columns
     private val ramplaneIdx = VectorI(1) // ramp/offramp TOTAL FLOW column
 
     // ----------------------------------------------------------------------
     // Unified Sensor Map: declare once, use everywhere
     private val sensorMap: Map[String, String] = Map(
         // mainline sensors
-        "1-404532ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/1-404532ML.csv", // driver source
-        "2-401834ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/2-401834ML.csv", // eval after offramp
-        "3-401833ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/3-401833ML.csv", // eval after onramp1
-        "4-401929ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/4-401929ML.csv",
-        "5-401652ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/5-401652ML.csv", // final eval
+        "1-404532ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/1-404531ML.csv", // driver source   // needs to be updated to 404532
+        "2-404532ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/2-404532ML.csv", //
+        "3-401834ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/3-401834ML.csv", // eval after offramp
+        "4-401833ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/4-401833ML.csv", // eval after onramp1
+        "5-401929ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/5-401929ML.csv",
+        //"5-401652ML" -> s"Mainline_VDS_Redwood_Creek_US101-N/5-401652ML.csv", // final eval
 
         // ramps
         "1-410095OR" -> s"Ramps_VDS_Redwood_Creek_US101-N/1-410095OR.csv", // onramp1
@@ -145,7 +147,7 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 
     // ----------------------------------------------------------------------
     // Evaluation sensors (mainline + offramp)
-    private val evalMainIds = Array("2-401834ML", "3-401833ML", "5-401652ML", offrampId)
+    private val evalMainIds = Array("3-401834ML", "4-401833ML", "5-401929ML", offrampId)
     val evalArrivalsPerRow: Array[Array[Double]] =
         evalMainIds.map(id => allSensorData(id)(?, ramplaneIdx(0)).toArray)
 
@@ -173,20 +175,56 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 
     // ----------------------------------------------------------------------
     // Exit fraction (offramp row0 / mainline lane0 row0)
-    def computeExitFraction(row: Int): Double =
-        val mainlineLane0 = mainlineCols(0)(row) // denominator
+
+    /**
+     * Compute raw exit fraction for a single row (offramp flow / mainline lane0 flow).
+     *
+     * @param row Time row index
+     * @return Exit fraction (0.0 if mainline has zero flow)
+     */
+    private def computeExitFraction(row: Int): Double =
+        val mainlineLane = totalArrivalsPerRow(row)   //mainlineCols(0)(row) // denominator      /// bug fix //    // offramp
+        //println(s"mainline?? $mainlineLane")
         val rampTotal = offrampData(row, ramplaneIdx(0)) // numerator
-        if mainlineLane0 == 0.0 then 0.0 else rampTotal / mainlineLane0
+        //println(s"offramp?? $rampTotal")
+        if mainlineLane == 0.0 then 0.0 else rampTotal / mainlineLane             //mainlineLane0
     end computeExitFraction
 
+    /**
+     * Pre-computed raw exit fractions for all time rows.
+     * Computed once during initialization to avoid redundant calculations in MA computation.
+     *
+     * Performance optimization:
+     * - Old approach: For 96 rows with window=5, computeExitFraction() called ~4,656 times
+     * - New approach: computeExitFraction() called exactly 96 times (once per row)
+     * - MA computation becomes simple array slicing and averaging
+     */
+    private lazy val exitFractionRaw: Array[Double] =
+        Array.tabulate(data.dim)(row => computeExitFraction(row))
+
+    /**
+     * Pre-computed moving average exit fractions for all time rows (window=5).
+     * Used by Car.act() for efficient lookup: config.exitFractionMA(curRow)
+     *
+     * Performance: Single array access instead of computing MA on-the-fly per vehicle
+     */
+    lazy val exitFractionMA: Array[Double] =
+        Array.tabulate(data.dim)(row => computeExitFractionMA(row, 5))
+    /**
+     * Compute moving average of exit fraction using pre-computed raw values.
+     *
+     * @param row Current time row index
+     * @param window MA window size (default 5)
+     * @return Moving average of exit fraction over the window
+     */
     def computeExitFractionMA(row: Int, window: Int): Double =
-        if window <= 1 then return computeExitFraction(row)
+        if window <= 1 then return exitFractionRaw(row)
         val start = math.max(0, row - window + 1)
         val count = row - start + 1
         var sum = 0.0
         var i = start
         while i <= row do
-            sum += computeExitFraction(i)
+            sum += exitFractionRaw(i)  // Direct array access - no redundant computation
             i += 1
         end while
         sum / count
@@ -198,6 +236,7 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
         //println(s"offramp exit fraction =${mainlineCols(0)(0)}, ${offrampData(0, ramplaneIdx(0))},  $average")
         average
     end exitFraction
+
 
 
     /**
@@ -218,8 +257,8 @@ class TrafficConfig(fileName: String, rowTime: Double, stream: Int = 0):
 
         val mainline = Array(
             coordMap("sensor1"),
-            coordMap("sensor2"),            // offramp merge before sensor2
-            coordMap("sensor3"),
+            coordMap("sensor2"),            // offramp merge before sensor2// old offramp loc
+            coordMap("sensor3"),            // New offramp loc
             coordMap("sensor4"),
             coordMap("sensor5"),
             coordMap("sensor6")
@@ -288,5 +327,22 @@ end TrafficConfig
 
 // Scala
 @main def TrafficConfigTest(): Unit =
-    val file    = "data/Tuesday-June-2025/d04_text_station_5min_2025_06_03.csv"
 
+//    import scalation.random.*
+//
+//
+    val file = "data/Tuesday-June-2025/d04_text_station_5min_2025_06_03.csv"
+
+//    val tc = new TrafficConfig(file, 300.0)
+//
+//    println(s"${tc.computeExitFractionMA()}")
+//
+//    val rand = Uniform(0.0, 1.0)              // probability uniform in [0,1)
+//
+//    val muvAvg = 5
+//    val rowTime = 15 * MINUTE
+//
+////    val rowIdx = (clock / rowTime).toInt
+////    val u = rand.gen
+////    val useOffRamp = u <= tc.computeExitFractionMA(rowIdx, muvAvg)
+//

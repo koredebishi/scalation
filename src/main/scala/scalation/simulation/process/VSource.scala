@@ -98,21 +98,21 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
 
         val sourceType = s"SRC$esubtype"
         this.subtype = esubtype   // ensure source subtype is set
-        ew.write(f"\n[$sourceType] STARTED | Budget=$units vehicles\n")
+        //ew.write(f"\n[$sourceType] STARTED | Budget=$units vehicles\n")
 
         val rep = 1
         //for rep <- 1 to director.reps do // MAJOR LOOP - replications
         actTime = director.clock // set to model start time
 
         breakable {
-            debug("act", s"start making $units Vehicles")
+            //debug("act", s"start making $units Vehicles")
             cfor (1 , units + 1) { i => // MINOR LOOP - make actors
                 if director.stopped then
-                    println(s"VSource.act: simulation unexpectedly ended at ${director.clock}")
+                    //println(s"VSource.act: simulation unexpectedly ended at ${director.clock}")
                     break() // terminate source, simulation ended
-                debug("act", s"make entity/vehicle $i")
+                //debug("act", s"make entity/vehicle $i")
                 val actor = makeEntity() // make new actor/vehicle
-                debug("act", s"after make entity/vehicle $i: actor = $actor")
+                //debug("act", s"after make entity/vehicle $i: actor = $actor")
                 actor.mySource = this // actor's source
                 actor.subtype = esubtype // set the entity subtype
                 seq += 1   // increment per-source sequence labeller
@@ -121,15 +121,16 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
 
                 director.numActors += 1 // number of actors created by all sources, so far
                 if director.isAnimating then director.dgAni.updateActorCount(director.numActors) // korede
-                director.log.trace(this, "generates", actor, director.clock)
+                //director.log.trace(this, "generates", actor, director.clock)
                 director.animate(actor, CreateToken, randomColor(actor.id), Ellipse(),
                     Array(at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
-                debug("act", s"schedule actor $i")
+                //debug("act", s"schedule actor $i")
                 actor.schedule(0.0)
-                debug("act", s"after schedule actor $i")
+                //debug("act", s"after schedule actor $i")
 
                 if director.isInstanceOf[CalRoute101] then
                     val rowManager = director.asInstanceOf[CalRoute101]
+                    rowManager.nextRow(director.clock) // update current row if needed
                     if i < units then
 
                         val currentRow = rowManager.getCurrentRow(director.clock)
@@ -144,19 +145,19 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
 
                         //record (actor, ctime)                                // record actor flow
                         schedule(duration)
-                        debug("act", s"actor $i yields to director")
+                        //debug("act", s"actor $i yields to director")
                         yieldToDirector() // yield and wait duration time units
-                        debug("act", s"after yield actor $i")
+                        //debug("act", s"after yield actor $i")
             }
         } // breakable
 
         ew.flush()
         if rep < director.reps then
-            director.log.trace(this, "wait for next rep", director, director.clock)
+            //director.log.trace(this, "wait for next rep", director, director.clock)
             yieldToDirector() // yield and wait for next replication
         //end for
 
-        director.log.trace(this, "terminates", null, director.clock)
+        //director.log.trace(this, "terminates", null, director.clock)
         yieldToDirector(true) // yield and terminate
     end act
 
