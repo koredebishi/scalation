@@ -5,12 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2426cf4f-6eea-44af-aca5-0ef65eba64ed" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_CalibrateSPSA.sbatch" beforeDir="false" afterPath="$PROJECT_DIR$/run_CalibrateSPSA.sbatch" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_CalibrateSPSA_Mo.sbatch" beforeDir="false" afterPath="$PROJECT_DIR$/run_CalibrateSPSA_Mo.sbatch" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/optimization/DifferentialEvolution.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/optimization/DifferentialEvolution.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/optimization/NelderMeadSimplex2.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/optimization/NelderMeadSimplex2.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/optimization/SPSA.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/optimization/SPSA.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/CalibrateCalRoute101.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/CalibrateCalRoute101.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -326,7 +320,7 @@
       <workItem from="1760747820434" duration="24368000" />
       <workItem from="1761491827367" duration="33750000" />
       <workItem from="1761879983465" duration="18182000" />
-      <workItem from="1761986530772" duration="4733000" />
+      <workItem from="1761986530772" duration="5232000" />
     </task>
     <servers />
   </component>

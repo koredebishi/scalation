@@ -3,7 +3,7 @@ package simulation
 package process
 
 import scalation.mathstat.VectorD
-import scalation.optimization.{NelderMeadSimplex2, SPSA_Mo, SPSA}
+import scalation.optimization.{NelderMeadSimplex2, SPSA_Mo, SPSA, DifferentialEvolution}
 import scalation.random.{Uniform, Variate}
 import scalation.simulation.process.example_1.CalRoute101
 
@@ -264,6 +264,42 @@ end runCalibrate_SPSA_Mo
 
     Model.shutdown()
 end runCalibrate_NelderMead
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Run Differential Evolution Optimizer Only - For SLURM Job Array
+ *  > runMain scalation.simulation.process.runCalibrate_DifferentialEvolution
+ */
+@main def runCalibrate_DifferentialEvolution(): Unit =
+
+    banner("DIFFERENTIAL EVOLUTION OPTIMIZER - CalRoute101 Calibration")
+
+    val modelAdapter = new CalibrateCalRoute101()
+    val simOpt = new TrafficOptimization(modelAdapter)
+    val params: VectorD = VectorD(5.0, 4.0, -1.5, 3.0, 1.0)
+
+    println(s"Starting Differential Evolution Optimization at ${java.time.LocalDateTime.now()}")
+    println(s"Initial parameters: $params")
+
+    // Optimized bounds matching your parameter ranges
+    val bounds = (-10.0, 10.0)  
+    
+    // DE Settings for FASTEST convergence:
+    // maxGen = 200 (reduced from default 400, early stopping will exit sooner anyway)
+    // F = 0.8 (good balance), CR = 0.9 (high crossover for faster convergence)
+    // popSize = 50 (10*dim, larger population = fewer generations needed)
+    
+    val startTime = System.currentTimeMillis()
+    val result = DifferentialEvolution.optimize(simOpt.func, params.dim, bounds, maxGen = 200, F = 0.8, CR = 0.9)(popSize = 50)
+    val endTime = System.currentTimeMillis()
+    val duration = (endTime - startTime) / 1000.0
+
+    println(s"Best Fitness : ${result._2}")
+    println(s"Best Parameters: ${result._1}")
+    println(s"Total Duration: $duration seconds")
+
+    Model.shutdown()
+end runCalibrate_DifferentialEvolution
 
 
 ////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
