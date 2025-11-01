@@ -31,7 +31,7 @@ import scalation.random.RandomVecD
 object DifferentialEvolution
     extends MonitorEpochs:
 
-    private val debug = debugf ("DifferentialEvolution", true)                   // debug function
+    private val debug = debugf ("DifferentialEvolution", false)                   // debug function
     private val eps   = 1E-12                                                    // number close to zero
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -48,6 +48,9 @@ object DifferentialEvolution
     def optimize (f: FunctionV2S, dim: Int, bounds: (Double, Double), maxGen: Int = 400,
                   F: Double = 0.8, CR: Double = 0.9)(popSize: Int = 10 * dim):
     (VectorD, Double) = boundary:                                        // boundary block to allow breaking early
+
+        initializeMonitoring(maxGen)                                             // reset monitoring state
+        val startTime = System.nanoTime()                                        // start timer
 
         val rrv     = RandomVecD (dim, bounds._2, bounds._1)                     // random vector generator within bounds
         val pop     = Array.fill (popSize)(rrv.gen)                              // initialize population
@@ -85,14 +88,54 @@ object DifferentialEvolution
                         improved = true                                          // mark that improvement occurred
             end for
 
+            updateMonitoring(gen, bestVal)                                       // update epoch monitoring
             epochLoss += bestVal                                                 // track bestVal for plotting convergence
             debug ("optimize", s"Generation $gen: bestVal = $bestVal")
 
             if improved then noImprove = 0 else noImprove += 1                   // update stagnation count
             if noImprove >= patience then
                 println (s"Early stopping at generation $gen (no improvement in $patience generations).")
+
+                val endTime       = System.nanoTime()
+                val elapsedTimeMs = (endTime - startTime) / 1E6
+                val elapsedTimeSec= elapsedTimeMs / 1E3
+
+
+                println()
+                println(sline(70).trim)
+                println("DIFFERENTIAL EVOLUTION: OPTIMIZATION SUMMARY")
+                println(sline(70).trim)
+                println(f"${"Metric"}%-25s | ${"Value"}%s")
+                println(sline(70).trim)
+                println(f"${"Best position found"}%-25s | $best")
+                println(f"${"Best loss achieved"}%-25s | $bestVal%.8f")
+                println(f"${"Total generations"}%-25s | ${epochLoss.size}")
+                println(f"${"Population size"}%-25s | $popSize")
+                println(f"${"Elapsed time"}%-25s | ${elapsedTimeSec}%.4f seconds (${elapsedTimeMs}%.2f ms)")
+                println(f"${"Time per generation"}%-25s | ${elapsedTimeMs / epochLoss.size}%.2f ms")
+                println(sline(70).trim)
+
                 break ((best, bestVal))                                          // exit early with best solution
         end for
+
+        val endTime       = System.nanoTime()
+        val elapsedTimeMs = (endTime - startTime) / 1E6
+        val elapsedTimeSec= elapsedTimeMs / 1E3
+
+
+        println()
+        println(sline(70).trim)
+        println("DIFFERENTIAL EVOLUTION: OPTIMIZATION SUMMARY")
+        println(sline(70).trim)
+        println(f"${"Metric"}%-25s | ${"Value"}%s")
+        println(sline(70).trim)
+        println(f"${"Best position found"}%-25s | $best")
+        println(f"${"Best loss achieved"}%-25s | $bestVal%.8f")
+        println(f"${"Total generations"}%-25s | ${epochLoss.size}")
+        println(f"${"Population size"}%-25s | $popSize")
+        println(f"${"Elapsed time"}%-25s | ${elapsedTimeSec}%.4f seconds (${elapsedTimeMs}%.2f ms)")
+        println(f"${"Time per generation"}%-25s | ${elapsedTimeMs / epochLoss.size}%.2f ms")
+        println(sline(70).trim)
 
         (best, bestVal)                                                          // return best result after all generations
     end optimize
@@ -102,22 +145,32 @@ end DifferentialEvolution
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `differentialEvolutionTest` main function is used to test the `DifferentialEvolution`
- *  object.
+ *  object. Tests the unified metrics implementation (elapsed time, epoch monitoring, best tracking).
  *  > runMain scalation.optimization.differentialEvolutionTest
  */
 @main def differentialEvolutionTest (): Unit =
 
     import DifferentialEvolution._
 
-    banner ("Problem: (x_0 - 3)^2 + (x_1 + 1)^2 + 1")
+    println("="*70)
+    println("DIFFERENTIAL EVOLUTION - UNIFIED METRICS TEST")
+    println("="*70)
+
+    println ("\nProblem: (x_0 - 3)^2 + (x_1 + 1)^2 + (x_2)^2 + 2")
+    println (s"Expected optimum: VectorD(3.0, -1.0, 0.0) with f(x) = 2.0")
+    println ()
+
     val f: FunctionV2S = (x: VectorD) => (x(0) - 3)~^2 + (x(1) + 1)~^2 + 1 + (x(2)~^2 + 1)      // test function
 
     val (bestSol, bestVal) = optimize (f, 3, (-5.0, 5.0))()
 
-    println (s"Best solution: $bestSol")                                         // output best solution vector
-    println (s"Objective value: $bestVal")                                       // output objective function value
+    println ()
+    println (s"Final result: best solution = $bestSol")
+    println (s"              objective value = $bestVal")
+    println ()
+    println ("Plotting loss convergence...")
+    plotLoss ()
 
-    plotLoss ()                                                                  // show convergence plot of bestVal per generation
 
 end differentialEvolutionTest
 

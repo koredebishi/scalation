@@ -37,7 +37,7 @@ class NelderMeadSimplex2 (f: FunctionV2S, n: Int, checkCon: Boolean = false,
          with BoundsConstraint (lower, upper)
          with MonitorEpochs:
 
-    private val debug   = debugf ("NelderMeadSimplex2", true) // debug function
+    private val debug   = debugf ("NelderMeadSimplex2", false) // debug function
     private val flaw    = flawf ("NelderMeadSimplex2")        // flaw function
     private val np1     = n + 1                              // number of vertices/points in simplex
     private val simplex = Array.ofDim [FuncVec] (np1)        // simplex { vetices } used for search
@@ -48,6 +48,8 @@ class NelderMeadSimplex2 (f: FunctionV2S, n: Int, checkCon: Boolean = false,
     private val delta = 0.5                                  // delta (0, 1) parameter for shrinkage
 
     private var (f_h, f_s, f_l) = (0.0, 0.0, 0.0)            // worst, second worst, best functional values
+    private var f_best = Double.MaxValue                     // best functional value found
+    private var x_best: VectorD = null                       // best position found
 
     if n < 2 then flaw ("init", "requires at least a 2-dimensional problem")
 
@@ -222,6 +224,11 @@ class NelderMeadSimplex2 (f: FunctionV2S, n: Int, checkCon: Boolean = false,
      *  @param toler  the tolerance used for termination
      */
     def solve (x0: VectorD, step: Double = STEP, toler: Double = EPSILON): FuncVec =
+        initializeMonitoring(MAX_IT)
+        val startTime = System.nanoTime()                    // start timer
+        f_best = Double.MaxValue                             // reset best tracking
+        x_best = x0.copy                                     // initialize best position
+
         initSimplex (x0, step)
         debug ("solve", s"0:\tdist = MAX, diff = MAX, \n\tsimplex = ${stringOf (simplex)}")
 
@@ -229,13 +236,45 @@ class NelderMeadSimplex2 (f: FunctionV2S, n: Int, checkCon: Boolean = false,
             for k <- 1 to MAX_IT do
                 val (dist, diff) = improveSimplex ()
                 debug ("solve", s"$k:\tdist = $dist, diff = $diff, \n\tsimplex = ${stringOf (simplex)}")
+
+                // track best solution found
+                if f_l < f_best then
+                    f_best = f_l
+                    x_best = simplex(n)._2.copy
+                end if
+                updateMonitoring(k, f_best)                          // update epoch monitoring
+
                 epochLoss += f_l
                 if dist < toler || diff < toler then break ()       // check termination condition
             end for
         } // breakable
 
+        val endTime       = System.nanoTime()
+        val elapsedTimeMs = (endTime - startTime) / 1E6
+        val elapsedTimeSec= elapsedTimeMs / 1E3
+
+        finalizeMonitoring()                                        // finalize epoch monitoring
+
         val opt = simplex(n)
         println (s"solve: optimal function, vertex = $opt")
+
+        // Replace lines 241-253 with:
+        println()
+        println(sline(70).trim)
+        println("NELDER-MEAD SIMPLEX: OPTIMIZATION SUMMARY")
+        println(sline(70).trim)
+        println(f"${"Metric"}%-25s | ${"Value"}%s")
+        println(sline(70).trim)
+        println(f"${"Final position (opt)"}%-25s | ${opt._2}")
+        println(f"${"Loss at final position"}%-25s | ${opt._1}%.8f")
+        println(f"${"Best position found"}%-25s | $x_best")
+        println(f"${"Best loss achieved"}%-25s | $f_best%.8f")
+        println(f"${"Total iterations"}%-25s | ${epochLoss.size}")
+        println(f"${"Elapsed time"}%-25s | ${elapsedTimeSec}%.4f seconds (${elapsedTimeMs}%.2f ms)")
+        println(f"${"Time per iteration"}%-25s | ${elapsedTimeMs / epochLoss.size}%.2f ms")
+        println(sline(70).trim)
+
+
         opt                                                         // return the best functional value and vertex point
     end solve
 
@@ -244,20 +283,33 @@ end NelderMeadSimplex2
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `nelderMeadSimplex2Test` main function is used to test the `NelderMeadSimplex2` class.
+ *  Tests the unified metrics implementation (elapsed time, epoch monitoring, best tracking).
  *  > runMain scalation.optimization.nelderMeadSimplex2Test
  */
 @main def nelderMeadSimplex2Test (): Unit =
 
+    println("="*70)
+    println("NELDER-MEAD SIMPLEX2 - UNIFIED METRICS TEST")
+    println("="*70)
+
     val x0 = VectorD (1.0, 1.0)                                     // starting point
 
     println ("\nProblem 1: (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
+    println (s"Starting point: $x0")
+    println (s"Expected optimum: VectorD(2.0, 3.0) with f(x) = 1.0")
+    println ()
+
     def f (x: VectorD): Double = (x(0) - 2.0) * (x(0) - 2.0) + (x(1) - 3.0) * (x(1) - 3.0) + 1.0
 
     val optimizer = new NelderMeadSimplex2 (f, 2)
     val opt = optimizer.solve (x0)                                  // optimal solution
-    println (s"optimal solution = (f(x), x) = $opt")
 
+    println ()
+    println (s"Final result: optimal solution = (f(x), x) = $opt")
+    println ()
+    println ("Plotting loss convergence...")
     optimizer.plotLoss ()
+
 
 end nelderMeadSimplex2Test
 

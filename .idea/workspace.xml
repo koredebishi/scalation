@@ -7,6 +7,11 @@
     <list default="true" id="2426cf4f-6eea-44af-aca5-0ef65eba64ed" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run_CalibrateSPSA.sbatch" beforeDir="false" afterPath="$PROJECT_DIR$/run_CalibrateSPSA.sbatch" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_CalibrateSPSA_Mo.sbatch" beforeDir="false" afterPath="$PROJECT_DIR$/run_CalibrateSPSA_Mo.sbatch" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/optimization/DifferentialEvolution.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/optimization/DifferentialEvolution.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/optimization/NelderMeadSimplex2.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/optimization/NelderMeadSimplex2.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/optimization/SPSA.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/optimization/SPSA.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/CalibrateCalRoute101.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/CalibrateCalRoute101.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,18 +53,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "koredebishi"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;koredebishi&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/koredebishi/scalation2.git",
-    "accountId": "586a9ff0-45d5-40b3-9e89-7eecb658d070"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/koredebishi/scalation2.git&quot;,
+    &quot;accountId&quot;: &quot;586a9ff0-45d5-40b3-9e89-7eecb658d070&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/src/main/scala/scalation/animation/DgAnimator.scala" root0="SKIP_INSPECTION" />
   </component>
@@ -80,9 +85,12 @@
     "Application.RoadCoodTest.executor": "Run",
     "Application.SPSA_MoTest.executor": "Run",
     "Application.TrafficConfigTest.executor": "Run",
+    "Application.differentialEvolutionTest.executor": "Run",
     "Application.metaModelTRTest.executor": "Run",
+    "Application.nelderMeadSimplex2Test.executor": "Run",
     "Application.qCurveTest2.executor": "Run",
     "Application.runCalRoute101.executor": "Run",
+    "Application.runCalibrate_NelderMead.executor": "Run",
     "Application.runCalibrate_SPSA.executor": "Run",
     "Application.runCalibrate_SPSA_Mo.executor": "Run",
     "Application.runOneWayPathwayTest.executor": "Run",
@@ -162,22 +170,9 @@
       <recent name="C:\Simulation\scalation_2.0\data\3rd-Tuesday-June-2025-Individual-Sensors-15min\Old File" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.runCalibrate_SPSA_Mo">
-    <configuration name="RoadCoodTest" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="scalation.simulation.process.example_1.RoadCoodTest" />
-      <module name="scalation.main" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="scalation.simulation.process.example_1.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="metaModelTRTest" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="scalation.optimization.metaModelTRTest" />
+  <component name="RunManager" selected="Application.differentialEvolutionTest">
+    <configuration name="differentialEvolutionTest" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="scalation.optimization.differentialEvolutionTest" />
       <module name="scalation.main" />
       <extension name="coverage">
         <pattern>
@@ -189,12 +184,25 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="runCalRoute101" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="scalation.simulation.process.example_1.runCalRoute101" />
+    <configuration name="nelderMeadSimplex2Test" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="scalation.optimization.nelderMeadSimplex2Test" />
       <module name="scalation.main" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="scalation.simulation.process.example_1.*" />
+          <option name="PATTERN" value="scalation.optimization.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="runCalibrate_NelderMead" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="scalation.simulation.process.runCalibrate_NelderMead" />
+      <module name="scalation.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="scalation.simulation.process.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -230,11 +238,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.differentialEvolutionTest" />
+        <item itemvalue="Application.nelderMeadSimplex2Test" />
+        <item itemvalue="Application.runCalibrate_NelderMead" />
         <item itemvalue="Application.runCalibrate_SPSA_Mo" />
         <item itemvalue="Application.runCalibrate_SPSA" />
-        <item itemvalue="Application.runCalRoute101" />
-        <item itemvalue="Application.RoadCoodTest" />
-        <item itemvalue="Application.metaModelTRTest" />
       </list>
     </recent_temporary>
   </component>
@@ -317,7 +325,8 @@
       <workItem from="1760481619710" duration="47211000" />
       <workItem from="1760747820434" duration="24368000" />
       <workItem from="1761491827367" duration="33750000" />
-      <workItem from="1761879983465" duration="13563000" />
+      <workItem from="1761879983465" duration="18182000" />
+      <workItem from="1761986530772" duration="4733000" />
     </task>
     <servers />
   </component>

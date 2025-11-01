@@ -31,7 +31,7 @@ ls -lh
 
 echo "=== Starting runCalibrateCalRoute101_OptimizerCompare ==="
 date
-time sbt -Dsbt.server.forcestart=false "runMain scalation.simulation.process.runCalibrate_SPSA_Mo"
+time sbt -Dsbt.server.forcestart=false "runMain scalation.simulation.process.runCalibrate_NelderMead"
 date
 
 echo "=== Job completed successfully at $(date) ==="

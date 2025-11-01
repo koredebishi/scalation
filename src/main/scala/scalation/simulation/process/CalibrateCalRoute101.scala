@@ -3,7 +3,7 @@ package simulation
 package process
 
 import scalation.mathstat.VectorD
-import scalation.optimization.{SPSA, SPSA_Mo}
+import scalation.optimization.{NelderMeadSimplex2, SPSA_Mo, SPSA}
 import scalation.random.{Uniform, Variate}
 import scalation.simulation.process.example_1.CalRoute101
 
@@ -237,47 +237,35 @@ end runCalibrate_SPSA
     Model.shutdown()
 end runCalibrate_SPSA_Mo
 
-//
-////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-///** Run Nelder-Mead Simplex Optimizer Only - For SLURM Job Array
-// *  > runMain scalation.simulation.process.runCalibrate_NelderMead
-// */
-//@main def runCalibrate_NelderMead(): Unit =
-//    banner("NELDER-MEAD SIMPLEX OPTIMIZER - CalRoute101 Calibration")
-//
-//    val modelAdapter = new CalibrateCalRoute101()
-//    val simOpt = new TrafficOptimization(modelAdapter)
-//    val params: VectorD = VectorD(5.0, 4.0, -1.5, 3.0, 1.0)
-//
-//    println(s"Starting Nelder-Mead Optimization at ${java.time.LocalDateTime.now()}")
-//    println(s"Initial parameters: $params")
-//
-//    val nelderMeadOptimizer = new NelderMeadSimplex2(simOpt.func, params.dim)
-//    val startTime = System.currentTimeMillis()
-//    val result = nelderMeadOptimizer.solve(params)
-//    val endTime = System.currentTimeMillis()
-//    val duration = (endTime - startTime) / 1000.0
-//
-//    // Get final metrics (RMSE and individual SMAPE values)
-//    //val (finalRMSE, smapeArray) = modelAdapter.getFinalMetrics()
-//
-//    println("\n" + "="*80)
-//    println("NELDER-MEAD OPTIMIZATION COMPLETE")
-//    println("="*80)
-//    println(s"Best Fitness (RMSE): ${result._1}")
-//    println(s"SMAPE - afterOfframp1: ${smapeArray(0)}")
-//    println(s"SMAPE - afterOnramp1:  ${smapeArray(1)}")
-//    println(s"SMAPE - afterOnramp2:  ${smapeArray(2)}")
-//    println(s"Best Parameters: ${result._2}")
-//    println(s"Execution Time: $duration seconds")
-//    println("="*80)
-//
-//    easyW.println(s"NelderMead: RMSE=${result._1}, SMAPE=[${smapeArray(0)},${smapeArray(1)},${smapeArray(2)}], params=${result._2}, time=${duration}s")
-//
-//    Model.shutdown()
-//end runCalibrate_NelderMead
-//
-//
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Run Nelder-Mead Simplex Optimizer Only - For SLURM Job Array
+ * > runMain scalation.simulation.process.runCalibrate_NelderMead
+ */
+@main def runCalibrate_NelderMead(): Unit =
+    banner("NELDER-MEAD SIMPLEX OPTIMIZER - CalRoute101 Calibration")
+
+    val modelAdapter = new CalibrateCalRoute101()
+    val simOpt = new TrafficOptimization(modelAdapter)
+    val params: VectorD = VectorD(5.0, 4.0, -1.5, 3.0, 1.0)
+
+    println(s"Starting Nelder-Mead Optimization at ${java.time.LocalDateTime.now()}")
+    println(s"Initial parameters: $params")
+
+    val nelderMeadOptimizer = new NelderMeadSimplex2(simOpt.func, params.dim)
+    val startTime = System.currentTimeMillis()
+    val result = nelderMeadOptimizer.solve(params)
+    val endTime = System.currentTimeMillis()
+    val duration = (endTime - startTime) / 1000.0
+
+    println(s"Best Fitness : ${result._1}")
+    println(s"Best Parameters: ${result._2}")
+    println(s"Execution Time: $duration seconds")
+
+    Model.shutdown()
+end runCalibrate_NelderMead
+
+
 ////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ///** Run Genetic Algorithm Optimizer Only - For SLURM Job Array
 // *  > runMain scalation.simulation.process.runCalibrate_GA

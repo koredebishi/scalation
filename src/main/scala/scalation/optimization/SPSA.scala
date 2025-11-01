@@ -86,6 +86,7 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
      */
     def solve (x0: VectorD, step: Double = STEP, toler: Double = EPS): FuncVec =
 
+        initializeMonitoring(max_iter)                                 // reset monitoring state
         var x_old  = x0.copy                                           // old point
         var x_best = x0.copy                                           // best point so far
         val x      = x0.copy                                           // new point
