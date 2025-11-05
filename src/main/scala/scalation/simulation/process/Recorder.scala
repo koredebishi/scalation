@@ -93,6 +93,9 @@ trait Recorder(nt: Int):
             val counts = r_counts(i)
             val speeds = r_speeds(i)
 
+            
+            
+            
             // Weighted average speed
             var weighted, total = 0.0
             var j = 0

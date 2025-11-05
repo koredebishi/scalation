@@ -3,9 +3,9 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
-#SBATCH --time=96:00:00
-#SBATCH --output=/scratch/krb84578/workDir/scalation/log/calibrate101Nelda_%j.out
-#SBATCH --error=/scratch/krb84578/workDir/scalation/log/calibrate101Nelda_%j.err
+#SBATCH --time=100:00:00
+#SBATCH --output=/scratch/krb84578/workDir/scalation/log/calibrate101DE_%j.out
+#SBATCH --error=/scratch/krb84578/workDir/scalation/log/calibrate101DE_%j.err
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=krb84578@uga.edu
 
@@ -28,9 +28,9 @@ cd /scratch/krb84578/workDir/scalation
 echo "Running from: $(pwd)"
 ls -lh
 
-echo "=== Starting runCalibrate_NelderMead ==="
+echo "=== Starting runCalibrate_DifferentialEvolution ==="
 date
-time sbt -Dsbt.server.forcestart=false "runMain scalation.simulation.process.runCalibrate_NelderMead"
+time sbt -Dsbt.server.forcestart=false "runMain scalation.simulation.process.runCalibrate_DifferentialEvolution"
 date
 
-echo "=== Job completed successfully at $(date) runCalibrate_NelderMead==="
+echo "=== Job completed successfully at $(date) runCalibrate_DifferentialEvolution==="

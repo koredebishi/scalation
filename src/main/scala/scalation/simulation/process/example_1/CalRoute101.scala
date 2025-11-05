@@ -29,8 +29,8 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     // ::
     /** Debugging and traffic data loading */
     val debug       = debugf("CalRoute101", false)
-    val config      = new TrafficConfig("/Mainline_VDS_Redwood_Creek_US101-N/1-404532ML.csv", rowTime, stream)
-    val nt          = config.data.dim
+    val config      = new TrafficConfig("1-404531ML", rowTime, stream)
+    val nt          = config.dim  // Number of time rows in anchor data
 
     val rand = Uniform(0.0, 1.0)              // probability uniform in [0,1)
 
@@ -135,7 +135,23 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
                 //println(s"NEW: RowIdx: $curRow | OfframpFraction: $currentOfframpFractionMA | RandomU: $u ")
                 val useOffRamp = u <= currentOfframpFractionMA
 
-                laneID = laneRV.igen
+//                 ============================================================================
+//                 OLD LANE ASSIGNMENT (Commented out - caused Lane 5 vehicles at 4-lane sensor)
+//                 ============================================================================
+                 laneID = laneRV.igen  // Randomly assigned lane 0-4, ignoring exit decision
+
+//                 ============================================================================
+//                 NEW LANE ASSIGNMENT (Exit-aware lane selection)
+//                 Reason: Sensor 3 (401834) has only 4 lanes after offramp divergence
+//                 Lane 5 vehicles must either exit or merge before reaching sensor 3
+//                 Strategy: Assign Lane 5 ONLY to vehicles that will exit
+//                 ============================================================================
+//                if useOffRamp then
+//                    laneID = 4  // Lane 5 (0-indexed) - exit lane for offramp-bound vehicles
+//                else
+//                    laneID = laneRV.igen % 4  // Restrict to lanes 0-3 (through traffic only)
+//                end if
+
                 val carAhead = route.path(laneID).getLast
 
                 route.path(laneID).addToAlist(this, carAhead)
@@ -230,110 +246,310 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
                 case s: Sink => s.leave()
                 case _       =>
         end driveRamp
-
     end Car
 
-
-
+//    override def fini(rep: Int): Unit =
+//        Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
+//        //val qofMetrics = getQoFMetrics()
+//        val mainlineSimCounts = Array(
+//            junc(0).getCountMatrix,        // taking reading @ sensor 531|first junction.
+//            junc(1).getCountMatrix,        // taking reading @ sensor 532|first junction.
+//            junc(2).getCountMatrix,        // offramp exit
+//            junc(3).getCountMatrix,        // Onramp1 entry
+//            junc(4).getCountMatrix        // Onramp2 entry
+////            MatrixD(ramp_sensors(0).getCountMatrix(?, 0)).𝐓,  // Extract column 0 only (active ramp lane)  // single row comparism
+////            MatrixD(ramp_sensors(1).getCountMatrix(?, 0)).𝐓  // Extract column 0 only (active ramp lane)
+//        )
+//        val pemsCounts = Array(
+//            config.getPemsCountMatrix(0),  // sensor1
+//            config.getPemsCountMatrix(1),   // sensor2
+//            config.getPemsCountMatrix(2),   // sensor3
+//            config.getPemsCountMatrix(3),   // sensor4
+//            config.getPemsCountMatrix(4)  // sensor5
+////            config.getPemsCountRampMatrix(0),   // ramp sensor1
+////            config.getPemsCountRampMatrix(1),   // ramap
+//        )
 //
-//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//    /** Compute SMAPE between simulation and PEMS data at co-located evaluation sensors.
-//     *
-//     * Validation Strategy (Apple-to-Apple Comparison):
-//     *  - Each PEMS sensor is matched with the simulation junction at the SAME physical location
-//     *  - This ensures we compare traffic state at identical points in the network after merge/diverge events
-//     *
-//     * Mainline Sensors (co-located PEMS : Simulation):
-//     *  - ytrue(0) = 2-401834ML (PEMS after offramp)  : junc(1) = ssor1 (Sim after offramp)
-//     *  - ytrue(1) = 3-401833ML (PEMS after onramp1)  : junc(2) = ssor2 (Sim after onramp1)
-//     *  - ytrue(2) = 5-401652ML (PEMS after onramp2)  : junc(4) = ssor4 (Sim after onramp2)
-//     *
-//     * Ramp Inflow Sensors (at ramp entrance, upstream of merge point):
-//     *  - onRampTotalsPerRow(0) = 1-410095OR (PEMS) : ramp_sensors(0) (Sim onramp1 entrance)
-//     *  - onRampTotalsPerRow(1) = 2-410093OR (PEMS) : ramp_sensors(1) (Sim onramp2 entrance)
-//     *
-//     * Note: Sensor 1-404532ML drives the simulation (mainline source) but is NOT used for validation
-//     * since it's the input, not an output to be validated.
-//     */
-////    def simRunVsPemsRun(): Array[Double] =
-////        val ytrue = config.evalArrivalsPerRow
-////        val onRampTotalsPerRow = config.onRampTotalsPerRow
-////        Array(
-////            smapeF(VectorD(ytrue(0)), junc(2).getCountMatrix.sumVr), // 2-401834ML, after offramp
-////            smapeF(VectorD(ytrue(1)), junc(3).getCountMatrix.sumVr), // 3-401833ML, after onramp1
-////            smapeF(VectorD(ytrue(2)), junc(5).getCountMatrix.sumVr), // 5-401652ML, after onramp2 (final evaluation)
-////            smapeF(VectorD(onRampTotalsPerRow(0)), ramp_sensors(0).getCountMatrix.sumVr), // onramp1 inflow
-////            smapeF(VectorD(onRampTotalsPerRow(1)), ramp_sensors(1).getCountMatrix.sumVr) // onramp2 inflow
-////        )
-////    end simRunVsPemsRun
-//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//    /** Compute RMSE values for all evaluation sensors.
-//     * Extracts RMSE (index 5) from the QoF metrics for use in optimization.
-//     *
-//     * @return Array of RMSE values: [afterOfframp1, afterOnramp1, afterOnramp2, onramp1Inflow, onramp2Inflow]
-//     */
-//    //    def simRunVsPemsRunRMSE(): Array[Double] =
-//    //        val qofMetrics = getQoFMetrics()
-//    //        qofMetrics.map(qof => qof(5))  // Extract RMSE (index 5) from each QoF vector
-//    //    end simRunVsPemsRunRMSE
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute all QoF metrics (including RMSE, MAE, SMAPE) using ScalaTion's built-in FitM.diagnose().
-     *  Returns a map of sensor names to their QoF vectors.
-     *  QoF vector format: VectorD(rSq, sst, sse, sde, mse0, rmse, mae, smape, m)
-     *  Indices: rmse=5, smape=7
-     */
-    def getQoFMetrics(): Array[VectorD] =
-        val ytrue = config.evalArrivalsPerRow
-        val onRampTotalsPerRow = config.onRampTotalsPerRow
-        
-        Array(
-            diagnose(VectorD(ytrue(0)), junc(2).getCountMatrix.sumVr), // 2-404532ML, after offramp
-            diagnose(VectorD(ytrue(1)), junc(3).getCountMatrix.sumVr), // 3-401834ML, after onramp1
-            diagnose(VectorD(ytrue(2)), junc(5).getCountMatrix.sumVr), // 5-401929ML, after onramp2
-            diagnose(VectorD(onRampTotalsPerRow(0)), ramp_sensors(0).getCountMatrix.sumVr), // onramp1 inflow
-            diagnose(VectorD(onRampTotalsPerRow(1)), ramp_sensors(1).getCountMatrix.sumVr) // onramp2 inflow
-        )
-    end getQoFMetrics
-
-
+////
+//
+////        for i <- simCounts.indices do
+////            println(s" Sensor $i: SimCounts = ${simCounts(i).toString}, \n PEMSCounts $i = ${pemsCounts(i).toString} \n ")
+//
+//        for i <- mainlineSimCounts.indices do      // loop over Array of sensors
+//            val simMatrix = mainlineSimCounts(i)
+//            val pemsMatrix = pemsCounts(i)
+//            for j <- 0 until simMatrix.dim do                 // loop over time intervals (rows)
+//                val simRow = simMatrix(j)
+//                val pemsRow = pemsMatrix(j)
+//                //println(s" Sensor $i: row $j : SIMCount: ${simRow.toString}: PEMSCounts: ${pemsRow.toString} \n ")
+//                val diag = diagnose(pemsRow, simRow)
+//                println(s"Sensor $i, Row $j: ${FitM.fitMap(diag)}")
+//        end for
+//        super.fini(rep)
+//    end fini
 
     override def fini(rep: Int): Unit =
         Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
-        
-        val qofMetrics = getQoFMetrics()
-        val names = Array("afterOfframp1", "afterOnramp1", "afterOnramp2", "onramp1Inflow", "onramp2Inflow")
-        val pemIds = Array("3-401834ML", "4-401833ML", "5-401929ML", "ramp1", "ramp2")
-        val simCounts = Array(
-            junc(2).getCountMatrix.sumVr.sum,        // taking reading @ sensor 532|second junction.
-            junc(3).getCountMatrix.sumVr.sum,        // no sensor here, we only have a joining point to take reading for offramps
-            //junc(4).getCountMatrix.sumVr.sum,        // Onramp1 with sensor 834
-            junc(5).getCountMatrix.sumVr.sum,        // Onramp2 with sensor 929
-            ramp_sensors(0).getCountMatrix.sumVr.sum,
-            ramp_sensors(1).getCountMatrix.sumVr.sum
-        )
-        val pemsCounts = Array(
-            config.evalArrivalsPerRow(0).sum,
-            config.evalArrivalsPerRow(1).sum,
-            config.evalArrivalsPerRow(2).sum,
-            config.onRampTotalsPerRow(0).sum,
-            config.onRampTotalsPerRow(1).sum
+
+        // Sensor names for clear output
+        val sensorNames = Array(
+            "PEMS 531 (Entry)",
+            "PEMS 532 (Second)",
+            "PEMS 834 (After offramp)",
+            "PEMS 833 (After onramp1)",
+            "PEMS 929 (After onramp2)"
         )
 
-        for i <- names.indices do
-            val rSq   = qofMetrics(i)(0)    // rSq is at index 0 in QoF vector
-            val rmse  = qofMetrics(i)(5)   // rmse is at index 5 in QoF vector
-            val smape = qofMetrics(i)(7)  // smape is at index 7 in QoF vector
-            
-            //easyW.println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} | SMAPE ${names(i)}: ${smape} | RMSE: ${rmse} ")
-            println(s"PEMSID:${pemIds(i)} | PEMSCount:${pemsCounts(i)} | SimCount:${simCounts(i)} |R^2 ${names(i)}: $rSq | SMAPE ${names(i)}: ${smape} | RMSE: ${rmse} ")
+        println("\n" + "=" * 80)
+        println("MAINLINE VALIDATION: Comparing Simulation vs PEMS Ground Truth")
+        println("=" * 80)
+//
+//        // Loop over each mainline sensor
+//        for i <- 0 until 5 do
+//            val simMatrix = junc(i).getCountMatrix // Simulation counts at junction i
+//            val pemsMatrix = config.getPemsCountMatrix(i) // PEMS ground truth for sensor i
+//
+//
+//
+//
+//            println(s"\n--- Sensor $i: junc($i) vs ${sensorNames(i)} ---")
+//
+//            // Loop over each time row
+//            for row <- 0 until simMatrix.dim do
+//                val simRow = simMatrix(row) // Simulation: [lane1, lane2, lane3, lane4, lane5]
+//                val pemsRow = pemsMatrix(row) // PEMS:       [lane1, lane2, lane3, lane4, lane5]
+//
+//                val totSimRow = simMatrix(row).sum // Simulation: [lane1, lane2, lane3, lane4, lane5]
+//                val totPemsRow = pemsMatrix(row).sum // PEMS:       [lane1, lane2, lane3, lane4, lane5]
+//
+//                // What we are comparing
+//                println(s"  Row $row:")
+//                println(s"    SIM  counts: ${simRow.toString}")
+//                println(s"    PEMS counts: ${pemsRow.toString}")
+//
+//                // Compute fit statistics
+//                val diag = diagnose(pemsRow, simRow)
+//                val diag1 = diagnose(VectorD(totPemsRow), VectorD(totSimRow))
+//                val fit = FitM.fitMap(diag)
+//                val fit1 = FitM.fitMap(diag1)
+//                val rSq = fit("rSq")
+//                val rmse = fit("rmse")
+//                val smape = fit("smape")
+//                val mae = fit("mae")
+//
+//                // Total counts fit
+//                val smape_total = fit1("smape")
+//                val rsme_total = fit1("rmse")
+//
+//                println(s" R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae , Smape15min = $smape_total, Rmse15min = $rsme_total")
+//            end for
+//        end for
+
+        println("\n" + "=" * 80)
+        println("MAINLINE COLUMN-WISE VALIDATION: Each Lane Across Time (6:00-6:45)")
+        println("=" * 80)
+
+        // Loop over each mainline sensor
+        for i <- 0 until 5 do
+            val simMatrix = junc(i).getCountMatrix // Simulation counts at junction i
+            val pemsMatrix = config.getPemsCountMatrix(i) // PEMS ground truth for sensor i
+
+            println(s"\n--- Sensor $i: junc($i) vs ${sensorNames(i)} ---")
+
+            // Loop over each lane (column)
+            for lane <- 0 until 5 do
+                val simCol = simMatrix(?, lane)    // Simulation: [row0, row1, row2, row3] for this lane
+                val pemsCol = pemsMatrix(?, lane)  // PEMS:       [row0, row1, row2, row3] for this lane
+
+                // What we are comparing
+                println(s"  Lane $lane across all time:")
+                println(s"    SIM  counts: ${simCol.toString}")
+                println(s"    PEMS counts: ${pemsCol.toString}")
+
+                // Compute fit statistics
+                val diag = diagnose(pemsCol, simCol)
+                val fit = FitM.fitMap(diag)
+                val rSq = fit("rSq")
+                val rmse = fit("rmse")
+                val smape = fit("smape")
+                val mae = fit("mae")
+
+                println(s"    R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae")
+            end for
+        end for
+
+        println("\n" + "=" * 80 + "\n")
 
         super.fini(rep)
     end fini
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Run the simulation */
     simulate()
     waitFinished()
-    //Model.shutdown()       // to be removed when TrafficOptimization is used
+    Model.shutdown()       // to be removed when TrafficOptimization is used
 end CalRoute101
+
+
+// column wise
+//        println("\n" + "=" * 80)
+//        println("MAINLINE COLUMN-WISE VALIDATION: Each Lane Across Time (6:00-6:45)")
+//        println("=" * 80)
+//
+//        // Loop over each mainline sensor
+//        for i <- 0 until 5 do
+//            val simMatrix = junc(i).getCountMatrix // Simulation counts at junction i
+//            val pemsMatrix = config.getPemsCountMatrix(i) // PEMS ground truth for sensor i
+//
+//            println(s"\n--- Sensor $i: junc($i) vs ${sensorNames(i)} ---")
+//
+//            // Loop over each lane (column)
+//            for lane <- 0 until 5 do
+//                val simCol = simMatrix(?, lane)    // Simulation: [row0, row1, row2, row3] for this lane
+//                val pemsCol = pemsMatrix(?, lane)  // PEMS:       [row0, row1, row2, row3] for this lane
+//
+//                // What we are comparing
+//                println(s"  Lane $lane across all time:")
+//                println(s"    SIM  counts: ${simCol.toString}")
+//                println(s"    PEMS counts: ${pemsCol.toString}")
+//
+//                // Compute fit statistics
+//                val diag = diagnose(pemsCol, simCol)
+//                val fit = FitM.fitMap(diag)
+//                val rSq = fit("rSq")
+//                val rmse = fit("rmse")
+//                val smape = fit("smape")
+//                val mae = fit("mae")
+//
+//                println(s"    R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae")
+//            end for
+//        end for
+
+
+
+
+
+
+
+
+//
+//        // Ramp names for clear output
+//        val rampNames = Array(
+//            "PEMS Onramp1 (410095OR)",
+//            "PEMS Onramp2 (410093OR)",
+//            "PEMS Offramp (410094FR)"
+//        )
+//
+//        println("\n" + "=" * 80)
+//        println("RAMP VALIDATION: Comparing Simulation vs PEMS Ground Truth")
+//        println("=" * 80)
+//
+//        // Loop over each ramp sensor
+//        for i <- 0 until 3 do
+//            // Extract single column for ramps (they only have 1 lane)
+//            val simMatrix = MatrixD(ramp_sensors(i).getCountMatrix(?, 0)).𝐓 // Simulation counts at ramp i
+//            val pemsMatrix = config.getPemsCountRampMatrix(i) // PEMS ground truth for ramp i
+//
+//            println(s"\n--- Ramp Sensor $i: ramp_sensors($i) vs ${rampNames(i)} ---")
+//
+//            // Loop over each time row
+//            for row <- 0 until simMatrix.dim do
+//                val simRow = simMatrix(row) // Simulation: [total_flow]
+//                val pemsRow = pemsMatrix(row) // PEMS:       [total_flow]
+//
+//                // What we are comparing
+//                println(s"  Row $row:")
+//                println(s"    SIM  counts: ${simRow.toString}")
+//                println(s"    PEMS counts: ${pemsRow.toString}")
+//
+//                // Compute fit statistics
+//                val diag = diagnose(pemsRow, simRow)
+//                val fit = FitM.fitMap(diag)
+//                //                val rSq = fit("rSq")
+//                val rmse = fit("rmse")
+//                val smape = fit("smape")
+//                val mae = fit("mae")
+//
+//                println(s" RMSE = $rmse, SMAPE = $smape, MAE = $mae ")
+//            end for
+//        end for
+//
+
+
+// ============================================================================
+// RAMP VALIDATION
+// ============================================================================
+
+//        // ============================================================================
+//        // RAMP COLUMN-WISE VALIDATION (Temporal: Ramp flow across all time)
+//        // ============================================================================
+//
+//        println("\n" + "=" * 80)
+//        println("RAMP COLUMN-WISE VALIDATION: Ramp Flow Across Time (6:00-6:45)")
+//        println("=" * 80)
+//
+//        // Loop over each ramp sensor
+//        for i <- 0 until 3 do
+//            // Extract single column for ramps (they only have 1 lane)
+//            val simMatrix = MatrixD(ramp_sensors(i).getCountMatrix(?, 0)).𝐓
+//            val pemsMatrix = config.getPemsCountRampMatrix(i)
+//
+//            println(s"\n--- Ramp Sensor $i: ramp_sensors($i) vs ${rampNames(i)} ---")
+//
+//            // Extract all time rows for the single ramp lane
+//            val simCol = simMatrix(?, 0)    // Simulation: [row0, row1, row2, row3] for ramp
+//            val pemsCol = pemsMatrix(?, 0)  // PEMS:       [row0, row1, row2, row3] for ramp
+//
+//            // What we are comparing
+//            println(s"  Ramp flow across all time:")
+//            println(s"    SIM  counts: ${simCol.toString}")
+//            println(s"    PEMS counts: ${pemsCol.toString}")
+//
+//            // Compute fit statistics
+//            val diag = diagnose(pemsCol, simCol)
+//            val fit = FitM.fitMap(diag)
+//            val rSq = fit("rSq")
+//            val rmse = fit("rmse")
+//            val smape = fit("smape")
+//            val mae = fit("mae")
+//
+//            println(s"    R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae")
+//        end for
+
+
+
+
+
+
+
+
+
+// 5                     5                  4                 5               5
+////1---------------------2------------------3----------------4----------------5
+////                             5th_turns offramp----------
+//  //                              offramp              onramp1         onramp2
+
+
+// We have to assume that , at the cars in the outter most lanes coming from sensor2 that they will be taking the offramp,
+                                // and at that point in 2018, the highway goes from 5 lanes to 4 lanes after the offramp divergence.
+                                // At sensor3, the highway has 4 lanes that is going on, the outter lanes goes into the onramps
+                                // the cars coming from the onramps are going to create the 5th lane again.// Sensor 3 and 4 are really 4 lanes 
+                                //while 1, 2 and 5 are 5 lanes.    
+                                // correct the structure of the simulation a bit. 
+                                // Cold start issue: 15min before simulation chopped off.   5:45PM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

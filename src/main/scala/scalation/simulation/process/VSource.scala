@@ -134,7 +134,7 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                     if i < units then
 
                         val currentRow = rowManager.getCurrentRow(director.clock)
-                        val safeRow = math.min(currentRow, rowManager.config.data.dim - 1)
+                        val safeRow = math.min(currentRow, rowManager.config.dim - 1)
                         val mu = rowManager.getMuForSource(this.subtype)(safeRow)
 
                         //val mu = rowManager.getMuForSource(this.subtype)(rowManager.curRow)

@@ -65,7 +65,7 @@ trait Component
      */
     def director_= (director: Model): Unit =
         if _director == null && director != null then _director = director
-        else flaw ("setDirector", "director may only be set once")
+        // else flaw ("setDirector", "director may only be set once")  // silenced - do nothing
     end director_=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -180,27 +180,59 @@ class GeneticAlgorithm (f: FunctionV2S, rands: Array [Variate])
      */
     def solve2 (seeds: Array[VectorD] = null): FuncVec =
 
+        initializeMonitoring(MAX_IT)                                     // reset monitoring state
+        val startTime = System.nanoTime()                                // start timer
+
         initPool (seeds)
         sortPool ()
-        println ("-------------------------------------------------------")
-        println ("Generation 0:")
-        printPool ()
+        // println ("-------------------------------------------------------")
+        // println ("Generation 0:")
+        // printPool ()
         breakable {
             for i <- 0 until MAX_IT do
-                println ("-------------------------------------------------------")
-                println ("Generation " + (i + 1) + ":")
+                // println ("-------------------------------------------------------")
+                // println ("Generation " + (i + 1) + ":")
                 nextGen ()
                 sortPool ()
+                
+                updateMonitoring(i + 1, pool(0)._1)                      // update epoch monitoring
                 epochs += pool(0)._1
-                printPool ()
+                // printPool ()
             end for
         }//breakable
+
+        val endTime       = System.nanoTime()
+        val elapsedTimeMs = (endTime - startTime) / 1E6
+        val elapsedTimeSec= elapsedTimeMs / 1E3
+
+        println()
+        println(sline(70).trim)
+        println("GENETIC ALGORITHM: OPTIMIZATION SUMMARY")
+        println(sline(70).trim)
+        println(f"${"Metric"}%-25s | ${"Value"}%s")
+        println(sline(70).trim)
+        println(f"${"Best position found"}%-25s | ${pool(0)._2}")
+        println(f"${"Best loss achieved"}%-25s | ${pool(0)._1}%.8f")
+        println(f"${"Total iterations"}%-25s | ${epochLoss.size}")
+        println(f"${"Pool size"}%-25s | $N")
+        println(f"${"Elapsed time"}%-25s | ${elapsedTimeSec}%.4f seconds (${elapsedTimeMs}%.2f ms)")
+        println(f"${"Time per iteration"}%-25s | ${elapsedTimeMs / epochLoss.size}%.2f ms")
+        println(sline(70).trim)
+
         pool(0)
     end solve2
 end GeneticAlgorithm
 
 
 @main def GATest(): Unit =
+
+    println("="*70)
+    println("GENETIC ALGORITHM - UNIFIED METRICS TEST")
+    println("="*70)
+
+    println ("\nProblem: (x_0 - 3)^2 + (x_1 + 1)^2 + 1")
+    println (s"Expected optimum: VectorD(3.0, -1.0) with f(x) = 1.0")
+    println ()
 
     def f (x: VectorD): Double = (x(0) - 3.0) * (x(0) - 3.0) + (x(1) + 1.0) * (x(1) + 1.0) + 1.0
 
@@ -212,7 +244,12 @@ end GeneticAlgorithm
     val solver = new GeneticAlgorithm (f, Array (r0, r1))
     val x      = solver.solve2 (seeds)
 
-    println ("optimal x = " + x)
+    println ()
+    println (s"Final result: optimal solution = $x")
+    println ()
+    println ("Plotting loss convergence...")
+    solver.plotLoss ()
+
 end GATest
 
 @main def selectionSortTest(): Unit =

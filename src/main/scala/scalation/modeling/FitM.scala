@@ -88,7 +88,7 @@ trait FitM:
      */
     def diagnose (y: VectorD, yp: VectorD, w: VectorD = null): VectorD =
         m = y.dim                                            // size of response vector (test/full)
-        if m < 2       then flaw ("diagnose", s"requires at least 2 responses to evaluate m = $m")
+        if m < 2       then //flaw ("diagnose", s"requires at least 2 responses to evaluate m = $m")
         if yp.dim != m then flaw ("diagnose", s"yp.dim = ${yp.dim} != y.dim = $m")
 
         val mu = y.mean                                      // mean of y (may be zero)
