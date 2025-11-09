@@ -43,28 +43,30 @@
 //     *  Also computes SMAPE for monitoring (not logged in hot path to avoid I/O overhead).
 //     *  @return average RMSE value for mainline sensors (used by optimizer)
 //     */
-////    def computeFitness(): Double =
-////         val qofMetrics = model.getQoFMetrics()  // Get full QoF metrics for all 5 sensors
-////
-////         // Extract RMSE (index 5) from first 3 mainline sensors
-////         val mainlineRMSE = qofMetrics.slice(0, 3).map(qof => qof(5))
-////         val avgRMSE = mainlineRMSE.sum / mainlineRMSE.length
-////
-////         avgRMSE  // Return RMSE for optimization (SMAPE available at index 7 if needed)
-////    end computeFitness
-////
-////    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-////    /** Get final metrics summary (RMSE and SMAPE) for reporting after optimization.
-////     *  @return tuple of (avgRMSE, Array of individual SMAPE values for 3 mainline sensors)
-////     *          SMAPE array: [afterOfframp1, afterOnramp1, afterOnramp2]
-////     */
-////    def getFinalMetrics(): (Double, Array[Double]) =
-////        val qofMetrics = model.getQoFMetrics()
-////        val mainlineRMSE = qofMetrics.slice(0, 3).map(qof => qof(5))
-////        val mainlineSMAPE = qofMetrics.slice(0, 3).map(qof => qof(7))
-////        val avgRMSE = mainlineRMSE.sum / mainlineRMSE.length
-////        (avgRMSE, mainlineSMAPE.toArray)  // Return avg RMSE and individual SMAPE values
-////    end getFinalMetrics
+//    def computeFitness(): Double =
+//         val qofMetrics = model.getQoFMetrics()  // Get full QoF metrics for all 5 sensors
+//
+//         // Extract RMSE (index 5) from first 3 mainline sensors
+//         val mainlineRMSE = qofMetrics.slice(0, 3).map(qof => qof(5))
+//         val avgRMSE = mainlineRMSE.sum / mainlineRMSE.length
+//
+//
+//        // use MSE in the
+//         avgRMSE  // Return RMSE for optimization (SMAPE available at index 7 if needed)
+//    end computeFitness
+//
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    /** Get final metrics summary (RMSE and SMAPE) for reporting after optimization.
+//     *  @return tuple of (avgRMSE, Array of individual SMAPE values for 3 mainline sensors)
+//     *          SMAPE array: [afterOfframp1, afterOnramp1, afterOnramp2]
+//     */
+//    def getFinalMetrics(): (Double, Array[Double]) =
+//        val qofMetrics = model.getQoFMetrics()
+//        val mainlineRMSE = qofMetrics.slice(0, 3).map(qof => qof(5))
+//        val mainlineSMAPE = qofMetrics.slice(0, 3).map(qof => qof(7))
+//        val avgRMSE = mainlineRMSE.sum / mainlineRMSE.length
+//        (avgRMSE, mainlineSMAPE.toArray)  // Return avg RMSE and individual SMAPE values
+//    end getFinalMetrics
 //
 //end CalibrateCalRoute101
 //
@@ -116,13 +118,13 @@
 //    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //    /** Create general optimizer with CalRoute101 model adapter */
 //    val simOpt = new TrafficOptimization(modelAdapter)
-//   
+//
 //    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //    /** Initial parameter guess for Gipps model: [s, amax, bmax, T, τ] */
 //    val params: VectorD = VectorD(5.0, 4.0, -1.5, 3.0, 1.0)  // shared params
 //    //4.99888,      3.99888,        -1.49888,       2.99888,        1.00112
 //
-//    
+//
 //
 //    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //    /** Evaluate initial fitness before optimization */

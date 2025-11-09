@@ -137,6 +137,8 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                         val safeRow = math.min(currentRow, rowManager.config.dim - 1)
                         val mu = rowManager.getMuForSource(this.subtype)(safeRow)
 
+                        //println(s"the value of the mu used ${mu/2}")
+
                         //val mu = rowManager.getMuForSource(this.subtype)(rowManager.curRow)
                         val gen = if iArrivalTime.isInstanceOf[Erlang] then iArrivalTime.gen1(mu/2) else iArrivalTime.gen1(mu)
                         val duration = gen

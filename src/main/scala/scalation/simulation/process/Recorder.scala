@@ -44,30 +44,21 @@ trait Recorder(nt: Int):
 
         val i = floor(ctime / timeConv).toInt // Time bucket index
         val j = if i >= nt then nt - 1 else i // cap the last time bucket for overflow
-        
-//        // ===== DETECT ROW TRANSITION =====
-//        if j != lastRecordedRow then
-//            val rowStartTime = j * timeConv
-//            val rowEndTime = (j + 1) * timeConv
-//            Recorder.ew.write(f"\n╔═══════════════════════════════════════════════════════════════════════════════╗\n")
-//            Recorder.ew.write(f"║ ROW TRANSITION DETECTED: Row $lastRecordedRow%2d → Row $j%2d at clock=$ctime%8.2f sec\n")
-//            Recorder.ew.write(f"║ Row $j%2d time window: [$rowStartTime%8.2f - $rowEndTime%8.2f) seconds\n")
-//            Recorder.ew.write(f"║ Sensor: $this\n")
-//            Recorder.ew.write(f"╚═══════════════════════════════════════════════════════════════════════════════╝\n")
-//            lastRecordedRow = j
-//        end if
-
-        // ===== LOG EVERY RECORDING EVENT =====
-        //Recorder.ew.write(f"\n[RECORD] Sensor=$this | Clock=$ctime%8.2f | Row=$j%2d | timeConv=$timeConv%6.1f | CalcRow_i=$i%2d")
 
         if actor.isInstanceOf[Vehicle] then
 
             val vehicle = actor.asInstanceOf[Vehicle]
-            val laneID = vehicle.laneID
-            val cnt = r_counts(j, laneID).toInt + 1
-            r_counts(j, laneID) = cnt
+
+            // LANE FLIP to match CalRoute101 flip (laneID = 4 - laneRV.igen)
+            // Vehicle's laneID is already flipped (0=leftmost/fast, 4=rightmost/slow in sim)
+            // Flip back for storage to match PEMS convention (0=L1=leftmost/fast, 4=L5=rightmost/slow)
+            val actualLaneID = vehicle.laneID
+            val flippedLaneID = (nl - 1) - actualLaneID  // 4-laneID: reverse the flip
+
+            val cnt = r_counts(j, flippedLaneID).toInt + 1
+            r_counts(j, flippedLaneID) = cnt
             val speed = if vehicle.velocity.isNaN then 0.0 else vehicle.velocity
-            r_speeds(j, laneID) = (r_speeds(j, laneID) * (cnt - 1) + (speed * 2.24694) ) / cnt // Compute running avg speed
+            r_speeds(j, flippedLaneID) = (r_speeds(j, flippedLaneID) * (cnt - 1) + (speed * 2.24694) ) / cnt // Compute running avg speed
 
             recordedVehicles += vehicle.name
 
@@ -93,9 +84,6 @@ trait Recorder(nt: Int):
             val counts = r_counts(i)
             val speeds = r_speeds(i)
 
-            
-            
-            
             // Weighted average speed
             var weighted, total = 0.0
             var j = 0

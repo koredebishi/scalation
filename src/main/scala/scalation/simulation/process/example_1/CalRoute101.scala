@@ -80,6 +80,15 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     )
 
 
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    /** Create VSources inline so mySource is bound properly */
+//    val sources: List[VSource] = VSource.group(this, () => Car(), centerPos,
+//        ("Vsrc", 0, Erlang(), 3, offsets(0)),
+//        ("srcRamp1", 1, Erlang(), 4, offsets(1)),
+//        ("srcRamp2", 2, Erlang(), 4, offsets(2))
+//    )
+
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create Sinks locally for correct mapping and final routing */
     val (x0, y0) = (aniCoords_Main.last._1 - 100.0, aniCoords_Main.last._2 - 100.0)
@@ -138,7 +147,7 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 //                 ============================================================================
 //                 OLD LANE ASSIGNMENT (Commented out - caused Lane 5 vehicles at 4-lane sensor)
 //                 ============================================================================
-                 laneID = laneRV.igen  // Randomly assigned lane 0-4, ignoring exit decision
+                 laneID = 4 - laneRV.igen  // Randomly assigned lane 0-4, ignoring exit decision
 
 //                 ============================================================================
 //                 NEW LANE ASSIGNMENT (Exit-aware lane selection)
@@ -198,21 +207,21 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
                 //easyW.println(s"Highway and moving $this join at seg $joinSeg and CarAhead = ${this.getCarAhead(this)} and laneID = $laneID")
 
                 //------------ lane change at segment boundaries ---
-                if clock - lastLaneChange >= 20.0 then
-                    val carAhead = getCarAhead(this)
-                    if carAhead != null && carAhead.velocity < 0.9 * vmax then
-                        val target =
-                            if laneID == 0 then 1
-                            else if laneID == numLanes - 1 then numLanes - 2
-                            else if laneChangeRV.igen == 1 then laneID + 1
-                            else laneID - 1
-
-                        val currentLane = laneID
-                        route.changeLane(currentLane, target, this, seg)
-
-                        lastLaneChange = clock
-                    end if
-                end if
+//                if clock - lastLaneChange >= 20.0 then
+//                    val carAhead = getCarAhead(this)
+//                    if carAhead != null && carAhead.velocity < 0.9 * vmax then
+//                        val target =
+//                            if laneID == 0 then 1
+//                            else if laneID == numLanes - 1 then numLanes - 2
+//                            else if laneChangeRV.igen == 1 then laneID + 1
+//                            else laneID - 1
+//
+//                        val currentLane = laneID
+//                        route.changeLane(currentLane, target, this, seg)
+//
+//                        lastLaneChange = clock
+//                    end if
+//                end if
                 // ---------------END lane change at segment boundaries ---
 
                 // --- advance vehicle along highway ---
@@ -303,82 +312,86 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
         println("\n" + "=" * 80)
         println("MAINLINE VALIDATION: Comparing Simulation vs PEMS Ground Truth")
         println("=" * 80)
+
+        // Loop over each mainline sensor
+        for i <- 0 until 5 do
+            val simMatrix = junc(i).getCountMatrix // Simulation counts at junction i
+            val pemsMatrix = config.getPemsCountMatrix(i) // PEMS ground truth for sensor i
+            //val bootstrappedMatrix = config.getBootstrappedMainlineMatrix(i)
+
+
+            println(s"\n--- Sensor $i: junc($i) vs ${sensorNames(i)} ---")
+
+            // Loop over each time row
+            for row <- 0 until simMatrix.dim do
+                val simRow = simMatrix(row) // Simulation: [lane1, lane2, lane3, lane4, lane5]
+                val pemsRow = pemsMatrix(row) // PEMS:       [lane1, lane2, lane3, lane4, lane5]
+                //val bootstrappedRow = bootstrappedMatrix(row)
+
+                val totSimRow = simMatrix(row).sum // Simulation: [lane1, lane2, lane3, lane4, lane5]
+                val totPemsRow = pemsMatrix(row).sum // PEMS:       [lane1, lane2, lane3, lane4, lane5]
+                //val totBootsRow = bootstrappedMatrix(row).sum // Bootstrapped:       [lane1, lane2, lane3, lane4, lane5]
+
+
+                // What we are comparing
+                println(s"  Row $row:")
+                println(s"    SIM  counts: ${simRow.toString}")
+                println(s"    PEMS counts: ${pemsRow.toString}")
+                //println(s"    BOOT counts: ${bootstrappedMatrix.toString}")
+
+                // Compute fit statistics
+                val diag = diagnose(pemsRow, simRow)
+                val diag1 = diagnose(VectorD(totPemsRow), VectorD(totSimRow))
+                val fit = FitM.fitMap(diag)
+                //println(s"fit $fit ")
+                val fit1 = FitM.fitMap(diag1)
+                val rSq = fit("rSq")
+                val rmse = fit("rmse")
+                val smape = fit("smape")
+                val mae = fit("mae")
+
+                // Total counts fit
+                val smape_total = fit1("smape")
+                val rsme_total = fit1("rmse")
+
+                println(s" R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae , Smape15min = $smape_total, Rmse15min = $rsme_total")
+            end for
+        end for
+//
+//        println("\n" + "=" * 80)
+//        println("MAINLINE COLUMN-WISE VALIDATION: Each Lane Across Time (6:00-6:45)")
+//        println("=" * 80)
 //
 //        // Loop over each mainline sensor
 //        for i <- 0 until 5 do
 //            val simMatrix = junc(i).getCountMatrix // Simulation counts at junction i
 //            val pemsMatrix = config.getPemsCountMatrix(i) // PEMS ground truth for sensor i
 //
-//
-//
-//
 //            println(s"\n--- Sensor $i: junc($i) vs ${sensorNames(i)} ---")
 //
-//            // Loop over each time row
-//            for row <- 0 until simMatrix.dim do
-//                val simRow = simMatrix(row) // Simulation: [lane1, lane2, lane3, lane4, lane5]
-//                val pemsRow = pemsMatrix(row) // PEMS:       [lane1, lane2, lane3, lane4, lane5]
-//
-//                val totSimRow = simMatrix(row).sum // Simulation: [lane1, lane2, lane3, lane4, lane5]
-//                val totPemsRow = pemsMatrix(row).sum // PEMS:       [lane1, lane2, lane3, lane4, lane5]
+//            // Loop over each lane (column)
+//            for lane <- 0 until 5 do
+//                val simCol = simMatrix(?, lane)    // Simulation: [row0, row1, row2, row3] for this lane
+//                val pemsCol = pemsMatrix(?, lane)  // PEMS:       [row0, row1, row2, row3] for this lane
 //
 //                // What we are comparing
-//                println(s"  Row $row:")
-//                println(s"    SIM  counts: ${simRow.toString}")
-//                println(s"    PEMS counts: ${pemsRow.toString}")
+//                println(s"  Lane $lane across all time:")
+//                println(s"    SIM  counts: ${simCol.toString}")
+//                println(s"    PEMS counts: ${pemsCol.toString}")
 //
 //                // Compute fit statistics
-//                val diag = diagnose(pemsRow, simRow)
-//                val diag1 = diagnose(VectorD(totPemsRow), VectorD(totSimRow))
+//                val diag = diagnose(pemsCol, simCol)
 //                val fit = FitM.fitMap(diag)
-//                val fit1 = FitM.fitMap(diag1)
 //                val rSq = fit("rSq")
 //                val rmse = fit("rmse")
 //                val smape = fit("smape")
 //                val mae = fit("mae")
 //
-//                // Total counts fit
-//                val smape_total = fit1("smape")
-//                val rsme_total = fit1("rmse")
-//
-//                println(s" R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae , Smape15min = $smape_total, Rmse15min = $rsme_total")
+//                println(s"    R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae")
 //            end for
 //        end for
-
-        println("\n" + "=" * 80)
-        println("MAINLINE COLUMN-WISE VALIDATION: Each Lane Across Time (6:00-6:45)")
-        println("=" * 80)
-
-        // Loop over each mainline sensor
-        for i <- 0 until 5 do
-            val simMatrix = junc(i).getCountMatrix // Simulation counts at junction i
-            val pemsMatrix = config.getPemsCountMatrix(i) // PEMS ground truth for sensor i
-
-            println(s"\n--- Sensor $i: junc($i) vs ${sensorNames(i)} ---")
-
-            // Loop over each lane (column)
-            for lane <- 0 until 5 do
-                val simCol = simMatrix(?, lane)    // Simulation: [row0, row1, row2, row3] for this lane
-                val pemsCol = pemsMatrix(?, lane)  // PEMS:       [row0, row1, row2, row3] for this lane
-
-                // What we are comparing
-                println(s"  Lane $lane across all time:")
-                println(s"    SIM  counts: ${simCol.toString}")
-                println(s"    PEMS counts: ${pemsCol.toString}")
-
-                // Compute fit statistics
-                val diag = diagnose(pemsCol, simCol)
-                val fit = FitM.fitMap(diag)
-                val rSq = fit("rSq")
-                val rmse = fit("rmse")
-                val smape = fit("smape")
-                val mae = fit("mae")
-
-                println(s"    R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae")
-            end for
-        end for
-
-        println("\n" + "=" * 80 + "\n")
+//
+//        println("\n" + "=" * 80 + "\n")
 
         super.fini(rep)
     end fini
@@ -389,6 +402,41 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     waitFinished()
     Model.shutdown()       // to be removed when TrafficOptimization is used
 end CalRoute101
+
+
+
+
+
+// 3hours, range of
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // column wise
@@ -533,13 +581,25 @@ end CalRoute101
 // We have to assume that , at the cars in the outter most lanes coming from sensor2 that they will be taking the offramp,
                                 // and at that point in 2018, the highway goes from 5 lanes to 4 lanes after the offramp divergence.
                                 // At sensor3, the highway has 4 lanes that is going on, the outter lanes goes into the onramps
-                                // the cars coming from the onramps are going to create the 5th lane again.// Sensor 3 and 4 are really 4 lanes 
-                                //while 1, 2 and 5 are 5 lanes.    
-                                // correct the structure of the simulation a bit. 
+                                // the cars coming from the onramps are going to create the 5th lane again.// Sensor 3 and 4 are really 4 lanes
+                                //while 1, 2 and 5 are 5 lanes.
+                                // correct the structure of the simulation a bit.
                                 // Cold start issue: 15min before simulation chopped off.   5:45PM
 
-
-
+//
+//1.5 lanes -------> normal 5 segments
+//2.5 lanes -------> normal 4 segment , 5th segment turns offramp
+//3 4 lanes --------> normal 4 segment, does not have a 5th lane because the 5th lane turned offramp from sensor2, and there is an onramp coming up so no space (the diff between sensor3 - sensor2 = offramps cars)
+//// if the diff between the count from 2-3 does not drop then we there might be an issue.
+//4 5 lanes --------> normal 4 lanes, 5th lane is vehicles using the onramp1, ie coming from onramp1 ( sensor 4 takes the count of onramp1 vehicles)
+//5 5 lanes -------- this takes the count of onramp2 vehicles.
+//
+//1. We have to assume that the last lane coming from sensor2 is protruding to an offramp. // if a route segment has a offramp ahead, the outer most lane is the offramp lane.
+//2. this is the reason why At sensor3, the highway has 4 lanes that is going on since the 5th lane coming from sensor2 is taking the offramp.
+//3. at sensor4 we have 5 lanes again because of onramp1 vehicles coming in. so the last lane is onramp1 vehicles traffic
+//    4. at sensor5 we have 5 lanes again because of onramp2 vehicles coming in. so the last lane is onramp2 vehicles traffic, but because that sensor is far upfront, everything blends in.
+//
+//
 
 
 
