@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ScalaCompilerConfiguration">
     <option name="separateProdTestSources" value="true" />
-    <profile name="sbt 1" modules="scalation,scalation_2-0_6991,scalation_2-0_6991.main,scalation_2-0_6991.test" />
+    <profile name="sbt 1" modules="scalation,scalation_2-0_9050,scalation_2-0_9050.main,scalation_2-0_9050.test" />
     <profile name="sbt 2" modules="scalation.main,scalation.test">
       <option name="deprecationWarnings" value="true" />
       <parameters>

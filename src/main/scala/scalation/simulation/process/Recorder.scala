@@ -49,16 +49,14 @@ trait Recorder(nt: Int):
 
             val vehicle = actor.asInstanceOf[Vehicle]
 
-            // LANE FLIP to match CalRoute101 flip (laneID = 4 - laneRV.igen)
-            // Vehicle's laneID is already flipped (0=leftmost/fast, 4=rightmost/slow in sim)
-            // Flip back for storage to match PEMS convention (0=L1=leftmost/fast, 4=L5=rightmost/slow)
-            val actualLaneID = vehicle.laneID
-            val flippedLaneID = (nl - 1) - actualLaneID  // 4-laneID: reverse the flip
+            // Use vehicle's laneID directly for recording to match PEMS lane order
+            // Assumption: laneID 0 corresponds to PEMS L1 (leftmost/fast), laneID 4 to PEMS L5 (rightmost/slow)
+            val lane = vehicle.laneID
 
-            val cnt = r_counts(j, flippedLaneID).toInt + 1
-            r_counts(j, flippedLaneID) = cnt
+            val cnt = r_counts(j, lane).toInt + 1
+            r_counts(j, lane) = cnt
             val speed = if vehicle.velocity.isNaN then 0.0 else vehicle.velocity
-            r_speeds(j, flippedLaneID) = (r_speeds(j, flippedLaneID) * (cnt - 1) + (speed * 2.24694) ) / cnt // Compute running avg speed
+            r_speeds(j, lane) = (r_speeds(j, lane) * (cnt - 1) + (speed * 2.24694) ) / cnt // Compute running avg speed
 
             recordedVehicles += vehicle.name
 

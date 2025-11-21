@@ -133,15 +133,21 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                     rowManager.nextRow(director.clock) // update current row if needed
                     if i < units then
 
-                        val currentRow = rowManager.getCurrentRow(director.clock)
-                        val safeRow = math.min(currentRow, rowManager.config.dim - 1)
-                        val mu = rowManager.getMuForSource(this.subtype)(safeRow)
+                        val currentRow = rowManager.getCurrentRow(director.clock)   // get the current row based on clock time
+                        val safeRow = math.min(currentRow, rowManager.config.dim - 1)  // ensure row index is within bounds
+                        val mu = rowManager.getMuForSource(this.subtype)(safeRow)      // get mu for the current row
 
-                        //println(s"the value of the mu used ${mu/2}")
-
-                        //val mu = rowManager.getMuForSource(this.subtype)(rowManager.curRow)
-                        val gen = if iArrivalTime.isInstanceOf[Erlang] then iArrivalTime.gen1(mu/2) else iArrivalTime.gen1(mu)
-                        val duration = gen
+                        // Generate inter-arrival time based on distribution type
+                        val duration = iArrivalTime match
+                            case erlang: Erlang =>
+                                // For Erlang-k: to achieve overall mean = μ, pass μ/k to gen1()
+                                // Example: Erlang-3 with μ=10 → each stage mean=10/3 → overall mean=10
+                                val muPerStage = mu / erlang.k
+                                iArrivalTime.gen1(muPerStage)
+                            case _ =>
+                                // Poisson/Exponential: direct mean
+                                iArrivalTime.gen1(mu)
+                        
                         val ctime = director.clock // clock time
                         tally(duration) // tally duration
 

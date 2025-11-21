@@ -42,11 +42,16 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     val pathway = Array.ofDim[Pathway](numLanes)      // create array of parallel Pathways
     private val GAP = 50.0     // pixel between lanes
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-
     for i <- pathway.indices do
-        val shift = calcShift2 * ((i - (numLanes - 1) / 2.0) * GAP)
+        // this for loop draws n amount of pathways based on numLanes. each of these pathways
+        //consist of segment called Vtransport.
+        // we want a situation where we can make this route draw. (n-1) standard pathway
+        // and allow us to configure the last pathway such that that last pathway can
+        //mimic the last lane of a highway. it can end and continue  at the same time.
+        // something like:
+        // -------------|                  |------------------|-------------------|
+        val physicalLane = numLanes - 1 - i  // Reverse: i=0 → lane 4 (rightmost), i=4 → lane 0 (leftmost)
+        val shift = calcShift2 * ((physicalLane - (numLanes - 1) / 2.0) * GAP)
         pathway(i) = new Pathway(s"${name}_$i", junc, from, to, motion, isSpeed, bend, laneShift = shift)
         subpart += pathway(i)
     end for
@@ -69,6 +74,9 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
 
         val fromPath = pathway(l1) // current Pathway  (lane l1)
         val toPath = pathway(l2) // target Pathway   (lane l2)
+
+        // Check if either lane doesn't exist
+        if fromPath == null || toPath == null then return false
 
         val safeDisp = fromPath.seg(seg).safetydist
 
@@ -115,13 +123,13 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     /** Get the first vehicle in the specified lane.
      *  @param i  the index of the pathway/lane
      */
-    def getFirst(i: Int): Vehicle = pathway(i).getFirst
+    def getFirst(i: Int): Vehicle = if pathway(i) != null then pathway(i).getFirst else null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the last vehicle in the specified lane.
      *  @param i  the index of the lane
      */
-    def getLast(i: Int): Vehicle = pathway(i).getLast
+    def getLast(i: Int): Vehicle = if pathway(i) != null then pathway(i).getLast else null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the Pathway at index i.
@@ -136,13 +144,11 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     def junctions: Array[Junction] = junc
 
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the number of segments (same for all Pathways).
      */
     def segments: Int = pathway(0).seg.length
 
-    
-          
+
      // reurn the pathway of this lane
 
 
@@ -170,7 +176,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     /** Display the Route by displaying each Pathway.
      */
     override def display(): Unit =
-        for l <- pathway do l.display()
+        for l <- pathway if l != null do l.display()
     end display
 
 end Route
