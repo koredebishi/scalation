@@ -60,6 +60,26 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     initComponent(name, from.at)   // using from.at for the initComponent
 
 
+    // Cumulative length up to (but not including) each segment
+    // segmentOffsets(0) = 0
+    // segmentOffsets(1) = seg(0).length
+    // segmentOffsets(2) = seg(0).length + seg(1).length
+    // etc.
+    val segmentOffsets: Array[Double] =
+        val n = pathway(0).seg.length  // number of segments (same for all Pathways)
+        val offsets = new Array[Double](n + 1)  // array to hold offsets
+        offsets(0) = 0.0  // starting offset is 0.0
+        for i <- 0 until n do
+            offsets(i + 1) = offsets(i) + pathway(0).seg(i).length  // cumulative sum of segment lengths
+        end for
+        offsets
+    end segmentOffsets
+
+    // O(1) helper: convert (segId, disp) → cumulative position
+    @inline def toCumulative(segId: Int, disp: Double): Double =
+        segmentOffsets(segId) + disp
+    end toCumulative
+
     // ----------------------------------------------------------------------------
 
     /** Attempt to change lanes for a vehicle that is on segment `seg` of lane `l1`
@@ -115,8 +135,60 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         success
     end changeLane
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    //def merge
+    /**
+     * A forcemerge that allows a vehicle to make mandatory lane changes,
+     * as in the case of highway offramps where the vehicles that did not exit
+     * must merge back into the mainline traffic.
+     */
+    def forceMerge(l1:Int, availLanes: Range, car: Vehicle, seg:Int): Int =
+
+        //fllfflf
+        val fromPath = pathway(l1) // current Pathway  (lane l1)
+        var bestLane = -1     // initialize best lane to -1 (no best lane found for now)
+        var minGap = -1.0      //fromPath.seg(seg).safetydist  // initialize minGap to a large value
+
+
+        // look for the best lane to merge into using max space availability as the criteria
+        cfor(availLanes){ i =>
+            if pathway(i) != null then
+                //val vAhead = pathway(i).seg(seg+1).getLast     // the vehicle ahead is the vehicle in the connecting segment and that vehcle is in seg+1
+                val nextSeg = min(seg + 1, pathway(i).seg.length - 1)  // ensure we don't go out of bounds
+                val vAhead  = pathway(i).seg(nextSeg).getLast   // vehicle ahead in next seg, check for null pathway first
+
+                // compute the gap ahead:
+                // if there is no vehicle ahead, then the gap is infinite
+                //else the gap is the distance from the start of the next segment to the vehicle ahead's rear bumper
+                val gapAhead = if vAhead == null then Double.PositiveInfinity
+                else pathway(i).seg(seg + 1).length - (vAhead.disp - Vehicle.len)
+
+                if gapAhead > minGap then
+                    minGap = gapAhead
+                    bestLane = i
+                end if
+            end if
+        }
+
+        if bestLane == -1 then bestLane = availLanes.start  // no available lane found, stay in the same lane
+
+        // we can try standard adjacent lane change first
+        val adjacent = abs(bestLane - l1) == 1    // adjacent lane
+        val changed = adjacent && changeLane(l1, bestLane, car, seg)   // try standard lane change
+        if changed then return bestLane    // successful standard lane change
+
+        // force insert even if safety fails (lane ends)
+        val toPath = pathway(bestLane)
+        val nextSeg = min(seg + 1, toPath.seg.length - 1)
+        val vAhead = toPath.seg(nextSeg).getLast
+
+        fromPath.removeFromAlist(car)
+        car.laneID = bestLane
+        car.pathInfo = toPath.seg(seg).name
+        toPath.addToAlist(car, vAhead)
+
+        bestLane
+    end forceMerge
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

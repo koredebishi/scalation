@@ -24,20 +24,46 @@ object Roadcood:
 //    "onramp2"  -> (37.496820213311665, -122.233427547066)              //On ramp 410093
 //    )
 
-    val latlong = Map(
-        "sensor1" -> (37.491812, -122.219838),                  // Mainline VDS 404531 - S of Maple st OC
-        "sensor2" -> (37.493958158096504, -122.22470162714667), //Mainline VDS 404532 N of Redwood Creek 5 lanes @ US101-N CA PM=6.2 (408.39)
-        "sensor3" -> (37.49547, -122.22961), // Off-ramp merge point between sensor1 and sensor2   // created to make offramp merge point
-        "sensor4" -> (37.49611371865748, -122.23194509331292), //Mainline VDS 401834 oppo Holly St rm-s-coll2 lanes @ US101-N CA PM=7.02 (409.21)
-        "sensor5" -> (37.49660297971446, -122.23361567714998), //Mainline VDS 401833 oppo Holly St rm-s-coll3 lanes @ US101-N CA PM=7.34 (409.53)
-        "sensor6" -> (37.50377824134259, -122.24447811368339), //Mainline VDS 401929 oppo Holly St rm-s-coll1 lanes @ US101-N CA PM=7.68 (409.87)
-        "offramp" -> (37.49547, -122.22961), //(37.496371200804205, -122.2315368954958),          //Off ramp 410094
-        "onramp1" -> (37.496442108229296, -122.23190311039164), //On ramp 410095
-        "onramp2" -> (37.496820213311665, -122.233427547066) //On ramp 410093
-    )
 
-    // A total of 1.8miles.
-
+    // need to rename these sensors points since we are adding some merge points as sensors too.
+    // Sensor1 , Sensor2, Sensor3, Sensor4, Sensor5 // Pems mainline sensors
+    // mergepoints: merge1 (offramp), merge2 (onramp1), merge3 (onramp2)
+//    val latlong = Map(
+//        "sensor1" -> (37.491812, -122.219838),                  // Mainline VDS 404531 - S of Maple st OC
+//        "sensor2" -> (37.493958158096504, -122.22470162714667), //Mainline VDS 404532 N of Redwood Creek 5 lanes @ US101-N CA PM=6.2 (408.39)
+//        "sensor3" -> (37.49547, -122.22961), // Off-ramp merge point between sensor1 and sensor2   // created to make offramp merge point
+//        "sensor4" -> (37.49611371865748, -122.23194509331292), //Mainline VDS 401834 oppo Holly St rm-s-coll2 lanes @ US101-N CA PM=7.02 (409.21)
+//        "sensor5" -> (37.49660297971446, -122.23361567714998), //Mainline VDS 401833 oppo Holly St rm-s-coll3 lanes @ US101-N CA PM=7.34 (409.53)
+//        "sensor6" -> (37.50377824134259, -122.24447811368339), //Mainline VDS 401929 oppo Holly St rm-s-coll1 lanes @ US101-N CA PM=7.68 (409.87)
+//        "offramp" -> (37.49547, -122.22961), //(37.496371200804205, -122.2315368954958),          //Off ramp 410094
+//        "onramp1" -> (37.496442108229296, -122.23190311039164), //On ramp 410095
+//        "onramp2" -> (37.496820213311665, -122.233427547066) //On ramp 410093
+//    )
+    // TCount         Tcount             X                      OR_M                       TCount             OR_M               TCount          TCount
+    // sensor1--------sensor2---------merge1(offramp)-------------------------------------sensor3--------------------------------sensor4---------sensor5
+    // sensor1--------sensor2---------merge1(offramp)-----------merge2(onramp1)-----LC_M--sensor3----------merge3(onramp2)-------sensor4---------sensor5
+    //
+        val latlong = Map(
+            "sensor1" -> (37.491812, -122.219838),                  // Mainline VDS 404531 - S of Maple st OC
+            "sensor2" -> (37.493958158096504, -122.22470162714667), //Mainline VDS 404532 N of Redwood Creek 5 lanes @ US101-N CA PM=6.2 (408.39)
+            "offR_marge" -> (37.49547, -122.22961), // Off-ramp merge point between sensor1 and sensor2   // created to make offramp merge point
+            "onR_marge" -> (37.49611371865748, -122.23194509331292),// on ramp merge point between sensor2 and sensor3
+            "sensor3" -> (37.49660297971446, -122.23361567714998), //Mainline VDS 401834 oppo Holly St rm-s-coll2 lanes @ US101-N CA PM=7.02 (409.21)
+            "onR_marge" -> (37.50377824134259, -122.24447811368339), // on ramp merge point between sensor3 and sensor4
+            "sensor4" -> (37.50798673265363, -122.24925380485341),          //Mainline VDS 401833 oppo Holly St rm-s-coll3 lanes @ US101-N CA PM=7.34 (409.53)
+            "sensor5" -> (37.510000, -122.252000),   // Mainline VDS 401929 oppo Holly St rm-s-coll1 lanes @ US101-N CA PM=7.68 (409.87)
+            "offramp" -> (37.49547, -122.22961), //(37.496371200804205, -122.2315368954958),          //Off ramp 410094
+            "onramp1" -> (37.496442108229296, -122.23190311039164), //On ramp 410095
+            "onramp2" -> (37.496820213311665, -122.233427547066) //On ramp 410093
+        )
+    // sensor1 point: @ 0
+    // sensor2 point: @ 1
+    // offramp point: same @ 2
+    // onramp1 point: now @ 3
+    // onramp2 point: now @ 5
+    // sensor3 point: now @4
+    // sensor4 point: now @6
+    // sensor5 point: now @7
 end Roadcood
 
 

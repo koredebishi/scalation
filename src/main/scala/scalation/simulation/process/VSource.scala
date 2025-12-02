@@ -71,8 +71,12 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
       * Used by: label construction below to preserve origin after merging.
       */
     private def srcPrefix: String = esubtype match
-        case 0 => "M"
-        case n => s"R$n"
+        case 0 | 1 | 2 | 3 | 4 => "M"               // mainline
+        case n             => s"R$n"     // ramps
+    
+        
+//        case 0 => "M"
+//        case n => s"R$n"
 
 
     debug ("Init", s"name = $name, located at ${stringOf (at)}")

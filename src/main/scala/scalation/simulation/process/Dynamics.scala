@@ -59,6 +59,7 @@ object GippsDynamics
     //easyW.off()
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+
     /** Update the vehicle's velocity and position using Gipps' Model (located in `Motion`)
      * and Butcher's method for solving ordinary differential equations.
      *
@@ -66,11 +67,62 @@ object GippsDynamics
      */
     def updateM(car: Vehicle, length: Double): Unit =
         val ref = car.myPathNode.ahead
-
         val car_ahead = if ref != null then ref.elem else null
+//
+//        // ===================== CONSISTENCY CHECKS =====================
+//        if car_ahead != null then
+//
+//            // 1. Leader MUST NOT be in an earlier segment (impossible physically)
+//            if car_ahead.segId < car.segId then
+//                println(
+//                    s"[GIPPS ERROR] Leader ${car_ahead.displayLabel} is in an EARLIER segId (${car_ahead.displayLabel}) " +
+//                        s"than follower ${car.id} (segId=${car.segId})"
+//                )
+//
+//            // 2. Leader MUST have greater t_disp (global position)
+//            if car_ahead.t_disp < car.t_disp then
+//                println(
+//                    s"[GIPPS ERROR] Leader ${car_ahead.id} has t_disp < follower ${car.id}. " +
+//                        s"Leader is actually BEHIND!"
+//                )
+//
+//            // 3. Same-segment negative local gap check
+//            if car_ahead.segId == car.segId then
+//                val gapLocal = car_ahead.disp - car.disp
+//                if gapLocal < 0 then
+//                    println(
+//                        s"[GAP ERROR] Negative local gap on same segment! " +
+//                            s"leader(${car_ahead.id}).disp=${car_ahead.disp}, follower(${car.id}).disp=${car.disp}"
+//                    )
+//        end if
+//        // ===============================================================
+//
+//        // ============ DEBUG GAP PRINTING (SAFE VERSION) ===============
+//        if car_ahead != null then
+//            val gapLocal = car_ahead.disp - car.disp // may be negative if inconsistent
+//
+//            println(
+//                s"""
+//                   |==== DEBUG GAP CHECK ====
+//                   |Follower   = ${car.displayLabel} (seg=${car.segId}, lane=${car.laneID})
+//                   |Leader     = ${car_ahead.displayLabel} (seg=${car_ahead.segId}, lane=${car_ahead.laneID})
+//                   |
+//                   |cn.disp     = ${car.disp}
+//                   |cp.disp     = ${car_ahead.disp}
+//                   |cn.t_disp   = ${car.t_disp}
+//                   |cp.t_disp   = ${car_ahead.t_disp}
+//                   |
+//                   |cn.velocity = ${car.velocity}
+//                   |cp.velocity = ${car_ahead.velocity}
+//                   |
+//                   |LOCAL GAP (disp) = $gapLocal
+//                   |
+//                   |""".stripMargin)
+//        end if
+//        // ==============================================================
+//
+//        // (Keep your Gipps integration here...)
 
-        //debug("updateM", s"car = ${car.displayLabel} (velocity and position) based on car_ahead = $car_ahead")
-        //easyW.println(s"updateM car = ${car.displayLabel} (velocity and position) based on car_ahead = $car_ahead")
 
         val v = gipps(car, car_ahead, length) + EPSILON // determine new velocity
         //debug("updateM", s"car = $car \t the new VELOCITY is: $v")
@@ -103,14 +155,22 @@ object GippsDynamics
      *  @param cn  the current vehicle
      *  @param cp  the predecessor of the current vehicle
      */
-    def gipps (cn: Vehicle, cp: Vehicle, length: Double): Double =
+//    def gipps (cn: Vehicle, cp: Vehicle, length: Double): Double =
+//        if cp == null then
+//            //easyW.println(s"vehicle_ahead value $cp, current_vehicle value = $cn ${prop("rt")} prop")
+//            gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))   // All vehicles initialized should use this first (that means every vehicle needs to keep track of his ahead vehicle
+//        else
+//            val cp_r_disp = if cp.segId == cn.segId then cp.disp
+//                            else length + cp.disp
+//            gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cp_r_disp, cp.velocity, prop("rt"))
+//    end gipps
+
+    def gipps(cn: Vehicle, cp: Vehicle, length: Double): Double =
         if cp == null then
-            //easyW.println(s"vehicle_ahead value $cp, current_vehicle value = $cn ${prop("rt")} prop")
-            gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))   // All vehicles initialized should use this first (that means every vehicle needs to keep track of his ahead vehicle
+            gipps(amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))
         else
-            val cp_r_disp = if cp.segId == cn.segId then cp.disp
-                            else length + cp.disp
-            gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cp_r_disp, cp.velocity, prop("rt"))
+            // Use t_disp (cumulative) for both vehicles - works for any segment distance
+            gipps(amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, prop("rt"))
     end gipps
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -180,6 +240,9 @@ object GippsDynamics
 
         val cong = (b * rt) + sqrt(max(0.0, inner_exp)) // braking (congested) velocity
 
+
+        println(s"branch = ${if phi >= 0 then "FREE" else "BRAKE"}")
+
         // --------------- Result --------------------------
         // The next-step velocity is the smaller of free-flow and safety-limited speeds.
         min(free, cong)
@@ -192,7 +255,9 @@ end GippsDynamics
 /** The `IDMDynamics` object provides equations for the Intelligent Driver Model (IDM)
  *  car-following model.
  *  @see https://en.wikipedia.org/wiki/Intelligent_driver_model
- */object IDMDynamics
+ */
+
+object IDMDynamics
     extends Dynamics:
 
     private val debug = debugf ("IDMDynamics", true)                // debug function

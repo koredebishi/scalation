@@ -3,14 +3,19 @@ package simulation
 package process
 package example_1
 
-import scalation.random.Variate
+import scalation.random.{Variate, Erlang}
 import scala.collection.mutable.ListBuffer
 import scala.math.hypot
 
 
 object MultiVSource:
 
-    /** Build 5 per-lane mainline VSources positioned from Route geometry using shift(). */
+    /** Per-lane speed limits in mph for mainline lanes 0..4 */
+    private val laneSpeedsMph = Array(72.0, 70.0, 68.0, 65.0, 62.0)
+
+    /** Build 5 per-lane mainline VSources positioned from Route geometry using shift().
+     *  NOTE: iArrivalRV parameter is ignored - each lane gets its own Erlang instance for independent mu values
+     */
     def mainline5(model: Model, makeCar: () => Vehicle, route: Route, baseName: String,
                   iArrivalRV: Variate, laneTotals: Array[Int]): List[VSource] =
 
@@ -25,7 +30,18 @@ object MultiVSource:
             val subtype = l                 // 0..4 = mainline lanes
             val nStop   = laneTotals(l)     // number of vehicles to generate for lane l (0..4): sum of the flow counts by lanes column
             val loc     = shift(route, l)   // positioning of the VSource near the start of lane l
-            val src  = new VSource(name, model, makeCar, subtype, nStop, iArrivalRV, loc)  // VSource for lane l (0..4)lanes
+
+            // Create per-lane vehicle factory that captures the correct speed
+            val laneSpeed = laneSpeedsMph(l) / 2.24694  // Convert to m/s and capture for this lane
+            val makeCarForLane = () => {
+                Vehicle.setInitialSpeed(laneSpeed)  // Set speed for this specific lane
+                makeCar()  // Create vehicle
+            }
+
+            // Create per-lane Erlang instance so each VSource has independent mu calculation
+            val laneArrivalRV = Erlang(3)  // Each lane gets its own Erlang-3 instance
+
+            val src  = new VSource(name, model, makeCarForLane, subtype, nStop, laneArrivalRV, loc)  // VSource for lane l (0..4)lanes
             sources += src  // add each lane's VSource to the list
             l += 1          // next lane
         end while

@@ -18,7 +18,7 @@ import scalation.mathstat.*
 
 @main def runCalRoute101(): Unit = new CalRoute101()
 
-class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolean = true,
+class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolean = false,
                   aniRatio: Double = 500.0, stream: Int = 0)
     extends Model(name, reps, animating, aniRatio)
         with RowTimeLoader
@@ -37,7 +37,7 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     /** Simulation dynamics and random variables */
     private val motion         = GippsDynamics
     private val numLanes        = 5
-    private val iArrivalRV     = Erlang()
+    private val iArrivalRV     = Erlang(3)
     //private val nStop          = config.nStopArray
     private val laneChangeRV       = Bernoulli(0.6)
 
@@ -122,21 +122,22 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     private val rampJoinSeg = Array(3, 4)    // hardcoded part needs generalization for the ramp joining segment.
     @inline private def pos(rampIdx: Int): Int = rampJoinSeg(rampIdx)
 
-    Vehicle.setInitialSpeed(68.0 / 2.24694)
+    // Per-lane speed initialization now handled in MultiVSource.mainline5()
+    // Ramp vehicles use default speed set below
+    Vehicle.setInitialSpeed(68.0 / 2.24694)  // Default for ramp vehicles (subtypes 5,6)
 
     case class Car() extends Vehicle("c", this):
 
 
         val offRampJunction = 2
-
-
         private val highway_length = junc.length - 1
-        // no laneRV: lane is determined by source subtype
 
         override def act(): Unit =
 
+
             // ------------------ handle main entry vehicles -------------------
             if subtype <= 4 then       // subtypes 0..4 = mainline lane-specific sources
+
 
                 // ===== SIMPLE IMPROVEMENT 1: Use raw exit fraction (removes 5-row MA lag) =====
                 val baseExitFraction = config.exitFractionRaw(curRow)
@@ -152,12 +153,6 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
                 val u = rand.gen
                 val useOffRamp = u <= laneExitFraction
 
-                // ===== OLD APPROACH (COMMENTED OUT FOR COMPARISON) =====
-                // val currentOfframpFractionMA = config.exitFractionMA(curRow)  // Used MA (5-row lag)
-                // val u = rand.gen
-                // val useOffRamp = u <= currentOfframpFractionMA  // Same probability all lanes
-
-                // Deterministic lane assignment: source subtype equals lane index
                 laneID = subtype
 
                 val carAhead = route.path(laneID).getLast
@@ -175,11 +170,25 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
                     route.path(laneID).removeFromAlist(this)   // take offramp, leave highway
                     driveRamp(ramps(2)) // offramp
                 else
-                    junc(offRampJunction).jump()
+
+
+                    // A force merge of vehicle to lanes 0-3 if currently on lane 4.
+                    // because lane 4 is no longer available after the offramp.
+                    // continue on highway but you can't be on lane 4 anymore.
                     //if the lane_id = 4 then, those vehicles need
                     // to change lane to ID= 0-3 (Mandatory lane change) for only those vehicles @ lane4
                     // code change here!!!!!
                     //Animation/ need to not draw that particular segment.
+                    val segIdx = offRampJunction
+                    if laneID == 4 && segIdx == offRampJunction then
+                        laneID = 3 // force merge to lane 3; simple implementation
+
+                           // segment index where the offramp is located
+                        //val availLane = 0 to 3         // available lanes after the offramp
+                        //val newLane = route.forceMerge(laneID, availLane, this, segIdx)    // force merge to lanes 0-3
+                        //laneID = newLane  // update laneID after forced merge
+                    end if
+                    junc(offRampJunction).jump() // take count as normal (this becomes 4 lane counts)
                     driveHighway() // continue on highway driving.
                 end if
             // ------------------ handle on-ramp entry vehicles -------------------
@@ -200,31 +209,44 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 
 
             // for onramp vehicles, jump to joinSeg first before adding to alist
+//            if subtype > 4 then
+//                val carAhead = route.path(laneID).seg(joinSeg).getLast
+//                route.path(laneID).addToAlist(this, carAhead)
+//                junc(joinSeg).jump()
+//            end if
+
             if subtype > 4 then
                 val carAhead = route.path(laneID).seg(joinSeg).getLast
                 route.path(laneID).addToAlist(this, carAhead)
+
+                // ─── Reset t_disp to ML coordinate system ───
+                t_disp = route.toCumulative(joinSeg, 0.0)
+                disp = 0.0
+                segId = joinSeg
+                // ─────────────────────────────────────────────
+
                 junc(joinSeg).jump()
             end if
 
             cfor (joinSeg , highway_length) { seg =>
-//
+
 ////------------ lane change at segment boundaries ---
-//                if clock - lastLaneChange >= 20.0 then
-//                    val carAhead = getCarAhead(this)
-//                    if carAhead != null && carAhead.velocity < 0.9 * vmax then
-//                        val target =
-//                            if laneID == 0 then 1
-//                            else if laneID == numLanes - 1 then numLanes - 2
-//                            else if laneChangeRV.igen == 1 then laneID + 1
-//                            else laneID - 1
+//            if clock - lastLaneChange >= 20.0 then
+//                val carAhead = getCarAhead(this)
+//                if carAhead != null && carAhead.velocity < 0.9 * vmax then
+//                    val target =
+//                        if laneID == 0 then 1
+//                        else if laneID == numLanes - 1 then numLanes - 2
+//                        else if laneChangeRV.igen == 1 then laneID + 1
+//                        else laneID - 1
 //
-//                        val currentLane = laneID
-//                        route.changeLane(currentLane, target, this, seg)
+//                    val currentLane = laneID
+//                    route.changeLane(currentLane, target, this, seg)
 //
-//                        lastLaneChange = clock
-//                    end if
+//                    lastLaneChange = clock
 //                end if
-// //---------------END lane change at segment boundaries ---
+//            end if
+////---------------END lane change at segment boundaries ---
                 route.path(laneID).seg(seg).move()
                 junc(seg + 1).jump()
             }
@@ -308,12 +330,15 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
                 val rmse = fit("rmse")
                 val smape = fit("smape")
                 val mae = fit("mae")
+                val sse = fit("sse")
+                val sst = fit("sst")
+
 
                 // Total counts fit
-                val smape_total = fit1("smape")
-                val rsme_total = fit1("rmse")
-
-                println(s" R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae , Smape15min = $smape_total, Rmse15min = $rsme_total")
+                //val smape_total = fit1("smape")
+                //val rsme_total = fit1("rmse")
+                //println(s"  Fit Statistics:  $diag")
+                println(s" R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae, SSE = $sse, SST = $sst")
             end for
         end for
         super.fini(rep)

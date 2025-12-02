@@ -32,9 +32,9 @@ abstract class Vehicle (name_ : String, director: Model)
     var laneID: Int = -1
     var pathInfo : String = ""
     var segId : Int = -1
-
     var prevSegId: Int = -1                // previous segment id (before current segId)
     var segmentEnterTime: Double = -1.0    // simulation clock when entering current segment
+
 
     // Derived: live time spent on current segment (call with director.clock)
     def segmentTravelTime(now: Double): Double =

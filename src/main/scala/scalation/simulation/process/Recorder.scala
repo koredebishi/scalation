@@ -58,9 +58,25 @@ trait Recorder(nt: Int):
             val speed = if vehicle.velocity.isNaN then 0.0 else vehicle.velocity
             r_speeds(j, lane) = (r_speeds(j, lane) * (cnt - 1) + (speed * 2.24694) ) / cnt // Compute running avg speed
 
-            recordedVehicles += vehicle.name
+            recordedVehicles += vehicle.displayLabel
 
-            // Enhanced vehicle recording log
+            // Since vehicle name/displayLabel is been recorded. I might use this to find vehicles that are not recorded at the next sensor.
+            // So, at sensor 0 and sensor 1, I can compare the recordedVehicles list to see which vehicles are missing.
+            //Sensor0: [lane1, lane2, lane3, lane4, lane5].row(i)
+            //Sensor1: [lane1, lane2, lane3, lane4, lane5].row(i)
+            // missingVehicles = recordedVehicles_sensor0.diff(recordedVehicles_sensor1)
+            //Should give me the vehicles that are missing between sensor0 and sensor1 @ time interval i. How can I get the exact value/names of those vehicles?
+            //Suppose this is the condense counts:
+            // ssro(row_0)  386,247,314,222,136  flow_total:1305
+            // ssr1 (row_0) 371,244,307,219,133  flow_total:1274
+            // missingVehicles = 15,3,7,3,3  flow_total:31 where did these vehicles go? there is no offramp or onramp between these two sensors.
+
+            //similarlt:
+            //ssr1(row_1) 462,301,372,254,145  flow_total:1534
+            //ssr2(row_1) 458,294,368,250,143  flow_total:1513
+            // missingVehicles = 4,7,4,4,2  flow_total:21 where did these vehicles go? there is no offramp or onramp between these two sensors.
+            // I can use this to estimate the number of vehicles that are missing between two sensors at
+
             //Recorder.ew.write(f" | Vehicle=${vehicle.displayLabel}%-8s | Lane=$laneID%d | Speed=$speed%5.2f | Count_in_row=$cnt%3d\n")
         else
             r_counts(j, 0) += 1 //None vehicle actors records
@@ -77,7 +93,10 @@ trait Recorder(nt: Int):
     def getSpeedMatrix: MatrixD = r_speeds
 
     def writeLaneIntervalStats(): Unit =
-        Recorder.ew.write(s"\n================== ROW-WISE LANE STATS FOR SENSOR $this : ${r_counts.sum} ==================\n")
+        Recorder.ew.write(s"\n $this : ${r_counts.sum}\n")
+
+//        if this.toString.startsWith("ssor") then
+
         for i <- 0 until r_counts.dim do
             val counts = r_counts(i)
             val speeds = r_speeds(i)
@@ -96,17 +115,21 @@ trait Recorder(nt: Int):
             val avgSpeed = if total > 0 then weighted / total else 0.0
 
             // Format
-            val countsStr = counts.map(_.toInt).mkString(", ")
+            val countsStr = counts.map(_.toInt).mkString(",")
             val speedsStr = speeds.map(s => f"$s%2.1f").mkString(", ")
-
+//
             Recorder.ew.write(
                 s" lane_flow: [$countsStr] : lane_speed: [$speedsStr] : flow_total: [${total.toInt}] : ave_speed = [${f"$avgSpeed%2.1f"}]\n"
             )
-        end for
-        Recorder.ew.write(s"\n================== ROW-WISE LANE STATS FOR SENSOR==================\n")
-        //Recorder.ew.flush()
-    end writeLaneIntervalStats
 
+//            Recorder.ew.write(
+//                s"$countsStr \n"
+//            )
+        end for
+        //Recorder.ew.write(s"\n================== ROW-WISE LANE STATS FOR SENSOR==================\n")
+        //Recorder.ew.flush()
+        //end  if
+    end writeLaneIntervalStats
 
 
 end Recorder
@@ -117,11 +140,12 @@ end Recorder
 object Recorder:
 
 
-    private [process] val ew = new EasyWriter("recorder", "recorder.txt")
+    private [process] val ew = new EasyWriter("recorder", "recorder.csv")
 
     def writeAllSensorStats(sensors: List[Recorder]): Unit =
-        ew.write("\n================== FINAL SENSOR STATS ==================\n")
-        for s <- sensors do s.writeLaneIntervalStats()
+        //ew.write("\n================== FINAL SENSOR STATS ==================\n")
+        for s <- sensors do
+            s.writeLaneIntervalStats()
         ew.finish()                                     // finalize the writer after logging everything
     end writeAllSensorStats
     
