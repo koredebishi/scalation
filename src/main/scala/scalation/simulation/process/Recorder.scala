@@ -15,14 +15,14 @@ import scala.math.floor
 import scalation.mathstat.MatrixD
 import scala.collection.mutable.ArrayBuffer
 
-trait Recorder(nt: Int):
+trait Recorder(nt: Int, nl: Int):
 
     private [process] val log       = Monitor ("recorder")        // log for model execution
 
     //private val timeConv = 86400.0 / nt  // Convert seconds in a day into time intervals
     val rowTime = 15.0 * MINUTE
     private val timeConv = rowTime
-    val nl = 5                           // Number of lanes for the model. May need to be dynamic
+    // nl is now a parameter - number of lanes (e.g., 4 for RoadCood2, 5 for original CalRoute101)
 
     protected val r_counts = new MatrixD(nt, nl)   // Count matrix [time_intervals × lanes] [nt, number of lanes]  
     protected val r_speeds = new MatrixD(nt, nl)   // Speed matrix [time_intervals × lanes]
@@ -139,14 +139,18 @@ end Recorder
 
 object Recorder:
 
+    // Default writer for backward compatibility
+    private [process] var ew = new EasyWriter("recorder", "recorder.csv")
 
-    private [process] val ew = new EasyWriter("recorder", "recorder.csv")
-
-    def writeAllSensorStats(sensors: List[Recorder]): Unit =
-        //ew.write("\n================== FINAL SENSOR STATS ==================\n")
+    /** Write all sensor stats to a specific output file.
+     *  @param sensors   list of Recorder instances (e.g., Junctions)
+     *  @param filename  output filename (default: "recorder.csv")
+     */
+    def writeAllSensorStats(sensors: List[Recorder], filename: String = "recorder.csv"): Unit =
+        ew = new EasyWriter("recorder", filename)  // Create new writer with specified filename
         for s <- sensors do
             s.writeLaneIntervalStats()
-        ew.finish()                                     // finalize the writer after logging everything
+        ew.finish()
     end writeAllSensorStats
     
     

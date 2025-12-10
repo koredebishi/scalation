@@ -155,23 +155,23 @@ object GippsDynamics
      *  @param cn  the current vehicle
      *  @param cp  the predecessor of the current vehicle
      */
-//    def gipps (cn: Vehicle, cp: Vehicle, length: Double): Double =
-//        if cp == null then
-//            //easyW.println(s"vehicle_ahead value $cp, current_vehicle value = $cn ${prop("rt")} prop")
-//            gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))   // All vehicles initialized should use this first (that means every vehicle needs to keep track of his ahead vehicle
-//        else
-//            val cp_r_disp = if cp.segId == cn.segId then cp.disp
-//                            else length + cp.disp
-//            gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cp_r_disp, cp.velocity, prop("rt"))
-//    end gipps
-
-    def gipps(cn: Vehicle, cp: Vehicle, length: Double): Double =
+    def gipps (cn: Vehicle, cp: Vehicle, length: Double): Double =
         if cp == null then
-            gipps(amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))
+            //easyW.println(s"vehicle_ahead value $cp, current_vehicle value = $cn ${prop("rt")} prop")
+            gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))   // All vehicles initialized should use this first (that means every vehicle needs to keep track of his ahead vehicle
         else
-            // Use t_disp (cumulative) for both vehicles - works for any segment distance
-            gipps(amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, prop("rt"))
+            val cp_r_disp = if cp.segId == cn.segId then cp.disp
+                            else length + cp.disp
+            gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cp_r_disp, cp.velocity, prop("rt"))
     end gipps
+
+//    def gipps(cn: Vehicle, cp: Vehicle, length: Double): Double =
+//        if cp == null then
+//            gipps(amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))
+//        else
+//            // Use t_disp (cumulative) for both vehicles - works for any segment distance
+//            gipps(amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, prop("rt"))
+//    end gipps
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the velocity of the vehicle based on Gipps' model.
@@ -235,13 +235,10 @@ object GippsDynamics
 
         // Otherwise, apply the congested/safety branch.
         val inner_exp = (b * b * rt * rt) - b * phi // value inside sqrt
-//        if inner_exp < 0.0 then
-//            easyW.println(s"[WARN] Negative sqrt term: $inner_exp") // numerical safety check
-
         val cong = (b * rt) + sqrt(max(0.0, inner_exp)) // braking (congested) velocity
 
-
-        println(s"branch = ${if phi >= 0 then "FREE" else "BRAKE"}")
+//
+//        println(s"branch = ${if phi >= 0 then "FREE" else "BRAKE"}")
 
         // --------------- Result --------------------------
         // The next-step velocity is the smaller of free-flow and safety-limited speeds.

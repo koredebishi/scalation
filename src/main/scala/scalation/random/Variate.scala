@@ -1,4 +1,3 @@
-
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -16,7 +15,7 @@
 package scalation
 package random
 
-import scala.math.{exp, floor, log, Pi, round, sqrt, tan}
+import scala.math.{exp, floor, log, max, Pi, round, sqrt, tan}
 import scala.runtime.ScalaRunTime.stringOf
 
 import scalation.mathstat.{Histogram, Plot, VectorD}
@@ -71,9 +70,10 @@ abstract class Variate (stream: Int = 0):
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the entire probability mass function (pmf) for finite discrete RV's.
+     *  FIX: make abstract and require extending classes to implement it.
      *  @param k  number of objects of the first type
      */
-    def pmf (k: Int = 0): Array [Double] = Array (0.0)
+    def pmf (k: Int = 1): Array [Double] = Array.fill (k)(1.0/k.toDouble)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the next random number for the particular distribution.
@@ -94,10 +94,9 @@ abstract class Variate (stream: Int = 0):
     def igen: Int =
         if LAX || _discrete then
             round (gen).toInt
-        else 
+        else
             flaw ("igen", "should not be invoked on continuous RV's")
             0
-        end if
     end igen
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -109,10 +108,9 @@ abstract class Variate (stream: Int = 0):
     def igen1 (z: Double): Int =
         if LAX || _discrete then
             round (gen1 (z)).toInt
-        else 
+        else
             flaw ("igen", "should not be invoked on continuous RV's")
             0
-        end if
     end igen1
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -140,8 +138,8 @@ end Variate
  *  @param p       the probability of success
  *  @param stream  the random number stream
  */
-case class Bernoulli (p: Double = 0.5, stream: Int = 0)
-     extends Variate (stream):
+case class Bernoulli (p: Double = .5, stream: Int = 0)
+    extends Variate (stream):
 
     if p < 0.0 || p > 1.0 then flaw ("init", "parameter p must be in [0, 1]")
     _discrete = true
@@ -172,7 +170,7 @@ end Bernoulli
  *  @param stream  the random number stream
  */
 case class Beta (alpha: Double = 2, beta: Double = 3, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if alpha <= 0 || beta <= 0 then flaw ("init", "parameters alpha and beta must be positive")
     private val gamma1 = Gamma (alpha, 1.0, stream)
@@ -204,7 +202,7 @@ end Beta
  *  @param stream  the random number stream
  */
 case class Binomial (p: Double = .5, n: Int = 10, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if p < 0.0 || p > 1.0 then flaw ("init", "parameter p must be in [0, 1]")
     if n <= 0 then             flaw ("init", "parameter n must be positive")
@@ -238,11 +236,11 @@ end Binomial
  *  This continuous RV models data with heavier tails than normally distributed.
  *  @see http://www.math.uah.edu/stat/special/Cauchy.html
  *  @param alpha   the location parameter (median)
- *  @param beta    the scale parameter 
+ *  @param beta    the scale parameter
  *  @param stream  the random number stream
  */
 case class Cauchy (alpha: Double = 2.5, beta: Double = 1.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if beta <= 0.0 then flaw ("init", "parameter beta must be positive")
 
@@ -261,11 +259,11 @@ end Cauchy
 /** This class generates `ChiSquare` random variates.
  *  This continuous RV models the variance of a distribution.
  *  @see www.math.uah.edu/stat/special/ChiSquare.html
- *  @param df      the degrees of freedom 
+ *  @param df      the degrees of freedom
  *  @param stream  the random number stream
  */
 case class ChiSquare (df: Int = 2, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if df <= 0 then flaw ("init", "parameter df must be positive")
 
@@ -293,7 +291,7 @@ end ChiSquare
  *  @param stream  the random number stream
  */
 case class Dice (cdf: Array [Double] = Array (.1, .3, .5, .7, .9, 1.0), stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     _discrete = true
     private val n = cdf.length
@@ -336,7 +334,7 @@ end Dice
  */
 case class Discrete (dist: VectorD = VectorD (.2, .2, .2, .2, .2), x: VectorD = null,
                      cumulative: Boolean = false, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     private val cdf = if cumulative then dist else dist.cumulate
     private val n   = dist.dim
@@ -351,7 +349,7 @@ case class Discrete (dist: VectorD = VectorD (.2, .2, .2, .2, .2), x: VectorD = 
         var j = -1
         for i <- 0 until n if xx(i) == z do j = i
         if j >= 0 then if j == 0 then cdf(0) else cdf(j) - cdf(j-1)
-        else 0 
+        else 0
     end pf
 
     def gen: Double =
@@ -377,75 +375,77 @@ end Discrete
  *  distribution specified via an array of functions.  At a particular time 't',
  *  the functions must sum to one.
  *  This discrete RV models time-varying experiments with discrete outcomes.
- *  @param f       the array of time-based functions 
+ *  @param f       the array of time-based functions
  *  @param stream  the random number stream
  *
-case class DiscreteF (f: Array [Double => Double] = Array ((x: Double) => x), stream: Int = 0)
-     extends Variate (stream):
+                   case class DiscreteF (f: Array [Double => Double] = Array ((x: Double) => x), stream: Int = 0)
+                   extends Variate (stream):
 
-    _discrete = true
+                   _discrete = true
 
-    val n = f.length                        // the number of functions
-    val x = VectorD.range (0, n)            // outcomes range 0 until n
-    var t = 0.0                             // time
+                   val n = f.length                        // the number of functions
+                   val x = VectorD.range (0, n)            // outcomes range 0 until n
+                   var t = 0.0                             // time
 
-    val mean = sum (x) / n.toDouble
+                   val mean = sum (x) / n.toDouble
 
-    def setTime (tt: Double): Unit = { t = tt }
+                   def setTime (tt: Double): Unit = { t = tt }
 
-    def pf (z: Double): Double = f(math.min (n-1, floor (z).toInt))(t)
-   
-    def gen: Double =
+                   def pf (z: Double): Double = f(math.min (n-1, floor (z).toInt))(t)
+
+                   def gen: Double =
         val y = r.gen
-        var sum = 0.0
-        for i <- 0 until n do
-            sum += f(i)(t)
-            if y <= sum then return i.toDouble
-        end for
-        n
-    end gen
+                   var sum = 0.0
+                   for i <- 0 until n do
+                   sum += f(i)(t)
+                   if y <= sum then return i.toDouble
+                   end for
+                   n
+                   end gen
 
-    def gen1 (z: Double): Double =
+                   def gen1 (z: Double): Double =
         throw new UnsupportedOperationException ("'gen1' not implemented for DiscreteF")
-    end gen1
+                   end gen1
 
-    private def sum (w: VectorD): Double =
+                   private def sum (w: VectorD): Double =
        var s = 0.0
-       for i <- 0 until n do s += f(i)(t) * w(i)
-       s 
-    end sum
+                   for i <- 0 until n do s += f(i)(t) * w(i)
+                   s
+                   end sum
 
-end DiscreteF
+                   end DiscreteF
  */
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates `Erlang` random variates.
  *  This continuous RV models the time until k stages complete.
+ *  Can also pass mu/k to provide an Exponential like distribution with cv < 1.
  *  @see http://www.math.uah.edu/stat/poisson/Gamma.html
  *  @param mu      the mean of exponential samples (Erlang mean = mu * k)
  *  @param k       the number of stages (or Exponential samples)
  *  @param stream  the random number stream
  */
 case class Erlang (mu: Double = 1.0, k: Int = 2, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if mu <= 0.0 || k <= 0 then flaw ("init", "parameters mu and k must be positive")
 
-    private val l = 1.0 / mu             // lambda
+    private val λ = 1.0 / mu                     // lambda, the rate parameter
 
     val mean = mu * k
 
-    def pf (z: Double): Double = l~^k * z~^(k-1) * exp (-l*z) / fac (k-1)
+    def pf (z: Double): Double = λ~^k * z~^(k-1) * exp (-λ*z) / fac (k-1)
 
     def gen: Double =
         var prod = 1.0
-        for i <- 0 until k do prod *= r.gen
+        cfor (0, k) { _ => prod *= r.gen }
         -mu * log (prod)
     end gen
 
     def gen1 (z: Double): Double =
         var prod = 1.0
-        for i <- 0 until k do prod *= r.gen
+        cfor (0, k) { _ => prod *= r.gen }
         -z * log (prod)
     end gen1
 
@@ -453,14 +453,73 @@ end Erlang
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class generates `Erlang2S` (Shifted right) random variates.
+ *  This continuous RV models the time until 2 stages complete.
+ *  @param mu      the original unshifted mean of exponential samples (Erlang mean = mu * 2)
+ *  @param tau     the time shift, generated values Y = tau + Erlang2
+ *  @param stream  the random number stream
+ */
+case class Erlang2S (mu: Double = 1.0, tau: Double = 0.2, stream: Int = 0)
+    extends Variate (stream):
+
+    if tau <= 0.0 then flaw ("init", "parameter tau must be positive")
+    if tau >= mu  then flaw ("init", "parameter tau must be less than mu")
+
+    private val λ = 1.0 / mu             // lambda, the rate parameter
+
+    val mean = tau + 2 * mu              // adjusted mean
+    
+
+    def pf (z: Double): Double = if z >= tau then λ~^2 * (z-tau) * exp (-λ*(z-tau))
+    else 0.0
+
+    def gen: Double = tau - mu * log (r.gen * r.gen)
+
+    def gen1 (z: Double): Double = tau - z * log (r.gen * r.gen)
+
+end Erlang2S
+
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class generates `Erlang2T` (lower-Truncated) random variates.
+ *  This discrete/continuous RV models the time until 2 stages complete.
+ *  @param mu      the original untruncated mean of exponential samples (Erlang mean = mu * 2)
+ *  @param tau     the time threshold, require generated values Y >= tau
+ *  @param stream  the random number stream
+ */
+case class Erlang2T (mu: Double = 1.0, tau: Double = 0.2, stream: Int = 0)
+    extends Variate (stream):
+
+    if tau <= 0.0 then flaw ("init", "parameter tau must be positive")
+    if tau >= mu  then flaw ("init", "parameter tau must be less than mu")
+
+    private val λ     = 1.0 / mu                                           // lambda, the rate parameter
+    private val p_tau = 1 - exp (-λ * tau) - λ * tau * exp (-λ * tau)      // probability Y = tau (mass point)
+
+    val mean = tau + (1 - p_tau) * 2 * mu                                  // adjusted mean
+
+    def pf (z: Double): Double = if z > tau then λ~^2 * (z-tau) * exp (-λ*(z-tau))
+    else if z == tau then POSITIVE_INFINITY   // 'p_tau * delta(y-tau)' Dirac delta function
+    else 0.0
+
+    def gen: Double = max (tau, -mu * log (r.gen * r.gen))
+
+    def gen1 (z: Double): Double = max (tau, -z * log (r.gen * r.gen))
+
+end Erlang2T
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates `Exponential` random variates.
  *  This continuous RV models the time until an event occurs.
+ *  As its stdev = mean, its coefficient of variation cv = 1.
  *  @see www.math.uah.edu/stat/poisson/Exponential.html
- *  @param mu      the mean
+ *  @param mu      the mean (e.g., mean inter-arrival time)
  *  @param stream  the random number stream
  */
 case class Exponential (mu: Double = 1.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if mu <= 0.0 then flaw ("init", "parameter mu must be positive")
 
@@ -477,39 +536,72 @@ case class Exponential (mu: Double = 1.0, stream: Int = 0)
 end Exponential
 
 
-case class Exponential2(mu_ : Double = 1.0, stream: Int = 0)
-    extends Variate(stream):
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class generates `ExponentialS` (Shifted right) random variates.
+ *  This continuous RV models the time until an event occurs.
+ *  @param mu      the original unshifted mean (e.g., mean inter-arrival time)
+ *  @param tau     the time shift, generated values Y = tau + Exponential
+ *  @param stream  the random number stream
+ */
+case class ExponentialS (mu: Double = 1.0, tau: Double = 0.2, stream: Int = 0)
+    extends Variate (stream):
 
-    var mu = mu_
+    if tau <= 0.0 then flaw ("init", "parameter tau must be positive")
+    if tau >= mu  then flaw ("init", "parameter tau must be less than mu")
 
-    def setMu(mu2: Double): Unit =
-        mu = mu2
+    private val λ = 1.0 / mu             // lambda, the rate parameter
 
-    if mu <= 0.0 then flaw("init", "parameter mu must be positive")
+    val mean = tau + mu                  // adjusted mean
 
-    inline def λ = 1.0 / mu // lambda, the rate parameter
+    def pf (z: Double): Double = if z >= tau then λ * exp (-λ*(z-tau))
+    else 0.0
 
-    val mean = mu
+    def gen: Double = tau - mu * log (r.gen)
 
-    def pf(z: Double): Double = if z >= 0 then λ * exp(-λ * z) else 0.0
+    def gen1 (z: Double): Double = tau - z * log (r.gen)
 
-    def gen: Double = -mu * log(r.gen)
+end ExponentialS
 
-    def gen1(z: Double): Double = -z * log(r.gen)
 
-end Exponential2
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class generates `ExponentialT` (lower-Truncated) random variates.
+ *  This discrete/continuous RV models the time until an event occurs.
+ *  @param mu      the original untruncated mean (e.g., mean inter-arrival time)
+ *  @param tau     the time threshold, require generated values Y >= tau
+ *  @param stream  the random number stream
+ */
+case class ExponentialT (mu: Double = 1.0, tau: Double = 0.2, stream: Int = 0)
+    extends Variate (stream):
+
+    if tau <= 0.0 then flaw ("init", "parameter tau must be positive")
+    if tau >= mu  then flaw ("init", "parameter tau must be less than mu")
+
+    private val λ     = 1.0 / mu                 // lambda, the rate parameter
+    private val p_tau = 1 - exp (-λ * tau)       // probability Y = tau (mass point)
+
+    val mean = tau + (1 - p_tau) * mu            // adjusted mean
+
+    def pf (z: Double): Double = if z > tau then λ * exp (-λ*(z-tau))
+    else if z == tau then POSITIVE_INFINITY   // 'p_tau * delta(y-tau)' Dirac delta function
+    else 0.0
+
+    def gen: Double = max (tau, -mu * log (r.gen))
+
+    def gen1 (z: Double): Double = max (tau, -z * log (r.gen))
+
+end ExponentialT
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates `Fisher` (F-Distribution) random variates.
  *  This continuous RV models the ratio of variances.
- *  @see http://www.math.uah.edu/stat/special/Fisher.html
+ *  @see http://www.math.uacombined discrete-continuoush.edu/stat/special/Fisher.html
  *  @param df1     the degrees of freedom for numerator Chi-Square
  *  @param df2     the degrees of freedom for denominator Chi-Square
  *  @param stream  the random number stream
  */
 case class Fisher (df1: Int = 6, df2: Int = 4, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if df1 <= 0 || df2 <= 2 then
         flaw ("init", "parameters df1 and df2 must be at least 1 and 3, respectively")
@@ -521,7 +613,7 @@ case class Fisher (df1: Int = 6, df2: Int = 4, stream: Int = 0)
 
     def pf (z: Double): Double =
         if z >= 0.0 then sqrt ((df1*z)~^df1 * df2.toDouble~^df2 / (df1*z + df2)~^(df1+df2)) /
-                              (z * betaF (df1/2.0, df2/2.0))
+            (z * betaF (df1/2.0, df2/2.0))
         else 0.0
     end pf
 
@@ -550,17 +642,17 @@ end Fisher
  *  @param stream  the random number stream
  */
 case class Gamma (alpha: Double = 1.0, beta: Double = 1.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if alpha <= 0.0 || beta <= 0.0 then flaw ("init", "parameters alpha and beta must be positive")
 
     private val a    = floor (alpha).toInt          // integral part
-    private val b    = alpha - a                    // fractional part  
+    private val b    = alpha - a                    // fractional part
     private val erl1 = Erlang (beta, a, stream)
     private val erl2 = Erlang (beta, a + 1, stream)
 
     val mean = alpha * beta
-    
+
     def pf (z: Double): Double =
         if z > 0.0 then beta~^(-alpha) * z~^(alpha-1.0) * exp (-z/beta) / gammaF (alpha)
         else 0.0
@@ -580,14 +672,13 @@ case class Gamma (alpha: Double = 1.0, beta: Double = 1.0, stream: Int = 0)
             while
                 x = alpha / a
                 var prod = 1.0
-                for i <- 0 until a do prod *= r.gen
+                cfor (0, a) { _ => prod *= r.gen }
                 x *= -log (prod)
                 r.gen > (x / alpha)~^b * exp (-b * x / (alpha-1.0))
             do ()
             x * beta
         else                                              // alpha >= 5
             if r.gen >= b then erl1.gen else erl2.gen
-        end if
     end gen
 
     def gen1 (z: Double): Double =
@@ -605,7 +696,7 @@ end Gamma
  *  @param stream  the random number stream
  */
 case class Geometric (p: Double = .5, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if p < 0 || p > 1 then flaw ("init", "parameter p must be in [0, 1]")
     _discrete = true
@@ -616,7 +707,7 @@ case class Geometric (p: Double = .5, stream: Int = 0)
 
     val mean = q_by_p
 
-    def pf (z: Double): Double = 
+    def pf (z: Double): Double =
         val k = floor (z).toInt
         if z == k && k >= 0 then p * q~^k else 0.0
     end pf
@@ -635,14 +726,14 @@ end Geometric
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates `HyperExponential` random variates (two rates).
  *  This continuous RV models the time until an event occurs (higher coefficient
- *  of variation than exponential distribution).  
+ *  of variation than exponential distribution).
  *  @param p       the probability of first vs. second rates
  *  @param mu1     the first mean (1 / lambda1)
  *  @param mu2     the second mean (1 / lambda2)
  *  @param stream  the random number stream
  */
 case class HyperExponential (p: Double = .5, mu1: Double = 1, mu2: Double = 2, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if p < 0.0 || p > 1.0 then       flaw ("init", "parameter p must be in [0, 1]")
     if mu1 <= 0.0 || mu2 <= 0.0 then flaw ("init", "parameters mu1 and mu2 must be positive")
@@ -654,7 +745,7 @@ case class HyperExponential (p: Double = .5, mu1: Double = 1, mu2: Double = 2, s
     val mean = p * mu1 + q * mu2
 
     def pf (z: Double): Double = if z >= 0.0 then p * l1 * exp (-l1*z) + q * l2 * exp (-l2*z)
-                                 else 0.0
+    else 0.0
 
     def gen: Double = log (r.gen) * (if r.gen < p then -mu1 else -mu2)
 
@@ -672,7 +763,7 @@ end HyperExponential
  *  @param stream  the random number stream
  */
 case class HyperExponential_ (mu: Double = 1.0, sigma: Double = 2, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if mu <= 0.0 || sigma <= 0.0 then flaw ("init", "parameters mu and sigma must be positive")
 
@@ -710,7 +801,7 @@ end HyperExponential_
  *  @param stream  the random number stream
  */
 case class HyperGeometric (p: Double = .5, n: Int = 5, pop: Int = 10, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if p < 0.0 || p > 1.0 then flaw ("init", "parameter p must be in [0, 1]")
     if n <= 0 || pop <= 0 then flaw ("init", "parameters n and pop must be positive")
@@ -731,10 +822,10 @@ case class HyperGeometric (p: Double = .5, n: Int = 5, pop: Int = 10, stream: In
         var b: Double = pop                      // population of number of balls
         var rd = reds                            // number of red/success balls in population
         var s = 0                                // count number of successes
-        for i <- 0 until n do
+        cfor (0, n) { _ =>
             if r.gen <= rd / b then { s += 1; rd -= 1 }
             b -= 1
-        end for
+        } // cfor
         s
     end gen
 
@@ -743,10 +834,10 @@ case class HyperGeometric (p: Double = .5, n: Int = 5, pop: Int = 10, stream: In
         var b: Double = pop                      // population of number of balls
         var rd = reds                            // number of red/success balls in population
         var s = 0                                // count number of successes
-        for i <- 0 until n do
+        cfor (0, n) { _ =>
             if r.gen <= rd / b then { s += 1; rd -= 1 }
             b -= 1
-        end for
+        } // cfor
         s
     end gen1
 
@@ -760,7 +851,7 @@ end HyperGeometric
  *  @param stream  the random number stream
  */
 case class Known (values: Array [Double], stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     private var i = -1
     private val n = values.length
@@ -787,7 +878,7 @@ end Known
  *  @param stream  the random number stream
  */
 case class Logistic (a: Double = 0.0, b: Double = 1.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     val mean = a
 
@@ -818,7 +909,7 @@ end Logistic
  *  @param stream  the random number stream
  */
 case class LogNormal (mu: Double = 0.0, sigma2: Double = 1.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if sigma2 <= 0.0 then flaw ("init", "parameter sigma2 must be positive")
 
@@ -851,7 +942,7 @@ end LogNormal
  *  @param stream  the random number stream
  */
 case class NegativeBinomial (p: Double = .5, s: Int = 2, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if p < 0.0 || p > 1.0 then flaw ("init", "parameter p must be in [0, 1]")
     if s <= 0 then             flaw ("init", "parameter s must be positive")
@@ -868,16 +959,16 @@ case class NegativeBinomial (p: Double = .5, s: Int = 2, stream: Int = 0)
         else 0.0
     end pf
 
-    def gen: Double = 
+    def gen: Double =
         var sum = 0
-        for i <- 0 until s do sum += geom.gen.toInt
+        cfor (0, s) { _ => sum += geom.gen.toInt }
         sum
     end gen
 
     def gen1 (z: Double): Double =
         val geom = Geometric (z, stream)
         var sum = 0
-        for i <- 0 until s do sum += geom.gen.toInt
+        cfor (0, s) { _ => sum += geom.gen.toInt }
         sum
     end gen1
 
@@ -894,7 +985,7 @@ end NegativeBinomial
  *  @param stream  the random number stream
  */
 case class Normal (mu: Double = 0.0, sigma2: Double = 1.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if sigma2 < 0.0 then flaw ("init", "parameter sigma2 must be nonnegative")
 
@@ -952,17 +1043,17 @@ end Normal
  *  @param b       the scale parameter
  *  @param stream  the random number stream
  *
-case class Pareto (a: Double = 0.5, b: Double = 1.0, stream: Int = 0)
-     extends Variate (stream):
+                   case class Pareto (a: Double = 0.5, b: Double = 1.0, stream: Int = 0)
+                   extends Variate (stream):
 
-    if a <= 0.0 || b < 0.0 then flaw ("init", "parameters 'a' and 'b' must be positive, nonegative")
-    if a >= 1.0 then flaw ("init", "parameter 'a' must be less than 1")
+                   if a <= 0.0 || b < 0.0 then flaw ("init", "parameters 'a' and 'b' must be positive, nonegative")
+                   if a >= 1.0 then flaw ("init", "parameter 'a' must be less than 1")
 
-    val mean = a * b / (a-1.0)
+                   val mean = a * b / (a-1.0)
 
-    def pf (z: Double): Double = if z >= b then a * b~^a / z~^(a+1.0) else 0.0
+                   def pf (z: Double): Double = if z >= b then a * b~^a / z~^(a+1.0) else 0.0
 
-    def gen: Double = b / (1.0 - r.gen)~^(1.0/a)
+                   def gen: Double = b / (1.0 - r.gen)~^(1.0/a)
 
     def gen1 (z: Double): Double = b / (1.0 - r.gen)~^(1.0/z)
 
@@ -978,7 +1069,7 @@ end Pareto
  *  @param stream  the random number stream
  */
 case class Poisson (mu: Double = 2.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if mu <= 0.0 then flaw ("init", "parameter mu must be positive")
     _discrete = true
@@ -992,7 +1083,7 @@ case class Poisson (mu: Double = 2.0, stream: Int = 0)
         if k == z && k >= 0 then exp (-mu) * mu~^k / fac (k) else 0.0
     end pf
 
-    def gen: Double = 
+    def gen: Double =
         var n = -1
         var prod = 1.0
         while
@@ -1008,9 +1099,9 @@ case class Poisson (mu: Double = 2.0, stream: Int = 0)
         var n      = -1
         var prod   = 1.0
         while
-           prod *= r.gen
-           n    += 1
-           prod >= cutoff
+            prod *= r.gen
+            n    += 1
+            prod >= cutoff
         do  ()
         n
     end gen1
@@ -1028,7 +1119,7 @@ end Poisson
  *  @param stream  the random number stream
  */
 case class PowerLaw (a: Double = 1.0, b: Double = 10.0, y: Double = 2.1, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if a >= b then  flaw ("init", "requires parameter a < b")
     if y < 1.0 then flaw ("init", "parameter y must be >= 1.0")
@@ -1064,7 +1155,7 @@ end PowerLaw
  *  @param stream  the random number stream
  */
 case class Randi (a: Int = 0, b: Int = 5, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if a > b then flaw ("init", "parameter a must not be greater than b")
     _discrete = true
@@ -1088,7 +1179,7 @@ object Randi:
 
     def apply (a_b: (Int, Int), stream: Int): Randi = Randi (a_b._1, a_b._2, stream)
 
-end Randi 
+end Randi
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1098,7 +1189,7 @@ end Randi
  *  @param stream  the random number stream
  */
 case class Randi0 (b: Int = 5, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if b < 0 then flaw ("init", "parameter b must be non-negative")
     _discrete = true
@@ -1126,7 +1217,7 @@ end Randi0
  *  @param stream  the random number stream
  */
 case class RandiU0 (b: Int = 1000, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if b < 0 then flaw ("init", "parameter b must be non-negative")
     _discrete = true
@@ -1148,12 +1239,11 @@ case class RandiU0 (b: Int = 1000, stream: Int = 0)
 
     override def igen: Int = igen1 (b)
 
-    override def igen1 (z: Double): Int = 
+    override def igen1 (z: Double): Int =
         val bb = z.toInt
         if previous.size == bb then
             flaw ("igen1", "all unique values have been exhausted - starting over")
             previous.clear ()
-        end if
         var i = -1
         while
             i = floor ((bb + 1) * r.gen).toInt
@@ -1173,7 +1263,7 @@ end RandiU0
  *  @param stream  the random number stream
  */
 case class Sharp (x: Double = 1.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     _discrete = true
 
@@ -1196,7 +1286,7 @@ end Sharp
  *  @param stream  the random number stream
  */
 case class StdNormal (stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     val mean = 0.0
 
@@ -1211,7 +1301,6 @@ case class StdNormal (stream: Int = 0)
             if y2 >= (y1 - 1)~^2 / 2.0 then
                 z = y1
                 cont = false
-            end if
             cont
         do ()
         if r.gen <= 0.5 then z else -z
@@ -1233,7 +1322,7 @@ end StdNormal
  *  @param stream  the random number stream
  */
 case class StudentT (df: Int = 4, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if df <= 0 then flaw ("init", "parameter df must be positive")
 
@@ -1247,7 +1336,7 @@ case class StudentT (df: Int = 4, stream: Int = 0)
         gammaF (_df) * (1.0 + (z*z)/df)~^(-_df) / (sqrt (df*Pi) * gammaF (df/2.0))
     end pf
 
-    def gen: Double = normal.gen / sqrt (chi.gen / df) 
+    def gen: Double = normal.gen / sqrt (chi.gen / df)
 
     def gen1 (z: Double): Double =
         val chi = ChiSquare (z.toInt, stream)
@@ -1270,7 +1359,7 @@ end StudentT
  */
 case class Trapezoidal (a: Double = 0.0, c: Double = 2.0, d: Double = 7.0, b: Double = 10.0,
                         stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     private val l  = b + d - a - c                     // length factor
     private val h  = 2.0 / l                           // maximum height
@@ -1280,13 +1369,13 @@ case class Trapezoidal (a: Double = 0.0, c: Double = 2.0, d: Double = 7.0, b: Do
     val mean = (b~^2 - a~^2 + d~^2 - c~^2 - a*c + b*d) / (3.0 * l)
 
     def pf (z: Double): Double =
-        if a <= z && z <= c then h * (z - a) / lf 
+        if a <= z && z <= c then h * (z - a) / lf
         else if z <= d      then h
         else if z <= b      then h * (b - z) / rt
         else 0.0
     end pf
 
-    def gen: Double = 
+    def gen: Double =
         val y   = r.gen
         val h_2 = h / 2.0
         if y <= h_2 * lf            then a + sqrt (2.0 * lf * y / h)
@@ -1319,7 +1408,7 @@ end Trapezoidal
  *  @param stream  the random number stream
  */
 case class Triangular (a: Double = 0, b: Double = 5, c: Double = Double.MaxValue, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if a > b then flaw ("init", "parameter a must not be greater than b")
 
@@ -1336,8 +1425,8 @@ case class Triangular (a: Double = 0, b: Double = 5, c: Double = Double.MaxValue
         else 0
     end pf
 
-    def gen: Double = 
-        val y = r.gen    
+    def gen: Double =
+        val y = r.gen
         if y <= left / width then a + sqrt (left * width * y)
         else b - sqrt (right * width * (1.0 - y))
     end gen
@@ -1368,7 +1457,7 @@ end Triangular
  *  @param stream  the random number stream
  */
 case class Trinomial (p: Double = 1.0/3.0, q: Double = 1.0/3.0, n: Int = 5, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if p < 0.0   then flaw ("init", "parameter p must be non-negative")
     if q < 0.0   then flaw ("init", "parameter q must be non-negative")
@@ -1377,7 +1466,7 @@ case class Trinomial (p: Double = 1.0/3.0, q: Double = 1.0/3.0, n: Int = 5, stre
     _discrete = true
 
     private val qq   = 1.0 - p - q               // the probability of low (0)
-//  private val p_qq = p / qq                    // the ratio of high to low
+    //  private val p_qq = p / qq                    // the ratio of high to low
     private val q_qq = q / qq                    // the ratio of medium to low
     private val dice = Dice (Array (qq, qq+q, 1.0), stream)
 
@@ -1399,14 +1488,14 @@ case class Trinomial (p: Double = 1.0/3.0, q: Double = 1.0/3.0, n: Int = 5, stre
         else 0.0
     end pf
 
-    def pf (k: Int, l: Int): Double =             // ex: n = 10, (k, l, m) = (2, 3, 5)
+    def pf (k: Int, l: Int): Double =                   // ex: n = 10, (k, l, m) = (2, 3, 5)
         if 0 <= k && 0 <= l && k+l <= n then
             choose (n, k, l) * p~^k * q~^l * qq~^(n-k-l)
         else 0.0
     end pf
 
     override def pmf (k: Int): Array [Double] =
-        val d = Array.ofDim [Double] (n-k+1)      // array to hold pmf distribution
+        val d = Array.ofDim [Double] (n-k+1)            // array to hold pmf distribution
         d(0) = choose (n, k) * p~^k * qq~^n-k
         for l <- 1 to n-k do d(l) = d(l-1) * q_qq * (k-l+1) / l.toDouble
         d
@@ -1414,13 +1503,13 @@ case class Trinomial (p: Double = 1.0/3.0, q: Double = 1.0/3.0, n: Int = 5, stre
 
     def gen: Double =
         var sum = 0.0
-        for i <- 0 until n do sum += dice.gen            // add 0, 1 or 2
+        cfor (0, n) { _ => sum += dice.gen }            // add 0, 1 or 2
         sum
     end gen
 
     def gen1 (z: Double): Double =
         var sum = 0.0
-        for i <- 0 until z.toInt do sum += dice.gen      // add 0, 1 or 2
+        cfor (0, z.toInt) { _ => sum += dice.gen }      // add 0, 1 or 2
         sum
     end gen1
 
@@ -1436,7 +1525,7 @@ end Trinomial
  *  @param stream  the random number stream
  */
 case class Uniform (a: Double = 0.0, b: Double = 5.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if a > b then flaw ("init", "parameter a must not be greater than b")
 
@@ -1468,7 +1557,7 @@ end Uniform
  *  @param stream  the random number stream
  */
 case class Weibull (alpha: Double = 1.0, beta: Double = 2.0, stream: Int = 0)
-     extends Variate (stream):
+    extends Variate (stream):
 
     if alpha <= 0.0 || beta <= 0.0 then flaw ("init", "parameters alpha and beta must be positive")
 
@@ -1537,69 +1626,72 @@ end Weibull
         var chi2   = 0.0            // ChiSquare statistic
         var n      = 0              // number of nonzero intervals
         val offset = if rv.isInstanceOf [StudentT] ||
-                        rv.isInstanceOf [Normal] ||
-                        rv.isInstanceOf [StdNormal] then 25 else 0
+            rv.isInstanceOf [Normal] ||
+            rv.isInstanceOf [StdNormal] then 25 else 0
         val sum    = new Array [Int] (51)
 
-        for i <- 1 to rep do
+        cfor (0, rep) { _ =>
             j = floor (rv.gen * 10.0).toInt + offset
             if 0 <= j && j <= 50 then sum (j) += 1
-        end for
+        } // cfor
 
         for i <- 0 until sum.length do
             x = (i - offset) / 10.0
             o = sum(i)
             e = round (if rv.discrete then 50000 * rv.pf (x)
-                       else 5000 * rv.pf (x + .05)).toDouble
+            else 5000 * rv.pf (x + .05)).toDouble
             if e >= 5 then
                 chi2 += (o-e)~^2.0 / e
                 n += 1
-            end if
             print (s"\tsum ($x) = $o : $e ")
             if i % 5 == 4 then println ()
         end for
         n -= 1
         if n < 2  then n = 2
-        if n > 49 then n = 49 
-        
+        if n > 49 then n = 49
+
         val criticalValue = Quantile.chiSquareInv (SIGNIFICANCE, n)
         println (s"\nchi^2 = $chi2 <? chi^2($SIGNIFICANCE, $n) = $criticalValue")
         assert (chi2  < criticalValue)
     end distributionTest
 
     val distribution = Array (Bernoulli (),
-                              Beta (),
-                              Binomial (),
-                              Cauchy (),
-                              ChiSquare (),
-                              Dice (),
-                              Discrete (),
-//  useful?                   DiscreteF (),
-                              Erlang (),
-                              Exponential (),
-                              Fisher (),
-                              Gamma (),
-                              Geometric (),
-                              HyperExponential (),
-                              HyperGeometric (),
-// barely fails               LogNormal (),
-                              Logistic (),
-                              NegativeBinomial (),
-                              Normal (),
-// fails                      Pareto (),
-                              Poisson (),
-                              PowerLaw (),
-                              Randi (),
-                              Randi0 (),
-                              RandiU0 (),
-                              Sharp (),
-                              StdNormal (),
-                              StudentT (),
-                              Trapezoidal (),
-                              Triangular (),
-//                            Trinomial (),
-                              Uniform (),
-                              Weibull ())
+        Beta (),
+        Binomial (),
+        Cauchy (),
+        ChiSquare (),
+        Dice (),
+        Discrete (),
+        // useful?                    DiscreteF (),
+        Erlang (),
+        Erlang2S (),
+        // fails                      Erlang2T (),
+        Exponential (),
+        ExponentialS (),
+        // fails Fit Test             ExponentialT (),
+        Fisher (),
+        Gamma (),
+        Geometric (),
+        HyperExponential (),
+        HyperGeometric (),
+        // barely fails               LogNormal (),
+        Logistic (),
+        NegativeBinomial (),
+        Normal (),
+        // fails                      Pareto (),
+        Poisson (),
+        PowerLaw (),
+        Randi (),
+        Randi0 (),
+        RandiU0 (),
+        Sharp (),
+        StdNormal (),
+        StudentT (),
+        Trapezoidal (),
+        Triangular (),
+        //                            Trinomial (),
+        Uniform (),
+        Weibull ())
 
     val testAll = true                        // test all distributions, else only those in 'include' set
     val include = Set (7, 11)                 // adjust as needed
@@ -1610,7 +1702,6 @@ end Weibull
         if testAll || (include contains i) then
             meansTest (distribution (i))
             distributionTest (distribution (i))
-        end if
     end for
 
     val trinom = Trinomial (1.0/3.0, 1.0/3.0, 9)
@@ -1631,12 +1722,12 @@ end variateTest
     val freq  = new VectorD (7)
     val x2    = VectorD.range (0, 13)
     val freq2 = new VectorD (13)
-    for i <- 0 until 10000 do
+    cfor (0, 10000) { _ =>
         val sum  = dice.igen
         val sum2 = dice.igen + dice.igen
         freq(sum)   += 1
         freq2(sum2) += 1
-    end for
+    } // cfor
     println (s"x    = $x")
     println (s"freq = $freq")
     println (s"x2    = $x2")
@@ -1658,7 +1749,7 @@ end diceTest
     import mathstat.Plot
 
     val rvg = Uniform ()
-    val x   = VectorD (for i <- 0 until 100000 yield rvg.gen + rvg.gen + rvg.gen + rvg.gen)
+    val x   = VectorD (for _ <- 0 until 100000 yield rvg.gen + rvg.gen + rvg.gen + rvg.gen)
     new Histogram (x)
 
     val nrm = Normal ()

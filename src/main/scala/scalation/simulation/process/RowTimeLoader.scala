@@ -20,7 +20,8 @@ trait RowTimeLoader:
     // Formula: currentRow = floor(clock / rowTimeSlice)
     // Example: clock=1350s, rowTimeSlice=900s → row = floor(1350/900) = 1
     // Use: VSource calls this to determine which row's mu to fetch
-    def getCurrentRow(clock: Double): Int = (clock / rowTimeSlice).toInt
+    def getCurrentRow(clock: Double): Int = 
+        (clock / rowTimeSlice).toInt
     
     def nextRow(clock: Double): Unit =
         //println(s"I was called by @@@@@@ director clock: $clock and rowTime: $rowTime")

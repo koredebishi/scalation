@@ -18,7 +18,7 @@ import scalation.mathstat.*
 
 @main def runCalRoute101(): Unit = new CalRoute101()
 
-class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolean = false,
+class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolean = true,
                   aniRatio: Double = 500.0, stream: Int = 0)
     extends Model(name, reps, animating, aniRatio)
         with RowTimeLoader
@@ -37,7 +37,7 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     /** Simulation dynamics and random variables */
     private val motion         = GippsDynamics
     private val numLanes        = 5
-    private val iArrivalRV     = Erlang(3)
+    private val iArrivalRV     = Erlang(15)
     //private val nStop          = config.nStopArray
     private val laneChangeRV       = Bernoulli(0.6)
 
@@ -60,13 +60,18 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     private val aniCoords_Ramp = config.getRampCoordinates((w, h)) // already nudged
     private val (centerPos, offsets) = config.getVSourceCenterAndOffsets((w, h))
 
+    // Junction naming convention:
+    //   - PEMS sensors: sensor1, sensor2, sensor3, sensor4, sensor5 (data comparison points)
+    //   - Merge points: offR_merge, onR_merge1, onR_merge2 (operational only, no PEMS comparison)
     private val junc: Array[Junction] = Array.ofDim[Junction](aniCoords_Main.length)
+    private val juncNames = Array("sensor1", "sensor2", "offR_merge", "sensor3", "onR_merge1", "sensor4", "onR_merge2", "sensor5")
+
     for i <- junc.indices do
-        junc(i) = new Junction(s"ssor$i", xy = aniCoords_Main(i), nt = nt)
+        junc(i) = new Junction(juncNames(i), xy = aniCoords_Main(i), nt = nt, nl = numLanes)
 
     private val ramp_sensors = Array.ofDim[Junction](aniCoords_Ramp.length)
     for i <- ramp_sensors.indices do
-        ramp_sensors(i) = new Junction(s"ramp${i+1}", xy = aniCoords_Ramp(i), nt = nt)
+        ramp_sensors(i) = new Junction(s"ramp${i+1}", xy = aniCoords_Ramp(i), nt = nt, nl = numLanes) // use numLanes for recording compatibility
 
 
 
@@ -119,8 +124,60 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
      * Example: ramp1 ↦ seg0, ramp2 ↦ seg1, ramp3 ↦ seg5
      */
 
-    private val rampJoinSeg = Array(3, 4)    // hardcoded part needs generalization for the ramp joining segment.
+
+    // ramp join are now
+    private val rampJoinSeg = Array(4, 6)    // hardcoded part needs generalization for the ramp joining segment.
     @inline private def pos(rampIdx: Int): Int = rampJoinSeg(rampIdx)
+
+
+    // Junction index → PEMS sensor index
+    private val pemsToJunc = Array(0, 1, 3, 5, 7)
+
+    // Segment → PEMS index for redistribution
+    private val redistributionSegs = Map(2 -> 2, 4 -> 3, 6 -> 4)
+
+    // Precomputed lane samplers: pemsIdx × row → Discrete
+    private val laneSamplers: Array[Array[Discrete]] = {
+        val arr = Array.ofDim[Discrete](5, nt)
+        for p <- 0 until 5; r <- 0 until nt do
+            arr(p)(r) = Discrete(config.getLaneDistribution(p, r))
+        arr
+    }
+
+    /** Sample target lane from PEMS distribution, constrained to ±1 from current.
+     *
+     * @param currentLane vehicle's current lane
+     * @param pemsIdx     target PEMS sensor index
+     * @param row         current time row
+     * @return target lane (same or adjacent)
+     */
+//    @inline private def targetLaneFromPems(currentLane: Int, pemsIdx: Int, row: Int): Int =
+//        val sampled = laneSamplers(pemsIdx)(row).igen
+//        if sampled < currentLane then math.max(0, currentLane - 1)
+//        else if sampled > currentLane then math.min(numLanes - 1, currentLane + 1)
+//        else currentLane
+//    end targetLaneFromPems
+//
+    @inline private def targetLaneFromPems(currentLane: Int, pemsIdx: Int, row: Int): Int =
+        val dist = config.getLaneDistribution(pemsIdx, row)
+        val myTarget = dist(currentLane)
+        val avgTarget = 0.20 // 1/5 for 5 active lanes
+        val scaledChangeProb = 0.3 * (avgTarget / math.max(0.01, myTarget))
+        val cappedChangeProb = math.min(0.5, scaledChangeProb)
+
+        if rand.gen > cappedChangeProb then return currentLane
+
+        val leftTarget = if currentLane > 0 then dist(currentLane - 1) else 0.0
+        val rightTarget = if currentLane < numLanes - 1 then dist(currentLane + 1) else 0.0
+        val total = leftTarget + rightTarget
+
+        if total < 0.01 then return currentLane
+
+        if rand.gen < leftTarget / total && currentLane > 0 then currentLane - 1
+        else if currentLane < numLanes - 1 then currentLane + 1
+        else currentLane
+
+
 
     // Per-lane speed initialization now handled in MultiVSource.mainline5()
     // Ramp vehicles use default speed set below
@@ -132,13 +189,14 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
         val offRampJunction = 2
         private val highway_length = junc.length - 1
 
-        override def act(): Unit =
+        override def act(): Unit = {
 
+            println(s"this vehicle just created ${this.displayLabel} of subtype $subtype")
 
             // ------------------ handle main entry vehicles -------------------
             if subtype <= 4 then       // subtypes 0..4 = mainline lane-specific sources
 
-
+                println(s"I entered here ${this.displayLabel} of subtype $subtype")
                 // ===== SIMPLE IMPROVEMENT 1: Use raw exit fraction (removes 5-row MA lag) =====
                 val baseExitFraction = config.exitFractionRaw(curRow)
 
@@ -159,47 +217,37 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 
                 route.path(laneID).addToAlist(this, carAhead)
 
-                // drive until off-ramp junction// Universal for all vehicles.
-                cfor (0 , offRampJunction) { seg =>
-                    junc(seg).jump()
+                // drive until off-ramp junction - Universal for all vehicles
+                // ALL vehicles (including those planning to exit) are counted at sensor1 and sensor2
+                cfor (0, offRampJunction) { seg =>
+                    if junc(seg).toString.contains("sensor") then
+                        junc(seg).jump()  // Count at sensors (sensor1, sensor2)
                     route.path(laneID).seg(seg).move()
                 }
 
-                // at junction 2, decide whether to take off-ramp
+                // at junction 2 (offR_merge), decide whether to take off-ramp
                 if useOffRamp then
+                    // ═══ OFFRAMP EXIT: Count only vehicles exiting to offramp ═══
+                    junc(offRampJunction).jump()  // Count at offR_merge (only offramp users)
                     route.path(laneID).removeFromAlist(this)   // take offramp, leave highway
                     driveRamp(ramps(2)) // offramp
                 else
-
-
-                    // A force merge of vehicle to lanes 0-3 if currently on lane 4.
-                    // because lane 4 is no longer available after the offramp.
-                    // continue on highway but you can't be on lane 4 anymore.
-                    //if the lane_id = 4 then, those vehicles need
-                    // to change lane to ID= 0-3 (Mandatory lane change) for only those vehicles @ lane4
-                    // code change here!!!!!
-                    //Animation/ need to not draw that particular segment.
                     val segIdx = offRampJunction
                     if laneID == 4 && segIdx == offRampJunction then
-                        laneID = 3 // force merge to lane 3; simple implementation
 
-                           // segment index where the offramp is located
-                        //val availLane = 0 to 3         // available lanes after the offramp
-                        //val newLane = route.forceMerge(laneID, availLane, this, segIdx)    // force merge to lanes 0-3
-                        //laneID = newLane  // update laneID after forced merge
+                        laneID = 3
                     end if
-                    junc(offRampJunction).jump() // take count as normal (this becomes 4 lane counts)
+                    // NO jump() here - mainline vehicles skip offR_merge counting
                     driveHighway() // continue on highway driving.
                 end if
             // ------------------ handle on-ramp entry vehicles -------------------
             else
                 val onRamp = ramps(subtype - 5) // subtype 5,6 = onRamp1, onRamp2
-
-                 //===== OLD code
-                 laneID = 4 // FORCED lane for ramp vehicles; all onramp vehicles enter lane 4
+                laneID = 4 // Physical entry lane (rightmost)
 
                 driveRamp(onRamp)
-                driveHighway()    // then drive the highway
+                driveHighway()
+        } // then drive the highway
         end act
 
         private def driveHighway(): Unit =
@@ -207,48 +255,33 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 
             val joinSeg = if subtype <= 4 then offRampJunction else pos(subtype - 5)       // offrampJunc for highway vehicles
 
-
-            // for onramp vehicles, jump to joinSeg first before adding to alist
-//            if subtype > 4 then
-//                val carAhead = route.path(laneID).seg(joinSeg).getLast
-//                route.path(laneID).addToAlist(this, carAhead)
-//                junc(joinSeg).jump()
-//            end if
-
             if subtype > 4 then
+                // ═══ ONRAMP MERGE POINT LOGIC ═══
+                // Vehicle has just exited ramp and needs to merge into mainline
                 val carAhead = route.path(laneID).seg(joinSeg).getLast
                 route.path(laneID).addToAlist(this, carAhead)
+                if junc(joinSeg).toString.contains("onR") then junc(joinSeg).jump()
 
-                // ─── Reset t_disp to ML coordinate system ───
-                t_disp = route.toCumulative(joinSeg, 0.0)
-                disp = 0.0
-                segId = joinSeg
-                // ─────────────────────────────────────────────
-
-                junc(joinSeg).jump()
+                // Now onramp vehicle joined the lane already.
             end if
 
-            cfor (joinSeg , highway_length) { seg =>
 
-////------------ lane change at segment boundaries ---
-//            if clock - lastLaneChange >= 20.0 then
-//                val carAhead = getCarAhead(this)
-//                if carAhead != null && carAhead.velocity < 0.9 * vmax then
-//                    val target =
-//                        if laneID == 0 then 1
-//                        else if laneID == numLanes - 1 then numLanes - 2
-//                        else if laneChangeRV.igen == 1 then laneID + 1
-//                        else laneID - 1
-//
-//                    val currentLane = laneID
-//                    route.changeLane(currentLane, target, this, seg)
-//
-//                    lastLaneChange = clock
-//                end if
-//            end if
-////---------------END lane change at segment boundaries ---
+            cfor(joinSeg, highway_length) { seg =>
+
+                println(s"About to drive highway for ${this.displayLabel} of subtype $subtype")
+                // PEMS-guided lane redistribution (ML vehicles only)
+
+                if subtype <= 4 then
+                    redistributionSegs.get(seg) match
+                        case Some(pemsIdx) =>
+                            val target = targetLaneFromPems(laneID, pemsIdx, curRow)
+                            if target != laneID && route.changeLane(laneID, target, this, seg) then
+                                laneID = target
+                        case None =>
+                end if
+
                 route.path(laneID).seg(seg).move()
-                junc(seg + 1).jump()
+                if junc(seg + 1).name.startsWith("sensor") then junc(seg + 1).jump()
             }
 
             route.path(laneID).removeFromAlist(this)
@@ -275,13 +308,79 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
                 case s: Sink => s.leave()
                 case _       =>
         end driveRamp
+
     end Car
 
-    // Remove duplicate sinks/ramps block at file end
+//    // Remove duplicate sinks/ramps block at file end
+//    override def fini(rep: Int): Unit =
+//        Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
+//
+//        // Sensor names for clear output
+//        val sensorNames = Array(
+//            "PEMS 531 (Entry)",
+//            "PEMS 532 (Second)",
+//            "PEMS 834 (After offramp)",
+//            "PEMS 833 (After onramp1)",
+//            "PEMS 929 (After onramp2)"
+//        )
+//
+//        println("\n" + "=" * 80)
+//        println("MAINLINE VALIDATION: Comparing Simulation vs PEMS Ground Truth")
+//        println("=" * 80)
+//
+//        // Loop over each mainline sensor
+//        for i <- 0 until 5 do
+//            val simMatrix = junc(i).getCountMatrix // Simulation counts at junction i
+//            val pemsMatrix = config.getPemsCountMatrix(i) // PEMS ground truth for sensor i
+//            //val bootstrappedMatrix = config.getBootstrappedMainlineMatrix(i)
+//
+//
+//            println(s"\n--- Sensor $i: junc($i) vs ${sensorNames(i)} ---")
+//
+//            // Loop over each time row
+//            for row <- 0 until simMatrix.dim do
+//                val simRow = simMatrix(row) // Simulation: [lane1, lane2, lane3, lane4, lane5]
+//                val pemsRow = pemsMatrix(row) // PEMS:       [lane1, lane2, lane3, lane4, lane5]
+//                //val bootstrappedRow = bootstrappedMatrix(row)
+//
+//                val totSimRow = simMatrix(row).sum // Simulation: [lane1, lane2, lane3, lane4, lane5]
+//                val totPemsRow = pemsMatrix(row).sum // PEMS:       [lane1, lane2, lane3, lane4, lane5]
+//                //val totBootsRow = bootstrappedMatrix(row).sum // Bootstrapped:       [lane1, lane2, lane3, lane4, lane5]
+//
+//
+//                // What we are comparing
+//                println(s"  Row $row:")
+//                println(s"    SIM  counts: ${simRow.toString}")
+//                println(s"    PEMS counts: ${pemsRow.toString}")
+//                //println(s"    BOOT counts: ${bootstrappedMatrix.toString}")
+//
+//                // Compute fit statistics
+//                val diag = diagnose(pemsRow, simRow)
+//                val diag1 = diagnose(VectorD(totPemsRow), VectorD(totSimRow))
+//                val fit = FitM.fitMap(diag)
+//                //println(s"fit $fit ")
+//                val fit1 = FitM.fitMap(diag1)
+//                val rSq = fit("rSq")
+//                val rmse = fit("rmse")
+//                val smape = fit("smape")
+//                val mae = fit("mae")
+//                val sse = fit("sse")
+//                val sst = fit("sst")
+//
+//
+//                // Total counts fit
+//                //val smape_total = fit1("smape")
+//                //val rsme_total = fit1("rmse")
+//                //println(s"  Fit Statistics:  $diag")
+//                println(s" R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae, SSE = $sse, SST = $sst")
+//            end for
+//        end for
+//        super.fini(rep)
+//    end fini
+
     override def fini(rep: Int): Unit =
         Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
 
-        // Sensor names for clear output
         val sensorNames = Array(
             "PEMS 531 (Entry)",
             "PEMS 532 (Second)",
@@ -294,16 +393,14 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
         println("MAINLINE VALIDATION: Comparing Simulation vs PEMS Ground Truth")
         println("=" * 80)
 
-        // Loop over each mainline sensor
-        for i <- 0 until 5 do
-            val simMatrix = junc(i).getCountMatrix // Simulation counts at junction i
-            val pemsMatrix = config.getPemsCountMatrix(i) // PEMS ground truth for sensor i
-            //val bootstrappedMatrix = config.getBootstrappedMainlineMatrix(i)
+        // ═══ FIXED: Use sensorJuncIdx to map PEMS index to junction index ═══
+        for pemsIdx <- 0 until 5 do
+            val jIdx = pemsToJunc(pemsIdx)
+            val simMatrix = junc(jIdx).getCountMatrix
+            val pemsMatrix = config.getPemsCountMatrix(pemsIdx)
 
+            println(s"\n--- PEMS $pemsIdx: ${junc(jIdx).name} vs ${sensorNames(pemsIdx)} ---")
 
-            println(s"\n--- Sensor $i: junc($i) vs ${sensorNames(i)} ---")
-
-            // Loop over each time row
             for row <- 0 until simMatrix.dim do
                 val simRow = simMatrix(row) // Simulation: [lane1, lane2, lane3, lane4, lane5]
                 val pemsRow = pemsMatrix(row) // PEMS:       [lane1, lane2, lane3, lane4, lane5]
@@ -343,7 +440,6 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
         end for
         super.fini(rep)
     end fini
-
     ////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Run the simulation */
     simulate()

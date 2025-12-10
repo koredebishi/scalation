@@ -197,7 +197,7 @@ class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating
 
     // Use coordinates from aniCoords for junctions
     for i <- 0 until numJunc do
-        junc(i) = Junction(s"junc-$i", xy = aniCoords(i + 1), nt = numJunc)
+        junc(i) = Junction(s"junc-$i", xy = aniCoords(i + 1), nt = numJunc, nl = numLane)
     end for
 
     val route = Route("route", numLane, junc, entry, exit, motion)

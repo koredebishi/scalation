@@ -17,7 +17,7 @@ class TrafficConfig(anchorSensorId: String ="1-404531ML" , rowTime: Double, stre
 
 
     val t1: Int = 0 // target 6am
-    val t2: Int = 2 // target 6pm
+    val t2: Int = 1// target 6pm
 
 
     private val rowOffset = t1
@@ -90,30 +90,15 @@ class TrafficConfig(anchorSensorId: String ="1-404531ML" , rowTime: Double, stre
     // Extract mainline lane flows: shape (rows x 5)   // is this per row or column?????
     private val mainlineLaneTotalsPerRow: MatrixD = anchorData(?, laneIdx)      // vectorized column extraction for each lanes (5 lanes)
 
-     //Per-lane mu series (carry-forward for zero counts): shape (5 x rows)
-    //this mu value feeds into VSource to determine inter-arrival times per lane for th
     private val muMainlineLanes: MatrixD = new MatrixD(5, anchorData.dim)
-    cfor(0, 5) { lane =>             // for each lane
-        var lastValidMu = rowTime / 1.0                // initial mu value
-        cfor(0, anchorData.dim) { row =>              // for each row
-            val count = mainlineLaneTotalsPerRow(row, lane)        // get the count for that lane at that row
-            if count > 0.0 then                                // if count is valid
-                lastValidMu = rowTime / count                   // update last valid mu
-            muMainlineLanes(lane, row) = lastValidMu            // set mu value for that lane at that row
+    cfor(0, 5) { lane =>
+        cfor(0, anchorData.dim) { row =>
+            val count = mainlineLaneTotalsPerRow(row, lane)
+            muMainlineLanes(lane, row) = 
+                if count > 0.0 then rowTime / count
+                else Double.MaxValue  // ← No vehicles this interval (infinite wait)
         }
     }
-//    // Per-lane mu series (no carry-forward into zero rows): shape (5 x rows)
-//    private val muMainlineLanes: MatrixD = new MatrixD(5, anchorData.dim)
-//    cfor(0, 5) { lane => // for each lane
-//        cfor(0, anchorData.dim) { row => // for each row
-//            val count = mainlineLaneTotalsPerRow(row, lane)
-//            muMainlineLanes(lane, row) =
-//                if count > 0.0 then rowTime / count
-//                else 0.0 // no arrivals when PEMS reports zero
-//        }
-//    }
-
-    //println(s"muMainlineLanes: $muMainlineLanes")        // optional: comment out noisy debug
 
 
     println(s"muMainlineLanes: $muMainlineLanes")          // print the muMainlineLanes matrix for debugging
@@ -138,26 +123,26 @@ class TrafficConfig(anchorSensorId: String ="1-404531ML" , rowTime: Double, stre
     }
 
     // Per-ramp mu series (carry-forward for zero counts): shape (2 x rows)
+    // private val muRamps: MatrixD = new MatrixD(2, anchorData.dim)
+    // cfor(0, 2) { ramp =>
+    //     var lastValidMu = rowTime / 1.0
+    //     cfor(0, anchorData.dim) { row =>
+    //         val count = onRampTotalsPerRow(ramp, row)
+    //         if count > 0.0 then
+    //             lastValidMu = rowTime / count
+    //         muRamps(ramp, row) = lastValidMu
+    //     }
+    // }
     private val muRamps: MatrixD = new MatrixD(2, anchorData.dim)
     cfor(0, 2) { ramp =>
-        var lastValidMu = rowTime / 1.0
         cfor(0, anchorData.dim) { row =>
             val count = onRampTotalsPerRow(ramp, row)
-            if count > 0.0 then
-                lastValidMu = rowTime / count
-            muRamps(ramp, row) = lastValidMu
+            muRamps(ramp, row) = 
+                if count > 0.0 then rowTime / count
+                else Double.MaxValue
         }
     }
-//    // Per-ramp mu series (no carry-forward into zero rows): shape (2 x rows)
-//    private val muRamps: MatrixD = new MatrixD(2, anchorData.dim)
-//    cfor(0, 2) { ramp =>
-//        cfor(0, anchorData.dim) { row =>
-//            val count = onRampTotalsPerRow(ramp, row)
-//            muRamps(ramp, row) =
-//                if count > 0.0 then rowTime / count
-//                else 0.0
-//        }
-//    }
+
 
 // Per-ramp totals: sum each ramp row (vectorized)
     private val onRampTotals: Array[Int] =
@@ -203,6 +188,34 @@ class TrafficConfig(anchorSensorId: String ="1-404531ML" , rowTime: Double, stre
         exitFractionRaw(row) = if mainlineTotal == 0.0 then 0.0 else offrampFlow / mainlineTotal
     }
 
+    /** Compute lane spread probabilities for a given PEMS sensor across all time rows
+     *  Returns a matrix where:
+     *    - Rows represent lanes (0-4)
+     *    - Columns represent time periods (0 to anchorData.dim-1)
+     *    - Values are probabilities (lane_count / total_count)
+     *  @param sensorIdx  PEMS sensor index (0-4 for sensors 1-5)
+     *  @return           5 x nt matrix of lane probabilities
+     */
+    def laneSpreadProb(sensorIdx: Int, row: Int): MatrixD =
+        val laneProbs: MatrixD = new MatrixD(5, anchorData.dim)
+
+        cfor(0, anchorData.dim) { row =>
+            val laneCounts = getPemsCountMatrix(sensorIdx)(row)  // VectorD of 5 lane counts
+            val totalCount = laneCounts.sum
+
+            if totalCount > 0.0 then
+                cfor(0, 5) { lane =>
+                    laneProbs(lane, row) = laneCounts(lane) / totalCount
+                }
+            else
+                // Fallback: uniform distribution if no data
+                cfor(0, 5) { lane =>
+                    laneProbs(lane, row) = 0.2
+                }
+        }
+        laneProbs
+    end laneSpreadProb
+
     /**
      * Use RoadCood to load all GPS coordinates and convert them to screen coordinates
      * Returns:
@@ -220,15 +233,30 @@ class TrafficConfig(anchorSensorId: String ="1-404531ML" , rowTime: Double, stre
         // Vectorized mapping: zip keys with screenCoords and convert to Map
         val coordMap = keys.zip(screenCoords).toMap
 
-        val mainline = Array.ofDim[(Double, Double)](6)
-        mainline(0) = coordMap("sensor1")
-        mainline(1) = coordMap("sensor2")
-        mainline(2) = coordMap("sensor3")
-        mainline(3) = coordMap("sensor4")
-        mainline(4) = coordMap("sensor5")
-        mainline(5) = coordMap("sensor6")
-        
-        
+        val mainline = Array.ofDim[(Double, Double)](coordMap.size - 3) // 8 mainline points
+        mainline(0) = coordMap("sensor1")     // take count from sensor1 point to compare with PEMS sensor1
+        mainline(1) = coordMap("sensor2")     // take count from sensor2 point to compare with PEMS sensor2
+        mainline(2) = coordMap("offR_merge")  // Vehicles that remains on the mainline after offramp  // compare with pems sensor3
+        mainline(3) = coordMap("sensor3")  // Entry point of onramp1 vehicles. No comparison
+        mainline(4) = coordMap("onR_merge1")     // take count from sensor3 point to compare with PEMS sensor4
+        mainline(5) = coordMap("sensor4")  // Entry point of onramp2 vehicles. No comparison
+        mainline(6) = coordMap("onR_merge2")     // take count from sensor4 point to compare with PEMS sensor5
+        mainline(7) = coordMap("sensor5")     // take count from sensor5 point to compare with PEMS sensor5
+
+
+        //sensor1---------sensor2-------sensor3-------sensor4-------sensor5      // Real pems road location
+        //                          |         |         |
+        //                    offR_merge  onR_merge1   onR_merge2
+        //Our approach:
+        //senso1-------sensor2---offR_merge---onR_merge1---sensor3---onR_merge2---sensor4---sensor5
+        // sensor1 point: @ 0
+        // sensor2 point: @ 1
+        // offR_marge point: same @ 2
+        // onR_merge1 point: now @ 3
+        // sensor3 point: now @4
+        // onR_merge2 point: now @ 5
+        // sensor4 point: now @6
+        // sensor5 point: now @7
 
         val ramps = Array.ofDim[(Double, Double)](3)
         ramps(0) = coordMap("onramp1")
@@ -288,13 +316,28 @@ class TrafficConfig(anchorSensorId: String ="1-404531ML" , rowTime: Double, stre
 
 
 
+
+    //New code
+
+    /** Get lane distribution as VectorD for a PEMS sensor at a given row.
+     *
+     * @param pemsIdx the PEMS sensor index (0..4)
+     * @param row     the time row
+     * @return VectorD of 5 lane fractions summing to ~1.0
+     */
+    def getLaneDistribution(pemsIdx: Int, row: Int): VectorD =
+        val counts = getPemsCountMatrix(pemsIdx)(row)
+        val total = counts.sum
+        if total > 0 then counts / total else VectorD.fill(5)(0.2)
+    end getLaneDistribution
+
 end TrafficConfig
 
 
 
 @main def TrafficConfigTest(): Unit =
 
-    val simResult = "data/Mainline_VDS_Redwood_Creek_US101-N/result2.csv"
+    val simResult = "data/Mainline_VDS_Redwood_Creek_US101-N/result3.csv"
     val simResult_slice = MatrixD.load(simResult, fullPath = true)
 
 
@@ -391,7 +434,8 @@ end TrafficConfig
 //    println(s"the result sheet5 is $sens5_slice")
 //    println(s"-----------------------------------")
 
-
 end TrafficConfigTest
 
-// One source per lane. Used in VSource to select lane based on discrete distribution.
+
+//Sensor1      Sensor2      Offramp_merge        Sensor3      Onramp1_merge        Sensor4     onramp2_merge        Sensor5
+// |---------------|---------------|----------------|---------------|----------------|---------------|----------------|

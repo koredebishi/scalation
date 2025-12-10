@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -27,10 +26,12 @@ import scalation.scala2d.Colors.*
  *  @param name   the name of the junction
  *  @param jTime  the jump-time through the junction
  *  @param at     the location of the junction (x, y, w, h)
+ *  @param nt     number of time intervals
+ *  @param nl     number of lanes
  */
-class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int)
+class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int, nl: Int)
     extends Component
-        with Recorder(nt):
+        with Recorder(nt, nl):
 
     initComponent(name, at)
 
@@ -39,9 +40,14 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int)
 
     private var onJunction = 0
 
-    // Overloaded constructor (NO DEFAULT VALUES)
-    def this(name: String, jTime: Variate = Sharp(1.0), xy: (Double, Double), nt: Int) =
-        this(name, jTime, Array(xy._1, xy._2, 20.0, 20.0), nt)
+    // Overloaded constructor with (Double, Double) tuple
+    def this(name: String, jTime: Variate, xy: (Double, Double), nt: Int, nl: Int) =
+        this(name, jTime, Array(xy._1, xy._2, 20.0, 20.0), nt, nl)
+    end this
+
+    // Convenience constructor without jTime
+    def this(name: String, xy: (Double, Double), nt: Int, nl: Int) =
+        this(name, Sharp(1.0), Array(xy._1, xy._2, 20.0, 20.0), nt, nl)
     end this
 
     override def display(): Unit =
@@ -75,14 +81,18 @@ end Junction
 
 
 object Junction:
-    def apply(name: String, jTime: Variate = Sharp(1.0), xy: (Double, Double), nt: Int): Junction =
-        new Junction(name, jTime, xy, nt)
+    def apply(name: String, jTime: Variate, xy: (Double, Double), nt: Int, nl: Int): Junction =
+        new Junction(name, jTime, xy, nt, nl)
     end apply
 
-    def group(jTime: Variate, xy: (Int, Int),nt:Int,
+    def apply(name: String, xy: (Double, Double), nt: Int, nl: Int): Junction =
+        new Junction(name, Sharp(1.0), xy, nt, nl)
+    end apply
+
+    def group(jTime: Variate, xy: (Int, Int), nt: Int, nl: Int,
               jnt: (String, (Int, Int))*): List[Junction] =
         val junctionGroup = new VEC[Junction]()
-        for j <- jnt do junctionGroup += Junction(j._1, jTime, (xy._1 + j._2._1, xy._2 + j._2._2), nt)
+        for j <- jnt do junctionGroup += Junction(j._1, jTime, (xy._1 + j._2._1, xy._2 + j._2._2), nt, nl)
         junctionGroup.toList
     end group
 end Junction

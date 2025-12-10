@@ -21,7 +21,7 @@ import scalation.scala2d.Ellipse
 import scalation.scala2d.Colors.*
 
 //::::::::::::::::::for my model::::::::::::::::::::::::::::
-import scalation.simulation.process.example_1.CalRoute101
+import scalation.simulation.process.example_1.CalRoute101_2
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -41,15 +41,6 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                esubtype: Int, units: Int,
               iArrivalTime: Variate, loc: Array [Double])
       extends Source (name, director, null, esubtype, units, iArrivalTime, loc):
-
-/*
-      extends SimActor (name, director)
-         with Component
-         with Recorder (()):
-*/
-//    initStats (name)
-//    at = loc
-//    println(s"${Console.RED} initializing $this again inside the VSource: ${stringOf (at)} ${Console.RESET}")
 
     private val debug = debugf ("VSource", false)                             // debug function
 
@@ -132,8 +123,8 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                 actor.schedule(0.0)
                 //debug("act", s"after schedule actor $i")
 
-                if director.isInstanceOf[CalRoute101] then
-                    val rowManager = director.asInstanceOf[CalRoute101]
+                if director.isInstanceOf[CalRoute101_2] then
+                    val rowManager = director.asInstanceOf[CalRoute101_2]
                     rowManager.nextRow(director.clock) // update current row if needed
                     if i < units then
 
@@ -141,17 +132,22 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                         val safeRow = math.min(currentRow, rowManager.config.dim - 1)  // ensure row index is within bounds
                         val mu = rowManager.getMuForSource(this.subtype)(safeRow)      // get mu for the current row
 
+                        println (s"the mu value for this row $safeRow and is $mu")
+                        
                         // Generate inter-arrival time based on distribution type
                         val duration = iArrivalTime match
                             case erlang: Erlang =>
                                 // For Erlang-k: to achieve overall mean = μ, pass μ/k to gen1()
                                 // Example: Erlang-3 with μ=10 → each stage mean=10/3 → overall mean=10
-                                val muPerStage = mu / erlang.k
+                                val muPerStage = mu / erlang.k // 2
+                                iArrivalTime.gen1(muPerStage)
+                            case erlang2S: Erlang2S =>
+                                val muPerStage = (mu - erlang2S.tau) / 2.0 
                                 iArrivalTime.gen1(muPerStage)
                             case _ =>
-                                // Poisson/Exponential: direct mean
+                                // Poisson/Exponential/ Erland2S: direct mean
                                 iArrivalTime.gen1(mu)
-                        
+
                         val ctime = director.clock // clock time
                         tally(duration) // tally duration
 
@@ -160,6 +156,9 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                         //debug("act", s"actor $i yields to director")
                         yieldToDirector() // yield and wait duration time units
                         //debug("act", s"after yield actor $i")
+
+                end if
+
             }
         } // breakable
 

@@ -59,7 +59,7 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
 
     val spacing = (exit.at(0) - entry.at(0)) / (numJunc + 1)    // need this spacing for the junc components
     for i <- 0 until numJunc do
-        junc(i) = Junction(s"jc-$i", xy = (entry.at(0) + spacing * (i + 1), 290), nt = 2)
+        junc(i) = Junction(s"jc-$i", xy = (entry.at(0) + spacing * (i + 1), 290), nt = 2, nl = 1)
     end for
 
     val lane  = Pathway("lane",junc,entry,exit,motion, laneShift = VectorD(0.0, 0.0)) // simple and clean

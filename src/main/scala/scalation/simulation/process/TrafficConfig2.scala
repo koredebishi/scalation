@@ -1,0 +1,438 @@
+package scalation
+package simulation
+package process
+
+
+import scalation.mathstat.*
+import scalation.simulation.process.example_1.Roadcood2
+import scala.util.Using
+import scala.io.Source
+
+
+class TrafficConfig2(anchorSensorId: String ="1-401112ML" , rowTime: Double, stream: Int = 0):
+
+    private[process] val ew = new EasyWriter("recorder", "TrafficConfigText.txt")
+
+    private val loadStart: Long = System.nanoTime()
+
+
+    val t1: Int = 0 // target 6am
+    val t2: Int = 48 // target 6pm
+
+
+    private val rowOffset = t1
+    // Column indices for lane FLOW data (4 lanes):
+    // Col 0: Timestamp, Col 1: Lane1 Flow, Col 2: Lane1 Speed, Col 3: Lane2 Flow, Col 4: Lane2 Speed,
+    // Col 5: Lane3 Flow, Col 6: Lane3 Speed, Col 7: Lane4 Flow, Col 8: Lane4 Speed, Col 9: Total Flow, Col 10: Avg Speed
+    private val laneIdx = VectorI(1, 3, 5, 7) // mainline lane FLOW columns (4 lanes for RoadCood2)
+    private val ramplaneIdx = VectorI(1) // ramp TOTAL FLOW column (single lane ramp, flow at col 1)
+
+
+    // ----------------------------------------------------------------------
+    // Unified Sensor Map: declare once, use everywhere
+    // Matches RoadCood2 layout: sensor1 -> onR_merge1 -> sensor2 -> sensor3 -> onR_merge2 -> sensor4 -> sensor5
+    private val sensorMap: Map[String, String] = Map(
+        // mainline sensors (from RoadCood2 comments)
+        "1-401112ML" -> s"Mainline_VDS_Donald_Doyle/1-401112ML.csv", // sensor1 - Entry point (4 lanes)
+        "2-401104ML" -> s"Mainline_VDS_Donald_Doyle/2-401104ML.csv", // sensor2 (4 lanes)
+        "3-400712ML" -> s"Mainline_VDS_Donald_Doyle/3-400712ML.csv", // sensor3 (4 lanes)
+        "4-400450ML" -> s"Mainline_VDS_Donald_Doyle/4-400450ML.csv", // sensor4 (4 lanes)
+        "5-407463ML" -> s"Mainline_VDS_Donald_Doyle/5-407463ML.csv", // sensor5 (4 lanes)
+        // ramps (from RoadCood2 comments)
+        "1-403157OR" -> s"Ramps_VDS_Donald_Doyle/1-403157OR.csv", // onramp1 at onR_merge1
+        "2-403108OR" -> s"Ramps_VDS_Donald_Doyle/2-403108OR.csv"  // onramp2 at onR_merge2
+    )
+
+    // ----------------------------------------------------------------------
+    // Load all sensor data once as a Map  // A map of all sensors
+    private val allSensorData: Map[String, MatrixD] =
+        sensorMap.view.mapValues(path => MatrixD.load(path, t1, t2)).toMap
+
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Get PEMS count matrix for mainline sensor (rows=time, cols=lanes).
+     * Matches format of junc(i).getCountMatrix for apple-to-apple comparison.
+     *
+     * @param idx sensor index: 0="1-404531ML", 1="2-404532ML", 2="3-401834ML", 3="4-401833ML", 4="5-401929ML"
+     */
+    def getPemsCountMatrix(idx: Int): MatrixD =
+        val mainlineIds = Array("1-401112ML", "2-401104ML", "3-400712ML", "4-400450ML", "5-407463ML")
+        val mainlineData = allSensorData(mainlineIds(idx))
+        val flowMainlineData = mainlineData(?, laneIdx)
+        // row0 : [lane1, lane2, lane3, lane4,lane5]
+        // row1 : [lane1, lane2, lane3,lane4,lane5]
+        // for our full data Matrix Dimention is 48 rows x 5 lanes_flow columns.
+        flowMainlineData   // return the flows from each lanes as a MatrixD : the size of this matrix is rowtimeNumber x lanes,
+    end getPemsCountMatrix
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Get PEMS count matrix for ramp sensor (rows=time, cols=1).
+     * Matches format of ramp_sensors(i).getCountMatrix for apple-to-apple comparison.
+     * @param idx ramp index: 0="1-403157OR" (onramp1), 1="2-403108OR" (onramp2)
+     */
+    def getPemsCountRampMatrix(idx: Int): MatrixD =
+        val rampIds = Array("1-403157OR", "2-403108OR")
+        val rampData = allSensorData(rampIds(idx))
+        val flowRampData = rampData(?, ramplaneIdx)
+        // row0 : [lane1]     //  the total lane flow for ramp @ col 1
+        // row2 : [lane1]
+        flowRampData   // return the flows from ramp as a MatrixD
+    end getPemsCountRampMatrix
+
+
+    // Direct sensor ID usage (no path parsing)
+    private[process] val anchorData: MatrixD = allSensorData(anchorSensorId)      //ID: 1-404531 the sensor that we used in driving this simulation
+
+    // the dimension of the data matrix (number of rows) in ID 1-404531
+    def dim: Int = anchorData.dim
+
+
+    // Extract mainline lane flows: shape (rows x 4)   // 4 lanes for RoadCood2
+    private val mainlineLaneTotalsPerRow: MatrixD = anchorData(?, laneIdx)      // vectorized column extraction for each lanes (4 lanes)
+
+    private val muMainlineLanes: MatrixD = new MatrixD(4, anchorData.dim)
+    cfor(0, 4) { lane =>
+        cfor(0, anchorData.dim) { row =>
+            val count = mainlineLaneTotalsPerRow(row, lane)
+            muMainlineLanes(lane, row) =
+                if count > 0.0 then rowTime / count
+                else Double.MaxValue  // ← No vehicles this interval (infinite wait)
+        }
+    }
+
+
+    println(s"muMainlineLanes: $muMainlineLanes")          // print the muMainlineLanes matrix for debugging
+    // Per-lane totals: sum of all rows for each lane (vectorized column sum)
+    private val mainlineLaneTotals: Array[Int] =
+        (0 until 4).map(lane => mainlineLaneTotalsPerRow(?, lane).sum.toInt).toArray
+
+    println(s"the mainline total is ${mainlineLaneTotals.toList}")    // print the mainlineLaneTotals array for debugging
+
+    // ----------------------------------------------------------------------
+    // Ramps: Same structure as mainline lanes - using MatrixD vectorization
+
+    private val onRampIds = Array("1-403157OR", "2-403108OR")
+    // Note: No offramp in current RoadCood2 layout
+    // private val offrampId = "1-410094FR"
+    // private val offrampData = allSensorData(offrampId)
+
+    // Extract ramp flows: shape (2 x rows) - each row is a ramp, each column is a time window
+    private val onRampTotalsPerRow: MatrixD = new MatrixD(2, anchorData.dim)
+    cfor(0, 2) { ramp =>
+        val rampData = allSensorData(onRampIds(ramp))
+        onRampTotalsPerRow(ramp) = rampData(?, ramplaneIdx(0))  // vectorized column extraction
+    }
+
+    // Per-ramp mu series (carry-forward for zero counts): shape (2 x rows)
+    // private val muRamps: MatrixD = new MatrixD(2, anchorData.dim)
+    // cfor(0, 2) { ramp =>
+    //     var lastValidMu = rowTime / 1.0
+    //     cfor(0, anchorData.dim) { row =>
+    //         val count = onRampTotalsPerRow(ramp, row)
+    //         if count > 0.0 then
+    //             lastValidMu = rowTime / count
+    //         muRamps(ramp, row) = lastValidMu
+    //     }
+    // }
+    private val muRamps: MatrixD = new MatrixD(2, anchorData.dim)
+    cfor(0, 2) { ramp =>
+        cfor(0, anchorData.dim) { row =>
+            val count = onRampTotalsPerRow(ramp, row)
+            muRamps(ramp, row) =
+                if count > 0.0 then rowTime / count
+                else Double.MaxValue
+        }
+    }
+
+
+    // Per-ramp totals: sum each ramp row (vectorized)
+    private val onRampTotals: Array[Int] =
+        (0 until 2).map(ramp => onRampTotalsPerRow(ramp).sum.toInt).toArray
+
+    // ----------------------------------------------------------------------
+    // Totals (for backward compatibility)
+
+    //lazy val sensor1Total: Int = mainlineLaneTotals.sum    // where did we use this?
+    //lazy val onramp1Total: Int = onRampTotals(0)
+    //lazy val onramp2Total: Int = onRampTotals(1)
+    //lazy val offrampTotal: Int = offrampData(?, ramplaneIdx(0)).sum.toInt
+
+    // ----------------------------------------------------------------------
+    // Sources: lanes 0-4, then ramps 5-6
+    //No more nStopArray
+    //val nStopArray: Array[Int] = mainlineLaneTotals ++ onRampTotals    //??? each Vsouce should have it's own nStop value so why is mainlneaneTotals used here?
+
+    // Combine all mu sources into single MatrixD (7 x rows): 5 mainline lanes + 2 ramps
+    // Vectorized vertical concatenation eliminates loops and duplicate storage
+    private val muAllSources: MatrixD = muMainlineLanes ++ muRamps  // (7 x rows)
+
+    // Accessor extracts row on-demand and converts to Array[Double], to be used by the Vssouce counting process: very important
+    def getMuForSource(i: Int): Array[Double] = muAllSources(i).toArray
+
+    def getMainlineLaneTotals: Array[Int] = mainlineLaneTotals  // accessor for mainline lane totals to be extracted by the MultiVSource for each lane Vsouce: Important2
+    def getOnRampTotals: Array[Int] = onRampTotals        // accessor for onramp totals to be extracted by the MultiVSource for each onramp Vsouce: Important3
+
+
+
+
+
+    // ----------------------------------------------------------------------
+    // Exit fraction (offramp / total mainline per row)
+    // NOTE: No offramp in current RoadCood2 layout - exitFractionRaw disabled
+    // /** Raw exit fraction per row (no smoothing) - more responsive to time-varying patterns
+    //  * using raw exit fraction since it is more responsive to time-varying patterns
+    //  * */
+    // val exitFractionRaw = Array.ofDim[Double](anchorData.dim)
+    // cfor (0, anchorData.dim) { row =>
+    //     val mainlineTotal = mainlineLaneTotalsPerRow(row).sum  // vectorized row sum
+    //     val offrampFlow = offrampData(row, ramplaneIdx(0))
+    //     exitFractionRaw(row) = if mainlineTotal == 0.0 then 0.0 else offrampFlow / mainlineTotal
+    // }
+
+    /** Compute lane spread probabilities for a given PEMS sensor across all time rows
+     *  Returns a matrix where:
+     *    - Rows represent lanes (0-4)
+     *    - Columns represent time periods (0 to anchorData.dim-1)
+     *    - Values are probabilities (lane_count / total_count)
+     *  @param sensorIdx  PEMS sensor index (0-4 for sensors 1-5)
+     *  @return           4 x nt matrix of lane probabilities
+     */
+    def laneSpreadProb(sensorIdx: Int, row: Int): MatrixD =
+        val laneProbs: MatrixD = new MatrixD(4, anchorData.dim)
+
+        cfor(0, anchorData.dim) { row =>
+            val laneCounts = getPemsCountMatrix(sensorIdx)(row)  // VectorD of 4 lane counts
+            val totalCount = laneCounts.sum
+
+            if totalCount > 0.0 then
+                cfor(0, 4) { lane =>
+                    laneProbs(lane, row) = laneCounts(lane) / totalCount
+                }
+            else
+                // Fallback: uniform distribution if no data (1/4 = 0.25 for 4 lanes)
+                cfor(0, 4) { lane =>
+                    laneProbs(lane, row) = 0.25
+                }
+        }
+        laneProbs
+    end laneSpreadProb
+
+    /**
+     * Use RoadCood to load all GPS coordinates and convert them to screen coordinates
+     * Returns:
+     *  - mainline: sensor1..sensor5 + merge points
+     *  - ramps: onramp1, onramp2 (no offramp in current layout)
+     */
+    def getRoadCoordinates(dims: (Double, Double)): Map[String, Array[(Double, Double)]] =
+        val allLatLongs = Roadcood2.latlong
+        val coordsArray = allLatLongs.values.toArray
+        val keys = allLatLongs.keys.toArray
+
+        val coordinates = new scalation.Coordinates(dims._1, dims._2, coordsArray)
+        val screenCoords = coordinates.aniCoords
+
+        // Vectorized mapping: zip keys with screenCoords and convert to Map
+        val coordMap = keys.zip(screenCoords).toMap
+
+        // RoadCood2 layout: sensor1 -> onR_merge1 -> sensor2 -> sensor3 -> onR_merge2 -> sensor4 -> sensor5
+        val mainline = Array.ofDim[(Double, Double)](7) // 7 mainline points (5 sensors + 2 merge points)
+        mainline(0) = coordMap("sensor1")     // VDS 401112 - Entry point (4 lanes)
+        mainline(1) = coordMap("onR_merge1")  // Merge point for onramp1 (between sensor1 and sensor2)
+        mainline(2) = coordMap("sensor2")     // VDS 401104 (4 lanes)
+        mainline(3) = coordMap("sensor3")     // VDS 400712 (4 lanes)
+        mainline(4) = coordMap("onR_merge2")  // Merge point for onramp2 (between sensor3 and sensor4)
+        mainline(5) = coordMap("sensor4")     // VDS 400450 (4 lanes)
+        mainline(6) = coordMap("sensor5")     // VDS 407463 (4 lanes)
+
+        // Physical Layout:
+        // sensor1 ──► onR_merge1 ──► sensor2 ──► sensor3 ──► onR_merge2 ──► sensor4 ──► sensor5
+        //                  │                                     │
+        //               onramp1                               onramp2
+
+        val ramps = Array.ofDim[(Double, Double)](2)
+        ramps(0) = coordMap("onramp1")
+        ramps(1) = coordMap("onramp2")
+
+        Map("mainline" -> mainline, "ramps" -> ramps)
+    end getRoadCoordinates
+
+    // Legacy CSV-based junctions method (kept for compatibility)
+    def getJunctions(path: String, w_h: (Double, Double)): Array[(Double, Double)] =
+        Using.resource(Source.fromFile(path)) { src =>
+            val data = src.getLines().toArray
+            val gps = data.map { line =>
+                val Array(lat, long) = line.split(",").map(_.toDouble)
+                (lat, long)
+            }
+            val coords = new scalation.Coordinates(w_h._1, w_h._2, gps)
+            coords.calcAniCoords()
+            coords.aniCoords
+        }
+    end getJunctions
+
+    // Provide coordinate accessors without relying on undefined cached values
+    def getMainlineCoordinates(dims: (Double, Double)): Array[(Double, Double)] =
+        getRoadCoordinates(dims)("mainline")
+
+    def getRampCoordinates(dims: (Double, Double)): Array[(Double, Double)] =
+        val (sx, sy) = (65.0, -70.0)
+        val rawRamps = getRoadCoordinates(dims)("ramps")
+        // Vectorized shift: map each coordinate pair
+        rawRamps.map((x, y) => (x + sx, y + sy))
+    end getRampCoordinates
+
+    def getSensorCoordinates(dims: (Double, Double)): Array[(Double, Double)] =
+        getMainlineCoordinates(dims)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    def getVSourceCenterAndOffsets(dims: (Double, Double)): ((Int, Int), Array[(Int, Int)]) =
+        val main = getMainlineCoordinates(dims)
+        val ramps = getRampCoordinates(dims)
+
+        // Move VSource back a bit (reduced offset from 100 to 50)
+        val centerPos = ((main(0)._1 - 50.0).toInt, (main(0)._2 + 50.0).toInt)
+
+        // NOTE: keep the (dx, dy) shift here per requirement (same as TrafficConfig)
+        val (dx, dy) = (800.0, -350.0)
+
+        // Only 2 onramps in current RoadCood2 layout (no offramp)
+        val offsets = Array(
+            (0, 0),
+            ((ramps(0)._1 + dx).toInt - centerPos._1, (ramps(0)._2 + dy).toInt - centerPos._2),
+            ((ramps(1)._1 + dx).toInt - centerPos._1, (ramps(1)._2 + dy).toInt - centerPos._2)
+        )
+        (centerPos, offsets)
+    end getVSourceCenterAndOffsets
+
+
+
+
+    //New code
+
+    /** Get lane distribution as VectorD for a PEMS sensor at a given row.
+     *
+     * @param pemsIdx the PEMS sensor index (0..4)
+     * @param row     the time row
+     * @return VectorD of 4 lane fractions summing to ~1.0
+     */
+    def getLaneDistribution(pemsIdx: Int, row: Int): VectorD =
+        val counts = getPemsCountMatrix(pemsIdx)(row)
+        val total = counts.sum
+        if total > 0 then counts / total else VectorD.fill(4)(0.25)
+    end getLaneDistribution
+
+end TrafficConfig2
+
+
+
+@main def TrafficConfigTest2(): Unit =
+
+    //val simResult = "data/Mainline_VDS_Donald_Doyle/result_vmax1percent.csv"
+    val simResult = "data/Mainline_VDS_Donald_Doyle/resultE2laneChange.csv"
+    val simResult_slice = MatrixD.load(simResult, fullPath = true)
+
+
+    val result_slice = simResult_slice(1 until simResult_slice.dim)
+
+
+    // Updated to match RoadCood2 sensor IDs
+    val pems1_count = "data/Mainline_VDS_Donald_Doyle/1-401112ML.csv"  // sensor1 - Entry point (4 lanes)
+    val pems2_count = "data/Mainline_VDS_Donald_Doyle/2-401104ML.csv"  // sensor2 (4 lanes)
+    val pems3_count = "data/Mainline_VDS_Donald_Doyle/3-400712ML.csv"  // sensor3 (4 lanes)
+    val pems4_count = "data/Mainline_VDS_Donald_Doyle/4-400450ML.csv"  // sensor4 (4 lanes)
+    val pems5_count = "data/Mainline_VDS_Donald_Doyle/5-407463ML.csv"  // sensor5 (4 lanes)
+    // Column indices for lane FLOW data: Col 1=Lane1, Col 3=Lane2, Col 5=Lane3, Col 7=Lane4
+    val laneIdx = VectorI(1, 3, 5, 7) // mainline lane FLOW columns for pems data (4 lanes)
+
+    val pems1 = MatrixD.load(pems1_count, fullPath = true)
+    val pems2 = MatrixD.load(pems2_count, fullPath = true)
+    val pems3 = MatrixD.load(pems3_count, fullPath = true)
+    val pems4 = MatrixD.load(pems4_count, fullPath = true)
+    val pems5 = MatrixD.load(pems5_count, fullPath = true)
+
+
+    //:SIM counts slicing (4 lanes per sensor)
+    val countSensor1 = VectorI(0, 1, 2, 3) // sensor1 lanes
+    val countSensor2 = VectorI(4, 5, 6, 7) // sensor2 lanes
+    val countSensor3 = VectorI(8, 9, 10, 11) // sensor3 lanes
+    val countSensor4 = VectorI(12, 13, 14, 15) // sensor4 lanes
+    val countSensor5 = VectorI(16, 17, 18, 19) // sensor5 lanes
+
+    val sens1_slice = result_slice(?, countSensor1)
+    val sens2_slice = result_slice(?, countSensor2)
+    val sens3_slice = result_slice(?, countSensor3)
+    val sens4_slice = result_slice(?, countSensor4)
+    val sens5_slice = result_slice(?, countSensor5)
+
+    //:Pems counts slicing
+
+    val pems_slice1 = pems1(?, laneIdx)
+    val pems_slice2 = pems2(?, laneIdx)
+    val pems_slice3 = pems3(?, laneIdx)
+    val pems_slice4 = pems4(?, laneIdx)
+    val pems_slice5 = pems5(?, laneIdx)
+
+
+    val sse1 = (pems_slice1 - sens1_slice).normFSq
+    val sse2 = (pems_slice2 - sens2_slice).normFSq
+    val sse3 = (pems_slice3 - sens3_slice).normFSq
+    val sse4 = (pems_slice4 - sens4_slice).normFSq
+    val sse5 = (pems_slice5 - sens5_slice).normFSq
+
+    val sst1  = (pems_slice1 - pems_slice1.mean).normFSq
+    val sst2  = (pems_slice2 - pems_slice2.mean).normFSq
+    val sst3  = (pems_slice3 - pems_slice3.mean).normFSq
+    val sst4  = (pems_slice4 - pems_slice4.mean).normFSq
+    val sst5  = (pems_slice5 - pems_slice5.mean).normFSq
+
+
+    val r2_1 = 1.0 - sse1 / sst1
+    val r2_2 = 1.0 - sse2 / sst2
+    val r2_3 = 1.0 - sse3 / sst3
+    val r2_4 = 1.0 - sse4 / sst4
+    val r2_5 = 1.0 - sse5 / sst5
+
+    println(s"The R2 value for sensor 1 is $r2_1, sse1 is $sse1, sst1 is $sst1")
+    println(s"The R2 value for sensor 2 is $r2_2, sse2 is $sse2, sst2 is $sst2")
+    println(s"The R2 value for sensor 3 is $r2_3, sse3 is $sse3, sst3 is $sst3")
+    println(s"The R2 value for sensor 4 is $r2_4, sse4 is $sse4, sst4 is $sst4")
+    println(s"The R2 value for sensor 5 is $r2_5, sse5 is $sse5, sst5 is $sst5")
+
+
+//
+//    println(s"the pems1 sheet1 is $pems_slice1")
+//    println(s"-----------------------------------")
+//    println(s"the pems2 sheet1 is $pems_slice2")
+//    println(s"-----------------------------------")
+//    println(s"the pems3 sheet1 is $pems_slice3")
+//    println(s"-----------------------------------")
+//    println(s"the pems4 sheet1 is $pems_slice4")
+//    println(s"-----------------------------------")
+//    println(s"the pems5 sheet1 is $pems_slice5")
+//    println(s"-----------------------------------")
+//
+//
+//
+//    println(s"\n-----------------------------------\n")
+//
+//
+//    println(s"the result sheet1 is $sens1_slice")
+//    println(s"-----------------------------------")
+//    println(s"the result sheet2 is $sens2_slice")
+//    println(s"-----------------------------------")
+//    println(s"the result sheet3 is $sens3_slice")
+//    println(s"-----------------------------------")
+//    println(s"the result sheet4 is $sens4_slice")
+//    println(s"-----------------------------------")
+//    println(s"the result sheet5 is $sens5_slice")
+//    println(s"-----------------------------------")
+
+end TrafficConfigTest2
+
+
+//Sensor1      Sensor2      Offramp_merge        Sensor3      Onramp1_merge        Sensor4     onramp2_merge        Sensor5
+// |---------------|---------------|----------------|---------------|----------------|---------------|----------------|
