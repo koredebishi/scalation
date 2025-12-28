@@ -494,7 +494,7 @@ end TrafficConfigTest2
  */
 @main def plotSensorComparison(): Unit =
     // Uncomment the sensor pair you want to analyze:
-    analyzeSensorComparison(1, 4)  // PEMS Sensor1 vs Sim Sensor1 (default)
+    analyzeSensorComparison(4, 4)  // PEMS Sensor1 vs Sim Sensor1 (default)
     // analyzeSensorComparison(1, 5)  // PEMS Sensor1 vs Sim Sensor5
     // analyzeSensorComparison(5, 5)  // PEMS Sensor5 vs Sim Sensor5
     // analyzeSensorComparison(2, 2)  // PEMS Sensor2 vs Sim Sensor2
