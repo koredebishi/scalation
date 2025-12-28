@@ -6,6 +6,7 @@
  *  @see     LICENSE (MIT style license file).
  *
  *  @note    Model Framework: Abstract Class for Forecasters that utilize Regression
+ *           Extending classes include ARY, ARX, ARX_Quad, ARX_SR, ...
  *
  *  @see `scalation.modeling.Regression`
  */
@@ -19,9 +20,15 @@ import scala.math.max
 import scala.util.control.Breaks.{break, breakable}
 
 import scalation.mathstat._
-import scalation.modeling.{Regression => REGRESSION}
-//import scalation.modeling.{RidgeRegression => REGRESSION}
+
+// Select via import the type of regression:
+// Regular, Ridge (L_2), Lasso (L_1), Bridge (L_q), RidgeBridge (L_2 and L_q)
+
+//import scalation.modeling.{Regression => REGRESSION}
+import scalation.modeling.{RidgeRegression => REGRESSION}     // default
 //import scalation.modeling.{LassoRegression => REGRESSION}
+//import scalation.modeling.{BridgeRegression => REGRESSION}
+//import scalation.modeling.{RidgeBridgeRegression => REGRESSION}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Forecaster_Reg` abstract class provides base methods for use by extending classes
@@ -40,33 +47,40 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
       extends Forecaster (y, hh, tRng, hparam, bakcast)
          with FeatureSelection:
 
-    private   val debug = debugf ("Forecaster_Reg", false)                // debug function
-    private   val flaw  = flawf ("Forecaster_Reg")                        // debug function
-    protected val reg   = new REGRESSION (x, y, fname, hparam)            // delegate training to regression
+    private val debug   = debugf ("Forecaster_Reg", false)                // debug function
+    private val flaw    = flawf ("Forecaster_Reg")                        // flaw function
+
     protected val nneg  = hparam("nneg").toInt == 1                       // 0 => unrestricted, 1 => predictions must be non-negative
+    protected val reg   = new REGRESSION (x, y, fname, hparam ++ REGRESSION.hp)  // delegate training to regression
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the data/input matrix built from lagged y (optionally xe) values.
+    /** Get the data/input matrix built from lagged y (and optionally xe) values.
      */
     override def getX: MatrixD = x
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the feature/variable names.  Overrides definition in `Forecast` trait.
+     */
+    override def getFname: Array [String] = fname
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train/fit an `ARY` model to the times-series data in vector y_.
-     *  Estimate the coefficient vector b for a p-th order Auto-Regressive ARY(p) model.
-     *  Uses OLS Matrix Fatorization to determine the coefficients, i.e., the b (φ) vector.
+    /** Train/fit a `Forecaster_Reg` model to the times-series data y_ = f(x_).
+     *  Estimate the coefficient vector b for a `Forecaster_Reg` model.
+     *  Uses OLS Matrix Fatorization to determine the coefficients, e.g., the b (φ) vector.
      *  @param x_  the data/input matrix (e.g., full x)
      *  @param y_  the training/full response vector (e.g., full y)
      */
     override def train (x_ : MatrixD, y_ : VectorD): Unit =
         debug ("train", s"$modelName, x_.dims = ${x_.dims}, y_.dim = ${y_.dim}")
-        reg.train (x_, y_)                                              // train the regression model
-        b = reg.parameter                                               // coefficients from regression
+        reg.train (x_, y_)                                                // train the regression model
+        b = reg.parameter                                                 // coefficients from regression
+        debug ("train", s"parameter vector b = $b")
     end train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train and test the forecasting model y_ = f(y-past) + e and report its QoF
+    /** Train and test the forecasting model y_ = f(x_) + e and report its QoF
      *  and plot its predictions.  Return the predictions and QoF.
-     *  NOTE: must use `trainNtest_x` when an x matrix is used, such as in `ARY`.
+     *  NOTE: must use `trainNtest_x` when an x matrix is used, such as in `ARX`.
      *  @param x_  the training/full data/input matrix (defaults to full x)
      *  @param y_  the training/full response/output vector (defaults to full y)
      *  @param xx  the testing/full data/input matrix (defaults to full x)
@@ -74,42 +88,40 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      */
     def trainNtest_x (x_ : MatrixD = x, y_ : VectorD = y)
                      (xx: MatrixD = x, yy: VectorD = y): (VectorD, VectorD) =
-        train (x_, y_)                                                  // train the model on training set
-        val (yp, qof) = test (xx, yy)                                   // test the model on testing set
-        println (report (qof))                                          // report on Quality of Fit (QoF)
+        train (x_, y_)                                                    // train the model on training set
+        val (yp, qof) = test (xx, yy)                                     // test the model on testing set
+        println (report (qof))                                            // report on Quality of Fit (QoF)
         (yp, qof)
     end trainNtest_x
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test FORECASTS of a forecasting model y_ = f(lags (y_)) + e
-     *  and RETURN (1) aligned actual values, (2) its forecasts and (3) QoF vector.
+    /** Test FORECASTS of a forecasting model y_ = f(y_) + e and RETURN
+     *  (1) aligned actual values, (2) its forecasts and (3) QoF vector.
      *  Testing may be in-sample (on the training set) or out-of-sample (on the testing set)
-     *  as determined by the parameters passed in.  Note: must call train and forecastAll
-     *  before testF.
+     *  as determined by the parameters passed in.
+     *  Note: must call train and forecastAll before testF.
      *  @param h   the forecasting horizon, number of steps ahead to produce forecasts
      *  @param y_  the testing/full response/output vector
-     */
+     * 
     override def testF (h: Int, y_ : VectorD): (VectorD, VectorD, VectorD) =
         val h_  = h - 1
-        val yy  = y_(h_ until y_.dim)                                   // align the actual values
-        val yfh = yf(?, h)(0 until y_.dim-h_)                           // column h of the forecast matrix
+        val yy  = y_(h_ until y_.dim)                                     // align the actual values
+        val yfh = yf(?, h)(0 until y_.dim-h_)                             // column h of the forecast matrix
         println (s"yy.dim = ${yy.dim}, yfh.dim = ${yfh.dim}")
-//      Forecaster.differ (yy, yfh)                                     // uncomment for debugging
-        assert (yy.dim == yfh.dim)                                      // make sure the vector sizes agree
+//      Forecaster.differ (yy, yfh)                                       // uncomment for debugging
+        assert (yy.dim == yfh.dim)                                        // make sure the vector sizes agree
 
         new Plot (null, yy, yfh, s"testF: yy, yfh vs. t for $modelName @h = $h", lines = true)
-        mod_resetDF (yy.dim)                                            // reset the degrees of freedom
-        (yy, yfh, diagnose (yy, yfh))                                   // return actual, forecasted and QoF vectors
+        mod_resetDF (yy.dim)                                              // reset the degrees of freedom
+        (yy, yfh, diagnose (yy, yfh))                                     // return actual, forecasted and QoF vectors
     end testF
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict a value for y_t using the 1-step ahead forecast.
-     *
-     *      y_t = b_0 + b_1 y_t-1 + b_2 y_t-2 + ... + b_p y_t-p = b dot x_t
-     *
      *  @see `modeling.rectify` define in `Predictor.scala`
      *  @param t   the time point being predicted
-     *  @param y_  the actual values to use in making predictions (ignored)
+     *  @param y_  the actual values to use in making predictions
      */
     override def predict (t: Int, y_ : VectorD): Double =
         val yp = rectify (reg.predict (x(t)), nneg)
@@ -135,14 +147,14 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      *  @param y_  the actual values to use in making predictions
      */
     override def forecast (t: Int, y_ : VectorD = y): VectorD =
-        val yh = new VectorD (hh)                                       // hold forecasts for each horizon
+        val yh = new VectorD (hh)                                         // hold forecasts for each horizon
         for h <- 1 to hh do
-            val xy   = forge (x(t), yf(t), h)                           // pull past and prior forecasted values
-            val pred = rectify (reg.predict (xy), nneg)                 // slide in prior forecasted values
+            val xy   = if h == 1 then x(t) else forge (x(t), yf(t), h)    // pull past and prior forecasted values
+            val pred = rectify (reg.predict (xy), nneg)                   // slide in prior forecasted values
 //          debug ("forecast", s"h = $h, @t = $t, xy = $xy, yp = $pred, y_ = ${y_(t)}")
-            yf(t, h) = pred                                             // record in forecast matrix
-            yh(h-1)  = pred                                             // record forecasts for each horizon
-        yh                                                              // return forecasts for all horizons
+            yf(t, h) = pred                                               // record in forecast matrix
+            yh(h-1)  = pred                                               // record forecasts for each horizon
+        yh                                                                // return forecasts for all horizons
     end forecast
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -156,12 +168,12 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
     override def forecastAt (h: Int, y_ : VectorD = y): VectorD =
         if h < 2 then flaw ("forecastAt", s"horizon h = $h must be at least 2")
 
-        for t <- y_.indices do                                          // make forecasts over all time points for horizon h
+        for t <- y_.indices do                                            // make forecasts over all time points for horizon h
             val xy   = forge (x(t), yf(t), h)
             val pred = rectify (reg.predict (xy), nneg)
-            debug ("forecastAt", s"h = $h, @t = $t, xy = $xy, yp = $pred, y_ = ${y_(t)}")
-            yf(t, h) = pred                                             // record in forecast matrix
-        yf(?, h)                                                        // return the h-step ahead forecast vector
+//          debug ("forecastAt", s"h = $h, @t = $t, xy = $xy, yp = $pred, y_ = ${y_(t)}")
+            yf(t, h) = pred                                               // record in forecast matrix
+        yf(?, h)                                                          // return the h-step ahead forecast vector
     end forecastAt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -169,9 +181,9 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      *  @param size  the size of dataset (full, train, or test)
      */
     override def mod_resetDF (size: Int): Unit =
-        val dfm = max (1, parameter.size - 1)                           // degrees of freedom for model/dataset
-        debug ("mod_resetDF", s"dfm = $dfm, df = ${size-dfm}")
-        resetDF (dfm, size - dfm)
+        val dfr = max (1, parameter.size - 1)                             // degrees of freedom for regression/model
+        debug ("mod_resetDF", s"dfr = $dfr, df = ${size-dfr}")
+        resetDF (dfr, size - dfr)
     end mod_resetDF
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -184,27 +196,67 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      */
     override def summary (x_ : MatrixD = getX, fname_ : Array [String] = fname,
                           b_ : VectorD = b, vifs: VectorD = reg.vif ()): String =
-        super.summary (x_, fname_, b_, vifs)                             // summary from `Fit`
+        super.summary (x_, fname_, b_, vifs)                              // summary from `Fit`
     end summary
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform In-Sample Testing (In-ST), i.e. train and test on the full data set.
+    /** Perform In-Sample Testing, i.e. train and test on the full data set.
      *  @param skip    the number of initial time points to skip (due to insufficient past)
      *  @param showYf  whether to show the forecast matrix
      */
-    override def inSampleTest (skip: Int = 2, showYf: Boolean = false): Unit =
-        banner (s"In-ST Test: $modelName")
-        trainNtest_x ()()                                                   // train on full and test on full
+    override def inSample_Test (skip: Int = 2, showYf: Boolean = false): Unit =
+        banner (s"In-Sample Test: $modelName")
+        trainNtest_x ()()                                                 // train on full and test on full
         forecastAll ()                                                    // forecast over all horizons
         setSkip (skip)                                                    // diagnose: skip the first 'skip' rows
         diagnoseAll (getY, getYf)                                         // compute metrics for all horizons
-//      println (s"Final In-ST Forecast Matrix yf = ${mod.getYf}")
-//      println (s"Final In-ST Forecast Matrix yf = ${mod.getYf.shiftDiag}")
-    end inSampleTest
+        if showYf then
+            println (s"Final In-Sample Forecast Matrix yf = ${getYf}")
+//          println (s"Final In-Sample Forecast Matrix yf = ${getYf.shiftDiag}")
+    end inSample_Test
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform Train-n-Test (TnT) Testing, i.e. train and test with rolling validation.
+     *  @param skip    the number of initial time points to skip (due to insufficient past)
+     *  @param rc      the retraining cycles (how often to retrain the model)
+     *  @param showYf  whether to show the forecast matrix
+     */
+    override def tnT_Test (skip: Int = 0, rc: Int = 2, showYf: Boolean = false): Unit =
+        banner (s"TnT Test: $modelName")
+        trainNtest_x ()()                                                 // initial training updated by `rollValidate`
+        setSkip (skip)                                                    // diagnose: skip the first 'skip' rows
+        rollValidate (rc)                                                 // TnT with Rolling Validation
+        diagnoseAll (getY,getYf, Forecaster.teRng (y.dim))                // only diagnose on the testing set
+        if showYf then
+            println (s"Final TnT Forecast Matrix yf = ${getYf}")
+//          println (s"Final TnT Forecast Matrix yf = ${getYf.shiftDiag}")
+    end tnT_Test
 
 //  F E A T U R E   S E L E C T I O N
 
-    private var theBest = BestStep ()()                                      // record the best model from feature selection
+    // @see givens in `modeling.FeatureSelection`
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a sub-model that is restricted to the given columns of the data matrix.
+     *  Must be implemented for models that support feature selection.
+     *  Otherwise, use @see `NoBuildModel
+     *  @note: Forecasting models should use this method to build there own sub-models.  FIX.
+     *  @param x_cols  the columns that the new model is restricted to
+     *  @param fname2  the variable/feature names for the new model (defaults to null)
+     */
+    def buildModel (x_cols: MatrixD, fname2: Array [String] = null): REGRESSION =
+        reg.buildModel (x_cols, fname2)
+    end buildModel
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the underlying Regression Model to a subtype of `Forecaster_Reg` Forecasting Model.
+     *  @param mod  the model to convert, e.g., the best model after feature selection
+     */
+    def convertReg2Forc (mod: Model_FS = getBest.mod): Forecaster_Reg
+
+    private var theBest = BestStep ()()                                   // record the best model from Feature Selection (FS)
+    private val t_rng   = if fullset_FS then 0 until y.dim                // use full dataset for Feature Selection (FS)
+                          else 0 until Model.trSize (y.dim)               // use training set for Feature Selection (FS)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset the best-step to default
@@ -221,7 +273,7 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      *  Note: for QoF where smaller if better, must switch to '<'.
      *  @param best  new best-step found during feature selection
      *  @param qk    index of Quality of Fit (QoF) to use for comparing quality
-     *               defaults to smapeIC, could try rSqBar could work better
+     *               defaults to smapeC, could try rSqBar could work better
      */
     private def updateBest (best: BestStep) (using qk: Int): Unit =
         if best.qof != null then
@@ -238,14 +290,16 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      *  @param qk    index of Quality of Fit (QoF) to use for comparing quality
      */
     def forwardSel (cols: LSET [Int])(using qk: Int): BestStep =
-        var best = BestStep ()()                                           // best step so far
+        var best = BestStep ()()                                          // best step so far
 
         for j <- x.indices2 if ! (cols contains j) do
-            val cols_j = cols union LSET (j)                        // try adding variable/column x_j
-            val x_cols = x(?, cols_j)                                        // x projected onto cols_j columns
-            val mod_j  = reg.buildModel (x_cols)                             // regress with x_j added
-            mod_j.train (x_cols, y)                                          // train model
-            best = best.better (j, mod_j.test ()._2, mod_j)                  // which is better
+            val cols_j = cols union LSET (j)                              // try adding variable/column x_j
+            val x_cols = x(?, cols_j)                                     // x projected onto cols_j columns
+            val mod_j  = buildModel (x_cols)                              // regress with x_j added
+
+            val (x_tr, y_tr) = (x_cols(t_rng), y(t_rng))                  // get full/training data
+            mod_j.train (x_tr, y_tr)                                      // train model
+            best = best.better (j, mod_j.test (x_tr, y_tr)._2, mod_j)     // which is better
         end for
 
         if best.col == -1 then
@@ -275,24 +329,24 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      *  measures for all steps.
      *  @see `modeling.Fit` for index of QoF measures.
      *  @see `modeling.Predictor` for more information
-     *  @param cross  whether to include the cross/roll-validation QoF measure
+     *  @param cross  indicator to include the cross-validation/validation QoF measure (defaults to "many")
      *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    override def forwardSelAll (cross: Boolean = false)(using qk: Int): (LSET [Int], MatrixD) =
+    override def forwardSelAll (cross: String = "many")(using qk: Int): (LSET [Int], MatrixD) =
         resetBest ()
-        val rSq  = new MatrixD (x.dim2, Fit.qofVectorSize)                   // QoF: R^2, R^2 Bar, sMAPE, R^2 cv
-        val cols = LSET (0)                                                  // start with x_0 in model (e.g., intercept)
-        updateQoF (rSq, 0, cross, reg.select0 (qk))                          // update Qof results for 0-th variable
+        val rSq  = new MatrixD (x.dim2, Fit.qofVectorSize)                // QoF: R^2, R^2 Bar, sMAPE, R^2 cv
+        val cols = LSET (0)                                               // start with x_0 in model (e.g., intercept)
+        updateQoF (rSq, 0, cross, reg.select0 (qk))                       // update Qof results for 0-th variable
 
         banner (s"forwardSelAll: (qk = $qk, l = 0) INITIAL variable (0, ${fname(0)}) => cols = $cols")
 
         breakable {
             for l <- 1 until x.dim2 do
-                val best = forwardSel (cols)                                 // add most predictive variable
-                if best.col == -1 then break ()                              // could not find variable to add
+                val best = forwardSel (cols)                              // add most predictive variable
+                if best.col == -1 then break ()                           // could not find variable to add
                 updateBest (best)
-                cols += best.col                                             // add variable x_j
-                updateQoF (rSq, l, cross, best)                              // update QoF results for l-th variable
+                cols += best.col                                          // add variable x_j
+                updateQoF (rSq, l, cross, best)                           // update QoF results for l-th variable
                 val (jj, jj_qof) = (best.col, best.qof(qk))
                 banner (s"forwardSelAll: (l = $l) ADD variable ($jj, ${fname(jj)}) => cols = $cols @ $jj_qof")
             end for
@@ -312,15 +366,17 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      *                      (default (1) assume intercept x_0 will be in any model)
      *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-     def backwardElim (cols: LSET [Int], first: Int = 1) (using qk: Int): BestStep =
-        var best = BestStep ()()                                             // best step so far
+    def backwardElim (cols: LSET [Int], first: Int = 1) (using qk: Int): BestStep =
+        var best = BestStep ()()                                          // best step so far
 
         for j <- first until x.dim2 if cols contains j do
-            val cols_j = cols diff LSET (j)                                  // try removing variable/column x_j
-            val x_cols = x(?, cols_j)                                        // x projected onto cols_j columns
-            val mod_j  = reg.buildModel (x_cols)                             // regress with x_j added
-            mod_j.train ()                                                   // train model
-            best = best.better (j, mod_j.test ()._2, mod_j)                  // which is better
+            val cols_j = cols diff LSET (j)                               // try removing variable/column x_j
+            val x_cols = x(?, cols_j)                                     // x projected onto cols_j columns
+            val mod_j  = buildModel (x_cols)                              // regress with x_j added
+
+            val (x_tr, y_tr) = (x_cols(t_rng), y(t_rng))                  // get full/training data
+            mod_j.train (x_tr, y_tr)                                      // train model
+            best = best.better (j, mod_j.test (x_tr, y_tr)._2, mod_j)     // which is better
         end for
 
         if best.col == -1 then
@@ -335,40 +391,40 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      *  @see `modeling.Fit` for index of QoF measures.
      *  @see `modeling.Predictor` for more information
      *  @param first  first variable to consider for elimination
-     *  @param cross  whether to include the cross/roll-validation QoF measure
+     *  @param cross  indicator to include the cross-validation/validation QoF measure (defaults to "none")
      *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    override def backwardElimAll (first: Int = 1, cross: Boolean = false)(using qk: Int):
+    override def backwardElimAll (first: Int = 1, cross: String = "none")(using qk: Int):
                                  (LSET [Int], MatrixD) =
         resetBest ()
-        val rSq  = new MatrixD (x.dim2, Fit.qofVectorSize)                   // R^2, R^2 Bar, sMAPE, R^2 cv
-        val cols = LSET.range (0, x.dim2)                                    // start with all x_j in model
-        val rem  = ArrayBuffer [Int] ()                                      // start with no columns removed
+        val rSq  = new MatrixD (x.dim2, Fit.qofVectorSize)                // R^2, R^2 Bar, sMAPE, R^2 cv
+        val cols = LSET.range (0, x.dim2)                                 // start with all x_j in model
+        val rem  = ArrayBuffer [Int] ()                                   // start with no columns removed
 
-        val best0 = reg.fullModel (qk)
-        updateQoF (rSq, 0, cross, best0)                                     // update QoF results for full model
+        val best0 = reg.fullModel (qk)                                    // call reg's fullModel
+        updateQoF (rSq, 0, cross, best0)                                  // update QoF results for full model
         val jj_qof = best0.qof(qk)
 
         banner (s"backwardElimAll: (qk = $qk, l = 0) INITIAL variables (all) => cols = $cols @ $jj_qof")
 
         breakable {
-            for l <- 1 until x.dim2 - 1 do                                   // l indicates number of variables eliminated
-                val best = backwardElim (cols, first)                        // remove least predictive variable
-                if best.col == -1 then break ()                              // could not find variable to remove
+            for l <- 1 until x.dim2 - 1 do                                // l indicates number of variables eliminated
+                val best = backwardElim (cols, first)                     // remove least predictive variable
+                if best.col == -1 then break ()                           // could not find variable to remove
                 updateBest (best)
-                cols -= best.col                                             // remove variable x_j
-                rem  += best.col                                             // keep track of removed columns
-                updateQoF (rSq, l, cross, best)                              // update QoF results
+                cols -= best.col                                          // remove variable x_j
+                rem  += best.col                                          // keep track of removed columns
+                updateQoF (rSq, l, cross, best)                           // update QoF results
                 val (jj, jj_qof) = (best.col, best.qof(qk))
                 banner (s"backwardElimAll: (l = $l) REMOVE variable ($jj, ${fname(jj)}) => cols = $cols @ $jj_qof")
             end for
         } // breakable
 
-        updateQoF (rSq, x.dim2-1, cross, reg.select0 (qk))                   // update Qof results for 0-th variable
-        rem += cols.max                                                      // remove last non-zero column
-        rem += 0                                                             // remove column 0
+        updateQoF (rSq, x.dim2-1, cross, reg.select0 (qk))                // update Qof results for 0-th variable
+        rem += cols.max                                                   // remove last non-zero column
+        rem += 0                                                          // remove column 0
 
-        (LSET.from (rem.reverse), rSq.reverse)                               // reverse the order results
+        (LSET.from (rem.reverse), rSq.reverse)                            // reverse the order results
     end backwardElimAll
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -378,46 +434,46 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
      *  and takes the best of the two actions.  Stops when neither action yields improvement.
      *  @see `modeling.Fit` for index of QoF measures.
      *  @see `modeling.Predictor` for more information
-     *  @param cross  whether to include the cross/roll-validation QoF measure
+     *  @param cross  indicator to include the cross-validation/validation QoF measure (defaults to "none")
      *  @param swap   whether to allow a swap step (swap out a feature for a new feature in one step)
      *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    override def stepwiseSelAll (cross: Boolean = false, swap: Boolean = true)(using qk: Int):
+    override def stepwiseSelAll (cross: String = "none", swap: Boolean = true)(using qk: Int):
                                 (LSET [Int], MatrixD) =
         resetBest ()
-        val rSq    = new MatrixD (x.dim2 - 1, Fit.qofVectorSize)             // QoF: R^2, R^2 Bar, sMAPE, R^2 cv
-        val cols   = LSET (0)                                                // start with x_0 in model
-        var last_q = Fit.extreme (qk)                                        // current best QoF initialized to extreme
+        val rSq    = new MatrixD (x.dim2 - 1, Fit.qofVectorSize)          // QoF: R^2, R^2 Bar, sMAPE, R^2 cv
+        val cols   = LSET (0)                                             // start with x_0 in model
+        var last_q = Fit.extreme (qk)                                     // current best QoF initialized to extreme
         val vars   = ArrayBuffer [Int]()
 
         banner (s"stepwiseSelAll: (qk = $qk, l = 0) INITIAL variable (0, ${fname(0)}) => cols = $cols")
 
         breakable {
             for l <- 1 until x.dim2 - 1 do
-                val bestf = forwardSel (cols)                                // add most predictive variable OR
-                val bestb = backwardElim (cols, 1)                           // remove least predictive variable
+                val bestf = forwardSel (cols)                             // add most predictive variable OR
+                val bestb = backwardElim (cols, 1)                        // remove least predictive variable
                 debug ("stepwiseSelAll", s"bestf = $bestf, bestb = $bestb")
 
-                val slack = 25.0 / l~^2                                      // increase slack to include more features
-                                                                             // slack => likely to ADD features at the beginning
+                val slack = 25.0 / l~^2                                   // increase slack to include more features
+                                                                          // slack => likely to ADD features at the beginning
 
                 if (bestb.col == -1 || (bestf ge bestb.qof(qk) + slack)) &&  // forward as good as backward
                    (bestf.col != -1 && (bestf gt last_q + slack)) then       // a better model has been found
                     updateBest (bestf)
                     vars  += bestf.col
-                    cols  += bestf.col                                       // ADD variable bestf.col
+                    cols  += bestf.col                                    // ADD variable bestf.col
                     last_q = bestf.qof(qk)
-                    updateQoF (rSq, l, cross, bestf)                         // update QoF results
+                    updateQoF (rSq, l, cross, bestf)                      // update QoF results
                     println (s"\nstepwiseSelAll: (l = $l) ADD variable $bestf")
                     val (jj, jj_qof) = (bestf.col, last_q)
                     banner (s"stepwiseSelAll: (l = $l) ADD variable ($jj, ${fname(jj)}) => cols = $cols @ $jj_qof")
 
-                else if bestb.col != -1 && (bestb gt last_q) then            // a better model has been found
+                else if bestb.col != -1 && (bestb gt last_q) then         // a better model has been found
                     updateBest (bestb)
                     vars  += bestb.col
-                    cols  -= bestb.col                                       // REMOVE variable bestb.col
+                    cols  -= bestb.col                                    // REMOVE variable bestb.col
                     last_q = bestb.qof(qk)
-                    updateQoF (rSq, l, cross, bestb)                         // update QoF results
+                    updateQoF (rSq, l, cross, bestb)                      // update QoF results
                     println (s"\nstepwiseSelAll: (l = $l) REMOVE variable $bestb")
                     val (jj, jj_qof) = (bestb.col, last_q)
                     banner (s"stepwiseSelAll: (l = $l) REMOVE variable ($jj, ${fname(jj)}) => cols = $cols @ $jj_qof")
@@ -427,24 +483,23 @@ abstract class Forecaster_Reg (x: MatrixD, y: VectorD, hh: Int, fname: Array [St
                     val (out, in) = (bestb.col, bestf.col)
                     val bestfb = reg.swapVars (cols, out, in, qk)
                     updateBest (bestfb)
-                    if out != -1 && in != -1 && (bestfb gt last_q) then      // a better model has been found
+                    if out != -1 && in != -1 && (bestfb gt last_q) then   // a better model has been found
                         vars  += bestb.col
                         vars  += bestf.col
-                        cols  -= bestb.col                                   // REMOVE variable bestb.col (swap out)
-                        cols  += bestf.col                                   // ADD variable bestf.col (swap in)
+                        cols  -= bestb.col                                // REMOVE variable bestb.col (swap out)
+                        cols  += bestf.col                                // ADD variable bestf.col (swap in)
                         last_q = bestfb.qof(qk)
-                        updateQoF (rSq, l, cross, bestfb)                    // update QoF results
+                        updateQoF (rSq, l, cross, bestfb)                 // update QoF results
                         println (s"\nstepwiseSelAll: (l = $l) SWAP variable $bestb with $bestf")
                     else
                         println (s"\nstepwiseSelAll: (l = $l) last_q = $last_q better ($bestb, $bestf)")
-                        break ()                                             // can't find a better model -> quit
-                    end if
+                        break ()                                          // can't find a better model -> quit
                 end if
 
-                val x_cols = x(?, cols)                                      // x projected onto cols columns
-                val mod_   = reg.buildModel (x_cols)                         // regress on this x
-                mod_.train ()                                                // train model
-                println (mod_.report (mod_.test ()._2))                      // test and report
+                val x_cols = x(?, cols)                                   // x projected onto cols columns
+                val mod_   = buildModel (x_cols)                          // regress on this x
+                mod_.train ()                                             // train model
+                println (mod_.report (mod_.test ()._2))                   // test and report
             end for
         } // breakable
 

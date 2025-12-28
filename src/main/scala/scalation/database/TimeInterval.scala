@@ -15,10 +15,10 @@
 package scalation
 package database
 
-import scala.collection.mutable.{ArrayBuffer => Bag}
+import scalation.TimeNum.{max, min}
+import scalation.database.TimeOfWeek.fromTimeNum
 
-import TimeNum.{min, max}
-import TimeOfWeek.fromTimeNum
+import scala.collection.mutable.ArrayBuffer as Bag
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TimeInterval` companion object provides factory functions for creating
@@ -314,7 +314,7 @@ end timeIntervalTest2
  */
 @main def timeIntervalTest3 (): Unit =
 
-    import TimeInterval.{makeIntervals, showIntervals, multiDay}
+    import TimeInterval.{makeIntervals, multiDay, showIntervals}
 
     banner ("timeIntervalTest3")
 
@@ -370,7 +370,6 @@ end timeIntervalTest2
         for cls <- periods do
             if lab conflict cls then
                 println (s"Found time conflict between lab ${lab.format} and cls ${cls.format}")
-            end if
     end for
 
 end timeIntervalTest3

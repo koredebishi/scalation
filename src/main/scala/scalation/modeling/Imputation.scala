@@ -6,6 +6,9 @@
  *  @see     LICENSE (MIT style license file).
  *
  *  @note    Collection of Simple Imputation Techniques for Missing Values or Outliers
+ *
+ *  Common imputation techniques:  Multiple Imputation of Chained Equations (MICE), Regression Imputation (RI),
+ *  kNN, Decision Trees, Random Forests (missForest), SoftImpute
  */
 
 package scalation
@@ -21,6 +24,7 @@ import scalation.random.Normal
  *      `ImputeForward`     - impute missing values using previous values and slopes
  *      `ImputeBackward`    - impute missing values using subsequent values and slopes
  *      `ImputeMean`        - impute missing values usind the filtered mean
+ *      `ImputeMedian`      - impute missing values usind the filtered median
  *      `ImputeNormal`      - impute missing values using the median of Normal random variates
  *      `ImputeMovingAvg`   - impute missing values using the moving average
  *      `ImputeNormalWin`   - impute missing values using the median of Normal random variates for a window
@@ -294,6 +298,25 @@ object ImputeMean extends Imputation:
     end imputeAt
 
 end ImputeMean
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ImputeMean` object imputes missing values using the filtered median.
+ */
+object ImputeMedian extends Imputation:
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Impute a value for the first missing value in vector x from index i
+     *  using the filtered mean.
+     *  @param x  the vector with missing values
+     *  @param i  the starting index to look for missing values (ignored)
+     */
+    def imputeAt (x: VectorD, i: Int):  Double =
+        val xf = x.filter (_ != missVal)
+        xf.median ()
+    end imputeAt
+
+end ImputeMedian
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

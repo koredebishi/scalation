@@ -11,10 +11,9 @@
 package scalation
 package calculus
 
-import scalation.mathstat._
-
-import BasisFunction.dot
-import DBasisFunction.penalty
+import scalation.calculus.BasisFunction.dot
+import scalation.calculus.DBasisFunction.penalty
+import scalation.mathstat.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DBasisFunction` object provides utility functions related to

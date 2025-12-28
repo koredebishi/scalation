@@ -1,7 +1,7 @@
 
 lazy val scalation = project.in(file("."))
   .settings(
-    scalaVersion  := "3.6.3",
+    scalaVersion  := "3.7.4",
     scalacOptions ++= Seq(
        "-deprecation",         // emit warning and location for usages of deprecated APIs
        "-explain",             // explain errors in more detail

@@ -21,7 +21,6 @@ class MatrixD2 (val dim:  Int,
         v = Array.ofDim [Double] (dim, dim2)
     else if dim != v.length || dim2 != v(0).length then
         flaw ("init", "dimensions are wrong")
-    end if
 
     private val flaw = flawf ("MatrixD2")                          // partial invocation of flaw function
 
@@ -277,7 +276,7 @@ object MatrixD2Example:
 
 end MatrixD2Example
 
-import MatrixD2Example.{x, y}
+import scalation.mathstat.MatrixD2Example.{x, y}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `matrixD2Test` main function tests the `MatrixD2` class.  Compares the performance

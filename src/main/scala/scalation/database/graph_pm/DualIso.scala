@@ -12,8 +12,7 @@ package scalation
 package database
 package graph_pm
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.{Set => SET}
+import scala.collection.mutable.{Map, Set as SET}
 import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
 
@@ -82,7 +81,6 @@ class DualIso (g: Graph, q: Graph)
             if ! φ.isEmpty then
                 matches += φ
                 if matches.size % CHECK == 0 then println ("saltzDualIso: matches so far = " + matches.size)
-            end if
         else if ! φ.isEmpty then
             breakable {
                 for i <- φ (depth) if ! contains (φ, depth, i) do
@@ -198,8 +196,8 @@ end dualIsoTest
  */
 @main def dualIsoTest2 (): Unit =
 
-    import graph_pm.{ExampleGraphD => EX_GRAPH}
-    import MatchAnswers._
+    import MatchAnswers.*
+    import graph_pm.ExampleGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g2
     val q = EX_GRAPH.q2
@@ -227,7 +225,7 @@ end dualIsoTest2
  */
 @main def dualIsoTest3 (): Unit =
 
-    import graph_pm.{ExampleGraphD => EX_GRAPH}
+    import graph_pm.ExampleGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g1
     val q = EX_GRAPH.q1

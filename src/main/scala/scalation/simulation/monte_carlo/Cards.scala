@@ -108,7 +108,7 @@ object Cards:
     def classify (hand: IndexedSeq  [Int]): Int =
         val flush = isFlush (hand)
         val hmap  = handMap (hand)
-        val freq  = hmap.values.toIndexedSeq.sorted ((x, y) => y.compare (x))
+        val freq  = hmap.values.toIndexedSeq.sorted(using (x, y) => y.compare (x))
      
         freq(0) match
         case 4 => 7

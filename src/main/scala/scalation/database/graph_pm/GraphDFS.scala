@@ -13,7 +13,7 @@ package scalation
 package database
 package graph_pm
 
-import scala.collection.mutable.{Stack, Queue}
+import scala.collection.mutable.{Queue, Stack}
 import scala.util.control.Breaks.{break, breakable}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -53,18 +53,24 @@ object Roadcood2:
         (p1._1 + (p2._1 - p1._1) * fraction, p1._2 + (p2._2 - p1._2) * fraction)
 
     // Raw sensor GPS coordinates
+    // Warm-up segment ~600m upstream for speed stabilization (40-50 seconds travel time @ 68mph)
+    // Network span (sensor1→sensor5) ≈ 870m, so warm-up = ~65% of network length
+    // Distance calculation: Δlat ≈ 0.0055° × 111km ≈ 610m
+    private val warm_up_sensor_gps = (37.826729, -121.999645) // ~600m upstream of sensor1 no warm up for now
     private val sensor1_gps = (37.832229, -122.004645)   // VDS 401112
     private val sensor2_gps = (37.833874, -122.007206)   // VDS 401104
     private val sensor3_gps = (37.835529, -122.009979)   // VDS 400712
     private val sensor4_gps = (37.838067, -122.014224)   // VDS 400450
     private val sensor5_gps = (37.839933, -122.017269)   // VDS 407463
 
-    // Calculate merge point coordinates (midpoints between sensors for proper spacing)
-    private val onR_merge1_gps = midpoint(sensor1_gps, sensor2_gps)  // Midpoint between sensor1 and sensor2
-    private val onR_merge2_gps = midpoint(sensor3_gps, sensor4_gps)  // Midpoint between sensor3 and sensor4
+    // Calculate merge point coordinates (75% position for realistic merge dynamics)
+    // 75% gives vehicles ~210m to establish flow before merge, ~70m post-merge recovery before sensor
+    private val onR_merge1_gps = interpolate(sensor1_gps, sensor2_gps, 0.75)  // 75% from sensor1 to sensor2
+    private val onR_merge2_gps = interpolate(sensor3_gps, sensor4_gps, 0.75)  // 75% from sensor3 to sensor4
 
     val latlong = Map(
         // ─── PEMS Mainline Sensors (5 total) ───
+        "warm_up_sensor" -> warm_up_sensor_gps,           // Hypothetical warm-up sensor before sensor1
         "sensor1" -> sensor1_gps,                         // VDS 401112 - Entry point (4 lanes)
         "sensor2" -> sensor2_gps,                         // VDS 401104 (4 lanes)
         "sensor3" -> sensor3_gps,                         // VDS 400712 (4 lanes)

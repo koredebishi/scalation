@@ -11,9 +11,8 @@
 package scalation
 package calculus
 
-import scalation.mathstat._
-
-import Integral.integrate
+import scalation.calculus.Integral.integrate
+import scalation.mathstat.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BasisFunction` object provides utility functions related to
@@ -50,7 +49,7 @@ object BasisFunction:
 
 end BasisFunction
 
-import BasisFunction.dot
+import scalation.calculus.BasisFunction.dot
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BasisFunction` trait provides a common framework for various Basis Functions.

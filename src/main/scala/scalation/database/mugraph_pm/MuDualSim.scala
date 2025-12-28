@@ -12,8 +12,7 @@ package scalation
 package database
 package mugraph_pm
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.{Set => SET}
+import scala.collection.mutable.{Map, Set as SET}
 import scala.util.control.Breaks.{break, breakable}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -53,7 +52,6 @@ class MuDualSim (g: MuGraph, q: MuGraph)
                             φ(u) -= v                                  // remove vertex v from φ(u)
                             if φ(u).isEmpty then break ()              // no match for vertex u => no overall match
                             alter = true
-                        end if
                         // build newφ to contain only those vertices in φ(u_c) which also have a parent in φ(u)
                         newφ ++= φInt
                     end for
@@ -96,7 +94,6 @@ class MuDualSim (g: MuGraph, q: MuGraph)
                             φ(u) -= v                                  // remove vertex v from φ(u)
                             if φ(u).isEmpty then break ()              // no match for vertex u => no overall match
                             alter = true
-                        end if
                         // build newφ to contain only those vertices in φ(u_c) which also have a parent in φ(u)
                         newφ ++= φInt
                     end for
@@ -162,8 +159,8 @@ end muDualSimTest
  */
 @main def muDualSimTest2 (): Unit =
 
-    import mugraph_pm.{ExampleMuGraphD => EX_GRAPH}
-    import MatchAnswers._
+    import MatchAnswers.*
+    import mugraph_pm.ExampleMuGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g2p
     val q = EX_GRAPH.q2p
@@ -187,7 +184,7 @@ end muDualSimTest2
  */
 @main def muDualSimTest3 (): Unit =
 
-    import mugraph_pm.{ExampleMuGraphD => EX_GRAPH}
+    import mugraph_pm.ExampleMuGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g1p
     val q = EX_GRAPH.q1p

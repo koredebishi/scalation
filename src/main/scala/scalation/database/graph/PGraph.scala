@@ -1,3 +1,4 @@
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -14,14 +15,12 @@ package graph
 import java.util.concurrent.ConcurrentLinkedQueue 
 
 //import scala.collection.immutable.{Vector => VEC}
-import scala.collection.mutable.{ArrayBuffer => VEC}
-
-import scala.collection.mutable.Map
-
-import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType.{CreateEdge, CreateNode}
+import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.mathstat.VectorD
-import scalation.scala2d.Colors._
+import scalation.scala2d.Colors.*
+
+import scala.collection.mutable.{Map, ArrayBuffer as VEC}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PGraph` class is used to store property graphs.
@@ -63,9 +62,7 @@ class PGraph (val name: String,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the animation flag (that is private) to done.
      */
-    def setAniDone(): Unit =
-        if animating && dgAni != null then dgAni.setAniDone()
-    end setAniDone
+    def setAniDone () = dgAni.setAniDone ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Update the name maps, vmap and emap, after constructing this property graph.
@@ -246,7 +243,7 @@ object SocialNetwork:
 
 end SocialNetwork
 
-import SocialNetwork._
+import scalation.database.graph.SocialNetwork.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `pGraphTest` main function is used to test the `PGraph` class, by displaying the graph.
@@ -510,3 +507,4 @@ end pGraphTest
     query32.show ()
 
 end pGraphTest2
+

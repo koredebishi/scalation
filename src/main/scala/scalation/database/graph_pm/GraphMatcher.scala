@@ -12,7 +12,7 @@ package scalation
 package database
 package graph_pm
 
-import scala.collection.mutable.{Set => SET}
+import scala.collection.mutable.Set as SET
 import scala.runtime.ScalaRunTime.stringOf
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

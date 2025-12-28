@@ -13,7 +13,7 @@ trait RowTimeLoader:
     // Purpose: Allow different simulations to use different observation windows
     // Example: Traffic model = 15min, Manufacturing = 1hr, Network = 5sec
     // Default: 15 minutes for backward compatibility with existing traffic models
-    def rowTimeSlice: Double = 15 * MINUTE
+    val rowTimeSlice: Double = 15 * MINUTE
     
     // NEW: Calculate current row index from simulation clock
     // Purpose: Convert clock time to data row index using model's time granularity

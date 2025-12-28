@@ -13,10 +13,10 @@
 package scalation
 package calculus
 
+import scalation.mathstat.*
+
 import scala.Double.NaN
 import scala.math.{abs, exp, log, sqrt}
-
-import scalation.mathstat._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Enumerations defining various Basis Functions to be used
@@ -27,7 +27,7 @@ enum RadialType:
          POLYHARMONIC_SPLINE, THIN_PLATE_SPLINE
 end RadialType
 
-import RadialType._
+import scalation.calculus.RadialType.*
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Radial` class provides Radial basis functions.  Such basis functions

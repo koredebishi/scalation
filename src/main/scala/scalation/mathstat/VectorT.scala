@@ -11,15 +11,13 @@
 package scalation
 package mathstat
 
+import scalation.TimeNum.*
+
 import java.util.Arrays.copyOf
-
-import scala.collection.immutable.{IndexedSeq => IIndexedSeq}
-import scala.collection.immutable.Set
-import scala.collection.generic._
-import scala.collection.mutable._
+import scala.collection.generic.*
+import scala.collection.immutable.{Set, IndexedSeq as IIndexedSeq}
+import scala.collection.mutable.*
 import scala.runtime.ScalaRunTime.stringOf
-
-import TimeNum.{_0, _1, _2, _3, _4, _5, _6}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorT` class stores and operates on Numeric Vectors of base type `TimeNum`.
@@ -38,7 +36,6 @@ class VectorT (val dim: Int,
         v = Array.ofDim [TimeNum] (dim)
     else if dim > v.length then
         flaw ("init", s"vector dimension is larger than space: dim = $dim > v.length = $v.length")
-    end if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the length of this vector.
@@ -120,7 +117,6 @@ class VectorT (val dim: Int,
             else
                 b.v(k) = v(i)
                 k += 1
-            end if
         end for
         (a, b)
     end split
@@ -344,7 +340,7 @@ class VectorT (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort the elements in this vector according to ord.lt (ascending order).
      */
-    def sorted: VectorT = { val a = v.sorted (TimeNum.ord); new VectorT (a.size, a) }
+    def sorted: VectorT = { val a = v.sorted (using timeNumOrd); new VectorT (a.size, a) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort the elements in this vector according to cmp (use '_ > _' for descending order.
@@ -651,7 +647,6 @@ class VectorT (val dim: Int,
             iqsort (rk, q + 1, r)                          // recursively sort right partition
         else
             iselsort (rk, p, r)                            // use simple sort when small
-        end if
         rk
     end iqsort
 
@@ -723,7 +718,6 @@ class VectorT (val dim: Int,
             if v(j) < v(k) then j else if v(i) < v(k) then k else i
         else
             if v(j) > v(k) then j else if v(i) > v(k) then k else i
-        end if
     end med3
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

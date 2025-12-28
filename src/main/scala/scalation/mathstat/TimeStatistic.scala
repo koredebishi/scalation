@@ -11,7 +11,7 @@
 package scalation
 package mathstat
 
-import scala.collection.mutable.{ArrayBuffer => VEC}
+import scala.collection.mutable.ArrayBuffer as VEC
 //import scala.collection.mutable.{ListBuffer => VEC}
 import scala.math.abs
 
@@ -179,7 +179,7 @@ end TimeStatistic
 
     banner ("Test sample statistics")
     val stat1 = new Statistic ()
-    for i <- 1 to 1000 do stat1.tally (rv.gen)
+    cfor (0, 1000) { _ => stat1.tally (rv.gen) }
 
     println (Statistic.labels)
     println (stat1)

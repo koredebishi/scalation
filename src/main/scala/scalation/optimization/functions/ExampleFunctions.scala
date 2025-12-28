@@ -29,11 +29,11 @@ object BealeFunction extends BenchmarkFunction:
 
     override def gradFunction (x: VectorD): VectorD =
         VectorD (2 * (1.5 - x(0) + x(0) * x(1)) * (-1 + x(1)) +
-                 2 * (2.25 - x(0) + x(0) * (x(1) ~^ 2)) * (-1 + (x(1) ~^ 2)) +
-                 2 * (2.625 - x(0) + x(0) * (x(1) ~^ 3)) * (-1 + (x(1) ~^ 3)),
-                 2 * (1.5 - x(0) + x(0) * x(1)) * x(0) + 
-                 2 * (2.25 - x(0) + x(0) * (x(1) ~^ 2)) * (2 * x(0) * x(1)) +
-                 2 * (2.625 - x(0) + x(0) * (x(1) ~^ 3)) * (3 * x(0) * (x(1) ~^ 2)))
+            2 * (2.25 - x(0) + x(0) * (x(1) ~^ 2)) * (-1 + (x(1) ~^ 2)) +
+            2 * (2.625 - x(0) + x(0) * (x(1) ~^ 3)) * (-1 + (x(1) ~^ 3)),
+            2 * (1.5 - x(0) + x(0) * x(1)) * x(0) +
+                2 * (2.25 - x(0) + x(0) * (x(1) ~^ 2)) * (2 * x(0) * x(1)) +
+                2 * (2.625 - x(0) + x(0) * (x(1) ~^ 3)) * (3 * x(0) * (x(1) ~^ 2)))
 
 end BealeFunction
 
@@ -51,7 +51,7 @@ object Bohachevsky1Function extends BenchmarkFunction:
 
     override def gradFunction (x: VectorD): VectorD =
         VectorD (2 * x(0) - 0.3 * 3 * Pi * sin(3 * Pi * x(0)),
-                 4 * x(1) - 0.4 * 4 * Pi * sin(4 * Pi * x(1)))
+            4 * x(1) - 0.4 * 4 * Pi * sin(4 * Pi * x(1)))
 
 end Bohachevsky1Function
 
@@ -69,7 +69,7 @@ object Bohachevsky2Function extends BenchmarkFunction:
 
     override def gradFunction(x: VectorD): VectorD =
         VectorD (2 * x(0) + 0.3 * 3 * Pi * sin(3 * Pi * x(0)) * cos(4 * Pi * x(1)),
-                 4 * x(1) - 0.3 * 4 * Pi * cos(3 * Pi * x(0)) * sin(4 * Pi * x(1)))
+            4 * x(1) - 0.3 * 4 * Pi * cos(3 * Pi * x(0)) * sin(4 * Pi * x(1)))
 
 end Bohachevsky2Function
 
@@ -156,8 +156,8 @@ object FreudensteinRothFunction extends BenchmarkFunction:
 
     override def gradFunction (x: VectorD): VectorD =
         VectorD (2 * (x(0) - 13 + x(1) * ((5 - x(1)) * x(1) - 2)) + 2 * (x(0) - 29 + x(1) * ((x(1) + 1) * x(1) - 14)),
-                 2 * x(1) * ((5 - x(1)) * x(1) - 2) + 2 * (x(1) * ((x(1) + 1) * x(1) - 14) +
-                    (x(0) - 13 + x(1) * ((5 - x(1)) * x(1) - 2)) * ((5 - x(1)) * x(1) - 2)))
+            2 * x(1) * ((5 - x(1)) * x(1) - 2) + 2 * (x(1) * ((x(1) + 1) * x(1) - 14) +
+                (x(0) - 13 + x(1) * ((5 - x(1)) * x(1) - 2)) * ((5 - x(1)) * x(1) - 2)))
 
 end FreudensteinRothFunction
 
@@ -170,12 +170,12 @@ object McCormickFunction extends BenchmarkFunction:
 
     val functionMinimum: VectorD = VectorD (-0.54719, -1.54719)
 
-    def objFunction (x: VectorD): Double = 
+    def objFunction (x: VectorD): Double =
         sin(x(0) + x(1)) + (x(0) - x(1)) ~^ 2 - 1.5 * x(0) + 2.5 * x(1) + 1
 
     override def gradFunction (x: VectorD): VectorD =
         VectorD (-1.5 + 2 * x(0) - 2 * x(1) + cos(x(0) + x(1)),
-                  2.5 - 2 * x(0) + 2 * x(1) + cos(x(0) + x(1)))
+            2.5 - 2 * x(0) + 2 * x(1) + cos(x(0) + x(1)))
 
 end McCormickFunction
 
@@ -222,6 +222,8 @@ object ReciprocalFunction extends BenchmarkFunction:
 
     val functionMinimum: VectorD = VectorD (1.06035, 4)
 
+    val bound: (VectorD, VectorD) = (VectorD (0.2, 0.2), VectorD (10.0, 10.0))
+
     def objFunction (x: VectorD): Double =
         1 / x(0) + x(0) ~^ 4 + (x(0) - 3.0) ~^ 2 + (x(1) - 4.0) ~^ 2 + 1.0
 
@@ -244,7 +246,7 @@ object RosenbrockFunction extends BenchmarkFunction:
 
     override def gradFunction(x: VectorD): VectorD =
         VectorD (-2.0 * (1 - x(0)) - 400.0 * x(0) * (x(1) - x(0) ~^ 2),
-                 200.0 * (x(1) - x(0) ~^ 2))
+            200.0 * (x(1) - x(0) ~^ 2))
 
 end RosenbrockFunction
 

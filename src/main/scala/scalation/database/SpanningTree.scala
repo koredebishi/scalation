@@ -13,9 +13,9 @@
 package scalation
 package database
 
-import scala.collection.mutable.{Map, Queue}
-
 import scalation.mathstat.MatrixD
+
+import scala.collection.mutable.{Map, Queue}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SpanningTree` class is used to build spanning trees from graphs.
@@ -78,7 +78,6 @@ class SpanningTree (g: MatrixD):
             out(j) = false                                    // j is no longer outsise the tree
             qu.enqueue (j)
             return j
-        end if
         -1
     end findNext
 

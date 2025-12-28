@@ -62,7 +62,6 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int, nl: I
         val ctime = director.clock
         tally(duration)
         accum(onJunction)
-        //println(s"Taking record at the Junction:$name")
         record(actor, ctime)
         onJunction += 1
         director.log.trace(this, s"jump for $duration", actor, director.clock)

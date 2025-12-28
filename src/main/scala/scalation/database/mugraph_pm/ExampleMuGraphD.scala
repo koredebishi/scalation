@@ -12,8 +12,7 @@ package scalation
 package database
 package mugraph_pm
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.{Set => SET}
+import scala.collection.mutable.{Map, Set as SET}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExampleMuGraphD` object contains example query and data multi-digraphs

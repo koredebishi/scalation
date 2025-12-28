@@ -16,9 +16,8 @@
 package scalation
 package calculus
 
-import scalation.mathstat._
-
-import DBasisFunction._
+import scalation.calculus.DBasisFunction.*
+import scalation.mathstat.*
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DB_Spline` class provides B-Spline basis functions with derivatives for
@@ -288,8 +287,8 @@ end dB_SplineTest
  */
 @main def dB_SplineTest2 (): Unit =
 
-    import scalation.random.Normal
     import Fac_LU.inverse
+    import scalation.random.Normal
 
     val normal = Normal ()
     val mM = 4                                                 // maximum order to test

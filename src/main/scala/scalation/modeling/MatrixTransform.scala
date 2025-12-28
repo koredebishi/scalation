@@ -136,7 +136,6 @@ def scale (extremes: (VectorD, VectorD), bounds: (Double, Double) = (0, 1)) (x: 
             x_s(?, j) = (x(?, j) - min_x(j)) * scale + lb        // shift and scale
         else
             x_s(?, j) = x(?, j)                                  // no change
-        end if
     end for
     x_s
 end scale
@@ -160,7 +159,6 @@ def unscale (extremes: (VectorD, VectorD), bounds: (Double, Double) = (0, 1)) (x
             x(?, j) = (x_s(?, j) - lb) / scale + min_x(j)        // scale and shift
         else
             x(?, j) = x_s(?, j)                                  // no change
-        end if
     end for
     x
 end unscale

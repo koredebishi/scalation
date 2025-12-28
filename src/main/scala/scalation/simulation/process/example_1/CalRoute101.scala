@@ -18,7 +18,7 @@ import scalation.mathstat.*
 
 @main def runCalRoute101(): Unit = new CalRoute101()
 
-class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolean = true,
+class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolean = false,
                   aniRatio: Double = 500.0, stream: Int = 0)
     extends Model(name, reps, animating, aniRatio)
         with RowTimeLoader
@@ -37,7 +37,10 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     /** Simulation dynamics and random variables */
     private val motion         = GippsDynamics
     private val numLanes        = 5
-    private val iArrivalRV     = Erlang(15)
+    private val iArrivalRV     = Erlang2S(tau=1.5)
+    private val iArrivalRV_ramp1     = Erlang2S(tau=3.0)
+    private val iArrivalRV_ramp2     = Erlang2S(tau=3.0)
+
     //private val nStop          = config.nStopArray
     private val laneChangeRV       = Bernoulli(0.6)
 
@@ -100,8 +103,8 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     // Build ramp sources (subtypes 5,6) using existing offsets
     private val rampSources: List[VSource] = VSource.group(
         this, () => Car(), centerPos,
-        ("srcRamp1", 5, iArrivalRV, config.getOnRampTotals(0), offsets(1)),
-        ("srcRamp2", 6, iArrivalRV, config.getOnRampTotals(1), offsets(2))
+        ("srcRamp1", 5, iArrivalRV_ramp1, config.getOnRampTotals(0), offsets(1)),
+        ("srcRamp2", 6, iArrivalRV_ramp2, config.getOnRampTotals(1), offsets(2))
     )
 
     // Combine sources: lanes first, then ramps
@@ -133,16 +136,16 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
     // Junction index → PEMS sensor index
     private val pemsToJunc = Array(0, 1, 3, 5, 7)
 
-    // Segment → PEMS index for redistribution
-    private val redistributionSegs = Map(2 -> 2, 4 -> 3, 6 -> 4)
-
-    // Precomputed lane samplers: pemsIdx × row → Discrete
-    private val laneSamplers: Array[Array[Discrete]] = {
-        val arr = Array.ofDim[Discrete](5, nt)
-        for p <- 0 until 5; r <- 0 until nt do
-            arr(p)(r) = Discrete(config.getLaneDistribution(p, r))
-        arr
-    }
+//    // Segment → PEMS index for redistribution
+//    private val redistributionSegs = Map(2 -> 2, 4 -> 3, 6 -> 4)
+//
+//    // Precomputed lane samplers: pemsIdx × row → Discrete
+//    private val laneSamplers: Array[Array[Discrete]] = {
+//        val arr = Array.ofDim[Discrete](5, nt)
+//        for p <- 0 until 5; r <- 0 until nt do
+//            arr(p)(r) = Discrete(config.getLaneDistribution(p, r))
+//        arr
+//    }
 
     /** Sample target lane from PEMS distribution, constrained to ±1 from current.
      *
@@ -158,24 +161,24 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 //        else currentLane
 //    end targetLaneFromPems
 //
-    @inline private def targetLaneFromPems(currentLane: Int, pemsIdx: Int, row: Int): Int =
-        val dist = config.getLaneDistribution(pemsIdx, row)
-        val myTarget = dist(currentLane)
-        val avgTarget = 0.20 // 1/5 for 5 active lanes
-        val scaledChangeProb = 0.3 * (avgTarget / math.max(0.01, myTarget))
-        val cappedChangeProb = math.min(0.5, scaledChangeProb)
-
-        if rand.gen > cappedChangeProb then return currentLane
-
-        val leftTarget = if currentLane > 0 then dist(currentLane - 1) else 0.0
-        val rightTarget = if currentLane < numLanes - 1 then dist(currentLane + 1) else 0.0
-        val total = leftTarget + rightTarget
-
-        if total < 0.01 then return currentLane
-
-        if rand.gen < leftTarget / total && currentLane > 0 then currentLane - 1
-        else if currentLane < numLanes - 1 then currentLane + 1
-        else currentLane
+//    @inline private def targetLaneFromPems(currentLane: Int, pemsIdx: Int, row: Int): Int =
+//        val dist = config.getLaneDistribution(pemsIdx, row)
+//        val myTarget = dist(currentLane)
+//        val avgTarget = 0.20 // 1/5 for 5 active lanes
+//        val scaledChangeProb = 0.3 * (avgTarget / math.max(0.01, myTarget))
+//        val cappedChangeProb = math.min(0.5, scaledChangeProb)
+//
+//        if rand.gen > cappedChangeProb then return currentLane
+//
+//        val leftTarget = if currentLane > 0 then dist(currentLane - 1) else 0.0
+//        val rightTarget = if currentLane < numLanes - 1 then dist(currentLane + 1) else 0.0
+//        val total = leftTarget + rightTarget
+//
+//        if total < 0.01 then return currentLane
+//
+//        if rand.gen < leftTarget / total && currentLane > 0 then currentLane - 1
+//        else if currentLane < numLanes - 1 then currentLane + 1
+//        else currentLane
 
 
 
@@ -191,12 +194,12 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 
         override def act(): Unit = {
 
-            println(s"this vehicle just created ${this.displayLabel} of subtype $subtype")
+            //println(s"this vehicle just created ${this.displayLabel} of subtype $subtype")
 
             // ------------------ handle main entry vehicles -------------------
             if subtype <= 4 then       // subtypes 0..4 = mainline lane-specific sources
 
-                println(s"I entered here ${this.displayLabel} of subtype $subtype")
+                //println(s"I entered here ${this.displayLabel} of subtype $subtype")
                 // ===== SIMPLE IMPROVEMENT 1: Use raw exit fraction (removes 5-row MA lag) =====
                 val baseExitFraction = config.exitFractionRaw(curRow)
 
@@ -268,17 +271,14 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 
             cfor(joinSeg, highway_length) { seg =>
 
-                println(s"About to drive highway for ${this.displayLabel} of subtype $subtype")
+                //println(s"About to drive highway for ${this.displayLabel} of subtype $subtype")
                 // PEMS-guided lane redistribution (ML vehicles only)
 
-                if subtype <= 4 then
-                    redistributionSegs.get(seg) match
-                        case Some(pemsIdx) =>
-                            val target = targetLaneFromPems(laneID, pemsIdx, curRow)
-                            if target != laneID && route.changeLane(laneID, target, this, seg) then
-                                laneID = target
-                        case None =>
-                end if
+//                val carAhead = getCarAhead(this)
+//                if carAhead != null && carAhead.velocity < 0.1 * vmax then //
+//                    val target = if laneID > 0 then laneID - 1 else laneID + 1
+//                    route.changeLane(laneID, target, this, seg)
+//                end if
 
                 route.path(laneID).seg(seg).move()
                 if junc(seg + 1).name.startsWith("sensor") then junc(seg + 1).jump()
@@ -379,65 +379,65 @@ class CalRoute101(name: String = "CalRoute101", reps: Int = 1, animating: Boolea
 //    end fini
 
     override def fini(rep: Int): Unit =
-        Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
-
-        val sensorNames = Array(
-            "PEMS 531 (Entry)",
-            "PEMS 532 (Second)",
-            "PEMS 834 (After offramp)",
-            "PEMS 833 (After onramp1)",
-            "PEMS 929 (After onramp2)"
-        )
-
-        println("\n" + "=" * 80)
-        println("MAINLINE VALIDATION: Comparing Simulation vs PEMS Ground Truth")
-        println("=" * 80)
-
-        // ═══ FIXED: Use sensorJuncIdx to map PEMS index to junction index ═══
-        for pemsIdx <- 0 until 5 do
-            val jIdx = pemsToJunc(pemsIdx)
-            val simMatrix = junc(jIdx).getCountMatrix
-            val pemsMatrix = config.getPemsCountMatrix(pemsIdx)
-
-            println(s"\n--- PEMS $pemsIdx: ${junc(jIdx).name} vs ${sensorNames(pemsIdx)} ---")
-
-            for row <- 0 until simMatrix.dim do
-                val simRow = simMatrix(row) // Simulation: [lane1, lane2, lane3, lane4, lane5]
-                val pemsRow = pemsMatrix(row) // PEMS:       [lane1, lane2, lane3, lane4, lane5]
-                //val bootstrappedRow = bootstrappedMatrix(row)
-
-                val totSimRow = simMatrix(row).sum // Simulation: [lane1, lane2, lane3, lane4, lane5]
-                val totPemsRow = pemsMatrix(row).sum // PEMS:       [lane1, lane2, lane3, lane4, lane5]
-                //val totBootsRow = bootstrappedMatrix(row).sum // Bootstrapped:       [lane1, lane2, lane3, lane4, lane5]
-
-
-                // What we are comparing
-                println(s"  Row $row:")
-                println(s"    SIM  counts: ${simRow.toString}")
-                println(s"    PEMS counts: ${pemsRow.toString}")
-                //println(s"    BOOT counts: ${bootstrappedMatrix.toString}")
-
-                // Compute fit statistics
-                val diag = diagnose(pemsRow, simRow)
-                val diag1 = diagnose(VectorD(totPemsRow), VectorD(totSimRow))
-                val fit = FitM.fitMap(diag)
-                //println(s"fit $fit ")
-                val fit1 = FitM.fitMap(diag1)
-                val rSq = fit("rSq")
-                val rmse = fit("rmse")
-                val smape = fit("smape")
-                val mae = fit("mae")
-                val sse = fit("sse")
-                val sst = fit("sst")
-
-
-                // Total counts fit
-                //val smape_total = fit1("smape")
-                //val rsme_total = fit1("rmse")
-                //println(s"  Fit Statistics:  $diag")
-                println(s" R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae, SSE = $sse, SST = $sst")
-            end for
-        end for
+//        Recorder.writeAllSensorStats(junc.toList ++ ramp_sensors.toList)
+//
+//        val sensorNames = Array(
+//            "PEMS 531 (Entry)",
+//            "PEMS 532 (Second)",
+//            "PEMS 834 (After offramp)",
+//            "PEMS 833 (After onramp1)",
+//            "PEMS 929 (After onramp2)"
+//        )
+//
+//        println("\n" + "=" * 80)
+//        println("MAINLINE VALIDATION: Comparing Simulation vs PEMS Ground Truth")
+//        println("=" * 80)
+//
+//        // ═══ FIXED: Use sensorJuncIdx to map PEMS index to junction index ═══
+//        for pemsIdx <- 0 until 5 do
+//            val jIdx = pemsToJunc(pemsIdx)
+//            val simMatrix = junc(jIdx).getCountMatrix
+//            val pemsMatrix = config.getPemsCountMatrix(pemsIdx)
+//
+//            println(s"\n--- PEMS $pemsIdx: ${junc(jIdx).name} vs ${sensorNames(pemsIdx)} ---")
+//
+//            for row <- 0 until simMatrix.dim do
+//                val simRow = simMatrix(row) // Simulation: [lane1, lane2, lane3, lane4, lane5]
+//                val pemsRow = pemsMatrix(row) // PEMS:       [lane1, lane2, lane3, lane4, lane5]
+//                //val bootstrappedRow = bootstrappedMatrix(row)
+//
+//                val totSimRow = simMatrix(row).sum // Simulation: [lane1, lane2, lane3, lane4, lane5]
+//                val totPemsRow = pemsMatrix(row).sum // PEMS:       [lane1, lane2, lane3, lane4, lane5]
+//                //val totBootsRow = bootstrappedMatrix(row).sum // Bootstrapped:       [lane1, lane2, lane3, lane4, lane5]
+//
+//
+//                // What we are comparing
+//                println(s"  Row $row:")
+//                println(s"    SIM  counts: ${simRow.toString}")
+//                println(s"    PEMS counts: ${pemsRow.toString}")
+//                //println(s"    BOOT counts: ${bootstrappedMatrix.toString}")
+//
+//                // Compute fit statistics
+//                val diag = diagnose(pemsRow, simRow)
+//                val diag1 = diagnose(VectorD(totPemsRow), VectorD(totSimRow))
+//                val fit = FitM.fitMap(diag)
+//                //println(s"fit $fit ")
+//                val fit1 = FitM.fitMap(diag1)
+//                val rSq = fit("rSq")
+//                val rmse = fit("rmse")
+//                val smape = fit("smape")
+//                val mae = fit("mae")
+//                val sse = fit("sse")
+//                val sst = fit("sst")
+//
+//
+//                // Total counts fit
+//                //val smape_total = fit1("smape")
+//                //val rsme_total = fit1("rmse")
+//                //println(s"  Fit Statistics:  $diag")
+//                println(s" R² = $rSq, RMSE = $rmse, SMAPE = $smape, MAE = $mae, SSE = $sse, SST = $sst")
+//            end for
+//        end for
         super.fini(rep)
     end fini
     ////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

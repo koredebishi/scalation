@@ -15,7 +15,7 @@ package scalation
 package modeling
 package neuralnet
 
-import scalation.mathstat._
+import scalation.mathstat.*
 import scalation.random.RandomMatD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -33,6 +33,11 @@ class CoFilter_2D (width: Int = 5):
      *  @param vec_  the new matrix parameters
      */
     def update (mat_ : MatrixD): Unit = mat = mat_
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return/get the filter coefficients (needed for forward and gradient computation)
+     */
+    def coef: MatrixD = mat
 
 end CoFilter_2D
 
@@ -138,7 +143,7 @@ object CoFilter_2D:
 
 end CoFilter_2D
 
-import CoFilter_2D._
+import scalation.modeling.neuralnet.CoFilter_2D.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `coFilter_2DTest` main function is used to test the `CoFilter_2D` class.

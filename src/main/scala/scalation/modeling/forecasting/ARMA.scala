@@ -22,6 +22,8 @@ package scalation
 package modeling
 package forecasting
 
+import scala.annotation.unused
+
 import scalation.mathstat._
 //import scalation.optimization.quasi_newton.{BFGS => Optimizer}       // change import to change optimizer
 //import scalation.optimization.quasi_newton.{LBFGS => Optimizer}
@@ -59,8 +61,9 @@ class ARMA (y: VectorD, hh: Int, tRng: Range = null,
 //  private   var z     = VectorD.nullv                                 // var for centered time series (used by first train)
     private   val pnq   = p + q                                         // sum of the orders
     private   val notHR = true                                          // don't use the HR algorithm
+    private   val useAR = false                                         // use AR for initial guess for φ parameters
 
-    modelName = s"ARMA($p, $q)"
+    _modelName = s"ARMA_${p}_$q"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Initialize the model parameters b = φ ++ θ by use the inherited AR for φ and
@@ -68,9 +71,12 @@ class ARMA (y: VectorD, hh: Int, tRng: Range = null,
      *  @param y_  the training/full response vector (e.g., full y)
      */
     def init_params (y_ : VectorD): VectorD =
-//      super.train (null, y_)                                            // option: fit AR to initialize ARMA
-//      var bb = super.parameter(1 until p+1)                             // use AR parameters to initialize φ for ARMA
-        var bb = NormalVec_c (p, 0.1, 0.01).gen                           // randomly initialize φ with small values
+        var bb =
+        if useAR then
+            super.train (null, y_)                                        // option: fit AR to initialize ARMA
+            super.parameter(1 until p+1)                                  // use AR parameters to initialize φ for ARMA
+        else
+            NormalVec_c (p, 0.1, 0.01).gen                                // randomly initialize φ with small values
         if q > 0 then bb = bb ++ NormalVec_c (q, 0.0, 0.01).gen           // randomly initialize θ with small values
         bb
     end init_params
@@ -86,7 +92,7 @@ class ARMA (y: VectorD, hh: Int, tRng: Range = null,
      *  @param x_null  the data/input matrix (ignored, pass null)
      *  @param y_      the training/full response vector (e.g., full y)
      */
-    def train0 (x_null: MatrixD, y_ : VectorD): Unit =
+    def train0 (@unused x_null: MatrixD, y_ : VectorD): Unit =
         banner (s"T R A I N 0  --  for p = $p, q = $q")
         val mu = y_.mean                                                // sample mean of y_
         b = init_params (y_)                                            // initialize parameter vector b = φ ++ θ
@@ -107,7 +113,7 @@ class ARMA (y: VectorD, hh: Int, tRng: Range = null,
 
         debug ("train0", s"before optimization: p = $p, q = $q, δ = $δ, b = $b")
         val optimizer = Optimizer (css, b.dim)                          // apply Quasi-Newton optimizer
-        val (fb, bb)  = optimizer.solve (b, STEP)                       // optimal solution for loss function and parameters
+        val bb = optimizer.solve (b, STEP)._2                           // optimal solution for loss function and parameters
         b = bb                                                          // assign optimized parameters to vector b
         δ = mu * (1 - b(0 until p).sum)                                 // determine intercept after optimization
         debug ("train0", s"after optimization: p = $p, q = $q, δ = $δ, b = $b")
@@ -133,7 +139,7 @@ class ARMA (y: VectorD, hh: Int, tRng: Range = null,
             δ = 0.0                                                     // intercept for y_
             resid (y_)                                                  // set the residuals using high order AR
             val optimizer = Optimizer (ss, b.dim)                       // apply Quasi-Newton optimizer
-            val (fb, bb)  = optimizer.solve (b, STEP)                   // optimal solution for loss function and parameters
+            val bb = optimizer.solve (b, STEP)._2                       // optimal solution for loss function and parameters
             b = bb                                                      // recover parameters for z
             δ = y.mean * (1 - b(0 until p).sum)                         // determine intercept after optimization
             debug ("train", s"optimized: p = $p, q - $q, δ = $δ, b = $b")
@@ -160,7 +166,7 @@ class ARMA (y: VectorD, hh: Int, tRng: Range = null,
     def ss (b_ : VectorD): Double =
         b = b_.copy                                                     // copy parameters from b vector
         val yy  = yb(1 until yb.dim)                                    // skip first (backcasted) value
-        δ = yy.mean * (1 - b(0 until p).sum)                                 // determine updated intercept
+        δ = yy.mean * (1 - b(0 until p).sum)                            // determine updated intercept
         val yyp = predictAll (yb)                                       // predicted value for yb
 //      debug ("ss", s"yy.dim = ${yy.dim}, yyp.dim = ${yyp.dim}")
         ssef (yy, yyp)                                                  // compute loss function

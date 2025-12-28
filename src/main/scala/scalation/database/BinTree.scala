@@ -11,7 +11,7 @@
 package scalation
 package database
 
-import scala.collection.mutable.{ArrayBuffer => VEC}
+import scala.collection.mutable.ArrayBuffer as VEC
 import scala.reflect.ClassTag
 
 class BinTree [T: ClassTag] (val elem: T):

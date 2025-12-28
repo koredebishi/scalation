@@ -12,11 +12,11 @@
 package scalation
 package database
 
-import scala.collection.mutable.{Map, Set => SET}
-import scala.runtime.ScalaRunTime.stringOf
-
 import scalation.database.graph_pm.Graph
 import scalation.mathstat.{MatrixD, VectorI}
+
+import scala.collection.mutable.{Map, Set as SET}
+import scala.runtime.ScalaRunTime.stringOf
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MinSpanningTree` class is used to build minimum cost spanning trees
@@ -35,7 +35,7 @@ class MinSpanningTree (g: Graph, undirected: Boolean = true):
 //  private val root  = new TreeNode (0, 0, 0.0)                          // for vertex 0 in g, create a root node
     private val key   = Array.fill (size)(MAX_VALUE)                      // cost/key array
     private val out   = Array.fill (size)(true)                           // status of outside spanning tree
-    private val qu    = PriorityQueue ()(NodeOrder)                       // priority queue of vertices
+    private val qu    = PriorityQueue ()(using NodeOrder)                 // priority queue of vertices
     for i <- 0 until size do qu.enqueue (Elem (i, key(i)))                // put all vertices in priority queue
 
     debug ("init", s"size = $size, already undirected = $undirected")

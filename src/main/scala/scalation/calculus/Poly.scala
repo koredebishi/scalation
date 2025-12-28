@@ -13,7 +13,7 @@
 package scalation
 package calculus
 
-import scalation.mathstat._
+import scalation.mathstat.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Poly` class provides operations on univariate polynomials.

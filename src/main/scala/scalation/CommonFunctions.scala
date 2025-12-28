@@ -23,9 +23,11 @@
  *  //def log10 (x: Double): Double
  *  def pow2 (x: Double): Double
  *  def pow10 (x: Double): Double
+ *  def pow (x: Double, a: Int, b: Int): Double
  *  //def log1p (x: Double): Double
- *  //def expm1 (x: Double): Double 
+ *  //def expm1 (x: Double): Double
  *  def logb (b: Double, x: Double): Double
+ *  def ihs (x: Double): Double
  *
  *  Many common functions are also supplied by the `scala.math` package.
  */
@@ -33,7 +35,6 @@
 package scalation
 
 import scala.math.{cos, exp, expm1, log, log10, log1p, max, pow, sin, sinh, sqrt, tan}
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /*  Top-level definitions of common scalar functions.
@@ -51,7 +52,7 @@ val log_2 = log (2.0)
 
 /** The value of log 10
  *
-val log_10 = log (10.0)
+ val log_10 = log (10.0)
  */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -123,22 +124,68 @@ inline def log2 (x: Double): Double = log (x) / log_2
  *  Its inverse function is pow10.
  *  @param x  the value whose log is sought
  *
-inline def log10 (x: Double): Double = log (x) / log_10
+              inline def log10 (x: Double): Double = log (x) / log_10
  */
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Find the y-th root of x, i.e.,  x ~^ 1/y for Scala Longs.
+ *  r = x ~^ 1/y is largest long integer r such that r ~^ y <= x.
+ *  @see http://en.wikipedia.org/wiki/Shifting_nth_root_algorithm
+ *  @see http://stackoverflow.com/questions/8826822/calculate-nth-root-with-integer-arithmetic
+ *  @param x  the Long base parameter
+ *  @param y  the Long root level (reciprocal exponent) parameter
+ */
+def lroot (x: Long, y: Long): Long =
+    var r = 1L                               // initial guess for root
+
+    def step: Long = ((y-1) * r + x / r~^(y-1)) / y
+
+    var q = step                             // find better root
+    while
+        r = q
+        q = step
+        q < r
+    do ()     // repeat looking for better root
+    r
+end lroot
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The power base 2 function of type `FunctionS2S`.
+/** The power base 2 function 2^x of type `FunctionS2S`.
  *  Its inverse function is log2.
  *  @param x  the value of the exponent 2^x
  */
 inline def pow2 (x: Double): Double = pow (2.0, x)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The power base 10 function of type `FunctionS2S`.
+/** The power base 10 function 10^x of type `FunctionS2S`.
  *  Its inverse function is log10.
  *  @param x  the value of the exponent 10^x
  */
 inline def pow10 (x: Double): Double = pow (10.0, x)
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Raise x to a rational (fractional) power r = b/c where b and c are longs using logic to handle
+ *  the sign separately if the exponent is a simple fraction with an odd denominator.
+ *  In particular, use `pow` when x is non-negative, else the identity (−a)^(b/c) = (−1)^b a^(b/c)
+ *  when c is odd, otherwise return Not-a-Number (NaN).
+ *  @see math.stackexchange.com/questions/317528/how-do-you-compute-negative-numbers-to-fractional-powers
+ *  @param x  the value of the base x^r
+ *  @param r  the rational `Rat` exponent: power/root, num/den, b/c
+ */
+def pow_ (x: Double, r: Rat): Double =
+    if x >= 0.0 then pow (x, r.toDouble)
+    else if r.den % 2 == 1 then pow (-1, r.num.toDouble) * pow (-x, r.toDouble)
+    else Double.NaN
+end pow_
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The power to p function x^p of type `FunctionS2S`.
+ *  Its inverse function is powTo (1/p)(x)
+ *  Usage: define a new function pow3 = powTo (3) so pow3 (x) = x^3
+ *  @param p  the value of the exponent/power x^p
+ *  @param x  the value of the base x^p
+ */
+inline def powTo (p: Double)(x: Double): Double = pow (x, p)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The "log one plus", log base e function of x + 1 of type `FunctionS2S`.  Built-into Scala.
@@ -150,14 +197,14 @@ inline def pow10 (x: Double): Double = pow (10.0, x)
  *  @see numpy:  np.log1p
  *  @param x  the value whose log1p is sought
  *
-inline def log1p (x: Double): Double =
+              inline def log1p (x: Double): Double =
     if x <= -1.0 then
-        Double.NaN                                // return Not-a-Number
-    else if abs (x) > 1e-4 then
-        log (1.0 + x)                             // x is large enough to use the obvious evaluation
-    else
-        (-0.5*x + 1.0) * x                        // second order Taylor approx.
-end log1p
+              Double.NaN                                // return Not-a-Number
+              else if abs (x) > 1e-4 then
+              log (1.0 + x)                             // x is large enough to use the obvious evaluation
+              else
+              (-0.5*x + 1.0) * x                        // second order Taylor approx.
+              end log1p
  */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -169,12 +216,12 @@ end log1p
  *  @see git.musl-libc.org/cgit/musl/tree/src/math/expm1.c  for a more accurate implementation
  *  @param x  the value whose expm1 is sought
  *
-inline def expm1 (x: Double): Double = 
+              inline def expm1 (x: Double): Double =
     if abs (x) < 1e-5 then
-        x + 0.5 * x*x                            // second order Taylor approx.
-    else
-        exp (x) - 1.0                            // x is large enough to use the obvious evaluation 
-end expm1
+              x + 0.5 * x*x                            // second order Taylor approx.
+              else
+              exp (x) - 1.0                            // x is large enough to use the obvious evaluation
+              end expm1
  */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -208,37 +255,46 @@ inline def logb (b: Double, x: Double): Double = log (x) / log (b)
  */
 @main def commonFunTest (): Unit =
 
-   val x = 1e-10
-   banner (s"Test expm1 (x = $x)")
-   val y = expm1 (x)
-   val z = exp (x) - 1.0
-   println (s"expm1 ($x)   = $y")
-   println (s"exp ($x) - 1 = $z")
+    val x = 1e-10
+    banner (s"Test expm1 (x = $x)")
+    val y = expm1 (x)
+    val z = exp (x) - 1.0
+    println (s"expm1 ($x)   = $y")
+    println (s"exp ($x) - 1 = $z")
 
-   banner (s"Test log1p (x = $x)")
-   val a = log1p (x)
-   val b = log (1.0 + x)
-   println (s"log1p ($x)   = $a")
-   println (s"log (1 + $x) = $b")
+    banner (s"Test log1p (x = $x)")
+    val a = log1p (x)
+    val b = log (1.0 + x)
+    println (s"log1p ($x)   = $a")
+    println (s"log (1 + $x) = $b")
 
-   banner (s"Test expm1 (log1p (x = $x))")
-   println (s"expm1 (log1p ($x))   = ${expm1 (a)}")
-   println (s"exp (log (1+$x)) - 1 = ${exp (b) - 1}")
+    banner (s"Test expm1 (log1p (x = $x))")
+    println (s"expm1 (log1p ($x))   = ${expm1 (a)}")
+    println (s"exp (log (1+$x)) - 1 = ${exp (b) - 1}")
 
-   banner (s"Test ihs (x = $x)")
-   val u = ihs (x)
-   println (s"lhs ($x)) = $u")
-   println (s"sinh (lhs ($x))) = ${sinh (u)}")
+    banner (s"Test pow_ (xx, r)")
+    val xx = -8.0
+    println (s"pow_ ($xx, Rat (2, 3))) = ${pow_ (xx, Rat (2, 3))}")
+    println (s"pow_ ($xx, Rat (1, 3))) = ${pow_ (xx, Rat (1, 3))}")
+    println (s"pow_ ($xx, Rat (1, 2))) = ${pow_ (xx, Rat (1, 2))}")
+    println (s"pow ($xx, 2/3))   = ${pow (xx, 2.toDouble/3)}")
+    println (s"pow ($xx, 1/3))   = ${pow (xx, 1.toDouble/3)}")
+    println (s"pow ($xx, 1/2))   = ${pow (xx, 1.toDouble/ 2)}")
 
-   banner ("Test ihs (x = 1)")
-   val v = ihs (1.0)
-   println (s"lhs (1)) = $v")
-   println (s"sinh (lhs (1))) = ${sinh (v)}")
+    banner (s"Test ihs (x = $x)")
+    val u = ihs (x)
+    println (s"lhs ($x)) = $u")
+    println (s"sinh (lhs ($x))) = ${sinh (u)}")
 
-   val t = mathstat.VectorD.range (1 until 100) / 20.0
-   new mathstat.Plot (t, t.map (log (_)), t.map (log1p (_)), "log vs. log1p (red)")
-   new mathstat.Plot (t, t.map (log (_)), t.map (ihs (_)), "log vs. ihs (red)")
-   new mathstat.Plot (t, t.map (log (_)), t.map (log10 (_)), "log vs. log10 (red)")
+    banner ("Test ihs (x = 1)")
+    val v = ihs (1.0)
+    println (s"lhs (1)) = $v")
+    println (s"sinh (lhs (1))) = ${sinh (v)}")
+
+    val t = mathstat.VectorD.range (1 until 100) / 20.0
+    new mathstat.Plot (t, t.map (log (_)), t.map (log1p (_)), "log vs. log1p (red)")
+    new mathstat.Plot (t, t.map (log (_)), t.map (ihs (_)), "log vs. ihs (red)")
+    new mathstat.Plot (t, t.map (log (_)), t.map (log10 (_)), "log vs. log10 (red)")
 
 end commonFunTest
 

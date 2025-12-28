@@ -13,8 +13,9 @@ package scalation
 package modeling
 package forecasting
 
+import scala.annotation.unused
+import scala.collection.mutable.{LinkedHashSet => LSET}
 import scala.math.max
-//import scala.math.min
 
 import scalation.mathstat._
 
@@ -24,12 +25,13 @@ import scalation.mathstat._
  *  @param x        the input lagged time series data
  *  @param y        the response matrix (time series data per horizon)
  *  @param hh       the maximum forecasting horizon (h = 1 to hh)
+ *  @param fname    the feature/variable names
  *  @param tRng     the time range, if relevant (index as time may suffice)
  *  @param hparam   the hyper-parameters for models extending this abstract class
  *  @param bakcast  whether a backcasted value is prepended to the time series (defaults to false)
  */
-abstract class Forecaster_D (x: MatrixD, y: MatrixD, hh: Int, tRng: Range = null,
-                             hparam: HyperParameter = MakeMatrix4TS.hp,
+abstract class Forecaster_D (x: MatrixD, y: MatrixD, hh: Int, fname: Array [String],
+                             tRng: Range = null, hparam: HyperParameter = MakeMatrix4TS.hp,
                              bakcast: Boolean = false)
       extends Forecaster (y(?, 0), hh, tRng, hparam, bakcast):          // no automatic backcasting, @see `ARY_D.apply`
 
@@ -41,6 +43,11 @@ abstract class Forecaster_D (x: MatrixD, y: MatrixD, hh: Int, tRng: Range = null
     /** Return the used response/output matrix y.
      */
     def getYy: MatrixD = y
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the feature/variable names.  Overrides definition in `Forecaster`
+     */
+    override def getFname: Array [String] = fname
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train/fit e.g., an `ARY_D` model to the times-series data in vector y_.
@@ -94,9 +101,9 @@ abstract class Forecaster_D (x: MatrixD, y: MatrixD, hh: Int, tRng: Range = null
      *  @param size  the size of dataset (full, train, or test)
      */
     override def mod_resetDF (size: Int): Unit =
-        val dfm = max (1, parameter.size - 1)                           // degrees of freedom for model
-        debug ("mod_resetDF", s"dfm = $dfm, df = ${size-dfm}")
-        resetDF (dfm, size - dfm)
+        val dfr = max (1, parameter.size - 1)                           // degrees of freedom for regression/model
+        debug ("mod_resetDF", s"dfr = $dfr, df = ${size-dfr}")
+        resetDF (dfr, size - dfr)
     end mod_resetDF
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -138,7 +145,7 @@ abstract class Forecaster_D (x: MatrixD, y: MatrixD, hh: Int, tRng: Range = null
      *
      *  @param y_  the actual values to use in making forecasts
      */
-    def forecastAll (y_ : MatrixD): MatrixD = yf
+    def forecastAll (@unused y_ : MatrixD): MatrixD = yf
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use rolling-validation to compute test Quality of Fit (QoF) measures
@@ -148,13 +155,14 @@ abstract class Forecaster_D (x: MatrixD, y: MatrixD, hh: Int, tRng: Range = null
      *  Return the forecasted values in the FORECAST MATRIX,.
      *  @param rc_      the retraining cycle (number of forecasts until retraining occurs)
      *  @param growing  whether the training grows as it roll or kepps a fixed size
+     *  @param doPlot   whether to show the plots
      */
-    override def rollValidate (rc: Int = 2, growing: Boolean = false): MatrixD =
+    override def rollValidate (rc: Int = 2, growing: Boolean = false, doPlot: Boolean = true): MatrixD =
         banner (s"rollValidate: Evaluate ${modelName}'s QoF for horizons 1 to $hh:")
 
         val yf      = getYf                                             // get the full in-sample forecast matrix
-        val te_size = Forecaster.teSize (y.dim)                         // size of testing set
-        val tr_size = y.dim - te_size                                   // size of initial training set
+        val te_size = Model.teSize (y.dim)                              // size of testing set
+        val tr_size = Model.trSize (y.dim)                              // size of initial training set
         debug ("rollValidate", s"y.dims = ${y.dims}, train: tr_size = $tr_size; test: te_size = $te_size, rc = $rc")
 
         val yp = new VectorD (te_size)
@@ -165,17 +173,94 @@ abstract class Forecaster_D (x: MatrixD, y: MatrixD, hh: Int, tRng: Range = null
                 val x_ = if x != null then x(is until t) else null
                 train_x (x_, y(is until t))                             // retrain on sliding training set
                 debug ("rollValidate", s"retrain on i = $i, bb = $bb")
-//          val yd = predict (t, y)                                     // predict the next value (only for h=1)
+            yp(i)  = predict (t, y)(0)                                  // predict the next value (only for h=1)
             val yd = forecast (t, y(?, 0))                              // forecast the next hh-values, yf is updated
-            yp(i)  = yd(0)
             println (s"yf(t, 0) = ${yf(t, 0)}, yp(i) = ${yp(i)}, yd = $yd")
         end for
 
-        val y_ = y(?, 0)(tr_size until y.dim-1)                         // trim the actual values
-        val t  = VectorD.range (tr_size, y.dim-1)
-        new Plot (t, y_, yp, s"rollValidate: Plot y_, yp vs. t for $modelName", lines = true)
+        if doPlot then
+            val (t, y_) = align (tr_size, y(?, 0))
+            new Plot (t, y_, yp, s"rollValidate: Plot y_, yp vs. t for $modelName", lines = true)
         yf
     end rollValidate
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform In-Sample Testing, i.e. train and test on the full data set.
+     *  @param skip    the number of initial time points to skip (due to insufficient past)
+     *  @param showYf  whether to show the forecast matrix
+     */
+    override def inSample_Test (skip: Int = 2, showYf: Boolean = false): Unit =
+        banner (s"In-Sample Test: $modelName")
+        trainNtest_x ()()                                                 // train on full and test on full
+        setSkip (skip)                                                    // diagnose: skip the first 'skip' rows
+        diagnoseAll (getY, getYf)                                         // compute metrics for all horizons
+        if showYf then
+            println (s"Final In-Sample Forecast Matrix yf = ${getYf}")
+//          println (s"Final In-Sample Forecast Matrix yf = ${getYf.shiftDiag}")
+    end inSample_Test
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform Train-n-Test (TnT) Testing, i.e. train and test with rolling validation.
+     *  @param skip    the number of initial time points to skip (due to insufficient past)
+     *  @param rc      the retraining cycles (how often to retrain the model)
+     *  @param showYf  whether to show the forecast matrix
+     */
+    override def tnT_Test (skip: Int = 0, rc: Int = 2, showYf: Boolean = false): Unit =
+        banner (s"TnT Test: $modelName")
+        trainNtest_x ()()                                                 // initial training updated by `rollValidate`
+        setSkip (skip)                                                    // diagnose: skip the first 'skip' rows
+        rollValidate (rc)                                                 // TnT with Rolling Validation
+        diagnoseAll (getY,getYf, Forecaster.teRng (y.dim))                // only diagnose on the testing set
+        if showYf then
+            println (s"Final TnT Forecast Matrix yf = ${getYf}")
+//          println (s"Final TnT Forecast Matrix yf = ${getYf.shiftDiag}")
+    end tnT_Test
+
+//  F E A T U R E   S E L E C T I O N
+
+    import SelectionTech.{Forward, Backward, Stepwise}
+
+    def getBest: BestStep = ???   // FIX -- implement or throw exception
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a single-horizon `ARX` model using input matrix x_fs with the selected features.
+     *  Note: uses `ARX` as it is the base model for ARX*_D.
+     *  @param k     the number of the horizon
+     *  @param x_fs  the input matrix containing the selected features
+     */
+    def getModel_k (k: Int = 1, x_fs: MatrixD = x): ARX =
+        new ARX (x_fs, y(?, k-1), 1, 1, fname, tRng, hparam, bakcast)
+    end getModel_k
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform regression-based feature selection to find the most predictive variables
+     *  to have in the model, returning the variables left and the new Quality of Fit
+     *  (QoF) measures for all steps.
+     *  @see `scalation.modeling.Forecaster_Reg` for index of QoF measures.
+     *  @param k       the number of the horizon
+     *  @param fsType  the type of the feature selection to use
+     *  @param cross   indicator to include the cross-validation/validation QoF measure (defaults to "none")
+     *  @param first   first variable to consider for elimination
+     *                     (default (1) assume intercept x_0 will be in any model)
+     *  @param swap    whether to allow a swap step (swap out a feature for a new feature in one step)
+     *  @param qk      index of Quality of Fit (QoF) to use for comparing quality
+     */
+    def featureSelectAtHorizon (k: Int, fsType: SelectionTech = Stepwise, cross: String = "none",
+                                first: Int = 1, swap: Boolean = true)
+                                (using qk: Int): (LSET [Int], MatrixD, ARX) =
+        require (1 <= k && k <= hh, s"horizon k=$k out of range [1,$hh]")
+
+        val fsFun: (ARX => (LSET [Int], MatrixD)) = fsType match            // choose the FS routine once
+        case Forward  => (m: ARX) => m.forwardSelAll (cross)
+        case Backward => (m: ARX) => m.backwardElimAll (first, cross)
+        case Stepwise => (m: ARX) => m.stepwiseSelAll (cross, swap)
+
+        val mod_k = getModel_k (k, x)                                       // build a single-horizon model bound to y(:, k-1) with hh=1
+        val (cols, rSq) = fsFun (mod_k)
+        val modBest = mod_k.getBest.mod
+        val modForc = mod_k.convertReg2Forc (modBest)
+        (cols, rSq, modForc)
+    end featureSelectAtHorizon
 
 end Forecaster_D
 

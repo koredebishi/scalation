@@ -38,15 +38,17 @@ class NonlinearRegression (x: MatrixD, y: VectorD, f: FunctionP2S,
                            b_init: VectorD, fname_ : Array [String] = null,
                            hparam: HyperParameter = null)
       extends Predictor (x, y, fname_, hparam)
-         with Fit (dfm = x.dim2 - 1, df = x.dim - x.dim2)
-         with NoSubModels:
+         with Fit (dfr = x.dim2 - 1, df = x.dim - x.dim2)
+         with NoSubModels:                                               // FIX -- need efficient feature selection
 
     private val debug = debugf ("Nonlinear", true)                       // debug function
     private val flaw  = flawf ("Nonlinear")                              // flaw function
 
     if y != null && x.dim != y.dim then flaw ("init", "dimensions of x and y are incompatible")
 
-    modelName = "NonlinearRegression"
+    _modelName = "NonlinearRegression"
+
+    override def getBest: BestStep = super [NoSubModels].getBest
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the

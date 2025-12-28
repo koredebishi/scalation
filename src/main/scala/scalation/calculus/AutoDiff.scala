@@ -17,11 +17,11 @@
 package scalation
 package calculus
 
-import scala.collection.mutable.{ArrayBuffer => VEC}
-
 import scalation.mathstat.MatrixD
 import scalation.modeling.AFF
-import scalation.modeling.ActivationFun._
+import scalation.modeling.ActivationFun.*
+
+import scala.collection.mutable.ArrayBuffer as VEC
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Node` case class maintains information about a node in a Computation Graph.

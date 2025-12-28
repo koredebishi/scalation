@@ -324,7 +324,7 @@ object TA_AssignmentDB:
 
 end TA_AssignmentDB
 
-import TA_AssignmentDB._
+import scalation.database.table.TA_AssignmentDB.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `showTabs` main function prints all the tables defined in the `TA_AssignmentDB` object.

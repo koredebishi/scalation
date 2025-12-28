@@ -1,0 +1,128 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Yousef Fekri Dabanloo
+ *  @version 2.0
+ *  @date    Sat Sep 20 17:13:38 EDT 2025
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @note    Support for Converting ScalaTion Equations to LaTeX
+ */
+
+package scalation
+package mathstat
+
+import scala.collection.mutable.{LinkedHashSet => LSET}
+import scala.util.matching.Regex
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Scala2LaTeX object provides methods for converting ScalaTion Equations
+ *  into LaTeX.
+ */
+object Scala2LaTeX:
+
+    /** Customize LaTeX operator rendering per transform *name* here (no `case` needed)
+     */
+    val TRANSFORM_LATEX: Map [String, String] = Map ("pow"  -> "\\mathrm{pow}",
+                                                     "root" -> "\\mathrm{root}",
+                                                     "log"  -> "\\log",
+                                                     "sin"  -> "\\sin",
+                                                     "cos"  -> "\\cos")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Render a TransformT to a LaTeX operator using its .name.
+     *  @param t the transform type
+     */
+    def latexOpFromTransform (t: TransformT): String =
+        TRANSFORM_LATEX.getOrElse (t.name, s"\\mathrm{${t.name}}")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert a single feature token into a LaTeX term with coefficient.
+     *  Supported tokens:
+     *
+     *    const
+     *    ylK
+     *    fI(ylK)
+     *    xeJlK
+     *    gJ,T(xeJlK)   (J = exo index, T = transform index for exo J)
+     *
+     *  @param feat           raw feature token (trimmed)
+     *  @param fEndo_enabled  enabled transforms for y (order matters)
+     *  @param fExo_enabled   enabled transforms per exo variable (order matters)
+     *  @param coeffSym       e.g., "\\beta"
+     *  @param termIdx        coefficient subscript index
+     */
+    def featureToLatexTerm (feat: String, fEndo_enabled: LSET [TransformT],
+                            fExo_enabled: Array [LSET [TransformT]],
+                            coeffSym: String, termIdx: Int): String =
+        // Regex patterns
+        val R_CONST: Regex  = raw"""^const$$""".r
+        val R_YL:    Regex  = raw"""^yl(\d+)$$""".r
+        val R_FY:    Regex  = raw"""^f\d+\(yl(\d+)\)$$""".r
+    
+        val R_XEL:   Regex  = raw"""^xe(\d+)l(\d+)$$""".r
+        val R_GX:    Regex  = raw"""^g\d+,\d+\(xe(\d+)l(\d+)\)$$""".r
+    
+        def withCoeff (body: String): String = s"${coeffSym}_${termIdx}\\, $body"
+    
+        feat match
+        case R_CONST() =>
+            s"${coeffSym}_${termIdx}"
+    
+        case R_YL(k) =>
+            val lag = k.toInt
+            withCoeff (s"y_{t-$lag}")
+    
+        case R_FY(i, k) =>
+            val idx = i.toInt
+            val lag = k.toInt
+            val endoArr = fEndo_enabled.toArray
+            val op = if 0 <= idx && idx < endoArr.length
+                    then latexOpFromTransform(endoArr(idx))
+                    else s"\\mathrm{f$idx}"
+            withCoeff (s"$op\\big(y_{t-$lag}\\big)")
+    
+        case R_XEL(j, k) =>
+            val exo = j.toInt
+            val lag = k.toInt
+            withCoeff (s"x^{(${exo})}_{t-$lag}")
+    
+        case R_GX(tIdx, j, k) =>
+            // Trust the inner xe<j>l<k> indices.
+            val exo  = j.toInt
+            val lag  = k.toInt
+            val trIx = tIdx.toInt
+            val op =
+            if 0 <= exo && exo < fExo_enabled.length then
+                val exoArr = fExo_enabled(exo).toArray
+                if 0 <= trIx && trIx < exoArr.length then latexOpFromTransform (exoArr(trIx))
+                else s"\\mathrm{g$trIx}"
+            else s"\\mathrm{g$trIx}"
+            withCoeff (s"$op\\big(x^{(${exo})}_{t-$lag}\\big)")
+    
+        case _ =>
+            // Fallback: still coefficiented, render raw token safely
+            withCoeff (s"\\mathrm{${feat.replace ("\\", "\\\\")}}")
+    end featureToLatexTerm
+        
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a LaTeX equation from feature tokens.
+     *  @param features       the feature tokens (any order/subset)
+     *  @param fEndo_enabled  enabled endo transforms (order matters)
+     *  @param fExo_enabled   enabled exo transforms per variable (order matters)
+     *  @param includeHat     whether to render \hat{y}_t on LHS
+     *  @param coeffSymbol    coefficient symbol, e.g. "\\beta"
+     *  @param errorSymbol    error term, e.g. "\\varepsilon_t"
+     */
+    def featuresToLatexEquation (features: Array [String], fEndo_enabled: LSET [TransformT],
+                                 fExo_enabled : Array[LSET[TransformT]], includeHat: Boolean = true,
+                                 coeffSymbol: String = "\\beta", errorSymbol: String = "\\varepsilon_t"): String =
+    
+        val lhs   = if includeHat then "\\hat{y}_t" else "y_t"
+        val terms = features.zipWithIndex.map { case (f, i) =>
+                    featureToLatexTerm (f.trim, fEndo_enabled, fExo_enabled, coeffSymbol, i) }
+        s"$lhs = ${terms.mkString(" \\\\; + \\\\; ")} \\\\; + \\\\; $errorSymbol"
+    
+    end featuresToLatexEquation
+
+end Scala2LaTeX
+

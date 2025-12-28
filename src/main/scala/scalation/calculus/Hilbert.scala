@@ -15,9 +15,9 @@
 package scalation
 package calculus
 
-import scala.math.sqrt
+import scalation.calculus.Integral.∫
 
-import Integral.∫
+import scala.math.sqrt
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Convert a function from `FunctionS2S` to `Hilbert`, which supports

@@ -1,0 +1,1 @@
+Always seek my permission before writing or modifying any code.

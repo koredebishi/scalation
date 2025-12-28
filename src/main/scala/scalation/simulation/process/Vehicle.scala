@@ -27,7 +27,19 @@ abstract class Vehicle (name_ : String, director: Model)
     extends SimActor (name_, director)
         with Dynamics:
 
-    val vmax = Vehicle.speedGen.gen
+    // Vehicle's target free-flow speed (m/s). Set at creation from PEMS data.]
+    //What this is doing is counter intuitive - it is setting the generic vmax to a random value
+    // I get the logic but we do not need this as it's introducing bug into our code because IDM
+    // is using it directly  in Dynamics line
+    //       var a = iDM(amax, b, len, car.vmax, x_n, v_n,
+    //                        x_leader, v_leader, T, s, del)
+    // So it's blockin our set pems speed.
+    // this is only valuable for generic simulation where we want to randomize vehicle speeds. where
+    //some vehicles are fast some are slow. (trucs and cars)
+    //Hower, we need this overriden in VSource when we set the pems speed. so we can cars not going above pems speed.
+    var vmax = Vehicle.speedGen.gen    // this is for generic. needs pems version.
+
+
     var key  = -0.0
     var laneID: Int = -1
     var pathInfo : String = ""
@@ -95,19 +107,32 @@ object Vehicle:
 
     val speedGen = Uniform(20.0 , 40.0)
 
+
     /** defaults values for driver/vehicle characteristics/properties (PUBLIC access required)
      *  @see https://en.wikipedia.org/wiki/Intelligent_driver_model
      */
 
     val def_prop = Map ("rt"   -> 0.5,                       // driver reaction time
         "amax" -> 4.0,                       // max acceleration
-        "bmax" -> -1.5,                      // max deceleration
+        "bmax" -> -2.0,                      // max deceleration use to be -1.5
         "v0"   -> 4.0,                       // starting velocity // v0 should be adjustable to 0
         "vmax" -> 33.528,                    // max velocity
         "T"    -> 3.0,                       // safe min time headway
         "s"    -> 5.0,                       // safe min distance headway
         "len"  -> 4.0,                       // length of the vehicles
         "del"  -> 4.0)                       // acceleration exponent (delta)
+
+//    val def_prop = Map(
+//        "rt" -> 0.5,      // fast reaction time (seconds)
+//        "amax" -> 1.5,    // strong acceleration (m/s²) - reaches high speeds
+//        "bmax" -> -2.5,   // stronger braking (m/s²) - was -1.5, now creates deeper congestion
+//        "v0" -> 4.0,      // low starting velocity (m/s)
+//        "vmax" -> 35.528, // max velocity cap (m/s) = 75 mph (overridden per lane)
+//        "T" -> 1.5,       // safe time headway (seconds) - reduced from 3.0 for tighter following
+//        "s" -> 2.0,       // min gap (meters) - reduced from 5.0 for denser packing
+//        "len" -> 4.0,     // vehicle length (meters)
+//        "del" -> 4.0      // acceleration exponent (delta)
+//    )
 
     /** current values for driver/vehicle characteristics/properties
      */

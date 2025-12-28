@@ -50,16 +50,16 @@ import scalation.mathstat._
 class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
                        hparam: HyperParameter = RidgeRegression.hp)
       extends Predictor (x, y, fname_, hparam)
-         with Fit (dfm = x.dim2, df = x.dim - x.dim2 - 1):
+         with Fit (dfr = x.dim2, df = x.dim - x.dim2 - 1):
          // if not using an intercept df = (x.dim2, x.dim-x.dim2), correct by calling 'resetDF' method from `Fit`
          // no intercept => correct Degrees of Freedom (DoF); as lambda get larger, need effective DoF
 
     private val debug     = debugf ("RidgeRegression", false)            // debug function
     private val lambda    = if hparam("lambda") <= 0.0 then findLambda._1
-                            else hparam ("lambda").toDouble
+                            else hparam("lambda").toDouble
     private val algorithm = hparam("factorization")                      // factorization algorithm
 
-    modelName = "RidgeRegression"
+    _modelName = s"RidgeRegression_${lambda}"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the value of the shrinkage parameter lambda.
@@ -71,8 +71,8 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
      *  factorization technique.
      *  @param x_  the data/input matrix
      */
-    private def solver (x_ : MatrixD = x): Factorization =
-        val xtx  = x_.transpose * x_                                     // pre-compute X.t * X
+    private def solver (x_ : MatrixD): Factorization =
+        val xtx  = x_.ᵀ * x_                                     // pre-compute X.t * X
         val ey   = MatrixD.eye (x_.dim, x_.dim2)                         // identity matrix
         val xtx_ = xtx.copy                                              // copy xtx (X.t * X)
         for i <- xtx_.indices do xtx_(i, i) += lambda                    // add lambda to the diagonal
@@ -102,7 +102,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
         b = fac match                                                    // solve for coefficient vector b
             case fac: Fac_QR  => fac.solve (y_ ++ new VectorD (y_.dim))
 //          case fac: Fac_SVD => fac.solve (y_)
-            case _            => fac.solve (x_.transpose * y_)
+            case _            => fac.solve (x_.ᵀ * y_)
     end train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -128,7 +128,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
         var l      = lambda                                              // start with a small default value
         var l_best = l
         var sse    = Double.MaxValue
-        for i <- 0 to 20 do
+        cfor (0, 20) { _ =>
             RidgeRegression.hp("lambda") = l
             val rrg = new RidgeRegression (x, y)
             val stats = rrg.crossValidate ()
@@ -137,7 +137,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
             if sse2 < sse then { sse = sse2; l_best = l }
 //          debug ("findLambda", showQofStatTable (stats))
             l *= 2
-        end for
+        } // cfor
         (l_best, sse)                                                    // best lambda and its sse_cv
     end findLambda
 
@@ -153,7 +153,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
         def f_sse (λ: Double): Double = 
             lambda = λ
             train (xx, yy)
-            e = yy - xx * b
+            val e = yy - xx * b
             val sse = e dot e
             if sse.isNaN then throw new ArithmeticException ("sse is NaN")
             debug ("findLambda2", s"for lambda = $λ, sse = $sse")
@@ -187,10 +187,11 @@ class RidgeRegression (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a sub-model that is restricted to the given columns of the data matrix.
      *  @param x_cols  the columns that the new model is restricted to
+     *  @param fname2  the variable/feature names for the new model (defaults to null)
      */
-    override def buildModel (x_cols: MatrixD): RidgeRegression =
+    def buildModel (x_cols: MatrixD, fname2: Array [String] = null): RidgeRegression =
         debug ("buildModel", s"${x_cols.dim} by ${x_cols.dim2}")
-        new RidgeRegression (x_cols, y, null, hparam)
+        new RidgeRegression (x_cols, y, fname2, hparam)
     end buildModel
 
 end RidgeRegression
@@ -202,17 +203,24 @@ end RidgeRegression
  */
 object RidgeRegression:
 
-    /** Base hyper-parameter specification for `RidgeRegression`
+    /** Base hyper-parameter specification for `RidgeRegression` and other regularized regression classes
      */
-    val hp = new HyperParameter;
+    val hp = new HyperParameter
     hp += ("factorization", "Fac_Cholesky", "Fac_Cholesky")            // factorization algorithm
-    hp += ("lambda", 0.01, 0.01)                                       // L2 regularization/shrinkage parameter
+    hp += ("lambda", 0.1, 0.1)                                         // Ridge L_2 regularization/shrinkage parameter
+    hp += ("sparse", 1, 1)                                             // 1 => sparsify, 0 => don't (@see sparsify in `LassoRegression`)
+    hp += ("beta", 0.1, 0.1)                                           // Bridge L_q regularization/shrinkage parameter
+    hp += ("pow", 0.5, 0.5)                                            // Bridge power (0 < q < 1)
+    hp += ("tol", 1e-6, 1e-6)                                          // convergence tolerance
+    hp += ("eps", 1e-8, 1e-8)                                          // small constant to avoid division by zero
+    hp += ("pow", 0.5, 0.5)                                            // exponent/L_q norm
+    hp += ("maxIter", 50, 50)                                          // maximum number of iterations, needed for Bridge
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a Ridge Regression from a combined data matrix.
      *  This function centers the data.
-     *  @param xy      the uncentered data/input m-by-n matrix, NOT augmented with a first column of ones
-     *                     and the uncentered response m-vector (combined)
+     *  @param xy      the un-centered data/input m-by-n matrix, NOT augmented with a first column of ones
+     *                     and the un-centered response m-vector (combined)
      *  @param fname   the feature/variable names (defaults to null)
      *  @param hparam  the shrinkage hyper-parameter (0 => OLS) in the penalty term lambda * b dot b
      *  @param col     the designated response column (defaults to the last column)
@@ -230,8 +238,8 @@ object RidgeRegression:
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a Ridge Regression from a data matrix and response vector.
      *  This function centers the data.
-     *  @param x       the uncentered data/input m-by-n matrix, NOT augmented with a first column of ones
-     *  @param y       the uncentered response/output vector
+     *  @param x       the un-centered data/input m-by-n matrix, NOT augmented with a first column of ones
+     *  @param y       the un-centered response/output vector
      *  @param fname   the feature/variable names (defaults to null)
      *  @param hparam  the shrinkage hyper-parameter (0 => OLS) in the penalty term 'lambda * b dot b'
      */
@@ -244,8 +252,21 @@ object RidgeRegression:
         new RidgeRegression (x_c, y_c, fname, hparam)
     end center
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `RidgeRegression` object from a data matrix and a response vector.
+     *  This method provides data rescaling of x and centering of y.
+     *  @param x       the un-centered data/input m-by-n matrix, NOT augmented with a first column of ones
+     *  @param y       the un-centered response/output vector
+     *  @param fname   the feature/variable names (defaults to null)
+     *  @param hparam  the shrinkage hyper-parameter (0 => OLS) in the penalty term 'lambda * b dot b'
+     */
     def rescale (x: MatrixD, y: VectorD, fname: Array [String] = null,
-                 hparam: HyperParameter = hp): RidgeRegression = ???
+                 hparam: HyperParameter = hp): RidgeRegression =
+        val xn = normalize ((x.mean, x.stdev)) (x)
+        val mu_y = y.mean                                              // mean of y
+        val y_c  = y - mu_y                                            // centered y
+        new RidgeRegression (xn, y_c, fname, hparam)
+    end rescale
 
 end RidgeRegression
 
@@ -387,10 +408,10 @@ end ridgeRegressionTest2
     println (mod.summary ())                                           // parameter/coeefficient statistics
 
     banner ("Forward Selection Test")
-    mod.forwardSelAll (cross = false)
+    mod.forwardSelAll (cross = "none")
 
     banner ("Backward Elimination Test")
-    mod.backwardElimAll (cross = false)
+    mod.backwardElimAll (cross = "none")
 
 end ridgeRegressionTest3
 
@@ -460,8 +481,7 @@ end ridgeRegressionTest4
         val (cols, rSq) = mod.selectFeatures (tech)                    // R^2, R^2 bar, R^2 cv
         val k = cols.size
         println (s"k = $k, n = ${x.dim2}")
-        new PlotM (null, rSq.transpose, Array ("R^2", "R^2 bar", "R^2 cv"),
-                   s"R^2 vs n for RidgeRegression with $tech", lines = true)
+        new PlotM (null, rSq.ᵀ, Regression.metrics, s"R^2 vs n for RidgeRegression with $tech", lines = true)
         println (s"$tech: rSq = $rSq")
     end for
 
@@ -507,7 +527,7 @@ end ridgeRegressionTest6
     val y = VectorD (1.0, 3.0, 3.0, 4.0)                       // 4-dim response vector
 
     val n   = x.dim2
-    val xt  = x.transpose
+    val xt  = x.ᵀ
     val xtx = xt * x
     val b   = inverse (xtx)() * xt * y
     val yp  = x * b
@@ -529,7 +549,7 @@ end ridgeRegressionTest6
     val x_   = x - mu_x                                        // center the data
     val y_   = y - mu_y
 
-    val xt_  = x_.transpose
+    val xt_  = x_.ᵀ
     val xtx_ = xt_ * x_ + eye (n, n) * l
     val b_   = inverse (xtx_)() * xt_ * y_
     val yp_  = x_ * b_ + mu_y
@@ -544,4 +564,102 @@ end ridgeRegressionTest6
     println (s"QoF:                sse_       = $sse_")
 
 end ridgeRegressionTest7
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ridgeRegressionTest8` main function tests the multi-collinearity method in
+ *  the `RidgeRegression` class using the following regression equation.
+ *      y  =  b dot x  =  b_1*x_1 + b_2*x_2 + b_2*x_3
+ *  Check correlation for perfectly and highly collinear vectors (@see Textbook, exercise 1)
+ *  > runMain scalation.modeling.ridgeRegressionTest8
+ */
+@main def ridgeRegressionTest8 (): Unit =
+
+    val rvg = random.RandomVecD (100)
+    val nrm = random.NormalVec_c (100, 0, 100)
+    val x_1 = rvg.gen
+    val x_2 = rvg.gen
+    val x_3 = x_2 * 2 + 3
+    val x   = MatrixD (x_1, x_2, x_3).ᵀ
+    println (s"Perfectly Collinear: correlation matrix rho = ${x.corr}")
+    x(?, 2) = x_3 + rvg.gen / 3.0
+    println (s"Highly Collinear: correlation matrix rho = ${x.corr}")
+
+    val b_ = VectorD (2, 3, 4)
+    val y  = x * b_ + nrm.gen
+    val xy = x :^+ y
+    println (s"Correlation matrix for xy: rho = ${xy.corr}")
+
+    val x_c = x - x.mean
+    val y_c = y - y.mean
+
+    banner ("Regression Model")
+    val mod = new Regression (x_c, y_c)
+    mod.trainNtest ()()
+    println (mod.summary ())
+    FitM.showQofStatTable (mod.crossValidate ())
+
+    banner ("Ridge Regression Model")
+    for i <- 1 to 10 do
+        RidgeRegression.hp("lambda") = 25.0 * i
+        val mod2 = new RidgeRegression (x_c, y_c)
+        mod2.trainNtest ()()
+        println (mod2.summary ())
+        FitM.showQofStatTable (mod2.crossValidate ())
+    end for
+
+end ridgeRegressionTest8
+ 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ridgeRegressionTest9` main function tests the multi-collinearity method in
+ *  the `RidgeRegression` class using the following regression equation.
+ *      y  =  b dot x  =  b_1*x_1 + b_2*x_2
+ *  Contour Plots for see, L2 penalty, see + penalty. 
+ *  > runMain scalation.modeling.ridgeRegressionTest9
+ */
+@main def ridgeRegressionTest9 (): Unit =
+
+    val rvg = random.RandomVecD (100)
+    val nrm = random.NormalVec_c (100, 0, 50)
+    val x_1 = rvg.gen
+    val x_2 = rvg.gen
+    val x   = MatrixD (x_1, x_2).ᵀ
+
+    val b_ = VectorD (4, 5)
+    val y  = x * b_ + nrm.gen
+    val xy = x :^+ y
+    println (s"Correlation matrix for xy: rho = ${xy.corr}")
+
+    val x_c = x - x.mean
+    val y_c = y - y.mean
+
+    banner ("Regression Model")
+    val mod = new Regression (x_c, y_c)
+    mod.trainNtest ()()
+    println (mod.summary ())
+    FitM.showQofStatTable (mod.crossValidate ())
+    var lambda = 0.0
+
+    banner ("Ridge Regression Model")
+    for i <- 1 to 10 do
+        lambda = 100.0 * i
+        RidgeRegression.hp("lambda") = lambda
+        val mod2 = new RidgeRegression (x_c, y_c)
+        mod2.trainNtest ()()
+        println (mod2.summary ())
+        FitM.showQofStatTable (mod2.crossValidate ())
+    end for
+
+    def f(b: VectorD): Double  = (y - x * b).normSq
+    def f2(b: VectorD): Double = b.normSq * lambda
+    def f3(b: VectorD): Double = f(b) + f2(b)
+
+    val lb = VectorD (3, 4)
+    val ub = VectorD (5, 6)
+    new PlotC (f,  lb, ub, title = "Contour plot of sse")
+    new PlotC (f2, lb, ub, title = "Contour plot of L2 penalty")
+    new PlotC (f3, lb, ub, title = "Contour Plot of sse + penalty")
+
+end ridgeRegressionTest9
 

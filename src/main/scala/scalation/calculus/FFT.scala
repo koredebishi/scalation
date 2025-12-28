@@ -14,7 +14,7 @@
 package scalation
 package calculus
 
-import scalation.mathstat._
+import scalation.mathstat.*
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `FFT` object provides a method to transform a signal in the time domain
@@ -77,7 +77,7 @@ object FFT:
  
 end FFT
 
-import FFT._
+import scalation.calculus.FFT.*
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `fFTTest` is used to test the `FFT` object by starting with a signal in th4e

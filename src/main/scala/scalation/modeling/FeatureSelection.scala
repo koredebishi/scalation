@@ -8,12 +8,16 @@
  *  @note    Model Framework: Support for Feature Selection and Best-Step
  *
  *  @see     bookdown.org/max/FES/selection.html
+ *
+ *  There are two important given instances the user may change (see below):
+ *      qk          the QoF metric index used for comparing models
+ *      fullset_FS  whether to use the full dataset or the training set for Feature Selection
  */
 
 package scalation
 package modeling
 
-import scala.collection.mutable.LinkedHashSet => LSET
+import scala.collection.mutable.{LinkedHashSet => LSET}
 
 import scalation.mathstat._
 
@@ -27,10 +31,28 @@ enum SelectionTech:
 
 end SelectionTech
 
-// Change as needed the default (given instance) QoF metric used for Feature Selection
+// G I V E N S
 
-//given qk: Int = QoF.rSqBar.ordinal                                    // which QoF metric index to use by default - Regression
-given qk: Int = QoF.smapeIC.ordinal                                     // which QoF metric index to use by default - Time Series
+// Change as needed the default (given instance) QoF metric used for Feature Selection (FS)
+
+given qk: Int = QoF.rSqBar.ordinal                                      // which QoF metric index to use by default - Regression
+//given qk: Int = QoF.smapeC.ordinal                                    // which QoF metric index to use by default - Time Series
+
+// Change as needed the default (given instance) data to be used for Feature Selection (FS)
+
+//given fullset_FS: Boolean = true                                      // use full dataset for Feature Selection
+given fullset_FS: Boolean = false                                       // use the training set for Feature Selection
+                                                                        // for example the training set used in the `validate` method
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Make a new restricted array of strings for the feature names based on the
+ *  selected columns.
+ *  @param fname  the original/full set of feature names
+ *  @param cols   the selected columns
+ */
+def newFname (fname: Array [String], cols: LSET [Int]): Array [String] = cols.map (fname(_)).toArray 
+def newFname (fname: Array [String], cols: VectorI): Array [String] = cols.map (fname(_)).toArray 
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `FeatureSelection` trait establishes a framework for feature selection,
@@ -47,10 +69,10 @@ trait FeatureSelection:
      *  Quality of Fit (QoF) measures/metrics for all steps.
      *  @see `Fit` for index of QoF measures/metrics.
      *  @param tech   the feature selection technique to apply
-     *  @param cross  whether to include the cross-validation QoF measure
+     *  @param cross  indicator to include the cross-validation/validation QoF measure (defaults to "many")
      *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    def selectFeatures (tech: SelectionTech, cross: Boolean = true)(using qk: Int):
+    def selectFeatures (tech: SelectionTech, cross: String = "many")(using qk: Int):
                        (LSET [Int], MatrixD) =
         debug ("selectFeatures", s"select features based on QoF metric with index qk = $qk")
         tech match
@@ -64,10 +86,10 @@ trait FeatureSelection:
      *  to ADD into the model, returning the features/variables added and the new
      *  Quality of Fit (QoF) measures/metrics for all steps.
      *  @see `Fit` for index of QoF measures/metrics.
-     *  @param cross  whether to include the cross-validation QoF measure
+     *  @param cross  indicator to include the cross-validation/validation QoF measure (defaults to "many")
      *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    def forwardSelAll (cross: Boolean = true)(using qk: Int): (LSET [Int], MatrixD)
+    def forwardSelAll (cross: String = "many")(using qk: Int): (LSET [Int], MatrixD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform BACKWARD ELIMINATION to find the LEAST predictive features/variables
@@ -75,10 +97,10 @@ trait FeatureSelection:
      *  new Quality of Fit (QoF)  measures/metrics for all steps.
      *  @see `Fit` for index of QoF measures/metrics.
      *  @param first  first variable to consider for elimination
-     *  @param cross  whether to include the cross-validation QoF measure
+     *  @param cross  indicator to include the cross-validation/validation QoF measure (defaults to "many")
      *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    def backwardElimAll (first: Int = 1, cross: Boolean = true)(using qk: Int): (LSET [Int], MatrixD)
+    def backwardElimAll (first: Int = 1, cross: String = "many")(using qk: Int): (LSET [Int], MatrixD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform STEPWISE SELECTION to find a GOOD COMBINATION of predictive features/variables
@@ -86,12 +108,41 @@ trait FeatureSelection:
      *  (QoF) measures/metrics for all steps.  At each step, it calls forward and backward
      *  and takes the best of the two actions.  Stops when neither action yields improvement.
      *  @see `Fit` for index of QoF measures/metrics.
-     *  @param cross  whether to include the cross-validation QoF measure
+     *  @param cross  indicator to include the cross-validation/validation QoF measure (defaults to "many")
      *  @param swap   whether to allow a swap step (swap out a feature for a new feature in one step)
      *  @param qk     index of Quality of Fit (QoF) to use for comparing quality
      */
-    def stepwiseSelAll (cross: Boolean = true, swap: Boolean = true)(using qk: Int):
+    def stepwiseSelAll (cross: String = "many", swap: Boolean = true)(using qk: Int):
                        (LSET [Int], MatrixD)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Filter the x-columns of matrix xy based on the two thresholds, returning
+     *  the filtered matrix and the column indices/predictor variables selected.
+     *  @param xy    the [ x, y ] combined data-response matrix
+     *  @param thr1  the threshold used to compare the predictor x-columns to the y-column
+     *               only want variables above some minimal dependency level
+     *  @param thr2  the threshold used to compare the predictor x-columns with each other
+     *               only want variables below some cut-off dependency/collinearity level
+     *  @param dep   the variable/column dependency measure (defaults to correlation)
+     *
+    def filter (xy: MatrixD, thr1: Double = 0.2, thr2: Double = 0.8)
+               (dep: MatrixD = xy.corr): (MatrixD, VectorI) =
+
+        val lst  = dep.dim2 - 1                                                    // the index of last column (holds y)
+        val depY = dep(?, lst)                                                     // the dependency sub-matrix for xy vs. y (last column)
+        val depX = dep(0 until lst, 0 until lst)                                   // the dependency sub-matrix for x vs. x
+        val indices  = for i <- 0 until lst if abs (depY(i)) > thr1 yield i        // row indices that match (> thr1)
+        val sIndices = indices.sortBy (i => -abs (depY(i)))                        // sort indices from highest dep to lowest
+
+        // only add index i if its dependency with all selected columns < thr2
+        val selected = ArrayBuffer [Int] ()
+        for i <- sIndices do
+            if selected.forall (k => abs (depX(i, k)) < thr2) then selected += i   // row indices that also match (< thr2)
+        val selected_ = selected.sorted
+
+        (xy(?, selected_), new VectorI (selected_.size, selected_.toArray))
+    end filter
+     */
 
 end FeatureSelection
 
@@ -112,6 +163,8 @@ case class BestStep (col: Int = -1, qof: VectorD = null, mod: Model_FS = null)
                     (using qk: Int)(bestq: Double = Fit.extreme (qk)):
 
     private val debug = debugf ("BestStep", false)
+
+    debug ("BestStep", s"bestq = $bestq")                          // needed for unused explicit parameter warning
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return whether this step is better than that step.
@@ -160,14 +213,22 @@ end BestStep
  *  @see `Predictor`
  *  @param rSq    the matrix contain information about r-Sq-based QoF measures
  *  @param l      the l-th iteration
- *  @param cross  indicator of whether cross-validation are to be included
+ *  @param cross  indicator to include "many" cross-validation, "one" validation, or "none" nothing
  *  @param best   the best step so far
  */
-def updateQoF (rSq: MatrixD, l: Int, cross: Boolean, best: BestStep): Unit =
+def updateQoF (rSq: MatrixD, l: Int, cross: String, best: BestStep): Unit =
     rSq(l) =
-        if cross then
+        cross match
+        case "many" =>
             Fit.qofVector (best.qof, best.mod.crossValidate ())       // results for model mod_l, with cross-validation
-        else
-            Fit.qofVector (best.qof, null)                            // results for model mod_l, no cross-validation
+        case "one" =>
+            val qof = best.mod.validate ()()._2
+            qof match 
+            case qofv: VectorD => 
+                Fit.qofVector (best.qof, best.mod.qof2Stat (qofv))    // results for model mod_l, with validation
+            case qofm: MatrixD =>
+                Fit.qofVector (best.qof, best.mod.qof2Stat (qofm(0)))   // results for model mod_l, with validation
+        case _     =>
+            Fit.qofVector (best.qof, null)                            // results for model mod_l, with nothing
 end updateQoF
 

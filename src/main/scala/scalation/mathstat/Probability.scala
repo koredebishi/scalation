@@ -11,9 +11,9 @@
 package scalation
 package mathstat
 
-import scala.math.{abs, log}
+import scalation.mathstat.MatrixD.outer
 
-import MatrixD.outer
+import scala.math.{abs, log}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Probability` object provides methods for operating on univariate and
@@ -129,10 +129,8 @@ object Probability:
                 for i <- idx if x(i) <= thres do { nu(y(i)) += 1; cnt += 1 }
             else
                 for i <- idx if x(i) >  thres do { nu(y(i)) += 1; cnt += 1 }
-            end if
         else
             for i <- idx if x(i) == vl do { nu(y(i)) += 1; cnt += 1 }
-        end if
         debug ("freq", s"k = $k, vl = $vl, cont = $cont, thres = $thres, nu = $nu")
         (cnt.toDouble / x.dim, nu)                                    // return fraction and frequency vector
     end freq
@@ -155,10 +153,8 @@ object Probability:
                 for i <- x.indices if x(i) <= thres do cnt += 1
             else
                 for i <- x.indices if x(i) >  thres do cnt += 1
-            end if
         else
             for i <- x.indices if x(i) == vl do cnt += 1
-        end if
         cnt
     end count
 
@@ -410,7 +406,7 @@ object Probability:
 
 end Probability
 
-import Probability._
+import scalation.mathstat.Probability.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `probabilityTest` main function is used to test the `Probability` object.

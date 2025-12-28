@@ -11,9 +11,8 @@
 package scalation
 package random
 
-import scalation.mathstat._
-
-import RandomSeeds.N_STREAMS
+import scalation.mathstat.*
+import scalation.random.RandomSeeds.N_STREAMS
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateTen` abstract class serves as a base class for all the Random
@@ -140,7 +139,7 @@ case class RandomTenD (dim: Int = 5, dim2: Int = 4, dim3: Int = 3, max: Double =
 
     def pf (z: TensorD): Double = 1.0 / (max - min) ~^ (dim + dim2 + dim3)
 
-    def gen: TensorD = TensorD (for i <- 0 until dim yield rmat.gen)
+    def gen: TensorD = TensorD (for _ <- 0 until dim yield rmat.gen)
 
     def igen: TensorD = gen.toInt
 
@@ -159,12 +158,12 @@ end RandomTenD
      banner ("Test: NormalTen random tensor generation")
      rvt = NormalTen (5, 4, 3, 0.0, 0.01)                      // random normal tensor generator
      println ("mean = " + rvt.mean)                            // with mean 0 and variance 0.01
-     for k <- 0 until 10 do println (rvt.gen)
+     cfor (0, 10) { _ => println (rvt.gen) }
 
      banner ("Test: RandomTenD random tensor generation")
      rvt = RandomTenD ()                                       // random tensor generator
      println ("mean = " + rvt.mean)
-     for k <- 0 until 10 do println (rvt.gen)
+     cfor (0, 10) { _ => println (rvt.gen) }
 
 /* FIX
      import VariateTen.corTransform

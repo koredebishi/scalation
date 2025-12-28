@@ -15,7 +15,7 @@ package scalation
 package modeling
 package neuralnet
 
-import scalation.mathstat._
+import scalation.mathstat.*
 import scalation.random.RandomVecD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -33,6 +33,11 @@ class CoFilter_1D (width: Int = 5):
      *  @param vec_  the new vector parameters
      */
     def update (vec_ : VectorD): Unit = vec = vec_
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return/get the filter coefficients (needed for forward and gradient computation)
+     */
+    def coef: VectorD = vec
 
 end CoFilter_1D
 
@@ -138,7 +143,7 @@ object CoFilter_1D:
 
 end CoFilter_1D
 
-import CoFilter_1D._
+import scalation.modeling.neuralnet.CoFilter_1D.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `coFilter_1DTest` main function is used to test the `CoFilter_1D` class.

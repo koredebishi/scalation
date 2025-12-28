@@ -16,9 +16,9 @@
 package scalation
 package calculus
 
-import scala.math.sqrt
+import scalation.mathstat.*
 
-import scalation.mathstat._
+import scala.math.sqrt
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `B_Spline` class provides B-Spline basis functions for various orders 'm',
@@ -271,10 +271,10 @@ object B_Spline:
     def benchmarked [R] (reps: Int = 100, useSeconds: Boolean = false, title: String = "benchmark") (block: => R):
         (R, Statistic) =
         val stat = new Statistic (title)
-        for i <- 0 until reps-1 do
-            val (r, ms) = timed (block)
+        cfor (0, reps-1) { _ =>
+            val (_, ms) = timed (block)
             stat.tally (if useSeconds then ms / 1000 else ms)
-        end for
+        } // cfor
         val (r, ms) = timed (block)
         stat.tally (if useSeconds then ms / 1000 else ms)
         (r, stat)

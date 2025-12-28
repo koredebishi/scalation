@@ -11,9 +11,9 @@
 package scalation
 package mathstat
 
-import scala.math.min
+import scalation.mathstat.MatrixD.eye
 
-import MatrixD.eye
+import scala.math.min
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_QR` class provides methods to factor an m-by-n matrix a into the
@@ -83,7 +83,6 @@ class Fac_QR (aa: MatrixD, needQ: Boolean = false)
             if at_k(k) < 0.0 then _norm = -_norm               // make k-th Householder vector
             cfor (k, m) { i => at_k(i) /= _norm }
             at_k(k) += 1.0
-        end if
         r(k, k) = -_norm                                       // set the diagonal of r matrix
 
         cfor (k+1, p) { j =>                                   // transform all the rest of aa matrix
@@ -232,7 +231,7 @@ object Fac_QR:
 
 end Fac_QR
 
-import Fac_QR._
+import scalation.mathstat.Fac_QR.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `fac_QRTest` main function is used to test the `Fac_QR` classes.

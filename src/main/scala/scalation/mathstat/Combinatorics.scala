@@ -11,7 +11,7 @@
 package scalation
 package mathstat
 
-import scala.math.{abs, asin, E, exp, log, Pi, sin, sqrt}
+import scala.math.*
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Combinatorics` object provides several common combinatorics functions,
@@ -283,7 +283,6 @@ object Combinatorics:
 //          prod *= SQRT_PI / 2~^ia
 //      else
 //          flaw ("gammaF", "only handle positive integer and halves cases")
-//      end if
 //      prod
 //  } // gammaF
 
@@ -392,7 +391,7 @@ object Combinatorics:
 
 end Combinatorics
 
-import Combinatorics._
+import scalation.mathstat.Combinatorics.*
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `combinatoricsTest` main function tests the methods in the `Combinatorics` object.
@@ -422,7 +421,7 @@ import Combinatorics._
     println ("\nBuild Pascal's Triangle using choose (n, k)")
     val max = 16
     for n <- 0 to max do
-        for i <- 1 to (max - n) / 2 do print ("\t")
+        cfor (0, (max - n) / 2) { _ => print ("\t") }
         for k <- 0 to n do
             val c = choose (n, k)
             if n % 2 == 1 then if c < 1000 then print ("    ") else print ("   ")

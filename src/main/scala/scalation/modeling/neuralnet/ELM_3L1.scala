@@ -15,10 +15,9 @@ package scalation
 package modeling
 package neuralnet
 
-import scalation.mathstat._
-
-import ActivationFun._
-import Initializer._
+import scalation.mathstat.*
+import scalation.modeling.ActivationFun.*
+import scalation.modeling.Initializer.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ELM_3L1` class supports single-output, 3-layer (input, hidden and output)
@@ -43,28 +42,29 @@ class ELM_3L1 (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
                private var nz: Int = -1, hparam: HyperParameter = null,
                f: AFF = f_tanh, val itran: FunctionV2V = null)
       extends Predictor (x, y, fname_, hparam)
-         with Fit (dfm = x.dim2 - 1, df = x.dim - x.dim2):
+         with Fit (dfr = x.dim2 - 1, df = x.dim - x.dim2):
 
+    private val debug = debugf ("ELM_3L1", false)                       // debug function
     private val n     = x.dim2                                          // nodes in input layer
     private val s     = 8                                               // random number stream to use (0 - 999)
 
     if nz < 1 then nz = 2 * n + 1                                       // default number of nodes for hidden layer
-    val df_m = compute_df_m (nz)                                        // degrees of freedom for model (first output only)
-    resetDF (df_m, x.dim - df_m)                                        // degrees of freedom for (model, error)
+    val df_r = compute_dfr (nz)                                         // degrees of freedom for regression/model (first output only)
+    resetDF (df_r, x.dim - df_r)                                        // degrees of freedom for (regression/model, error)
  
     private val a = new NetParam (weightMat3 (n, nz, s),
                                   weightVec3 (nz, s))                   // parameters (weights & biases) in to hid (fixed)
 
-    modelName = "ELM_3L1_" + f.name
+    _modelName = s"ELM_3L1_${f.name}"
 
-    println (s"Create an ELM_3L1 with $n input, $nz hidden and 1 output nodes: df_m = $df_m")
+    println (s"Create an ELM_3L1 with $n input, $nz hidden and 1 output nodes: df_r = $df_r")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the degrees of freedom for the model (based on n, nz_, ny = 1).
      *  Rough extimate based on total number of parameters - 1.
      *  @param nz_  the number of nodes in the hidden layer
      */
-    def compute_df_m (nz_ : Int): Int = nz_
+    def compute_dfr (nz_ : Int): Int = nz_
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the parameters b.  Since the a weights are fixed, only return b.
@@ -115,9 +115,11 @@ class ELM_3L1 (x: MatrixD, y: VectorD, fname_ : Array [String] = null,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a sub-model that is restricted to the given columns of the data matrix.
      *  @param x_cols  the columns that the new model is restricted to
+     *  @param fname2  the variable/feature names for the new model (defaults to null)
      */
-    def buildModel (x_cols: MatrixD): ELM_3L1 =
-        new ELM_3L1 (x_cols, y, null, -1, hparam, f, itran)
+    def buildModel (x_cols: MatrixD, fname2: Array [String] = null): ELM_3L1 =
+        debug ("buildModel", s"${x_cols.dim} by ${x_cols.dim2}")
+        new ELM_3L1 (x_cols, y, fname2, -1, hparam, f, itran)
     end buildModel
 
 end ELM_3L1
@@ -188,7 +190,7 @@ end ELM_3L1
  */
 @main def eLM_3L1Test (): Unit =                                     // FIX - fails
 
-    import Example_BPressure._
+    import Example_BPressure.*
 
     println ("model: y = b_0 + b_1*x1 + b_2*x_ + b3*x3 + b4*x4")
 
@@ -223,7 +225,7 @@ end eLM_3L1Test
  */
 @main def eLM_3L1Test2 (): Unit =
 
-    import Example_BasketBall.{oxy, ox, y}
+    import Example_BasketBall.{ox, oxy, y}
 
     banner ("ELM_3L1 vs. Regression - Example_BasketBall")
 
@@ -259,7 +261,7 @@ end eLM_3L1Test2
  */
 @main def eLM_3L1Test3 (): Unit =
 
-    import Example_AutoMPG._
+    import Example_AutoMPG.*
 
     banner ("ELM_3L1 vs. Regression - Example_AutoMPG")
 
@@ -299,7 +301,7 @@ end eLM_3L1Test3
  */
 @main def eLM_3L1Test4 (): Unit =
 
-    import Example_AutoMPG._
+    import Example_AutoMPG.*
 
     banner ("ELM_3L1 cross-validation - Example_AutoMPG")
 
@@ -325,7 +327,7 @@ end eLM_3L1Test4
  */
 @main def eLM_3L1Test5 (): Unit =
 
-    import Example_AutoMPG._
+    import Example_AutoMPG.*
 
     val nz  = 17                                                     // number of nodes in hidden layer
     banner ("ELM_3L1 feature selection - Example_AutoMPG")
@@ -336,7 +338,7 @@ end eLM_3L1Test4
     elm.trainNtest ()()
 
     banner ("Forward Selection Test")
-    val (cols, rSq) = elm.forwardSelAll ()                           // R^2, R^2 Bar, smape, R^2 cv
+    elm.forwardSelAll ()                                             // showing R^2, R^2 Bar, smape, R^2 cv
 
 end eLM_3L1Test5
 
@@ -348,7 +350,7 @@ end eLM_3L1Test5
  */
 @main def eLM_3L1Test6 (): Unit =
 
-    import Example_AutoMPG._
+    import Example_AutoMPG.*
 
     val n = ox.dim2                                                 // number of parameters/variables
     banner ("ELM_3L1 feature selection - Example_AutoMPG")
@@ -368,8 +370,7 @@ end eLM_3L1Test5
     val k = cols.size
     println (s"k = $k, n = $n")
     val t = VectorD.range (1, k)                                    // instance index
-    new PlotM (t, rSq.transpose, Array ("R^2", "R^2 bar", "smape", "R^2 cv"),
-               "R^2 vs n for ELM_3L1", lines = true)
+    new PlotM (t, rSq.transpose, Regression.metrics, "R^2 vs n for ELM_3L1", lines = true)
 
 end eLM_3L1Test6
 

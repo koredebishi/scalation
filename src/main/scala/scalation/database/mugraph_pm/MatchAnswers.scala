@@ -99,7 +99,7 @@ end MatchAnswers
  */
 @main def matchAnswersTest (): Unit =
 
-    import MatchAnswers._
+    import MatchAnswers.*
 
     println ("graphSim:   " + stringOf (shift (graphSim)))
     println ("dualSim:    " + stringOf (shift (dualSim)))

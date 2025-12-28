@@ -6,7 +6,6 @@ package process
 
 import scalation.mathstat.VectorD
 import scalation.scala2d.Colors.*
-import scalation.animation.CommandType.*
 import scalation.animation.CommandType.CreateEdge
 
 //import scala.math.{hypot}

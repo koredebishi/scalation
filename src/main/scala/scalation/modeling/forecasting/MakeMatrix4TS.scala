@@ -19,12 +19,15 @@ import scala.math.{cos, sin}
 
 import scalation.mathstat._
 
+import TransformT._
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TransformMap` type and its extension methods provides maps of transforms.
  */
 type TransformMap = Map [String, Transform | Array [Transform]]
 
 extension (tr: Transform | Array [Transform])
+
     def apply (i: Int = -1): Transform =
         tr match
             case t: Transform => t
@@ -32,7 +35,7 @@ extension (tr: Transform | Array [Transform])
 
     def length: Int =
         tr match
-            case t: Transform => 1
+            case _ : Transform => 1
             case tArr: Array [Transform] => tArr.length
 
     def f(x: VectorD): VectorD = apply ().f(x)
@@ -76,7 +79,7 @@ trait  MakeMatrix4TSY:
     def rescale (y: VectorD, hh: Int, fname_ : Array [String] = null,
                  tRng: Range = null, hparam: HyperParameter = MakeMatrix4TS.hp,
                  bakcast: Boolean = false,
-                 tForm: VectorD | MatrixD => Transform = x => zForm(x)): Forecaster_Reg | Forecaster_D
+                 tForm: VectorD | MatrixD => Transform = MinMax.form): Forecaster_Reg | Forecaster_D
 
 end MakeMatrix4TSY
 
@@ -122,16 +125,18 @@ trait  MakeMatrix4TS:
                  tRng: Range = null, hparam: HyperParameter = MakeMatrix4TS.hp,
                  fEndo: Array [Transform] = null, fExo: Array [Transform] = null,
                  bakcast: Boolean = false,
-                 tForm: VectorD | MatrixD => Transform = x => zForm(x)): Forecaster_Reg | Forecaster_D
+                 tForm: VectorD | MatrixD => Transform = MinMax.form): Forecaster_Reg | Forecaster_D
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form an array of names for the features included in the model.
-     *  @param n_exo  the number of exogenous variable
-     *  @param hp_    the hyper-parameters
-     *  @param n_fEn  the number of functions used to map endogenous variables
-     *  @param n_fEx  the number of functions used to map exogenous variables
+     *  @param n_exo    the number of exogenous variable
+     *  @param hp_      the hyper-parameters
+     *  @param xe_name  the feature/variable names
+     *  @param n_fEn    the number of functions used to map endogenous variables
+     *  @param n_fEx    the number of functions used to map exogenous variables
      */
-    def formNames (n_exo: Int, hp_ : HyperParameter, n_fEn: Int = 0, n_fEx: Int = 0): Array [String]
+    def formNames (n_exo: Int, hp_ : HyperParameter, xe_name: Array [String] = null,
+                   n_fEn: Int = 0, n_fEx: Int = 0): Array [String]
 
 end MakeMatrix4TS
 
@@ -145,14 +150,11 @@ object MakeMatrix4TS:
     /** Base hyper-parameter specification for regression based time series models.
      */
     val hp = new HyperParameter
-    hp += ("p",  1, 1)                              // number of lags for the endogenous variable
+    hp += ("p",  3, 3)                              // number of lags for the endogenous variable
     hp += ("sp", 7, 7)                              // the seasonal period (time units between repetitive behavior)
     hp += ("ps", 2, 2)                              // number of seasonal lags for the endogenous variable
-    hp += ("pp", 2.0, 2.0)                          // the power (defaults to quadratic) to raise the lags of the endogenous variable to
-    hp += ("pr", 0.5, 0.5)                          // the root (defaults to sqrt) to take of the lags of the endogenous variable
-    hp += ("q",  1, 1)                              // number of lags for the exogenous variables
-    hp += ("qp", 2.0, 2.0)                          // the power (defaults to quadratic) to raise the lags of the exogenous variables to
-    hp += ("qr", 0.5, 0.5)                          // the root (defaults to sqrt) to take of the lags of the exogenous variables
+    hp += ("pp", 1.5, 1.5)                          // the power (set between (linear, cubic] to raise the lags of the variables to
+    hp += ("q",  2, 2)                              // number of lags for the exogenous variables
     hp += ("spec", 1, 1)                            // trend terms: 0 - none, 1 - constant, 2 - linear, 3 - quadratic,
                                                     //              4 - sine, 5 - cosine
     hp += ("lwave", 7, 7)                           // wavelength for sine/cosine (distance between peaks)
@@ -160,16 +162,18 @@ object MakeMatrix4TS:
 
     hp += ("nneg", 1, 1)                            // 0 - unrestricted, 1 - predictions must be non-negative
     hp += ("factorization", "Fac_QR", "Fac_QR")     // type of matrix factorization
-    hp += ("lambda", 0.1, 0.1)                      // shrinkage/regularization parameter
 
     /*-------------------------------------------------------------------------------
+    hp += ("pr", 0.5, 0.5)                          // the root (defaults to sqrt) to take of the lags of the endogenous variable
+    hp += ("qp", 2.0, 2.0)                          // the power (defaults to quadratic) to raise the lags of the exogenous variables to
+    hp += ("qr", 0.5, 0.5)                          // the root (defaults to sqrt) to take of the lags of the exogenous variables
     Usage:
     ARY:       p, spec, lwave                          lags of endogenous variable
     ARY_Quad:  p, pp, spec, lwave                      lags of endogenous variable with power/quadratic terms
     ARX:       p, q, spec, lwave                       lags of endogenous variable and exogenous variable
     ARX_Quad:  p, pp, q, spec, lwave                   lags of endogenous variable with power/quadratic terms and exogenous variable
-    ARX_Symb:  p, pp, pr, q, qp, qr, spec, lwave       supports powers and roots for all variables
-    for DIRECT forecasting use ARY_D, ARY_Quad_D, ARX_D, ARX_Quad_D, ARX_Symb_D
+    ARX_SR:    p, pp, pr, q, qp, qr, spec, lwave       supports powers and roots for all variables
+    for DIRECT forecasting use ARY_D, ARY_Quad_D, ARX_D, ARX_Quad_D, ARX_SR_D
     NOTE: Last three hyper-parameters can be used any any such model
     -------------------------------------------------------------------------------*/
 
@@ -181,19 +185,19 @@ object MakeMatrix4TS:
      *  `*ARY*` models.  The `*ARX*` models require custom `formNames` methods.
      *  @param spec   the number of trend terms
      *  @param p      the number of lags for the endogenous variable (lags 1 to p)
-     *  @param pwr    whether to raise the lagged endogenous values to a power (defaults to false)
+     *  @param pp     the power to raise the lagged endogenous values to (defaults to 0.0)
      *  @param sp     the seasonal period (time units until repetitive behavior)
      *  @param start  the first seasonal lag to use (not subsumed by regular lags)
      *  @param ps     the number of seasonal lags for the endogenous variable (lags 1 to ps)
      */
-    def formNames (spec: Int, p: Int, pwr: Boolean = false,
+    def formNames (spec: Int, p: Int, pp: Double = 0.0,
                    sp: Int = -1, start: Int = 1, ps: Int = 0): Array [String] =
         val names = ArrayBuffer [String] ()
         for j <- 0 until spec do names += s"${trend(j)}"                // trend terms
         for j <- ps to start by -1 do names += s"yl${j*sp}"             // seasonal lags terms
         for j <- p to 1 by -1 do names += s"yl$j"                       // regular lags terms
-        if pwr then for j <- p to 1 by -1 do names += s"yl$j^"          // power lags terms
-//      println (s"formNames: $names")
+        if pp != 0.0 then for j <- p to 1 by -1 do names += s"yl$j^$pp" // power lags terms
+        println (s"MakeMatrix4TS.formNames: names = $names")
         names.toArray
     end formNames
 
@@ -202,9 +206,9 @@ object MakeMatrix4TS:
      *  same prepended with one backcasted value.
      *  @see `WeightedMovingAverage`
      *  @param y        the given output/response vector
-     *  @param bakcast  whether a backcasted value is prepended to the time series (defaults to false)
+     *  @param bakcast  whether a backcasted value is prepended to the time series
      */
-    private inline def getYb (y: VectorD, bakcast: Boolean = false): VectorD =
+    private inline def getYb (y: VectorD, bakcast: Boolean): VectorD =
         if bakcast then WeightedMovingAverage.backcast (y) +: y         // y prepended with one backcast
         else y
     end getYb
@@ -219,6 +223,7 @@ object MakeMatrix4TS:
      *  @param bakcast  whether a backcasted value is prepended to the time series
      */
     def makeMatrix4T (y: VectorD, spec: Int, lwave: Double, bakcast: Boolean = false): MatrixD =
+        if bakcast then println ("makeMatrix4T: FIX: backcasted value not accounted for in any these methods")
         val m    = y.dim
         val m2   = m / 2.0
         val w    = _2Pi / lwave                                         // 2 Pi over wavelength
@@ -352,6 +357,17 @@ object MakeMatrix4TS:
         for i <- ii-1 to 0 by -1 do                                     // replace zero prefix with backcasted values
             xe_j(i) = WeightedMovingAverage.backcast (xe_j, i)          // backcast from index i
         xe_j(1 until xe_j.dim)
+    end backfill
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Backfill the zero prefix of the exogenous variables j (xe) by backcasting.  The zero
+     *  prefix will be at least of size 1 as 0.0 is initially prepended.
+     *  @param xe  the matrix of exogenous variables
+     */
+    def backfill (xe: MatrixD): MatrixD =
+        val xe_bfill = new MatrixD (xe.dim, xe.dim2)
+        for j <- xe.indices2 do xe_bfill(?, j) = backfill (xe(?, j))
+        xe_bfill
     end backfill
 
 end MakeMatrix4TS

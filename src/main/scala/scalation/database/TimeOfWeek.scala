@@ -30,7 +30,7 @@ import java.time.temporal.ChronoField
 
 //import scala.runtime.ScalaRunTime.stringOf
 
-import TimeNum.{DAY, HOUR, MINUTE}
+import scalation.TimeNum.{DAY, HOUR, MINUTE}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TimeOfWeek` companion object provide factory functions for creating
@@ -156,7 +156,6 @@ case class TimeOfWeek (day: Int, second: Long):
             f"$E%s $HH%02d:$mm%02d:$ss%02d"
         else
             f"$E%s $HH%02d:$mm%02d"
-        end if
     end format
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

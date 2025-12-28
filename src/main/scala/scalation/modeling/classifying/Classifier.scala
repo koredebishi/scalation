@@ -12,6 +12,7 @@ package scalation
 package modeling
 package classifying
 
+import scala.annotation.unused
 import scala.collection.mutable.{ArrayBuffer, IndexedSeq, LinkedHashSet => LSET, Set}
 import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
@@ -40,7 +41,6 @@ trait Classifier (x: MatrixD, y: VectorI, protected var fname: Array [String],
     if cname == null then
         cname = if k == 2 then Array ("No", "Yes")                           // use default class names/labels
                 else (for i <- 0 until k yield s"c$i").toArray
-    end if
     if cname.length != k then flaw ("init", "# class names != # classes")
 
     if x != null then
@@ -58,6 +58,8 @@ trait Classifier (x: MatrixD, y: VectorI, protected var fname: Array [String],
     protected var p_yz = VectorD.nullv                                       // probability estimates for y-values (class probabilities given z)
 //  protected var b    = VectorD.nullv                                       // parameter/coefficient vector [b_0, b_1, ... b_k]
     protected var e    = VectorI.nullv                                       // residual/error vector [e_0, e_1, ... e_m-1]
+
+    _taskType = TaskType.Classify                                            // the type of task performed
 
     if x != null && fname == null then fname = x.indices2.map ("x" + _).toArray  // default feature/variable names
 
@@ -96,6 +98,7 @@ trait Classifier (x: MatrixD, y: VectorI, protected var fname: Array [String],
      *  @param y_  the training/full response/output vector (defaults to full y)
      */
     def train (x_ : MatrixD = x, y_ : VectorI = y): Unit =
+        debug ("train", s"x_.dims = ${x_.dims}, y_.dim = ${y_.dim}")
         val nup = y_.freq (k)
         nu_y    = nup._1                                                       // set frequency vector
         p_y     = nup._2                                                       // set probability vector
@@ -151,7 +154,7 @@ trait Classifier (x: MatrixD, y: VectorI, protected var fname: Array [String],
      *  Override as needed.
      *  @param z  the new vector to predict
      */
-    def predictI (z: VectorI): Int = p_y.argmax ()
+    def predictI (@unused z: VectorI): Int = p_y.argmax ()
     def predictI (z: VectorD): Int // = p_y.argmax ()
 
     def predict (z: VectorD): Double = predictI (z.toInt)
@@ -279,8 +282,14 @@ REPORT
     /** Build a sub-model that is restricted to the given columns of the data matrix.
      *  Override for models that support feature selection.
      *  @param x_cols  the columns that the new model is restricted to
+     *  @param fname2  the variable/feature names for the new model (defaults to null)
      */
-    def buildModel (x_cols: MatrixD): Classifier = null
+    def buildModel (x_cols: MatrixD, fname2: Array [String] = null): Classifier = ???  // FIX
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the best model found from feature selection.
+     */
+    def getBest: scalation.modeling.BestStep = ???  // FIX
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The `BestStep` is used to record the best improvement step found so far.
@@ -304,7 +313,6 @@ REPORT
                 FitC.qofVector (best.qof, best.mod.crossValidate ())          // results for model mod_l, with cross-validation
             else
                 FitC.qofVector (best.qof, null)                               // results for model mod_l, no cross-validation
-            end if
     end updateQoF
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -348,7 +356,6 @@ REPORT
 
         if best.col == -1 then
             flaw ("forwardSel", "could not find a variable x_j to add: best.col = -1")
-        end if
         best
     end forwardSel
 
@@ -406,7 +413,6 @@ REPORT
 
         if best.col == -1 then
             flaw ("backwardElim", "could not find a variable x_j to eliminate: best.col = -1")
-        end if
         best
     end backwardElim
 
@@ -511,7 +517,6 @@ REPORT
                         println (s"\nstepRegressionAll: (l = $l) SWAP variable $bestb with $bestf")
                     else
                         break ()                                             // can't find a better model -> quit
-                    end if
                 end if
             end for
         } // breakable
@@ -560,6 +565,20 @@ REPORT
         vifV
     end vif
 
+//  T E S T I N G   S C E N A R I O S
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform In-Sample Testing, i.e., train and test on the FULL data set.
+     *  @param skip    the number of initial data points to skip (due to insufficient information)
+     *  @param showYp  whether to show the prediction vector
+     */
+    def inSample_Test (skip: Int = 0, showYp: Boolean = false): Unit =
+        val (x_, y_) = (x.drop (skip), y.drop (skip))
+        val yp = trainNtest (x_, y_)(x_, y_)._1
+        if showYp then
+            println (s"Final In-Sample Prediction Vector yp = $yp")
+    end inSample_Test
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the indices for the test-set.
      *  @see `scalation.mathstat.TnT_Split`
@@ -571,23 +590,38 @@ REPORT
     end testIndices
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the indices for the test-set for (1) RANDONLY or (3) LAST
+     *  @see `scalation.mathstat.TnT_Split`
+     *  @param n_total  the size of full dataset
+     *  @param n_test   the size of test-set
+     *  @param rando    whether to select indices randomly or in blocks
+     */
+    inline def testIndices (n_total: Int, n_test: Int, rando: Boolean): IndexedSeq [Int] =
+        TnT_Split.testIndices (permGen, n_total, n_test, rando)
+    end testIndices
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /*  Use validation to compute test Quality of Fit (QoF) measures by dividing
      *  the full dataset into a TESTING set and a TRAINING set.
      *  The test set is defined by idx and the rest of the data is the training set.
+     *  @see `modeling.Predictor.validate` about the RANDOM, FIRST, and LAST options
+     *  for selecting the testing-set.
      *  @param rando  flag indicating whether to use randomized or simple validation
      *  @param ratio  the ratio of the TESTING set to the full dataset (most common 70-30, 80-20)
-     *  @param idx    the prescribed TESTING set indices
+     *  @param idx    the prescribed TESTING set indices (default => generate)
      */
-    def validate (rando: Boolean = true, ratio: Double = 0.2)
-                 (idx : IndexedSeq [Int] = testIndices ((ratio * y.dim).toInt, rando)): VectorD =
+    def validate (rando: Boolean = true, ratio: Double = Model.TE_RATIO)
+//               (idx: IndexedSeq [Int] = testIndices ((ratio * y.dim).toInt, rando)):
+                 (idx: IndexedSeq [Int] = testIndices (y.dim, (ratio * y.dim).toInt, rando)):
+                 (VectorD, VectorD) =
+        debug ("validate", s"n_test = ${(ratio * y.dim).toInt}, rando = $rando")
         val (x_e, x_, y_e, y_) = TnT_Split (x, y, idx)                       // Test-n-Train Split
 
         train (x_, y_)                                                       // train model on the training set
-        val qof = test (x_e, y_e)._2                                         // test on test-set and get QoF measures
+        val (yp, qof) = test (x_e, y_e)                                      // test on test-set and get QoF measures
         if qof(QoF.sst.ordinal) <= 0.0 then                                  // requires variation in test-set
             flaw ("validate", "chosen testing set has no variability")
-        end if
-        qof
+        (yp.toDouble, qof)
     end validate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -609,11 +643,10 @@ REPORT
         for fold <- 0 until k do
             banner (s"crossValidate: fold $fold: train-test sizes = (${y.dim - sz}, $sz)")
             val idx = fullIdx (fold * sz until (fold+1) * sz).toMuIndexedSeq   // instance indices for this fold
-            val qof = validate (rando, ratio)(idx)
+            val qof = validate (rando, ratio)(idx)._2
             debug ("crossValidate", s"fold $fold: qof = $qof")
             if qof(QoF.sst.ordinal) > 0.0 then                               // requires variation in test-set
                 for q <- qof.indices do stats(q).tally (qof(q))              // tally these QoF measures
-            end if
         end for
         stats
     end crossValidate
@@ -623,7 +656,7 @@ end Classifier
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Classifier` companion object provides a method for testing predictive
- *  models.
+ *  classification models.
  */
 object Classifier:
 
@@ -674,10 +707,9 @@ object Classifier:
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Downsample to reduce imbalance of classes, by returning the group indices
      *  and the probability for each group.
-     *  @param y   the classification/response vector
-     *  @param ns  the number of instances in downsample
+     *  @param y  the classification/response vector
      */
-    def downsample (y: VectorI, ns: Int): Array [Int] =
+    def downsample (y: VectorI): Array [Int] =
         val dsample = Set [Int] ()                      // create an empty downsample
         val (group, freq) = partition (y)               // partition into groups
         val gmax = freq.min - 1                         // use smallest group for samples per group
@@ -701,12 +733,12 @@ object Classifier:
     def test (mod: Classifier, ext: String = "", check: Boolean = true): Unit =
         val iq = QoF.rSq.ordinal
         banner (s"Test ${mod.modelName} $ext")
-        val (yp, qof) = mod.trainNtest ()()                                  // train and test the model on full dataset (in-sample)
+        val qof = mod.trainNtest ()()._2                                     // train and test the model on full dataset (in-sample)
 
         println ("Validate: Out-of-Sample Testing")
-        val qof2 = mod.validate ()()                                         // train on training set, test on testing set
+        val qof2 = mod.validate ()()._2                                      // train on training set, test on testing set
         if check then assert (rel_diff (qof(iq), qof2(iq)) < 0.2)            // check agreement of in-sample and out-of-sample results
-        println (FitM.fitMap (mod.validate ()(), QoFC.values.map (_.toString)))
+        println (FitM.fitMap (qof2, QoFC.values.map (_.toString)))
     end test
 
 end Classifier

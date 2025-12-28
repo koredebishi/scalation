@@ -13,10 +13,10 @@
 package scalation
 package calculus
 
+import scalation.mathstat.*
+
 import scala.Double.NaN
 import scala.math.{Pi, cos, sin}
-
-import scalation.mathstat._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DFourier` class provides Fourier basis functions with derivatives.

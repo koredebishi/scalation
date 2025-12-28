@@ -12,8 +12,7 @@ package scalation
 package database
 package graph_pm
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.{Set => SET}
+import scala.collection.mutable.{Map, Set as SET}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExampleGraphS` object contains example query and data digraphs in which

@@ -11,9 +11,9 @@
 package scalation
 package mathstat
 
-import scala.math.{signum, sqrt}
+import scalation.mathstat.MatrixD.{eye, outer}
 
-import MatrixD.{eye, outer}
+import scala.math.{signum, sqrt}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Householder` object provides methods to compute Householder vectors and

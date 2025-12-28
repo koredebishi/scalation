@@ -13,10 +13,15 @@ package modeling
 package forecasting
 
 import scalation.mathstat._
+
 import scalation.modeling.neuralnet.{RegressionMV => REGRESSION}
+//import scalation.modeling.neuralnet.{RidgeRegressionMV => REGRESSION}
+// FIX -- might help to make Forester_Reg_D as an analog to Forester_Reg
+// FIX -- missing code: regularized multivariate (MV) regression @see `neuralnet` package
 
 import Example_Covid.{loadData, response}
 import MakeMatrix4TS._
+import TransformT._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ARX_D` class provides basic time series analysis capabilities for
@@ -41,9 +46,9 @@ class ARX_D (x: MatrixD, y: MatrixD, hh: Int, n_exo: Int, fname: Array [String],
              tRng: Range = null, hparam: HyperParameter = hp,
              bakcast: Boolean = false,
              tForms: TransformMap = Map ("tForm_y" -> null))
-      extends Forecaster_D (x, y, hh, tRng, hparam, bakcast):
+      extends Forecaster_D (x, y, hh, fname, tRng, hparam, bakcast):
 
-    private val debug   = debugf ("ARX_D", true)                        // debug function
+    private   val debug = debugf ("ARX_D", true)                        // debug function
     protected val p     = hparam("p").toInt                             // use the last p endogenous values (p lags)
     protected val q     = hparam("q").toInt                             // use the last q exogenous values (q lags)
     protected val spec  = hparam("spec").toInt                          // trend terms: 0 - none, 1 - constant, 2 - linear, 3 - quadratic
@@ -51,8 +56,8 @@ class ARX_D (x: MatrixD, y: MatrixD, hh: Int, n_exo: Int, fname: Array [String],
     protected val nneg  = hparam("nneg").toInt == 1                     // 0 => unrestricted, 1 => predictions must be non-negative
     protected val reg   = new REGRESSION (x, y, fname, hparam)          // delegate training to multi-variate regression
 
-    modelName = s"ARX_D($p, $q, $n_exo)"
-    yForm = tForms("tForm_y").asInstanceOf [Transform]
+    _modelName = s"ARX_D_${p}_${q}_$n_exo"
+    yForm      = tForms("tForm_y").asInstanceOf [Transform]
 
     debug ("init", s"$modelName with $n_exo exogenous variables and additional term spec = $spec")
 //  debug ("init", s"[ x | y ] = ${x ++^ y}")
@@ -78,7 +83,7 @@ class ARX_D (x: MatrixD, y: MatrixD, hh: Int, n_exo: Int, fname: Array [String],
      *  @param b_      the parameters/coefficients for the model
      *  @param vifs    the Variance Inflation Factors (VIFs)
      */
-    override def summary (x_ : MatrixD = getX, fname_ : Array [String] = reg.getFname,
+    override def summary (x_ : MatrixD = x, fname_ : Array [String] = reg.getFname,
                           b_ : VectorD = b, vifs: VectorD = reg.vif ()): String =
         super.summary (x_, fname_, b_, vifs)                             // summary from `Fit`
     end summary
@@ -106,8 +111,8 @@ class ARX_D (x: MatrixD, y: MatrixD, hh: Int, n_exo: Int, fname: Array [String],
      *  @param y_  the actual values to use in making predictions
      */
     override def forecast (t: Int, y_ : VectorD): VectorD =
-        val pred = predict (t, MatrixD (y_).transpose)
-        for h <- 1 to hh do yf(t, h) = pred(h-1)
+        val pred = predict (t, MatrixD (y_).ᵀ)
+        yf(t, 1 until hh+1) = pred
         pred                                                         // yh is pred
     end forecast
 
@@ -148,10 +153,10 @@ object ARX_D extends MakeMatrix4TS:
                fEndo: Array [Transform] = null, fExo: Array [Transform] = null,
                bakcast: Boolean = false): ARX_D =
 
-        val xy    = ARX.buildMatrix (xe, y, hparam, bakcast)
+        val (xy, tForms) = ARX.buildMatrix (xe, y, hparam, bakcast)
         val yy    = makeMatrix4Y (y, hh, bakcast)
-        val fname = if fname_ == null then ARX.formNames (xe.dim2, hparam) else fname_
-        new ARX_D (xy, yy, hh, xe.dim2, fname, tRng, hparam, bakcast)
+        val fname = formNames (xe.dim2, hparam, fname_)
+        new ARX_D (xy, yy, hh, xe.dim2, fname, tRng, hparam, bakcast, tForms)
     end apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -161,38 +166,39 @@ object ARX_D extends MakeMatrix4TS:
      *  @param y        the endogenous/response vector (main time series data)
      *  @param hh       the maximum forecasting horizon (h = 1 to hh)
      *  @param tRng     the time range, if relevant (time index may suffice)
+     *  @param fname_   the feature/variable names
      *  @param hparam   the hyper-parameters
      *  @param fEndo    the array of functions used to transform endogenous variables
      *  @param fExo     the array of functions used to transform exogenous variables
      *  @param bakcast  whether a backcasted value is prepended to the time series (defaults to false)
-     *  @param tForm    the z-transform (rescale to standard normal)
+     *  @param tForm    the z-transform (e.g., rescale to range or standard normal z)
      */
     def rescale (xe: MatrixD, y: VectorD, hh: Int, fname_ : Array [String] = null,
                  tRng: Range = null, hparam: HyperParameter = hp,
                  fEndo: Array [Transform] = null, fExo: Array [Transform] = null,
                  bakcast: Boolean = false,
-                 tForm: VectorD | MatrixD => Transform = x => zForm(x)): ARX_D =
+                 tForm: VectorD | MatrixD => Transform = MinMax.form): ARX_D =
 
-        val tForm_y = tForm(y)
-        if tForm_y.getClass.getSimpleName == "zForm" then hparam("nneg") = 0
-        val y_scl   = tForm_y.f(y)
-        val tForms: TransformMap = Map ("tForm_y" -> tForm_y)
+        val (xy, tForms) = ARX.buildMatrix (xe, y, hparam, bakcast, tForm)
+        if tForms("tForm_y").getClass.getSimpleName == "NormForm" then hparam("nneg") = 0
+        val y_scl = tForms("tForm_y").f(y)
 
-        val xy    = ARX.buildMatrix (xe, y_scl, hparam, bakcast)
         val yy    = makeMatrix4Y (y_scl, hh, bakcast)
-        val fname = if fname_ == null then formNames (xe.dim2, hparam) else fname_
+        val fname = formNames (xe.dim2, hparam, fname_)
         new ARX_D (xy, yy, hh, xe.dim2, fname, tRng, hparam, bakcast, tForms)
     end rescale
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form an array of names for the features included in the model.
-     *  @param n_exo  the number of exogenous variable
-     *  @param hp_    the hyper-parameters
-     *  @param n_fEn  the number of functions used to map endogenous variables
-     *  @param n_fEx  the number of functions used to map exogenous variables
+     *  @param n_exo    the number of exogenous variable
+     *  @param hp_      the hyper-parameters
+     *  @param xe_name  the names of the exogenous variables (defaults to null)
+     *  @param n_fEn    the number of functions used to map endogenous variables ((none for `ARX_D`)
+     *  @param n_fEx    the number of functions used to map exogenous variables ((none for `ARX_D`)
      */
-    def formNames (n_exo: Int, hp_ : HyperParameter, n_fEn: Int, n_fEx: Int): Array [String] =
-        ARX.formNames (n_exo, hp_, n_fEn, n_fEx)
+    inline def formNames (n_exo: Int, hp_ : HyperParameter, xe_name: Array [String] = null,
+                          n_fEn: Int = 0, n_fEx: Int = 0): Array [String] =
+        ARX.formNames (n_exo, hp_, xe_name, n_fEn, n_fEx)
     end formNames
 
 end ARX_D
@@ -267,8 +273,7 @@ end aRX_DTest2
         hp("q")    = q                                                  // mumber of exo lags
         hp("spec") = s                                                  // trend specification: 0, 1, 2, 3, 5
         val mod = ARX_D (xe, y, hh)                                     // create model for time series data
-//        val mod = ARX_D.rescale (xe, y, hh)
-        mod.inSampleTest ()                                             // In-sample Testing
+        mod.inSample_Test ()                                            // In-sample Testing
         println (mod.summary ())                                        // statistical summary of fit  FIX - crashes
     end for
 
@@ -299,8 +304,8 @@ end aRX_DTest3
         hp("p")    = p                                                  // number of endo lags
         hp("q")    = q                                                  // number of exo lags
         hp("spec") = s                                                  // trend specification: 0, 1, 2, 3, 5
-        val mod = ARX_D (xe, y, hh)                                     // create model for time series data
-//        val mod = ARX_D.rescale (xe, y, hh)
+//      val mod = ARX_D (xe, y, hh)                                     // create model for time series data
+        val mod = ARX_D.rescale (xe, y, hh)
         banner (s"TnT Forecasts: ${mod.modelName} on COVID-19 Dataset")
         mod.trainNtest_x ()()                                           // use customized trainNtest_x
 

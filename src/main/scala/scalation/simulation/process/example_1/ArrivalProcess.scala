@@ -8,7 +8,7 @@ import scalation.mathstat._
 import scala.collection.mutable.ArrayBuffer
 import scalation.random.{Erlang, Exponential, Variate}
 
-import scala.math.abs
+
 //import scala.math.abs
 import scalation.modeling.FitM
 

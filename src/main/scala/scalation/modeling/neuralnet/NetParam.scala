@@ -12,7 +12,7 @@ package scalation
 package modeling
 package neuralnet
 
-import scalation.mathstat._
+import scalation.mathstat.*
 
 type NetParams = Array [NetParam]
 

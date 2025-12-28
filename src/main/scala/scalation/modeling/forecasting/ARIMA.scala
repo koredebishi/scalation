@@ -56,7 +56,7 @@ class ARIMA (y: VectorD, hh: Int, tRng: Range = null,
 
     if d out (0, 2) then flaw ("init", s"difference d = $d must be in {0, 1, 2}")
 
-    modelName = s"ARIMA($p, $d, $q)"                                   // name of model
+    _modelName = s"ARIMA_${p}_${d}_$q"                                 // name of model
 
     debug ("init", s"$modelName")
 
@@ -191,9 +191,10 @@ end aRIMATest2
         hp("p") = p; hp("q") = q                                       // set p (AR) and q (MA) hyper-parameters
         val mod = new ARIMA (y, hh)                                    // create model for time-series data ARIMA(p, q)
         banner (s"Test Predictions: ${mod.modelName} on LakeLevels Dataset")
-        val (vp, qof) = mod.trainNtest ()()                            // test and test the model on full dataset
+        val vp = mod.trainNtest ()()._1                                // test and test the model on full dataset
         val yp = mod.predictAll2 (y)                                   // results on original scale
 
+        new Plot (null, v, vp, s"Plot: ${mod.modelName} predictAll2: v, vp vs t", lines = true)
         new Plot (null, y, yp, s"Plot: ${mod.modelName} predictAll2: y, yp vs t", lines = true)
     end for
 

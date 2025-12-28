@@ -13,14 +13,11 @@ package database
 package graph
 
 //import scala.collection.immutable.{Vector => VEC}
-import scala.collection.mutable.{ArrayBuffer => VEC}
-
-import scala.collection.mutable.Map
-import scala.math.max
-
+import scalation.database.graph.Vertex.prt
 import scalation.mathstat.VectorD
 
-import Vertex.prt
+import scala.collection.mutable.{Map, ArrayBuffer as VEC}
+import scala.math.max
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Vertex` class maintains properties for a vertex, e.g., a person.
@@ -74,13 +71,13 @@ class Vertex (_name: String, val prop: Property, _pos: VectorD = null)
             println ("|-" + "-" * len + "-|")
 
             print ("| ")
-            for (k, v) <- prop do prt (k, wj)
+            for (k, _) <- prop do prt (k, wj)
             println (" |")
 
             println ("|-" + "-" * len + "-|")
 
             print("| ")
-            for (k, v) <- prop do prt (v, wj)
+            for (_, v) <- prop do prt (v, wj)
             println (" |")
 
             println ("|-" + "-" * len + "-|")

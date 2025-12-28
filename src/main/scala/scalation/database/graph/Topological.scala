@@ -13,7 +13,7 @@ package database
 package graph
 
 //import scala.collection.immutable.{Vector => VEC}
-import scala.collection.mutable.{ArrayBuffer => VEC}
+import scala.collection.mutable.ArrayBuffer as VEC
 import scala.math.abs
 
 type Element = Vertex | Edge
@@ -45,6 +45,7 @@ trait Topological (var elem: Element, var dist: Double)
         val oth = other.asInstanceOf [Topological]
         if elem == oth.elem then Option (dist compare oth.dist)
         else oth.elem `tryCompareTo` oth.elem
+    end tryCompareTo
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the topological objects/tokens in the neighborhood of this token.

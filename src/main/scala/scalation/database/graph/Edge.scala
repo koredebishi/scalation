@@ -13,11 +13,9 @@ package database
 package graph
 
 //import scala.collection.immutable.{Vector => VEC}
-import scala.collection.mutable.{ArrayBuffer => VEC}
+import scalation.mathstat.*
 
-import scala.collection.mutable.Map
-
-import scalation.mathstat._
+import scala.collection.mutable.{Map, ArrayBuffer as VEC}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Edge` class maintains the edge's connections between vertices as well as its own properites.

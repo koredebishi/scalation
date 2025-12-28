@@ -12,8 +12,7 @@ package scalation
 package database
 package mugraph_pm
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.{Set => SET}
+import scala.collection.mutable.{Map, Set as SET}
 import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
 
@@ -82,7 +81,6 @@ class MuDualIso (g: MuGraph, q: MuGraph)
             if ! φ.isEmpty then
                 matches += φ
                 if matches.size % CHECK == 0 then println ("saltzDualIso: matches so far = " + matches.size)
-            end if
         else if ! φ.isEmpty then
             breakable {
                 for i <- φ (depth) if ! contains (φ, depth, i) do
@@ -198,8 +196,8 @@ end muDualIsoTest
  */
 @main def muDualIsoTest2 (): Unit =
 
-    import mugraph_pm.{ExampleMuGraphD => EX_GRAPH}
-    import MatchAnswers._
+    import MatchAnswers.*
+    import mugraph_pm.ExampleMuGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g2
     val q = EX_GRAPH.q2
@@ -227,7 +225,7 @@ end muDualIsoTest2
  */
 @main def muDualIsoTest3 (): Unit =
 
-    import mugraph_pm.{ExampleMuGraphD => EX_GRAPH}
+    import mugraph_pm.ExampleMuGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g1
     val q = EX_GRAPH.q1

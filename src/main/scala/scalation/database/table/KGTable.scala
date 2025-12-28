@@ -49,7 +49,7 @@ object KGTable:
 
 end KGTable
 
-import KGTable.cntr
+import scalation.database.table.KGTable.cntr
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KGTable` class (knowledge-graph-table) stores graph-relational data and
@@ -106,7 +106,6 @@ class KGTable (name_ : String, schema_ : Schema, domain_ : Domain, key_ : Schema
             s.vertices ++= np.vertices
             for nn <- n.subtypes do
                 addSubVertices (lev + 1, levels, s, nn.asInstanceOf [KGTable])
-            end for
         end if
     end addSubVertices
 

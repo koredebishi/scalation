@@ -12,7 +12,7 @@ package scalation
 package database
 package relation
 
-import scalation.mathstat._
+import scalation.mathstat.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Type definition for a union of column/vector types for `Double`, `Int`, `Long`, `String`,

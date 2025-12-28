@@ -12,8 +12,7 @@ package scalation
 package database
 package graph_pm
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.{Set => SET}
+import scala.collection.mutable.{Map, Set as SET}
 import scala.util.control.Breaks.{break, breakable}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -52,7 +51,6 @@ class DualSim (g: Graph, q: Graph)
                             φ(u) -= v                                  // remove vertex v from φ(u)
                             if φ(u).isEmpty then break ()              // no match for vertex u => no overall match
                             alter = true
-                        end if
                         // build newφ to contain only those vertices in φ(u_c) which also have a parent in φ(u)
                         newφ ++= φInt
                     end for
@@ -95,7 +93,6 @@ class DualSim (g: Graph, q: Graph)
                             φ(u) -= v                                  // remove vertex v from φ(u)
                             if φ(u).isEmpty then break ()              // no match for vertex u => no overall match
                             alter = true
-                        end if
                         // build newφ to contain only those vertices in φ(u_c) which also have a parent in φ(u)
                         newφ ++= φInt
                     end for
@@ -161,8 +158,8 @@ end dualSimTest
  */
 @main def dualSimTest2 (): Unit =
 
-    import graph_pm.{ExampleGraphD => EX_GRAPH}
-    import MatchAnswers._
+    import MatchAnswers.*
+    import graph_pm.ExampleGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g2p
     val q = EX_GRAPH.q2p
@@ -186,7 +183,7 @@ end dualSimTest2
  */
 @main def dualSimTest3 (): Unit =
 
-    import graph_pm.{ExampleGraphD => EX_GRAPH}
+    import graph_pm.ExampleGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g1p
     val q = EX_GRAPH.q1p

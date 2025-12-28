@@ -14,7 +14,6 @@ package scalation
 package random
 
 import java.util.Date
-
 import scala.runtime.ScalaRunTime.stringOf
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

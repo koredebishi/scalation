@@ -11,13 +11,12 @@
 package scalation
 package database
 
-import java.time.DateTimeException
+import scalation.mathstat.{MatrixD, VectorS}
 
-import scala.collection.mutable.{ArrayBuffer => Bag}
+import java.time.DateTimeException
+import scala.collection.mutable.ArrayBuffer as Bag
 import scala.math.max
 import scala.runtime.ScalaRunTime.stringOf
-
-import scalation.mathstat.{MatrixD, VectorS}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MakeSchema` object provides helper methods for making database schema.
@@ -54,7 +53,7 @@ object MakeSchema:
         try
             TimeNum (str)
         catch
-            case ex: DateTimeException => correct = false
+            case _ : DateTimeException => correct = false
         correct
     end isDateTime
 

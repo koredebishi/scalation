@@ -12,7 +12,7 @@ package scalation
 package database
 package triplegraph
 
-import scala.collection.mutable.{ArrayBuffer => Bag, Map, Set => SET}
+import scala.collection.mutable.{Map, ArrayBuffer as Bag, Set as SET}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Triple` class holds information about a triple (3 part edge). 
@@ -136,9 +136,8 @@ case class TripleGraph (label: Array [ValueType],
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print this triple-graph in a deep sense with all the information.
-     *  @param clip whether to clip out "Set(" and ")"
      */
-    def printG (clip: Boolean = true): Unit =
+    def printG (): Unit =
         println (s"TripleGraph ($name, $size")
         println ("Triples: ")
         for e <- triples do println (s"\t $e")

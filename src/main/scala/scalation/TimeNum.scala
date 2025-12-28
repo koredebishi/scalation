@@ -10,12 +10,11 @@
 
 package scalation
 
-import java.time.{DateTimeException, Instant, ZonedDateTime, ZoneId, ZoneOffset}
 import java.time.format.DateTimeFormatter
 import java.time.temporal.{ChronoField, UnsupportedTemporalTypeException}
-
+import java.time.*
 import scala.language.implicitConversions
-import scala.math.{abs => ABS, sqrt => SQRT}
+import scala.math.{abs as ABS, sqrt as SQRT}
 import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
 
@@ -25,6 +24,15 @@ import scala.util.control.Breaks.{break, breakable}
 extension (s: Instant)
     def <<= (t: Instant): Boolean = s.compareTo (t) <= 0
         
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Given instance to be used with methods such as `sorted` to define the ordering
+ *  of elements.
+ *  FIX - should be implicit in "sorted (using timeNumOrd)" 
+ */
+given timeNumOrd: Ordering [TimeNum] = new Ordering [TimeNum]:
+    def compare (s: TimeNum, t: TimeNum) = s compare t
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TimeNum` companion object is used to represent and operate on date-time values.
@@ -85,7 +93,7 @@ object TimeNum:
 
     /** Ordering for date-time values
      */
-    val ord = new Ordering [TimeNum] { def compare (s: TimeNum, t: TimeNum) = s compare t }
+//  val ord = new Ordering [TimeNum] { def compare (s: TimeNum, t: TimeNum) = s compare t }
 
     /** Nano-seconds must be strictly than this limit (billion nanoseconds = 1 second)
      */
@@ -208,10 +216,8 @@ object TimeNum:
         var (dts, dtp) = (dt, dtPattern)
         if ! dtPattern.contains ("h") && ! dtPattern.contains ("H") then
             dts += DEFAULT_HOUR._1; dtp +=  DEFAULT_HOUR._2
-        end if
         if ! dtPattern.contains ("z") && ! dtPattern.contains ("Z") then
             dts += DEFAULT_ZONE._1; dtp +=  DEFAULT_ZONE._2
-        end if
         debug ("apply", s"dts = $dts, dtp = $dtp")
         new TimeNum (dts, dtp)
     end apply
@@ -277,7 +283,7 @@ object TimeNum:
 
 end TimeNum
 
-import TimeNum._
+import scalation.TimeNum.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TimeNum` class is used to represent and operate on date-time numbers.
@@ -449,36 +455,36 @@ class TimeNum (val inst: Instant)
     inline def ≥ (t: TimeNum): Boolean = t <= this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether this is within the given bounds
+    /** Determine whether this is within the given bounds.
      *  @param lim  the given (lower, upper) bounds
      */
-    def in (lim: (TimeNum, TimeNum)): Boolean = lim._1 <= this && this <= lim._2
+    infix def in (lim: (TimeNum, TimeNum)): Boolean = lim._1 <= this && this <= lim._2
 
-    inline def ∈ (lim: (TimeNum, TimeNum)): Boolean  = this.in (lim)
+    inline def ∈ (lim: (TimeNum, TimeNum)): Boolean  = this in lim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether this is in the given set.
      *  @param lim  the given set of values
      */
-    def in (set: Set [TimeNum]): Boolean = set contains this
+    infix def in (set: Set [TimeNum]): Boolean = set contains this
 
-    inline def ∈ (set: Set [TimeNum]): Boolean  = this.in (set)
+    inline def ∈ (set: Set [TimeNum]): Boolean  = this in set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether this is not within the given bounds
+    /** Determine whether this is outside the given bounds.
      *  @param lim  the given (lower, upper) bounds
      */
-    def not_in (lim: (TimeNum, TimeNum)): Boolean = ! (lim._1 <= this && this <= lim._2)
+    infix def out (lim: (TimeNum, TimeNum)): Boolean = this < lim._1 || lim._2 < this
 
-    inline def ∉ (lim: (TimeNum, TimeNum)): Boolean = this.not_in (lim)
+    inline def ∉ (lim: (TimeNum, TimeNum)): Boolean = this out lim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether this is not in the given set.
      *  @param lim  the given set of values
      */
-    def not_in (set: Set [TimeNum]): Boolean = ! (set contains this)
+    infix def not_in (set: Set [TimeNum]): Boolean = ! (set contains this)
 
-    inline def ∉ (set: Set [TimeNum]): Boolean = this.not_in (set)
+    inline def ∉ (set: Set [TimeNum]): Boolean = this not_in set
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a temporal aspect (e.g., month, week, day, hour, ...).
@@ -634,7 +640,7 @@ end TimeNum
     val arr = Array (date1, date2, date3)
     println ("compare = " + (date1 compare date2))
     println ("original arr = " + stringOf (arr))
-    val sarr = arr.sorted (ord)
+    val sarr = arr.sorted (using timeNumOrd)
     println ("sorted arr   = " + stringOf (sarr))
 
 end timeNumTest

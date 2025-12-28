@@ -17,7 +17,7 @@ package scalation
 package database
 package table
 
-import Table._
+import scalation.database.table.Table.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PurchaseOrderDB` main function uses the `Table` class for simple database application.

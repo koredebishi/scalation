@@ -14,15 +14,11 @@ package scalation
 package mathstat
 
 import java.util.Arrays.copyOf
-
-import scala.collection.immutable.{IndexedSeq => IIndexedSeq}
-import scala.collection.immutable.Set
-import scala.collection.generic._
-import scala.collection.mutable._
+import scala.collection.generic.*
+import scala.collection.immutable.{Set, IndexedSeq as IIndexedSeq}
+import scala.collection.mutable.*
 import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
-
-import Complex._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorC` class stores and operates on Numeric Vectors of base type `Complex`.
@@ -44,7 +40,6 @@ class VectorC (val dim: Int,
     else if dim > v.length then
         flaw ("init", s"vector dimension is larger than space: dim = $dim > v.length = ${v.length}")
         assert (dim <= v.length)                                  // make this a fatal flaw
-    end if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the length of this vector.
@@ -137,7 +132,6 @@ class VectorC (val dim: Int,
             else
                 b.v(k) = v(i)
                 k += 1
-            end if
         end for
         (a, b)
     end split
@@ -738,11 +732,9 @@ class VectorC (val dim: Int,
                 else
                     iqsort (rk, pivot + 1, r_)             // recursively sort right partition
                     r_ = pivot - 1
-                end if
             end while
         else
             iselsort (rk, p, r)                            // use simple sort when small
-        end if
         rk
     end iqsort
 
@@ -755,7 +747,6 @@ class VectorC (val dim: Int,
             iqsort (rk, pivot + 1, r)                      // recursively sort right partition
         else
             iselsort (rk, p, r)                            // use simple sort when small
-        end if
         rk
     end iqsort_
 */
@@ -828,7 +819,6 @@ class VectorC (val dim: Int,
             if v(j) < v(k) then j else if v(i) < v(k) then k else i
         else
             if v(j) > v(k) then j else if v(i) > v(k) then k else i
-        end if
     end med3
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1152,6 +1142,8 @@ end VectorC
  */
 @main def vectorCTest (): Unit =
 
+    import scalation.Complex._
+
     val x = VectorC (_1, _2, _3)
     val y = VectorC (_4, _6, _5)
     val z = VectorC (_4, _6, _5)
@@ -1268,6 +1260,8 @@ end vectorCTest
  */
 @main def vectorCTest2 (): Unit =
 
+    import scalation.Complex._
+
     val y  = VectorC (_4, _6, _5, _2, _8, _3, _9, _7, _5, _2)
     val is = y.iselsort
     val iq = y.iqsort
@@ -1289,6 +1283,8 @@ end vectorCTest2
  *  > runMain scalation.mathstat.vectorCTest3
  */
 @main def vectorCTest3 (): Unit =
+
+    import scalation.Complex._
 
     val y    = VectorC (_1, _2, _4, _7, _9, _8, _6, _5, _3)
     val z    = VectorC (_2, _1, _9, _7, _4, _8, _6, _3, _5)

@@ -12,8 +12,7 @@ package scalation
 package database
 package graph_pm
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.{Set => SET}
+import scala.collection.mutable.{Map, Set as SET}
 import scala.util.control.Breaks.{break, breakable}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -157,8 +156,8 @@ end graphSimTest
  */
 @main def graphSimTest2 (): Unit =
 
-    import graph_pm.{ExampleGraphD => EX_GRAPH}
-    import MatchAnswers._
+    import MatchAnswers.*
+    import graph_pm.ExampleGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g2p
     val q = EX_GRAPH.q2p
@@ -182,7 +181,7 @@ end graphSimTest2
  */
 @main def graphSimTest3 (): Unit =
 
-    import graph_pm.{ExampleGraphD => EX_GRAPH}
+    import graph_pm.ExampleGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g1p
     val q = EX_GRAPH.q1p

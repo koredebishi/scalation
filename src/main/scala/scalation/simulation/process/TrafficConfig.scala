@@ -17,7 +17,7 @@ class TrafficConfig(anchorSensorId: String ="1-404531ML" , rowTime: Double, stre
 
 
     val t1: Int = 0 // target 6am
-    val t2: Int = 1// target 6pm
+    val t2: Int = 48// target 6pm
 
 
     private val rowOffset = t1
@@ -187,35 +187,6 @@ class TrafficConfig(anchorSensorId: String ="1-404531ML" , rowTime: Double, stre
         val offrampFlow = offrampData(row, ramplaneIdx(0))
         exitFractionRaw(row) = if mainlineTotal == 0.0 then 0.0 else offrampFlow / mainlineTotal
     }
-
-    /** Compute lane spread probabilities for a given PEMS sensor across all time rows
-     *  Returns a matrix where:
-     *    - Rows represent lanes (0-4)
-     *    - Columns represent time periods (0 to anchorData.dim-1)
-     *    - Values are probabilities (lane_count / total_count)
-     *  @param sensorIdx  PEMS sensor index (0-4 for sensors 1-5)
-     *  @return           5 x nt matrix of lane probabilities
-     */
-    def laneSpreadProb(sensorIdx: Int, row: Int): MatrixD =
-        val laneProbs: MatrixD = new MatrixD(5, anchorData.dim)
-
-        cfor(0, anchorData.dim) { row =>
-            val laneCounts = getPemsCountMatrix(sensorIdx)(row)  // VectorD of 5 lane counts
-            val totalCount = laneCounts.sum
-
-            if totalCount > 0.0 then
-                cfor(0, 5) { lane =>
-                    laneProbs(lane, row) = laneCounts(lane) / totalCount
-                }
-            else
-                // Fallback: uniform distribution if no data
-                cfor(0, 5) { lane =>
-                    laneProbs(lane, row) = 0.2
-                }
-        }
-        laneProbs
-    end laneSpreadProb
-
     /**
      * Use RoadCood to load all GPS coordinates and convert them to screen coordinates
      * Returns:

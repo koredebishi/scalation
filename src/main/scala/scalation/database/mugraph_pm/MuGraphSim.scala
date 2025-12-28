@@ -12,8 +12,7 @@ package scalation
 package database
 package mugraph_pm
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.{Set => SET}
+import scala.collection.mutable.{Map, Set as SET}
 import scala.util.control.Breaks.{break, breakable}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -157,8 +156,8 @@ end muGraphSimTest
  */
 @main def muGraphSimTest2 (): Unit =
 
-    import mugraph_pm.{ExampleMuGraphD => EX_GRAPH}
-    import MatchAnswers._
+    import MatchAnswers.*
+    import mugraph_pm.ExampleMuGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g2p
     val q = EX_GRAPH.q2p
@@ -182,7 +181,7 @@ end muGraphSimTest2
  */
 @main def muGraphSimTest3 (): Unit =
 
-    import mugraph_pm.{ExampleMuGraphD => EX_GRAPH}
+    import mugraph_pm.ExampleMuGraphD as EX_GRAPH
 
     val g = EX_GRAPH.g1p
     val q = EX_GRAPH.q1p

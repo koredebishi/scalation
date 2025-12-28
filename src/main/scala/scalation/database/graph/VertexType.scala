@@ -13,17 +13,14 @@ package database
 package graph
 
 //import scala.collection.immutable.{Vector => VEC}
-import scala.collection.mutable.{ArrayBuffer => VEC}
-
-import scala.collection.mutable.Map
-import scala.runtime.ScalaRunTime.stringOf
-import scala.util.control.Breaks.{break, breakable}
-
+import scalation.database.graph.Vertex.prt
 import scalation.mathstat.VectorD
 import scalation.scala2d.Colors.{Color, yellow}
-import scalation.scala2d.{Ellipse, Octagon, Rectangle, RoundRectangle, Shape}
+import scalation.scala2d.*
 
-import Vertex.prt
+import scala.collection.mutable.{Map, ArrayBuffer as VEC}
+import scala.runtime.ScalaRunTime.stringOf
+import scala.util.control.Breaks.{break, breakable}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VertexType` class collects vertices of the same type, e.g., a person vertex-type.
@@ -46,15 +43,17 @@ class VertexType (_name: String, val schema: Schema,
     private var primaryKey: String = null                                      // property used as primary key
     private val index     = Map [ValueType, Vertex] ()                         // primary key -> vertex
 
+    def getPK: String = primaryKey
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a new shape object based on the shape template.
      */
     def newShapeObj: Shape =
         shape match
-        case s: Ellipse   => Ellipse ()
-        case s: Octagon   => Octagon ()
-        case s: Rectangle => Rectangle ()
-        case _            => RoundRectangle ()
+        case _ : Ellipse   => Ellipse ()
+        case _ : Octagon   => Octagon ()
+        case _ : Rectangle => Rectangle ()
+        case _             => RoundRectangle ()
         end match
     end newShapeObj
 
@@ -309,7 +308,7 @@ class VertexType (_name: String, val schema: Schema,
             for i <- rng do
                 System.out.print ("| ")
                 val tuple_i = verts(i).prop
-                for (k, v) <- tuple_i do prt (v, wj)
+                for (_, v) <- tuple_i do prt (v, wj)
                 println (" |")
             end for
             println ("|-" + "-" * len + "-|")

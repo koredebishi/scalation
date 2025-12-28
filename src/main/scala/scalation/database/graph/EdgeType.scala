@@ -13,16 +13,13 @@ package database
 package graph
 
 //import scala.collection.immutable.{Vector => VEC}
-import scala.collection.mutable.{ArrayBuffer => VEC}
-
-import scala.collection.mutable.Map
-import scala.runtime.ScalaRunTime.stringOf
-
+import scalation.database.graph.Vertex.prt
 import scalation.mathstat.VectorD
 import scalation.scala2d.Colors.{Color, blue}
-import scalation.scala2d.{CurvilinearShape, Arrow, QArrow}
+import scalation.scala2d.{Arrow, CurvilinearShape, QArrow}
 
-import Vertex.prt
+import scala.collection.mutable.{Map, ArrayBuffer as VEC}
+import scala.runtime.ScalaRunTime.stringOf
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `EdgeType` class collects edges of the same type, e.g., knows relationship type.
@@ -48,7 +45,7 @@ class EdgeType (_name: String,
      */
     def newShapeObj: CurvilinearShape =
         shape match
-        case s: Arrow => Arrow ()
+        case _ : Arrow => Arrow ()
         case _        => QArrow ()
         end match
     end newShapeObj
@@ -233,7 +230,7 @@ class EdgeType (_name: String,
                 println ("|-" + "-" * len + "-|")
                 System.out.print ("| ")
                 prt ("from", wj)
-                for (k, v) <- tuple0 do prt (k, wj)
+                for (k, _) <- tuple0 do prt (k, wj)
                 prt ("to", wj)
                 println (" |")
 
@@ -245,7 +242,7 @@ class EdgeType (_name: String,
                     if edges (i).from == null then prt ("null-vertex", wj)
                     else prt (edges (i).from.name, wj)
 
-                    for (k, v) <- tuple_i do prt (v, wj)
+                    for (_, v) <- tuple_i do prt (v, wj)
 
                     if edges(i).to == null then prt ("null-vertex", wj)
                     else prt (edges(i).to.name, wj)
