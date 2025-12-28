@@ -28,7 +28,7 @@ class TrafficConfig2(anchorSensorId: String ="1-401112ML" , rowTime: Double, str
 
     // Extract mainline lane flows: shape (rows x 4)   // 4 lanes for RoadCood2
     private val mainlineLaneTotalsPerRow: MatrixD = anchorData(?, laneIdx)      // vectorized column extraction for each lanes (4 lanes)
- 
+
     private val muMainlineLanes: MatrixD = new MatrixD(4, anchorData.dim)
     cfor(0, 4) { lane =>
         cfor(0, anchorData.dim) { row =>
@@ -619,4 +619,3 @@ def analyzeSensorComparison(pemsSensorIdx: Int, simSensorIdx: Int): Unit =
     println("Analysis complete. Close plot windows to continue.\n")
 
 end analyzeSensorComparison
-
