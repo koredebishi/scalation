@@ -41,29 +41,30 @@ enum QoF (val name: String):
     case sst    extends QoF ("sst")                            // index  2
     case sse    extends QoF ("sse")                            // index  3
 
-    case sde    extends QoF ("sde")                            // index  4  4-8 various error metrics
+    case sde    extends QoF ("sde")                            // index  4  4-9 various error metrics
     case mse0   extends QoF ("mse0")                           // index  5
     case rmse   extends QoF ("rmse")                           // index  6
     case mae    extends QoF ("mae")                            // index  7
     case smape  extends QoF ("smape")                          // index  8
+    case nrmse  extends QoF ("nrmse")                          // index  9  normalized RMSE (RMSE / range)
 
-    case m      extends QoF ("m")                              // index  9  9-14 degrees of freedom and information criteria
-    case dfr    extends QoF ("dfr")                            // index 10
-    case df     extends QoF ("df")                             // index 11
-    case fStat  extends QoF ("fStat")                          // index 12
-    case aic    extends QoF ("aic")                            // index 13
-    case bic    extends QoF ("bic")                            // index 14
+    case m      extends QoF ("m")                              // index 10  10-15 degrees of freedom and information criteria
+    case dfr    extends QoF ("dfr")                            // index 11
+    case df     extends QoF ("df")                             // index 12
+    case fStat  extends QoF ("fStat")                          // index 13
+    case aic    extends QoF ("aic")                            // index 14
+    case bic    extends QoF ("bic")                            // index 15
 
-    case mape   extends QoF ("mape")                           // index 15  15-17 time series metrics (also 8)
-    case mase   extends QoF ("mase")                           // index 16
-    case smapeC extends QoF ("smapeC")                         // index 17
+    case mape   extends QoF ("mape")                           // index 16  16-18 time series metrics (also 8)
+    case mase   extends QoF ("mase")                           // index 17
+    case smapeC extends QoF ("smapeC")                         // index 18
 
-    case picp   extends QoF ("picp")                           // index 18  18-23 for prediction intervals 
-    case pinc   extends QoF ("pinc")                           // index 19
-    case ace    extends QoF ("ace")                            // index 20
-    case pinaw  extends QoF ("pinaw")                          // index 21
-    case mis    extends QoF ("mis")                            // index 22
-    case wis    extends QoF ("wis")                            // index 23
+    case picp   extends QoF ("picp")                           // index 19  19-24 for prediction intervals 
+    case pinc   extends QoF ("pinc")                           // index 20
+    case ace    extends QoF ("ace")                            // index 21
+    case pinaw  extends QoF ("pinaw")                          // index 22
+    case mis    extends QoF ("mis")                            // index 23
+    case wis    extends QoF ("wis")                            // index 24
 
 end QoF
 
@@ -101,6 +102,7 @@ help: Quality of Fit (QoF) metrics/measures:
     rmse   =  Root Mean Square Error (RMSE)
     mae    =  Mean Absolute Error (MAE)
     smape  =  symmetric Mean Absolute Percentage Error (sMAPE)
+    nrmse  =  Normalized RMSE (RMSE / range), scale-invariant error metric
 
     m      =  Number of Observations
     dfr    =  Degrees of Freedom (DFr) taken by the regression/model, e.g., one lost per parameter
@@ -334,6 +336,7 @@ trait Fit (protected var dfr: Double, protected var df: Double)
     private var mape    = -1.0                                              // Mean Absolute Percentage Error (MAPE)
     private var mase    = -1.0                                              // Mean Absolute Scaled Error (MASE)
     private var smapeC  = -1.0                                              // symmetric Mean Absolute Percentage Error Information Criteria (sMAPE-IC)
+    private var nrmse   = -1.0                                              // Normalized RMSE (RMSE / range), scale-invariant error metric
 //  private var nmae    = -1.0                                              // normalized MAE (MAD/Mean Ratio)
 
     private var picp    = -1.0                                              // Prediction Interval empirical Coverage Probability (PICP)
@@ -412,6 +415,8 @@ trait Fit (protected var dfr: Double, protected var df: Double)
         mape   = 100 * (e.abs / y.abs).sum / m                              // Mean Absolute Percentage Error
         mase   = Fit.mase (y, yp)                                           // Mean Absolute Scaled Error
         smapeC = smape + pIC * (dfr + 1) / y.dim.toDouble                   // sMAPE Information Criterion
+        val yRange = y.max - y.min                                          // range of actual values
+        nrmse  = if yRange > 0 then rmse / yRange else 0.0                  // Normalized RMSE (scale-invariant)
         fit
     end diagnose
 
@@ -497,7 +502,7 @@ trait Fit (protected var dfr: Double, protected var df: Double)
      *  Override to add more quality of fit measures.
      */
     override def fit: VectorD = VectorD (rSq, rSqBar, sst, sse, sde, mse0, rmse, mae,
-                                         smape, m, dfr, df, fStat, aic, bic, mape, mase, smapeC,
+                                         smape, nrmse, m, dfr, df, fStat, aic, bic, mape, mase, smapeC,
                                          picp, pinc, ace, pinaw, mis, wis)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

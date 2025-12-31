@@ -18,18 +18,22 @@ ml Java/21.0.5
 
 cd /scratch/krb84578/workDir/scalation_2.0 || exit 1
 
-# Create log directory if it doesn't exist
 mkdir -p /scratch/krb84578/workDir/scalation_2.0/log/spsa
 
-echo "Running SPSA Optimizer with 20 iterations"
+echo "Running SPSA Optimizer"
 
-# Set temp directory to avoid /run/user permission issues
-export TMPDIR=/scratch/krb84578/workDir/scalation_2.0/tmp
-export SBT_OPTS="-Djava.io.tmpdir=$TMPDIR -Dsbt.boot.directory=$TMPDIR/sbt-boot -Dsbt.global.base=$TMPDIR/.sbt -Dsbt.ivy.home=$TMPDIR/.ivy2"
-mkdir -p $TMPDIR
+# Use Coursier cache - verified paths
+SCALA3_LIB="/home/krb84578/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar"
+SCALA_LIB="/home/krb84578/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar"
+
+# Verify JARs exist
+if [ ! -f "$SCALA3_LIB" ]; then echo "ERROR: scala3-library not found at $SCALA3_LIB"; exit 1; fi
+if [ ! -f "$SCALA_LIB" ]; then echo "ERROR: scala-library not found at $SCALA_LIB"; exit 1; fi
+
+CP="target/scala-3.7.4/scalation_3-0.1.0-SNAPSHOT.jar:$SCALA3_LIB:$SCALA_LIB"
 
 date
-time sbt -J-Xmx28G "runMain scalation.simulation.process.runCalibrate_SPSA"
+time java -Xmx28G -cp "$CP" scalation.simulation.process.runCalibrate_SPSA
 date
 
 echo "=== SPSA Calibration completed at $(date) ==="

@@ -149,7 +149,7 @@ object DormandPrince
      *  @param t0    the initial time
      *  @param step  the step size
      */
-    def integrateVVM (f: Array [DerivativeV], y0: VectorD, t: Double,
+    def integrateVV (f: Array [DerivativeV], y0: VectorD, t: Double,
                      t0: Double = 0.0, step: Double = defaultStepSize): VectorD =
 
         val maxSteps = 1000
@@ -170,203 +170,216 @@ object DormandPrince
 
         var ti = 0.0
         var yi: VectorD = null
+        var n = 0
+        var go = true
+        cfor(go && n < maxSteps, n += 1) {
+            ti = tn
+            cfor(0, y.dim) { j =>
+                yi = y
+                k1(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k1 = $k1")
 
-        breakable {
-            for n <- 1 to maxSteps do
-                ti = tn
-                cfor (0, y.dim) { j => yi = y
-                                  k1(j) = f(j)(ti, yi) }
-                //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k1 = $k1")
+            ti = tn + c2 * h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a21) * h
+                k2(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k2 = $k2")
 
-                ti = tn + c2 * h
-                cfor (0, y.dim) { j => yi = y + (k1*a21) * h
-                                  k2(j) = f(j)(ti, yi) }
-                //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k2 = $k2")
+            ti = tn + c3 * h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a31 + k2 * a32) * h
+                k3(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k3 = $k3")
 
-                ti = tn + c3 * h
-                cfor (0, y.dim) { j => yi =  y + (k1*a31 + k2*a32) * h
-                                  k3(j) = f(j)(ti, yi) }
-                //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k3 = $k3")
+            ti = tn + c4 * h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a41 + k2 * a42 + k3 * a43) * h
+                k4(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k4 = $k4")
 
-                ti = tn + c4 * h
-                cfor (0, y.dim) { j => yi = y + (k1*a41 + k2*a42 + k3*a43) * h
-                                  k4(j) = f(j)(ti, yi) }
-                //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k4 = $k4")
+            ti = tn + c5 * h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a51 + k2 * a52 + k3 * a53 + k4 * a54) * h
+                k5(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k5 = $k5")
 
-                ti = tn + c5 * h
-                cfor (0, y.dim) { j => yi = y + (k1*a51 + k2*a52 + k3*a53 + k4*a54) * h
-                                  k5(j) = f(j)(ti, yi) }
-                //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k5 = $k5")
+            ti = tn + h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a61 + k2 * a62 + k3 * a63 + k4 * a64 + k5 * a65) * h
+                k6(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k6 = $k6")
 
-                ti = tn + h
-                cfor (0, y.dim) { j => yi = y + (k1*a61 + k2*a62 + k3*a63 + k4*a64 + k5*a65) * h
-                                  k6(j) = f(j)(ti, yi) }
-                //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k6 = $k6")
+            ti = tn + h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a71 + k2 * a72 + k3 * a73 + k4 * a74 + k5 * a75 + k6 * a76) * h
+                k7(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k7 = $k7")
 
-                ti = tn + h
-                cfor (0, y.dim) { j => yi = y + (k1*a71 + k2*a72 + k3*a73 + k4*a74 + k5*a75 + k6*a76) * h
-                                  k7(j) = f(j)(ti, yi) }
-                //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k7 = $k7")
+            //              debug ("integrateVV", s"h = $h, stage derivatives k = ${MatrixD (k1, k2, k3, k4, k5, k6, k7).transpose}")
 
-//              debug ("integrateVV", s"h = $h, stage derivatives k = ${MatrixD (k1, k2, k3, k4, k5, k6, k7).transpose}")
+            error = abs((b1 - b_1) * k1.norm + (b3 - b_3) * k3.norm + (b4 - b_4) * k4.norm +
+                (b5 - b_5) * k5.norm + (b6 - b_6) * k6.norm + (b7 - b_7) * k7.norm)
+            if error < tol then
+                cfor(0, y.dim) { j => y(j) += h * (b1 * k1(j) + b3 * k3(j) + b4 * k4(j) + b5 * k5(j) + b6 * k6(j)) }
+                tn += h
+            end if
+            //debug ("integrate2", s"for step n = $n: error = $error, y = $y")
+            //              if n == 4 then System.exit (0)
 
-                error = abs ( (b1-b_1) * k1.norm + (b3-b_3) * k3.norm + (b4-b_4) * k4.norm +
-                              (b5-b_5) * k5.norm + (b6-b_6) * k6.norm + (b7-b_7) * k7.norm )
-                if error < tol then
-                    cfor (0, y.dim) { j => y(j) += h * (b1*k1(j) + b3*k3(j) + b4*k4(j) + b5*k5(j) + b6*k6(j)) }
-                    tn += h
-                end if
-                //debug ("integrate2", s"for step n = $n: error = $error, y = $y")
-//              if n == 4 then System.exit (0)
+            val delta = 0.84 * pow(tol / error, 0.2) // error control
+            h *= (if delta <= 0.1 then 0.1 // adjust the step size
+            else if delta >= 4.0 then 4.0
+            else delta)
+            if h > hmax then h = hmax
 
-                val delta = 0.84 * pow (tol / error, 0.2)               // error control
-                h *= (if delta <= 0.1 then 0.1                          // adjust the step size
-                      else if delta >= 4.0 then 4.0
-                      else delta)
-                if h > hmax then h = hmax
+            if tn >= t then go = false // at or past end time
+            else if tn + h > t then h = t - tn // complete last time increment
+            else if h < hmin then go = false // step size too small
 
-                if tn >= t then break ()                                // at or past end time
-                else if tn + h > t then h = t - tn                      // complete last time increment
-                else if h < hmin then break ()                          // step size too small
-
-                if y.mag > ovf then flaw ("integrate2", s"probable overflow since y = $y")
-                if n % 100 == 0 then println (s"integrate2: step $n: tn = $tn, y = $y")
-            end for
-        } // breakable
+            if y.mag > ovf then flaw("integrate2", s"probable overflow since y = $y")
+            if n % 100 == 0 then println(s"integrate2: step $n: tn = $tn, y = $y")
+        } // cfor
         y                       // the value of the function at time t, y = f(t)
-    end integrateVVM
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute y(t), a vector, governed by a system of differential equations using
-     *  numerical integration of the derivative function f(t, y) using a (4,5)-order
-     *  Dormand-Prince method to return the value of y(t) at time t.
-     *  OPTIMIZED VERSION: eliminates redundant allocations and redundant yi computation.
-     *  @param f     the array of derivative functions [f(t, y)] where y is a vector
-     *  @param y0    the value of the y-function at time t0, y0 = y(t0)
-     *  @param t     the time value at which to compute y(t)
-     *  @param t0    the initial time
-     *  @param step  the step size
-     */
-    def integrateVV (f: Array [DerivativeV], y0: VectorD, t: Double,
-                      t0: Double = 0.0, step: Double = defaultStepSize): VectorD =
-
-        val maxSteps = 1000
-        val hmin     = 0.5 * step
-        val hmax     = 2.0 * step
-        val tol      = 1E-5
-        var h        = hmax
-        var tn       = t0
-        val dim      = y0.dim
-
-        // Reusable arrays for stage derivatives - allocated once
-        val k1 = new Array[Double](dim)
-        val k2 = new Array[Double](dim)
-        val k3 = new Array[Double](dim)
-        val k4 = new Array[Double](dim)
-        val k5 = new Array[Double](dim)
-        val k6 = new Array[Double](dim)
-        val k7 = new Array[Double](dim)
-
-        // Reusable state vector - single allocation
-        val y  = new Array[Double](dim)
-        val yi = new Array[Double](dim)
-        var j = 0
-        while j < dim do { y(j) = y0(j); j += 1 }
-
-        // Reusable VectorD for derivative calls - single allocation
-        val yiVec = new VectorD(dim)
-
-        breakable {
-            for n <- 1 to maxSteps do
-
-                // Stage 1: k1 = f(tn, y)
-                var j = 0
-                while j < dim do { yi(j) = y(j); yiVec(j) = y(j); j += 1 }
-                j = 0
-                while j < dim do { k1(j) = f(j)(tn, yiVec); j += 1 }
-
-                // Stage 2: k2 = f(tn + c2*h, y + a21*k1*h)
-                val hh = h
-                j = 0
-                while j < dim do { yi(j) = y(j) + a21 * k1(j) * hh; yiVec(j) = yi(j); j += 1 }
-                val t2 = tn + c2 * hh
-                j = 0
-                while j < dim do { k2(j) = f(j)(t2, yiVec); j += 1 }
-
-                // Stage 3: k3 = f(tn + c3*h, y + (a31*k1 + a32*k2)*h)
-                j = 0
-                while j < dim do { yi(j) = y(j) + (a31 * k1(j) + a32 * k2(j)) * hh; yiVec(j) = yi(j); j += 1 }
-                val t3 = tn + c3 * hh
-                j = 0
-                while j < dim do { k3(j) = f(j)(t3, yiVec); j += 1 }
-
-                // Stage 4: k4 = f(tn + c4*h, y + (a41*k1 + a42*k2 + a43*k3)*h)
-                j = 0
-                while j < dim do { yi(j) = y(j) + (a41 * k1(j) + a42 * k2(j) + a43 * k3(j)) * hh; yiVec(j) = yi(j); j += 1 }
-                val t4 = tn + c4 * hh
-                j = 0
-                while j < dim do { k4(j) = f(j)(t4, yiVec); j += 1 }
-
-                // Stage 5: k5 = f(tn + c5*h, y + (a51*k1 + a52*k2 + a53*k3 + a54*k4)*h)
-                j = 0
-                while j < dim do { yi(j) = y(j) + (a51 * k1(j) + a52 * k2(j) + a53 * k3(j) + a54 * k4(j)) * hh; yiVec(j) = yi(j); j += 1 }
-                val t5 = tn + c5 * hh
-                j = 0
-                while j < dim do { k5(j) = f(j)(t5, yiVec); j += 1 }
-
-                // Stage 6: k6 = f(tn + h, y + (a61*k1 + a62*k2 + a63*k3 + a64*k4 + a65*k5)*h)
-                j = 0
-                while j < dim do { yi(j) = y(j) + (a61 * k1(j) + a62 * k2(j) + a63 * k3(j) + a64 * k4(j) + a65 * k5(j)) * hh; yiVec(j) = yi(j); j += 1 }
-                val t6 = tn + hh
-                j = 0
-                while j < dim do { k6(j) = f(j)(t6, yiVec); j += 1 }
-
-                // Stage 7: k7 = f(tn + h, y + (a71*k1 + a72*k2 + a73*k3 + a74*k4 + a75*k5 + a76*k6)*h)
-                j = 0
-                while j < dim do { yi(j) = y(j) + (a71 * k1(j) + a72 * k2(j) + a73 * k3(j) + a74 * k4(j) + a75 * k5(j) + a76 * k6(j)) * hh; yiVec(j) = yi(j); j += 1 }
-                j = 0
-                while j < dim do { k7(j) = f(j)(t6, yiVec); j += 1 }
-
-                // Error estimation using infinity norm (faster than vector norm)
-                var errSum = 0.0
-                j = 0
-                while j < dim do
-                    val ej = abs(b_b1 * k1(j) + b_b3 * k3(j) + b_b4 * k4(j) + b_b5 * k5(j) + b_b6 * k6(j) + b_b7 * k7(j))
-                    if ej > errSum then errSum = ej
-                    j += 1
-                end while
-                error = errSum
-
-                if error < tol then
-                    // Accept step and update y
-                    j = 0
-                    while j < dim do
-                        y(j) += hh * (b1 * k1(j) + b3 * k3(j) + b4 * k4(j) + b5 * k5(j) + b6 * k6(j))
-                        j += 1
-                    end while
-                    tn += hh
-                end if
-
-                // Adaptive step size control
-                val delta = 0.84 * pow (tol / error, 0.2)
-                h *= (if delta <= 0.1 then 0.1
-                      else if delta >= 4.0 then 4.0
-                      else delta)
-                if h > hmax then h = hmax
-
-                if tn >= t then break ()
-                else if tn + h > t then h = t - tn
-                else if h < hmin then break ()
-
-            end for
-        } // breakable
-
-        // Return result as VectorD
-        val result = new VectorD(dim)
-        var k = 0
-        while k < dim do { result(k) = y(k); k += 1 }
-        result
     end integrateVV
+
+//    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    /** Compute y(t), a vector, governed by a system of differential equations using
+//     *  numerical integration of the derivative function f(t, y) using a (4,5)-order
+//     *  Dormand-Prince method to return the value of y(t) at time t.
+//     *  OPTIMIZED VERSION: eliminates redundant allocations and redundant yi computation.
+//     *  @param f     the array of derivative functions [f(t, y)] where y is a vector
+//     *  @param y0    the value of the y-function at time t0, y0 = y(t0)
+//     *  @param t     the time value at which to compute y(t)
+//     *  @param t0    the initial time
+//     *  @param step  the step size
+//     */
+//    def integrateVV (f: Array [DerivativeV], y0: VectorD, t: Double,
+//                      t0: Double = 0.0, step: Double = defaultStepSize): VectorD =
+//
+//        val maxSteps = 1000
+//        val hmin     = 0.5 * step
+//        val hmax     = 2.0 * step
+//        val tol      = 1E-5
+//        var h        = hmax
+//        var tn       = t0
+//        val dim      = y0.dim
+//
+//        // Reusable arrays for stage derivatives - allocated once
+//        val k1 = new Array[Double](dim)
+//        val k2 = new Array[Double](dim)
+//        val k3 = new Array[Double](dim)
+//        val k4 = new Array[Double](dim)
+//        val k5 = new Array[Double](dim)
+//        val k6 = new Array[Double](dim)
+//        val k7 = new Array[Double](dim)
+//
+//        // Reusable state vector - single allocation
+//        val y  = new Array[Double](dim)
+//        val yi = new Array[Double](dim)
+//        var j = 0
+//        while j < dim do { y(j) = y0(j); j += 1 }
+//
+//        // Reusable VectorD for derivative calls - single allocation
+//        val yiVec = new VectorD(dim)
+//
+//        breakable {
+//            for n <- 1 to maxSteps do
+//
+//                // Stage 1: k1 = f(tn, y)
+//                var j = 0
+//                while j < dim do { yi(j) = y(j); yiVec(j) = y(j); j += 1 }
+//                j = 0
+//                while j < dim do { k1(j) = f(j)(tn, yiVec); j += 1 }
+//
+//                // Stage 2: k2 = f(tn + c2*h, y + a21*k1*h)
+//                val hh = h
+//                j = 0
+//                while j < dim do { yi(j) = y(j) + a21 * k1(j) * hh; yiVec(j) = yi(j); j += 1 }
+//                val t2 = tn + c2 * hh
+//                j = 0
+//                while j < dim do { k2(j) = f(j)(t2, yiVec); j += 1 }
+//
+//                // Stage 3: k3 = f(tn + c3*h, y + (a31*k1 + a32*k2)*h)
+//                j = 0
+//                while j < dim do { yi(j) = y(j) + (a31 * k1(j) + a32 * k2(j)) * hh; yiVec(j) = yi(j); j += 1 }
+//                val t3 = tn + c3 * hh
+//                j = 0
+//                while j < dim do { k3(j) = f(j)(t3, yiVec); j += 1 }
+//
+//                // Stage 4: k4 = f(tn + c4*h, y + (a41*k1 + a42*k2 + a43*k3)*h)
+//                j = 0
+//                while j < dim do { yi(j) = y(j) + (a41 * k1(j) + a42 * k2(j) + a43 * k3(j)) * hh; yiVec(j) = yi(j); j += 1 }
+//                val t4 = tn + c4 * hh
+//                j = 0
+//                while j < dim do { k4(j) = f(j)(t4, yiVec); j += 1 }
+//
+//                // Stage 5: k5 = f(tn + c5*h, y + (a51*k1 + a52*k2 + a53*k3 + a54*k4)*h)
+//                j = 0
+//                while j < dim do { yi(j) = y(j) + (a51 * k1(j) + a52 * k2(j) + a53 * k3(j) + a54 * k4(j)) * hh; yiVec(j) = yi(j); j += 1 }
+//                val t5 = tn + c5 * hh
+//                j = 0
+//                while j < dim do { k5(j) = f(j)(t5, yiVec); j += 1 }
+//
+//                // Stage 6: k6 = f(tn + h, y + (a61*k1 + a62*k2 + a63*k3 + a64*k4 + a65*k5)*h)
+//                j = 0
+//                while j < dim do { yi(j) = y(j) + (a61 * k1(j) + a62 * k2(j) + a63 * k3(j) + a64 * k4(j) + a65 * k5(j)) * hh; yiVec(j) = yi(j); j += 1 }
+//                val t6 = tn + hh
+//                j = 0
+//                while j < dim do { k6(j) = f(j)(t6, yiVec); j += 1 }
+//
+//                // Stage 7: k7 = f(tn + h, y + (a71*k1 + a72*k2 + a73*k3 + a74*k4 + a75*k5 + a76*k6)*h)
+//                j = 0
+//                while j < dim do { yi(j) = y(j) + (a71 * k1(j) + a72 * k2(j) + a73 * k3(j) + a74 * k4(j) + a75 * k5(j) + a76 * k6(j)) * hh; yiVec(j) = yi(j); j += 1 }
+//                j = 0
+//                while j < dim do { k7(j) = f(j)(t6, yiVec); j += 1 }
+//
+//                // Error estimation using infinity norm (faster than vector norm)
+//                var errSum = 0.0
+//                j = 0
+//                while j < dim do
+//                    val ej = abs(b_b1 * k1(j) + b_b3 * k3(j) + b_b4 * k4(j) + b_b5 * k5(j) + b_b6 * k6(j) + b_b7 * k7(j))
+//                    if ej > errSum then errSum = ej
+//                    j += 1
+//                end while
+//                error = errSum
+//
+//                if error < tol then
+//                    // Accept step and update y
+//                    j = 0
+//                    while j < dim do
+//                        y(j) += hh * (b1 * k1(j) + b3 * k3(j) + b4 * k4(j) + b5 * k5(j) + b6 * k6(j))
+//                        j += 1
+//                    end while
+//                    tn += hh
+//                end if
+//
+//                // Adaptive step size control
+//                val delta = 0.84 * pow (tol / error, 0.2)
+//                h *= (if delta <= 0.1 then 0.1
+//                      else if delta >= 4.0 then 4.0
+//                      else delta)
+//                if h > hmax then h = hmax
+//
+//                if tn >= t then break ()
+//                else if tn + h > t then h = t - tn
+//                else if h < hmin then break ()
+//
+//            end for
+//        } // breakable
+//
+//        // Return result as VectorD
+//        val result = new VectorD(dim)
+//        var k = 0
+//        while k < dim do { result(k) = y(k); k += 1 }
+//        result
+//    end integrateVV
 
 end DormandPrince
 

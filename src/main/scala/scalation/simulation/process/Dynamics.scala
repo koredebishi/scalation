@@ -42,7 +42,7 @@ trait Dynamics:
 //        println (s"Dynamics.updateV: called $car")
         this match
             case GippsDynamics => { GippsDynamics.updateM (car, maxDisp) }
-            case _             => { IDMDynamics.updateM (car,  maxDisp) }
+            case _             => { println ("IDM");   IDMDynamics.updateM (car,  maxDisp) }
     end updateV
 
 end Dynamics

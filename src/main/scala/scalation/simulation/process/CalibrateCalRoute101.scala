@@ -11,8 +11,8 @@ import scalation.simulation.process.example_1.{CalRoute101_2}
 
 val easyW = new EasyWriter("simulation", "Home_14-CalibrateCalRoute101_2.txt")
 // Parameter order: [s, amax, bmax, T, rt] - matches Vehicle.setParams
-// Good def_prop values: s=5.0, amax=4.0, bmax=-2.0, T=3.0, rt=0.5
-val params: VectorD = VectorD(5.0, 4.0, -2.0, 3.0, 0.5) // shared params
+// IDM Literature defaults (Treiber & Kesting, 2013): s₀=2m, a=1.0m/s², b=1.5m/s², T=1.5s, τ=0.6s
+val params: VectorD = VectorD(2.0, 1.0, -1.5, 1.5, 0.6) // literature-standard starting point
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Adapter to make CalRoute101 compatible with CalibratableModel trait.
@@ -77,19 +77,23 @@ class CalibrateCalRoute101 extends CalibratableModel:
         var totalSpeedSMAPE = 0.0
         var totalCountRMSE = 0.0
         var totalSpeedRMSE = 0.0
+        var totalCountNRMSE = 0.0
+        var totalSpeedNRMSE = 0.0
 
         for i <- 0 until 5 do
             val cqof = TestFit.diagnose_mat(sensor_counts(i), simSensor_counts(i))
             val sqof = TestFit.diagnose_mat(sensor_speeds(i), simSensor_speeds(i))
 
-            // Extract metrics using matrix indexing (rmse=6, smape=8)
+            // Extract metrics using matrix indexing (rmse=6, smape=8, nrmse=9)
             totalCountSMAPE += cqof(8, 0)
             totalSpeedSMAPE += sqof(8, 0)
             totalCountRMSE += cqof(6, 0)
             totalSpeedRMSE += sqof(6, 0)
+            totalCountNRMSE += cqof(9, 0)
+            totalSpeedNRMSE += sqof(9, 0)
 
             // Print individual sensor results
-            println(s"Sensor $i: Count RMSE=${cqof(6,0)}, Count SMAPE=${cqof(8,0)}, Speed RMSE=${sqof(6,0)}, Speed SMAPE=${sqof(8,0)}")
+            //println(s"Sensor $i: Count RMSE=${cqof(6,0)}, Count SMAPE=${cqof(8,0)}, Count NRMSE=${cqof(9,0)}, Speed RMSE=${sqof(6,0)}, Speed SMAPE=${sqof(8,0)}, Speed NRMSE=${sqof(9,0)}")
         end for
 
         // Compute averages
@@ -97,23 +101,23 @@ class CalibrateCalRoute101 extends CalibratableModel:
         val avgSpeedSMAPE = totalSpeedSMAPE / 5.0
         val avgCountRMSE = totalCountRMSE / 5.0
         val avgSpeedRMSE = totalSpeedRMSE / 5.0
+        val avgCountNRMSE = totalCountNRMSE / 5.0
+        val avgSpeedNRMSE = totalSpeedNRMSE / 5.0
 
         // Print summary
         println("\n" + "=" * 60)
         println("SUMMARY (Average across 5 sensors)")
         println("=" * 60)
-        println(f"Counts - Avg RMSE: $avgCountRMSE%.4f, Avg SMAPE: $avgCountSMAPE%.2f")
-        println(f"Speeds - Avg RMSE: $avgSpeedRMSE%.4f, Avg SMAPE: $avgSpeedSMAPE%.2f")
+        println(f"Counts - Avg RMSE: $avgCountRMSE%.4f, Avg SMAPE: $avgCountSMAPE%.2f, Avg NRMSE: $avgCountNRMSE%.4f")
+        println(f"Speeds - Avg RMSE: $avgSpeedRMSE%.4f, Avg SMAPE: $avgSpeedSMAPE%.2f, Avg NRMSE: $avgSpeedNRMSE%.4f")
         println("=" * 60)
 
         // Return fitness value for optimization
-        // Weighted combination of count and speed SMAPE
+        // Weighted combination of count and speed NRMSE (scale-invariant)
         val countWeight = 0.5
         val speedWeight = 0.5
-        val fitness = countWeight * avgCountSMAPE + speedWeight * avgSpeedSMAPE
-
-         println(f"FITNESS (${countWeight}*countSMAPE + ${speedWeight}*speedSMAPE): $fitness%.4f")
-
+        val fitness = countWeight * avgCountNRMSE + speedWeight * avgSpeedNRMSE
+        println(f"FITNESS (${countWeight}*countNRMSE + ${speedWeight}*speedNRMSE): $fitness%.4f")
 
         fitness
     end computeFitness
@@ -142,6 +146,8 @@ end eval
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Run SPSA Optimizer Only - For SLURM Job Array
  *  > runMain scalation.simulation.process.runCalibrate_SPSA
+ *  Uses bounded objective to keep parameters in physically meaningful ranges
+ *  centered around known-good values: [s=5.0, amax=4.0, bmax=-2.0, T=3.0, rt=0.5]
  */
 @main def runCalibrate_SPSA(): Unit =
     banner("SPSA OPTIMIZER - CalRoute101 Calibration")
@@ -149,17 +155,34 @@ end eval
     val modelAdapter = new CalibrateCalRoute101()
     val simOpt = new TrafficOptimization(modelAdapter)
     modelAdapter.applyParameters(params)
-    //val params: VectorD = VectorD(5.0, 4.0, -2.0, 3.0, 0.5)
     println(s"Initial parameters: $params")
 
-    val spsaOptimizer = new SPSA(simOpt.func, 20)
+    // Parameter bounds: [s, amax, bmax, T, rt]
+    // Centered around good values with reasonable exploration range
+    val lower = VectorD(2.0, 1.5, -3.0, 1.0, 0.3)   // lower bounds
+    val upper = VectorD(8.0, 6.0, -1.0, 5.0, 1.5)   // upper bounds
+
+    // Bounded objective function: clamps parameters before evaluation
+    def boundedFunc(x: VectorD): Double =
+        val clamped = VectorD(for i <- x.indices yield math.max(lower(i), math.min(upper(i), x(i))))
+        simOpt.func(clamped)
+    end boundedFunc
+
+    val spsaOptimizer = new SPSA(boundedFunc, 100)
+    spsaOptimizer.setVerbose(1)        // use built-in table output
+    spsaOptimizer.setPrintEvery(5)     // print every 5 epochs
     val startTime = System.currentTimeMillis()
     val result    = spsaOptimizer.solve(params)
     val endTime   = System.currentTimeMillis()
     val duration  = (endTime - startTime) / 1000.0
 
+    // Clamp final result for reporting
+    val clampedResult = VectorD(for i <- result._2.indices yield math.max(lower(i), math.min(upper(i), result._2(i))))
+
     println(s"Best Fitness : ${result._1}")
-    println(s"Best Parameters: ${result._2}")
+    println(s"Best Parameters (bounded): $clampedResult")
+    println(f"Duration: $duration%.2f seconds")
+
     Model.shutdown()
 end runCalibrate_SPSA
 
@@ -175,15 +198,33 @@ end runCalibrate_SPSA
 
     println(f"Initial parameters: $params")
 
-    val spsaOptimizer = new SPSA_Mo(simOpt.func, 20)
+    // Parameter bounds: [s, amax, bmax, T, rt]
+    val lower = VectorD(2.0, 1.5, -4.0, 1.0, 0.3)
+    val upper = VectorD(8.0, 6.0, -0.5, 5.0, 1.5)
+
+    // Bounded objective function
+    def boundedFunc(x: VectorD): Double =
+        val clamped = VectorD(for i <- x.indices yield math.max(lower(i), math.min(upper(i), x(i))))
+        simOpt.func(clamped)
+    end boundedFunc
+
+    val spsaOptimizer = new SPSA_Mo(boundedFunc, 70)
+    spsaOptimizer.setVerbose(1)
+    spsaOptimizer.setPrintEvery(5)
     val startTime = System.currentTimeMillis()
     val result = spsaOptimizer.solve(params)
     val endTime = System.currentTimeMillis()
     val duration = (endTime - startTime) / 1000.0
 
+    // Clamp final result for reporting
+    val clampedResult = VectorD(for i <- result._2.indices yield math.max(lower(i), math.min(upper(i), result._2(i))))
+
     println(f"Best Fitness: ${result._1}%.4f")
-    println(f"Best Parameters: ${result._2}")
+    println(f"Best Parameters (bounded): $clampedResult")
     println(f"Duration: ${duration}%.2f seconds")
+
+    // Note: Use spsaOptimizer.lossPerEpochs() to get convergence history if needed
+    // plotLoss() requires GUI - not available on HPC
 
     Model.shutdown()
 end runCalibrate_SPSA_Mo
@@ -198,7 +239,6 @@ end runCalibrate_SPSA_Mo
 
     val modelAdapter = new CalibrateCalRoute101()
     val simOpt = new TrafficOptimization(modelAdapter)
-    val params: VectorD = VectorD(5.0, 4.0, -2.0, 3.0, 0.5)
 
     println(s"Starting Nelder-Mead Optimization at ${java.time.LocalDateTime.now()}")
     println(s"Initial parameters: $params")
@@ -267,12 +307,14 @@ end runCalibrate_DifferentialEvolution
     println(f"Initial parameters: $params")
 
     // Define search ranges for GA: [s, amax, bmax, T, τ]
+    // Literature-based + SPSA-informed bounds (Treiber & Kesting, 2013)
+    // SPSA best: (3.8, 2.9, -0.64, 1.9, 1.6) and (3.1, 4.0, -0.05, 3.0, 2.3)
     val randVars: Array[Variate] = Array(
-        Uniform(3.0, 10.0),   // s:    safe distance headway (3-10 meters)
-        Uniform(1.0, 10.0),   // amax: max acceleration (1-10 m/s²)
-        Uniform(-10.0, -1.0), // bmax: max deceleration (-10 to -1 m/s²)
-        Uniform(1.0, 5.0),    // T:    safe time headway (1-5 seconds)
-        Uniform(0.5, 3.0)     // τ:    reaction time (0.5-3 seconds)
+        Uniform(1.0, 5.0),    // s₀:   min gap (1-5 m) - literature default: 2m
+        Uniform(0.5, 2.5),    // a:    max acceleration (0.5-2.5 m/s²) - literature: 1.0-1.5 m/s²
+        Uniform(-3.0, -1.0),  // b:    comfortable deceleration (-3 to -1 m/s²) - literature: 1.5-2.0 m/s²
+        Uniform(0.8, 2.5),    // T:    safe time headway (0.8-2.5 s) - literature: 1.5s
+        Uniform(0.5, 1.5)     // τ:    reaction time (0.5-1.5 s) - literature: 0.6-1.0s
     )
 
     val gaOptimizer = new GeneticAlgorithm(simOpt.func, randVars)
@@ -284,6 +326,8 @@ end runCalibrate_DifferentialEvolution
     println(f"Best Fitness: ${result._1}%.4f")
     println(f"Best Parameters: ${result._2}")
     println(f"Duration: ${duration}%.2f seconds")
+
+
 
     Model.shutdown()
 end runCalibrate_GA

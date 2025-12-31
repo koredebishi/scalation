@@ -334,7 +334,7 @@ class VectorD (val dim: Int,
     /** Compute the element-wise sum (or difference, product, quotient) of vectors this and y.
      *  @param y  the other vector/indexed sequence
      */
-    def + (y: VectorD): VectorD = new VectorD (dim, cfor (dim) { i => v(i) + y.v(i) })
+    inline def + (y: VectorD): VectorD = new VectorD (dim, cfor (dim) { i => v(i) + y.v(i) })
     def + (y: IndexedSeq [Double]): VectorD = new VectorD (dim, cfor (dim) { i => v(i) + y(i) })
 
     def - (y: VectorD): VectorD = new VectorD (dim, cfor (dim) { i => v(i) - y.v(i) })
@@ -352,7 +352,7 @@ class VectorD (val dim: Int,
      */
     def + (a: Double): VectorD = new VectorD (dim, cfor (dim) { i => v(i) + a })
     def - (a: Double): VectorD = new VectorD (dim, cfor (dim) { i => v(i) - a })
-    def * (a: Double): VectorD = new VectorD (dim, cfor (dim) { i => v(i) * a })
+    inline def * (a: Double): VectorD = new VectorD (dim, cfor (dim) { i => v(i) * a })
     def / (a: Double): VectorD = new VectorD (dim, cfor (dim) { i => v(i) / a })
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

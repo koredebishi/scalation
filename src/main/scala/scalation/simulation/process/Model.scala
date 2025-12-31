@@ -364,7 +364,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
      *  @param rep  the replication number (1, ... reps)
      */
     protected def fini (rep: Int): Unit =
-        report ()                                                   // report in terminal
+        //report ()                                                   // report in terminal
         if animating then
             reportF ()                                              // report in new window/frame
             if rep == 1 then dgAni.animate (0, 100000)              // only animate first rep

@@ -112,27 +112,29 @@ object Vehicle:
      *  @see https://en.wikipedia.org/wiki/Intelligent_driver_model
      */
 
-    val def_prop = Map ("rt"   -> 0.5,                       // driver reaction time
-        "amax" -> 4.0,                       // max acceleration
-        "bmax" -> -2.0,                      // max deceleration use to be -1.5
+//    val def_prop = Map ("rt"   -> 0.5,                       // driver reaction time
+//        "amax" -> 4.0,                       // max acceleration
+//        "bmax" -> -2.0,                      // max deceleration use to be -1.5
+//        "v0"   -> 4.0,                       // starting velocity // v0 should be adjustable to 0
+//        "vmax" -> 33.528,                    // max velocity
+//        "T"    -> 3.0,                       // safe min time headway
+//        "s"    -> 5.0,                       // safe min distance headway
+//        "len"  -> 4.0,                       // length of the vehicles
+//        "del"  -> 4.0)                       // acceleration exponent (delta)
+    // Good def_prop values: s=5.0, amax=4.0, bmax=-2.0, T=3.0, rt=0.5
+
+   // 5.00000,    4.00000,        -2.00000,       3.00000,        0.500000
+//Best Parameters: VectorD(3.81720,       2.90907,        -0.643255,      1.87390,        1.61078)
+
+    val def_prop = Map ("rt"   -> 1.61,                       // driver reaction time
+        "amax" -> 2.909,                       // max acceleration
+        "bmax" -> -0.643,                      // max deceleration use to be -1.5
         "v0"   -> 4.0,                       // starting velocity // v0 should be adjustable to 0
         "vmax" -> 33.528,                    // max velocity
-        "T"    -> 3.0,                       // safe min time headway
-        "s"    -> 5.0,                       // safe min distance headway
+        "T"    -> 1.87,                       // safe min time headway
+        "s"    -> 3.8,                       // safe min distance headway
         "len"  -> 4.0,                       // length of the vehicles
         "del"  -> 4.0)                       // acceleration exponent (delta)
-
-//    val def_prop = Map(
-//        "rt" -> 0.5,      // fast reaction time (seconds)
-//        "amax" -> 1.5,    // strong acceleration (m/s²) - reaches high speeds
-//        "bmax" -> -2.5,   // stronger braking (m/s²) - was -1.5, now creates deeper congestion
-//        "v0" -> 4.0,      // low starting velocity (m/s)
-//        "vmax" -> 35.528, // max velocity cap (m/s) = 75 mph (overridden per lane)
-//        "T" -> 1.5,       // safe time headway (seconds) - reduced from 3.0 for tighter following
-//        "s" -> 2.0,       // min gap (meters) - reduced from 5.0 for denser packing
-//        "len" -> 4.0,     // vehicle length (meters)
-//        "del" -> 4.0      // acceleration exponent (delta)
-//    )
 
     /** current values for driver/vehicle characteristics/properties
      */
