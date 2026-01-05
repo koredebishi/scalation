@@ -154,7 +154,7 @@ end eval
 
     val modelAdapter = new CalibrateCalRoute101()
     val simOpt = new TrafficOptimization(modelAdapter)
-    modelAdapter.applyParameters(params)
+
     println(s"Initial parameters: $params")
 
     // Parameter bounds: [s, amax, bmax, T, rt]
@@ -233,6 +233,8 @@ end runCalibrate_SPSA_Mo
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Run Nelder-Mead Simplex Optimizer Only - For SLURM Job Array
  * > runMain scalation.simulation.process.runCalibrate_NelderMead
+ *  Uses bounded objective to keep parameters in physically meaningful ranges
+ *  centered around known-good values: [s=5.0, amax=4.0, bmax=-2.0, T=3.0, rt=0.5]
  */
 @main def runCalibrate_NelderMead(): Unit =
     banner("NELDER-MEAD SIMPLEX OPTIMIZER - CalRoute101 Calibration")
@@ -240,18 +242,35 @@ end runCalibrate_SPSA_Mo
     val modelAdapter = new CalibrateCalRoute101()
     val simOpt = new TrafficOptimization(modelAdapter)
 
-    println(s"Starting Nelder-Mead Optimization at ${java.time.LocalDateTime.now()}")
-    println(s"Initial parameters: $params")
+    // Same starting point as SPSA for fair comparison
+    val startParams: VectorD = VectorD(5.0, 4.0, -2.0, 3.0, 0.5)
 
-    val nelderMeadOptimizer = new NelderMeadSimplex2(simOpt.func, params.dim)
+    println(s"Starting Nelder-Mead Optimization at ${java.time.LocalDateTime.now()}")
+    println(s"Initial parameters: $startParams")
+
+    // Parameter bounds: [s, amax, bmax, T, rt]
+    // Same bounds as SPSA for consistency
+    val lower = VectorD(2.0, 1.5, -3.0, 1.0, 0.3)   // lower bounds
+    val upper = VectorD(8.0, 6.0, -1.0, 5.0, 1.5)   // upper bounds
+
+    // Bounded objective function: clamps parameters before evaluation
+    def boundedFunc(x: VectorD): Double =
+        val clamped = VectorD(for i <- x.indices yield math.max(lower(i), math.min(upper(i), x(i))))
+        simOpt.func(clamped)
+    end boundedFunc
+
+    val nelderMeadOptimizer = new NelderMeadSimplex2(boundedFunc, startParams.dim)
     val startTime = System.currentTimeMillis()
-    val result = nelderMeadOptimizer.solve(params)
+    val result = nelderMeadOptimizer.solve(startParams)
     val endTime = System.currentTimeMillis()
     val duration = (endTime - startTime) / 1000.0
 
+    // Clamp final result for reporting
+    val clampedResult = VectorD(for i <- result._2.indices yield math.max(lower(i), math.min(upper(i), result._2(i))))
+
     println(s"Best Fitness : ${result._1}")
-    println(s"Best Parameters: ${result._2}")
-    println(s"Execution Time: $duration seconds")
+    println(s"Best Parameters (bounded): $clampedResult")
+    println(f"Duration: $duration%.2f seconds")
 
     Model.shutdown()
 end runCalibrate_NelderMead
@@ -413,3 +432,235 @@ end runCalibrate_GA
 //////            println(s"  Counts  - R²: ${cqof(0, 0)}, SSE: ${cqof(3, 0)}, RMSE: ${cqof(6, 0)}, SMAPE: ${cqof(8, 0)}")
 //////            println(s"  Speeds  - R²: ${sqof(0, 0)}, SSE: ${sqof(3, 0)}, RMSE: ${sqof(6, 0)}, SMAPE: ${sqof(8, 0)}")
 ////        end for
+
+
+
+// Numerical ODE choice (Dormand-P)--> RK4/5;  ()// (2,3) (4,4)          (Use more and test for the bragging right and rigor of the experimentation)
+// using Poisson also and compare with erlang2S for result analysis.
+// Micro level simulation calibration  Rsq, nrmse, rmse, smape
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Run a single experiment with specific integrator and arrival type.
+ *  Saves raw data CSV and fitness to log/experiments/ directory.
+ *
+ *  @param integratorType  the ODE integrator (DOPRI5, RK4, RK3, RK2, Ballistic)
+ *  @param arrivalType     the arrival process ("Erlang2S" or "Poisson")
+ *  @param experimentParams parameter vector [s, amax, bmax, T, rt]
+ */
+def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
+                        experimentParams: VectorD): Double =
+    // Ensure experiments directory exists
+    val experimentsDir = new java.io.File(LOG_DIR + "experiments")
+    if !experimentsDir.exists() then experimentsDir.mkdirs()
+
+    val experimentName = s"${arrivalType.toLowerCase}_${integratorType.toString.toLowerCase}"
+    println(s"\n${"=" * 70}")
+    println(s"EXPERIMENT: $experimentName")
+    println(s"Integrator: $integratorType, Arrival: $arrivalType")
+    println(s"Parameters: $experimentParams")
+    println(s"${"=" * 70}")
+
+    // Set integrator BEFORE model instantiation
+    IDMDynamics.integratorType = integratorType
+
+    // Apply vehicle parameters and create model with specified arrival type
+    Vehicle.setProps(Vehicle.setParams(experimentParams))
+    val model = new CalRoute101_2(arrivalType = arrivalType)
+    model.simulate()
+
+    // Extract simulation data
+    val mats = for s <- model.junc yield s.getRecorderMat
+    val simCounts = mats.map(_._1)
+    val simSpeeds = mats.map(_._2)
+
+    val pemsSensorIndices = model.pemsToJunc
+    val simSensor_counts = pemsSensorIndices.map(i => simCounts(i))
+    val simSensor_speeds = pemsSensorIndices.map(i => simSpeeds(i))
+
+    // Load PEMS data for comparison
+    val pemsData = (0 until 5).map(i => TrafficConfig2.getPemsCountMatrix(i))
+    val sensor_counts = pemsData.map(_._1)
+    val sensor_speeds = pemsData.map(_._2)
+
+    // --- Save raw simulation data to CSV ---
+    val dataWriter = new EasyWriter("experiments", s"${experimentName}_data.csv")
+
+    // Header: S1L1_Flow,...,S5L4_Flow,S1L1_Speed,...,S5L4_Speed
+    val header = (for s <- 1 to 5; l <- 1 to 4 yield s"S${s}L${l}_Flow").mkString(",") + "," +
+        (for s <- 1 to 5; l <- 1 to 4 yield s"S${s}L${l}_Speed").mkString(",")
+    dataWriter.println(header)
+
+    // Write each time row
+    val numRows = simSensor_counts(0).dim
+    for row <- 0 until numRows do
+        val flowValues = for i <- 0 until 5 yield
+            val countRow = simSensor_counts(i)(row)
+            (for lane <- 0 until 4 yield countRow(lane).toInt).mkString(",")
+
+        val speedValues = for i <- 0 until 5 yield
+            val speedRow = simSensor_speeds(i)(row)
+            (for lane <- 0 until 4 yield f"${speedRow(lane)}%.2f").mkString(",")
+
+        dataWriter.println(flowValues.mkString(",") + "," + speedValues.mkString(","))
+    end for
+    dataWriter.flush()
+    dataWriter.close()
+    println(s"Raw data saved: log/experiments/${experimentName}_data.csv")
+
+    // --- Compute fitness metrics ---
+    val nt = sensor_counts(0).dim
+    val nparams = experimentParams.length
+    object TestFit extends Fit(dfr = nparams, df = nt - nparams)
+
+    var totalCountNRMSE = 0.0
+    var totalSpeedNRMSE = 0.0
+    var totalCountSMAPE = 0.0
+    var totalSpeedSMAPE = 0.0
+    var totalCountRMSE = 0.0
+    var totalSpeedRMSE = 0.0
+
+    val fitnessWriter = new EasyWriter("experiments", s"${experimentName}_fitness.txt")
+    fitnessWriter.println(s"Experiment: $experimentName")
+    fitnessWriter.println(s"Integrator: $integratorType")
+    fitnessWriter.println(s"Arrival: $arrivalType")
+    fitnessWriter.println(s"Parameters: $experimentParams")
+    fitnessWriter.println(s"Timestamp: ${java.time.LocalDateTime.now()}")
+    fitnessWriter.println("=" * 60)
+
+    for i <- 0 until 5 do
+        val cqof = TestFit.diagnose_mat(sensor_counts(i), simSensor_counts(i))
+        val sqof = TestFit.diagnose_mat(sensor_speeds(i), simSensor_speeds(i))
+
+        val countNRMSE = cqof(9).mean   // nrmse index
+        val speedNRMSE = sqof(9).mean
+        val countSMAPE = cqof(8).mean
+        val speedSMAPE = sqof(8).mean
+        val countRMSE = cqof(6).mean
+        val speedRMSE = sqof(6).mean
+
+        totalCountNRMSE += countNRMSE
+        totalSpeedNRMSE += speedNRMSE
+        totalCountSMAPE += countSMAPE
+        totalSpeedSMAPE += speedSMAPE
+        totalCountRMSE += countRMSE
+        totalSpeedRMSE += speedRMSE
+
+        val sensorLine = f"Sensor $i: CountNRMSE=$countNRMSE%.4f, SpeedNRMSE=$speedNRMSE%.4f, CountSMAPE=$countSMAPE%.2f, SpeedSMAPE=$speedSMAPE%.2f"
+        println(sensorLine)
+        fitnessWriter.println(sensorLine)
+    end for
+
+    val avgCountNRMSE = totalCountNRMSE / 5.0
+    val avgSpeedNRMSE = totalSpeedNRMSE / 5.0
+    val avgCountSMAPE = totalCountSMAPE / 5.0
+    val avgSpeedSMAPE = totalSpeedSMAPE / 5.0
+    val fitness = 0.5 * avgCountNRMSE + 0.5 * avgSpeedNRMSE
+
+    fitnessWriter.println("=" * 60)
+    fitnessWriter.println(f"Avg Count NRMSE: $avgCountNRMSE%.6f")
+    fitnessWriter.println(f"Avg Speed NRMSE: $avgSpeedNRMSE%.6f")
+    fitnessWriter.println(f"Avg Count SMAPE: $avgCountSMAPE%.4f")
+    fitnessWriter.println(f"Avg Speed SMAPE: $avgSpeedSMAPE%.4f")
+    fitnessWriter.println(f"FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): $fitness%.6f")
+    fitnessWriter.flush()
+    fitnessWriter.close()
+
+    println(f"\nFITNESS: $fitness%.6f")
+    println(s"Fitness saved: log/experiments/${experimentName}_fitness.txt")
+
+    Model.shutdown()
+    fitness
+end runSingleExperiment
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Run all experiments for paper comparison.
+ *  Tests all combinations of integrators and arrival types.
+ *
+ *  > runMain scalation.simulation.process.runAllExperiments
+ */
+@main def runAllExperiments(): Unit =
+    banner("EXPERIMENTAL COMPARISON - Integrators & Arrival Processes")
+
+    // Best parameters from initial testing
+    val bestParams = VectorD(5.0, 4.0, -2.0, 3.0, 0.5)
+
+    // Define experiments: (integratorType, arrivalType)
+    val experiments = Seq(
+        // Erlang2S with all integrators
+        (IntegratorType.DOPRI5, "Erlang2S"),
+        (IntegratorType.RK4, "Erlang2S"),
+        (IntegratorType.RK3, "Erlang2S"),
+        (IntegratorType.RK2, "Erlang2S"),
+        (IntegratorType.Ballistic, "Erlang2S"),
+        // Poisson with all integrators
+        (IntegratorType.DOPRI5, "Poisson"),
+        (IntegratorType.RK4, "Poisson"),
+        (IntegratorType.RK3, "Poisson"),
+        (IntegratorType.RK2, "Poisson"),
+        (IntegratorType.Ballistic, "Poisson")
+    )
+
+    val results = scala.collection.mutable.ArrayBuffer[(String, Double)]()
+
+    for (integrator, arrival) <- experiments do
+        val experimentName = s"${arrival.toLowerCase}_${integrator.toString.toLowerCase}"
+        val fitness = runSingleExperiment(integrator, arrival, bestParams)
+        results += (experimentName -> fitness)
+    end for
+
+    // Write summary
+    val summaryWriter = new EasyWriter("experiments", "experiment_summary.txt")
+    summaryWriter.println("=" * 70)
+    summaryWriter.println("EXPERIMENTAL RESULTS SUMMARY")
+    summaryWriter.println(s"Timestamp: ${java.time.LocalDateTime.now()}")
+    summaryWriter.println(s"Parameters: $bestParams")
+    summaryWriter.println("=" * 70)
+    summaryWriter.println(f"${"Configuration"}%-30s | ${"Fitness (NRMSE)"}%15s")
+    summaryWriter.println("-" * 50)
+
+    for (config, fitness) <- results.sortBy(_._2) do
+        val line = f"$config%-30s | $fitness%15.6f"
+        println(line)
+        summaryWriter.println(line)
+    end for
+
+    summaryWriter.println("=" * 70)
+    summaryWriter.println("Lower fitness = better fit to PEMS data")
+    summaryWriter.flush()
+    summaryWriter.close()
+
+    println(s"\nSummary saved: log/experiments/experiment_summary.txt")
+    println("All experiment data saved in log/experiments/")
+end runAllExperiments
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Run a single experiment from command line (for individual runs).
+ *
+ *  Usage: runMain scalation.simulation.process.runExperimentCLI <integrator> <arrival>
+ *  Where: integrator = DOPRI5, RK4, RK3, RK2, Ballistic
+ *         arrival    = Erlang2S, Poisson
+ */
+@main def runExperimentCLI(integratorName: String, arrivalType: String): Unit =
+    val integrator = integratorName match
+        case "DOPRI5"    => IntegratorType.DOPRI5
+        case "RK4"       => IntegratorType.RK4
+        case "RK3"       => IntegratorType.RK3
+        case "RK2"       => IntegratorType.RK2
+        case "Ballistic" => IntegratorType.Ballistic
+        case _           =>
+            println(s"Unknown integrator: $integratorName, using DOPRI5")
+            IntegratorType.DOPRI5
+
+    val arrival = arrivalType match
+        case "Poisson"  => "Poisson"
+        case "Erlang2S" => "Erlang2S"
+        case _          =>
+            println(s"Unknown arrival: $arrivalType, using Erlang2S")
+            "Erlang2S"
+
+    val bestParams = VectorD(5.0, 4.0, -2.0, 3.0, 0.5)
+    runSingleExperiment(integrator, arrival, bestParams)
+end runExperimentCLI

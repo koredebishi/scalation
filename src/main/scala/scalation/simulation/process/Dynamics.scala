@@ -19,6 +19,19 @@ import Vehicle._
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Enumeration for selecting the ODE integrator type for IDM dynamics.
+ *  Used for experimental comparison of numerical integration methods.
+ */
+enum IntegratorType:
+    case DOPRI5      // Dormand-Prince (4,5) adaptive - O(Δt⁵) - current default
+    case RK4         // Classic Runge-Kutta 4th order - O(Δt⁴)
+    case RK3         // SSPRK3 - O(Δt³)
+    case RK2         // Modified Euler (Explicit Midpoint) - O(Δt²)
+    case Ballistic   // Kinematic equations - O(Δt²)
+end IntegratorType
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Dynamics` trait supports physics models for the motion of vehicles, e.g.,
  *  car-following models.
  */
@@ -137,31 +150,6 @@ object GippsDynamics
         car.disp = new_disp
     end updateM
 
-
-    //    def updateM(car: Vehicle, length: Double): Unit =
-//        val ref = car.myPathNode.ahead
-//        val car_ahead = if ref != null then ref.elem else null
-//
-//        val v = gipps(car, car_ahead, length) + EPSILON // determine new velocity
-//
-//        val x = butcher(car.t_disp, v, car.velocity, prop("rt")) // new proposed position for car
-//
-//        car.o_velocity = car.velocity // save the old velocity
-//        car.velocity = v // assign new velocity
-//
-//
-//        car.o_t_disp = car.t_disp // save old car position
-//        val dx = x - car.t_disp // change in car's position
-//        val new_disp = if car.disp + dx <= length then car.disp + dx // new car displacement on road
-//        else length
-//
-//        car.t_disp += new_disp - car.disp // new car position
-//        car.disp = new_disp // displacement on road
-//        //debug("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
-//    end updateM
-
-
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the velocity of the vehicle based on Gipps' model for a vehicle and its predecessor.
      *  @param cn  the current vehicle
@@ -234,59 +222,16 @@ object IDMDynamics
 
     private val FREERANGE = 50.0
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the vehicle's acceleration, velocity, and position using the
-     *  Intelligent Driver Model (located in `Motion`) and Butcher's method
-     *  for solving ordinary differential equations.
-     *  @param car  the car/vehicle whose acceleration, velocity, and position is being updated
-     */
-//    def updateM (car: Vehicle, length: Double): Unit =
-//        //debug ("updateM", s"car = $car")
-//        var a = iDM (car, car.myNode.ahead.asInstanceOf [Vehicle], del)
-//        //debug ("updateM", s"car = $car \t the new ACCELERATION is: $a")
-//        if a.isNaN then         a = 0.0
-//        if a.isNegInfinity then a = bmax                            // max braking acceleration
-//        if a.isPosInfinity then a = amax                            // max forward acceleration
-//        if a < 0.0 && a < bmax then
-//            val r = log(a) / log (bmax)
-//            a = if r > 5.0 then 3.0 * bmax else bmax                // FIX - unclear
-//        if a > 0.0 && a > amax then a = amax
-//
-//        //make it a bit:
-//        // rather than invoking the solver 2x, We can.
-//        // Vectorization and call it once.
-//        var v = butcher (car.velocity, a, car.acc, rt)      // determine new velocity
-//        // dormand prince
-//        //debug ("updateM", s"car = $car \t the new VELOCITY is: $v")
-//        if v < 0.0 then v = 1.0                                     // move slowly, not stopped
-//
-//        val x = butcher (car.t_disp, v, car.velocity, rt)   // new proposed position for car
-//        //debug ("updateM", s"car = $car \t the new POSITION is: $x")
-//
-//        car.o_acc = car.acc
-//        car.acc   = a
-//        car.o_velocity = car.velocity
-//        car.velocity = v
-//        var dx    = x - car.t_disp
-//        car.disp += dx
-//        car.o_t_disp = car.t_disp
-//        car.t_disp   = x
-//    end updateM//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Configurable integrator type for ODE solving - default DOPRI5 */
+    var integratorType: IntegratorType = IntegratorType.DOPRI5
+
+
+
     /**
      *  @param car     the vehicle to update
      *  @param length  the segment length
      */
     def updateM(car: Vehicle, length: Double): Unit =
-        // ─────────────────────────────────────────────────────────────────────────
-        // STEP 1: Snapshot leader state BEFORE integration
-        // ─────────────────────────────────────────────────────────────────────────
-        // This is the key to preserving simultaneity without global state vectors.
-        // The leader's position and velocity are treated as CONSTANTS during this
-        // vehicle's integration step. This is physically justified because:
-        //   - Reaction time τ means driver responds to observed (past) leader state
-        //   - For Δt ≈ τ, leader motion during Δt is second-order effect
-        //   - Same assumption underlies discrete stepping (snapshot semantics)
-        // ─────────────────────────────────────────────────────────────────────────
         val ref = car.myPathNode.ahead
         val car_ahead = if ref != null then ref.elem else null
         val dt = rt
@@ -304,68 +249,11 @@ object IDMDynamics
         val v_old = car.velocity
         val x_old = car.t_disp
 
-        // ─────────────────────────────────────────────────────────────────────────
-        // STEP 3: Define the coupled ODE system as Array[DerivativeV]
-        // ─────────────────────────────────────────────────────────────────────────
-        // State vector: y = [x, v] where x = position, v = velocity
-        // Derivatives:  y' = [v, a] where a = IDM acceleration
-        //
-        // integrateVV expects Array[DerivativeV] where DerivativeV = (Double, VectorD) => Double
-        // Each element returns the derivative for one dimension:
-        //   odes(0) = dx/dt = v
-        //   odes(1) = dv/dt = a (IDM acceleration)
-        // ─────────────────────────────────────────────────────────────────────────
-
-        // Helper function to compute IDM acceleration
-
         /**
-         * Compute IDM acceleration using the existing iDM method.
-         * This avoids duplicating the IDM formula - single source of truth.
-         *
-         * ═══════════════════════════════════════════════════════════════════════
-         * WHY THIS HELPER EXISTS (NOT REDUNDANT WITH iDM):
-         * ═══════════════════════════════════════════════════════════════════════
-         *
-         * The Dormand-Prince ODE solver calls this function MULTIPLE TIMES per
-         * timestep with DIFFERENT trial values. These are NOT the vehicle's
-         * actual state - they are intermediate Runge-Kutta stage evaluations.
-         *
-         * Dormand-Prince 7-Stage Evaluation:
-         * ┌─────────────────────────────────────────────────────────────────────┐
-         * │ Stage 1: y = [x₀, v₀]                  idmAccel(x₀, v₀)           │
-         * │ Stage 2: y = [x₀ + k₁·h/5, ...]        idmAccel(x_trial, v_trial) │
-         * │ Stage 3: y = [x₀ + k₁·3h/40 + ..., ...]idmAccel(x_trial, v_trial) │
-         * │ Stage 4: y = [x₀ + k₁·44h/45 + ...,...]idmAccel(x_trial, v_trial) │
-         * │ Stage 5: y = [x₀ + ..., ...]           idmAccel(x_trial, v_trial) │
-         * │ Stage 6: y = [x₀ + ..., ...]           idmAccel(x_trial, v_trial) │
-         * │ Stage 7: y = [x₀ + ..., ...]           idmAccel(x_trial, v_trial) │
-         * └─────────────────────────────────────────────────────────────────────┘
-         *
-         * At each stage, y(0) and y(1) are DIFFERENT trial values computed by
-         * the solver. The existing iDM(cn, cp, del) method reads directly from
-         * Vehicle objects (car.t_disp, car.velocity), which would always return
-         * the ORIGINAL state - defeating the purpose of higher-order integration.
-         *
-         * This helper accepts (x_n, v_n) as parameters so the ODE solver can
-         * pass its internal trial values, while using SNAPSHOTTED leader state
-         * (x_leader, v_leader) from the enclosing scope.
-         *
-         * ═══════════════════════════════════════════════════════════════════════
-         * RELATIONSHIP TO EXISTING iDM METHODS:
-         * ═══════════════════════════════════════════════════════════════════════
-         *
-         * iDM(cn, cp, del)           Wrapper for Vehicle objects (discrete stepping)
-         * iDM(an, bn, sp, ...)       Core IDM formula (called by this helper)
-         * iDMFree(an, vn, Vn, del)   Free-flow case (no leader)
-         * idmAccel(x_n, v_n)         ODE-compatible wrapper (this method)
-         *
-         * This method calls iDM(an, bn, sp, ...) internally, ensuring the IDM
-         * formula is defined in exactly ONE place.
-         *
          * @param x_n  Current position of driver n (from ODE solver trial values, NOT car.t_disp)
          * @param v_n  Current velocity of driver n (from ODE solver trial values, NOT car.velocity)
          * @return     IDM acceleration clamped to physical bounds [-bmax, amax]
-         */
+        */
         def idmAccel(x_n: Double, v_n: Double): Double =
             val b = abs(bmax)
 
@@ -390,13 +278,22 @@ object IDMDynamics
         )
 
         // ─────────────────────────────────────────────────────────────────────────
-        // STEP 4: Solve the coupled system with Dormand-Prince
-        // ─────────────────────────────────────────────────────────────────────────
-        // integrateVV solves: y(t + dt) given y(t) and dy/dt = odes(t, y)
-        // Single call, consistent state evolution, O(Δt⁵) accuracy
+        // STEP 4: Solve the coupled system with selected integrator
         // ─────────────────────────────────────────────────────────────────────────
         val y0 = VectorD(car.t_disp, car.velocity)                      // initial state [x(t), v(t)]
-        val y1 = DormandPrince.integrateVV(odes, y0, dt)                // solve to get [x(t+dt), v(t+dt)]
+
+        // Select integrator based on integratorType setting
+        val y1: VectorD = integratorType match
+            case IntegratorType.DOPRI5    => DormandPrince.integrateVV(odes, y0, dt)
+            case IntegratorType.RK4       => RungeKutta2.rk4.integrateVV(odes, y0, dt)
+            case IntegratorType.RK3       => RungeKutta2.rk3.integrateVV(odes, y0, dt)
+            case IntegratorType.RK2       => RungeKutta2.rk2.integrateVV(odes, y0, dt)
+            case IntegratorType.Ballistic =>
+                // Ballistic: compute IDM acceleration once, then kinematic update
+                val a_idm = idmAccel(car.t_disp, car.velocity)
+                val v_ball = car.velocity + a_idm * dt   // v(t + dt)
+                val x_ball = car.t_disp + car.velocity * dt + 0.5 * a_idm * dt * dt  // x(t + dt)
+                VectorD(x_ball, v_ball)  // construct new state vector
 
         // ─────────────────────────────────────────────────────────────────────────
         // STEP 5: Extract and clamp results
@@ -430,71 +327,6 @@ object IDMDynamics
         car.t_disp += new_disp - car.disp                              // update total position
         car.disp    = new_disp                                         // update displacement on segment
     end updateM
-
-//
-//    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//    /** Update the vehicle's acceleration, velocity, and position using the
-//     *  Intelligent Driver Model and Butcher's method (simpler/faster than Dormand-Prince).
-//     *  Uses 2 Butcher calls vs 14 derivative evaluations in Dormand-Prince.
-//     *  @param car     the vehicle to update
-//     *  @param length  the segment length
-//     */
-//    def updateM(car: Vehicle, length: Double): Unit =
-//        val ref = car.myPathNode.ahead
-//        val car_ahead = if ref != null then ref.elem else null
-//
-//        // ─────────────────────────────────────────────────────────────────────────
-//        // STEP 1: Compute IDM acceleration (single evaluation)
-//        // ─────────────────────────────────────────────────────────────────────────
-//        var a = iDM(car, car_ahead, del)
-//
-//        // Clamp acceleration to physical bounds
-//        if a.isNaN then a = 0.0
-//        if a.isNegInfinity then a = bmax
-//        if a.isPosInfinity then a = amax
-//        if a < bmax then a = bmax
-//        if a > amax then a = amax
-//
-//        // ─────────────────────────────────────────────────────────────────────────
-//        // STEP 2: Integrate velocity using Butcher's method
-//        // v(t+τ) = butcher(v(t), a(t), a(t-τ), τ)
-//        // ─────────────────────────────────────────────────────────────────────────
-//        var v = butcher(car.velocity, a, car.o_acc, rt)
-//
-//        // Physical constraints
-//        if v < 0.0 then v = 0.0
-//        if v > car.vmax then v = car.vmax
-//
-//        // ─────────────────────────────────────────────────────────────────────────
-//        // STEP 3: Integrate position using Butcher's method
-//        // x(t+τ) = butcher(x(t), v(t+τ), v(t), τ)
-//        // ─────────────────────────────────────────────────────────────────────────
-//        val x = butcher(car.t_disp, v, car.velocity, rt)
-//
-//        // ─────────────────────────────────────────────────────────────────────────
-//        // STEP 4: Update vehicle state
-//        // ─────────────────────────────────────────────────────────────────────────
-//        car.o_acc      = car.acc
-//        car.acc        = a
-//        car.o_velocity = car.velocity
-//        car.velocity   = v
-//        car.o_t_disp   = car.t_disp
-//
-//        // ─────────────────────────────────────────────────────────────────────────
-//        // STEP 5: Segment-bounded displacement update
-//        // ─────────────────────────────────────────────────────────────────────────
-//        val dx = x - car.t_disp
-//        val proposed_disp = car.disp + dx
-//        val new_disp = if proposed_disp <= length then proposed_disp else length
-//
-//        car.t_disp += new_disp - car.disp
-//        car.disp    = new_disp
-//    end updateM
-
-
-    // How far into the segment is any Car.  //
-    //From where you started, how far have you travelled?  //
-    //Given that they started from different places, is that going to cause a problem?
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the acceleration of the vehicle based on the Intelligent Driver Model

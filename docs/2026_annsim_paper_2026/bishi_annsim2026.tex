@@ -1,0 +1,486 @@
+%**************************************************************************
+%* ANNSIM 2026 Author Kit
+%*
+%* Word Processing System: TeXnicCenter and MiKTeX
+%*
+%**************************************************************************
+
+\documentclass{scspaperproc}
+
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{mathptmx}
+
+%
+%****************************************************************************
+% AUTHOR: You may want to use some of these packages. (Optional)
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+%****************************************************************************
+
+%
+%****************************************************************************
+% AUTHOR: If you do not wish to use hyperlinks, then just comment
+% out the hyperref usepackage commands below.
+
+\usepackage[pdftex,colorlinks=true,urlcolor=blue,citecolor=black,anchorcolor=black,linkcolor=black,bookmarks=false]{hyperref}
+
+%****************************************************************************
+
+% add custom hyphenation rules here
+\usepackage{hyphenat}
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+% Avoid overrunning the right margin
+\sloppy
+
+% ==== Accessibility essentials ====
+\usepackage[english]{babel}
+
+%#########################################################
+%*
+%*  The Document.
+%*
+\begin{document}
+
+%***************************************************************************
+\SCSpagesetup{Bishi, Bowman, and Miller}
+
+\def\SCSconferencename{Annual Modeling and Simulation Conference}
+\def\SCSconferenceacro{ANNSIM'26}
+\def\SCSpublicationyear{2026}
+\def\SCSconferenceeditors{G. Rabadi, V. Prabhu, R. Cárdenas, A. Bany Abdelnabi, J. Jabbour, and M. Germanos}
+\def\SCSconferencedates{May 4-7}
+\def\SCSconferencevenue{University of Central Florida, Orlando, Florida, USA}
+
+% AUTHOR: Enter the title, all letters in upper case
+\title{HIGHER-ORDER IDM INTEGRATION FOR MICROSCOPIC TRAFFIC SIMULATION: A DORMAND-PRINCE APPROACH WITH MULTI-SCALE VALIDATION}
+
+% AUTHOR: Enter the authors of the article
+\author[\authorrefmark{1}]{Korede R. Bishi}
+\author[\authorrefmark{2}]{Casey Bowman}
+\author[\authorrefmark{3}]{John A. Miller}
+
+\affil[\authorrefmark{1}]{Simulation, Modeling and Analytics Lab, School of Computing, University of Georgia, USA}
+\affil[\authorrefmark{2}]{University of North Georgia, USA}
+\affil[\authorrefmark{3}]{Simulation, Modeling and Analytics Lab, School of Computing, University of Georgia, USA}
+
+\maketitle
+
+\section*{Abstract}
+Microscopic traffic simulation requires accurate vehicle dynamics for meaningful calibration against empirical data. We extend the ScalaTion simulation framework with three contributions for freeway traffic modeling: (1) per-vehicle coupled ODE integration using Dormand-Prince (DOPRI5), achieving $O(\Delta t^5)$ accuracy for Intelligent Driver Model dynamics within a coroutine-based discrete-event architecture; (2) a shifted Erlang-2 arrival process with data-driven parameterization, enforcing physical minimum headways while matching observed headway variance; and (3) a multi-scale validation framework comparing simulated vehicle counts and speeds against 40 PeMS data streams at 15-minute temporal resolution. We demonstrate calibration of 5 IDM parameters using SPSA with momentum, minimizing Normalized RMSE across the US-101 Donald Doyle corridor. Results show strong flow agreement ($R^2 > 0.82$) with lane-level speed validation.
+
+\textbf{Keywords:} microscopic traffic simulation, Intelligent Driver Model, Dormand-Prince integration, discrete-event simulation, calibration, PeMS validation
+
+\section{Introduction}
+\label{sec:intro}
+
+Microscopic traffic simulation is essential for evaluating traffic management strategies, infrastructure planning, and autonomous vehicle testing. The fidelity of such simulations depends critically on two factors: (1) the accuracy of vehicle dynamics models, and (2) the realism of vehicle arrival processes.
+
+The Intelligent Driver Model (IDM) \cite{treiber2000congested} is widely used for car-following behavior. However, most simulators---including SUMO---integrate IDM using first-order Euler methods, introducing $O(\Delta t)$ discretization error that compounds during parameter estimation. When the goal is micro-level validation---matching speeds and flows at individual lanes and 15-minute intervals---this numerical noise obscures the signal we seek to calibrate.
+
+\textbf{Our contributions:}
+\begin{enumerate}
+\item \textbf{Per-vehicle coupled ODE integration} using Dormand-Prince (DOPRI5), achieving $O(\Delta t^5)$ accuracy for IDM dynamics---enabling reliable speed and flow reporting at micro-level temporal resolution
+\item \textbf{Shifted Erlang-2 arrivals} with data-driven parameterization, enforcing physical minimum headways while matching observed traffic demand patterns
+\item \textbf{Multi-scale validation framework} comparing simulated counts and speeds against 40 PeMS data streams at lane-level, 15-minute resolution
+\end{enumerate}
+
+The remainder of this paper is organized as follows. Section 2 reviews related work. Section 3 presents our methodology. Section 4 describes the experimental setup. Section 5 presents results. Section 6 concludes.
+
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Car-Following Models}
+
+The Intelligent Driver Model (IDM) \cite{treiber2000congested} computes acceleration based on desired velocity, safe following distance, and approach rate. Variants include the Improved IDM \cite{kesting2013traffic} and ACC models.
+
+\subsection{Numerical Integration in Traffic Simulation}
+
+SUMO uses ballistic/Euler integration \cite{lopez2018microscopic}. Higher-order methods like Runge-Kutta have been applied to macroscopic models but rarely to microscopic, per-vehicle dynamics within discrete-event frameworks.
+
+\subsection{Arrival Processes}
+
+Most simulators use Poisson (exponential) arrivals. The limitation is that exponential distributions allow arbitrarily small headways, which is physically unrealistic.
+
+\subsection{Calibration Methods}
+
+SPSA \cite{spall2002implementation} is gradient-free and suitable for noisy simulation-based optimization. Extensions with momentum improve convergence.
+
+\section{Methodology}
+\label{sec:methodology}
+
+Our aim with this work was to conduct a simulation setup that not only report macro level report validation of our simulation run, but to also report the micro level of vehicles at the respective interval of the simulation. To achieve this level of details and accuracy, the only car following model that allow that level of accuracy was Intelligent Driver's Model due to it's acceleration profile computation \cite{treiber2000congested}. One of the experimental trial we previously had while conducting this research was the use of Gipps model \cite{gipps1981behavioural} for the car-following model of choice, however, we soon realized that Gipps model can although produce a continuous discrete time step flow matching but produce acceleration bottleneck that can not recover from shockwave \cite{treiber2015comparing}, hence our choice for the IDM.
+
+\subsection{Intelligent Driver Model}
+
+The Intelligent Driver Model (IDM) computes the longitudinal acceleration
+$a_n$ of vehicle $n$ following a predecessor $p$ as \cite{treiber2000congested}:
+
+\begin{equation}
+a_n = a_{\max} \left[
+1 - \left( \frac{v_n}{v_{\max}} \right)^\delta
+- \left( \frac{s^*(v_n, \Delta v)}{s_n} \right)^2
+\right],
+\end{equation}
+
+where $v_n$ is the velocity of vehicle $n$, $\Delta v = v_n - v_p$ is the
+relative velocity to the leader, and $s_n$ is the net distance gap.
+The desired dynamic gap $s^*$ is given by:
+
+\begin{equation}
+s^*(v_n, \Delta v) =
+s_0 + \max\!\left(0,\, v_n T + \frac{v_n \Delta v}{2\sqrt{a_{\max} b}} \right).
+\end{equation}
+
+IDM behavior is sensitive to five parameters: minimum gap $s_0$, maximum acceleration $a_{\max}$, comfortable deceleration $b$, desired time headway $T$, and desired velocity $v_{\max}$. Small changes in these values particularly $T$ and $b$ can shift the model from free-flow to congested regimes. This sensitivity motivates our use of systematic calibration rather than literature defaults.
+
+\subsection{The Integration Problem}
+
+Accurate velocity trajectories are critical for micro-level validation because numerical
+integration errors propagate through vehicle positions, affect gap calculations, and
+accumulate in lane-level aggregated speed statistics. Using explicit Euler integration,
+
+\begin{equation}
+x_n^{t+\Delta t} = x_n^t + v_n^t \cdot \Delta t,
+\qquad
+v_n^{t+\Delta t} = v_n^t + a_n^t \cdot \Delta t,
+\end{equation}
+
+introduces a local truncation error of $O(\Delta t)$ and performs poorly for nonlinear
+car-following models.
+
+Although higher-order schemes reduce truncation error in smooth systems, studies by \cite{treiber2015comparing} and \cite{pvrikryl2017comparing} show that, for car-following models the practical accuracy
+depends strongly on model smoothness, braking events, and step size selection.
+In particular, fixed-step high-order methods do not universally outperform simpler
+schemes when abrupt accelerations or decelerations occur.
+
+To address this, we employ an adaptive Dormand--Prince (RK45) integrator, which dynamically
+adjusts the step size based on local error estimates. This allows fine temporal resolution
+during rapid braking or gap-closing events while maintaining efficiency during steady
+cruising, yielding improved trajectory stability and micro-level speed accuracy in our
+simulations.
+
+\subsection{Coupled ODE Formulation}
+
+Standard discrete stepping treats position and velocity as separate updates. But IDM acceleration depends on both quantities simultaneously through the gap term $s_n = x_p - x_n$. As the vehicle moves, the gap changes, which changes the acceleration, which changes how the vehicle moves. This coupling is the source of truncation error amplification in Euler schemes.
+
+To capture this coupling explicitly, we reformulate each vehicle's state as a vector. Let $x_n(t)$ denote the cumulative displacement of vehicle $n$ from the corridor origin, and $v_n(t)$ its velocity at time $t$. The state vector is:
+
+\begin{equation}
+\mathbf{y}_n = \begin{bmatrix} x_n \\ v_n \end{bmatrix}
+\end{equation}
+
+The dynamics become a coupled initial value problem:
+
+\begin{equation}
+\frac{d\mathbf{y}_n}{dt} = \begin{bmatrix} v_n \\ a_{\text{IDM}}(x_n, v_n; x_p, v_p) \end{bmatrix}
+\end{equation}
+
+where $(x_p, v_p)$ is the state of the preceding vehicle. This formulation makes the coupling explicit: position evolves with velocity, and velocity evolves with acceleration that depends on both position (through the gap $s_n = x_p - x_n$) and velocity (through the approach rate $\Delta v = v_n - v_p$).
+
+\textbf{The leader state problem.} In continuous time, all vehicles evolve simultaneously. In discrete-event simulation, we update vehicles sequentially. A naive implementation would read the leader's current state during integration, but this state may have already been updated in the current timestep, breaking causality.
+
+Our solution is to \textit{snapshot} the leader state at the beginning of each integration step:
+
+\begin{equation}
+\frac{d\mathbf{y}}{dt} = \begin{bmatrix} v \\ a_{\text{IDM}}(x, v; \tilde{x}_p, \tilde{v}_p) \end{bmatrix}
+\end{equation}
+
+where $(\tilde{x}_p, \tilde{v}_p)$ are frozen values. This approximation is physically justified: drivers respond to \textit{perceived} leader state, not instantaneous state. The reaction time $\tau$ inherently introduces a delay. For step sizes $\Delta t \approx \tau$, leader motion during integration is a second-order effect. The snapshot approach preserves discrete-event semantics while enabling higher-order integration within each step.
+
+\subsection{Dormand-Prince Integration}
+
+The coupled formulation in Equation (6) defines a well-posed initial value problem. We solve it using the Dormand-Prince method \cite{dormand1980family}, a 7-stage embedded Runge-Kutta scheme with adaptive step control.
+
+The key insight is that each stage probes the IDM function at different trial positions and velocities; not just the initial state. This allows the solver to ``feel'' the nonlinearity of the acceleration function across the step interval. At stage $i$:
+
+\begin{equation}
+\mathbf{k}_i = \mathbf{f}\left( t_n + c_i h, \, \mathbf{y}_n + h \sum_{j=1}^{i-1} a_{ij} \mathbf{k}_j \right)
+\end{equation}
+
+where $\mathbf{f}$ is the right-hand side of Equation (6) and $c_i$, $a_{ij}$ are the Butcher tableau coefficients. The first stage evaluates at the initial state; subsequent stages evaluate at progressively refined trial points. The final update combines all seven evaluations:
+
+\begin{equation}
+\mathbf{y}_{n+1} = \mathbf{y}_n + h \sum_{i=1}^{7} b_i \mathbf{k}_i
+\end{equation}
+
+This achieves $O(\Delta t^5)$ local truncation error. The embedded error estimate allows adaptive step sizing; smaller steps during rapid braking, larger steps during steady cruising, precisely where IDM nonlinearity varies most.
+
+Throughout all seven stages, the snapshotted leader state $(\tilde{x}_p, \tilde{v}_p)$ from Equation (6) remains constant. The higher-order accuracy applies to the follower's trajectory given the frozen leader, which is the information available to the driver within their reaction time window.
+
+Algorithm 1 summarizes the complete per-vehicle update procedure.
+
+\begin{algorithm}
+\caption{Per-Vehicle IDM Update with Dormand-Prince Integration}
+\begin{algorithmic}[1]
+\Require vehicle $n$, segment length $L$, time step $\Delta t$
+\Ensure updated position $x_n$, velocity $v_n$
+\State Snapshot leader state: $(\tilde{x}_p, \tilde{v}_p) \gets (x_p, v_p)$
+\State Define ODE system: $d\mathbf{y}/dt = [v, a_{\text{IDM}}(x, v; \tilde{x}_p, \tilde{v}_p)]^T$
+\State Set initial state: $\mathbf{y}_0 \gets [x_n, v_n]^T$
+\State Solve: $\mathbf{y}_1 \gets \text{DOPRI5.integrate}(d\mathbf{y}/dt, \mathbf{y}_0, \Delta t)$
+\State Extract: $x_{\text{new}} \gets \mathbf{y}_1[0]$, $v_{\text{new}} \gets \mathbf{y}_1[1]$
+\State Clamp velocity: $v_{\text{new}} \gets \max(0, \min(v_{\text{new}}, v_{\max}))$
+\State Update segment displacement: $\Delta x \gets x_{\text{new}} - x_n$; $\text{disp} \gets \min(\text{disp} + \Delta x, L)$
+\State Update vehicle state: $x_n \gets x_{\text{new}}$, $v_n \gets v_{\text{new}}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Shifted Erlang-2 Arrivals}
+
+We introduce a shift parameter $\tau > 0$ to enforce minimum headway:
+
+\begin{equation}
+Y = \tau + X, \quad X \sim \text{Erlang-2}(\mu)
+\end{equation}
+
+\textbf{PDF:}
+\begin{equation}
+f_Y(y) = \begin{cases} \lambda^2 (y - \tau) e^{-\lambda(y - \tau)} & y \geq \tau \\ 0 & y < \tau \end{cases}
+\end{equation}
+
+\textbf{Random variate generation:}
+\begin{equation}
+Y = \tau - \mu \ln(U_1 \cdot U_2)
+\end{equation}
+
+The mean inter-arrival time $\mu_{\ell,t}$ is computed per lane $\ell$ and time interval $t$ from PeMS flow data:
+
+\begin{equation}
+\mu_{\ell,t} = \frac{\Delta T}{N_{\ell,t}}
+\end{equation}
+
+\subsection{Multi-Scale Validation}
+
+\textbf{Metric selection.} We use different metrics for calibration versus reporting, each chosen for its specific purpose.
+
+\textbf{NRMSE for calibration.} The optimization objective uses Normalized Root Mean Square Error:
+
+\begin{equation}
+\text{NRMSE} = \frac{\text{RMSE}}{y_{\max} - y_{\min}}
+\end{equation}
+
+We chose NRMSE for the fitness function because:
+\begin{enumerate}
+\item \textbf{Scale invariance:} Normalization by range allows combining count errors (vehicles) and speed errors (m/s) into a single objective
+\item \textbf{Symmetric penalty:} Over- and under-prediction are penalized equally
+\item \textbf{Stability:} Unlike $R^2$, which depends on observed variance (SST), NRMSE normalizes by range, providing consistent behavior across sensors with different traffic patterns
+\end{enumerate}
+
+\textbf{$R^2$ and RMSE for reporting.} In results, we report two complementary metrics:
+
+\begin{equation}
+R^2 = 1 - \frac{SSE}{SST} = 1 - \frac{\sum(y_i - \hat{y}_i)^2}{\sum(y_i - \bar{y})^2}
+\end{equation}
+
+\begin{equation}
+\text{RMSE} = \sqrt{\frac{1}{m}\sum_{i=1}^{m}(y_i - \hat{y}_i)^2}
+\end{equation}
+
+$R^2$ provides interpretability---values near 1 indicate good fit, while negative values signal failure. RMSE provides absolute error magnitude in original units (vehicles for counts, m/s for speeds). Together, they answer: ``How well does the simulation fit?'' and ``How large are the errors?''
+
+\textbf{Aggregate fitness.} The calibration objective combines both modalities across $S=5$ sensors:
+
+\begin{equation}
+\mathcal{F}(\theta) = 0.5 \cdot \frac{1}{S} \sum_{s=1}^{S} \text{NRMSE}_s^{\text{count}} + 0.5 \cdot \frac{1}{S} \sum_{s=1}^{S} \text{NRMSE}_s^{\text{speed}}
+\end{equation}
+
+Equal weighting (0.5/0.5) reflects our goal of matching both flow and speed dynamics.
+
+\subsection{SPSA with Momentum}
+
+We use the Simultaneous Perturbation Stochastic Approximation (SPSA) algorithm \cite{spall2002implementation} with momentum for gradient-free optimization. The gradient is estimated via simultaneous perturbation:
+
+\begin{equation}
+\hat{g}_k(\theta_k) = \frac{f(\theta_k + c_k \Delta_k) - f(\theta_k - c_k \Delta_k)}{2 c_k} \Delta_k^{-1}
+\end{equation}
+
+where $\Delta_k \in \{-1, +1\}^p$ is a Bernoulli perturbation vector. Parameter updates use momentum \cite{qian1999momentum}:
+
+\begin{equation}
+m_{k+1} = \beta \cdot m_k + (1 - \beta) \cdot \hat{g}_k
+\end{equation}
+\begin{equation}
+\theta_{k+1} = \theta_k - a_k \cdot m_{k+1}
+\end{equation}
+
+The gain sequences $a_k = a/(A+k)^\alpha$ and $c_k = c/k^\gamma$ follow standard SPSA practice with $\alpha = 0.602$, $\gamma = 0.101$. We set momentum $\beta = 0.9$ and clamp parameters to physically meaningful bounds after each update.
+
+\subsection{System Architecture}
+
+Figure 1 illustrates the simulation architecture. The system consists of:
+
+\begin{itemize}
+\item \textbf{Vehicle Sources (VSource):} Per-lane sources generating vehicles via Shifted Erlang-2 with data-driven $\mu$ from PeMS
+\item \textbf{Route/Pathway:} Multi-lane highway segments with doubly-linked list vehicle ordering
+\item \textbf{IDM Dynamics:} Per-vehicle Dormand-Prince integration at each segment traversal
+\item \textbf{Sensors (Junction):} Recording counts and speeds at 15-minute intervals
+\item \textbf{Calibration Loop:} SPSA optimizer adjusting IDM parameters to minimize NRMSE
+\end{itemize}
+
+% [INSERT FIGURE 1 HERE]
+
+\section{Experimental Setup}
+\label{sec:setup}
+
+\subsection{Study Corridor}
+
+We model a 1.4 km segment of northbound US-101 in the Donald Doyle Drive area
+near Danville, California (Figure~\ref{fig:corridor}). The corridor features
+four mainline lanes with two on-ramp merge points. Five loop detector stations
+are positioned along the mainline at approximately 280m, 310m, 470m, and 350m
+intervals, providing flow and speed measurements at 15-minute resolution.
+
+The physical layout follows the sequence: Sensor 1 (VDS 401112) $\rightarrow$
+On-ramp 1 merge $\rightarrow$ Sensor 2 (VDS 401104) $\rightarrow$ Sensor 3
+(VDS 400712) $\rightarrow$ On-ramp 2 merge $\rightarrow$ Sensor 4 (VDS 400450)
+$\rightarrow$ Sensor 5 (VDS 407463). This corridor exhibits recurring congestion
+during morning and evening peak periods, making it suitable for validating
+car-following model calibration at the micro level.
+
+\subsection{Empirical Data}
+
+Traffic data was obtained from the California Performance Measurement System (PeMS),
+which collects real-time data from inductive loop detectors across California's
+freeway network. For the study corridor, we collected data from five
+mainline Vehicle Detector Stations (VDS 401112, 401104, 400712, 400450, and 407463)
+and two on-ramp detectors (VDS 403157 and 403108).
+
+Following the data processing approach of \cite{bowman2022microscopic}, the raw PeMS
+data recorded at 5-minute intervals was aggregated to 15-minute intervals to reduce
+noise while preserving congestion dynamics. This yields 48 time periods per simulation
+day (6:00 AM to 6:00 PM). To obtain representative weekday traffic patterns, we
+collected data from three consecutive weekdays (Tuesday, Wednesday, Thursday) and
+computed the average flow and speed for each lane and time interval. Weekend and
+holiday data were excluded to focus on recurring commute patterns.
+
+Each mainline detector provides lane-level measurements, yielding 20 flow time series
+(5 sensors $\times$ 4 lanes) and 20 speed time series for validation. Speed data
+recorded in mph was converted to m/s for simulation consistency. With 48 time
+intervals per series, the validation dataset comprises 1,920 data points per
+simulation day. On-ramp demand is derived from two single-lane ramp detectors,
+providing boundary conditions for merge traffic.
+
+All data underwent quality checks; sensor 4 lanes 2--3 exhibited anomalous speed
+readings (likely detector malfunction) and were flagged during micro-level analysis.
+
+\subsection{Simulation Model}
+
+The simulation is implemented in ScalaTion 2.0 \cite{miller2010scalation}, a Scala-based modeling and simulation framework. The architecture follows a process-oriented discrete-event paradigm where each vehicle is an independent coroutine-based actor \cite{miller2017advanced}. Key components include:
+
+\begin{itemize}
+\item \textbf{MultiVSource:} Generates vehicles per lane using Shifted Erlang-2 arrivals with data-driven mean inter-arrival times computed from PeMS flow data at each 15-minute interval.
+\item \textbf{Pathway/Route:} Represents highway segments as doubly-linked lane structures supporting lane changes.
+\item \textbf{Dynamics:} Computes IDM acceleration and integrates vehicle state using Dormand-Prince (DOPRI5) with adaptive step control.
+\item \textbf{Junction (Sensors):} Records vehicle counts and speeds at segment boundaries, aggregating to 15-minute intervals for comparison with PeMS data.
+\end{itemize}
+
+The simulation clock runs for 43,200 seconds (12 hours), with vehicles entering according to the time-varying arrival schedule derived from sensor 1 flow data.
+
+\subsection{Calibration Parameters}
+
+We calibrate five IDM parameters that govern car-following behavior:
+
+\begin{table}[h]
+\centering
+\caption{IDM Parameter Configuration}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+Parameter & Symbol & Unit & Bounds & Initial \\
+\hline
+Minimum gap & $s_0$ & m & [2.0, 8.0] & 5.0 \\
+Max acceleration & $a$ & m/s$^2$ & [1.5, 6.0] & 4.0 \\
+Comfortable deceleration & $b$ & m/s$^2$ & [-3.0, -1.0] & -2.0 \\
+Safe time headway & $T$ & s & [1.0, 5.0] & 3.0 \\
+Reaction time & $\tau$ & s & [0.3, 1.5] & 0.5 \\
+\hline
+\end{tabular}
+\end{table}
+
+Initial values were selected based on prior calibration experiments that yielded stable simulation behavior. Bounds enforce physical plausibility and prevent the optimizer from exploring unrealistic parameter regions.
+
+\subsection{Optimization Settings}
+
+We employ SPSA with momentum for derivative-free calibration. Each fitness evaluation requires a complete simulation run (approximately 15 minutes wall-clock time). Key settings:
+
+\begin{itemize}
+\item Maximum iterations: 100 (SPSA), 70 (SPSA with momentum)
+\item Momentum coefficient: $\beta = 0.9$
+\item Gain sequences: $a_k = a/(A+k)^{0.602}$, $c_k = c/k^{0.101}$
+\item Parameter clamping: Applied after each update to enforce bounds
+\end{itemize}
+
+For comparison, we also run Nelder-Mead simplex optimization with 100 iterations from the same starting point. All optimizations execute on the Georgia Advanced Computing Resource Center (GACRC) Sapelo2 cluster using 8 CPU cores and 32 GB memory per job.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Calibration Convergence}
+
+[INSERT: Fitness vs. iteration plot from SPSA run]
+
+Best fitness achieved: [X.XX] after [N] iterations.
+
+Calibrated parameters: $[s_0, a_{\max}, b, T, \tau]$ = [X.X, X.X, X.X, X.X, X.X]
+
+\subsection{Macro-Level Validation}
+
+\begin{table}[h]
+\centering
+\caption{Macro-Level Validation Results}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Sensor & Flow $R^2$ & Flow RMSE & Speed $R^2$ & Speed RMSE \\
+\hline
+1 & 0.97 & 12.8 & 0.75 & 3.3 \\
+2 & 0.92 & 20.1 & 0.54 & 4.2 \\
+3 & 0.89 & 24.6 & 0.58 & 3.6 \\
+4 & 0.85 & 28.5 & 0.46 & 3.8 \\
+5 & 0.82 & 31.1 & 0.31 & 3.7 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Micro-Level Validation}
+
+[INSERT: Lane-level breakdown table or select representative sensor]
+
+\subsection{Discussion}
+
+Flow matching is strong ($R^2 > 0.82$). Speed matching is moderate, reflecting known challenges in matching congestion dynamics. Downstream sensors show degradation due to cumulative error.
+
+\section{Conclusions}
+\label{sec:conclusions}
+
+We presented three contributions for microscopic traffic simulation, motivated by the need for accurate micro-level dynamics reporting:
+
+\begin{enumerate}
+\item \textbf{Per-vehicle Dormand-Prince integration} achieves $O(\Delta t^5)$ accuracy for IDM dynamics within a process-oriented DES. By formulating each vehicle's state as a coupled ODE and snapshotting leader state, we enable higher-order integration without requiring global state vectors or architectural redesign.
+
+\item \textbf{Shifted Erlang-2 arrivals} enforce physical minimum headways ($\tau > 0$) while matching observed traffic demand through data-driven parameterization of $\mu_{\ell,t}$ from PeMS flow counts.
+
+\item \textbf{Multi-scale validation} compares both counts and speeds at lane-level, 15-minute resolution against 40 empirical data streams, using NRMSE for calibration and $R^2$/RMSE for interpretable reporting.
+\end{enumerate}
+
+\textbf{Toward digital twins.} Accurate micro-level dynamics---speeds and flows at fine temporal and spatial resolution---are foundational for traffic digital twins, where simulation must mirror reality closely enough to support real-time decision-making. Our results demonstrate that higher-order integration (Dormand-Prince) combined with realistic arrival processes (Shifted Erlang-2) can achieve strong flow agreement ($R^2 > 0.82$) with lane-level speed validation. This accuracy at the micro level moves simulation closer to digital twin requirements, where per-lane, per-interval fidelity is essential.
+
+\textbf{Future work:} Lane-change model calibration, GPU acceleration for large-scale networks, real-time data assimilation for online digital twin operation.
+
+\section*{Acknowledgments}
+
+This work was supported by [funding source if applicable].
+
+\textbf{AI Disclosure:} In accordance with SCS policy, we disclose the use of a Large Language Model (Claude) to assist with drafting portions of Section 3 (Methodology) and structuring the manuscript. All technical content, experimental results, and scientific conclusions are the authors' own work.
+
+\bibliographystyle{scsproc}
+\bibliography{assets/myReference}
+
+\end{document}
+

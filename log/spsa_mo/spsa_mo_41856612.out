@@ -1,0 +1,2418 @@
+=== SPSA_Mo Calibration started on c5-21 at Wed Dec 31 20:06:14 EST 2025 ===
+Job ID: 41856612
+Running SPSA_Mo Optimizer with 20 iterations
+Wed Dec 31 20:06:15 EST 2025
+Classpath: target/scala-3.7.4/scalation_3-0.1.0-SNAPSHOT.jar:/scratch/krb84578/workDir/scala-libs/scala3-library_3-3.7.4.jar:/scratch/krb84578/workDir/scala-libs/scala-library-2.13.16.jar
+-----------------------------------------------
+| SPSA_MO OPTIMIZER - CalRoute101 Calibration |
+-----------------------------------------------
+Initial parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+----------------------------------------------------------------------
+   Epoch |            Loss |       Best Loss |   Progress
+----------------------------------------------------------------------
+Evaluating parameters: VectorD(4.06761,	3.06761,	-1.06761,	2.06761,	1.43239)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (59707,59704,59700)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9496, Avg SMAPE: 8.07, Avg NRMSE: 0.0531
+Speeds - Avg RMSE: 2.3156, Avg SMAPE: 7.11, Avg NRMSE: 0.1508
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1019
+Fitness value: 0.10194116807024364
+Evaluating parameters: VectorD(5.93239,	4.93239,	-2.93239,	3.93239,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (119414,119409,119401)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 20.4692, Avg SMAPE: 7.97, Avg NRMSE: 0.0605
+Speeds - Avg RMSE: 3.6947, Avg SMAPE: 12.94, Avg NRMSE: 0.2346
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1476
+Fitness value: 0.14757983078144618
+Evaluating parameters: VectorD(4.99995,	3.99995,	-1.99995,	2.99995,	0.500046)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (179121,179114,179102)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.5982, Avg SMAPE: 7.98, Avg NRMSE: 0.0550
+Speeds - Avg RMSE: 3.4684, Avg SMAPE: 11.94, Avg NRMSE: 0.2201
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1375
+Fitness value: 0.13754526360876249
+       1 |      0.13754526 |      0.13754526 |       1.4% ✓
+Evaluating parameters: VectorD(5.89493,	3.10498,	-2.89493,	2.10498,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (238828,238819,238803)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.0037882627141217397 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.3959, Avg SMAPE: 6.91, Avg NRMSE: 0.0515
+Speeds - Avg RMSE: 3.6830, Avg SMAPE: 13.03, Avg NRMSE: 0.2318
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1416
+Fitness value: 0.14164687335177598
+Evaluating parameters: VectorD(4.10498,	4.89493,	-1.10498,	3.89493,	1.39502)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (298535,298524,298504)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.2802, Avg SMAPE: 7.83, Avg NRMSE: 0.0511
+Speeds - Avg RMSE: 2.3954, Avg SMAPE: 7.52, Avg NRMSE: 0.1559
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1035
+Fitness value: 0.10354801094436586
+Evaluating parameters: VectorD(4.99989,	3.99997,	-1.99989,	2.99997,	0.500105)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (358242,358229,358205)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.1705, Avg SMAPE: 7.96, Avg NRMSE: 0.0538
+Speeds - Avg RMSE: 3.4771, Avg SMAPE: 11.97, Avg NRMSE: 0.2206
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1372
+Fitness value: 0.13715741096396972
+Evaluating parameters: VectorD(5.86924,	4.86932,	-1.13055,	2.13063,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (417949,417934,417906)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.4732, Avg SMAPE: 7.86, Avg NRMSE: 0.0517
+Speeds - Avg RMSE: 2.4707, Avg SMAPE: 7.62, Avg NRMSE: 0.1584
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1050
+Fitness value: 0.10503353707491626
+Evaluating parameters: VectorD(4.13055,	3.13063,	-2.86924,	3.86932,	1.36945)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (477656,477639,477607)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.159404933625416 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -2.523791251864412 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 22.9469, Avg SMAPE: 7.76, Avg NRMSE: 0.0678
+Speeds - Avg RMSE: 4.2374, Avg SMAPE: 15.74, Avg NRMSE: 0.2711
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1695
+Fitness value: 0.16948011608875882
+Evaluating parameters: VectorD(4.99993,	4.00004,	-1.99979,	2.99990,	0.500071)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (537363,537344,537308)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.8299, Avg SMAPE: 7.85, Avg NRMSE: 0.0528
+Speeds - Avg RMSE: 3.4970, Avg SMAPE: 12.06, Avg NRMSE: 0.2218
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1373
+Fitness value: 0.13730152887330516
+Evaluating parameters: VectorD(4.14996,	3.15007,	-1.14982,	3.84988,	1.35004)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (597070,597049,597009)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.43652635616957625 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.6026, Avg SMAPE: 7.90, Avg NRMSE: 0.0521
+Speeds - Avg RMSE: 2.5925, Avg SMAPE: 8.23, Avg NRMSE: 0.1683
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1102
+Fitness value: 0.1101893474022326
+Evaluating parameters: VectorD(5.84990,	4.85001,	-2.84976,	2.14993,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (656777,656754,656710)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.4785583231342047 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 16.4647, Avg SMAPE: 6.83, Avg NRMSE: 0.0488
+Speeds - Avg RMSE: 3.7271, Avg SMAPE: 13.20, Avg NRMSE: 0.2348
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1418
+Fitness value: 0.14175977260477407
+Evaluating parameters: VectorD(4.99989,	4.00004,	-1.99970,	2.99991,	0.500106)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (716484,716459,716411)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.6106, Avg SMAPE: 8.00, Avg NRMSE: 0.0551
+Speeds - Avg RMSE: 3.4928, Avg SMAPE: 12.03, Avg NRMSE: 0.2217
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1384
+Fitness value: 0.13836163351240519
+Evaluating parameters: VectorD(4.16543,	3.16557,	-1.16524,	3.83437,	1.33457)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (776191,776164,776112)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.18567317047702067 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.7360, Avg SMAPE: 7.97, Avg NRMSE: 0.0525
+Speeds - Avg RMSE: 2.6439, Avg SMAPE: 8.34, Avg NRMSE: 0.1716
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1121
+Fitness value: 0.11205847942993301
+Evaluating parameters: VectorD(5.83436,	4.83450,	-2.83416,	2.16545,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (835898,835869,835813)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.6253594801185235 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 16.7748, Avg SMAPE: 6.97, Avg NRMSE: 0.0497
+Speeds - Avg RMSE: 3.7042, Avg SMAPE: 13.04, Avg NRMSE: 0.2334
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1415
+Fitness value: 0.1415431659270767
+Evaluating parameters: VectorD(4.99985,	4.00002,	-1.99960,	2.99993,	0.500155)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (895605,895574,895514)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2296, Avg SMAPE: 7.98, Avg NRMSE: 0.0539
+Speeds - Avg RMSE: 3.4802, Avg SMAPE: 12.00, Avg NRMSE: 0.2207
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1373
+Fitness value: 0.1373094127724424
+       5 |      0.13715741 |      0.13715741 |       7.1% ✓
+Evaluating parameters: VectorD(4.17827,	3.17844,	-1.17803,	3.82150,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (955312,955279,955215)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2999, Avg SMAPE: 8.18, Avg NRMSE: 0.0541
+Speeds - Avg RMSE: 2.6243, Avg SMAPE: 8.42, Avg NRMSE: 0.1687
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1114
+Fitness value: 0.11142640770418019
+Evaluating parameters: VectorD(5.82142,	4.82159,	-2.82117,	2.17836,	1.32173)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1015019,1014984,1014916)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.2691394658813198 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.49304772430410476 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 35.1796, Avg SMAPE: 10.97, Avg NRMSE: 0.1038
+Speeds - Avg RMSE: 3.7326, Avg SMAPE: 12.82, Avg NRMSE: 0.2381
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1710
+Fitness value: 0.17095238949341401
+Evaluating parameters: VectorD(4.99975,	3.99995,	-1.99946,	3.00000,	0.500117)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1074726,1074689,1074617)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.9194, Avg SMAPE: 8.02, Avg NRMSE: 0.0560
+Speeds - Avg RMSE: 3.4036, Avg SMAPE: 11.69, Avg NRMSE: 0.2160
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1360
+Fitness value: 0.13598191492195755
+Evaluating parameters: VectorD(5.81032,	3.18938,	-2.81002,	3.81056,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1134433,1134394,1134318)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.42193883742959193 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 19.6249, Avg SMAPE: 7.87, Avg NRMSE: 0.0581
+Speeds - Avg RMSE: 3.6635, Avg SMAPE: 13.40, Avg NRMSE: 0.2332
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1456
+Fitness value: 0.1456389835780813
+Evaluating parameters: VectorD(4.18919,	4.81051,	-1.18889,	2.18943,	1.31068)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1194140,1194099,1194019)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.23575066645120918 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9717, Avg SMAPE: 8.10, Avg NRMSE: 0.0532
+Speeds - Avg RMSE: 2.5259, Avg SMAPE: 7.83, Avg NRMSE: 0.1633
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1083
+Fitness value: 0.10826486962735385
+Evaluating parameters: VectorD(4.99966,	3.99996,	-1.99932,	2.99999,	0.500155)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1253847,1253804,1253720)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.5272, Avg SMAPE: 8.03, Avg NRMSE: 0.0548
+Speeds - Avg RMSE: 3.5181, Avg SMAPE: 12.14, Avg NRMSE: 0.2231
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1390
+Fitness value: 0.13895941119953448
+Evaluating parameters: VectorD(5.80064,	4.80094,	-2.80030,	3.80097,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1313554,1313509,1313421)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 19.5878, Avg SMAPE: 7.70, Avg NRMSE: 0.0579
+Speeds - Avg RMSE: 3.5818, Avg SMAPE: 12.39, Avg NRMSE: 0.2276
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1428
+Fitness value: 0.14278958692531277
+Evaluating parameters: VectorD(4.19868,	3.19898,	-1.19834,	2.19901,	1.30114)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1373261,1373214,1373122)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.5354475686281581 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.8831, Avg SMAPE: 8.07, Avg NRMSE: 0.0529
+Speeds - Avg RMSE: 2.5613, Avg SMAPE: 7.94, Avg NRMSE: 0.1659
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1094
+Fitness value: 0.10939426365222364
+Evaluating parameters: VectorD(4.99955,	3.99991,	-1.99918,	2.99996,	0.500208)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1432968,1432919,1432823)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.4759, Avg SMAPE: 7.96, Avg NRMSE: 0.0547
+Speeds - Avg RMSE: 3.4626, Avg SMAPE: 11.93, Avg NRMSE: 0.2198
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1372
+Fitness value: 0.13721597760802137
+Evaluating parameters: VectorD(5.79205,	4.79241,	-2.79168,	3.79246,	1.29271)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1492675,1492624,1492524)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.2279463330593476 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.8720965542957678 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 25.6448, Avg SMAPE: 8.59, Avg NRMSE: 0.0758
+Speeds - Avg RMSE: 4.3224, Avg SMAPE: 15.98, Avg NRMSE: 0.2757
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1758
+Fitness value: 0.175759745014053
+Evaluating parameters: VectorD(4.20705,	3.20741,	-1.20668,	2.20746,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1552382,1552329,1552225)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.1293, Avg SMAPE: 8.16, Avg NRMSE: 0.0536
+Speeds - Avg RMSE: 2.4775, Avg SMAPE: 7.71, Avg NRMSE: 0.1587
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1062
+Fitness value: 0.10617193640587665
+Evaluating parameters: VectorD(4.99940,	3.99980,	-1.99899,	2.99987,	0.500159)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1612089,1612034,1611926)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.8620, Avg SMAPE: 7.78, Avg NRMSE: 0.0529
+Speeds - Avg RMSE: 3.4802, Avg SMAPE: 12.00, Avg NRMSE: 0.2208
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1368
+Fitness value: 0.1368387851097032
+Evaluating parameters: VectorD(4.21449,	4.78471,	-2.78390,	2.21496,	1.28507)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1671796,1671739,1671627)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -2.0998803478814643 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.287809336872928 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 26.4338, Avg SMAPE: 9.31, Avg NRMSE: 0.0781
+Speeds - Avg RMSE: 3.8372, Avg SMAPE: 13.33, Avg NRMSE: 0.2442
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1612
+Fitness value: 0.16115907234186103
+Evaluating parameters: VectorD(5.78431,	3.21489,	-1.21408,	3.78478,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1731503,1731444,1731328)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.3671, Avg SMAPE: 8.19, Avg NRMSE: 0.0543
+Speeds - Avg RMSE: 2.6636, Avg SMAPE: 8.57, Avg NRMSE: 0.1711
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1127
+Fitness value: 0.11273960767476912
+Evaluating parameters: VectorD(4.99936,	3.99969,	-1.99881,	2.99989,	0.500097)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1791210,1791149,1791029)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.0603, Avg SMAPE: 7.90, Avg NRMSE: 0.0534
+Speeds - Avg RMSE: 3.4966, Avg SMAPE: 12.05, Avg NRMSE: 0.2218
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1376
+Fitness value: 0.1376157729895755
+      10 |      0.13598191 |      0.13598191 |      14.3% ✓
+Evaluating parameters: VectorD(5.77740,	3.22165,	-2.77685,	2.22185,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1850917,1850854,1850730)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.21776589928465176 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.1298, Avg SMAPE: 6.86, Avg NRMSE: 0.0507
+Speeds - Avg RMSE: 3.6337, Avg SMAPE: 12.82, Avg NRMSE: 0.2289
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1398
+Fitness value: 0.13981948766375368
+Evaluating parameters: VectorD(4.22131,	4.77773,	-1.22077,	3.77793,	1.27814)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1910624,1910559,1910431)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.0784, Avg SMAPE: 7.76, Avg NRMSE: 0.0506
+Speeds - Avg RMSE: 2.7034, Avg SMAPE: 8.59, Avg NRMSE: 0.1751
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1128
+Fitness value: 0.11281687650010243
+Evaluating parameters: VectorD(4.99926,	3.99965,	-1.99864,	2.99991,	0.500098)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1970331,1970264,1970132)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.4510, Avg SMAPE: 7.96, Avg NRMSE: 0.0546
+Speeds - Avg RMSE: 3.4726, Avg SMAPE: 11.97, Avg NRMSE: 0.2203
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1374
+Fitness value: 0.13744337348438354
+Evaluating parameters: VectorD(4.22748,	3.22787,	-1.22686,	2.22813,	1.27187)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2030038,2029969,2029833)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9218, Avg SMAPE: 8.06, Avg NRMSE: 0.0530
+Speeds - Avg RMSE: 2.6910, Avg SMAPE: 8.43, Avg NRMSE: 0.1738
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1134
+Fitness value: 0.11342506183189047
+Evaluating parameters: VectorD(5.77104,	4.77143,	-2.77041,	3.77168,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2089745,2089674,2089534)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 19.9608, Avg SMAPE: 7.67, Avg NRMSE: 0.0591
+Speeds - Avg RMSE: 3.5877, Avg SMAPE: 12.44, Avg NRMSE: 0.2279
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1435
+Fitness value: 0.14347500884736308
+Evaluating parameters: VectorD(4.99915,	3.99956,	-1.99847,	2.99988,	0.500119)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2149452,2149379,2149235)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.5930, Avg SMAPE: 7.66, Avg NRMSE: 0.0521
+Speeds - Avg RMSE: 3.4969, Avg SMAPE: 12.09, Avg NRMSE: 0.2219
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1370
+Fitness value: 0.13697868635275964
+Evaluating parameters: VectorD(4.23313,	3.23354,	-1.23244,	2.23385,	1.26614)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2209159,2209084,2208936)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.057790464806570845 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9018, Avg SMAPE: 8.06, Avg NRMSE: 0.0530
+Speeds - Avg RMSE: 2.6919, Avg SMAPE: 8.46, Avg NRMSE: 0.1738
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1134
+Fitness value: 0.11340437825747615
+Evaluating parameters: VectorD(5.76517,	4.76558,	-2.76449,	3.76590,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2268866,2268789,2268637)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 19.7356, Avg SMAPE: 7.34, Avg NRMSE: 0.0584
+Speeds - Avg RMSE: 3.6253, Avg SMAPE: 12.59, Avg NRMSE: 0.2303
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1443
+Fitness value: 0.14432712570659206
+Evaluating parameters: VectorD(4.99904,	3.99947,	-1.99829,	2.99983,	0.500156)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2328573,2328494,2328338)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.0783, Avg SMAPE: 7.90, Avg NRMSE: 0.0535
+Speeds - Avg RMSE: 3.4563, Avg SMAPE: 11.87, Avg NRMSE: 0.2194
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1364
+Fitness value: 0.13642082702124297
+Evaluating parameters: VectorD(5.75974,	4.76017,	-2.75899,	3.76053,	1.26086)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2388280,2388199,2388039)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.716041487651694 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.67428138267296 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 24.4939, Avg SMAPE: 8.21, Avg NRMSE: 0.0724
+Speeds - Avg RMSE: 4.5395, Avg SMAPE: 16.75, Avg NRMSE: 0.2894
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1809
+Fitness value: 0.1808856637546589
+Evaluating parameters: VectorD(4.23833,	3.23876,	-1.23759,	2.23912,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2447987,2447904,2447740)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.0605, Avg SMAPE: 8.13, Avg NRMSE: 0.0534
+Speeds - Avg RMSE: 2.5397, Avg SMAPE: 7.96, Avg NRMSE: 0.1626
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1080
+Fitness value: 0.1080057360318602
+Evaluating parameters: VectorD(4.99887,	3.99931,	-1.99807,	2.99972,	0.500090)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2507694,2507609,2507441)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.3757, Avg SMAPE: 7.91, Avg NRMSE: 0.0544
+Speeds - Avg RMSE: 3.4742, Avg SMAPE: 11.96, Avg NRMSE: 0.2204
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1374
+Fitness value: 0.13739279527781764
+Evaluating parameters: VectorD(5.75463,	4.75507,	-1.24231,	2.24396,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2567401,2567314,2567142)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.0548, Avg SMAPE: 8.12, Avg NRMSE: 0.0534
+Speeds - Avg RMSE: 2.4908, Avg SMAPE: 7.79, Avg NRMSE: 0.1592
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1063
+Fitness value: 0.10630474683039319
+Evaluating parameters: VectorD(4.24311,	3.24355,	-2.75383,	3.75548,	1.25585)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2627108,2627019,2626843)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.666804349347008 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.5022051988987284 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.8799029961579647 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 21.3255, Avg SMAPE: 7.61, Avg NRMSE: 0.0631
+Speeds - Avg RMSE: 4.4372, Avg SMAPE: 16.56, Avg NRMSE: 0.2830
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1730
+Fitness value: 0.17304305294835254
+Evaluating parameters: VectorD(4.99883,	3.99929,	-1.99783,	2.99958,	0.499993)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2686815,2686724,2686544)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.0989, Avg SMAPE: 7.79, Avg NRMSE: 0.0536
+Speeds - Avg RMSE: 3.4547, Avg SMAPE: 11.88, Avg NRMSE: 0.2192
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1364
+Fitness value: 0.13637280924349204
+      15 |      0.13598191 |      0.13598191 |      21.4% ✓
+Evaluating parameters: VectorD(4.24769,	4.75044,	-2.74898,	2.24843,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2746522,2746429,2746245)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.23494847372146294 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.5303, Avg SMAPE: 7.32, Avg NRMSE: 0.0519
+Speeds - Avg RMSE: 3.6992, Avg SMAPE: 12.94, Avg NRMSE: 0.2331
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1425
+Fitness value: 0.1424846697315411
+Evaluating parameters: VectorD(5.74998,	3.24814,	-1.24669,	3.75073,	1.25114)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2806229,2806134,2805946)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.1929353294117622 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.1064, Avg SMAPE: 7.77, Avg NRMSE: 0.0506
+Speeds - Avg RMSE: 2.7781, Avg SMAPE: 8.93, Avg NRMSE: 0.1797
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1152
+Fitness value: 0.115180781924253
+Evaluating parameters: VectorD(4.99880,	3.99920,	-1.99763,	2.99953,	0.499974)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2865936,2865839,2865647)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2830, Avg SMAPE: 7.85, Avg NRMSE: 0.0541
+Speeds - Avg RMSE: 3.4750, Avg SMAPE: 11.97, Avg NRMSE: 0.2205
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1373
+Fitness value: 0.13730432009950225
+Evaluating parameters: VectorD(4.25197,	3.25238,	-1.25080,	2.25270,	1.24680)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2925643,2925544,2925348)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.20088890878871724 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.7298, Avg SMAPE: 8.00, Avg NRMSE: 0.0525
+Speeds - Avg RMSE: 2.7774, Avg SMAPE: 8.78, Avg NRMSE: 0.1789
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1157
+Fitness value: 0.11566990414177755
+Evaluating parameters: VectorD(5.74562,	4.74603,	-2.74445,	3.74635,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2985350,2985249,2985049)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 19.6439, Avg SMAPE: 7.36, Avg NRMSE: 0.0581
+Speeds - Avg RMSE: 3.6342, Avg SMAPE: 12.67, Avg NRMSE: 0.2307
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1444
+Fitness value: 0.14440356423357478
+Evaluating parameters: VectorD(4.99871,	3.99911,	-1.99742,	2.99943,	0.499975)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3045057,3044954,3044750)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9502, Avg SMAPE: 7.87, Avg NRMSE: 0.0531
+Speeds - Avg RMSE: 3.4967, Avg SMAPE: 12.01, Avg NRMSE: 0.2219
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1375
+Fitness value: 0.13752537327353478
+Evaluating parameters: VectorD(5.74147,	3.25635,	-2.74018,	3.74219,	1.24273)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3104764,3104659,3104451)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.68508773533122 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.23772093732067645 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.814685457798846 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 22.7769, Avg SMAPE: 7.77, Avg NRMSE: 0.0673
+Speeds - Avg RMSE: 4.1869, Avg SMAPE: 15.59, Avg NRMSE: 0.2673
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1673
+Fitness value: 0.16731877954436258
+Evaluating parameters: VectorD(4.25596,	4.74186,	-1.25467,	2.25667,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3164471,3164364,3164152)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9763, Avg SMAPE: 8.10, Avg NRMSE: 0.0532
+Speeds - Avg RMSE: 2.4877, Avg SMAPE: 7.79, Avg NRMSE: 0.1590
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1061
+Fitness value: 0.10611063854577474
+Evaluating parameters: VectorD(4.99859,	3.99911,	-1.99718,	2.99929,	0.499890)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3224178,3224069,3223853)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2867, Avg SMAPE: 7.90, Avg NRMSE: 0.0541
+Speeds - Avg RMSE: 3.4670, Avg SMAPE: 11.94, Avg NRMSE: 0.2198
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1370
+Fitness value: 0.13696625627098918
+Evaluating parameters: VectorD(4.25967,	3.26019,	-2.73610,	3.73821,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3283885,3283774,3283554)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.30315768804822935 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 19.0280, Avg SMAPE: 7.22, Avg NRMSE: 0.0563
+Speeds - Avg RMSE: 3.5966, Avg SMAPE: 12.97, Avg NRMSE: 0.2283
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1423
+Fitness value: 0.1422749060047949
+Evaluating parameters: VectorD(5.73750,	4.73802,	-1.25827,	2.26037,	1.23881)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3343592,3343479,3343255)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.3818937271190771 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.5007, Avg SMAPE: 7.96, Avg NRMSE: 0.0518
+Speeds - Avg RMSE: 2.7429, Avg SMAPE: 8.72, Avg NRMSE: 0.1766
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1142
+Fitness value: 0.11421979634189994
+Evaluating parameters: VectorD(4.99854,	3.99911,	-1.99697,	2.99916,	0.499880)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3403299,3403184,3402956)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2710, Avg SMAPE: 7.90, Avg NRMSE: 0.0541
+Speeds - Avg RMSE: 3.4888, Avg SMAPE: 12.00, Avg NRMSE: 0.2213
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1377
+Fitness value: 0.13770337607840305
+Evaluating parameters: VectorD(5.73382,	3.26382,	-1.26169,	2.26388,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3463006,3462889,3462657)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2830, Avg SMAPE: 8.18, Avg NRMSE: 0.0541
+Speeds - Avg RMSE: 2.5048, Avg SMAPE: 7.87, Avg NRMSE: 0.1604
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1072
+Fitness value: 0.10722476273295498
+Evaluating parameters: VectorD(4.26325,	4.73439,	-2.73226,	3.73445,	1.23517)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3522713,3522594,3522358)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.8947794800884696 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.6269305596200144 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 22.5695, Avg SMAPE: 7.72, Avg NRMSE: 0.0667
+Speeds - Avg RMSE: 4.3594, Avg SMAPE: 16.08, Avg NRMSE: 0.2777
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1722
+Fitness value: 0.1722022960404223
+Evaluating parameters: VectorD(4.99856,	3.99901,	-1.99672,	2.99899,	0.499780)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3582420,3582299,3582059)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9897, Avg SMAPE: 7.82, Avg NRMSE: 0.0532
+Speeds - Avg RMSE: 3.4410, Avg SMAPE: 11.87, Avg NRMSE: 0.2183
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1358
+Fitness value: 0.13576044838100004
+      20 |      0.13576045 |      0.13576045 |      28.6% ✓
+Evaluating parameters: VectorD(5.73039,	4.73085,	-2.72856,	2.26715,	1.23162)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3642127,3642004,3641760)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -2.5415202090506193 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.4003783320598551 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 25.6206, Avg SMAPE: 9.05, Avg NRMSE: 0.0757
+Speeds - Avg RMSE: 4.1952, Avg SMAPE: 14.81, Avg NRMSE: 0.2667
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1712
+Fitness value: 0.17120204594244942
+Evaluating parameters: VectorD(4.26672,	3.26718,	-1.26489,	3.73083,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3701834,3701709,3701461)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.5047, Avg SMAPE: 8.23, Avg NRMSE: 0.0547
+Speeds - Avg RMSE: 2.6639, Avg SMAPE: 8.58, Avg NRMSE: 0.1709
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1128
+Fitness value: 0.11281790531106217
+Evaluating parameters: VectorD(4.99847,	3.99890,	-1.99647,	2.99894,	0.499659)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3761541,3761414,3761162)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.3641, Avg SMAPE: 7.90, Avg NRMSE: 0.0543
+Speeds - Avg RMSE: 3.5043, Avg SMAPE: 12.09, Avg NRMSE: 0.2223
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1383
+Fitness value: 0.13830827948539273
+Evaluating parameters: VectorD(4.26991,	3.27034,	-2.72503,	3.72750,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3821248,3821119,3820863)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.300599268961507 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 19.1514, Avg SMAPE: 7.35, Avg NRMSE: 0.0566
+Speeds - Avg RMSE: 3.6984, Avg SMAPE: 13.38, Avg NRMSE: 0.2347
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1457
+Fitness value: 0.1456870017403682
+Evaluating parameters: VectorD(5.72703,	4.72746,	-1.26791,	2.27038,	1.22822)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3880955,3880824,3880564)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.3189583512022998 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.4495, Avg SMAPE: 7.94, Avg NRMSE: 0.0516
+Speeds - Avg RMSE: 2.7530, Avg SMAPE: 8.82, Avg NRMSE: 0.1774
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1145
+Fitness value: 0.11452282156012561
+Evaluating parameters: VectorD(4.99846,	3.99887,	-1.99624,	2.99883,	0.499618)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3940662,3940529,3940265)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.3261, Avg SMAPE: 7.89, Avg NRMSE: 0.0542
+Speeds - Avg RMSE: 3.4752, Avg SMAPE: 11.96, Avg NRMSE: 0.2204
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1373
+Fitness value: 0.1373106020384124
+Evaluating parameters: VectorD(4.27302,	3.27343,	-2.72167,	3.72426,	1.22505)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4000369,4000234,3999966)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.466071049338719 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.37600392589961024 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.6473704626722536 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 21.8456, Avg SMAPE: 7.95, Avg NRMSE: 0.0646
+Speeds - Avg RMSE: 4.2994, Avg SMAPE: 16.15, Avg NRMSE: 0.2739
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1692
+Fitness value: 0.16923654907860272
+Evaluating parameters: VectorD(5.72389,	4.72430,	-1.27080,	2.27339,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4060076,4059939,4059667)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9347, Avg SMAPE: 8.08, Avg NRMSE: 0.0531
+Speeds - Avg RMSE: 2.4866, Avg SMAPE: 7.81, Avg NRMSE: 0.1590
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1060
+Fitness value: 0.1060223319064079
+Evaluating parameters: VectorD(4.99850,	3.99889,	-1.99597,	2.99867,	0.499492)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4119783,4119644,4119368)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.5645, Avg SMAPE: 7.94, Avg NRMSE: 0.0549
+Speeds - Avg RMSE: 3.4511, Avg SMAPE: 11.87, Avg NRMSE: 0.2189
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1369
+Fitness value: 0.13693168389849916
+Evaluating parameters: VectorD(4.27605,	4.72134,	-2.71842,	3.72112,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4179490,4179349,4179069)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.1718, Avg SMAPE: 7.21, Avg NRMSE: 0.0538
+Speeds - Avg RMSE: 3.4932, Avg SMAPE: 11.92, Avg NRMSE: 0.2217
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1377
+Fitness value: 0.1377316936836087
+Evaluating parameters: VectorD(5.72095,	3.27644,	-1.27352,	2.27622,	1.22194)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4239197,4239054,4238770)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.8565, Avg SMAPE: 8.04, Avg NRMSE: 0.0528
+Speeds - Avg RMSE: 2.8134, Avg SMAPE: 9.07, Avg NRMSE: 0.1813
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1171
+Fitness value: 0.11705707139321875
+Evaluating parameters: VectorD(4.99853,	3.99886,	-1.99575,	2.99854,	0.499437)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4298904,4298759,4298471)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2307, Avg SMAPE: 7.85, Avg NRMSE: 0.0539
+Speeds - Avg RMSE: 3.4840, Avg SMAPE: 11.99, Avg NRMSE: 0.2211
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1375
+Fitness value: 0.1375129731278688
+Evaluating parameters: VectorD(4.27894,	4.71845,	-1.27615,	3.71813,	1.21903)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4358611,4358464,4358172)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.3450, Avg SMAPE: 7.90, Avg NRMSE: 0.0513
+Speeds - Avg RMSE: 2.7920, Avg SMAPE: 9.09, Avg NRMSE: 0.1802
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1158
+Fitness value: 0.11575209122135537
+Evaluating parameters: VectorD(5.71813,	3.27926,	-2.71534,	2.27894,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4418318,4418169,4417873)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.4579, Avg SMAPE: 6.86, Avg NRMSE: 0.0517
+Speeds - Avg RMSE: 3.5802, Avg SMAPE: 12.56, Avg NRMSE: 0.2258
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1387
+Fitness value: 0.13872948355642936
+Evaluating parameters: VectorD(4.99852,	3.99886,	-1.99553,	2.99846,	0.499403)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4478025,4477874,4477574)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.5317, Avg SMAPE: 7.93, Avg NRMSE: 0.0548
+Speeds - Avg RMSE: 3.4423, Avg SMAPE: 11.84, Avg NRMSE: 0.2184
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1366
+Fitness value: 0.13659766046983424
+      25 |      0.13576045 |      0.13576045 |      35.7% ✓
+Evaluating parameters: VectorD(4.28167,	3.28201,	-2.71239,	2.28160,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4537732,4537579,4537275)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.7710, Avg SMAPE: 7.16, Avg NRMSE: 0.0526
+Speeds - Avg RMSE: 3.6614, Avg SMAPE: 12.89, Avg NRMSE: 0.2307
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1416
+Fitness value: 0.14164371083026697
+Evaluating parameters: VectorD(5.71538,	4.71572,	-1.27867,	3.71531,	1.21626)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4597439,4597284,4596976)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 16.9676, Avg SMAPE: 7.72, Avg NRMSE: 0.0502
+Speeds - Avg RMSE: 2.8186, Avg SMAPE: 9.20, Avg NRMSE: 0.1819
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1161
+Fitness value: 0.11609219581337189
+Evaluating parameters: VectorD(4.99855,	3.99889,	-1.99532,	2.99840,	0.499389)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4657146,4656989,4656677)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.4019, Avg SMAPE: 7.92, Avg NRMSE: 0.0544
+Speeds - Avg RMSE: 3.4621, Avg SMAPE: 11.90, Avg NRMSE: 0.2196
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1370
+Fitness value: 0.13702453727686806
+Evaluating parameters: VectorD(5.71278,	3.28466,	-2.70955,	2.28418,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4716853,4716694,4716378)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.4921, Avg SMAPE: 7.02, Avg NRMSE: 0.0518
+Speeds - Avg RMSE: 3.5864, Avg SMAPE: 12.62, Avg NRMSE: 0.2260
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1389
+Fitness value: 0.13890953672797382
+Evaluating parameters: VectorD(4.28433,	4.71311,	-1.28109,	3.71263,	1.21362)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4776560,4776399,4776079)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.3069, Avg SMAPE: 7.86, Avg NRMSE: 0.0512
+Speeds - Avg RMSE: 2.8197, Avg SMAPE: 9.17, Avg NRMSE: 0.1820
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1166
+Fitness value: 0.116600772614747
+Evaluating parameters: VectorD(4.99854,	3.99892,	-1.99512,	2.99837,	0.499389)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4836267,4836104,4835780)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.0598, Avg SMAPE: 7.84, Avg NRMSE: 0.0534
+Speeds - Avg RMSE: 3.4345, Avg SMAPE: 11.78, Avg NRMSE: 0.2178
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1356
+Fitness value: 0.13564011698199022
+Evaluating parameters: VectorD(4.28684,	4.71062,	-2.70682,	2.28667,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4895974,4895809,4895481)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.07175852669405228 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.2023, Avg SMAPE: 7.12, Avg NRMSE: 0.0509
+Speeds - Avg RMSE: 3.6704, Avg SMAPE: 12.85, Avg NRMSE: 0.2314
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1412
+Fitness value: 0.1411599777032121
+Evaluating parameters: VectorD(5.71025,	3.28722,	-1.28341,	3.71007,	1.21109)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4955681,4955514,4955182)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.2494243373320376 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.2314, Avg SMAPE: 7.75, Avg NRMSE: 0.0510
+Speeds - Avg RMSE: 2.8538, Avg SMAPE: 9.35, Avg NRMSE: 0.1846
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1178
+Fitness value: 0.11778490042221659
+Evaluating parameters: VectorD(4.99857,	3.99891,	-1.99492,	2.99835,	0.499403)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5015388,5015219,5014883)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9827, Avg SMAPE: 7.80, Avg NRMSE: 0.0532
+Speeds - Avg RMSE: 3.4863, Avg SMAPE: 11.99, Avg NRMSE: 0.2212
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1372
+Fitness value: 0.13720307300846254
+Evaluating parameters: VectorD(5.70784,	4.70818,	-1.28565,	2.28908,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5075095,5074924,5074584)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2100, Avg SMAPE: 8.18, Avg NRMSE: 0.0539
+Speeds - Avg RMSE: 2.4929, Avg SMAPE: 7.83, Avg NRMSE: 0.1593
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1066
+Fitness value: 0.10661215211992145
+Evaluating parameters: VectorD(4.28931,	3.28964,	-2.70419,	3.70762,	1.20867)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5134802,5134629,5134285)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.25748021922607306 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.264806063875028 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.1746567734352999 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.4268289559640601 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 22.5841, Avg SMAPE: 7.82, Avg NRMSE: 0.0668
+Speeds - Avg RMSE: 4.3039, Avg SMAPE: 16.00, Avg NRMSE: 0.2744
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1706
+Fitness value: 0.17058753029611345
+Evaluating parameters: VectorD(4.99866,	3.99898,	-1.99468,	2.99825,	0.499330)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5194509,5194334,5193986)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.1061, Avg SMAPE: 7.87, Avg NRMSE: 0.0536
+Speeds - Avg RMSE: 3.4292, Avg SMAPE: 11.81, Avg NRMSE: 0.2176
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1356
+Fitness value: 0.1355742371178364
+Evaluating parameters: VectorD(5.70558,	3.29206,	-2.70161,	2.29132,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5254216,5254039,5253687)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.5246, Avg SMAPE: 7.03, Avg NRMSE: 0.0519
+Speeds - Avg RMSE: 3.5716, Avg SMAPE: 12.56, Avg NRMSE: 0.2251
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1385
+Fitness value: 0.13849738315898658
+Evaluating parameters: VectorD(4.29174,	4.70591,	-1.28776,	3.70517,	1.20625)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5313923,5313744,5313388)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 16.7514, Avg SMAPE: 7.69, Avg NRMSE: 0.0496
+Speeds - Avg RMSE: 2.8106, Avg SMAPE: 9.13, Avg NRMSE: 0.1813
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1155
+Fitness value: 0.11546469245264404
+Evaluating parameters: VectorD(4.99868,	3.99904,	-1.99448,	2.99822,	0.499325)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5373630,5373449,5373089)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.3972, Avg SMAPE: 7.86, Avg NRMSE: 0.0544
+Speeds - Avg RMSE: 3.4090, Avg SMAPE: 11.71, Avg NRMSE: 0.2164
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1354
+Fitness value: 0.1353921645932357
+      30 |      0.13539216 |      0.13539216 |      42.9% ✓
+Evaluating parameters: VectorD(4.29402,	3.29438,	-2.69914,	3.70288,	1.20399)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5433337,5433154,5432790)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.7549363263798841 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.0270894421382089 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.35104920218517804 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.5391010981261157 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 20.4740, Avg SMAPE: 7.22, Avg NRMSE: 0.0605
+Speeds - Avg RMSE: 4.4053, Avg SMAPE: 16.50, Avg NRMSE: 0.2808
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1707
+Fitness value: 0.1706543085948614
+Evaluating parameters: VectorD(5.70334,	4.70370,	-1.28982,	2.29356,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5493044,5492859,5492491)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.1699, Avg SMAPE: 8.16, Avg NRMSE: 0.0538
+Speeds - Avg RMSE: 2.5150, Avg SMAPE: 7.90, Avg NRMSE: 0.1607
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1072
+Fitness value: 0.10723649095087641
+Evaluating parameters: VectorD(4.99878,	3.99916,	-1.99424,	2.99810,	0.499236)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5552751,5552564,5552192)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2228, Avg SMAPE: 7.81, Avg NRMSE: 0.0539
+Speeds - Avg RMSE: 3.4532, Avg SMAPE: 11.90, Avg NRMSE: 0.2191
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1365
+Fitness value: 0.13650110748388905
+Evaluating parameters: VectorD(5.70125,	3.29668,	-1.29177,	2.29563,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5612458,5612269,5611893)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.3679, Avg SMAPE: 8.23, Avg NRMSE: 0.0543
+Speeds - Avg RMSE: 2.5710, Avg SMAPE: 8.12, Avg NRMSE: 0.1644
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1094
+Fitness value: 0.1093759481564422
+Evaluating parameters: VectorD(4.29630,	4.70163,	-2.69671,	3.70058,	1.20171)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5672165,5671974,5671594)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.6485250369707145 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.2535293643673449 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.4560312302387998 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 25.0713, Avg SMAPE: 8.36, Avg NRMSE: 0.0741
+Speeds - Avg RMSE: 4.3527, Avg SMAPE: 16.00, Avg NRMSE: 0.2772
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1756
+Fitness value: 0.1756375969342625
+Evaluating parameters: VectorD(4.99891,	3.99915,	-1.99398,	2.99796,	0.499115)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5731872,5731679,5731295)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.0988, Avg SMAPE: 7.81, Avg NRMSE: 0.0536
+Speeds - Avg RMSE: 3.4976, Avg SMAPE: 12.04, Avg NRMSE: 0.2219
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1377
+Fitness value: 0.13770553855674883
+Evaluating parameters: VectorD(4.29855,	4.69951,	-2.69434,	2.29760,	1.19947)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5791579,5791384,5790996)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.4193988701906062 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.9963459414477043 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.16543070731241105 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 24.2490, Avg SMAPE: 9.13, Avg NRMSE: 0.0717
+Speeds - Avg RMSE: 4.0652, Avg SMAPE: 14.42, Avg NRMSE: 0.2585
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1651
+Fitness value: 0.16508436284522476
+Evaluating parameters: VectorD(5.69927,	3.29879,	-1.29362,	3.69832,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5851286,5851089,5850697)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2759, Avg SMAPE: 8.16, Avg NRMSE: 0.0541
+Speeds - Avg RMSE: 2.7493, Avg SMAPE: 8.90, Avg NRMSE: 0.1763
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1152
+Fitness value: 0.11517054315038597
+Evaluating parameters: VectorD(4.99905,	3.99912,	-1.99373,	2.99793,	0.498986)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5910993,5910794,5910398)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.1647, Avg SMAPE: 7.90, Avg NRMSE: 0.0537
+Speeds - Avg RMSE: 3.5067, Avg SMAPE: 12.11, Avg NRMSE: 0.2223
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1380
+Fitness value: 0.13803450081159574
+Evaluating parameters: VectorD(5.69736,	3.30081,	-1.29542,	3.69624,	1.19730)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (5970700,5970499,5970099)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.16340281152346606 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.4828, Avg SMAPE: 7.78, Avg NRMSE: 0.0517
+Speeds - Avg RMSE: 2.8345, Avg SMAPE: 9.28, Avg NRMSE: 0.1831
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1174
+Fitness value: 0.11744234181225155
+Evaluating parameters: VectorD(4.30074,	4.69743,	-2.69204,	2.29961,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6030407,6030204,6029800)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.05174445621965846 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.5913, Avg SMAPE: 7.29, Avg NRMSE: 0.0521
+Speeds - Avg RMSE: 3.6522, Avg SMAPE: 12.79, Avg NRMSE: 0.2302
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1411
+Fitness value: 0.14113025746392222
+Evaluating parameters: VectorD(4.99917,	3.99910,	-1.99350,	2.99790,	0.498923)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6090114,6089909,6089501)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.4206, Avg SMAPE: 7.97, Avg NRMSE: 0.0545
+Speeds - Avg RMSE: 3.4836, Avg SMAPE: 12.02, Avg NRMSE: 0.2209
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1377
+Fitness value: 0.1376934408271522
+Evaluating parameters: VectorD(5.69550,	3.30277,	-1.29718,	3.69422,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6149821,6149614,6149202)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.1934, Avg SMAPE: 8.12, Avg NRMSE: 0.0538
+Speeds - Avg RMSE: 2.7654, Avg SMAPE: 8.99, Avg NRMSE: 0.1773
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1155
+Fitness value: 0.11554453499288334
+Evaluating parameters: VectorD(4.30285,	4.69542,	-2.68983,	2.30157,	1.19525)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6209528,6209319,6208903)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.5979203735051166 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -1.687711231902326 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.19693754096465674 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 25.0135, Avg SMAPE: 9.34, Avg NRMSE: 0.0739
+Speeds - Avg RMSE: 4.0676, Avg SMAPE: 14.36, Avg NRMSE: 0.2588
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1664
+Fitness value: 0.16637909093428666
+Evaluating parameters: VectorD(4.99933,	3.99903,	-1.99326,	2.99791,	0.498797)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6269235,6269024,6268604)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2344, Avg SMAPE: 7.96, Avg NRMSE: 0.0539
+Speeds - Avg RMSE: 3.4151, Avg SMAPE: 11.76, Avg NRMSE: 0.2168
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1354
+Fitness value: 0.13535086778865726
+      35 |      0.13535087 |      0.13535087 |      50.0% ✓
+Evaluating parameters: VectorD(5.69373,	4.69343,	-2.68766,	3.69232,	1.19320)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6328942,6328729,6328305)
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.3196249433917101 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.40325978004829205 to be nonnegative [0m
+[31mERROR @ CDF.fisherCDF: F(x) requires coordinate x = -0.37646345878168397 to be nonnegative [0m
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 24.6724, Avg SMAPE: 8.43, Avg NRMSE: 0.0729
+Speeds - Avg RMSE: 4.3177, Avg SMAPE: 15.86, Avg NRMSE: 0.2753
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1741
+Fitness value: 0.17409228667200186
+Evaluating parameters: VectorD(4.30493,	3.30463,	-1.29885,	2.30351,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6388649,6388434,6388006)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.2994, Avg SMAPE: 8.21, Avg NRMSE: 0.0541
+Speeds - Avg RMSE: 2.6634, Avg SMAPE: 8.40, Avg NRMSE: 0.1701
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1121
+Fitness value: 0.1121242039202163
+Evaluating parameters: VectorD(4.99937,	3.99893,	-1.99299,	2.99783,	0.498641)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6448356,6448139,6447707)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 18.4974, Avg SMAPE: 7.95, Avg NRMSE: 0.0547
+Speeds - Avg RMSE: 3.4397, Avg SMAPE: 11.84, Avg NRMSE: 0.2182
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1365
+Fitness value: 0.13647082406245897
+Evaluating parameters: VectorD(4.30684,	3.30639,	-2.68553,	2.30530,	0.300000)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6508063,6507844,6507408)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.2239, Avg SMAPE: 7.00, Avg NRMSE: 0.0510
+Speeds - Avg RMSE: 3.6584, Avg SMAPE: 12.83, Avg NRMSE: 0.2305
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1407
+Fitness value: 0.14074060275492878
+Evaluating parameters: VectorD(5.69191,	4.69146,	-1.30046,	3.69037,	1.19118)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6567770,6567549,6567109)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 16.8196, Avg SMAPE: 7.70, Avg NRMSE: 0.0498
+Speeds - Avg RMSE: 2.7942, Avg SMAPE: 9.08, Avg NRMSE: 0.1805
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1152
+Fitness value: 0.1151615281248908
+Evaluating parameters: VectorD(4.99947,	3.99890,	-1.99276,	2.99782,	0.498563)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (6627477,6627254,6626810)
+
+============================================================
+SUMMARY (Average across 5 sensors)
+============================================================
+Counts - Avg RMSE: 17.9017, Avg SMAPE: 7.85, Avg NRMSE: 0.0530
+Speeds - Avg RMSE: 3.4586, Avg SMAPE: 11.90, Avg NRMSE: 0.2194
+============================================================
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.1362
+Fitness value: 0.13618957399522225
+Evaluating parameters: VectorD(4.30875,	3.30817,	-2.68348,	3.68854,	1.18928)
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m
+[31mERROR @ Variate.init: parameter tau must be less than mu [0m

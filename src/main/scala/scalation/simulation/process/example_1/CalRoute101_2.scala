@@ -19,7 +19,8 @@ import scalation.mathstat.*
 @main def runCalRoute101_2(): Unit = new CalRoute101_2()
 
 class CalRoute101_2(name: String = "CalRoute101_2", reps: Int = 1, animating: Boolean = false,
-                  aniRatio: Double = 500.0, stream: Int = 0)
+                    aniRatio: Double = 500.0, stream: Int = 0,
+                    arrivalType: String = "Erlang2S")  // "Erlang2S" or "Poisson" for experiments
     extends Model(name, reps, animating, aniRatio)
         with RowTimeLoader
         with FitM:
@@ -37,11 +38,20 @@ class CalRoute101_2(name: String = "CalRoute101_2", reps: Int = 1, animating: Bo
     /** Simulation dynamics and random variables */
     private val motion         = IDMDynamics                                     //GippsDynamics
     private val numLanes        = 4                                             // RoadCood2 specifies 4 lanes for all sensors
-    //private val iArrivalRV     = Erlang(3)
-    private val iArrivalRV       = Erlang2S(tau = 0.6)   // ExponentialS
-    private val iArrivalRV_ramp1       = Erlang2S(tau = 4.0)
-    private val iArrivalRV_ramp2       = Erlang2S(tau = 10.0)
-    //private val iArrivalRV       = ExponentialS()
+
+    // Arrival variate based on constructor parameter (for experiments)
+    private val iArrivalRV: Variate = arrivalType match
+        case "Poisson"  => Exponential()      // mu overridden per-lane
+        case _          => Erlang2S(tau = 0.6)   // default: shifted Erlang-2
+
+    private val iArrivalRV_ramp1: Variate = arrivalType match
+        case "Poisson"  => Exponential()
+        case _          => Erlang2S(tau = 4.0)
+
+    private val iArrivalRV_ramp2: Variate = arrivalType match
+        case "Poisson"  => Exponential()
+        case _          => Erlang2S(tau = 10.0)
+
     private val laneChangeRV       = Bernoulli(0.6)
 
 
@@ -180,7 +190,7 @@ class CalRoute101_2(name: String = "CalRoute101_2", reps: Int = 1, animating: Bo
 
             // Now onramp vehicle joined the lane already.
             end if
-           // nexting of method inside the for loop.
+            // nexting of method inside the for loop.
             cfor(joinSeg, highway_length) { seg =>
 
                 val carAhead = getCarAhead(this)
@@ -237,6 +247,3 @@ class CalRoute101_2(name: String = "CalRoute101_2", reps: Int = 1, animating: Bo
     waitFinished()
     //Model.shutdown()       // to be removed when TrafficOptimization is used
 end CalRoute101_2
-
-
-

@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=168:00:00
-#SBATCH --output=/scratch/krb84578/workDir/scalation_NM/log/nm/nm_%j.out
-#SBATCH --error=/scratch/krb84578/workDir/scalation_NM/log/nm/nm_%j.err
+#SBATCH --output=/scratch/krb84578/workDir/scalation_MO/log/nm/nm_%j.out
+#SBATCH --error=/scratch/krb84578/workDir/scalation_MO/log/nm/nm_%j.err
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=krb84578@uga.edu
 
@@ -16,10 +16,10 @@ echo "Job ID: ${SLURM_JOB_ID}"
 ml purge
 ml Java/21.0.5
 
-cd /scratch/krb84578/workDir/scalation_NM || exit 1
+cd /scratch/krb84578/workDir/scalation_MO || exit 1
 
 # Create log directory if it doesn't exist
-mkdir -p /scratch/krb84578/workDir/scalation_NM/log/nm
+mkdir -p /scratch/krb84578/workDir/scalation_MO/log/nm
 
 echo "Running Nelder-Mead Optimizer"
 
