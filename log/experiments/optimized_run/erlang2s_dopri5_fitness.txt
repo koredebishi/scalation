@@ -1,0 +1,21 @@
+Experiment: erlang2s_dopri5
+Integrator: DOPRI5
+Arrival: Erlang2S
+Parameters: VectorD(2.00000,	1.50000,	-1.00000,	1.00000,	1.24832)
+Start Time: 2026-01-08T03:42:54.781221500
+============================================================
+Sensor 0: CountNRMSE=0.0450, SpeedNRMSE=0.1812, CountSMAPE=3.51, SpeedSMAPE=20.51, CountR²=0.9421, SpeedR²=0.7153
+Sensor 1: CountNRMSE=0.0693, SpeedNRMSE=0.1589, CountSMAPE=5.64, SpeedSMAPE=13.57, CountR²=0.8480, SpeedR²=0.7876
+Sensor 2: CountNRMSE=0.0856, SpeedNRMSE=0.1806, CountSMAPE=7.75, SpeedSMAPE=14.22, CountR²=0.8034, SpeedR²=0.6918
+Sensor 3: CountNRMSE=0.0973, SpeedNRMSE=0.2236, CountSMAPE=8.68, SpeedSMAPE=15.95, CountR²=0.7439, SpeedR²=0.4871
+Sensor 4: CountNRMSE=0.1076, SpeedNRMSE=0.2712, CountSMAPE=9.46, SpeedSMAPE=14.57, CountR²=0.7177, SpeedR²=0.2201
+============================================================
+Avg Count NRMSE: 0.080961
+Avg Speed NRMSE: 0.203124
+Avg Count SMAPE: 7.0080
+Avg Speed SMAPE: 15.7639
+Avg Count R²: 0.8110
+Avg Speed R²: 0.5804
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.142043
+End Time: 2026-01-08T04:33:24.752584400
+Duration: 3030.03 seconds

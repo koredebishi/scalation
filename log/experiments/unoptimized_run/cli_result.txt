@@ -1,0 +1,314 @@
+"C:\Program Files\Java\jdk-23\bin\java.exe" "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2025.2\lib\idea_rt.jar=53318" -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath C:\Simulation\scalation_2.0\target\scala-3.7.4\classes;C:\Users\kored\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala3-library_3\3.7.4\scala3-library_3-3.7.4.jar;C:\Users\kored\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\com\google\code\gson\gson\2.10\gson-2.10.jar;C:\Users\kored\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala-library\2.13.16\scala-library-2.13.16.jar scalation.simulation.process.runAllExperiments
+-------------------------------------------------------------
+| EXPERIMENTAL COMPARISON - Integrators & Arrival Processes |
+-------------------------------------------------------------
+
+======================================================================
+EXPERIMENT: erlang2s_dopri5
+Integrator: DOPRI5, Arrival: Erlang2S
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-06T19:59:20.305330700
+ERROR @ Variate.init: parameter tau must be less than mu
+ERROR @ Variate.init: parameter tau must be less than mu
+[IDMDynamics.updateM] INTEGRATOR IN USE: DOPRI5
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (59707,59704,59700)
+Raw data saved: log/experiments/erlang2s_dopri5_data.csv
+Sensor 0: CountNRMSE=0.0425, SpeedNRMSE=0.2216, CountSMAPE=3.47, SpeedSMAPE=19.77, CountR²=0.9519, SpeedR²=0.6140
+Sensor 1: CountNRMSE=0.0647, SpeedNRMSE=0.2334, CountSMAPE=5.30, SpeedSMAPE=19.67, CountR²=0.8669, SpeedR²=0.5648
+Sensor 2: CountNRMSE=0.0818, SpeedNRMSE=0.2398, CountSMAPE=7.39, SpeedSMAPE=18.88, CountR²=0.8224, SpeedR²=0.4811
+Sensor 3: CountNRMSE=0.0920, SpeedNRMSE=0.2474, CountSMAPE=8.29, SpeedSMAPE=17.53, CountR²=0.7767, SpeedR²=0.4072
+Sensor 4: CountNRMSE=0.1019, SpeedNRMSE=0.2571, CountSMAPE=9.09, SpeedSMAPE=13.92, CountR²=0.7524, SpeedR²=0.3034
+
+FITNESS: 0.158221
+Count R²: 0.8341, Speed R²: 0.4741
+Duration: 3065.98 seconds
+END TIME: 2026-01-06T20:50:26.273908300
+Fitness saved: log/experiments/erlang2s_dopri5_fitness.txt
+
+======================================================================
+EXPERIMENT: erlang2s_rk4
+Integrator: RK4, Arrival: Erlang2S
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-06T20:50:26.275349900
+ERROR @ Variate.init: parameter tau must be less than mu
+ERROR @ Variate.init: parameter tau must be less than mu
+[IDMDynamics.updateM] INTEGRATOR IN USE: RK4
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (119414,119409,119401)
+Raw data saved: log/experiments/erlang2s_rk4_data.csv
+Sensor 0: CountNRMSE=0.0423, SpeedNRMSE=0.2210, CountSMAPE=3.42, SpeedSMAPE=19.69, CountR²=0.9527, SpeedR²=0.6153
+Sensor 1: CountNRMSE=0.0636, SpeedNRMSE=0.2319, CountSMAPE=5.26, SpeedSMAPE=19.59, CountR²=0.8746, SpeedR²=0.5698
+Sensor 2: CountNRMSE=0.0807, SpeedNRMSE=0.2359, CountSMAPE=7.34, SpeedSMAPE=18.55, CountR²=0.8288, SpeedR²=0.4971
+Sensor 3: CountNRMSE=0.0911, SpeedNRMSE=0.2476, CountSMAPE=8.19, SpeedSMAPE=17.54, CountR²=0.7810, SpeedR²=0.4090
+Sensor 4: CountNRMSE=0.1013, SpeedNRMSE=0.2565, CountSMAPE=9.00, SpeedSMAPE=13.91, CountR²=0.7549, SpeedR²=0.3062
+
+FITNESS: 0.157180
+Count R²: 0.8384, Speed R²: 0.4795
+Duration: 3055.28 seconds
+END TIME: 2026-01-06T21:41:21.551440800
+Fitness saved: log/experiments/erlang2s_rk4_fitness.txt
+
+======================================================================
+EXPERIMENT: erlang2s_rk3
+Integrator: RK3, Arrival: Erlang2S
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-06T21:41:21.552952800
+ERROR @ Variate.init: parameter tau must be less than mu
+ERROR @ Variate.init: parameter tau must be less than mu
+[IDMDynamics.updateM] INTEGRATOR IN USE: RK3
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (179121,179114,179102)
+Raw data saved: log/experiments/erlang2s_rk3_data.csv
+Sensor 0: CountNRMSE=0.0423, SpeedNRMSE=0.2210, CountSMAPE=3.41, SpeedSMAPE=19.70, CountR²=0.9529, SpeedR²=0.6155
+Sensor 1: CountNRMSE=0.0636, SpeedNRMSE=0.2323, CountSMAPE=5.25, SpeedSMAPE=19.60, CountR²=0.8731, SpeedR²=0.5682
+Sensor 2: CountNRMSE=0.0809, SpeedNRMSE=0.2363, CountSMAPE=7.35, SpeedSMAPE=18.57, CountR²=0.8273, SpeedR²=0.4960
+Sensor 3: CountNRMSE=0.0913, SpeedNRMSE=0.2472, CountSMAPE=8.19, SpeedSMAPE=17.51, CountR²=0.7796, SpeedR²=0.4098
+Sensor 4: CountNRMSE=0.1013, SpeedNRMSE=0.2574, CountSMAPE=9.01, SpeedSMAPE=13.95, CountR²=0.7548, SpeedR²=0.3014
+
+FITNESS: 0.157357
+Count R²: 0.8376, Speed R²: 0.4782
+Duration: 2882.72 seconds
+END TIME: 2026-01-06T22:29:24.270064
+Fitness saved: log/experiments/erlang2s_rk3_fitness.txt
+
+======================================================================
+EXPERIMENT: erlang2s_rk2
+Integrator: RK2, Arrival: Erlang2S
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-06T22:29:24.271559400
+ERROR @ Variate.init: parameter tau must be less than mu
+ERROR @ Variate.init: parameter tau must be less than mu
+[IDMDynamics.updateM] INTEGRATOR IN USE: RK2
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (238828,238819,238803)
+Raw data saved: log/experiments/erlang2s_rk2_data.csv
+Sensor 0: CountNRMSE=0.0423, SpeedNRMSE=0.2207, CountSMAPE=3.41, SpeedSMAPE=19.68, CountR²=0.9532, SpeedR²=0.6166
+Sensor 1: CountNRMSE=0.0632, SpeedNRMSE=0.2323, CountSMAPE=5.23, SpeedSMAPE=19.63, CountR²=0.8755, SpeedR²=0.5683
+Sensor 2: CountNRMSE=0.0805, SpeedNRMSE=0.2378, CountSMAPE=7.31, SpeedSMAPE=18.69, CountR²=0.8291, SpeedR²=0.4890
+Sensor 3: CountNRMSE=0.0910, SpeedNRMSE=0.2494, CountSMAPE=8.18, SpeedSMAPE=17.66, CountR²=0.7814, SpeedR²=0.4009
+Sensor 4: CountNRMSE=0.1010, SpeedNRMSE=0.2563, CountSMAPE=8.99, SpeedSMAPE=13.89, CountR²=0.7564, SpeedR²=0.3068
+
+FITNESS: 0.157453
+Count R²: 0.8391, Speed R²: 0.4764
+Duration: 2902.76 seconds
+END TIME: 2026-01-06T23:17:47.028006600
+Fitness saved: log/experiments/erlang2s_rk2_fitness.txt
+
+======================================================================
+EXPERIMENT: erlang2s_ballistic
+Integrator: Ballistic, Arrival: Erlang2S
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-06T23:17:47.028006600
+ERROR @ Variate.init: parameter tau must be less than mu
+ERROR @ Variate.init: parameter tau must be less than mu
+[IDMDynamics.updateM] INTEGRATOR IN USE: Ballistic
+Skipping Source actor due to time limit at clock = 43200.83716757934
+Skipping Source actor due to time limit at clock = 43205.027969898685
+Skipping Source actor due to time limit at clock = 43280.79739938677
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (298535,298524,298504)
+Raw data saved: log/experiments/erlang2s_ballistic_data.csv
+Sensor 0: CountNRMSE=0.0414, SpeedNRMSE=0.2102, CountSMAPE=3.36, SpeedSMAPE=18.38, CountR²=0.9549, SpeedR²=0.6519
+Sensor 1: CountNRMSE=0.0649, SpeedNRMSE=0.2397, CountSMAPE=5.26, SpeedSMAPE=20.33, CountR²=0.8697, SpeedR²=0.5399
+Sensor 2: CountNRMSE=0.0814, SpeedNRMSE=0.2351, CountSMAPE=7.40, SpeedSMAPE=18.72, CountR²=0.8258, SpeedR²=0.4986
+Sensor 3: CountNRMSE=0.0917, SpeedNRMSE=0.2479, CountSMAPE=8.31, SpeedSMAPE=17.73, CountR²=0.7787, SpeedR²=0.4078
+Sensor 4: CountNRMSE=0.1016, SpeedNRMSE=0.2527, CountSMAPE=9.08, SpeedSMAPE=13.53, CountR²=0.7543, SpeedR²=0.3249
+
+FITNESS: 0.156666
+Count R²: 0.8367, Speed R²: 0.4846
+Duration: 1050.61 seconds
+END TIME: 2026-01-06T23:35:17.634289
+Fitness saved: log/experiments/erlang2s_ballistic_fitness.txt
+
+======================================================================
+EXPERIMENT: poisson_dopri5
+Integrator: DOPRI5, Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-06T23:35:17.634289
+[IDMDynamics.updateM] INTEGRATOR IN USE: DOPRI5
+Skipping Source actor due to time limit at clock = 43200.035762501764
+Skipping Source actor due to time limit at clock = 43242.10313692256
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (358068,358054,358031)
+Raw data saved: log/experiments/poisson_dopri5_data.csv
+Sensor 0: CountNRMSE=0.0798, SpeedNRMSE=0.2362, CountSMAPE=6.52, SpeedSMAPE=21.44, CountR²=0.8617, SpeedR²=0.5602
+Sensor 1: CountNRMSE=0.0977, SpeedNRMSE=0.2435, CountSMAPE=7.88, SpeedSMAPE=20.87, CountR²=0.7696, SpeedR²=0.5255
+Sensor 2: CountNRMSE=0.1097, SpeedNRMSE=0.2451, CountSMAPE=9.02, SpeedSMAPE=19.72, CountR²=0.7095, SpeedR²=0.4583
+Sensor 3: CountNRMSE=0.1181, SpeedNRMSE=0.2521, CountSMAPE=9.57, SpeedSMAPE=18.34, CountR²=0.6632, SpeedR²=0.3914
+Sensor 4: CountNRMSE=0.1259, SpeedNRMSE=0.2566, CountSMAPE=10.13, SpeedSMAPE=13.98, CountR²=0.6435, SpeedR²=0.3060
+
+FITNESS: 0.176473
+Count R²: 0.7295, Speed R²: 0.4483
+Duration: 3611.48 seconds
+END TIME: 2026-01-07T00:35:29.111976900
+Fitness saved: log/experiments/poisson_dopri5_fitness.txt
+
+======================================================================
+EXPERIMENT: poisson_rk4
+Integrator: RK4, Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-07T00:35:29.112938600
+[IDMDynamics.updateM] INTEGRATOR IN USE: RK4
+Skipping Source actor due to time limit at clock = 43200.035762501764
+Skipping Source actor due to time limit at clock = 43242.10313692256
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (417601,417584,417558)
+Raw data saved: log/experiments/poisson_rk4_data.csv
+Sensor 0: CountNRMSE=0.0789, SpeedNRMSE=0.2340, CountSMAPE=6.46, SpeedSMAPE=21.26, CountR²=0.8655, SpeedR²=0.5680
+Sensor 1: CountNRMSE=0.0966, SpeedNRMSE=0.2414, CountSMAPE=7.71, SpeedSMAPE=20.71, CountR²=0.7755, SpeedR²=0.5339
+Sensor 2: CountNRMSE=0.1090, SpeedNRMSE=0.2416, CountSMAPE=8.90, SpeedSMAPE=19.38, CountR²=0.7119, SpeedR²=0.4720
+Sensor 3: CountNRMSE=0.1180, SpeedNRMSE=0.2545, CountSMAPE=9.56, SpeedSMAPE=18.48, CountR²=0.6633, SpeedR²=0.3793
+Sensor 4: CountNRMSE=0.1261, SpeedNRMSE=0.2560, CountSMAPE=10.13, SpeedSMAPE=14.02, CountR²=0.6419, SpeedR²=0.3083
+
+FITNESS: 0.175602
+Count R²: 0.7316, Speed R²: 0.4523
+Duration: 3100.82 seconds
+END TIME: 2026-01-07T01:27:09.927231100
+Fitness saved: log/experiments/poisson_rk4_fitness.txt
+
+======================================================================
+EXPERIMENT: poisson_rk3
+Integrator: RK3, Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-07T01:27:09.927231100
+[IDMDynamics.updateM] INTEGRATOR IN USE: RK3
+Skipping Source actor due to time limit at clock = 43200.035762501764
+Skipping Source actor due to time limit at clock = 43242.10313692256
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (477134,477114,477085)
+Raw data saved: log/experiments/poisson_rk3_data.csv
+Sensor 0: CountNRMSE=0.0791, SpeedNRMSE=0.2341, CountSMAPE=6.47, SpeedSMAPE=21.29, CountR²=0.8649, SpeedR²=0.5678
+Sensor 1: CountNRMSE=0.0965, SpeedNRMSE=0.2411, CountSMAPE=7.70, SpeedSMAPE=20.71, CountR²=0.7765, SpeedR²=0.5352
+Sensor 2: CountNRMSE=0.1091, SpeedNRMSE=0.2416, CountSMAPE=8.90, SpeedSMAPE=19.41, CountR²=0.7117, SpeedR²=0.4718
+Sensor 3: CountNRMSE=0.1179, SpeedNRMSE=0.2543, CountSMAPE=9.55, SpeedSMAPE=18.47, CountR²=0.6638, SpeedR²=0.3801
+Sensor 4: CountNRMSE=0.1261, SpeedNRMSE=0.2559, CountSMAPE=10.13, SpeedSMAPE=14.01, CountR²=0.6419, SpeedR²=0.3091
+
+FITNESS: 0.175555
+Count R²: 0.7318, Speed R²: 0.4528
+Duration: 3131.77 seconds
+END TIME: 2026-01-07T02:19:21.697094600
+Fitness saved: log/experiments/poisson_rk3_fitness.txt
+
+======================================================================
+EXPERIMENT: poisson_rk2
+Integrator: RK2, Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-07T02:19:21.697094600
+[IDMDynamics.updateM] INTEGRATOR IN USE: RK2
+Skipping Source actor due to time limit at clock = 43200.035762501764
+Skipping Source actor due to time limit at clock = 43242.10313692256
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (536667,536644,536612)
+Raw data saved: log/experiments/poisson_rk2_data.csv
+Sensor 0: CountNRMSE=0.0788, SpeedNRMSE=0.2341, CountSMAPE=6.46, SpeedSMAPE=21.30, CountR²=0.8659, SpeedR²=0.5676
+Sensor 1: CountNRMSE=0.0962, SpeedNRMSE=0.2405, CountSMAPE=7.67, SpeedSMAPE=20.62, CountR²=0.7783, SpeedR²=0.5378
+Sensor 2: CountNRMSE=0.1088, SpeedNRMSE=0.2418, CountSMAPE=8.88, SpeedSMAPE=19.42, CountR²=0.7137, SpeedR²=0.4708
+Sensor 3: CountNRMSE=0.1175, SpeedNRMSE=0.2543, CountSMAPE=9.50, SpeedSMAPE=18.45, CountR²=0.6674, SpeedR²=0.3793
+Sensor 4: CountNRMSE=0.1258, SpeedNRMSE=0.2560, CountSMAPE=10.11, SpeedSMAPE=14.01, CountR²=0.6452, SpeedR²=0.3078
+
+FITNESS: 0.175381
+Count R²: 0.7341, Speed R²: 0.4527
+Duration: 2921.87 seconds
+END TIME: 2026-01-07T03:08:03.567654600
+Fitness saved: log/experiments/poisson_rk2_fitness.txt
+
+======================================================================
+EXPERIMENT: poisson_ballistic
+Integrator: Ballistic, Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+======================================================================
+START TIME: 2026-01-07T03:08:03.568910900
+[IDMDynamics.updateM] INTEGRATOR IN USE: Ballistic
+Skipping Source actor due to time limit at clock = 43200.035762501764
+Skipping Source actor due to time limit at clock = 43242.10313692256
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (596200,596174,596139)
+Raw data saved: log/experiments/poisson_ballistic_data.csv
+Sensor 0: CountNRMSE=0.0788, SpeedNRMSE=0.2288, CountSMAPE=6.46, SpeedSMAPE=20.36, CountR²=0.8657, SpeedR²=0.5875
+Sensor 1: CountNRMSE=0.0967, SpeedNRMSE=0.2479, CountSMAPE=7.73, SpeedSMAPE=21.41, CountR²=0.7729, SpeedR²=0.5068
+Sensor 2: CountNRMSE=0.1085, SpeedNRMSE=0.2457, CountSMAPE=8.83, SpeedSMAPE=19.92, CountR²=0.7141, SpeedR²=0.4525
+Sensor 3: CountNRMSE=0.1169, SpeedNRMSE=0.2580, CountSMAPE=9.52, SpeedSMAPE=18.96, CountR²=0.6694, SpeedR²=0.3638
+Sensor 4: CountNRMSE=0.1249, SpeedNRMSE=0.2532, CountSMAPE=10.16, SpeedSMAPE=13.75, CountR²=0.6486, SpeedR²=0.3217
+
+FITNESS: 0.175926
+Count R²: 0.7341, Speed R²: 0.4465
+Duration: 594.49 seconds
+END TIME: 2026-01-07T03:17:58.054176200
+Fitness saved: log/experiments/poisson_ballistic_fitness.txt
+erlang2s_ballistic             |        0.156666
+erlang2s_rk4                   |        0.157180
+erlang2s_rk3                   |        0.157357
+erlang2s_rk2                   |        0.157453
+erlang2s_dopri5                |        0.158221
+poisson_rk2                    |        0.175381
+poisson_rk3                    |        0.175555
+poisson_rk4                    |        0.175602
+poisson_ballistic              |        0.175926
+poisson_dopri5                 |        0.176473
+
+Summary saved: log/experiments/experiment_summary.txt
+All experiment data saved in log/experiments/
+
+Process finished with exit code 0

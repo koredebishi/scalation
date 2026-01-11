@@ -1,0 +1,21 @@
+Experiment: erlang2s_butcher
+Integrator: butcher
+Arrival: Erlang2S
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+Start Time: 2026-01-08T17:32:50.814559500
+============================================================
+Sensor 0: CountNRMSE=0.1567, SpeedNRMSE=0.1860, CountSMAPE=8.06, SpeedSMAPE=18.44, CountR²=0.1796, SpeedR²=0.7237
+Sensor 1: CountNRMSE=0.1649, SpeedNRMSE=0.2090, CountSMAPE=9.80, SpeedSMAPE=19.00, CountR²=0.1904, SpeedR²=0.6494
+Sensor 2: CountNRMSE=0.1641, SpeedNRMSE=0.2431, CountSMAPE=11.30, SpeedSMAPE=20.16, CountR²=0.2170, SpeedR²=0.4576
+Sensor 3: CountNRMSE=0.1655, SpeedNRMSE=0.2614, CountSMAPE=11.75, SpeedSMAPE=19.22, CountR²=0.1707, SpeedR²=0.3278
+Sensor 4: CountNRMSE=0.1730, SpeedNRMSE=0.2747, CountSMAPE=12.43, SpeedSMAPE=14.85, CountR²=0.1626, SpeedR²=0.2198
+============================================================
+Avg Count NRMSE: 0.164838
+Avg Speed NRMSE: 0.234828
+Avg Count SMAPE: 10.6705
+Avg Speed SMAPE: 18.3343
+Avg Count R²: 0.1841
+Avg Speed R²: 0.4757
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.199833
+End Time: 2026-01-08T17:52:49.452634400
+Duration: 1198.64 seconds

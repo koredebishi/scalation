@@ -1,0 +1,21 @@
+Experiment: erlang2s_heun
+Integrator: Heun
+Arrival: Erlang2S
+Parameters: VectorD(2.00000,	1.50000,	-1.00000,	1.00000,	1.24832)
+Start Time: 2026-01-08T07:55:22.239759600
+============================================================
+Sensor 0: CountNRMSE=0.0451, SpeedNRMSE=0.1758, CountSMAPE=3.57, SpeedSMAPE=19.95, CountR²=0.9429, SpeedR²=0.7309
+Sensor 1: CountNRMSE=0.0698, SpeedNRMSE=0.1603, CountSMAPE=5.65, SpeedSMAPE=13.72, CountR²=0.8468, SpeedR²=0.7832
+Sensor 2: CountNRMSE=0.0860, SpeedNRMSE=0.1825, CountSMAPE=7.79, SpeedSMAPE=14.39, CountR²=0.8025, SpeedR²=0.6842
+Sensor 3: CountNRMSE=0.0974, SpeedNRMSE=0.2243, CountSMAPE=8.73, SpeedSMAPE=15.95, CountR²=0.7445, SpeedR²=0.4808
+Sensor 4: CountNRMSE=0.1085, SpeedNRMSE=0.2714, CountSMAPE=9.57, SpeedSMAPE=14.63, CountR²=0.7136, SpeedR²=0.2162
+============================================================
+Avg Count NRMSE: 0.081367
+Avg Speed NRMSE: 0.202863
+Avg Count SMAPE: 7.0621
+Avg Speed SMAPE: 15.7292
+Avg Count R²: 0.8101
+Avg Speed R²: 0.5791
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.142115
+End Time: 2026-01-08T08:37:05.411134300
+Duration: 2503.17 seconds

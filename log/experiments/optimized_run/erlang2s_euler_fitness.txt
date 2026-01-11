@@ -1,0 +1,21 @@
+Experiment: erlang2s_euler
+Integrator: Euler
+Arrival: Erlang2S
+Parameters: VectorD(2.00000,	1.50000,	-1.00000,	1.00000,	1.24832)
+Start Time: 2026-01-08T07:15:23.348320
+============================================================
+Sensor 0: CountNRMSE=0.0451, SpeedNRMSE=0.1819, CountSMAPE=3.58, SpeedSMAPE=20.64, CountR²=0.9426, SpeedR²=0.7125
+Sensor 1: CountNRMSE=0.0701, SpeedNRMSE=0.1579, CountSMAPE=5.63, SpeedSMAPE=13.41, CountR²=0.8438, SpeedR²=0.7906
+Sensor 2: CountNRMSE=0.0861, SpeedNRMSE=0.1811, CountSMAPE=7.77, SpeedSMAPE=14.26, CountR²=0.8010, SpeedR²=0.6899
+Sensor 3: CountNRMSE=0.0980, SpeedNRMSE=0.2234, CountSMAPE=8.74, SpeedSMAPE=15.96, CountR²=0.7392, SpeedR²=0.4879
+Sensor 4: CountNRMSE=0.1085, SpeedNRMSE=0.2706, CountSMAPE=9.55, SpeedSMAPE=14.56, CountR²=0.7123, SpeedR²=0.2229
+============================================================
+Avg Count NRMSE: 0.081571
+Avg Speed NRMSE: 0.202983
+Avg Count SMAPE: 7.0537
+Avg Speed SMAPE: 15.7657
+Avg Count R²: 0.8078
+Avg Speed R²: 0.5808
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.142277
+End Time: 2026-01-08T07:55:22.238764300
+Duration: 2398.89 seconds

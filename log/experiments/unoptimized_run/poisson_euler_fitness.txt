@@ -1,0 +1,21 @@
+Experiment: poisson_euler
+Integrator: Euler
+Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+Start Time: 2026-01-09T05:16:11.750099800
+============================================================
+Sensor 0: CountNRMSE=0.0785, SpeedNRMSE=0.2370, CountSMAPE=6.44, SpeedSMAPE=21.48, CountR²=0.8674, SpeedR²=0.5574
+Sensor 1: CountNRMSE=0.0972, SpeedNRMSE=0.2420, CountSMAPE=7.79, SpeedSMAPE=20.73, CountR²=0.7735, SpeedR²=0.5320
+Sensor 2: CountNRMSE=0.1094, SpeedNRMSE=0.2436, CountSMAPE=8.95, SpeedSMAPE=19.62, CountR²=0.7113, SpeedR²=0.4652
+Sensor 3: CountNRMSE=0.1179, SpeedNRMSE=0.2530, CountSMAPE=9.53, SpeedSMAPE=18.38, CountR²=0.6643, SpeedR²=0.3872
+Sensor 4: CountNRMSE=0.1260, SpeedNRMSE=0.2563, CountSMAPE=10.11, SpeedSMAPE=13.98, CountR²=0.6437, SpeedR²=0.3080
+============================================================
+Avg Count NRMSE: 0.105797
+Avg Speed NRMSE: 0.246351
+Avg Count SMAPE: 8.5628
+Avg Speed SMAPE: 18.8366
+Avg Count R²: 0.7320
+Avg Speed R²: 0.4500
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.176074
+End Time: 2026-01-09T05:59:55.029402400
+Duration: 2623.28 seconds

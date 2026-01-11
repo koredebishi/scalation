@@ -1,0 +1,21 @@
+Experiment: poisson_ballistic
+Integrator: Ballistic
+Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+Start Time: 2026-01-07T03:08:03.568910900
+============================================================
+Sensor 0: CountNRMSE=0.0788, SpeedNRMSE=0.2288, CountSMAPE=6.46, SpeedSMAPE=20.36, CountR²=0.8657, SpeedR²=0.5875
+Sensor 1: CountNRMSE=0.0967, SpeedNRMSE=0.2479, CountSMAPE=7.73, SpeedSMAPE=21.41, CountR²=0.7729, SpeedR²=0.5068
+Sensor 2: CountNRMSE=0.1085, SpeedNRMSE=0.2457, CountSMAPE=8.83, SpeedSMAPE=19.92, CountR²=0.7141, SpeedR²=0.4525
+Sensor 3: CountNRMSE=0.1169, SpeedNRMSE=0.2580, CountSMAPE=9.52, SpeedSMAPE=18.96, CountR²=0.6694, SpeedR²=0.3638
+Sensor 4: CountNRMSE=0.1249, SpeedNRMSE=0.2532, CountSMAPE=10.16, SpeedSMAPE=13.75, CountR²=0.6486, SpeedR²=0.3217
+============================================================
+Avg Count NRMSE: 0.105143
+Avg Speed NRMSE: 0.246710
+Avg Count SMAPE: 8.5404
+Avg Speed SMAPE: 18.8802
+Avg Count R²: 0.7341
+Avg Speed R²: 0.4465
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.175926
+End Time: 2026-01-07T03:17:58.054176200
+Duration: 594.49 seconds

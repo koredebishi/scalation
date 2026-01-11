@@ -5,6 +5,7 @@ Microscopic traffic simulation using ScalaTion 2.0 framework (Scala 3). Simulate
 
 ## Rules
 - **Always ask permission before writing or modifying code**
+- **Do not plagiarize** - all paper text must be original
 - Simulation may be running on HPC - don't interrupt with code changes unless asked
 - Use ScalaTion 2.0 style: Scala 3, `cfor` loops, `VectorD`/`MatrixD`
 - Do not hallucinate - if unsure, say so

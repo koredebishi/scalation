@@ -1,0 +1,25 @@
+======================================================================
+EXPERIMENTAL RESULTS SUMMARY
+Timestamp: 2026-01-08T12:59:11.128940700
+Parameters: VectorD(2.00000,	1.50000,	-1.00000,	1.00000,	1.24832)
+======================================================================
+Configuration                  | Fitness (NRMSE)
+--------------------------------------------------
+erlang2s_butcher               |        0.112317
+erlang2s_ballistic             |        0.127122
+poisson_butcher                |        0.130291
+erlang2s_rk4                   |        0.141519
+erlang2s_dopri5                |        0.142043
+erlang2s_rk3                   |        0.142053
+erlang2s_heun                  |        0.142115
+erlang2s_euler                 |        0.142277
+pisson_euler                   |        0.142277
+erlang2s_rk2                   |        0.142282
+poisson_ballistic              |        0.150101
+poisson_heun                   |        0.159131
+poisson_rk3                    |        0.159314
+poisson_rk2                    |        0.159330
+poisson_rk4                    |        0.159450
+poisson_dopri5                 |        0.159729
+======================================================================
+Lower fitness = better fit to PEMS data

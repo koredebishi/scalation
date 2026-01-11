@@ -1,0 +1,21 @@
+Experiment: erlang2s_ballistic
+Integrator: Ballistic
+Arrival: Erlang2S
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+Start Time: 2026-01-06T23:17:47.028006600
+============================================================
+Sensor 0: CountNRMSE=0.0414, SpeedNRMSE=0.2102, CountSMAPE=3.36, SpeedSMAPE=18.38, CountR²=0.9549, SpeedR²=0.6519
+Sensor 1: CountNRMSE=0.0649, SpeedNRMSE=0.2397, CountSMAPE=5.26, SpeedSMAPE=20.33, CountR²=0.8697, SpeedR²=0.5399
+Sensor 2: CountNRMSE=0.0814, SpeedNRMSE=0.2351, CountSMAPE=7.40, SpeedSMAPE=18.72, CountR²=0.8258, SpeedR²=0.4986
+Sensor 3: CountNRMSE=0.0917, SpeedNRMSE=0.2479, CountSMAPE=8.31, SpeedSMAPE=17.73, CountR²=0.7787, SpeedR²=0.4078
+Sensor 4: CountNRMSE=0.1016, SpeedNRMSE=0.2527, CountSMAPE=9.08, SpeedSMAPE=13.53, CountR²=0.7543, SpeedR²=0.3249
+============================================================
+Avg Count NRMSE: 0.076201
+Avg Speed NRMSE: 0.237131
+Avg Count SMAPE: 6.6839
+Avg Speed SMAPE: 17.7402
+Avg Count R²: 0.8367
+Avg Speed R²: 0.4846
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.156666
+End Time: 2026-01-06T23:35:17.634289
+Duration: 1050.61 seconds

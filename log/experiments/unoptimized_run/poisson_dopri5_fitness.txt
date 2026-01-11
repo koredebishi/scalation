@@ -1,0 +1,21 @@
+Experiment: poisson_dopri5
+Integrator: DOPRI5
+Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+Start Time: 2026-01-06T23:35:17.634289
+============================================================
+Sensor 0: CountNRMSE=0.0798, SpeedNRMSE=0.2362, CountSMAPE=6.52, SpeedSMAPE=21.44, CountR²=0.8617, SpeedR²=0.5602
+Sensor 1: CountNRMSE=0.0977, SpeedNRMSE=0.2435, CountSMAPE=7.88, SpeedSMAPE=20.87, CountR²=0.7696, SpeedR²=0.5255
+Sensor 2: CountNRMSE=0.1097, SpeedNRMSE=0.2451, CountSMAPE=9.02, SpeedSMAPE=19.72, CountR²=0.7095, SpeedR²=0.4583
+Sensor 3: CountNRMSE=0.1181, SpeedNRMSE=0.2521, CountSMAPE=9.57, SpeedSMAPE=18.34, CountR²=0.6632, SpeedR²=0.3914
+Sensor 4: CountNRMSE=0.1259, SpeedNRMSE=0.2566, CountSMAPE=10.13, SpeedSMAPE=13.98, CountR²=0.6435, SpeedR²=0.3060
+============================================================
+Avg Count NRMSE: 0.106228
+Avg Speed NRMSE: 0.246717
+Avg Count SMAPE: 8.6222
+Avg Speed SMAPE: 18.8684
+Avg Count R²: 0.7295
+Avg Speed R²: 0.4483
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.176473
+End Time: 2026-01-07T00:35:29.111976900
+Duration: 3611.48 seconds

@@ -1,0 +1,21 @@
+Experiment: poisson_heun
+Integrator: Heun
+Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+Start Time: 2026-01-08T18:46:06.427651400
+============================================================
+Sensor 0: CountNRMSE=0.0790, SpeedNRMSE=0.2341, CountSMAPE=6.47, SpeedSMAPE=21.31, CountR²=0.8652, SpeedR²=0.5677
+Sensor 1: CountNRMSE=0.0968, SpeedNRMSE=0.2408, CountSMAPE=7.72, SpeedSMAPE=20.69, CountR²=0.7756, SpeedR²=0.5362
+Sensor 2: CountNRMSE=0.1092, SpeedNRMSE=0.2419, CountSMAPE=8.90, SpeedSMAPE=19.43, CountR²=0.7120, SpeedR²=0.4706
+Sensor 3: CountNRMSE=0.1176, SpeedNRMSE=0.2545, CountSMAPE=9.52, SpeedSMAPE=18.50, CountR²=0.6673, SpeedR²=0.3781
+Sensor 4: CountNRMSE=0.1256, SpeedNRMSE=0.2559, CountSMAPE=10.10, SpeedSMAPE=14.01, CountR²=0.6461, SpeedR²=0.3089
+============================================================
+Avg Count NRMSE: 0.105626
+Avg Speed NRMSE: 0.245452
+Avg Count SMAPE: 8.5421
+Avg Speed SMAPE: 18.7857
+Avg Count R²: 0.7332
+Avg Speed R²: 0.4523
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.175539
+End Time: 2026-01-08T19:43:37.993782500
+Duration: 3451.57 seconds

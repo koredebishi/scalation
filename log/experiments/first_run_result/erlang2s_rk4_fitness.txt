@@ -1,0 +1,17 @@
+Experiment: erlang2s_rk4
+Integrator: RK4
+Arrival: Erlang2S
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+Timestamp: 2026-01-05T05:51:36.760502700
+============================================================
+Sensor 0: CountNRMSE=0.0423, SpeedNRMSE=0.2210, CountSMAPE=3.42, SpeedSMAPE=19.69
+Sensor 1: CountNRMSE=0.0636, SpeedNRMSE=0.2319, CountSMAPE=5.26, SpeedSMAPE=19.59
+Sensor 2: CountNRMSE=0.0807, SpeedNRMSE=0.2359, CountSMAPE=7.34, SpeedSMAPE=18.55
+Sensor 3: CountNRMSE=0.0911, SpeedNRMSE=0.2476, CountSMAPE=8.19, SpeedSMAPE=17.54
+Sensor 4: CountNRMSE=0.1013, SpeedNRMSE=0.2565, CountSMAPE=9.00, SpeedSMAPE=13.91
+============================================================
+Avg Count NRMSE: 0.075796
+Avg Speed NRMSE: 0.238564
+Avg Count SMAPE: 6.6425
+Avg Speed SMAPE: 17.8558
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.157180

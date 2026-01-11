@@ -1,0 +1,21 @@
+Experiment: poisson_butcher
+Integrator: butcher
+Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+Start Time: 2026-01-08T19:43:37.995745600
+============================================================
+Sensor 0: CountNRMSE=0.1776, SpeedNRMSE=0.1878, CountSMAPE=10.82, SpeedSMAPE=18.84, CountR²=0.1127, SpeedR²=0.7176
+Sensor 1: CountNRMSE=0.1771, SpeedNRMSE=0.2047, CountSMAPE=11.44, SpeedSMAPE=18.80, CountR²=0.1179, SpeedR²=0.6639
+Sensor 2: CountNRMSE=0.1777, SpeedNRMSE=0.2339, CountSMAPE=12.17, SpeedSMAPE=19.58, CountR²=0.1163, SpeedR²=0.4947
+Sensor 3: CountNRMSE=0.1816, SpeedNRMSE=0.2556, CountSMAPE=12.61, SpeedSMAPE=19.04, CountR²=0.0816, SpeedR²=0.3533
+Sensor 4: CountNRMSE=0.1898, SpeedNRMSE=0.2691, CountSMAPE=13.21, SpeedSMAPE=14.67, CountR²=0.0662, SpeedR²=0.2467
+============================================================
+Avg Count NRMSE: 0.180771
+Avg Speed NRMSE: 0.230211
+Avg Count SMAPE: 12.0502
+Avg Speed SMAPE: 18.1844
+Avg Count R²: 0.0989
+Avg Speed R²: 0.4952
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.205491
+End Time: 2026-01-08T20:02:54.606006600
+Duration: 1156.61 seconds

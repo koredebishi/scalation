@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=168:00:00
-#SBATCH --output=/scratch/krb84578/workDir/scalation_2.0/log/experiments/experiments_%j.out
-#SBATCH --error=/scratch/krb84578/workDir/scalation_2.0/log/experiments/experiments_%j.err
+#SBATCH --output=/scratch/krb84578/workDir/scalation_experiments/log/experiments/experiments_%j.out
+#SBATCH --error=/scratch/krb84578/workDir/scalation_experiments/log/experiments/experiments_%j.err
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=krb84578@uga.edu
 
@@ -16,10 +16,10 @@ echo "Job ID: ${SLURM_JOB_ID}"
 ml purge
 ml Java/21.0.5
 
-cd /scratch/krb84578/workDir/scalation_2.0 || exit 1
+cd /scratch/krb84578/workDir/scalation_experiments || exit 1
 
 # Create experiments directory for output files
-mkdir -p /scratch/krb84578/workDir/scalation_2.0/log/experiments
+mkdir -p /scratch/krb84578/workDir/scalation_experiments/log/experiments
 
 echo "Running All Experiments: 5 integrators × 2 arrival processes = 10 runs"
 echo "Integrators: DOPRI5, RK4, RK3, RK2, Ballistic"

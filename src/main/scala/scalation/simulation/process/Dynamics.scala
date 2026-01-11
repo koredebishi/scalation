@@ -12,10 +12,10 @@ package simulation
 package process
 
 
-import scala.math.{ sqrt, abs, max, min}//, min, max, abs}
+import scala.math.{abs, max, min, sqrt}
 import scalation.mathstat.*
 import scalation.dynamics.*
-import Vehicle._
+import Vehicle.*
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -27,6 +27,9 @@ enum IntegratorType:
     case RK4         // Classic Runge-Kutta 4th order - O(Δt⁴)
     case RK3         // SSPRK3 - O(Δt³)
     case RK2         // Modified Euler (Explicit Midpoint) - O(Δt²)
+    case Heun        // Heun's method (Explicit Trapezoidal) - O(Δt²) - Treiber recommended
+    case Euler       // Forward Euler - O(Δt¹) - what SUMO uses
+    case butcher     // Butcher 5th order - O(Δt⁵)
     case Ballistic   // Kinematic equations - O(Δt²)
 end IntegratorType
 
@@ -55,7 +58,7 @@ trait Dynamics:
 //        println (s"Dynamics.updateV: called $car")
         this match
             case GippsDynamics => { GippsDynamics.updateM (car, maxDisp) }
-            case _             => { println ("IDM");   IDMDynamics.updateM (car,  maxDisp) }
+            case _             => { IDMDynamics.updateM (car,  maxDisp) }
     end updateV
 
 end Dynamics
@@ -118,7 +121,6 @@ object GippsDynamics
         //   ft_rt  = v(t−τ),
         //   rt     = τ
         // )
-        //
         // This matches Wikipedia's Butcher method exactly.
         // ------------------------------------------------------------------
         val x = butcher(
@@ -225,6 +227,12 @@ object IDMDynamics
     /** Configurable integrator type for ODE solving - default DOPRI5 */
     var integratorType: IntegratorType = IntegratorType.DOPRI5
 
+    /** Flag to print integrator type only once per simulation run */
+    private var integratorPrinted: Boolean = false
+
+    /** Reset the print flag - call this before each new simulation */
+    def resetIntegratorPrintFlag(): Unit = integratorPrinted = false
+
 
 
     /**
@@ -282,16 +290,47 @@ object IDMDynamics
         // ─────────────────────────────────────────────────────────────────────────
         val y0 = VectorD(car.t_disp, car.velocity)                      // initial state [x(t), v(t)]
 
+        // Print integrator type ONCE per simulation (from inside updateM, not from caller)
+        if !integratorPrinted then
+            println(s"[IDMDynamics.updateM] INTEGRATOR IN USE: $integratorType")
+            integratorPrinted = true
+
         // Select integrator based on integratorType setting
         val y1: VectorD = integratorType match
             case IntegratorType.DOPRI5    => DormandPrince.integrateVV(odes, y0, dt)
             case IntegratorType.RK4       => RungeKutta2.rk4.integrateVV(odes, y0, dt)
             case IntegratorType.RK3       => RungeKutta2.rk3.integrateVV(odes, y0, dt)
             case IntegratorType.RK2       => RungeKutta2.rk2.integrateVV(odes, y0, dt)
+            case IntegratorType.Heun      => RungeKutta2.heun.integrateVV(odes, y0, dt)
+            case IntegratorType.Euler     => RungeKutta2.euler.integrateVV(odes, y0, dt)
+            case IntegratorType.butcher   =>
+                // Butcher's 5th-order method (J.C. Butcher) - a quadrature rule using historical samples.
+                // Apply twice: once for velocity (using acceleration history), once for position (using velocity history).
+                // This maintains 5th-order accuracy for BOTH state variables.
+                
+                // Step 1: Velocity via Butcher using acceleration history: a(t), a(t−τ)
+                // v(t+τ) = v(t) + (1/90)(7k1 + 32k3 + 12k4 + 32k5 + 7k6)τ  where k's interpolate a(t-τ) to a(t)
+                val a_idm = idmAccel(car.t_disp, car.velocity)        // a(t) from IDM
+                val v_new_b = Vehicle.butcher(
+                    car.velocity,    // v(t)   - current velocity
+                    a_idm,           // a(t)   - current acceleration
+                    car.o_acc,       // a(t−τ) - previous acceleration
+                    dt
+                )
+                
+                // Step 2: Position via Butcher using velocity history: v(t), v(t−τ)
+                // x(t+τ) = x(t) + (1/90)(7k1 + 32k3 + 12k4 + 32k5 + 7k6)τ  where k's interpolate v(t-τ) to v(t)
+                val x_new_b = Vehicle.butcher(
+                    car.t_disp,      // x(t)   - current position
+                    car.velocity,    // v(t)   - current velocity
+                    car.o_velocity,  // v(t−τ) - previous velocity
+                    dt
+                )
+                VectorD(x_new_b, v_new_b)
             case IntegratorType.Ballistic =>
                 // Ballistic: compute IDM acceleration once, then kinematic update
                 val a_idm = idmAccel(car.t_disp, car.velocity)
-                val v_ball = car.velocity + a_idm * dt   // v(t + dt)
+                val v_ball = car.velocity + a_idm * dt   // v(t + dt) the new velocity
                 val x_ball = car.t_disp + car.velocity * dt + 0.5 * a_idm * dt * dt  // x(t + dt)
                 VectorD(x_ball, v_ball)  // construct new state vector
 

@@ -415,9 +415,11 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                                 val muPerStage = mu / erlang.k // 2
                                 iArrivalTime.gen1(muPerStage)
                             case erlang2S: Erlang2S =>
+                                println(s"Arrival model is ${iArrivalTime.toString}")
                                 val muPerStage = (mu - erlang2S.tau) / 2.0
                                 iArrivalTime.gen1(muPerStage)
                             case _ =>
+                                println(s"Arrival model is ${iArrivalTime.toString}")
                                 iArrivalTime.gen1(mu)
                         val ctime = director.clock // clock time
                         tally(duration) // tally duration

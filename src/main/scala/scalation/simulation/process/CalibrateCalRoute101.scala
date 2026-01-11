@@ -2,8 +2,8 @@ package scalation
 package simulation
 package process
 
-import scalation.mathstat.{MatrixD, VectorD}
-import scalation.modeling.Fit
+import scalation.mathstat.{MatrixD, VectorD, VectorI}
+import scalation.modeling.{Fit}
 import scalation.optimization.{DifferentialEvolution, GeneticAlgorithm, NelderMeadSimplex2, SPSA, SPSA_Mo}
 import scalation.random.{Uniform, Variate}
 import scalation.simulation.process.example_1.{CalRoute101_2}
@@ -461,8 +461,15 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
     println(s"Parameters: $experimentParams")
     println(s"${"=" * 70}")
 
+    // Record start time
+    val startTime = System.currentTimeMillis()
+    val startTimestamp = java.time.LocalDateTime.now()
+    println(s"START TIME: $startTimestamp")
+
     // Set integrator BEFORE model instantiation
     IDMDynamics.integratorType = integratorType
+    // Reset print flag so updateM will print the integrator it's actually using
+    IDMDynamics.resetIntegratorPrintFlag()
 
     // Apply vehicle parameters and create model with specified arrival type
     Vehicle.setProps(Vehicle.setParams(experimentParams))
@@ -519,13 +526,15 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
     var totalSpeedSMAPE = 0.0
     var totalCountRMSE = 0.0
     var totalSpeedRMSE = 0.0
+    var totalCountRsq = 0.0
+    var totalSpeedRsq = 0.0
 
     val fitnessWriter = new EasyWriter("experiments", s"${experimentName}_fitness.txt")
     fitnessWriter.println(s"Experiment: $experimentName")
     fitnessWriter.println(s"Integrator: $integratorType")
     fitnessWriter.println(s"Arrival: $arrivalType")
     fitnessWriter.println(s"Parameters: $experimentParams")
-    fitnessWriter.println(s"Timestamp: ${java.time.LocalDateTime.now()}")
+    fitnessWriter.println(s"Start Time: $startTimestamp")
     fitnessWriter.println("=" * 60)
 
     for i <- 0 until 5 do
@@ -538,6 +547,8 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
         val speedSMAPE = sqof(8).mean
         val countRMSE = cqof(6).mean
         val speedRMSE = sqof(6).mean
+        val countRsq = cqof(0).mean    // R² index
+        val speedRsq = sqof(0).mean
 
         totalCountNRMSE += countNRMSE
         totalSpeedNRMSE += speedNRMSE
@@ -545,8 +556,10 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
         totalSpeedSMAPE += speedSMAPE
         totalCountRMSE += countRMSE
         totalSpeedRMSE += speedRMSE
+        totalCountRsq += countRsq
+        totalSpeedRsq += speedRsq
 
-        val sensorLine = f"Sensor $i: CountNRMSE=$countNRMSE%.4f, SpeedNRMSE=$speedNRMSE%.4f, CountSMAPE=$countSMAPE%.2f, SpeedSMAPE=$speedSMAPE%.2f"
+        val sensorLine = f"Sensor $i: CountNRMSE=$countNRMSE%.4f, SpeedNRMSE=$speedNRMSE%.4f, CountSMAPE=$countSMAPE%.2f, SpeedSMAPE=$speedSMAPE%.2f, CountR²=$countRsq%.4f, SpeedR²=$speedRsq%.4f"
         println(sensorLine)
         fitnessWriter.println(sensorLine)
     end for
@@ -555,21 +568,34 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
     val avgSpeedNRMSE = totalSpeedNRMSE / 5.0
     val avgCountSMAPE = totalCountSMAPE / 5.0
     val avgSpeedSMAPE = totalSpeedSMAPE / 5.0
+    val avgCountRsq = totalCountRsq / 5.0
+    val avgSpeedRsq = totalSpeedRsq / 5.0
     val fitness = 0.5 * avgCountNRMSE + 0.5 * avgSpeedNRMSE
+
+    // Record end time and duration
+    val endTime = System.currentTimeMillis()
+    val endTimestamp = java.time.LocalDateTime.now()
+    val durationSeconds = (endTime - startTime) / 1000.0
 
     fitnessWriter.println("=" * 60)
     fitnessWriter.println(f"Avg Count NRMSE: $avgCountNRMSE%.6f")
     fitnessWriter.println(f"Avg Speed NRMSE: $avgSpeedNRMSE%.6f")
     fitnessWriter.println(f"Avg Count SMAPE: $avgCountSMAPE%.4f")
     fitnessWriter.println(f"Avg Speed SMAPE: $avgSpeedSMAPE%.4f")
+    fitnessWriter.println(f"Avg Count R²: $avgCountRsq%.4f")
+    fitnessWriter.println(f"Avg Speed R²: $avgSpeedRsq%.4f")
     fitnessWriter.println(f"FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): $fitness%.6f")
+    fitnessWriter.println(s"End Time: $endTimestamp")
+    fitnessWriter.println(f"Duration: $durationSeconds%.2f seconds")
     fitnessWriter.flush()
     fitnessWriter.close()
 
     println(f"\nFITNESS: $fitness%.6f")
+    println(f"Count R²: $avgCountRsq%.4f, Speed R²: $avgSpeedRsq%.4f")
+    println(f"Duration: $durationSeconds%.2f seconds")
+    println(s"END TIME: $endTimestamp")
     println(s"Fitness saved: log/experiments/${experimentName}_fitness.txt")
 
-    Model.shutdown()
     fitness
 end runSingleExperiment
 
@@ -585,21 +611,30 @@ end runSingleExperiment
 
     // Best parameters from initial testing
     val bestParams = VectorD(5.0, 4.0, -2.0, 3.0, 0.5)
+    //val bestParams = VectorD(2.00000, 1.50000, -1.00000, 1.00000, 1.24832)
+
 
     // Define experiments: (integratorType, arrivalType)
     val experiments = Seq(
-        // Erlang2S with all integrators
-        (IntegratorType.DOPRI5, "Erlang2S"),
-        (IntegratorType.RK4, "Erlang2S"),
-        (IntegratorType.RK3, "Erlang2S"),
-        (IntegratorType.RK2, "Erlang2S"),
-        (IntegratorType.Ballistic, "Erlang2S"),
-        // Poisson with all integrators
-        (IntegratorType.DOPRI5, "Poisson"),
-        (IntegratorType.RK4, "Poisson"),
-        (IntegratorType.RK3, "Poisson"),
-        (IntegratorType.RK2, "Poisson"),
-        (IntegratorType.Ballistic, "Poisson")
+         //Erlang2S with all integrators
+        //(IntegratorType.DOPRI5, "Erlang2S"),
+        //(IntegratorType.RK4, "Erlang2S"),
+        //(IntegratorType.RK3, "Erlang2S"),
+        //(IntegratorType.RK2, "Erlang2S"),
+        //(IntegratorType.Ballistic, "Erlang2S"),
+        (IntegratorType.Euler, "Erlang2S"),
+        //(IntegratorType.Heun, "Erlang2S"),
+        //(IntegratorType.butcher, "Erlang2S"),
+         //Poisson with all integrators
+        //(IntegratorType.DOPRI5, "Poisson"),
+        //(IntegratorType.RK4, "Poisson"),
+        //(IntegratorType.RK3, "Poisson"),
+        //(IntegratorType.RK2, "Poisson"),
+        //(IntegratorType.Ballistic, "Poisson"),
+        (IntegratorType.Euler, "Poisson")
+        //(IntegratorType.Heun, "Poisson"),
+        //(IntegratorType.butcher, "Poisson")
+        // Additional Erlang2S runs for completeness
     )
 
     val results = scala.collection.mutable.ArrayBuffer[(String, Double)]()
@@ -633,34 +668,212 @@ end runSingleExperiment
 
     println(s"\nSummary saved: log/experiments/experiment_summary.txt")
     println("All experiment data saved in log/experiments/")
+    Model.shutdown()   // this is the issue
 end runAllExperiments
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Run a single experiment from command line (for individual runs).
+/** Offline Analysis: Read all experiment CSVs and compute macro/micro validation.
+ *  Produces same output as TrafficConfigTest2 for all 10 experiment configurations.
+ *  All results written to a single file: log/experiments/offline_analysis_summary.txt
  *
- *  Usage: runMain scalation.simulation.process.runExperimentCLI <integrator> <arrival>
- *  Where: integrator = DOPRI5, RK4, RK3, RK2, Ballistic
- *         arrival    = Erlang2S, Poisson
+ *  > runMain scalation.simulation.process.analyzeAllExperiments
  */
-@main def runExperimentCLI(integratorName: String, arrivalType: String): Unit =
-    val integrator = integratorName match
-        case "DOPRI5"    => IntegratorType.DOPRI5
-        case "RK4"       => IntegratorType.RK4
-        case "RK3"       => IntegratorType.RK3
-        case "RK2"       => IntegratorType.RK2
-        case "Ballistic" => IntegratorType.Ballistic
-        case _           =>
-            println(s"Unknown integrator: $integratorName, using DOPRI5")
-            IntegratorType.DOPRI5
+@main def analyzeAllExperiments(): Unit =
+    banner("OFFLINE ANALYSIS - All Experiment Configurations")
+    
+    val nSensors = 5
+    val nLanes   = 4
+    val nRows    = 48
+    val nParams  = 5
+    
+    // Create Fit object for diagnostics - same as runSingleExperiment
+    object TestFit extends Fit(dfr = nParams, df = nRows - nParams)
 
-    val arrival = arrivalType match
-        case "Poisson"  => "Poisson"
-        case "Erlang2S" => "Erlang2S"
-        case _          =>
-            println(s"Unknown arrival: $arrivalType, using Erlang2S")
-            "Erlang2S"
+    // PEMS data paths
+    val pemsFiles = Array(
+        "Mainline_VDS_Donald_Doyle/1-401112ML.csv",
+        "Mainline_VDS_Donald_Doyle/2-401104ML.csv",
+        "Mainline_VDS_Donald_Doyle/3-400712ML.csv",
+        "Mainline_VDS_Donald_Doyle/4-400450ML.csv",
+        "Mainline_VDS_Donald_Doyle/5-407463ML.csv"
+    )
+    val flowIdx  = VectorI(1, 3, 5, 7)
+    val speedIdx = VectorI(2, 4, 6, 8)
+    
+    // Load PEMS data once (shared across all experiments)
+    val pemsData = new Array[MatrixD](nSensors)
+    cfor(0, nSensors) { s => pemsData(s) = MatrixD.load(pemsFiles(s)) }
+    
+    def pemsFlow(s: Int): MatrixD  = pemsData(s)(?, flowIdx)
+    def pemsSpeed(s: Int): MatrixD = pemsData(s)(?, speedIdx) * 0.44704  // mph → m/s
+    
+    // Define all experiment configurations
+    val experiments = Seq(
+        ("erlang2s", "dopri5"),
+        ("erlang2s", "rk4"),
+        ("erlang2s", "rk3"),
+        ("erlang2s", "rk2"),
+        ("erlang2s", "ballistic"),
+        ("erlang2s", "butcher"),
+        ("erlang2s", "euler"),
+        ("erlang2s", "heun"),
+        ("poisson", "dopri5"),
+        ("poisson", "rk4"),
+        ("poisson", "rk3"),
+        ("poisson", "rk2"),
+        ("poisson", "ballistic"),
+        ("poisson", "butcher"),
+        ("poisson", "euler"),
+        ("poisson", "heun")
+    )
+    
+    // Output file
+    val outputWriter = new EasyWriter("experiments", "offline_analysis_summary.txt")
+    outputWriter.println("=" * 140)
+    outputWriter.println("OFFLINE ANALYSIS - All Experiment Configurations")
+    outputWriter.println(s"Timestamp: ${java.time.LocalDateTime.now()}")
+    outputWriter.println("=" * 140)
+    
+    // Macro validation helper - uses TestFit.diagnose_mat for consistency with runSingleExperiment
+    // Returns: (R², SMAPE, RMSE, NRMSE) - all as mean across lanes
+    def macroValidation(sim: MatrixD, pms: MatrixD): (Double, Double, Double, Double) =
+        val qof = TestFit.diagnose_mat(pms, sim)
+        val r2    = qof(0).mean   // R² index
+        val rmse  = qof(6).mean   // RMSE index
+        val smape = qof(8).mean   // SMAPE index
+        val nrmse = qof(9).mean   // NRMSE index
+        (r2, smape, rmse, nrmse)
+    end macroValidation
+    
+    // Micro validation helper - uses TestFit.diagnose_mat for consistency with runSingleExperiment
+    // Returns per-lane: (R², SMAPE, RMSE, NRMSE)
+    def microValidation(sim: MatrixD, pms: MatrixD): Array[(Double, Double, Double, Double)] =
+        val qof = TestFit.diagnose_mat(pms, sim)
+        val results = new Array[(Double, Double, Double, Double)](nLanes)
+        cfor(0, nLanes) { lane =>
+            results(lane) = (qof(0, lane), qof(8, lane), qof(6, lane), qof(9, lane))  // R², SMAPE, RMSE, NRMSE
+        }
+        results
+    end microValidation
+    
+    // Process each experiment
+    for (arrival, integrator) <- experiments do
+        val experimentName = s"${arrival}_${integrator}"
+        val simFile = s"C:/Simulation/scalation_2.0/log/experiments/unoptimized_run/${experimentName}_data.csv"
+        
+        outputWriter.println(s"\n${"#" * 140}")
+        outputWriter.println(s"EXPERIMENT: $experimentName (Arrival: $arrival, Integrator: $integrator)")
+        outputWriter.println(s"${"#" * 140}")
+        
+        // Check if file exists
+        val file = new java.io.File(simFile)
+        if !file.exists() then
+            outputWriter.println(s"  [SKIPPED] File not found: $simFile")
+            println(s"[SKIPPED] $experimentName - file not found")
+        else
+            println(s"Processing: $experimentName")
+            
+            // Load simulation data
+            val simData = MatrixD.load(simFile, skip = 1, fullPath = true)
+            
+            // Slice helpers
+            def simFlow(s: Int): MatrixD  = simData(?, VectorI.range(s * nLanes, (s + 1) * nLanes))
+            def simSpeed(s: Int): MatrixD = simData(?, VectorI.range((nSensors + s) * nLanes, (nSensors + s + 1) * nLanes))
+            
+            // Arrays for macro metrics
+            val flowR2     = new Array[Double](nSensors)
+            val flowSmape  = new Array[Double](nSensors)
+            val flowRmse   = new Array[Double](nSensors)
+            val flowNrmse  = new Array[Double](nSensors)
+            val speedR2    = new Array[Double](nSensors)
+            val speedSmape = new Array[Double](nSensors)
+            val speedRmse  = new Array[Double](nSensors)
+            val speedNrmse = new Array[Double](nSensors)
 
-    val bestParams = VectorD(5.0, 4.0, -2.0, 3.0, 0.5)
-    runSingleExperiment(integrator, arrival, bestParams)
-end runExperimentCLI
+            // Compute macro validation
+            cfor(0, nSensors) { s =>
+                val (fr2, fsm, frm, fnr) = macroValidation(simFlow(s), pemsFlow(s))
+                flowR2(s) = fr2; flowSmape(s) = fsm; flowRmse(s) = frm; flowNrmse(s) = fnr
+                val (sr2, ssm, srm, snr) = macroValidation(simSpeed(s), pemsSpeed(s))
+                speedR2(s) = sr2; speedSmape(s) = ssm; speedRmse(s) = srm; speedNrmse(s) = snr
+            }
+            
+            // Compute micro validation
+            val flowMicro  = new Array[Array[(Double, Double, Double, Double)]](nSensors)
+            val speedMicro = new Array[Array[(Double, Double, Double, Double)]](nSensors)
+            cfor(0, nSensors) { s =>
+                flowMicro(s)  = microValidation(simFlow(s), pemsFlow(s))
+                speedMicro(s) = microValidation(simSpeed(s), pemsSpeed(s))
+            }
+            
+            // ─── MACRO-LEVEL OUTPUT ───
+            outputWriter.println(s"\n${"=" * 160}")
+            outputWriter.println("MACRO-LEVEL VALIDATION (Sensor Aggregates)")
+            outputWriter.println("=" * 160)
+            outputWriter.println(f"${"Sensor"}%-10s ${"Flow R²"}%-12s ${"Flow SMAPE"}%-14s ${"Flow RMSE"}%-14s ${"Flow NRMSE"}%-14s ${"Speed R²"}%-12s ${"Speed SMAPE"}%-14s ${"Speed RMSE"}%-14s ${"Speed NRMSE"}%-14s")
+            outputWriter.println("-" * 160)
+            cfor(0, nSensors) { s =>
+                outputWriter.println(f"${s + 1}%-10d ${flowR2(s)}%-12.4f ${flowSmape(s)}%-14.2f ${flowRmse(s)}%-14.2f ${flowNrmse(s)}%-14.4f ${speedR2(s)}%-12.4f ${speedSmape(s)}%-14.2f ${speedRmse(s)}%-14.2f ${speedNrmse(s)}%-14.4f")
+            }
+            outputWriter.println("=" * 160)
+
+            // ─── MICRO-LEVEL OUTPUT ───
+            outputWriter.println(s"\n${"=" * 180}")
+            outputWriter.println("MICRO-LEVEL VALIDATION (Lane Detail)")
+            outputWriter.println("=" * 180)
+            outputWriter.println(f"${"Sensor"}%-8s ${"Lane"}%-6s ${"Flow R²"}%-12s ${"Flow SMAPE"}%-14s ${"Flow RMSE"}%-14s ${"Flow NRMSE"}%-14s ${"Speed R²"}%-12s ${"Speed SMAPE"}%-14s ${"Speed RMSE"}%-14s ${"Speed NRMSE"}%-14s")
+            outputWriter.println("-" * 180)
+            cfor(0, nSensors) { s =>
+                cfor(0, nLanes) { l =>
+                    val (fR2, fSm, fRm, fNr) = flowMicro(s)(l)
+                    val (sR2, sSm, sRm, sNr) = speedMicro(s)(l)
+                    val label = if l == 0 then s"${s + 1}" else ""
+                    outputWriter.println(f"$label%-8s ${l + 1}%-6d $fR2%-12.4f $fSm%-14.2f $fRm%-14.2f $fNr%-14.4f $sR2%-12.4f $sSm%-14.2f $sRm%-14.2f $sNr%-14.4f")
+                }
+                if s < nSensors - 1 then outputWriter.println("-" * 180)
+            }
+            outputWriter.println("=" * 180)
+
+            // ─── DIAGNOSE_MAT OUTPUT ───
+            outputWriter.println(s"\n${"=" * 120}")
+            outputWriter.println("DIAGNOSE_MAT VALIDATION (Full Quality of Fit Metrics)")
+            outputWriter.println("=" * 120)
+            cfor(0, nSensors) { s =>
+                val flowQof  = TestFit.diagnose_mat(pemsFlow(s), simFlow(s))
+                val speedQof = TestFit.diagnose_mat(pemsSpeed(s), simSpeed(s))
+                
+                outputWriter.println(s"\n--- Sensor ${s + 1} - Flow Quality of Fit ---")
+                outputWriter.println(Fit.showFitMap(flowQof))
+                
+                outputWriter.println(s"\n--- Sensor ${s + 1} - Speed Quality of Fit ---")
+                outputWriter.println(Fit.showFitMap(speedQof))
+            }
+            
+            // ─── Compute overall fitness (average NRMSE) for summary ───
+            var totalCountNRMSE = 0.0
+            var totalSpeedNRMSE = 0.0
+            cfor(0, nSensors) { s =>
+                val flowQof  = TestFit.diagnose_mat(pemsFlow(s), simFlow(s))
+                val speedQof = TestFit.diagnose_mat(pemsSpeed(s), simSpeed(s))
+                totalCountNRMSE += flowQof(9).mean   // NRMSE index
+                println(s"totalCountNRMSE: $totalCountNRMSE")
+                totalSpeedNRMSE += speedQof(9).mean  //
+                println(s"totalSpeedNRMSE: $totalSpeedNRMSE")
+            }
+            val fitness = (0.5 * (totalCountNRMSE / 5.0)) + (0.5 * (totalSpeedNRMSE / 5.0))
+            println(s"fitness: $fitness")
+
+            outputWriter.println(s"\n average_totalSpeedNRMSE: $totalSpeedNRMSE ; average_totalFlowNRMSE: $totalCountNRMSE OVERALL FITNESS: $fitness")
+        end if
+    end for
+    
+    outputWriter.println(s"\n${"=" * 140}")
+    outputWriter.println("END OF OFFLINE ANALYSIS")
+    outputWriter.println(s"${"=" * 140}")
+    outputWriter.flush()
+    outputWriter.close()
+    
+    println(s"\nOffline analysis complete!")
+    println(s"Results written to: log/experiments/offline_analysis_summary.txt")
+    
+end analyzeAllExperiments

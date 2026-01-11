@@ -1,0 +1,21 @@
+Experiment: poisson_rk2
+Integrator: RK2
+Arrival: Poisson
+Parameters: VectorD(5.00000,	4.00000,	-2.00000,	3.00000,	0.500000)
+Start Time: 2026-01-07T02:19:21.697094600
+============================================================
+Sensor 0: CountNRMSE=0.0788, SpeedNRMSE=0.2341, CountSMAPE=6.46, SpeedSMAPE=21.30, CountR²=0.8659, SpeedR²=0.5676
+Sensor 1: CountNRMSE=0.0962, SpeedNRMSE=0.2405, CountSMAPE=7.67, SpeedSMAPE=20.62, CountR²=0.7783, SpeedR²=0.5378
+Sensor 2: CountNRMSE=0.1088, SpeedNRMSE=0.2418, CountSMAPE=8.88, SpeedSMAPE=19.42, CountR²=0.7137, SpeedR²=0.4708
+Sensor 3: CountNRMSE=0.1175, SpeedNRMSE=0.2543, CountSMAPE=9.50, SpeedSMAPE=18.45, CountR²=0.6674, SpeedR²=0.3793
+Sensor 4: CountNRMSE=0.1258, SpeedNRMSE=0.2560, CountSMAPE=10.11, SpeedSMAPE=14.01, CountR²=0.6452, SpeedR²=0.3078
+============================================================
+Avg Count NRMSE: 0.105413
+Avg Speed NRMSE: 0.245348
+Avg Count SMAPE: 8.5246
+Avg Speed SMAPE: 18.7628
+Avg Count R²: 0.7341
+Avg Speed R²: 0.4527
+FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): 0.175381
+End Time: 2026-01-07T03:08:03.567654600
+Duration: 2921.87 seconds

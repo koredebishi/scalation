@@ -244,7 +244,7 @@ object DormandPrince
             else if h < hmin then go = false // step size too small
 
             if y.mag > ovf then flaw("integrate2", s"probable overflow since y = $y")
-            if n % 100 == 0 then println(s"integrate2: step $n: tn = $tn, y = $y")
+            // if n % 100 == 0 then println(s"integrate2: step $n: tn = $tn, y = $y")  // commented for batch runs
         } // cfor
         y                       // the value of the function at time t, y = f(t)
     end integrateVV

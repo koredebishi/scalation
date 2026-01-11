@@ -130,6 +130,23 @@ end RungeKutta2
  */
 object RungeKutta2:
 
+    // Compute y(t) using Forward Euler Integrator (1st order).
+    // Simplest explicit method - what SUMO uses
+
+    val euler = new RungeKutta2 ("euler",
+                  a = MatrixD.low (1) (),
+                  b = VectorD (1.0),
+                  c = VectorD (0.0))
+
+    // Compute y(t) using Heun's Method (2nd order).
+    // Explicit Trapezoidal - recommended by Treiber & Kanagaraj (2015)
+    // for car-following models
+
+    val heun = new RungeKutta2 ("heun",
+                  a = MatrixD.low (2) (1.0),
+                  b = VectorD (0.5, 0.5),
+                  c = VectorD (0.0, 1.0))
+
     // Compute y(t) using a 2nd-order Runge-Kutta Integrator (RK2).
     // Modified Euler (Explicit Midpoint) method
 

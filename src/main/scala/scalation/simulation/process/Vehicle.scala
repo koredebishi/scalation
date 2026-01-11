@@ -175,10 +175,10 @@ object Vehicle:
      *  @param Ft     the "original" function value at time t
      *  @param ft     the "derivative" function value at time t
      *  @param ft_rt  the "derivative" function value at time t - rt
-     *  @param rt     the time difference (reaction time)
+     *  @param rt     the time difference (reaction time)   // it's a 5th order Runge-Kutta method like D
      *
      *  FIX - integrate into Dynamics package
-                      //     */
+    */
 
     def butcher(Ft: Double, ft: Double, ft_rt: Double, rt: Double): Double =
         val _1_by_90 = 1.0 / 90.0
@@ -191,7 +191,6 @@ object Vehicle:
         val k6 = ft
 
         Ft + _1_by_90 * (7 * k1 + 32 * k3 + 12 * k4 + 32 * k5 + 7 * k6) * rt
-
     end butcher
 
 end Vehicle

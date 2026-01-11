@@ -494,7 +494,7 @@ end TrafficConfigTest2
  */
 @main def plotSensorComparison(): Unit =
     // Uncomment the sensor pair you want to analyze:
-    analyzeSensorComparison(4, 4)  // PEMS Sensor1 vs Sim Sensor1 (default)
+    analyzeSensorComparison(5, 5)  // PEMS Sensor1 vs Sim Sensor1 (default)
     // analyzeSensorComparison(1, 5)  // PEMS Sensor1 vs Sim Sensor5
     // analyzeSensorComparison(5, 5)  // PEMS Sensor5 vs Sim Sensor5
     // analyzeSensorComparison(2, 2)  // PEMS Sensor2 vs Sim Sensor2
@@ -539,7 +539,7 @@ def analyzeSensorComparison(pemsSensorIdx: Int, simSensorIdx: Int): Unit =
     // ─── Load Data ───
     //val simResult = "C:/Simulation/scalation_2.0/log/recorder/resultShifted_parameters_changed.csv"
     //val simResult = "C:/Simulation/scalation_2.0/log/recorder/simulation_output_IDM.csv"
-    val simResult = "C:/Simulation/scalation_2.0/log/recorder/simulation_output.csv"
+    val simResult = "C:/Simulation/scalation_2.0/log/experiments/optimized_run/erlang2s_ballistic_data.csv"
     //val simResult = "C:/Simulation/scalation_2.0/log/recorder/simulation_output_gipps_butcher.csv"
     val simData  = MatrixD.load(simResult, skip = 1, fullPath = true)
     val pemsData = MatrixD.load(pemsFile)
