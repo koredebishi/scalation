@@ -1,0 +1,188 @@
+% =============================================================================
+% MICRO-LEVEL VALIDATION TABLE (Lane-by-Lane)
+% Best Configuration: Ballistic + Erlang2S
+% Headers: MAE, RMSE, Mean, NRMSE*100, SMAPE
+% NRMSE*100 = (RMSE / Mean) × 100
+% =============================================================================
+\begin{tabular}{cc|ccccc|ccccc}
+    \hline
+     &  & \multicolumn{5}{c|}{\textbf{\large FLOW} (veh/15-min)}
+         & \multicolumn{5}{c}{\textbf{\large SPEED} (m/s)} \\
+    \cline{3-12}
+    \textbf{Sensor} & \textbf{Lane}
+    & \textbf{MAE} & \textbf{RMSE} & \textbf{Mean} & \textbf{NRMSE*100} & \textbf{SMAPE}
+    & \textbf{MAE} & \textbf{RMSE} & \textbf{Mean} & \textbf{NRMSE*100} & \textbf{SMAPE} \\
+    \hline
+    1 & 1 & 7.6 & 11.7 & 201.35 & 5.81 & 4.8 & 2.5 & 3.6 & 28.67 & 12.56 & 13.3 \\
+      & 2 & 10.1 & 15.3 & 410.71 & 3.73 & 2.5 & 4.4 & 4.8 & 23.40 & 20.51 & 22.9 \\
+      & 3 & 9.5 & 12.7 & 319.88 & 3.97 & 3.0 & 3.5 & 3.8 & 22.40 & 16.96 & 19.6 \\
+      & 4 & 7.0 & 9.2 & 236.85 & 3.88 & 3.1 & 2.8 & 3.2 & 20.71 & 15.45 & 17.7 \\
+    \hline
+    2 & 1 & 10.8 & 15.1 & 210.10 & 7.19 & 6.0 & 2.7 & 3.9 & 29.19 & 13.36 & 13.7 \\
+      & 2 & 14.3 & 19.4 & 417.92 & 4.64 & 3.6 & 4.4 & 4.7 & 25.01 & 18.79 & 22.6 \\
+      & 3 & 24.3 & 28.7 & 345.58 & 8.30 & 7.3 & 3.8 & 4.2 & 18.67 & 22.50 & 21.3 \\
+      & 4 & 11.5 & 15.0 & 283.31 & 5.29 & 4.1 & 3.6 & 4.0 & 23.05 & 17.35 & 23.8 \\
+    \hline
+    3 & 1 & 15.4 & 18.4 & 216.35 & 8.50 & 8.7 & 2.2 & 3.2 & 27.27 & 11.73 & 11.1 \\
+      & 2 & 22.6 & 26.6 & 431.71 & 6.16 & 5.5 & 4.5 & 4.6 & 25.94 & 17.73 & 22.6 \\
+      & 3 & 25.1 & 28.3 & 346.54 & 8.17 & 7.6 & 3.7 & 4.0 & 21.31 & 18.77 & 20.5 \\
+      & 4 & 21.8 & 24.8 & 270.15 & 9.18 & 7.8 & 3.3 & 3.9 & 18.34 & 21.26 & 20.7 \\
+    \hline
+    4 & 1 & 18.6 & 22.7 & 220.17 & 10.31 & 9.8 & 2.4 & 3.6 & 28.90 & 12.46 & 12.2 \\
+      & 2 & 26.9 & 31.6 & 437.67 & 7.22 & 6.5 & 5.0 & 5.2 & 24.71 & 21.05 & 24.9 \\
+      & 3 & 28.4 & 31.5 & 349.21 & 9.02 & 8.6 & 3.7 & 4.4 & 23.69 & 18.57 & 20.8 \\
+      & 4 & 24.9 & 28.1 & 236.85 & 11.86 & 8.4 & 2.2 & 2.6 & 21.26 & 12.23 & 13.1 \\
+    \hline
+    5 & 1 & 18.3 & 22.7 & 220.00 & 10.32 & 10.0 & 1.8 & 2.7 & 25.99 & 10.39 & 7.6 \\
+      & 2 & 29.8 & 35.0 & 438.52 & 7.98 & 7.1 & 3.8 & 4.4 & 25.74 & 17.09 & 19.1 \\
+      & 3 & 25.7 & 28.9 & 345.81 & 8.36 & 7.8 & 2.6 & 3.8 & 23.31 & 16.30 & 14.7 \\
+      & 4 & 33.6 & 36.7 & 275.77 & 13.31 & 11.5 & 2.1 & 3.1 & 20.82 & 14.89 & 12.7 \\
+    \hline
+\end{tabular}
+
+
+
+
+
+
+	201.35	28.6731456
+	410.71	23.3980736
+	319.88	22.4011744
+	236.85	20.7068928
+	1168.79
+	210.1	29.191712
+	417.92	25.0074176
+	345.58	18.6683904
+	283.31	23.0493824
+88.12	1256.91
+	216.35	27.26944
+	431.71	25.9417312
+	346.54	21.3148672
+	270.15	18.3420512
+7.84	1264.75
+	220.17	28.8966656
+	437.67	24.7079008
+	349.21	23.69312
+	284.9	21.256752
+27.2	1291.95
+	220	25.9864352
+	438.52	25.7405632
+	345.81	23.3086656
+	275.77	20.8186528
+-11.85	1280.1
+
+
+
+=======================================================
+
+
+
+% =============================================================================
+% MACRO-LEVEL VALIDATION TABLES (Sensor Aggregates)
+% Best Configuration: Ballistic + Erlang2S
+% =============================================================================
+\begin{table}[H]
+    \centering
+    \caption{Macro-Level Validation: Sensor Aggregates (Ballistic + Erlang2S)}
+    \label{tab:macro-validation}
+    \scriptsize
+    \setlength{\tabcolsep}{6pt}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \textbf{(a) Flow (vehicles/15-min)}\\[0.5em]
+        \begin{tabular}{crrrrr}
+            \hline
+            \textbf{Sensor} & \textbf{MAE} & \textbf{RMSE} & \textbf{Mean} & \textbf{NRMSE*100} & \textbf{SMAPE} \\
+            \hline
+            1 & 8.53 & 12.24 & 1168.79 & 1.05 & 3.36 \\
+            2 & 15.23 & 19.55 & 1256.92 & 1.56 & 5.26 \\
+            3 & 21.22 & 24.52 & 1264.75 & 1.94 & 7.40 \\
+            4 & 24.68 & 28.47 & 1291.94 & 2.20 & 8.31 \\
+            5 & 26.85 & 30.82 & 1280.10 & 2.41 & 9.08 \\
+            \hline
+            \textbf{Avg} & 19.30 & 23.12 & 1252.50 & \textbf{1.83} & 6.68 \\
+            \hline
+        \end{tabular}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \textbf{(b) Speed (m/s)}\\[0.5em]
+        \begin{tabular}{crrrrr}
+            \hline
+            \textbf{Sensor} & \textbf{MAE} & \textbf{RMSE} & \textbf{Mean} & \textbf{NRMSE*100} & \textbf{SMAPE} \\
+            \hline
+            1 & 3.28 & 3.85 & 23.79 & 16.16 & 18.38 \\
+            2 & 3.61 & 4.20 & 24.03 & 17.48 & 20.33 \\
+            3 & 3.43 & 3.92 & 24.37 & 16.08 & 18.73 \\
+            4 & 3.31 & 3.92 & 24.64 & 15.90 & 17.73 \\
+            5 & 2.56 & 3.51 & 25.33 & 13.87 & 13.53 \\
+            \hline
+            \textbf{Avg} & 3.24 & 3.88 & 24.43 & \textbf{15.90} & 17.74 \\
+            \hline
+        \end{tabular}
+    \end{minipage}
+    \vspace{0.2em}
+    \begin{flushleft}
+        \centering
+        \footnotesize
+        \textit{Note:} Fitness $= 0.5 \times 1.83 + 0.5 \times 15.90 = 8.87$
+    \end{flushleft}
+\end{table}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{assets/fig2_macro_validation.pdf}
+    \vspace{-2.9em}
+    \caption{Macro-level flow validation: observed (PeMS) vs. simulated (Ballistic + Erlang2S) at five mainline sensors. 15-minute intervals, 6:00 AM to 6:00 PM.}
+    \label{fig:macro-validation}
+\end{figure}e
+
+
+
+Sensor  	   Flow R²   	   Flow SMAPE     	Flow RMSE  	Mean	    Flow NRMSE   	  Speed R²  	   Speed SMAPE  	  Speed RMSE    	Mean Speed	 Speed NRMSE
+1.00	0.9549	3.36	12.24	1168.79	1.047236886	0.6519	18.38	3.85	23.79	16.17999103
+2.00	0.8697	5.26	19.55	1256.91	1.555401739	0.5399	20.33	4.2	23.98	17.51516112
+3.00	0.8258	7.4	   24.52	1264.75	1.938723068	0.4985	18.73	3.92	23.22	16.88416341
+4.00	0.7787	8.31	28.47	1291.95	2.203645652	0.4079	17.73	3.92	24.64	15.90998869
+5.00	0.7543	9.08	30.82	1280.1	2.407624404	0.3249	13.53	3.51	23.96	14.64722766
+
+
+
+====================================================================================================================================================================================
+MACRO-LEVEL VALIDATION (Sensor Aggregates)
+====================================================================================================================================================================================
+Sensor   Flow MAE     Flow RMSE    Flow Mean    Flow NRMSE*100   Flow SMAPE     Speed MAE    Speed RMSE   Speed Mean   Speed NRMSE*100  Speed SMAPE
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1        8.53         12.24        1168.79      1.05             3.36           3.28         3.85         23.79        16.16            18.38
+2        15.23        19.55        1256.92      1.56             5.26           3.61         4.20         24.03        17.48            20.33
+3        21.22        24.52        1264.75      1.94             7.40           3.43         3.92         24.37        16.08            18.73
+4        24.68        28.47        1291.94      2.20             8.31           3.31         3.92         24.64        15.90            17.73
+5        26.85        30.82        1280.10      2.41             9.08           2.56         3.51         25.33        13.87            13.53
+====================================================================================================================================================================================
+
+
+
+
+
+
+
+
+
+\subsection{Shifted Erlang-2 Arrivals}
+
+Once vehicle dynamics were integrated using \textbf{Algorithm~1}, the remaining challenge was generating vehicle arrivals at realistic inter-arrival rates. Vehicle arrivals are commonly modeled using exponential inter-arrival times, corresponding to a Poisson process \cite{law2007simulation}. However, exponential distributions permit arbitrarily small headways, which is physically unrealistic due to finite vehicle length and driver reaction constraints.
+
+Shifted headway distributions address this limitation by enforcing a minimum inter-arrival time \cite{cowan1975useful}. Following this approach, we employ a shifted Erlang-2 distribution, which preserves the smoothness of the Erlang family while enforcing a hard lower bound on headway.
+
+\textbf{Variate generation.} Let $U_1, U_2 \sim \text{Uniform}(0,1)$ be independent uniform variates, $\mu > 0$ the exponential stage mean, and $\tau > 0$ the minimum headway. An Erlang-2 variable is the sum of two exponentials: $X = E_1 + E_2$ with $E_i = -\mu \ln(U_i)$, giving $X = -\mu \ln(U_1 U_2)$. Adding the shift $\tau$ yields the headway:
+\begin{equation}
+\label{eq:erlang-variate}
+Y = \tau - \mu \ln(U_1 U_2), \quad \text{with mean } \mathbb{E}[Y] = \tau + 2\mu.
+\end{equation}
+
+\textbf{Data-driven parameterization.}
+The mean inter-arrival time for lane $\ell$ during interval $t$ is $\bar{\mu}_{\ell,t} = \Delta T / N_{\ell,t}$, where $\Delta T = 900$ seconds and $N_{\ell,t}$ is the observed count. Setting $\mathbb{E}[Y] = \bar{\mu}_{\ell,t}$ and solving:
+\begin{equation}
+\label{eq:erlang-param}
+\mu = \frac{\bar{\mu}_{\ell,t} - \tau}{2}.
+\end{equation}

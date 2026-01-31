@@ -28,7 +28,6 @@
 \usepackage{placeins}
 \usepackage{float}
 
-
 %****************************************************************************
 
 %
@@ -162,7 +161,9 @@
 %               Please list ALL authors using last name only, separate by a comma except
 %               for the last author, separate with "and"
 %
-    \SCSpagesetup{Bishi, Bowman, and Miller}
+%\SCSpagesetup{Bishi, Bowman, and Miller}
+
+    \SCSpagesetup{Anonymous}
 
 % AUTHOR: Uncomment ONE of these correct conference names.
     \def\SCSconferencename{Annual Modeling and Simulation Conference}
@@ -187,301 +188,185 @@
     \def\SCSconferencevenue{University of Central Florida, Orlando, Florida, USA}
 
 % AUTHOR: Enter the title, all letters in upper case
-    \title{HIGHER-ORDER IDM INTEGRATION FOR MICROSCOPIC TRAFFIC SIMULATION: A DORMAN-PRINCE APPROACH WITH MULTI-SCALE VALIDATION}
+    \title{LANE-LEVEL VALIDATION OF MICROSCOPIC TRAFFIC SIMULATION: A DATA DRIVEN ARRIVAL APPROACH}
 
-% AUTHOR: Enter the authors of the article
-    \author[\authorrefmark{1}]{Korede R. Bishi}
-    \author[\authorrefmark{2}]{Casey Bowman}
-    \author[\authorrefmark{1}]{John A. Miller}
-
-% Department and university with the mark
-    \affil[\authorrefmark{1}]{Simulation, Modeling and Analytics Lab, School of Computing, University of Georgia, USA}
-% Do NOT include emails in the title section. They will appear in the author biography
-
-    \affil[\authorrefmark{2}]{The Department of Mathematics, rUniversity of North Georgia, USA}
-
-% \affil[\authorrefmark{3}]{Simulation, Modeling and Analytics Lab, School of Computing, University of Georgia, USA}
+    \author{Anonymous Author(s)}
 
     \maketitle
-
     \section*{Abstract}
-    Traffic flow modeling is an essential part of civil planning around the world, and traffic simulation is an important component of the analysis city planners must do to ensure safe and efficient road networks for their citizens.
-    This work seeks to improve the accuracy and efficiency of traffic flow simulation models through improved vehicle arrival modeling, and a balanced approach to numerically solving the car-following equations.
-    The shifted Erlang distribution solves several important problems in arrival modeling, but is not a computationally expensive method.
-    Multiple numerical integrators were applied and compared to determine the trade-offs between accuracy and efficiency when solving the car-following model.
+    Traffic flow modeling is an essential part of civil planning around the world, and traffic simulation is an
+    important component of the analyses that city planners must perform to ensure safe and efficient road networks for
+    their citizens. This work advances microscopic traffic simulation through lane‑level validation of speed and flow
+    dynamics, addressing a critical gap in conventional macro‑aggregated approaches. We systematically evaluate the
+    trade‑offs between numerical integration methods and vehicle arrival processes when reproducing empirical trajectory
+    data from California’s freeway network. Results demonstrate that numerical‑integrator choice has negligible impact
+    on simulation accuracy, with less than one percent variation across eight methods, while vehicle arrival‑process modeling substantially affects fidelity. The shifted Erlang‑2 distribution reduces flow‑prediction error by approximately
+    28\% compared to Poisson processes by enforcing a realistic minimum headway. Lane‑level validation across five
+    detector stations reveals lane‑specific dynamics that aggregated metrics often obscure.
 
+    \textbf{Keywords: }{Lane-level validation, Vehicle headway distribution, Numerical integration, Loop detector data, Arrival process}
 
-
-    \textbf{Keywords:} microscopic traffic simulation, Intelligent Driver Model, Dormand-Prince integration, interval lane-wise speed and flow matching, PeMS validation
 %% AUTHOR:
 % This is a list of no more than five keywords that will identify your paper in indices and databases (required).
 % Do not use the words “computer”, “simulation”, “model”, or “modeling”, since these are all assumed.
 
     \section{Introduction}
     \label{sec:intro}
-
-
-
-    Every day, citizens of large cities around the world are forced to struggle with inefficient and unsafe traffic conditions.
-    There continues to be a need for traffic analysis that can improve the safety and efficiency of the highway and suburban roads that carry the many millions of commuters to work each day.
-    This analysis can benefit greatly from accurate simulation models.
-    While other algorithms such as deep learning networks can help solve problems related to current data, an accurate simulation model is much better suited to answer what-if questions such as the effect of physical changes to the road, or how to deal with major disruptions to traffic flow from, for example, natural disasters.
+    Every day, citizens in large cities around the world struggle with inefficient and unsafe traffic conditions.
+    There remains a need for traffic analysis that can improve the safety and efficiency of highways and suburban roads that carry millions of commuters to work each day. Such analysis can benefit greatly from accurate simulation models. Accurate simulation models are well suited to answer what‑if questions, such as the effect of physical changes to the road or how to handle major disruptions to traffic flow.
 
     The accuracy of traffic simulation models depends on several components of the model.
-    One of the primary concerns is the development of an accurate vehicle arrival model, and in this work we highlight how the use of a shifted Erlang distribution improves on other arrival models.
-    Car-following models are systems of differential equations which require numerical solvers to compute updates to the vehicles’ speeds and positions.  In this work we offer several possible solutions that exist along a spectrum of trade-offs between model accuracy and computational efficiency.
+    One primary concern is developing an accurate vehicle‑arrival model. In this work, we highlight how the use of a shifted Erlang distribution improves on other arrival models \cite{cowan1975useful, li2017vehicle}.
+    Car‑following models are systems of differential equations that require numerical solvers to compute updates to vehicle speeds and positions. In this work, we offer several solutions that span a spectrum of trade‑offs - between model accuracy and computational efficiency \cite{treiber2015comparing, pvrikryl2017comparing}.
 
-    Our investigation yields three key findings. First, we demonstrate that the choice of numerical integrator has negligible impact on simulation accuracy for microscopic discrete-event traffic simulation using car-following models. We evaluated eight numerical solvers ranging from simple ballistic kinematics to higher-order Runge-Kutta methods; for clarity, we focus our discussion on five representative solvers, with complete results for all eight provided in Appendix~\ref{app:full-results}. Across all integrators, the variation in goodness-of-fit metrics remained below 1\%, indicating that computational resources spent on sophisticated numerical methods yield no meaningful improvement in prediction accuracy. Consequently, the simplest and fastest method ballistic integration is recommended for microscopic traffic simulation which surprisingly still held true from \cite{treiber2015comparing, pvrikryl2017comparing}
-    Second, we find that the choice of vehicle arrival process has a substantially greater effect on simulation fidelity than the numerical integration scheme. Specifically, the shifted Erlang-2 (Erlang2S) arrival distribution improved overall fitness by 10.7\% compared to the best-performing Poisson-based configuration. This improvement was consistent across all numerical integrator choices, suggesting that researchers should prioritize arrival process modeling over numerical solver selection.
+    Our investigation yields three key findings:
+    First, we demonstrate that the choice of numerical integrator has negligible impact on the simulation accuracy for microscopic discrete‑event traffic simulation using car‑following models. We evaluated eight numerical solvers, ranging from simple ballistic kinematics to higher‑order Runge‑Kutta methods. Across all integrators, the variation in the goodness‑of‑fit metrics remained below one-percent, indicating that increasing numerical sophistication provides little benefit in prediction accuracy. These findings are consistent with prior comparative studies \cite{treiber2015comparing, pvrikryl2017comparing}.
 
-    Third, we validate our simulation against empirical trajectory data from the California Performance Measurement System (PeMS), using observations from five mainline loop detectors across a four-lane freeway segment, supplemented by two on-ramp detector stations. All experiments were conducted using ScalaTion 2.0, an open-source simulation, modeling, and analytics testbed developed at the University of Georgia.
+    Second, we find that the choice of vehicle‑arrival process has a substantially greater effect on simulation fidelity
+    than the numerical‑integration scheme. Specifically, the shifted Erlang‑2 (Erlang2S) arrival distribution reduces overall error compared to the best‑performing Poisson‑based configuration. This improvement was consistent across all numerical‑integrator choices, highlighting the relative importance of arrival‑process modeling.
 
-
-
-
-
+    Third, we validate our simulation against empirical trajectory data from the California Performance Measurement System (PeMS), using observations from five mainline loop detectors across a four‑lane freeway segment, supplemented by two on‑ramp detector stations.
 %and its Microsoft Word companion.
 %This document was typeset using \texttt{pdflatex}.
+
+
 
     \section{RELATED WORK}
     \label{sec:related}
     \subsection{Car-following Models}
-
-    Microscopic traffic simulation relies on the use of car-following models to describe the behavior of vehicles as they follow one another in traffic.
-    There have been numerous models proposed, which can fall into any of several broad categories including stimulus-response models, optimal velocity models, collision-avoidance models, continuous-time models, psycho-physical models, and cellular-automaton models.
-    A comprehensive genealogy of the evolution of car-following models was presented by \cite{van2015genealogy}.
-
-    A continuous-time model which is the most widely used CF model today is the Intelligent Driver Model (IDM) \cite{treiber2000congested}.
-    It has performed well in comparative studies such as \cite{zhang2021comprehensive} and \cite{pourabdollah2017calibration} which both found that the IDM outperforms other popular car-following models.
-    Other
+    Microscopic traffic simulation relies on car‑following models to describe the behavior of vehicles as they follow
+    one another in traffic. Numerous models have been proposed, falling into several broad categories, including
+    stimulus‑response models, optimal‑velocity models, collision‑avoidance models, continuous‑time models,
+    psycho‑physical models, and cellular‑automaton models. The most widely used continuous‑time car-following model today is the Intelligent
+    Driver Model (IDM) \cite{treiber2000congested}, which has been shown to outperform other popular car‑following models in comparative studies.
 
     \subsection{Numerical Integration in Traffic Simulation}
-
-    Car-following models typically provide a formula to calculate either the new acceleration or new velocity of each vehicle in the traffic system.
-    This calculation is usually based on the relative distances, speeds, and accelerations of the vehicle in focus and the vehicle it is immediately following.
-    When the model calculates a new acceleration for a vehicle a numerical integrator must be used to solve the differential equation and calculate first the new velocity, and then the distance traveled.
-    Many numerical integrators have been used in the past, with the key consideration being a balance between accuracy and computational efficiency.
-    Treiber and Kanagaraj compare Euler's Method, Heun's (Trapezoidal) Method, a fourth-order Runge-Kutta (RK4) method, and an update method based on Newtonian ballistics \cite{treiber2015comparing}.
-    They find that the ballistic update method performs well in all cases, and particularly when dealing with stop and start traffic and lane changing.
-    P\v{r}ikryl and Vani\v{s} had similar results, though found Euler's method to perform somewhat more strongly \cite{pvrikryl2017comparing}.
-    Both studies found that the ballistic update based on simple Newtonian equations performs both more accurately and more efficiently than other methods.
-
-
+    Car‑following models typically provide a formula to calculate either the new acceleration or velocity of each
+    vehicle in the traffic system. This calculation is usually based on the relative distances, speeds, and
+    accelerations of the vehicle in focus and its immediate leader. When the model calculates a new acceleration for a
+    vehicle, a numerical integrator must solve the differential equation to compute first the new velocity and then the
+    distance traveled. Many numerical integrators have been used, with the key consideration being a balance between
+    accuracy and computational efficiency. Treiber and Kanagaraj compare Euler’s Method, Heun’s (Trapezoidal) Method, a
+    fourth‑order Runge‑Kutta (RK4) method, and an update method based on Newtonian ballistics
+    \cite{treiber2015comparing}. They find that the ballistic update method performs well in all cases, particularly
+    when dealing with stop‑and‑start traffic and lane changing. P\v{r}ikryl and Vani\v{s} reported similar results,
+    though found Euler’s method to perform somewhat more strongly \cite{pvrikryl2017comparing}. Both studies found that
+    the ballistic update based on simple Newtonian equations performs more accurately and more efficiently than other
+    methods.
     \subsection{Arrival Processes}
+    Proper modeling of vehicle headways is essential in traffic simulation. Vehicles must enter the simulation horizon
+    in a realistic manner. Poisson distributions are still used extensively; however, they have been shown to be inappropriate in complex traffic scenarios with multiple busy periods of varying intensities \cite{meng2009self}.
+    Other models have been proposed for these scenarios, including those based on the gamma distribution or closely
+    related distributions such as the Erlang and Pearson families \cite{li2017vehicle}. Various comparative studies of
+    different headway models include Li and Chen \cite{li2017vehicle}, Roy and Saha \cite{roy2018headway}, and Singh et
+    al. \cite{singh2020multivariate}.
 
-    Proper modeling of vehicle headways is an essential aspect of traffic simulation.
-    Vehicles must arrive to the simulation horizon in a realistic manner.
-    Poisson distributions are still used extensively however it has been shown that they are inappropriate in complex traffic scenarios with multiple busy periods of different intensities \cite{meng2009self}.
-    Other models have been proposed for these scenarios including models based on the gamma distribution, or closely related distributions such as the Erlang and Pearson families of distributions \cite{li2017vehicle}.
-    There have been various comparative studies of different headway models including Li and Chen \cite{li2017vehicle}, Roy and Saha \cite{roy2018headway}, and Singh et al. \cite{singh2020multivariate}.
+    \subsection{Lane-Level Validation}
+    Vehicle‑arrival processes and car‑following models have been widely studied in the
+    traffic‑simulation literature; however, validation is most often performed using aggregated flow
+    measures, as illustrated in \cite{11118854}. While such approaches provide useful corridor‑level insights, they can obscure lane‑specific speed and flow dynamics. Our work differs from \cite{11118854} in three key aspects: consideration of numerical‑integrator choice, explicit arrival‑process modeling, and systematic lane‑level validation of both speed and flow. Specifically, \cite{11118854} focuses on a single bottleneck loop detector and evaluates lane‑wise speed and flow using two car‑following models.
 
-    \subsection{Calibration Methods}
+    In contrast, we perform lane‑level validation across five detector stations with two on‑ramp merge locations, reporting speed and flow dynamics for all lanes at regular time intervals. To our knowledge, no prior work has conducted a comprehensive lane‑level analysis of microscopic simulation accuracy across multiple detector stations and lanes, reporting lane‑specific speed and flow dynamics at this spatial and temporal granularity.
+
+
 
     \section{Methodology}
     \label{sec:methodology}
-    Our aim in this work is to design a simulation setup that reports not only macro-level validation metrics, but also micro-level vehicle dynamics at fixed temporal intervals. Achieving reliable micro-level accuracy requires
+    Our aim in this work is to design a simulation setup that reports not only macro-level validation metrics but also micro-level vehicle dynamics at fixed temporal intervals. Achieving reliable micro-level accuracy requires
     a car-following model whose acceleration formulation responds smoothly to changes in speed, spacing, and relative velocity.
 
-    For this reason, we adopt the Intelligent Driver Model (IDM) \cite{treiber2000congested}. IDM defines acceleration as a continuous function of the current velocity, net distance gap, and approach rate, allowing it to capture gradual transitions between free-flow, following, and braking regimes. As emphasized in the original formulation \cite{treiber2000congested}, this structure enables realistic representation of congestion formation and recovery through smooth acceleration dynamics rather than hard constraints.
+    For this reason, we adopt the Intelligent Driver Model (IDM) \cite{treiber2000congested}. IDM defines acceleration as a continuous function of the current velocity, net distance gap, and approach rate, allowing it to capture gradual transitions between free-flow, following, and braking regimes. As emphasized in the original formulation \cite{treiber2000congested}, Unlike the Gipps model \cite{gipps1981behavioural}, which introduces abrupt acceleration and deceleration behavior in stop and go regime.
 
-    In early experiments, we evaluated the Gipps model \cite{gipps1981behavioural} as an alternative car-following formulation. While the Gipps model can reproduce stable macroscopic flow patterns under discrete-time updates, its rule-based safety constraints introduce abrupt acceleration and deceleration behavior. In our experiments, this resulted in persistent acceleration bottlenecks and limited recovery from shockwaves, particularly after strong braking events.
-
-    These limitations of rule-based car-following models in reproducing realistic congestion dynamics have also been discussed in comparative studies \cite{treiber2015comparing}. Consequently, we selected IDM as it provides a continuous acceleration profile that supports both micro-level trajectory fidelity and consistent macro-level validation.
-
-% \subsection{Intelligent Driver Model}
-% Since the acceleration computed in the The Intelligent Driver's models \cite{treiber2000congested} models a continuous snapshot of the \mathbf{delta}v, the gap between follower and leader vehicle, this according to \cite{treiber2000congested} is an interpolation of the tendency to accelerate with \mathbf{a} and a tendency to break with deceleration b.
+    For arrival processes, we experimented with two approaches: the Poisson process and Shifted Erlang‑2 arrivals.
 
     \subsection{Intelligent Driver Model}
 
     The Intelligent Driver Model (IDM) computes the longitudinal acceleration
-    $a_n$ of vehicle $n$ following a predecessor $p$ as \cite{treiber2000congested}:
+    $a_n$ of vehicle $n$ following a predecessor $p$ as shown in Equation~\eqref{eq:idm-accel}  \cite{treiber2000congested}:
 
     \begin{equation}
+        \label{eq:idm-accel}
         a_n = a_{\max} \left[
                            1 - \left( \frac{v_n}{v_{\max}} \right)^\delta
                            - \left( \frac{s^*(v_n, \Delta v)}{s_n} \right)^2
         \right],
     \end{equation}
-
     where $v_n$ is the velocity of vehicle $n$, $\Delta v = v_n - v_p$ is the
-    relative velocity to the leader, and $s_n$ is the net distance gap.
-    The desired dynamic gap $s^*$ is given by:
-
+    relative velocity to the leader, and $s_n$ is the bumper-to-bumper gap.
+    The model's target spacing $s^*$ is given by:
     \begin{equation}
+        \label{eq:idm-spacing}
         s^*(v_n, \Delta v) =
         s_0 + \max\!\left(0,\, v_n T + \frac{v_n \Delta v}{2\sqrt{a_{\max} b}} \right).
     \end{equation}
 
-    IDM behavior is sensitive to five parameters: minimum gap $s_0$, maximum acceleration $a_{\max}$, comfortable deceleration $b$, desired time headway $T$, and desired velocity $v_{\max}$. Small changes in these values particularly $T$ and $b$ can shift the model from free-flow to congested regimes. This sensitivity motivates our use of systematic calibration rather than literature defaults.
-
-    \subsection{The Integration Problem}
-    Accurate velocity trajectories are critical for micro-level validation because numerical integration errors propagate through vehicle positions, affect gap calculations, and accumulate in lane-level aggregated speed statistics. Using explicit Euler integration, introduces a local truncation error of $O(\Delta t)$ and performs poorly for nonlinear
-    car-following models.
-
-    \begin{equation}
-        x_n^{t+\Delta t} = x_n^t + v_n^t \cdot \Delta t,
-        \qquad
-        v_n^{t+\Delta t} = v_n^t + a_n^t \cdot \Delta t,
-    \end{equation}
-
-
-
-    Although higher-order schemes reduce truncation error in smooth systems, studies by  \cite{ treiber2015comparing, pvrikryl2017comparing} show that, for car-following models the practical accuracy
-    depends strongly on model smoothness, braking events, and step size selection.
-    In particular, fixed-step high-order methods do not universally outperform simpler
-    schemes when abrupt accelerations or decelerations occur.
-
-    To address this, we employ an adaptive Dormand–Prince (RK45) integrator, which dynamically
-    adjusts the step size based on local error estimates. This allows fine temporal resolution
-    during rapid braking or gap-closing events while maintaining efficiency during steady
-    cruising, yielding improved trajectory stability and micro-level speed accuracy in our
-    simulations.
+    The IDM's behavior is sensitive to five parameters: minimum gap $s_0$, maximum acceleration $a_{\max}$, comfortable deceleration $b$, desired time headway $T$, and desired velocity $v_{\max}$. Following Equation~\eqref{eq:idm-accel} and \eqref{eq:idm-spacing}, we set $s_0 = 5.0$ m, $a_{\max} = 4.0$ m/s$^2$, $b = 2.0$ m/s$^2$, $T = 3.0$ s, and $v_{\max}$ derived from California Department of Transportation \cite{caltran_pems} lane-level speed data.
 
     \subsection{Coupled ODE Formulation}
-    Standard discrete stepping treats position and velocity as separate updates. But IDM acceleration depends on both quantities simultaneously through the gap term $s_n = x_p - x_n$. As the vehicle moves, the gap changes, which changes the acceleration, which changes how the vehicle moves. This coupling is the source of truncation error amplification in Euler schemes.
-    To capture this coupling explicitly, we reformulate the vehicle state as a vector:
+    IDM acceleration depends on both position and velocity simultaneously: position determines the gap $s_n = x_p - x_n$, and velocity determines the approach rate $\Delta v = v_n - v_p$. To capture this coupling, we formulate the vehicle state as a vector (Equation~\eqref{eq:state-vector}):
     \begin{equation}
+        \label{eq:state-vector}
         \mathbf{y}_n = \begin{bmatrix} x_n \\ v_n \end{bmatrix}
     \end{equation}
+    At each simulation step, the state update is governed by a couple initial value problem (Equation~\eqref{eq:coupled-ode}):
+    \begin{equation}
+        \label{eq:coupled-ode}
+        \frac{d\mathbf{y}_n}{dt} = \begin{bmatrix} v_n \\ a_{\text{IDM}}(x_n, v_n; \tilde{x}_p, \tilde{v}_p) \end{bmatrix}
+    \end{equation}
+    where $(\tilde{x}_p, \tilde{v}_p)$ are the leader's state values, frozen at the start of each integration step, which we simulated using \textbf{Algorithm 1} in the
+    \textbf{Appendix}. $a_{\text{IDM}}$ is the IDM acceleration.
 
-    The dynamics become a coupled initial value problem:
+% \subsection{Shifted Erlang-2 Arrivals}
+% Once vehicle dynamics were integrated using \textbf{Algorithm~1}, the remaining challenge was generating vehicle arrivals at realistic inter-arrival rates. Vehicle arrivals are commonly modeled using exponential inter-arrival times, corresponding to a Poisson process \cite{law2007simulation}. However, exponential distributions permit arbitrarily small headways, which is physically unrealistic due to finite vehicle length and driver-reaction constraints.
 
+% Shifted headway distributions address this limitation by enforcing a minimum inter-arrival time \cite{cowan1975useful}. Following this approach, we employ a shifted Erlang-2 distribution, which preserves the smoothness of the Erlang family while enforcing a hard lower bound on headway.
+
+% Let $X \sim \text{Erlang-2}(\mu)$ and define the shifted headway as $Y = \tau + X$, where $\tau > 0$ represents the minimum feasible headway. Random variates are generated via Equation~\eqref{eq:erlang-variate}:
 % \begin{equation}
-% \frac{d\mathbf{y}}{dt} = \begin{bmatrix} v \\ a_{\text{IDM}}(x, v) \end{bmatrix}
+% \label{eq:erlang-variate}
+% Y = \tau - \mu \ln(U_1 U_2),
+% \end{equation}
+% with $U_1, U_2 \sim \text{Uniform}(0,1)$.
+% This expression ensures that the shifted Erlang-2 distribution has a mean inter-arrival time matching the empirically observed headway while enforcing the minimum gap $\tau$.
+
+% \textbf{Data-driven parameterization:}
+% The mean inter-arrival time for lane $\ell$ during interval $t$ is computed from flow data as $\bar{\mu}_{\ell,t} = \Delta T / N_{\ell,t}$, where $\Delta T = 900$ seconds and $N_{\ell,t}$ is the observed vehicle count. To match this empirical mean while enforcing the minimum headway, the Erlang stage parameter is set as (Equation~\eqref{eq:erlang-param}):
+% \begin{equation}
+% \label{eq:erlang-param}
+% \mu = \frac{\bar{\mu}_{\ell,t} - \tau}{2}.
 % \end{equation}
 
-% where $a_{\text{IDM}}$ is the acceleration from Equation (1). This formulation makes the coupling explicit: position evolves with velocity, and velocity evolves with acceleration that depends on both position and velocity.
-
-
-
-    \begin{equation}
-        \frac{d\mathbf{y}_n}{dt} = \begin{bmatrix} v_n \\ a_{\text{IDM}}(x_n, v_n; x_p, v_p) \end{bmatrix}
-    \end{equation}
-
-    where $(x_p, v_p)$ is the state of the preceding vehicle. This formulation makes the coupling explicit: position evolves with velocity, and velocity evolves with acceleration that depends on both position (through the gap $s_n = x_p - x_n$) and velocity (through the approach rate $\Delta v = v_n - v_p$).
-
-
-    \textbf{The leader state problem.} In continuous time, all vehicles evolve simultaneously. In discrete-event simulation, we update vehicles sequentially. A naive implementation would read the leader's current state during integration, but this state may have already been updated in the current timestep, breaking causality.
-
-    Our solution is to \textit{snapshot} the leader state at the beginning of each integration step:
-
-    \begin{equation}
-        \frac{d\mathbf{y}}{dt} = \begin{bmatrix} v \\ a_{\text{IDM}}(x, v; \tilde{x}_p, \tilde{v}_p) \end{bmatrix}
-    \end{equation}
-    where $(\tilde{x}_p, \tilde{v}_p)$ are frozen values. This approximation is physically justified: drivers respond to \textit{perceived} leader state, not instantaneous state. The reaction time $\tau$ inherently introduces a delay. For step sizes $\Delta t \approx \tau$, leader motion during integration is a second-order effect. The snapshot approach preserves discrete-event semantics while enabling higher-order integration within each step.
-
-    \subsection{Solving the Car-Following ODE}
-    The coupled formulation in Equation (6) defines a well-posed initial value problem. We solve it using numerical integration methods from the Runge-Kutta family, which follow the general form:
-
-    \begin{equation}
-        \mathbf{k}_i = \mathbf{f}\left( t_n + c_i h, \, \mathbf{y}_n + h \sum_{j=1}^{i-1} a_{ij} \mathbf{k}_j \right)
-    \end{equation}
-    where $\mathbf{f}$ is the right-hand side of Equation (7) and $c_i$, $a_{ij}$ are the Butcher tableau coefficients specific to each method. The final update combines all stage evaluations:
-    \begin{equation}
-        \mathbf{y}_{n+1} = \mathbf{y}_n + h \sum_{i=1}^{s} b_i \mathbf{k}_i
-    \end{equation}
-    where $s$ is the number of stages (ranging from 1 for Euler to 7 for Dormand-Prince).
-
-    The key insight is that each stage probes the IDM function at different trial positions and velocities, allowing the solver to capture the nonlinearity of the acceleration function across the step interval. Higher-order methods achieve smaller local truncation error $O(\Delta t^2)$ for Euler up to $O(\Delta t^5)$ for Dormand-Prince but require proportionally more function evaluations per step.
-
-    Throughout all stages, the snapshotted leader state $(\tilde{x}_p, \tilde{v}_p)$ from Equation (6) remains constant.\\
-    Algorithm 1 summarizes the complete per-vehicle update procedure.
-    \begin{algorithm}
-        \caption{Per-Vehicle IDM Update with Numerical Integration}
-        \begin{algorithmic}[1]
-            \Require vehicle $n$, segment length $L$, time step $\Delta t$, solver $\mathcal{S}$\footnotemark
-            \Ensure updated position $x_n$, velocity $v_n$
-            \State Snapshot leader state: $(\tilde{x}_p, \tilde{v}_p) \gets (x_p, v_p)$
-            \State Define ODE system: $d\mathbf{y}/dt = [v, a_{\text{IDM}}(x, v; \tilde{x}_p, \tilde{v}_p)]^T$
-            \State Set initial state: $\mathbf{y}_0 \gets [x_n, v_n]^T$
-            \State Solve: $\mathbf{y}_1 \gets \mathcal{S}.\text{integrate}(d\mathbf{y}/dt, \mathbf{y}_0, \Delta t)$
-            \State Extract: $x_{\text{new}} \gets \mathbf{y}_1[0]$, $v_{\text{new}} \gets \mathbf{y}_1[1]$
-            \State Clamp velocity: $v_{\text{new}} \gets \max(0, \min(v_{\text{new}}, v_{\max}))$
-            \State Update segment displacement: $\Delta x \gets x_{\text{new}} - x_n$; $\text{disp} \gets \min(\text{disp} + \Delta x, L)$
-            \State Update vehicle state: $x_n \gets x_{\text{new}}$, $v_n \gets v_{\text{new}}$
-        \end{algorithmic}
-    \end{algorithm}
-    \footnotetext{Solver $\mathcal{S} \in \{\text{Ballistic, Euler, Heun, RK2, RK3, RK4, DOPRI5}\}$. See Table~\ref{tab:integrator-comparison} for performance comparison.}
-
-
-
-% Runtime and Accuracy Comparison Table - VERIFIED 2026-01-09
-    \begin{table}[H]
-        \centering
-        \caption{Numerical Integrator Comparison: Runtime vs. Fitness (Erlang2S Arrival)}
-        \label{tab:integrator-comparison}
-        \begin{tabular}{lrrrr}
-            \hline
-            \textbf{Integrator} & \textbf{Duration (min)} & \textbf{Fitness} & \textbf{Flow R²} & \textbf{Speed R²} \\
-            \hline
-            Ballistic & \textbf{17.5} & \textbf{0.1567} & 0.8367 & 0.4846 \\
-            RK4       & 50.9 & 0.1572 & 0.8384 & 0.4795 \\
-            RK3       & 48.1 & 0.1574 & 0.8376 & 0.4782 \\
-            RK2       & 48.4 & 0.1575 & 0.8391 & 0.4764 \\
-            Heun      & 44.8 & 0.1578 & 0.8372 & 0.4752 \\
-            Euler     & 44.3 & 0.1579 & 0.8331 & 0.4778 \\
-            DOPRI5    & 51.1 & 0.1582 & 0.8341 & 0.4741 \\
-            \hline
-        \end{tabular}
-        \vspace{0.5em}
-        \begin{flushleft}
-            \footnotesize
-            \textit{Note:} Fitness $= 0.5 \times$ Flow\_NRMSE $+ 0.5 \times$ Speed\_NRMSE (lower is better). \\
-            Ballistic achieves best fitness while being 3$\times$ faster than other methods.
-        \end{flushleft}
-    \end{table}
-
-
     \subsection{Shifted Erlang-2 Arrivals}
-    Once vehicle dynamics were smoothly integrated by Algorithm 1, the remaining challenge was generating vehicle arrivals at realistic inter-arrival rates. Vehicle arrivals in traffic simulation are commonly modeled using exponential inter-arrival times, corresponding to a Poisson process \cite{law2007simulation}. However, exponential distributions allow arbitrarily small headways, including values approaching zero. This is physically unrealistic: vehicles have finite length and drivers require minimum spacing before the next vehicle can enter the roadway.
 
-    The concept of shifted headway distributions addresses this limitation by enforcing a minimum inter-arrival time \cite{cowan1975useful}. Various shifted and composite headway models have been proposed in the literature, as surveyed by \cite{li2017vehicle}. Following this approach, we define a shifted Erlang-2 distribution that combines the smoothness of the Erlang family with a hard lower bound on headways.
+    Once vehicle dynamics were integrated using \textbf{Algorithm~1}, the remaining challenge was generating vehicle arrivals at realistic inter-arrival rates. Vehicle arrivals are commonly modeled using exponential inter-arrival times, corresponding to a Poisson process \cite{law2007simulation}. However, exponential distributions permit arbitrarily small headways, which is physically unrealistic due to finite vehicle length and driver reaction constraints.
 
-    Let $X \sim \text{Erlang-2}(\mu)$ be the standard two-stage Erlang variate with stage rate $\lambda = 1/\mu$, giving $\mathbb{E}[X] = 2\mu$. We introduce a shift parameter $\tau > 0$ representing the minimum physically feasible headway:
+    Shifted headway distributions address this limitation by enforcing a minimum inter-arrival time \cite{cowan1975useful}. Following this approach, we employ a shifted Erlang-2 distribution, which preserves the smoothness of the Erlang family while enforcing a hard lower bound on headway.
 
+    \textbf{Variate generation.} Let $U_1, U_2 \sim \text{Uniform}(0,1)$ be independent uniform variates, $\mu > 0$ denote the mean of each exponential stage, and $\tau > 0$ the minimum headway. An Erlang-2 variable is the sum of two independent exponentials: $X = E_1 + E_2$, where each $E_i = -\mu \ln(U_i)$ via the logarithmic transformation. This gives $X = -\mu \ln(U_1 U_2)$. Adding the shift $\tau$ yields the headway:
     \begin{equation}
-        Y = \tau + X, \quad X \sim \text{Erlang-2}(\mu)
+        \label{eq:erlang-variate}
+        Y = \tau - \mu \ln(U_1 U_2), \quad \text{with mean } \mathbb{E}[Y] = \tau + 2\mu.
     \end{equation}
 
-    The shifted variate $Y$ has mean $\mathbb{E}[Y] = \tau + 2\mu$ and probability density function:
-
+    \textbf{Data-driven parameterization.}
+    The mean inter-arrival time for lane $\ell$ during interval $t$ is $\bar{\mu}_{\ell,t} = \Delta T / N_{\ell,t}$, where $\Delta T = 900$ seconds and $N_{\ell,t}$ is the observed count. Setting $\mathbb{E}[Y] = \bar{\mu}_{\ell,t}$ and solving:
     \begin{equation}
-        f_Y(y) = \begin{cases}
-                     \lambda^2 (y - \tau) e^{-\lambda(y - \tau)} & y \geq \tau \\
-                     0 & y < \tau
-        \end{cases}
+        \label{eq:erlang-param}
+        \mu = \frac{\bar{\mu}_{\ell,t} - \tau}{2}.
     \end{equation}
 
-    Random variates are generated efficiently using:
-
-    \begin{equation}
-        Y = \tau - \mu \ln(U_1 \cdot U_2)
-    \end{equation}
-
-    where $U_1, U_2 \sim \text{Uniform}(0,1)$.
-
-    \textbf{Data-driven parameterization.} The mean inter-arrival time for lane $\ell$ during interval $t$ is computed from PeMS flow data:
-
-    \begin{equation}
-        \bar{\mu}_{\ell,t} = \frac{\Delta T}{N_{\ell,t}}
-    \end{equation}
-
-    where $\Delta T = 900$ seconds (15 minutes) and $N_{\ell,t}$ is the observed vehicle count. To achieve this empirical mean with our shifted distribution, we set the stage parameter as:
-
-    \begin{equation}
-        \mu = \frac{\bar{\mu}_{\ell,t} - \tau}{2}
-    \end{equation}
-
-    This ensures $\mathbb{E}[Y] = \tau + 2\mu = \bar{\mu}_{\ell,t}$, matching the observed arrival rate while enforcing the physical headway constraint.
 
 
-    \section{SIMULATION SETUP AND CALIBRATION}
+    \section{SIMULATION SETUP}
     \label{sec:setup}
+    \subsection{Study Site and Data}
+    We model a 1.4 km segment of northbound US-101 in the Donald Doyle Highway area near Danville, California (Figure~\ref{fig:corridor}). The corridor features four mainline lanes with two on-ramp merge points and five loop detector stations at approximately 280--470 m intervals. This corridor exhibits recurring congestion during morning and evening peak periods, making it suitable for validating car-following dynamics at the lane level.
 
-    \begin{figure}[H]
+    Traffic data was obtained from the California Performance Measurement System (PeMS) \cite{caltran_pems}, aggregated into 15-minute intervals (6:00 AM to 6:00 PM, 48 intervals). Each mainline detector provides lane-level measurements across four lanes, yielding 20 flow and 20 speed time series. On-ramp demand is derived from two single-lane ramp detectors. Figure~\ref{fig:sensor_timeseries} shows the observed traffic volumes. All data underwent quality checks as outlined in \cite{law2007simulation, sargent2020verification}. Sensor 4 lanes 2--3 exhibited anomalous speed readings (likely detector malfunction), a common issue in loop-detector datasets \cite{li2020trajectory}.
+
+    \begin{figure}[htbp]
         \centering
-        \begin{tikzpicture}[scale=1.1, >=Latex]
-
+        \begin{tikzpicture}[scale=0.9, >=Latex]
 % ---- Road boundaries (ONLY these are solid) ----
             \draw[thick,->] (0,0) -- (14,0);     % bottom boundary
             \draw[thick,->] (0,2.0) -- (14,2.0); % top boundary
@@ -558,278 +443,366 @@
 % ---- Direction arrow ----
             \draw[very thick,->] (14.2,1.0) -- (15.2,1.0);
             \node[right] at (15.2,1.0) {\scriptsize N};
-
         \end{tikzpicture}
+        \vspace{-1.5em}
         \caption{Study corridor: US-101 northbound, Donald Doyle Highway segment, San Francisco. Five mainline loop detector stations (S1--S5) monitor four lanes. Two on-ramps merge between S1--S2 and S3--S4.}
         \label{fig:corridor}
     \end{figure}
 
-    \subsection{Study Corridor}
-    We model a 1.4 km segment of northbound US-101 in the Donald Doyle Highway area  near Danville, California (Figure~\ref{fig:corridor}). The corridor features four mainline lanes with two on-ramp merge points. Five loop detector stations are positioned along the mainline at approximately 280m, 310m, 470m, and 350m intervals, providing flow and speed measurements.
-    The physical layout follows Figure 1 above. This corridor exhibits recurring congestion
-    during morning and evening peak periods, making it suitable for validating car-following model calibration at the micro level.
-    \subsection{Empirical Data}
-    Traffic data was obtained from the California Performance Measurement System (PeMS),
-    which collects real-time data from inductive loop detectors across California's freeway network. For the study corridor, we collected data from five mainline Vehicle Detector Stations (VDS 401112, 401104, 400712, 400450, and 407463) and two on-ramp detectors (VDS 403157 and 403108).
-
-    Following the data processing approach of \cite{bowman2022microscopic}, the raw PeMS
-    data recorded at 5-minute intervals was aggregated to 15-minute intervals to reduce
-    noise while preserving congestion dynamics. This yields 48 time periods per simulation
-    day (6:00 AM to 6:00 PM).
-%To obtain representative weekday traffic patterns, we
-% collected data from three consecutive weekdays (Tuesday, Wednesday, Thursday) and
-% computed the average flow and speed for each lane and time interval. Weekend and
-% holiday data were excluded to focus on recurring commute patterns.
-
-    Each mainline detector provides lane-level measurements, yielding 20 flow time series
-    (5 sensors $\times$ 4 lanes) and 20 speed time series for validation. Speed data
-    recorded in mph was converted to m/s for simulation consistency. With 48 time
-    intervals per series, the validation dataset comprises 1,920 data points per
-    simulation day. On-ramp demand is derived from two single-lane ramp detectors,
-    providing boundary conditions for merge traffic.
-
-    All data underwent quality checks as outlines in \cite{law2007simulation} \cite{sargent2020verification} \cite{balci1995principles}. Sensor 4 lanes 2--3 exhibited anomalous speed readings (likely detector malfunction) (Need to continue this part)
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=\linewidth]{assets/sensor_timeseries_plot.pdf}
+        \vspace{-1.0em}
+        \caption{Observed flow (top) and speed (bottom) at five mainline sensors (S1--S5) along the US-101 corridor. Daily volumes range from 56,102 to 62,445 vehicles; average speeds from 23.6 to 28.0 m/s.}
+        \label{fig:sensor_timeseries}
+    \end{figure}
 
     \subsection{Simulation Model}
-    Our simulation is implemented in ScalaTion 2.0 \cite{miller2010using} \cite{miller2017advanced}, a Scala-based modeling and simulation framework. Scalation is a complete analytic suite built end to end to with scientific comoutation, simulation, result testing and validation. One may select different modeling paramdigm in Scalation such as Agent based, Process based or event based. In the work, our selected selective Scalation architecture follows a process-oriented discrete-event paradigm where each vehicle is an independent coroutine-based actor \cite{miller2017advanced} with the following key components:
-
-    \begin{itemize}
-        \item \textbf{MultiVSource:} Generates vehicles per lane using a suit of arrival process. We choose the Shifted Erlang-2 arrivals with data-driven mean inter-arrival times computed from PeMS flow data at each 15-minute interval for this work.
-        \item \textbf{Pathway/Route:} Represents highway segments as doubly-linked lane structures supporting lane changes.
-        \item \textbf{Dynamics:} Computes various selected Car following models,  IDM acceleration and integrates vehicle state using Dormand-Prince (DOPRI5) with adaptive step control.
-        \item \textbf{Junction (Sensors):} Records vehicle counts and speeds at segment boundaries, aggregating to 15-minute intervals for comparison with PeMS data.
-    \end{itemize}
-
+    Our simulation is implemented in an open-source Scala-based modeling and simulation framework. The framework supports multiple modeling paradigms including agent-based, process-based, and event-based approaches. Microscopic traffic simulation with time-continuous events follows a process-oriented paradigm in which each vehicle is an independent coroutine-based actor.
     The simulation clock runs for 43,200 seconds (12 hours), with vehicles entering according to the time-varying arrival schedule derived from sensor 1 flow data.
-    \subsection{Calibration and Optimization}
-
-    Traffic microsimulation presents a noisy, non-convex optimization surface where
-    gradient-based methods often fail due to stochastic simulation outputs and
-    discontinuous lane-change events. We therefore employ derivative-free optimization
-    to calibrate the IDM parameters governing car-following behavior.
-
-    The calibration objective is to minimize the discrepancy between observed PeMS
-    sensor data and simulated outputs. Let $\boldsymbol{\theta} = (s_0, a, b, T, \tau)$
-    denote the parameter vector. The optimization problem is formulated as:
-
-    \begin{equation}
-        \boldsymbol{\theta}^* = \arg\min_{\boldsymbol{\theta} \in \Theta} \mathcal{L}(\boldsymbol{\theta})
-    \end{equation}
-
-    where $\Theta$ defines the bounded parameter space and $\mathcal{L}$ is the loss function.
-
-    \begin{table}[h]
-        \centering
-        \caption{IDM Parameter Configuration}
-        \begin{tabular}{|l|c|c|c|c|}
-            \hline
-            Parameter & Symbol & Unit & Bounds & Initial \\
-            \hline
-            Minimum gap & $s_0$ & m & [2.0, 8.0] & 5.0 \\
-            Max acceleration & $a$ & m/s$^2$ & [1.5, 6.0] & 4.0 \\
-            Comfortable deceleration & $b$ & m/s$^2$ & [1.0, 3.0] & 2.0 \\
-            Safe time headway & $T$ & s & [1.0, 5.0] & 3.0 \\
-            Reaction time & $\tau$ & s & [0.3, 1.5] & 0.5 \\
-            \hline
-        \end{tabular}
-        \label{tab:idm_params}
-    \end{table}
-
-    Initial parameter values were selected based on exploratory runs that yielded stable simulation behavior. Parameter bounds were imposed to prevent the optimizer from exploring physically unrealistic regions following the approach of \cite{bowman2022microscopic}.
-
-    \subsubsection{Loss function design.} Calibrating car-following models on a single
-    measure of performance (MoP) can lead to Pareto-inefficient solutions: optimizing
-    for speed alone degrades flow accuracy, and vice versa \cite{punzo2021calibration}.
-    Following recommendations by Kesting and Treiber \cite{kesting2008calibrating} for
-    joint speed-flow calibration, we define a balanced loss function using Normalized
-    RMSE (NRMSE):
-
-    \begin{equation}
-        \text{NRMSE} = \frac{\text{RMSE}}{\bar{y}} = \frac{1}{\bar{y}} \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
-    \end{equation}
-
-    where $\bar{y}$ is the mean of observed values. Normalization renders the metric
-    dimensionless, enabling meaningful combination of speed and flow errors. The
-    composite loss function is:
-
-    \begin{equation}
-        \mathcal{L}(\boldsymbol{\theta}) = 0.5 \cdot \text{NRMSE}_{\text{flow}} + 0.5 \cdot \text{NRMSE}_{\text{speed}}
-    \end{equation}
-
-    This equal weighting ensures neither flow counts nor speeds dominate the objective,
-    avoiding calibration bias toward one measure at the expense of the other.
-
-    \subsubsection{Optimizer selection.} We employ the Simultaneous Perturbation Stochastic
-    Approximation (SPSA) algorithm \cite{spall2002implementation}, which estimates
-    gradients using only two function evaluations per iteration regardless of parameter
-    dimensionality. This efficiency is critical given our 40-minute simulation runtime
-    per evaluation. SPSA iteratively updates parameters as:
-
-    \begin{equation}
-        \boldsymbol{\theta}_{k+1} = \boldsymbol{\theta}_k - a_k \hat{g}_k(\boldsymbol{\theta}_k)
-    \end{equation}
-
-    where $\hat{g}_k$ is the gradient estimate obtained by perturbing all parameters
-    simultaneously with a random direction vector $\boldsymbol{\Delta}_k$.
-
-
-
-
 
     \section{RESULTS AND VALIDATION}
     \label{sec:results}
+    We validate simulation performance using multiple goodness-of-fit metrics, including Mean Absolute Error (MAE), Root Mean Square Error (RMSE), Normalized RMSE (NRMSE), and Symmetric Mean Absolute Percentage Error (SMAPE) for both flow and speed at each sensor and lane. Following \cite{punzo2021calibration, kesting2008calibrating}, we avoid single-metric
+    optimization which can yield Pareto-inefficient solutions.
+
+    \subsection{Numerical Integrator Result}
+    Our experiments indicate that numerical integrator choice has limited impact on lane-level flow and speed accuracy for the IDM car-following model. While small differences are observable, their magnitude remains within $\sim 1\%$ across repeated stochastic runs, suggesting that integration error is not a primary driver of simulation outcomes in this setting. In contrast, runtime differences are substantial and consistent. From a practical simulation standpoint, this makes computational cost the dominant factor when selecting an integrator. A similar conclusion was reached by \cite{treiber2015comparing, pvrikryl2017comparing}. Under this criterion, the ballistic method is clearly preferable, achieving an average total runtime of \textbf{17 minutes and running approximately $\sim$ 3X} faster than RK4 and Dorman-Prince \cite{dormand1980family}. Runtime results for all integrators are reported in Table~\ref{tab:integrator-comparison}.
+    \begin{table}[H]
+        \centering
+        \caption{Numerical integrator comparison for IDM car-following simulation. Ballistic integration achieves 3$\times$ speedup with $<$1\% fitness difference. Runtime measured on 12-hour simulation with $\sim$60,000 vehicles.}
+        \label{tab:integrator-comparison}
+        \begin{tabular}{lrrr}
+            \hline
+            \textbf{Integrator} & \textbf{Duration (min)} & \textbf{Fitness} & \textbf{Speedup} \\
+            \hline
+            Ballistic & \textbf{17.5} & \textbf{0.1567} & 1.00$\times$ \\
+            RK4       & 50.9 & 0.1572 & 0.34$\times$ \\
+            RK3       & 48.0 & 0.1574 & 0.36$\times$ \\
+            RK2       & 48.4 & 0.1575 & 0.36$\times$ \\
+            Heun      & 44.8 & 0.1578 & 0.39$\times$ \\
+            Euler     & 44.3 & 0.1579 & 0.40$\times$ \\
+            DOPRI5    & 51.1 & 0.1582 & 0.34$\times$ \\
+            \hline
+        \end{tabular}
+        \vspace{0.5em}
+        \begin{flushleft}
+            \footnotesize
+            \centering
+            \textit{Note:} Fitness $= 0.5 \times$ Flow\_NRMSE $+ 0.5 \times$ Speed\_NRMSE (lower is better). \\
+            Speedup relative to Ballistic. All integrators achieve $<$1\% fitness variation.
+        \end{flushleft}
+    \end{table}
+    \subsection{Arrival Results}
+    On the other hand, the arrival process modeling has a substantial impact on lane-level
+    flow and fitness. We consider both a Poisson process and a shifted Erlang process for
+    vehicle arrivals, driven directly by trajectory-based PeMS data. The shifted Erlang process produces an overall average lane-level simulated flow that is approximately
+    \textbf{28$\%$ more accurate} when comparing the downstream sensor's 15-minute flow
+    measurements to their simulated counterparts. At Sensor~1, the shifted Erlang model
+    achieves an RMSE of 12.24 vehicles compared to 23.04 for Poisson, representing a
+    \textbf{47\% reduction in prediction error}, as illustrated in Fig.~\ref{fig:arrival-comparison}.
+    This represents a reduction in prediction
+    uncertainty by nearly one-half compared to the Poisson process. We attribute this
+    improvement to the $\tau$ parameter in the shifted Erlang model, which enforces a
+    minimum headway and provides the IDM with sufficient temporal spacing within each interval.
+    \begin{figure}[htbp]
+        \centering
+        % \includegraphics[width=\textwidth]{assets/arrival_error_comparison.pdf}
+        \includegraphics[width=\textwidth]{assets/fig2c_cumulative_sse.pdf}
+        \vspace{-1.5em}
+        \caption{Cumulative squared error comparison of arrival processes at Sensor~1. The shifted Erlang-2 distribution ($\tau = 0.6$s) achieves 47\% lower prediction error than Poisson (RMSE: 12.24 vs.\ 23.04 vehicles per 15-min interval). The minimum headway constraint prevents unrealistic vehicle bunching.}
+        \label{fig:arrival-comparison}
+    \end{figure}
+
+
     \subsection{Macro-Level Validation}
-    \subsection{Micro-Level Validation}
 
-    \subsection{Discussion}
+    We evaluate macro-level simulation performance by assessing per-sensor agreement between simulated and empirical data. The simulated corridor spans 1.45~km and includes five mainline loop detector sensors across four lanes. Validation compares aggregated simulated and observed flow and speed at each sensor location using MAE, RMSE, NRMSE, and SMAPE as evaluation metrics.
 
+% =============================================================================
+% MACRO-LEVEL VALIDATION TABLES (Sensor Aggregates)
+% Best Configuration: Ballistic + Erlang2S
+% =============================================================================
+    \begin{table}[H]
+        \centering
+        \caption{Macro-level validation metrics aggregated per sensor. Flow accuracy degrades downstream (S1$\rightarrow$S5) due to cumulative error propagation. Speed NRMSE remains consistent across sensors. Best configuration: Ballistic + Erlang2S.}
+        \label{tab:macro-validation}
+        \scriptsize
+        \setlength{\tabcolsep}{6pt}
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \textbf{(a) Flow (vehicles/15-min)}\\[0.5em]
+            \begin{tabular}{crrrrr}
+                \hline
+                \textbf{Sensor} & \textbf{MAE} & \textbf{RMSE} & \textbf{Mean} & \textbf{NRMSE} & \textbf{SMAPE} \\
+                \hline
+                1 & 8.53 & 12.24 & 1168.79 & 1.05 & 3.36 \\
+                2 & 15.23 & 19.55 & 1256.92 & 1.56 & 5.26 \\
+                3 & 21.22 & 24.52 & 1264.75 & 1.94 & 7.40 \\
+                4 & 24.68 & 28.47 & 1291.94 & 2.20 & 8.31 \\
+                5 & 26.85 & 30.82 & 1280.10 & 2.41 & 9.08 \\
+                \hline
+                \textbf{Avg} & 19.30 & 23.12 & 1252.50 & \textbf{1.83} & 6.68 \\
+                \hline
+            \end{tabular}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \textbf{(b) Speed (m/s)}\\[0.5em]
+            \begin{tabular}{crrrrr}
+                \hline
+                \textbf{Sensor} & \textbf{MAE} & \textbf{RMSE} & \textbf{Mean} & \textbf{NRMSE} & \textbf{SMAPE} \\
+                \hline
+                1 & 3.28 & 3.85 & 23.79 & 16.16 & 18.38 \\
+                2 & 3.61 & 4.20 & 24.03 & 17.48 & 20.33 \\
+                3 & 3.43 & 3.92 & 24.37 & 16.08 & 18.73 \\
+                4 & 3.31 & 3.92 & 24.64 & 15.90 & 17.73 \\
+                5 & 2.56 & 3.51 & 25.33 & 13.87 & 13.53 \\
+                \hline
+                \textbf{Avg} & 3.24 & 3.88 & 24.43 & \textbf{15.90} & 17.74 \\
+                \hline
+            \end{tabular}
+        \end{minipage}
+        \vspace{0.2em}
+        \begin{flushleft}
+            \footnotesize
+            \centering
+            \textit{Note:} Fitness $= 0.5 \times 1.83 + 0.5 \times 15.90 = 8.87$
+        \end{flushleft}
+    \end{table}
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=0.92\textwidth]{assets/fig2_macro_validation.pdf}
+        \vspace{-1.0em}
+        \caption{Macro-level flow validation across five mainline sensors (S1--S5). Solid lines: observed PeMS data; dashed lines: simulated (Ballistic + Erlang2S). The model captures morning congestion onset ($\sim$7:00--9:00 AM) and afternoon peak ($\sim$4:00--6:00 PM). Average flow NRMSE = 1.83\%.}
+        \label{fig:macro-validation}
+    \end{figure}
+
+    Our results show an average flow NRMSE of 1.83\% (MAE: 19.30, RMSE: 23.12) and speed NRMSE of 15.90\% (MAE: 3.24, RMSE: 3.88), yielding a combined fitness of 8.87 (Table~\ref{tab:macro-validation}).
+    The shifted Erlang-2 arrival process plays a significant role in accurately
+    reproducing total vehicle counts, with approximately 60{,}000 vehicles recorded across the
+    five mainline loop detectors and two on-ramp loop detectors during the 12-hour study
+    period (6:00~AM to 6:00~PM). Figure~\ref{fig:macro-validation} demonstrates that our simulation model captures congestion onset and dissipation along the corridor. However, aggregated metrics can obscure lane-specific dynamics; we therefore present lane-level validation in the following subsection.
+
+
+
+    \subsection{Micro-Level Validation: Lane Speed and Flow}
+    Aggregate validation provides a useful baseline, but it masks the lane-specific interactions that govern car-following behavior, merge conflicts, and congestion formation. To our knowledge, only \cite{11118854} has reported lane-level validation of simulated flow and speed against empirical detector data. Because driver decisions are made based on local lane conditions rather than corridor averages, validating simulation performance at the lane level is essential for assessing microscopic realism.
+    \begin{table}[htbp]
+        \centering
+        \caption{Lane-level validation metrics across all five sensors and four lanes (20 time series). Fast lanes (L1) consistently outperform slow lanes (L4) in flow prediction. Speed accuracy is more uniform across lanes but degrades at downstream sensors.}
+        \label{tab:micro-flow-speed}
+        \scriptsize
+        \setlength{\tabcolsep}{6pt}
+        \begin{tabular}{cc|ccccc|ccccc}
+            \hline
+            & & \multicolumn{5}{c|}{\textbf{\large FLOW}}
+            & \multicolumn{5}{c}{\textbf{\large SPEED}} \\
+            & & \multicolumn{5}{c|}{\textbf{(vehicles / 15-min)}}
+            & \multicolumn{5}{c}{\textbf{(m/s)}} \\
+            \cline{3-12}
+            \textbf{Sensor} & \textbf{Lane}
+            & \textbf{MAE} & \textbf{RMSE} & \textbf{Mean} & \textbf{NRMSE} & \textbf{SMAPE}
+            & \textbf{MAE} & \textbf{RMSE} & \textbf{Mean} & \textbf{NRMSE} & \textbf{SMAPE} \\
+            \hline
+            1 & 1 & 7.60 & 11.70 & 201.35 & 5.81 & 4.80 & 2.50 & 3.60 & 28.67 & 12.56 & 13.30 \\
+            & 2 & 10.10 & 15.30 & 410.71 & 3.73 & 2.50 & 4.40 & 4.80 & 23.40 & 20.51 & 22.90 \\
+            & 3 & 9.50 & 12.70 & 319.88 & 3.97 & 3.00 & 3.50 & 3.80 & 22.40 & 16.96 & 19.60 \\
+            & 4 & 7.00 & 9.20 & 236.85 & 3.88 & 3.10 & 2.80 & 3.20 & 20.71 & 15.45 & 17.70 \\
+            \hline
+            2 & 1 & 10.80 & 15.10 & 210.10 & 7.19 & 6.00 & 2.70 & 3.90 & 29.19 & 13.36 & 13.70 \\
+            & 2 & 14.30 & 19.40 & 417.92 & 4.64 & 3.60 & 4.40 & 4.70 & 25.01 & 18.79 & 22.60 \\
+            & 3 & 24.30 & 28.70 & 345.58 & 8.30 & 7.30 & 3.80 & 4.20 & 18.67 & 22.50 & 21.30 \\
+            & 4 & 11.50 & 15.00 & 283.31 & 5.29 & 4.10 & 3.60 & 4.00 & 23.05 & 17.35 & 23.80 \\
+            \hline
+            3 & 1 & 15.40 & 18.40 & 216.35 & 8.50 & 8.70 & 2.20 & 3.20 & 27.27 & 11.73 & 11.10 \\
+            & 2 & 22.60 & 26.60 & 431.71 & 6.16 & 5.50 & 4.50 & 4.60 & 25.94 & 17.73 & 22.60 \\
+            & 3 & 25.10 & 28.30 & 346.54 & 8.17 & 7.60 & 3.70 & 4.00 & 21.31 & 18.77 & 20.50 \\
+            & 4 & 21.80 & 24.80 & 270.15 & 9.18 & 7.80 & 3.30 & 3.90 & 18.34 & 21.26 & 20.70 \\
+            \hline
+            4 & 1 & 18.60 & 22.70 & 220.17 & 10.31 & 9.80 & 2.40 & 3.60 & 28.90 & 12.46 & 12.20 \\
+            & 2 & 26.90 & 31.60 & 437.67 & 7.22 & 6.50 & 5.00 & 5.20 & 24.71 & 21.05 & 24.90 \\
+            & 3 & 28.40 & 31.50 & 349.21 & 9.02 & 8.60 & 3.70 & 4.40 & 23.69 & 18.57 & 20.80 \\
+            & 4 & 24.90 & 28.10 & 284.90 & 9.86 & 8.40 & 2.20 & 2.60 & 21.26 & 12.23 & 13.10 \\
+            \hline
+            5 & 1 & 18.30 & 22.70 & 220.00 & 10.32 & 10.00 & 1.80 & 2.70 & 25.99 & 10.39 & 7.60 \\
+            & 2 & 29.80 & 35.00 & 438.52 & 7.98 & 7.10 & 3.80 & 4.40 & 25.74 & 17.09 & 19.10 \\
+            & 3 & 25.70 & 28.90 & 345.81 & 8.36 & 7.80 & 2.60 & 3.80 & 23.31 & 16.30 & 14.70 \\
+            & 4 & 33.60 & 36.70 & 275.77 & 13.31 & 11.50 & 2.10 & 3.10 & 20.82 & 14.89 & 12.70 \\
+            \hline
+        \end{tabular}
+        \vspace{0.5em}
+        \begin{flushleft}
+            \footnotesize
+            \textit{Note:} Lane 1 = leftmost (fast lane); Lane 4 = rightmost (slow lane). (NRMSE*100)
+        \end{flushleft}
+    \end{table}
+
+    We validate our simulation by comparing observed and simulated 15-minute flow and speed measurements for each lane at each sensor. The results show clear and consistent lane-dependent patterns. Fast lanes exhibit the highest predictability, with flow NRMSE ranging from 5.8\% to 10.3\% across all five sensors, while slow lanes display increased variability associated with merging activity and heterogeneous driving behavior. Speed accuracy degrades at downstream sensors, where congestion and stop-and-go dynamics dominate.
+    Table~\ref{tab:micro-flow-speed} reports complete lane-level diagnostics for all sensors, while Figures~\ref{fig:micro-flow} and~\ref{fig:micro-speed} illustrate representative per-lane behavior at Sensor~3, highlighting the model's ability to capture lane-specific congestion onset, persistence, and recovery.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.90\textwidth]{assets/fig3_micro_flow_validation.pdf}
+        % \vspace{-1.0em}
+        \caption{Lane-level flow validation at Sensor~3 (mid-corridor). L1 (fast lane, leftmost) shows highest accuracy (NRMSE = 8.5\%); L4 (slow lane, rightmost) exhibits greater variability due to on-ramp merging. Solid: observed; dashed: simulated. 15-minute intervals, 6:00 AM--6:00 PM.}
+        \label{fig:micro-flow}
+    \end{figure}
+% \vspace{-1em}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.90\textwidth]{assets/fig4_micro_speed_validation.pdf}
+        % \vspace{-1.0em}
+        \caption{Lane-level speed validation at Sensor~3. The simulation captures general congestion trends but exhibits systematic bias in slower lanes (L3, L4) near merge zones. Speed NRMSE ranges from 11.7\% (L1) to 21.3\% (L4), with R$^2 \approx 0.48$ indicating limited variance capture. Ballistic + Erlang2S configuration.}
+        \label{fig:micro-speed}
+    \end{figure}
+
+
+    \section{Discussion}
+    \label{sec:discussion}
+
+    The lane-level validation results presented in this study highlight a methodological gap in current microscopic traffic simulation practice. Although car-following models are inherently lane-based, validation is most often performed using aggregate measures such as total corridor flow and average speed. This mismatch between modeling resolution and validation granularity can conceal systematic errors that emerge at the lane level, particularly in congested or merging environments.
+
+    Reproducing lane-specific speed distributions, especially in slower lanes near merge regions, remains
+    challenging. Similar observations were reported by Gao et al.~\cite{11118854} for a single
+    bottleneck; our results confirm that such discrepancies persist across multiple sensors, suggesting
+    the issue is structural.
+
+    The negligible influence of numerical integration schemes on simulation accuracy is evident from our experiments: all eight integrators produced fitness values within 1\% of each other. The main difference is runtime: ballistic integration runs approximately 3$\times$ faster than higher-order methods like RK4. For microscopic traffic simulation, the simplest integrator is therefore sufficient.
+    In contrast, arrival process modeling strongly affects simulation accuracy. The shifted Erlang distribution enforces a minimum headway between vehicles, better matching how traffic actually enters a freeway and improving both aggregate and lane-level results. Lane-level analysis also reveals clear differences between lanes: fast lanes behave predictably, while slow lanes are heavily influenced by merging and stop-and-go traffic. These patterns are invisible when validation relies only on corridor-wide averages.
+
+
+    \section{Limitations and Future Directions}
+
+    We used standard IDM parameter values from literature since our primary
+    objective was evaluating the relative influence of integration schemes and
+    arrival processes on lane-level accuracy. Prior work has shown that
+    calibration outcomes depend on driving regime completeness
+    \cite{sharma2019more}. Future work will incorporate systematic
+    calibration of the IDM and related car-following models using established optimization
+    methods such as Simultaneous Perturbation Stochastic Approximation (SPSA), Genetic
+    Algorithms (GA), and Simulated Annealing. These methods will be tested within a controlled experimental framework to assess their impact on lane-level accuracy across multiple sensors. \\
+% \textbf{Data Bias:} A key limitation of this study is the reliance on PeMS loop-detector data, which provides aggregated measurements rather than per vehicle trajectories. Thus aggregation can mask lane-specific variability. Future work could supplement detector data with video-based trajectory extraction, though such methods introduce their own uncertainties (occlusion, detector noise).
 
     \section{CONCLUSIONS}
     \label{sec:conclusions}
+    Our investigation yields three key findings. First, the choice of numerical integrator
+    has negligible impact on simulation accuracy for microscopic discrete-event traffic simulation. Across eight solvers, from ballistic kinematics to higher-order Runge-Kutta methods, variation in goodness-of-fit metrics remained below 1\%. The simplest and fastest method, ballistic integration, is therefore recommended.
 
-    \subsection{Toward digital twin}
+    Second, vehicle arrival process modeling has a substantially greater effect on simulation fidelity. The shifted Erlang-2 distribution improved overall fitness by approximately 28\% compared to Poisson arrivals. This result was consistent across all integrators, demonstrating that accurate arrival modeling deserves greater attention than numerical solver selection in calibration efforts.
 
-% Use \verb+\cite+ to cite references in the \LaTeX source document. For example,
-
-% \begin{verbatim}
-%     \cite{law:simulationc,cheng:queuehetero}
-% \end{verbatim} % no space after the comma!
-
-% results in the citation~\cite{law:simulationc,cheng:queuehetero}.
-
-% %There are a number of macros available to cite references in the \LaTeX\ source document.  The \verb+\cite+ macro can be used to give a list of references in parentheses.  For example,
-
-% %\begin{verbatim}
-% %\cite{law:simulationc,cheng:queuehetero}
-% %\end{verbatim} % no space after the comma!
-
-% %results in the citation~\cite{law:simulationc,cheng:queuehetero}. A reference that functions as a noun is created with the \verb+\citeN+ macro. For example,
-
-% %\begin{verbatim}
-% %\citeN{law:simulationc} say \ldots
-% %\end{verbatim}
-
-% %results in:~\citeN{law:simulationc} say \ldots\,.
-
-% %Citations within parentheses do not need the extra parentheses provided by the above citation commands. To suppress the inclusion of extra parentheses, use the \verb+\citeNP+ macro. To obtain (\citeNP{cheng:queuehetero}, \citeNP{law:simulationc}), for example, use:
-
-% %\begin{verbatim}
-% %(\citeNP{cheng:queuehetero}, \citeNP{law:simulationc}).
-% %\end{verbatim}
-
-% %When there are four or more authors, the name of the first author should be given along with the text ``et al.''  This can be achieved with the \verb+\shortcite+ macro. To obtain~\shortcite{bcnn:simulation}, for example, use:
-
-% %\begin{verbatim}
-% %\shortcite{bcnn:simulation}
-% %\end{verbatim}
-
-% %The macros \verb+\shortciteN+ and \verb+\shortciteNP+ are also available to obtain `et al.' when a citation with many authors is used as a noun.
-
-% %When citing a reference inside a figure or table caption, please use \verb+\protect\cite+ sequence to avoid build errors.
-% %}
-
-% \subsection{Generate the Bibliography File}
-
-% Run \texttt{PDFLaTeX} (or \LaTeX), then \BibTeX, and then \texttt{PDFLaTeX} two more times. Running \texttt{PDFLaTeX} the first time creates the \texttt{.aux} file. Running \BibTeX\ creates the \texttt{.bbl} file.  Running \texttt{PDFLaTeX} again (twice) fixes the bibliography and citation references.
-
-
-% \subsection{Include the Bibliography File in Your Submission}
-% \label{sec:submitbib}
-
-% \textcolor{red}{Be sure to include your \texttt{.bib} file(s) or your \texttt{.bbl} file as part of your submission}. If you only include the \texttt{.bbl} file, then please verify that you include the most up-to-date version reflecting changes during the editing process by rerunning \BibTeX\ one last time before submission.
-
-% Please be aware that submitting the \texttt{.bbl} file instead of the \texttt{.bib} file means extra work for the editing team and for you, as any changes to the reference list need to be done by you in this case.
-% Please open and save the file before every submission with software like JabRef to see whether the file is correct and to check for duplicated entries and/or bib keys in the file.
-
-
-% \section{Author Checklist}
-% We strive for a consistent appearance in all papers published in the proceedings. If you used the template and styles within this author’s kit, then almost all of the requirements in this checklist will be automatically satisfied, and there is very little to check.
-
-% Please \textbf{print a hardcopy of your paper}, and go over your printed paper to make sure it adheres to the following requirements. \textit{Thank you!}
-% \begin{enumerate}
-% 	\item Abstract
-%   \begin{enumerate}
-% 	  \item \textcolor{red}{150 or fewer words.}
-% 	  \item \textcolor{red}{Provide 3-5 keywords (mandatory).} This set of keywords will identify your paper in indices and databases.
-% 	\end{enumerate}
-% 	\item Paper Length
-%   \begin{enumerate}
-% 	  \item At least 5, but no more than 12 pages.
-% 	  \item Page size is letter size (8.5’’ x 11’’, or 216 mm x 279 mm).
-% 	\end{enumerate}
-% 	\item All text is in 11-Point Times New Roman except the title, header, and footer (default in this template).
-% 	\item Paper title is in 12-Point Times New Roman \textbf{BOLDFACE ALL CAPS} (default in this template).
-% 	\item The paper has been \textcolor{red}{spellchecked using U.S. English}.
-% 	\item Spacing and Margins
-%   \begin{enumerate}
-% 	  \item Single spaced.
-% 	  \item Left and right margins are each 1 inch (default in this template).
-% 	  \item Top and bottom margins are according to the template.
-% 	  \item Title starts 1.25 inches from the top of the page (default in this template).
-% 	\end{enumerate}
-% 	\item Section Headings
-%   \begin{enumerate}
-% 	  \item Left justified and set in \textbf{BOLDFACE ALL CAPS} (default in this template).
-% 	  \item Numbered, except for the abstract, acknowledgments, references, and author biographies.
-% 	  \item Subsection headings are set in \textbf{Boldface Headline Style} (default in this template).
-%     \item \textbf{Follow a logical order (\textbackslash section $\rightarrow$ \textbackslash subsection $\rightarrow$ \textbackslash subsubsection); do    not skip levels}.
-% 	\end{enumerate}
-% 	\item No footnotes or page numbers.
-% %	\item The copyright notice on the first page contains the name of the symposium or a track where you want to submit your paper, and the running head on subsequent pages is the surnames of all authors.
-% 	\item Multiple authors are formatted correctly.
-% 	\item Equations are centered and any equation numbers are in parentheses and right-justified (default). \textbf{After key equations, add a one-sentence plain-language explanation in the surrounding text.}
-% 	\item Figures and Tables
-%   \begin{enumerate}
-% 	  \item All text in figures and tables is readable.
-%     \item Provide descriptive captions that explain the point of the visual;    do not rely on color alone to convey meaning.
-%     \item Ensure sufficient color contrast ($\ge$4.5:1 for normal text;         $\ge$3:1 for large text).
-% 	  \item Table captions appear above the table.
-% 	  \item Figure captions appear below the figure.
-% 	\end{enumerate}
-% 	\item Citations and References
-%   \begin{enumerate}
-% 	  \item \textcolor{red}{Citations are by numbers between brackets} (default \BibTeX).
-% 	  \item References are in the hangref style and are listed in the order they are cited in the text (also default \BibTeX\ setting in this template).
-% 	\end{enumerate}
-% 	\item Author biographies are one paragraph per author.
-% 	\item Hyperlinks
-%   \begin{enumerate}
-% 	  \item Be sure that hyperlinks will probably work in the future as well.
-% 	  \item Live hyperlinks are blue. Nonlive hyperlinks are black (default in this template).
-%     \item \textbf{Use descriptive link text (e.g., “Conference website”) rather than only raw URLs.}
-% 	\end{enumerate}
-% 	\item All fonts must be embedded in the resulting \texttt{.pdf}. If you use \texttt{pdflatex}, this should already be true--unless you included figures in the \texttt{.eps} or \texttt{.pdf} format which may introduce additional font dependencies. You can use the \texttt{pdffonts} command to see if all the fonts are embedded (the column ``emb'' should say yes for all rows). You can use GhostScript to force embed the fonts, like so: {\texttt{gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dEmbedAllFonts=true -sOutputFile=out.pdf -f in.pdf}} (in Windows, use \texttt{gswin32} or \texttt{gswin32c} to invoke GhostScript).
-% \end{enumerate}
-% After verifying that your paper meets these requirements, please go to the final submission page at the conference website and submit your paper. Be sure to complete the transfer of copyright form and upload the \texttt{.pdf} receipt. \textit{Thank you for contributing to the SCS conferences!}
-
-
-    \section*{Acknowledgments}
-
-    Place the acknowledgments section, if needed, after the main text, but before any appendices and references. The section heading is not numbered. These instructions are adapted from the version by Roeder, T. M. K., Frazier, P. I., Wotton, H., Szechtman, R., Yooh, H. L., Harker, J., and Zhou, E. Those instructions were adapted from WSC instructions with permission from WSC BoD~\cite{WSC} that have been iteratively updated and improved by proceedings editors and several other individuals, who are too numerous to name separately since the first set of instructions were written by Barry Nelson for the 1991 WSC.
+    Third, lane-level validation against empirical PeMS data reveals dynamics that aggregate metrics obscure. Using observations from five mainline loop-detectors across a four-lane freeway segment, we demonstrate that microscopic validation provides a more rigorous assessment of simulation fidelity than corridor-level metrics alone.
 
     \appendix
-
     \section{Appendices} \label{app:quadratic}
-    Place any appendices after the acknowledgments. Note that the default style labels them A, B, C, and so forth (please, do not change this).
-    The solution to \eqref{eq:quadratic} has the form:
+    This snapshot is necessary because discrete-event simulation updates vehicles sequentially
+    \begin{algorithm}
+        \caption{Per-Vehicle State Update}
+        \begin{algorithmic}[1]
+            \Require vehicle $n$, time step $\Delta t$, solver $\mathcal{S}$
+            \Ensure updated position $x_n$, velocity $v_n$
+            \State Snapshot leader: $(\tilde{x}_p, \tilde{v}_p) \gets (x_p, v_p)$
+            \State Solve: $\mathbf{y}_1 \gets \mathcal{S}.\text{integrate}([v, a_{\text{IDM}}]^T, [x_n, v_n]^T, \Delta t)$
+            \State Extract: $x_n \gets \mathbf{y}_1[0]$, $v_n \gets \mathbf{y}_1[1]$
+            \State Clamp: $v_n \gets \max(0, \min(v_n, v_{\max}))$
+        \end{algorithmic}
+    \end{algorithm}
 
-    \begin{equation} \label{eq:quadratic sol}
-        x = \frac{-b \pm \sqrt{b^2-4ac}}{2a} \mbox{ if } a \ne 0\;.
-    \end{equation}
 
 % Please don't change the bibliographystyle style
     \bibliographystyle{scsproc}
 
 % AUTHOR: Include your bib file here
     \bibliography{assets/myReference}
-
-    \section*{Author Biographies}
-
-% \textbf{\uppercase{Korede R. Bishi}} is a third-year Computer Science Ph.D. student at the University of Georgia working in the Modeling, Simulation and Analytics Lab (MSAL) under the supervision of Dr. John A. Miller. My research centers on lane-level traffic simulation, trustworthy AI, and digital twins that adapt to urban mobility dynamics in real time. \email{korede.bishi@uga.edu}.
-
-    \textbf{\uppercase{Casey Bowman}} Casey Bowman is a Professor of Mathematics at the University of North Georgia.  He earned his PhD in Computer Science from the University of Georgia in 2022.  His research interests include agent-based simulation, microscopic traffic simulation, calibration of simulation models, and simulation optimization \email{casey.bowman@ung.edu}.
-
-% \textbf{\uppercase{John A. Miller}} is a Professor of Computer Science at the University of Georgia. He has been the Associate Head for 6 years and is/has been Graduate Coordinator for 13 years. His research interests include Modeling Simulation, Web Services/Workflow, Database Systems, and Big Data/Data Science. Dr. Miller received a B.S. in Applied Mathematics from Northwestern University in 1980 and an M.S. and Ph.D. in Information and Computer Science from the Georgia Institute of Technology in 1982 and 1986, respectively. In his areas of interest, Dr. Miller has authored over 200 research papers. He has served as General/Program Chair for four international research conferences: ANSS, WSC, ICWS, and SCC, as well as one regional research conference ACM-SE. \email{jamill@uga.edu}.
-
-
 \end{document}
+
+
+
+% Scale all images down to 90-95% and see what that saves
+%Also see if you can rap / reward single sentence.
+%Arrival is on it's on line
+%Modeling is on it's on line
+% Accronyms usage once defined eg IDM
+%Might need to take the text that preceed the reference.
+%Get rid of the data bias.
+
+%=============================================================================
+% DIFF: 6 REFERENCE REMOVALS (apply manually in Overleaf)
+%=============================================================================
+%
+%-----------------------------------------------------------------------------
+% REMOVAL 1: bcnn:simulation + fishman2001discrete (Line 216)
+%-----------------------------------------------------------------------------
+% BEFORE:
+%   Such analysis can benefit greatly from accurate simulation models \cite{bcnn:simulation, law2007simulation}.While algorithms such as deep learning networks can help solve problems related to current data, accurate simulation models are better suited to answer what‑if questions, such as the effect of physical changes to the road or how to handle major disruptions to traffic flow caused by natural disasters \cite{fishman2001discrete}.
+%
+% AFTER:
+%   Such analysis can benefit greatly from accurate simulation models. Accurate simulation models are well suited to answer what‑if questions, such as the effect of physical changes to the road or how to handle major disruptions to traffic flow.
+%
+% NOTE: law2007simulation is cited later (lines 345, 465) so removing it here is safe.
+%
+%-----------------------------------------------------------------------------
+% REMOVAL 2: van2015genealogy + kesting2013traffic (Line 241)
+%-----------------------------------------------------------------------------
+% BEFORE:
+%   A comprehensive genealogy of car‑following model evolution
+%   was presented by \cite{van2015genealogy}; a comprehensive treatment of traffic flow dynamics appears in \cite{kesting2013traffic}. The most widely used continuous‑time CF model today is the Intelligent
+%
+% AFTER:
+%   The most widely used continuous‑time car-following model today is the Intelligent
+%
+%-----------------------------------------------------------------------------
+% REMOVAL 3: zhang2021comprehensive + pourabdollah2017calibration (Lines 242-244)
+%-----------------------------------------------------------------------------
+% BEFORE:
+%   Driver Model (IDM) \cite{treiber2000congested}. It has performed well in comparative studies such as
+%   \cite{zhang2021comprehensive, pourabdollah2017calibration}, which both found that IDM outperforms other popular
+%   car‑following models. Newell's simplified model \cite{newell2002simplified} provides a lower-order alternative.
+%
+% AFTER:
+%   Driver Model (IDM) \cite{treiber2000congested}, which has been shown to outperform other popular car‑following models in comparative studies.
+%
+%-----------------------------------------------------------------------------
+% REMOVAL 4: roy2018headway + singh2020multivariate (Lines 263-265)
+%-----------------------------------------------------------------------------
+% BEFORE:
+%   related distributions such as the Erlang and Pearson families \cite{li2017vehicle}. Various comparative studies of
+%   different headway models include Li and Chen \cite{li2017vehicle}, Roy and Saha \cite{roy2018headway}, and Singh et
+%   al. \cite{singh2020multivariate}.
+%
+% AFTER:
+%   related distributions such as the Erlang and Pearson families \cite{li2017vehicle}.
+%
+%-----------------------------------------------------------------------------
+% REMOVAL 5: balci1995principles (Line 465)
+%-----------------------------------------------------------------------------
+
+%-----------------------------------------------------------------------------
+% SUMMARY: References Removed (6 total)
+%-----------------------------------------------------------------------------
+% 1. bcnn:simulation        - generic intro cite
+% 2. fishman2001discrete    - generic what-if claim
+% 3. van2015genealogy       - CF genealogy not essential
+% 4. kesting2013traffic     - textbook not directly used
+% 5. zhang2021comprehensive - redundant IDM validation
+% 6. pourabdollah2017calibration - redundant IDM validation
+% 7. roy2018headway         - redundant headway survey
+% 8. singh2020multivariate  - redundant headway survey
+% 9. balci1995principles    - redundant V&V cite
+% 10. newell2002simplified  - mentioned but not used (OPTIONAL)
+%
+% ALSO REMOVED: Newell reference since we no longer mention it
+%=============================================================================
+
+
+\subsection{Lane-Level Validation}
+Vehicle‑arrival processes and car‑following models have been widely studied in the
+traffic‑simulation literature;
+however, validation is most often performed using aggregated corridor‑level metrics, as illustrated in \cite{11118854}.
+Such approaches can obscure lane‑specific dynamics. Our work differs from \cite{11118854}
+in three key aspects: consideration of numerical‑integrator choice, explicit arrival‑process modeling,
+and systematic lane‑level validation of both speed and flow. Specifically, \cite{11118854} focuses on a
+single bottleneck detector and two car‑following models, whereas we validate across five detector stations
+with two on‑ramp merge locations, reporting per‑lane speed and flow at 15‑minute intervals. To our knowledge,
+no prior work has reported lane‑level validation at this granularity across multiple sensors.

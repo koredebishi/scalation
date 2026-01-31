@@ -33,7 +33,7 @@ class CalRoute101_2(name: String = "CalRoute101_2", reps: Int = 1, animating: Bo
 
     val rand = Uniform(0.0, 1.0)                                                // probability uniform in [0,1)
 
-
+// discrete event and discrete time.
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Simulation dynamics and random variables */
     private val motion         = IDMDynamics                                     //GippsDynamics

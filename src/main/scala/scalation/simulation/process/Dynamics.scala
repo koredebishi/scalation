@@ -58,6 +58,7 @@ trait Dynamics:
 //        println (s"Dynamics.updateV: called $car")
         this match
             case GippsDynamics => { GippsDynamics.updateM (car, maxDisp) }
+            case KraussDynamics => { KraussDynamics.updateM (car, maxDisp) }
             case _             => { IDMDynamics.updateM (car,  maxDisp) }
     end updateV
 
@@ -211,6 +212,107 @@ object GippsDynamics
 
 end GippsDynamics
 
+
+
+object KraussDynamics
+    extends Dynamics:
+
+    private val debug = debugf("KraussDynamics", false)
+    
+    /** Krauss stochastic imperfection magnitude (m/s) - hardcoded for now */
+    private val sigma = 0.5
+    
+    /** Uniform random variate for stochastic noise */
+    private val noiseRV = scalation.random.Uniform(0.0, sigma)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update the vehicle's velocity and position using Krauss Model
+     *  with Ballistic position update.
+     *  @param car    the vehicle to update
+     *  @param length the segment length
+     */
+    def updateM(car: Vehicle, length: Double): Unit =
+        val ref = car.myPathNode.ahead
+        val car_ahead = if ref != null then ref.elem else null
+        val dt = prop("rt")
+
+        // Compute leader position and velocity
+        val (xp, vp): (Double, Double) =
+            if car_ahead == null || car_ahead.segId < car.segId then
+                (car.disp + 1000.0, car.vmax)  // phantom leader (free flow)
+            else if car_ahead.segId == car.segId then
+                (car_ahead.disp, car_ahead.velocity)
+            else
+                (length + car_ahead.disp, car_ahead.velocity)
+
+        // Step 1: Compute next velocity using Krauss
+        val v_new = krauss(
+            amax, bmax, len, car.vmax,
+            car.disp, car.velocity,
+            xp, vp, dt, s
+        )
+
+        // Step 2: Ballistic position update using current velocity
+        val x_new = car.t_disp + car.velocity * dt
+
+        // Step 3: Commit velocity state AFTER position update
+        car.o_velocity = car.velocity
+        car.velocity = v_new
+
+        // Step 4: Segment-bounded displacement update
+        car.o_t_disp = car.t_disp
+        val dx = x_new - car.t_disp
+        val new_disp = if car.disp + dx <= length then car.disp + dx else length
+
+        car.t_disp += new_disp - car.disp
+        car.disp = new_disp
+    end updateM
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute next velocity using Krauss car-following model.
+     *  Safety is enforced BEFORE stochastic noise is applied.
+     *
+     *  @param an  max acceleration
+     *  @param bn  max deceleration (negative)
+     *  @param sp  vehicle length
+     *  @param Vn  desired speed
+     *  @param xn  follower position
+     *  @param vn  follower velocity
+     *  @param xp  leader position
+     *  @param vp  leader velocity
+     *  @param rt  reaction time (timestep)
+     *  @param s0  minimum spacing
+     */
+    private def krauss(an: Double, bn: Double, sp: Double, Vn: Double,
+                       xn: Double, vn: Double, xp: Double, vp: Double,
+                       rt: Double, s0: Double): Double =
+        val b = abs(bn)
+
+        // Netto gap (front-to-rear)
+        val gap = xp - xn - sp
+        if gap <= 0.0 then return 0.0  // collision avoidance
+
+        // Krauss safe speed: v_safe = sqrt(v_leader^2 + 2*b*(gap - s0))
+        val inner = vp * vp + 2.0 * b * (gap - s0)
+        val v_safe = sqrt(max(0.0, inner))
+
+        // Acceleration constraint: v_cap = v + a_max * tau
+        val v_cap = vn + an * rt
+
+        // Desired speed constraint
+        val v_des = Vn
+
+        // Deterministic candidate (minimum of all constraints)
+        val v_star = min(v_des, min(v_safe, v_cap))
+
+        // Stochastic imperfection applied AFTER safety
+        val eps = noiseRV.gen
+        max(0.0, v_star - eps)
+    end krauss
+
+end KraussDynamics    
+    
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `IDMDynamics` object provides equations for the Intelligent Driver Model (IDM)
  *  car-following model.
@@ -224,8 +326,8 @@ object IDMDynamics
 
     private val FREERANGE = 50.0
 
-    /** Configurable integrator type for ODE solving - default DOPRI5 */
-    var integratorType: IntegratorType = IntegratorType.DOPRI5
+    /** Configurable integrator type for ODE solving - default Ballistic */
+    var integratorType: IntegratorType = IntegratorType.Ballistic
 
     /** Flag to print integrator type only once per simulation run */
     private var integratorPrinted: Boolean = false

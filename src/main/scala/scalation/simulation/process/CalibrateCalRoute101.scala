@@ -526,6 +526,10 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
     var totalSpeedSMAPE = 0.0
     var totalCountRMSE = 0.0
     var totalSpeedRMSE = 0.0
+    var totalCountMAE = 0.0
+    var totalSpeedMAE = 0.0
+    var totalCountMean = 0.0
+    var totalSpeedMean = 0.0
     var totalCountRsq = 0.0
     var totalSpeedRsq = 0.0
 
@@ -541,14 +545,22 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
         val cqof = TestFit.diagnose_mat(sensor_counts(i), simSensor_counts(i))
         val sqof = TestFit.diagnose_mat(sensor_speeds(i), simSensor_speeds(i))
 
-        val countNRMSE = cqof(9).mean   // nrmse index
-        val speedNRMSE = sqof(9).mean
+        // Calculate means from observed data (sum all elements / total count)
+        val countMean = sensor_counts(i).sum / (sensor_counts(i).dim * sensor_counts(i).dim2)
+        val speedMean = sensor_speeds(i).sum / (sensor_speeds(i).dim * sensor_speeds(i).dim2)
+
         val countSMAPE = cqof(8).mean
         val speedSMAPE = sqof(8).mean
         val countRMSE = cqof(6).mean
         val speedRMSE = sqof(6).mean
-        val countRsq = cqof(0).mean    // R² index
+        val countMAE = cqof(7).mean     // mae index
+        val speedMAE = sqof(7).mean
+        val countRsq = cqof(0).mean     // R² index
         val speedRsq = sqof(0).mean
+
+        // Manual NRMSE*100 calculation: (RMSE / Mean) * 100
+        val countNRMSE = (countRMSE / countMean) * 100.0
+        val speedNRMSE = (speedRMSE / speedMean) * 100.0
 
         totalCountNRMSE += countNRMSE
         totalSpeedNRMSE += speedNRMSE
@@ -556,10 +568,14 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
         totalSpeedSMAPE += speedSMAPE
         totalCountRMSE += countRMSE
         totalSpeedRMSE += speedRMSE
+        totalCountMAE += countMAE
+        totalSpeedMAE += speedMAE
+        totalCountMean += countMean
+        totalSpeedMean += speedMean
         totalCountRsq += countRsq
         totalSpeedRsq += speedRsq
 
-        val sensorLine = f"Sensor $i: CountNRMSE=$countNRMSE%.4f, SpeedNRMSE=$speedNRMSE%.4f, CountSMAPE=$countSMAPE%.2f, SpeedSMAPE=$speedSMAPE%.2f, CountR²=$countRsq%.4f, SpeedR²=$speedRsq%.4f"
+        val sensorLine = f"Sensor $i: CountMAE=$countMAE%.2f, CountRMSE=$countRMSE%.2f, CountMean=$countMean%.2f, CountNRMSE*100=$countNRMSE%.2f, CountSMAPE=$countSMAPE%.2f, CountR²=$countRsq%.4f, SpeedMAE=$speedMAE%.2f, SpeedRMSE=$speedRMSE%.2f, SpeedMean=$speedMean%.2f, SpeedNRMSE*100=$speedNRMSE%.2f, SpeedSMAPE=$speedSMAPE%.2f, SpeedR²=$speedRsq%.4f"
         println(sensorLine)
         fitnessWriter.println(sensorLine)
     end for
@@ -568,6 +584,12 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
     val avgSpeedNRMSE = totalSpeedNRMSE / 5.0
     val avgCountSMAPE = totalCountSMAPE / 5.0
     val avgSpeedSMAPE = totalSpeedSMAPE / 5.0
+    val avgCountRMSE = totalCountRMSE / 5.0
+    val avgSpeedRMSE = totalSpeedRMSE / 5.0
+    val avgCountMAE = totalCountMAE / 5.0
+    val avgSpeedMAE = totalSpeedMAE / 5.0
+    val avgCountMean = totalCountMean / 5.0
+    val avgSpeedMean = totalSpeedMean / 5.0
     val avgCountRsq = totalCountRsq / 5.0
     val avgSpeedRsq = totalSpeedRsq / 5.0
     val fitness = 0.5 * avgCountNRMSE + 0.5 * avgSpeedNRMSE
@@ -578,13 +600,22 @@ def runSingleExperiment(integratorType: IntegratorType, arrivalType: String,
     val durationSeconds = (endTime - startTime) / 1000.0
 
     fitnessWriter.println("=" * 60)
-    fitnessWriter.println(f"Avg Count NRMSE: $avgCountNRMSE%.6f")
-    fitnessWriter.println(f"Avg Speed NRMSE: $avgSpeedNRMSE%.6f")
+    fitnessWriter.println(f"Avg Count MAE: $avgCountMAE%.2f")
+    fitnessWriter.println(f"Avg Count RMSE: $avgCountRMSE%.2f")
+    fitnessWriter.println(f"Avg Count Mean: $avgCountMean%.2f")
+    fitnessWriter.println(f"Avg Count NRMSE*100: $avgCountNRMSE%.2f")
     fitnessWriter.println(f"Avg Count SMAPE: $avgCountSMAPE%.4f")
-    fitnessWriter.println(f"Avg Speed SMAPE: $avgSpeedSMAPE%.4f")
     fitnessWriter.println(f"Avg Count R²: $avgCountRsq%.4f")
+    fitnessWriter.println("---")
+    fitnessWriter.println(f"Avg Speed MAE: $avgSpeedMAE%.2f")
+    fitnessWriter.println(f"Avg Speed RMSE: $avgSpeedRMSE%.2f")
+    fitnessWriter.println(f"Avg Speed Mean: $avgSpeedMean%.2f")
+    fitnessWriter.println(f"Avg Speed NRMSE*100: $avgSpeedNRMSE%.2f")
+    fitnessWriter.println(f"Avg Speed SMAPE: $avgSpeedSMAPE%.4f")
     fitnessWriter.println(f"Avg Speed R²: $avgSpeedRsq%.4f")
-    fitnessWriter.println(f"FITNESS (0.5*countNRMSE + 0.5*speedNRMSE): $fitness%.6f")
+    fitnessWriter.println("---")
+    fitnessWriter.println(f"FITNESS (0.5*countNRMSE*100 + 0.5*speedNRMSE*100): $fitness%.6f")
+    fitnessWriter.println("Note: NRMSE*100 = (RMSE/Mean)*100 for consistent manual calculation")
     fitnessWriter.println(s"End Time: $endTimestamp")
     fitnessWriter.println(f"Duration: $durationSeconds%.2f seconds")
     fitnessWriter.flush()
@@ -734,24 +765,49 @@ end runAllExperiments
     outputWriter.println(s"Timestamp: ${java.time.LocalDateTime.now()}")
     outputWriter.println("=" * 140)
     
-    // Macro validation helper - uses TestFit.diagnose_mat for consistency with runSingleExperiment
-    // Returns: (R², SMAPE, RMSE, NRMSE) - all as mean across lanes
-    def macroValidation(sim: MatrixD, pms: MatrixD): (Double, Double, Double, Double) =
+    // Macro validation helper for FLOW - sum of lane means for total flow
+    def macroFlowValidation(sim: MatrixD, pms: MatrixD): (Double, Double, Double, Double, Double, Double) =
         val qof = TestFit.diagnose_mat(pms, sim)
-        val r2    = qof(0).mean   // R² index
+        val mae   = qof(7).mean   // MAE index
         val rmse  = qof(6).mean   // RMSE index
+        // Flow Mean = sum of lane means (total flow per sensor)
+        var laneMeanSum = 0.0
+        cfor(0, nLanes) { lane => laneMeanSum += pms(?, lane).sum / pms.dim }
+        val mean = laneMeanSum
+        val nrmse100 = (rmse / mean) * 100.0  // Manual NRMSE*100 = (RMSE/Mean)*100
         val smape = qof(8).mean   // SMAPE index
-        val nrmse = qof(9).mean   // NRMSE index
-        (r2, smape, rmse, nrmse)
-    end macroValidation
-    
-    // Micro validation helper - uses TestFit.diagnose_mat for consistency with runSingleExperiment
-    // Returns per-lane: (R², SMAPE, RMSE, NRMSE)
-    def microValidation(sim: MatrixD, pms: MatrixD): Array[(Double, Double, Double, Double)] =
+        val r2    = qof(0).mean   // R² index
+        (mae, rmse, mean, nrmse100, smape, r2)
+    end macroFlowValidation
+
+    // Macro validation helper for SPEED - average of lane means
+    def macroSpeedValidation(sim: MatrixD, pms: MatrixD): (Double, Double, Double, Double, Double, Double) =
         val qof = TestFit.diagnose_mat(pms, sim)
-        val results = new Array[(Double, Double, Double, Double)](nLanes)
+        val mae   = qof(7).mean   // MAE index
+        val rmse  = qof(6).mean   // RMSE index
+        // Speed Mean = average of lane means
+        var laneMeanSum = 0.0
+        cfor(0, nLanes) { lane => laneMeanSum += pms(?, lane).sum / pms.dim }
+        val mean = laneMeanSum / nLanes
+        val nrmse100 = (rmse / mean) * 100.0  // Manual NRMSE*100 = (RMSE/Mean)*100
+        val smape = qof(8).mean   // SMAPE index
+        val r2    = qof(0).mean   // R² index
+        (mae, rmse, mean, nrmse100, smape, r2)
+    end macroSpeedValidation
+
+    // Micro validation helper - uses TestFit.diagnose_mat for consistency with runSingleExperiment
+    // Returns per-lane: (MAE, RMSE, Mean, NRMSE*100, SMAPE, R²)
+    def microValidation(sim: MatrixD, pms: MatrixD): Array[(Double, Double, Double, Double, Double, Double)] =
+        val qof = TestFit.diagnose_mat(pms, sim)
+        val results = new Array[(Double, Double, Double, Double, Double, Double)](nLanes)
         cfor(0, nLanes) { lane =>
-            results(lane) = (qof(0, lane), qof(8, lane), qof(6, lane), qof(9, lane))  // R², SMAPE, RMSE, NRMSE
+            val mae = qof(7, lane)
+            val rmse = qof(6, lane)
+            val mean = pms(?, lane).sum / pms.dim  // Mean of observed data for this lane
+            val nrmse100 = (rmse / mean) * 100.0  // Manual NRMSE*100
+            val smape = qof(8, lane)
+            val r2 = qof(0, lane)
+            results(lane) = (mae, rmse, mean, nrmse100, smape, r2)
         }
         results
     end microValidation
@@ -781,58 +837,62 @@ end runAllExperiments
             def simSpeed(s: Int): MatrixD = simData(?, VectorI.range((nSensors + s) * nLanes, (nSensors + s + 1) * nLanes))
             
             // Arrays for macro metrics
-            val flowR2     = new Array[Double](nSensors)
-            val flowSmape  = new Array[Double](nSensors)
+            val flowMAE    = new Array[Double](nSensors)
             val flowRmse   = new Array[Double](nSensors)
+            val flowMean   = new Array[Double](nSensors)
             val flowNrmse  = new Array[Double](nSensors)
-            val speedR2    = new Array[Double](nSensors)
-            val speedSmape = new Array[Double](nSensors)
+            val flowSmape  = new Array[Double](nSensors)
+            val flowR2     = new Array[Double](nSensors)
+            val speedMAE   = new Array[Double](nSensors)
             val speedRmse  = new Array[Double](nSensors)
+            val speedMean  = new Array[Double](nSensors)
             val speedNrmse = new Array[Double](nSensors)
+            val speedSmape = new Array[Double](nSensors)
+            val speedR2    = new Array[Double](nSensors)
 
             // Compute macro validation
             cfor(0, nSensors) { s =>
-                val (fr2, fsm, frm, fnr) = macroValidation(simFlow(s), pemsFlow(s))
-                flowR2(s) = fr2; flowSmape(s) = fsm; flowRmse(s) = frm; flowNrmse(s) = fnr
-                val (sr2, ssm, srm, snr) = macroValidation(simSpeed(s), pemsSpeed(s))
-                speedR2(s) = sr2; speedSmape(s) = ssm; speedRmse(s) = srm; speedNrmse(s) = snr
+                val (fmae, frm, fmean, fnr, fsm, fr2) = macroFlowValidation(simFlow(s), pemsFlow(s))
+                flowMAE(s) = fmae; flowRmse(s) = frm; flowMean(s) = fmean; flowNrmse(s) = fnr; flowSmape(s) = fsm; flowR2(s) = fr2
+                val (smae, srm, smean, snr, ssm, sr2) = macroSpeedValidation(simSpeed(s), pemsSpeed(s))
+                speedMAE(s) = smae; speedRmse(s) = srm; speedMean(s) = smean; speedNrmse(s) = snr; speedSmape(s) = ssm; speedR2(s) = sr2
             }
             
             // Compute micro validation
-            val flowMicro  = new Array[Array[(Double, Double, Double, Double)]](nSensors)
-            val speedMicro = new Array[Array[(Double, Double, Double, Double)]](nSensors)
+            val flowMicro  = new Array[Array[(Double, Double, Double, Double, Double, Double)]](nSensors)
+            val speedMicro = new Array[Array[(Double, Double, Double, Double, Double, Double)]](nSensors)
             cfor(0, nSensors) { s =>
                 flowMicro(s)  = microValidation(simFlow(s), pemsFlow(s))
                 speedMicro(s) = microValidation(simSpeed(s), pemsSpeed(s))
             }
             
             // ─── MACRO-LEVEL OUTPUT ───
-            outputWriter.println(s"\n${"=" * 160}")
-            outputWriter.println("MACRO-LEVEL VALIDATION (Sensor Aggregates)")
-            outputWriter.println("=" * 160)
-            outputWriter.println(f"${"Sensor"}%-10s ${"Flow R²"}%-12s ${"Flow SMAPE"}%-14s ${"Flow RMSE"}%-14s ${"Flow NRMSE"}%-14s ${"Speed R²"}%-12s ${"Speed SMAPE"}%-14s ${"Speed RMSE"}%-14s ${"Speed NRMSE"}%-14s")
-            outputWriter.println("-" * 160)
-            cfor(0, nSensors) { s =>
-                outputWriter.println(f"${s + 1}%-10d ${flowR2(s)}%-12.4f ${flowSmape(s)}%-14.2f ${flowRmse(s)}%-14.2f ${flowNrmse(s)}%-14.4f ${speedR2(s)}%-12.4f ${speedSmape(s)}%-14.2f ${speedRmse(s)}%-14.2f ${speedNrmse(s)}%-14.4f")
-            }
-            outputWriter.println("=" * 160)
-
-            // ─── MICRO-LEVEL OUTPUT ───
             outputWriter.println(s"\n${"=" * 180}")
-            outputWriter.println("MICRO-LEVEL VALIDATION (Lane Detail)")
+            outputWriter.println("MACRO-LEVEL VALIDATION (Sensor Aggregates)")
             outputWriter.println("=" * 180)
-            outputWriter.println(f"${"Sensor"}%-8s ${"Lane"}%-6s ${"Flow R²"}%-12s ${"Flow SMAPE"}%-14s ${"Flow RMSE"}%-14s ${"Flow NRMSE"}%-14s ${"Speed R²"}%-12s ${"Speed SMAPE"}%-14s ${"Speed RMSE"}%-14s ${"Speed NRMSE"}%-14s")
+            outputWriter.println(f"${"Sensor"}%-8s ${"Flow MAE"}%-12s ${"Flow RMSE"}%-12s ${"Flow Mean"}%-12s ${"Flow NRMSE*100"}%-16s ${"Flow SMAPE"}%-14s ${"Speed MAE"}%-12s ${"Speed RMSE"}%-12s ${"Speed Mean"}%-12s ${"Speed NRMSE*100"}%-16s ${"Speed SMAPE"}%-14s")
             outputWriter.println("-" * 180)
             cfor(0, nSensors) { s =>
-                cfor(0, nLanes) { l =>
-                    val (fR2, fSm, fRm, fNr) = flowMicro(s)(l)
-                    val (sR2, sSm, sRm, sNr) = speedMicro(s)(l)
-                    val label = if l == 0 then s"${s + 1}" else ""
-                    outputWriter.println(f"$label%-8s ${l + 1}%-6d $fR2%-12.4f $fSm%-14.2f $fRm%-14.2f $fNr%-14.4f $sR2%-12.4f $sSm%-14.2f $sRm%-14.2f $sNr%-14.4f")
-                }
-                if s < nSensors - 1 then outputWriter.println("-" * 180)
+                outputWriter.println(f"${s + 1}%-8d ${flowMAE(s)}%-12.2f ${flowRmse(s)}%-12.2f ${flowMean(s)}%-12.2f ${flowNrmse(s)}%-16.2f ${flowSmape(s)}%-14.2f ${speedMAE(s)}%-12.2f ${speedRmse(s)}%-12.2f ${speedMean(s)}%-12.2f ${speedNrmse(s)}%-16.2f ${speedSmape(s)}%-14.2f")
             }
             outputWriter.println("=" * 180)
+
+            // ─── MICRO-LEVEL OUTPUT ───
+            outputWriter.println(s"\n${"=" * 200}")
+            outputWriter.println("MICRO-LEVEL VALIDATION (Lane Detail)")
+            outputWriter.println("=" * 200)
+            outputWriter.println(f"${"Sensor"}%-8s ${"Lane"}%-6s ${"Flow MAE"}%-12s ${"Flow RMSE"}%-12s ${"Flow Mean"}%-12s ${"Flow NRMSE*100"}%-16s ${"Flow SMAPE"}%-14s ${"Speed MAE"}%-12s ${"Speed RMSE"}%-12s ${"Speed Mean"}%-12s ${"Speed NRMSE*100"}%-16s ${"Speed SMAPE"}%-14s")
+            outputWriter.println("-" * 200)
+            cfor(0, nSensors) { s =>
+                cfor(0, nLanes) { l =>
+                    val (fMAE, fRm, fMean, fNr, fSm, fR2) = flowMicro(s)(l)
+                    val (sMAE, sRm, sMean, sNr, sSm, sR2) = speedMicro(s)(l)
+                    val label = if l == 0 then s"${s + 1}" else ""
+                    outputWriter.println(f"$label%-8s ${l + 1}%-6d $fMAE%-12.2f $fRm%-12.2f $fMean%-12.2f $fNr%-16.2f $fSm%-14.2f $sMAE%-12.2f $sRm%-12.2f $sMean%-12.2f $sNr%-16.2f $sSm%-14.2f")
+                }
+                if s < nSensors - 1 then outputWriter.println("-" * 200)
+            }
+            outputWriter.println("=" * 200)
 
             // ─── DIAGNOSE_MAT OUTPUT ───
             outputWriter.println(s"\n${"=" * 120}")
@@ -849,21 +909,20 @@ end runAllExperiments
                 outputWriter.println(Fit.showFitMap(speedQof))
             }
             
-            // ─── Compute overall fitness (average NRMSE) for summary ───
-            var totalCountNRMSE = 0.0
-            var totalSpeedNRMSE = 0.0
+            // ─── Compute overall fitness using manual NRMSE*100 ───
+            var totalCountNRMSE100 = 0.0
+            var totalSpeedNRMSE100 = 0.0
             cfor(0, nSensors) { s =>
-                val flowQof  = TestFit.diagnose_mat(pemsFlow(s), simFlow(s))
-                val speedQof = TestFit.diagnose_mat(pemsSpeed(s), simSpeed(s))
-                totalCountNRMSE += flowQof(9).mean   // NRMSE index
-                println(s"totalCountNRMSE: $totalCountNRMSE")
-                totalSpeedNRMSE += speedQof(9).mean  //
-                println(s"totalSpeedNRMSE: $totalSpeedNRMSE")
+                totalCountNRMSE100 += flowNrmse(s)   // Already NRMSE*100
+                totalSpeedNRMSE100 += speedNrmse(s)  // Already NRMSE*100
             }
-            val fitness = (0.5 * (totalCountNRMSE / 5.0)) + (0.5 * (totalSpeedNRMSE / 5.0))
-            println(s"fitness: $fitness")
+            val avgCountNRMSE100 = totalCountNRMSE100 / 5.0
+            val avgSpeedNRMSE100 = totalSpeedNRMSE100 / 5.0
+            val fitness = 0.5 * avgCountNRMSE100 + 0.5 * avgSpeedNRMSE100
 
-            outputWriter.println(s"\n average_totalSpeedNRMSE: $totalSpeedNRMSE ; average_totalFlowNRMSE: $totalCountNRMSE OVERALL FITNESS: $fitness")
+            outputWriter.println(s"\n${"=" * 120}")
+            outputWriter.println(f"SUMMARY: Avg Flow NRMSE*100=${avgCountNRMSE100}%.2f, Avg Speed NRMSE*100=${avgSpeedNRMSE100}%.2f, FITNESS=${fitness}%.2f")
+            outputWriter.println(s"${"=" * 120}")
         end if
     end for
     

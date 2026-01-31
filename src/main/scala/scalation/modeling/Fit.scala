@@ -415,8 +415,8 @@ trait Fit (protected var dfr: Double, protected var df: Double)
         mape   = 100 * (e.abs / y.abs).sum / m                              // Mean Absolute Percentage Error
         mase   = Fit.mase (y, yp)                                           // Mean Absolute Scaled Error
         smapeC = smape + pIC * (dfr + 1) / y.dim.toDouble                   // sMAPE Information Criterion
-        val yRange = y.max - y.min                                          // range of actual values
-        nrmse  = if yRange > 0 then rmse / yRange else 0.0                  // Normalized RMSE (scale-invariant)
+        //val yRange = y.max - y.min                                          // range of actual values
+        //nrmse  = if yRange > 0 then rmse / y.mean else 0.0                  // Normalized RMSE (scale-invariant)
         fit
     end diagnose
 

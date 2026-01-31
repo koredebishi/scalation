@@ -1771,3 +1771,151 @@ WARNING: Unmatched cancel notification for request id 51
 2026.01.08 14:51:08 INFO  Shutting down server[0m
 2026.01.08 14:51:08 INFO  shutting down Metals[0m
 2026.01.08 14:51:08 INFO  Exiting server[0m
+2026.01.28 02:22:01 INFO  Started: Metals version 1.6.5 in folders '/mnt/c/Simulation/scalation_2.0' for client Visual Studio Code 1.108.1.[0m
+2026.01.28 02:22:01 INFO  Memory monitor started[0m
+2026.01.28 02:22:02 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.[0m
+Jan 28, 2026 2:22:03 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 2
+2026.01.28 02:22:15 INFO  running '/home/korede/.cache/coursier/arc/https/github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.16%252B8/OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz/jdk-17.0.16+8/bin/java -Djline.terminal=jline.UnsupportedTerminal -Dsbt.log.noformat=true -Dfile.encoding=UTF-8 -jar /tmp/metals17832557971041453550/sbt-launch.jar -Dbloop.export-jar-classifiers=sources bloopInstall'[0m
+2026.01.28 02:22:15 ERROR [info] [launcher] getting org.scala-sbt sbt 1.11.3  (this may take some time)...[0m
+2026.01.28 02:22:23 ERROR [info] [launcher] getting Scala 2.12.20 (for sbt)...[0m
+2026.01.28 02:22:24 INFO  [info] welcome to sbt 1.11.3 (Eclipse Adoptium Java 17.0.16)[0m
+2026.01.28 02:22:28 INFO  [info] loading settings for project scalation_2-0-build-build from metals.sbt...[0m
+2026.01.28 02:22:30 INFO  [info] loading project definition from /mnt/c/Simulation/scalation_2.0/project/project[0m
+2026.01.28 02:22:35 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/DgAnimator.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:35 INFO  [info] loading settings for project scalation_2-0-build from metals.sbt...[0m
+2026.01.28 02:22:35 INFO  [info] loading project definition from /mnt/c/Simulation/scalation_2.0/project[0m
+2026.01.28 02:22:41 INFO  [success] Generated .bloop/scalation_2-0-build.json[0m
+2026.01.28 02:22:41 INFO  [success] Total time: 6 s, completed Jan 28, 2026, 2:22:41 AM[0m
+2026.01.28 02:22:43 WARN  no build target for: /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/DgAnimator.scala[0m
+2026.01.28 02:22:43 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/DgAnimator.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:43 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/DgAnimator.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+Jan 28, 2026 2:22:43 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 8
+Jan 28, 2026 2:22:43 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 5
+Jan 28, 2026 2:22:43 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 7
+2026.01.28 02:22:43 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/DgAnimator.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:43 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:43 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+Jan 28, 2026 2:22:43 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 16
+2026.01.28 02:22:44 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:44 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:44 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:46 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:46 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:46 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:48 INFO  [info] loading settings for project scalation from build.sbt...[0m
+2026.01.28 02:22:48 INFO  [info] set current project to scalation (in build file:/mnt/c/Simulation/scalation_2.0/)[0m
+2026.01.28 02:22:49 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:49 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:53 INFO  [warn] scala3-library_3-3.7.4-sources.jar no longer exists at /C:/Users/kored/AppData/Local/Coursier/Cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4-sources.jar[0m
+2026.01.28 02:22:57 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/animation/SimpleAnimator2.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:57 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:57 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:22:59 INFO  [success] Generated .bloop/scalation.json[0m
+2026.01.28 02:23:01 INFO  [success] Generated .bloop/scalation-test.json[0m
+2026.01.28 02:23:01 INFO  [success] Total time: 13 s, completed Jan 28, 2026, 2:23:01 AM[0m
+2026.01.28 02:23:01 INFO  time: ran 'sbt bloopInstall' in 46s[0m
+2026.01.28 02:23:01 INFO  Attempting to connect to the build server...[0m
+2026.01.28 02:23:01 INFO  No running Bloop server found, starting one.[0m
+2026.01.28 02:23:04 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:04 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:09 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:09 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:09 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+Jan 28, 2026 2:23:10 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 45
+Jan 28, 2026 2:23:10 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 46
+2026.01.28 02:23:10 INFO  Starting compilation server[0m
+2026.01.28 02:23:11 WARN  no build target for: /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala[0m
+2026.01.28 02:23:11 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:11 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:11 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:11 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:11 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:12 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/c/Simulation/scalation_2.0/.metals/bsp.trace.json or /home/korede/.cache/metals/bsp.trace.json[0m
+2026.01.28 02:23:13 INFO  no build target found for /mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/calculus/AutoDiff.scala. Using presentation compiler with project's scala-library version: 3.3.7[0m
+2026.01.28 02:23:13 INFO  Attempting to connect to the build server...[0m
+2026.01.28 02:23:13 INFO  Found a Bloop server running[0m
+2026.01.28 02:23:13 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/c/Simulation/scalation_2.0/project/.metals/bsp.trace.json or /home/korede/.cache/metals/bsp.trace.json[0m
+2026.01.28 02:23:16 INFO  time: Connected to build server in 14s[0m
+2026.01.28 02:23:16 INFO  Connected to Build server: Bloop v2.0.18[0m
+2026.01.28 02:23:16 INFO  time: Imported build in 0.32s[0m
+2026.01.28 02:23:53 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.[0m
+2026.01.28 02:24:06 INFO  compiling scalation (592 scala sources and 2 java sources)[0m
+2026.01.28 02:24:12 INFO  time: indexed workspace in 55s[0m
+2026.01.28 02:24:14 INFO  Deduplicating compilation of scalation from bsp client 'Metals 1.6.5' (since 1m 1.387s)[0m
+2026.01.28 02:24:14 INFO  compiling scalation (592 scala sources and 2 java sources)[0m
+2026.01.28 02:24:52 INFO  time: compiled scalation in 37s[0m
+2026.01.28 02:32:33 INFO  running '/home/korede/.cache/coursier/arc/https/github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.16%252B8/OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz/jdk-17.0.16+8/bin/java -Djline.terminal=jline.UnsupportedTerminal -Dsbt.log.noformat=true -Dfile.encoding=UTF-8 -jar /tmp/metals3360124200339794040/sbt-launch.jar -Dbloop.export-jar-classifiers=sources bloopInstall'[0m
+2026.01.28 02:32:35 INFO  [info] welcome to sbt 1.11.3 (Eclipse Adoptium Java 17.0.16)[0m
+2026.01.28 02:32:36 INFO  [info] loading settings for project scalation_2-0-build-build from metals.sbt...[0m
+2026.01.28 02:32:38 INFO  [info] loading project definition from /mnt/c/Simulation/scalation_2.0/project/project[0m
+2026.01.28 02:32:39 INFO  [info] loading settings for project scalation_2-0-build from metals.sbt...[0m
+2026.01.28 02:32:39 INFO  [info] loading project definition from /mnt/c/Simulation/scalation_2.0/project[0m
+2026.01.28 02:32:42 INFO  [success] Generated .bloop/scalation_2-0-build.json[0m
+2026.01.28 02:32:42 INFO  [success] Total time: 3 s, completed Jan 28, 2026, 2:32:42 AM[0m
+2026.01.28 02:32:42 INFO  [error] [/mnt/c/Simulation/scalation_2.0/build.sbt]:42: illegal start of simple expression[0m
+2026.01.28 02:32:42 INFO  [error] [/mnt/c/Simulation/scalation_2.0/build.sbt]:43: '(' expected but identifier found.[0m
+2026.01.28 02:32:42 INFO  [warn] Project loading failed: (r)etry, (q)uit, (l)ast, or (i)gnore? (default: r)[0m
+2026.01.28 02:32:43 INFO  time: ran 'sbt bloopInstall' in 10s[0m
+2026.01.28 02:32:43 ERROR sbt command failed: /home/korede/.cache/coursier/arc/https/github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.16%252B8/OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz/jdk-17.0.16+8/bin/java -Djline.terminal=jline.UnsupportedTerminal -Dsbt.log.noformat=true -Dfile.encoding=UTF-8 -jar /tmp/metals3360124200339794040/sbt-launch.jar -Dbloop.export-jar-classifiers=sources bloopInstall[0m
+2026.01.28 02:32:43 INFO  Disconnecting from Bloop session...[0m
+2026.01.28 02:32:43 INFO  Shut down connection with build server.[0m
+2026.01.28 02:32:43 INFO  Shut down connection with build server.[0m
+2026.01.28 02:32:43 INFO  Attempting to connect to the build server...[0m
+2026.01.28 02:32:43 INFO  Found a Bloop server running[0m
+2026.01.28 02:32:43 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/c/Simulation/scalation_2.0/.metals/bsp.trace.json or /home/korede/.cache/metals/bsp.trace.json[0m
+2026.01.28 02:32:43 INFO  Attempting to connect to the build server...[0m
+2026.01.28 02:32:43 INFO  Found a Bloop server running[0m
+2026.01.28 02:32:43 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/c/Simulation/scalation_2.0/project/.metals/bsp.trace.json or /home/korede/.cache/metals/bsp.trace.json[0m
+2026.01.28 02:32:44 INFO  time: Connected to build server in 0.31s[0m
+2026.01.28 02:32:43 INFO  Connected to Build server: Bloop v2.0.18[0m
+2026.01.28 02:32:44 INFO  time: Imported build in 0.23s[0m
+2026.01.28 02:33:19 INFO  time: indexed workspace in 34s[0m
+2026.01.28 02:33:21 INFO  compiling scalation (598 scala sources and 2 java sources)[0m
+2026.01.28 02:33:50 INFO  time: compiled scalation in 28s[0m
+2026.01.28 02:36:31 INFO  running '/home/korede/.cache/coursier/arc/https/github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.16%252B8/OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz/jdk-17.0.16+8/bin/java -Djline.terminal=jline.UnsupportedTerminal -Dsbt.log.noformat=true -Dfile.encoding=UTF-8 -jar /tmp/metals1765940588934372686/sbt-launch.jar -Dbloop.export-jar-classifiers=sources bloopInstall'[0m
+2026.01.28 02:36:32 INFO  [info] welcome to sbt 1.11.3 (Eclipse Adoptium Java 17.0.16)[0m
+2026.01.28 02:36:32 INFO  [info] loading settings for project scalation_2-0-build-build from metals.sbt...[0m
+2026.01.28 02:36:34 INFO  [info] loading project definition from /mnt/c/Simulation/scalation_2.0/project/project[0m
+2026.01.28 02:36:35 INFO  [info] loading settings for project scalation_2-0-build from metals.sbt...[0m
+2026.01.28 02:36:35 INFO  [info] loading project definition from /mnt/c/Simulation/scalation_2.0/project[0m
+2026.01.28 02:36:38 INFO  [success] Generated .bloop/scalation_2-0-build.json[0m
+2026.01.28 02:36:38 INFO  [success] Total time: 3 s, completed Jan 28, 2026, 2:36:38 AM[0m
+2026.01.28 02:36:39 INFO  [info] loading settings for project scalation from build.sbt...[0m
+2026.01.28 02:36:39 INFO  [info] set current project to scalation (in build file:/mnt/c/Simulation/scalation_2.0/)[0m
+2026.01.28 02:36:49 INFO  [success] Generated .bloop/scalation.json[0m
+2026.01.28 02:36:51 INFO  [success] Generated .bloop/scalation-test.json[0m
+2026.01.28 02:36:51 INFO  [success] Total time: 11 s, completed Jan 28, 2026, 2:36:51 AM[0m
+2026.01.28 02:36:51 INFO  time: ran 'sbt bloopInstall' in 20s[0m
+2026.01.28 02:36:51 INFO  Disconnecting from Bloop session...[0m
+2026.01.28 02:36:51 INFO  Shut down connection with build server.[0m
+2026.01.28 02:36:51 INFO  Shut down connection with build server.[0m
+2026.01.28 02:36:51 INFO  Attempting to connect to the build server...[0m
+2026.01.28 02:36:51 INFO  Found a Bloop server running[0m
+2026.01.28 02:36:51 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/c/Simulation/scalation_2.0/.metals/bsp.trace.json or /home/korede/.cache/metals/bsp.trace.json[0m
+2026.01.28 02:36:51 INFO  Attempting to connect to the build server...[0m
+2026.01.28 02:36:51 INFO  Found a Bloop server running[0m
+2026.01.28 02:36:52 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/c/Simulation/scalation_2.0/project/.metals/bsp.trace.json or /home/korede/.cache/metals/bsp.trace.json[0m
+2026.01.28 02:36:51 INFO  time: Connected to build server in 0.29s[0m
+2026.01.28 02:36:52 INFO  Connected to Build server: Bloop v2.0.18[0m
+2026.01.28 02:36:51 INFO  time: Imported build in 0.21s[0m
+2026.01.28 02:37:21 INFO  time: indexed workspace in 29s[0m
+2026.01.28 02:37:24 INFO  compiling scalation (592 scala sources and 2 java sources)[0m
+2026.01.28 02:37:51 WARN  Invalid text document uri received from build server: file:///mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/scala3d/Source.scala[0m
+2026.01.28 02:37:51 WARN  Invalid text document uri received from build server: file:///mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/scala3d/Vehicle.scala[0m
+2026.01.28 02:37:51 WARN  Invalid text document uri received from build server: file:///mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/scala3d/Road3d.scala[0m
+2026.01.28 02:37:51 WARN  Invalid text document uri received from build server: file:///mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/scala3d/Sink.scala[0m
+2026.01.28 02:37:51 WARN  Invalid text document uri received from build server: file:///mnt/c/Simulation/scalation_2.0/src/main/scala/scalation/scala3d/Gfx3DExample.scala[0m
+2026.01.28 02:37:51 INFO  time: compiled scalation in 27s[0m
+2026.01.28 02:38:19 INFO  Shutting down server[0m
+2026.01.28 02:38:19 INFO  Memory monitor stopped[0m
+2026.01.28 02:38:19 INFO  shutting down Metals[0m
+2026.01.28 02:38:19 INFO  Shut down connection with build server.[0m
+2026.01.28 02:38:19 INFO  Shut down connection with build server.[0m
+2026.01.28 02:38:19 INFO  Exiting server[0m
