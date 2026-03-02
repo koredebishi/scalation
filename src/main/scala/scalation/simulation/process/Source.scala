@@ -13,7 +13,7 @@ package simulation
 package process
 
 import scala.collection.mutable.{ArrayBuffer => VEC}
-//import scala.runtime.ScalaRunTime.stringOf
+import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
 
 import scalation.animation.CommandType._
@@ -46,7 +46,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor,
 
     private val debug = debugf ("Source", false)                              // debug function
 
-    //debug ("Init", s"name = $name with cor_id = $id, located at ${stringOf (at)}")
+    debug ("Init", s"name = $name with cor_id = $id, located at ${stringOf (at)}")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.

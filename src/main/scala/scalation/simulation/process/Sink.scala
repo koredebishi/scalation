@@ -14,7 +14,7 @@ package simulation
 package process
 
 import scala.collection.mutable.{ArrayBuffer => VEC}
-//import scala.runtime.ScalaRunTime.stringOf
+import scala.runtime.ScalaRunTime.stringOf
 
 import scalation.animation.CommandType._
 import scalation.scala2d.Ellipse
@@ -33,7 +33,7 @@ class Sink (name: String, at: Array [Double])
 
     private val debug = debugf ("Sink", false)                          // debug function
 
-    //debug ("init", s"name = $name, located at ${stringOf (at)}")
+    debug ("init", s"name = $name, located at ${stringOf (at)}")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.

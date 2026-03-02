@@ -30,16 +30,19 @@ import scala.util.control.Breaks.breakable
  *
  *  minimize    f(x)
  *
- *  @param f      the vector-to-scalar objective function
- *  @param rands  randomm variables used to create the initial 'gene' pool.
- *                There is one r.v. per dimension, and should reflect the
- *                domain of the search space.
+ *  @param f       the vector-to-scalar objective function
+ *  @param rands   randomm variables used to create the initial 'gene' pool.
+ *                 There is one r.v. per dimension, and should reflect the
+ *                 domain of the search space.
+ *  @param maxGen  maximum number of generations (default 400)
+ *  @param popSize size of the candidate pool (default 15)
  */
-class GeneticAlgorithm (f: FunctionV2S, rands: Array [Variate])
+class GeneticAlgorithm (f: FunctionV2S, rands: Array [Variate], 
+                        maxGen: Int = 400, popSize: Int = 15)
     extends Minimizer
         with MonitorEpochs:
 
-    private val N = 15        // number of candidates to keep in the pool
+    private val N = popSize   // number of candidates to keep in the pool
 
     private val pool = Array.ofDim [FuncVec] (N)    // the pool of candidate solutions. The values are a tuple
                                                              // of the candidate with their objective function value.
@@ -180,7 +183,7 @@ class GeneticAlgorithm (f: FunctionV2S, rands: Array [Variate])
      */
     def solve2 (seeds: Array[VectorD] = null): FuncVec =
 
-        initializeMonitoring(MAX_IT)                                     // reset monitoring state
+        initializeMonitoring(maxGen)                                     // reset monitoring state
         val startTime = System.nanoTime()                                // start timer
 
         initPool (seeds)
@@ -189,7 +192,7 @@ class GeneticAlgorithm (f: FunctionV2S, rands: Array [Variate])
         // println ("Generation 0:")
         // printPool ()
         breakable {
-            for i <- 0 until MAX_IT do
+            for i <- 0 until maxGen do
                 // println ("-------------------------------------------------------")
                 // println ("Generation " + (i + 1) + ":")
                 nextGen ()

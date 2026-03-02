@@ -37,7 +37,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     extends Component ():
 
 
-    private val debug = debugf("Route", false)     // debug function
+    private val debug = debugf("Route", true)     // debug function
 
     val pathway = Array.ofDim[Pathway](numLanes)      // create array of parallel Pathways
     private val GAP = 50.0     // pixel between lanes

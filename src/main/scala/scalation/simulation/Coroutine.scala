@@ -35,7 +35,7 @@ abstract class Coroutine (label: String = "cor")
     private var started = false                                // whether this coroutine has started
 
     nCreated += 1
-    protected val cor_id = label + "." + nCreated
+    protected val cor_id = label + "." + nCreated             // the coroutine id, e.g., "cor.1", "cor.2", ...
     debug ("init", s"===> $cor_id waits to be STARTed")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -142,7 +142,7 @@ end Coroutine
  */
 object Coroutine:
 
-    private [simulation]  var useVirtualThread = false         // whether to use regular or virtual threads
+    private [simulation]  var useVirtualThread = true         // whether to use regular or virtual threads
 
     private val debug = debugf ("Coroutine", false)            // debug function
     private val flaw  = flawf ("Coroutine")                    // flaw function

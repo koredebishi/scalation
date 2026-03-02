@@ -26,3 +26,14 @@ libraryDependencies += "com.google.code.gson" % "gson" % "2.10"
 // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
 libraryDependencies += "org.junit.jupiter" % "junit-jupiter-api" % "5.9.1" % Test
 
+// Assembly settings for creating fat JAR (HPC deployment)
+// Note: Requires sbt-assembly plugin in project/plugins.sbt
+import sbtassembly.AssemblyPlugin.autoImport._
+assembly / assemblyJarName := "scalation-assembly.jar"
+assembly / mainClass := Some("scalation.simulation.process.builder.runCalibrationArrayJob")
+assembly / assemblyMergeStrategy := {
+  case PathList("META-INF", _*) => MergeStrategy.discard
+  case "module-info.class" => MergeStrategy.discard
+  case x => MergeStrategy.first
+}
+

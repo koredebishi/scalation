@@ -1,0 +1,1930 @@
+========================================
+CALIBRATION ARRAY JOB (v2 - Feb 2026)
+========================================
+Job ID:        42800454
+Array Task ID: 8
+Host:          e1-16
+Started:       Tue Feb 17 23:39:27 EST 2026
+========================================
+Fitness Mode:  MACRO
+Model:         Gipps
+Optimizer:     NelderMead
+========================================
+Working directory: /scratch/krb84578/workDir/scalation_2.0
+Using JAR: target/scala-3.7.4/scalation-assembly.jar
+JAR size:  22M
+
+=== Starting Calibration ===
+Tue Feb 17 23:39:27 EST 2026
+----------------------------------
+| CALIBRATION ARRAY JOB - Task 8 |
+----------------------------------
+Model: gipps (Gipps)
+Optimizer: neldermead
+Fitness Mode: macro (corridor-level)
+Timestamp: 2026-02-17T23:39:28.134283063
+Host: e1-16
+============================================================
+Starting parameters: VectorD(2.00000,	1.50000,	-3.00000,	1.00000,	0.670000)
+----------------------------------------------------------------------
+   Epoch |            Loss |       Best Loss |   Progress
+----------------------------------------------------------------------
+[ModelOptimizer] Evaluating parameters: VectorD(2.00000,	1.50000,	-3.00000,	1.00000,	0.670000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (59757,59753,59750)
+[ModelOptimizer] Fitness: 4.4119 | Elapsed: 38.36 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.50000,	1.50000,	-3.00000,	1.00000,	0.670000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (119514,119506,119501)
+[ModelOptimizer] Fitness: 4.4119 | Elapsed: 31.05 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.00000,	2.00000,	-3.00000,	1.00000,	0.670000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (179271,179259,179252)
+[ModelOptimizer] Fitness: 4.2972 | Elapsed: 29.34 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.00000,	1.50000,	-2.50000,	1.00000,	0.670000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (239028,239012,239003)
+[ModelOptimizer] Fitness: 4.6958 | Elapsed: 29.88 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.00000,	1.50000,	-3.00000,	1.50000,	0.670000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (298785,298765,298754)
+[ModelOptimizer] Fitness: 4.4119 | Elapsed: 29.32 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.00000,	1.50000,	-3.00000,	1.00000,	1.17000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (358542,358518,358505)
+[ModelOptimizer] Fitness: 4.0544 | Elapsed: 21.38 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.10000,	1.60000,	-3.00000,	1.10000,	0.770000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (418299,418271,418256)
+[ModelOptimizer] Fitness: 4.3031 | Elapsed: 26.96 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.20000,	1.70000,	-3.50000,	1.20000,	0.870000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (478056,478024,478007)
+[ModelOptimizer] Fitness: 3.9811 | Elapsed: 24.59 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.30000,	1.80000,	-4.00000,	1.30000,	0.970000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (537813,537777,537758)
+[ModelOptimizer] Fitness: 3.6182 | Elapsed: 23.05 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.30000,	1.80000,	-4.00000,	1.30000,	0.970000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (597570,597530,597509)
+[ModelOptimizer] Fitness: 3.6182 | Elapsed: 23.01 sec
+       1 |      4.05435902 |      4.05435902 |       0.3% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.06000,	1.66000,	-3.20000,	1.16000,	0.830000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (657327,657283,657260)
+[ModelOptimizer] Fitness: 4.1237 | Elapsed: 25.49 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.62000,	1.82000,	-3.40000,	1.32000,	0.990000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (717084,717036,717011)
+[ModelOptimizer] Fitness: 3.9116 | Elapsed: 23.04 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.62000,	1.82000,	-3.40000,	1.32000,	0.990000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (776841,776789,776762)
+[ModelOptimizer] Fitness: 3.9116 | Elapsed: 23.03 sec
+       2 |      3.61822044 |      3.61822044 |       0.5% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(1.98400,	1.72400,	-3.28000,	1.22400,	0.894000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (836598,836542,836513)
+[ModelOptimizer] Fitness: 4.0231 | Elapsed: 24.45 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.96800,	1.94800,	-3.56000,	1.44800,	1.11800)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (896355,896295,896264)
+[ModelOptimizer] Fitness: 3.7521 | Elapsed: 21.62 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.96800,	1.94800,	-3.56000,	1.44800,	1.11800)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (956112,956048,956015)
+[ModelOptimizer] Fitness: 3.7521 | Elapsed: 21.59 sec
+       3 |      3.61822044 |      3.61822044 |       0.8% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(1.97760,	1.81360,	-3.39200,	1.21360,	0.983600)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1015869,1015801,1015766)
+[ModelOptimizer] Fitness: 3.9281 | Elapsed: 24.65 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.95520,	2.12720,	-3.78400,	0.927200,	1.29720)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1075626,1075554,1075517)
+[ModelOptimizer] Fitness: 3.3663 | Elapsed: 20.10 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.93280,	2.44080,	-4.00000,	0.800000,	1.61080)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1135383,1135307,1135268)
+[ModelOptimizer] Fitness: 3.0891 | Elapsed: 18.36 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.93280,	2.44080,	-4.00000,	0.800000,	1.61080)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1195140,1195060,1195019)
+[ModelOptimizer] Fitness: 3.0891 | Elapsed: 18.36 sec
+       4 |      3.61822044 |      3.61822044 |       1.0% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(1.96416,	1.90176,	-3.62720,	1.14176,	1.17176)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1254897,1254813,1254770)
+[ModelOptimizer] Fitness: 3.6487 | Elapsed: 21.28 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.92832,	1.80352,	-4.00000,	1.28352,	1.67352)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1314654,1314566,1314521)
+[ModelOptimizer] Fitness: 3.1410 | Elapsed: 18.32 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.92832,	1.80352,	-4.00000,	1.28352,	1.67352)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1374411,1374319,1374272)
+[ModelOptimizer] Fitness: 3.1410 | Elapsed: 18.56 sec
+       5 |      3.08910417 |      3.08910417 |       1.3% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(1.94982,	1.96246,	-3.87808,	1.19846,	1.27246)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1434168,1434072,1434023)
+[ModelOptimizer] Fitness: 3.3509 | Elapsed: 20.62 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.89965,	2.42493,	-4.00000,	1.39693,	1.37493)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1493925,1493825,1493774)
+[ModelOptimizer] Fitness: 3.1251 | Elapsed: 19.94 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.89965,	2.42493,	-4.00000,	1.39693,	1.37493)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1553682,1553578,1553525)
+[ModelOptimizer] Fitness: 3.1251 | Elapsed: 20.06 sec
+       6 |      3.08910417 |      3.08910417 |       1.5% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.00575,	2.08345,	-4.00000,	1.21385,	1.34945)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1613439,1613331,1613276)
+[ModelOptimizer] Fitness: 3.1756 | Elapsed: 21.05 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.39151,	2.34690,	-4.00000,	1.10770,	1.70890)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1673196,1673084,1673027)
+[ModelOptimizer] Fitness: 2.9771 | Elapsed: 18.43 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.77726,	2.61035,	-4.00000,	1.00155,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1732953,1732837,1732778)
+[ModelOptimizer] Fitness: 2.6135 | Elapsed: 17.44 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.77726,	2.61035,	-4.00000,	1.00155,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1792710,1792590,1792529)
+[ModelOptimizer] Fitness: 2.6135 | Elapsed: 18.16 sec
+       7 |      3.08910417 |      3.08910417 |       1.8% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.16761,	2.21592,	-4.00000,	1.12456,	1.53952)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1852467,1852343,1852280)
+[ModelOptimizer] Fitness: 3.1575 | Elapsed: 19.25 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.36721,	2.48384,	-4.00000,	0.801119,	1.96104)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1912224,1912096,1912031)
+[ModelOptimizer] Fitness: 2.6427 | Elapsed: 17.78 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.36721,	2.48384,	-4.00000,	0.801119,	1.96104)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (1971981,1971849,1971782)
+[ModelOptimizer] Fitness: 2.6427 | Elapsed: 28.66 sec
+       8 |      2.61349539 |      2.61349539 |       2.0% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.18105,	2.35269,	-4.00000,	1.02478,	1.73773)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2031738,2031602,2031533)
+[ModelOptimizer] Fitness: 2.9371 | Elapsed: 20.15 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.06210,	2.90537,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2091495,2091355,2091284)
+[ModelOptimizer] Fitness: 2.5897 | Elapsed: 19.76 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.94314,	3.45806,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2151252,2151108,2151035)
+[ModelOptimizer] Fitness: 2.5279 | Elapsed: 17.55 sec
+[ModelOptimizer] Evaluating parameters: VectorD(1.94314,	3.45806,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2211009,2210861,2210786)
+[ModelOptimizer] Fitness: 2.5279 | Elapsed: 18.04 sec
+       9 |      2.61349539 |      2.61349539 |       2.3% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.18401,	2.68360,	-4.00000,	0.862949,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2270766,2270614,2270537)
+[ModelOptimizer] Fitness: 2.5966 | Elapsed: 27.40 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.43971,	3.56367,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2330523,2330367,2330288)
+[ModelOptimizer] Fitness: 2.5244 | Elapsed: 31.91 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.69540,	4.44375,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2390280,2390120,2390039)
+[ModelOptimizer] Fitness: 2.4488 | Elapsed: 19.24 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.69540,	4.44375,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2450037,2449873,2449790)
+[ModelOptimizer] Fitness: 2.4488 | Elapsed: 17.66 sec
+      10 |      2.52785526 |      2.52785526 |       2.5% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.34316,	3.08736,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2509794,2509626,2509541)
+[ModelOptimizer] Fitness: 2.5650 | Elapsed: 17.77 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.78668,	3.74979,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2569551,2569379,2569292)
+[ModelOptimizer] Fitness: 2.5045 | Elapsed: 23.76 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.78668,	3.74979,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2629308,2629132,2629043)
+[ModelOptimizer] Fitness: 2.5045 | Elapsed: 25.79 sec
+      11 |      2.44880081 |      2.44880081 |       2.8% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.51394,	3.34916,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2689065,2688885,2688794)
+[ModelOptimizer] Fitness: 2.5465 | Elapsed: 31.96 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.09508,	4.25751,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2748822,2748638,2748545)
+[ModelOptimizer] Fitness: 2.4611 | Elapsed: 32.21 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.09508,	4.25751,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2808579,2808391,2808295)
+[ModelOptimizer] Fitness: 2.4611 | Elapsed: 30.78 sec
+      12 |      2.44880081 |      2.44880081 |       3.0% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.65951,	3.70389,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2868336,2868144,2868046)
+[ModelOptimizer] Fitness: 2.5111 | Elapsed: 23.74 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.95181,	4.92395,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2928093,2927897,2927797)
+[ModelOptimizer] Fitness: 2.3851 | Elapsed: 18.28 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.24411,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (2987850,2987650,2987548)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 19.95 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.24411,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3047607,3047403,3047299)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 27.23 sec
+      13 |      2.44880081 |      2.44880081 |       3.3% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.75288,	4.41062,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3107364,3107156,3107050)
+[ModelOptimizer] Fitness: 2.4539 | Elapsed: 19.69 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.72850,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3167121,3166909,3166801)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 17.57 sec
+[ModelOptimizer] Evaluating parameters: VectorD(2.72850,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3226878,3226662,3226552)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 21.33 sec
+      14 |      2.25175977 |      2.25175977 |       3.5% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(2.90995,	4.96119,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3286635,3286415,3286303)
+[ModelOptimizer] Fitness: 2.3818 | Elapsed: 18.04 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.87676,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3346392,3346168,3346054)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 17.51 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.87676,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3406149,3405921,3405805)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 25.15 sec
+      15 |      2.25175977 |      2.25175977 |       3.8% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(3.12797,	5.50409,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3465906,3465674,3465556)
+[ModelOptimizer] Fitness: 2.3114 | Elapsed: 17.52 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.46926,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3525663,3525427,3525307)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 24.63 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.46926,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3585420,3585180,3585058)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 18.08 sec
+      16 |      2.25175977 |      2.25175977 |       4.0% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(3.20281,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3645177,3644933,3644809)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 19.01 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.31054,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3704934,3704686,3704560)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 17.84 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.31054,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3764691,3764439,3764311)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 22.24 sec
+      17 |      2.25175977 |      2.25175977 |       4.3% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(3.32584,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3824448,3824192,3824062)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 18.35 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.95627,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3884205,3883945,3883813)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 17.15 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.64106,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (3943962,3943698,3943564)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 17.40 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.64106,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4003719,4003451,4003315)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 17.22 sec
+      18 |      2.25175977 |      2.25175977 |       4.5% ✓
+[ModelOptimizer] Evaluating parameters: VectorD(3.32584,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4063476,4063204,4063066)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 17.23 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.01062,	5.62474,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4123233,4122957,4122817)
+[ModelOptimizer] Fitness: 2.2984 | Elapsed: 17.15 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.48345,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4182990,4182710,4182568)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 19.20 sec
+[ModelOptimizer] Evaluating parameters: VectorD(3.48345,	6.00000,	-4.00000,	0.800000,	2.00000)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4242747,4242463,4242319)
+[ModelOptimizer] Fitness: 2.2518 | Elapsed: 17.06 sec
+      19 |      2.25175977 |      2.25175977 |       4.8% ✓
+----------------------------------------------------------------------
+Training completed! Total epochs: 38
+Final Loss: 2.25175977
+Best Loss:  2.25175977
+----------------------------------------------------------------------
+solve: optimal function, vertex = (2.251759768978767,VectorD(3.24411,	6.14400,	-10.3247,	-0.722083,	5.23223))
+
+----------------------------------------------------------------------
+NELDER-MEAD SIMPLEX: OPTIMIZATION SUMMARY
+----------------------------------------------------------------------
+Metric                    | Value
+----------------------------------------------------------------------
+Final position (opt)      | VectorD(3.24411,	6.14400,	-10.3247,	-0.722083,	5.23223)
+Loss at final position    | 2.25175977
+Best position found       | VectorD(3.24411,	6.14400,	-10.3247,	-0.722083,	5.23223)
+Best loss achieved        | 2.25175977
+Total iterations          | 38
+Elapsed time              | 1559.8118 seconds (1559811.77 ms)
+Time per iteration        | 41047.68 ms
+----------------------------------------------------------------------
+
+============================================================
+GENERATING FINAL REPORT WITH OPTIMIZED PARAMETERS
+============================================================
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: Gipps
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (4302504,4302216,4302070)
+
+==================================================================================================================================================================================================================
+MACRO-LEVEL VALIDATION (Sensor Aggregates)
+==================================================================================================================================================================================================================
+Sensor    Flow R²      Flow MAE     Flow RMSE    Flow Mean    Flow NRMSE*100   Flow SMAPE     Speed R²     Speed MAE    Speed RMSE   Speed Mean   Speed NRMSE*100  Speed SMAPE   
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1         0.9766       10.05        16.30        1168.79      1.39             3.77           0.9224       1.31         2.01         95.18        2.11             4.61          
+2         0.9509       16.60        23.37        1256.92      1.86             5.60           0.9202       1.63         1.96         96.12        2.04             6.81          
+3         0.9355       22.70        27.72        1264.75      2.19             7.68           0.8969       1.68         2.01         97.47        2.06             8.07          
+4         0.9154       26.39        31.87        1291.94      2.47             8.75           0.8456       1.78         2.30         98.56        2.33             9.13          
+5         0.9059       28.07        33.78        1280.10      2.64             9.38           0.6617       2.01         3.06         101.33       3.02             10.91         
+==================================================================================================================================================================================================================
+
+============================================================================================================================================================================================================================
+MICRO-LEVEL VALIDATION (Lane Detail)
+============================================================================================================================================================================================================================
+Sensor   Lane   Flow R²      Flow MAE     Flow RMSE    Flow Mean    Flow NRMSE*100   Flow SMAPE     Speed R²     Speed MAE    Speed RMSE   Speed Mean   Speed NRMSE*100  Speed SMAPE   
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1        1      0.9832       8.19         12.87        201.35       6.39             4.54           0.7227       2.44         3.12         28.67        10.89            7.92          
+         2      0.8413       13.81        24.87        410.71       6.06             3.61           0.9381       1.41         1.92         23.40        8.23             5.02          
+         3      0.9102       10.02        13.25        319.88       4.14             3.17           0.9472       1.07         1.55         22.40        6.91             4.05          
+         4      0.9714       8.19         10.13        236.85       4.28             3.75           0.9920       0.33         0.50         20.71        2.43             1.46          
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2        1      0.9757       10.65        15.94        210.10       7.59             5.52           0.8343       2.06         2.31         28.89        7.99             7.14          
+         2      0.8291       14.52        25.25        417.92       6.04             3.76           0.9157       1.84         2.08         23.66        8.79             8.04          
+         3      0.6155       26.94        30.18        345.58       8.73             8.28           0.8887       1.84         2.17         22.89        9.47             8.08          
+         4      0.9133       14.31        19.52        283.31       6.89             4.85           0.9667       0.79         1.02         20.68        4.91             3.99          
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+3        1      0.9648       15.94        19.40        216.35       8.97             8.41           0.8642       1.73         2.04         28.79        7.09             6.02          
+         2      0.7879       22.85        29.37        431.71       6.80             5.60           0.8756       1.97         2.26         24.18        9.33             9.99          
+         3      0.5994       27.77        30.48        346.54       8.79             8.58           0.8429       2.00         2.23         23.27        9.56             10.13         
+         4      0.7852       24.25        30.10        270.15       11.14            8.12           0.9148       1.03         1.40         21.23        6.60             6.16          
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+4        1      0.9475       19.46        23.81        220.17       10.82            10.01          0.9208       1.24         1.48         28.90        5.13             4.75          
+         2      0.6807       28.44        35.15        437.67       8.03             6.94           0.7269       2.63         3.06         24.71        12.37            13.34         
+         3      0.5150       29.81        33.59        349.21       9.62             9.18           0.6907       2.05         2.69         23.69        11.34            11.38         
+         4      0.7806       27.85        33.64        284.90       11.81            8.86           0.8870       1.18         1.55         21.26        7.31             7.04          
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+5        1      0.9481       19.08        23.37        220.00       10.62            10.14          0.7511       1.46         2.20         29.91        7.35             6.09          
+         2      0.6888       29.58        36.35        438.52       8.29             7.12           0.5648       2.37         3.54         25.23        14.01            13.14         
+         3      0.5914       26.88        30.58        345.81       8.84             8.35           0.2820       2.30         3.47         24.12        14.41            13.01         
+         4      0.6334       36.75        41.97        275.77       15.22            11.92          0.3628       1.92         2.82         22.08        12.77            11.38         
+============================================================================================================================================================================================================================
+
+============================================================
+SUMMARY
+============================================================
+Average Flow NRMSE*100:  2.1102
+Average Speed NRMSE*100: 2.3124
+Fitness (avg NRMSE*100): 2.2518
+============================================================
+Simulation data exported to: log/simulation/gipps_neldermead_macro_optimized_data.csv
+Validation report exported to: log/simulation/gipps_neldermead_macro_optimized_report.txt
+
+Exported: gipps_neldermead_macro_optimized_data.csv, gipps_neldermead_macro_optimized_report.txt
+Best Fitness: 2.251759768978767
+Best Parameters: VectorD(3.24411,	6.00000,	-4.00000,	0.800000,	2.00000)
+Total Duration: 1559812.78 seconds

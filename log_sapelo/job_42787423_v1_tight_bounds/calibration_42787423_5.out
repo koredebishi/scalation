@@ -1,0 +1,108 @@
+========================================
+CALIBRATION ARRAY JOB
+========================================
+Job ID:        42787428
+Array Task ID: 5
+Host:          ra2-24
+Started:       Tue Feb 17 01:30:49 EST 2026
+========================================
+Model:         IDM
+Optimizer:     DE
+========================================
+Working directory: /scratch/krb84578/workDir/scalation_2.0
+Using JAR: target/scala-3.7.4/scalation-assembly.jar
+JAR size:  22M
+
+=== Starting Calibration ===
+Tue Feb 17 01:30:50 EST 2026
+----------------------------------
+| CALIBRATION ARRAY JOB - Task 5 |
+----------------------------------
+Model: idm (IDM)
+Optimizer: de
+Timestamp: 2026-02-17T01:30:50.844886580
+Host: ra2-24
+============================================================
+Starting parameters: VectorD(2.00000,	1.00000,	-1.50000,	1.50000,	0.600000)
+----------------------------------------------------------------------
+   Epoch |            Loss |       Best Loss |   Progress
+----------------------------------------------------------------------
+[ModelOptimizer] Evaluating parameters: VectorD(4.70649,	2.28415,	-7.79844,	2.97548,	-2.67611)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: IDM
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+[IDMDynamics.updateM] INTEGRATOR IN USE: Ballistic
+[31mERROR @ Model.act: actor Vehicle(M-1 ) activation time < 0.0 [0m
+QUIT
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: terminate actor SimActor (VSource.vsrcML_L2.48 with cor_id 48 at 0.0) in agenda
+cleanup: terminate actor Vehicle(M-1 ) in agenda
+cleanup: terminate actor Vehicle(R5-1 ) in agenda
+cleanup: terminate actor Vehicle(M-1 ) in agenda
+cleanup: terminate actor Vehicle(M-1 ) in agenda
+cleanup: terminate actor SimActor (VSource.vsrcML_L1.47 with cor_id 47 at 6.186898749945561) in agenda
+cleanup: terminate actor SimActor (VSource.vsrcML_L0.46 with cor_id 46 at 10.64079872074154) in agenda
+cleanup: terminate actor SimActor (VSource.vsrcML_L3.49 with cor_id 49 at 20.30281903525245) in agenda
+cleanup: terminate actor SimActor (VSource.srcRamp1.50 with cor_id 50 at 29.92798847580596) in agenda
+cleanup: terminate actor SimActor (VSource.srcRamp2.51 with cor_id 51 at 178.9653638558492) in agenda
+cleanup: wait queues
+coroutine counts = (12,9,0)
+[ModelOptimizer] Fitness: 26.0219 | Elapsed: 0.65 sec
+[ModelOptimizer] Evaluating parameters: VectorD(-7.82354,	0.661096,	9.56760,	8.30248,	7.01949)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: IDM
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557
+-----------------------------
+| Model.cleanup in progress |
+-----------------------------
+cleanup: agenda
+cleanup: wait queues
+coroutine counts = (59769,59762,59751)
+[ModelOptimizer] Fitness: 6.3118 | Elapsed: 57.69 sec
+[ModelOptimizer] Evaluating parameters: VectorD(-1.18387,	-8.88131,	-5.30287,	2.39603,	5.41728)
+
+======================================================================
+TRAFFIC MODEL BUILDER SUMMARY
+======================================================================
+Network:      US-101-N-DonaldDoyle
+Segments:     7
+Lanes:        4
+Junctions:    8
+Ramps:        2
+Sensors:      5
+Mode:         PeMS Data-Driven
+Car-Following: IDM
+ODE Solver:   Ballistic
+Vmax:         35.0 m/s
+======================================================================
+Skipping Source actor due to time limit at clock = 43201.00125327633
+Skipping Source actor due to time limit at clock = 43210.6788297557

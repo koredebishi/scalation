@@ -13,7 +13,7 @@ package simulation
 package process
 
 import scala.math.{abs, floor}
-//import scala.runtime.ScalaRunTime.stringOf
+import scala.runtime.ScalaRunTime.stringOf
 import scalation.animation.CommandType.*
 import scalation.mathstat.VectorD
 import scalation.random.{Discrete, Variate}
@@ -58,7 +58,7 @@ class Transport (name: String, val from: Component, val to: Component,
     private [process] var selector: Variate = Discrete (VectorD (0.25, 0.5, 0.25))
             // Random variate for selecting next direction, defaults to left (.25), straight (.50), right (.25)
 
-    //debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
+    debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
 
     if abs (bend) < EPSILON then
         curve.setLine (p1, p2)
@@ -139,7 +139,7 @@ class Transport (name: String, val from: Component, val to: Component,
         //println(s"The director in the Move Transport $director")
         val actor    = director.theActor
 
-        //debug ("move", s"actor = $actor this  = along the Transport")
+        debug ("move", s"actor = $actor this  = along the Transport")
         val duration = if isSpeed then curve.length / motion.gen else motion.gen
         tally (duration)
         accum (onTransport)

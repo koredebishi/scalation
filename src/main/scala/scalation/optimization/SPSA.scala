@@ -44,7 +44,7 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
     private val coin  = Bernoulli ()                                   // Bernoulli (0/1) RVG
     private var alpha = 0.602
     private var gamma = 0.101
-    private var A     = 100.0
+    private var A     = 0.1 * max_iter    // stability constant (~10% of max_iter per Spall (1998))
     private var a     = 0.16       // these numbers are from Spall (1998) DOI: 10.1109/7.705889
     private var c     = 1.0
 
@@ -54,7 +54,7 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
     /** Reset the parameters.
      *  @param params  the given starting parameters of a VectorD
      */
-    def reset (params: VectorD = VectorD (0.602, 0.101, 10.0, 0.16, 1.0)): Unit =
+    def reset (params: VectorD = VectorD (0.602, 0.101, 0.1 * max_iter, 0.16, 1.0)): Unit =
         if params.length != 5 then flaw ("reset", "failed! did not pass 5 parameters")
         alpha  = params(0)
         gamma  = params(1)

@@ -74,74 +74,40 @@ object GippsDynamics
 
     private val debug = debugf ("GippsDynamics", false)              // debug function
     private[process] val easyW = new EasyWriter("simulation", "CalRoute101Model.txt")
-    //easyW.off()
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    
+    /** Integrator type for position update (configurable, default Ballistic) */
+    var integratorType: IntegratorType = IntegratorType.Ballistic
 
-
-    /** Update the vehicle's velocity and position using Gipps' Model (located in `Motion`)
-     * and Butcher's method for solving ordinary differential equations.
+    /** Update the vehicle's velocity and position using Gipps' Model.
+     *  Position update method is configurable via integratorType.
      *
      * @param car the car/vehicle whose velocity and position is being updated
      */
     def updateM(car: Vehicle, length: Double): Unit =
         val ref = car.myPathNode.ahead
         val car_ahead = if ref != null then ref.elem else null
+        val dt = prop("rt")
 
-        // ------------------------------------------------------------------
-        // WRONG (OLD LOGIC — DO NOT USE)
-        //
-        // val v = gipps(car, car_ahead, length) + EPSILON
-        // val x = butcher(car.t_disp, v, car.velocity, prop("rt"))
-        //
-        // PROBLEM:
-        // - `v` here is v(t+τ)
-        // - Butcher expects ft = v(t), ft_rt = v(t−τ)
-        // - Passing v(t+τ) into the integrator violates causality
-        // - This mixes future velocity prediction with position reconstruction
-        // ------------------------------------------------------------------
-
-        // ------------------------------------------------------------------
-        // CORRECT LOGIC (REPLACEMENT)
-        //
         // Step 1: compute next velocity using Gipps (discrete rule)
-        // This gives v(t+τ) but is NOT used inside the Butcher integrator.
-        // ------------------------------------------------------------------
-        val v = gipps(car, car_ahead, length) + EPSILON // v(t+τ)
+        val v = gipps(car, car_ahead, length) + EPSILON
 
-        println(s"car_id = ${car.displayLabel} : velocity = ${car.velocity} -> $v")
+        // Step 2: update position based on configured integrator type
+        val x = integratorType match
+            case IntegratorType.Ballistic =>
+                // Ballistic: x(t+τ) = x(t) + v(t) * τ
+                car.t_disp + car.velocity * dt
+            case IntegratorType.butcher =>
+                // Butcher 5th order using past velocities
+                butcher(car.t_disp, car.velocity, car.o_velocity, dt)
+            case _ =>
+                // Default to Ballistic for any other type
+                car.t_disp + car.velocity * dt
 
-        // ------------------------------------------------------------------
-        // Step 2: update position using ONLY past velocity samples
-        //          Can also (replace this with)  kinematics.
-        //        // --- Position update using kinematics ---
-        //        // x(t+τ) = x(t) + v(t)τ + ½aτ²
-        //        val dx = v_old * rt + 0.5 * a * rt * rt
-        // butcher(
-        //   Ft     = x(t),
-        //   ft     = v(t),
-        //   ft_rt  = v(t−τ),
-        //   rt     = τ
-        // )
-        // This matches Wikipedia's Butcher method exactly.
-        // ------------------------------------------------------------------
-        val x = butcher(
-            car.t_disp, // x(t)
-            car.velocity, // v(t)
-            car.o_velocity, // v(t−τ)
-            prop("rt")
-        )
-
-        println(s"car_id = ${car.displayLabel} : position = ${car.t_disp} -> $x")
-
-        // ------------------------------------------------------------------
         // Step 3: commit velocity state AFTER position integration
-        // ------------------------------------------------------------------
-        car.o_velocity = car.velocity // store v(t) as old velocity
-        car.velocity = v // assign v(t+τ)
+        car.o_velocity = car.velocity
+        car.velocity = v
 
-        // ------------------------------------------------------------------
         // Step 4: update displacement (segment-bounded)
-        // ------------------------------------------------------------------
         car.o_t_disp = car.t_disp
         val dx = x - car.t_disp
 
@@ -219,15 +185,20 @@ object KraussDynamics
 
     private val debug = debugf("KraussDynamics", false)
     
-    /** Krauss stochastic imperfection magnitude (m/s) - hardcoded for now */
-    private val sigma = 0.5
+    /** Krauss stochastic imperfection magnitude (m/s)
+     *  Must be small relative to amax*tau to allow net acceleration
+     */
+    private val sigma = 0.2
     
     /** Uniform random variate for stochastic noise */
     private val noiseRV = scalation.random.Uniform(0.0, sigma)
+    
+    /** Integrator type for position update (configurable, default Ballistic) */
+    var integratorType: IntegratorType = IntegratorType.Ballistic
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the vehicle's velocity and position using Krauss Model
-     *  with Ballistic position update.
+    /** Update the vehicle's velocity and position using Krauss Model.
+     *  Position update method is configurable via integratorType.
      *  @param car    the vehicle to update
      *  @param length the segment length
      */
@@ -252,8 +223,14 @@ object KraussDynamics
             xp, vp, dt, s
         )
 
-        // Step 2: Ballistic position update using current velocity
-        val x_new = car.t_disp + car.velocity * dt
+        // Step 2: Position update based on configured integrator type
+        val x_new = integratorType match
+            case IntegratorType.Ballistic =>
+                car.t_disp + car.velocity * dt
+            case IntegratorType.butcher =>
+                butcher(car.t_disp, car.velocity, car.o_velocity, dt)
+            case _ =>
+                car.t_disp + car.velocity * dt
 
         // Step 3: Commit velocity state AFTER position update
         car.o_velocity = car.velocity
@@ -324,7 +301,7 @@ object IDMDynamics
 
     private val debug = debugf ("IDMDynamics", true)                // debug function
 
-    private val FREERANGE = 50.0
+    private val FREERANGE = 150.0
 
     /** Configurable integrator type for ODE solving - default Ballistic */
     var integratorType: IntegratorType = IntegratorType.Ballistic
@@ -348,10 +325,14 @@ object IDMDynamics
 
         // Snapshot leader state (frozen during integration)
         val (x_leader, v_leader): (Double, Double) =                // leader's (position, velocity)
-            if car_ahead == null || car_ahead.t_disp - car.t_disp > FREERANGE then
-                (car.t_disp + 1000.0, car.velocity)  // Phantom leader: free-flow
+            if car_ahead == null then
+                (car.t_disp + 1000.0, car.velocity)                 // no leader: free-flow
+            else if car_ahead.segId < car.segId then
+                (car.t_disp + 1000.0, car.velocity)                 // leader is behind (stale DLL node): free-flow
+            else if car_ahead.t_disp - car.t_disp > FREERANGE then
+                (car.t_disp + 1000.0, car.velocity)                 // leader is far ahead: free-flow
             else
-                (car_ahead.t_disp, car_ahead.velocity)  // Real leader: snapshot
+                (car_ahead.t_disp, car_ahead.velocity)              // real leader: use it
 
         // ─────────────────────────────────────────────────────────────────────────
         // STEP 2: Save old state for history tracking

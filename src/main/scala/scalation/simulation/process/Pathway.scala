@@ -33,7 +33,7 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
                laneShift: VectorD = VectorD(0.0, 0.0))
     extends Component with Joinable:
 
-    private val debug = debugf ("Pathway", false)             // debug function
+    private val debug = debugf ("Pathway", true)             // debug function
     val vList = DoublyLinkedList [Vehicle]                   // one lane = one doubly linked list
 
     // Enhanced DLL identification for debugging

@@ -6,6 +6,13 @@
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_23" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../..">
+      <excludeFolder url="file://$MODULE_DIR$/../../../context" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../data" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../log" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../log_sapelo" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../src/main/java" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../src/main/scala/scalation/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../store" />
       <excludeFolder url="file://$MODULE_DIR$/../../../target" />
     </content>
     <orderEntry type="inheritedJdk" />

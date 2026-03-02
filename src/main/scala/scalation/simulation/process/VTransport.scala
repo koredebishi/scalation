@@ -14,7 +14,7 @@ package process
 
 
 //import scala.collection.mutable.ArrayDeque
-import scala.runtime.ScalaRunTime.stringOf
+//import scala.runtime.ScalaRunTime.stringOf
 
 import scalation.animation.CommandType._
 //import scalation.database.BpTreeMap
@@ -41,7 +41,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
     extends Transport (name, from_, to_, null, isSpeed, bend, shift1, shift2):
 
     private val debug = debugf ("VTransport", false)                     // debug function
-    debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
+    //debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
 
     var length = 0.0    //  The actual length of the road segment.
     if length <= 0.0 then length = curve.length

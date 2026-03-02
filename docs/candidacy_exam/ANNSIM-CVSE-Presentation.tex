@@ -1,0 +1,460 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{pgfpages}
+
+
+% UGA Colors
+\definecolor{UGARed}{HTML}{BA0C2F}
+\definecolor{UGABlack}{HTML}{000000}
+
+% Apply UGA colors to Madrid theme
+\setbeamercolor{palette primary}{bg=UGARed,fg=white}
+\setbeamercolor{palette secondary}{bg=UGABlack,fg=white}
+\setbeamercolor{palette tertiary}{bg=UGARed,fg=white}
+\setbeamercolor{title}{fg=UGARed}
+\setbeamercolor{frametitle}{bg=UGARed,fg=white}
+\setbeamercolor{structure}{fg=UGARed}
+\setbeameroption{show notes on second screen=right}
+
+% UGA Logo on title page
+\titlegraphic{\includegraphics[height=1.5cm]{assets/download.png}}
+\logo{\includegraphics[height=1.5cm]{assets/download.png}}
+
+% Title info
+\title[Beyond Corridor Averages]{BEYOND CORRIDOR AVERAGES: LANE-LEVEL VALIDATION OF MICROSCOPIC FREEWAY SIMULATION WITH DATA-DRIVEN ARRIVALS}
+\author{Korede Bishi}
+\institute{Submitted to ANNSIM 2026}
+\date{January 2026}
+
+\begin{document}
+
+%==============================================================================
+% SLIDE 1: Title
+%==============================================================================
+    \begin{frame}
+        \titlepage
+        \note{Good morning, and thanks for being here. This talk is about lane-level validation of microscopic traffic simulation using a data-driven arrival process. The big issue we address is simple: we model at lane level, but we often validate at corridor level.}
+    \end{frame}
+% SPEAKER NOTES - Slide 1:
+% "Good morning/afternoon. I'm presenting our work on lane-level validation
+% of microscopic traffic simulation using a data-driven arrival approach.
+% This work addresses a critical gap between how we model traffic and how
+% we validate those models."
+
+%==============================================================================
+% SLIDE 2: Problem & Motivation
+%==============================================================================
+    \begin{frame}{Problem \& Motivation}
+        \begin{columns}
+            \begin{column}{0.6\textwidth}
+                \textbf{Traffic simulation is critical for:}
+                \begin{itemize}
+                    \item Urban planning and infrastructure design
+                    \item Answering "what-if" questions
+                    \item Evaluating disruption scenarios
+                \end{itemize}
+
+                \vspace{1em}
+                \textbf{The Problem:}
+                \begin{itemize}
+                    \item Car-following models operate at \textbf{lane level}
+                    \item But validation uses \textbf{aggregated corridor metrics}
+                    \item Lane-specific dynamics are \textbf{hidden}
+                \end{itemize}
+            \end{column}
+            \begin{column}{0.4\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{assets/sensor_timeseries_plot.pdf}
+            \end{column}
+        \end{columns}
+        \note{Traffic simulation supports major planning decisions, so validation quality matters. The mismatch is this: the model makes lane-level decisions vehicle by vehicle, but validation is often done on corridor totals. When we aggregate too early, lane-specific behavior gets hidden.}
+    \end{frame}
+% SPEAKER NOTES - Slide 2:
+% "Traffic simulation helps city planners make critical infrastructure decisions.
+% The core issue is a mismatch: car-following models make decisions at the
+% lane level - individual vehicles following leaders in specific lanes.
+% But when we validate these models, we typically aggregate everything to
+% corridor-level totals, hiding what's actually happening in each lane."
+
+%==============================================================================
+% SLIDE 3: Research Questions
+%==============================================================================
+    \begin{frame}{Research Questions}
+        \begin{enumerate}
+            \item[\textbf{RQ1:}] Does the choice of \textbf{numerical integrator} affect simulation accuracy?
+            \vspace{1em}
+            \item[\textbf{RQ2:}] Does the \textbf{arrival process} (how vehicles enter) affect accuracy?
+            \vspace{1em}
+            \item[\textbf{RQ3:}] What do \textbf{lane-level validation metrics} reveal that aggregate metrics hide?
+        \end{enumerate}
+
+        \vspace{1.5em}
+        \centering
+        \textit{Spoiler: Integrators don't matter much. Arrivals matter a lot.}
+        \note{We organized the study around three questions. Does integrator choice matter? Does the arrival process matter? And what does lane-level validation reveal that aggregate metrics miss? Short answer: integrator choice matters little, but arrival modeling matters a lot.}
+    \end{frame}
+% SPEAKER NOTES - Slide 3:
+% "We structured our investigation around three questions.
+% First, numerical integration - we're solving differential equations, does
+% solver choice matter?
+% Second, arrival processes - how vehicles enter the simulation. Does modeling
+% this carefully make a difference?
+% Third, what do we learn by validating at the lane level?
+% I'll give you the punchline now: integrators barely matter, but arrival
+% process modeling is crucial."
+
+%==============================================================================
+% SLIDE 4: Methodology - IDM
+%==============================================================================
+    \begin{frame}{Car-Following: Intelligent Driver Model}
+        The IDM computes acceleration as a continuous function:
+
+        \begin{equation*}
+            a_n = a_{\max} \left[
+                               1 - \left( \frac{v_n}{v_{\max}} \right)^\delta
+                               - \left( \frac{s^*(v_n, \Delta v)}{s_n} \right)^2
+            \right]
+        \end{equation*}
+
+        \vspace{0.5em}
+        \textbf{Key properties:}
+        \begin{itemize}
+            \item Smooth transitions: free-flow $\rightarrow$ following $\rightarrow$ braking
+            \item No abrupt acceleration jumps (unlike Gipps model)
+            \item 5 parameters: $s_0$, $a_{\max}$, $b$, $T$, $v_{\max}$
+        \end{itemize}
+
+        \vspace{0.5em}
+        \textbf{We used standard literature values} (no calibration in this study)
+        \note{A quick way to read IDM is as two parts. The first is free-flow: it keeps the vehicle accelerating toward the desired speed, v0, or vmax as shown here. The second part is the interaction term based on the ratio s-star over s, so the car reacts as current spacing approaches the desired spacing. And s-star itself has two pieces: an equilibrium spacing term and a dynamic closing-speed term. That dynamic piece is what gives IDM its intelligent braking behavior. In this study, we used literature IDM parameters and did not calibrate yet.}
+    \end{frame}
+% SPEAKER NOTES - Slide 4:
+% "For car-following, we use the Intelligent Driver Model, or IDM.
+% The key advantage of IDM is smooth acceleration - it transitions gradually
+% between free-flow driving, following a leader, and braking.
+% This is important because abrupt changes in other models like Gipps can
+% create unrealistic stop-and-go oscillations.
+% We used standard parameter values from the literature. Calibration is
+% future work - our focus here is on the arrival process and validation approach."
+
+%==============================================================================
+% SLIDE 5: Methodology - Shifted Erlang
+%==============================================================================
+    \begin{frame}{Arrival Process: Shifted Erlang-2}
+        \textbf{Problem with Poisson arrivals:}
+        \begin{itemize}
+            \item Allows arbitrarily small headways (unrealistic)
+            \item No minimum spacing between vehicles
+        \end{itemize}
+
+        \vspace{0.5em}
+        \textbf{Our solution: Shifted Erlang-2 distribution}
+        \begin{equation*}
+            Y = \tau - \mu \ln(U_1 U_2)
+        \end{equation*}
+
+        where $\tau > 0$ = minimum feasible headway
+
+        \vspace{0.5em}
+        \textbf{Data-driven parameterization:}
+        \begin{itemize}
+            \item $\bar{\mu}_{\ell,t}$ = mean inter-arrival from PeMS flow data
+            \item $\mu = \frac{\bar{\mu}_{\ell,t} - \tau}{2}$ (matches empirical mean)
+        \end{itemize}
+
+% \centering
+        \textit{Enforces realistic spacing while matching observed flow}
+        \note{This equation does two jobs. First, tau is a hard minimum headway, so entries cannot be unrealistically close. Second, the Erlang-2 part adds realistic variation using two exponential stages. We sample that with inverse transform: draw U1 and U2 from Uniform(0,1), then apply minus mu times log. Adding tau shifts the distribution right, so all headways stay physically reasonable. That is why realism and accuracy improve.}
+    \end{frame}
+% SPEAKER NOTES - Slide 5:
+% "Now the key methodological contribution: arrival process modeling.
+% The standard approach uses Poisson arrivals, but this allows two vehicles
+% to arrive almost simultaneously - physically impossible.
+% We use a shifted Erlang-2 distribution. The shift parameter tau enforces
+% a minimum headway - vehicles can't arrive faster than physically possible.
+% The parameters come directly from PeMS detector data, so this is data-driven,
+% not arbitrary. This simple change has a major impact on accuracy."
+
+% % %==============================================================================
+% % % SLIDE 6: Study Corridor
+% % %==============================================================================
+% \begin{frame}{Study Corridor: US-101 Northbound}
+% \begin{columns}
+% \begin{column}{0.5\textwidth}
+% \textbf{Location:} Donald Doyle Highway, California
+
+% \vspace{0.5em}
+% \textbf{Characteristics:}
+% \begin{itemize}
+%     \item 1.4 km segment
+%     \item 4 mainline lanes
+%     \item 5 loop detector stations
+%     \item 2 on-ramp merge points
+% \end{itemize}
+
+% \vspace{0.5em}
+% \textbf{Data:}
+% \begin{itemize}
+%     \item PeMS loop detector data
+%     \item 12-hour period (6 AM - 6 PM)
+%     \item 15-minute aggregation intervals
+%     \item $\sim$60,000 vehicles total
+% \end{itemize}
+% % \end{column}
+% % \begin{column}{0.5\textwidth}
+% % \centering
+% % Include your corridor figure here
+% % \includegraphics[width=\textwidth]{assets/corridor_diagram.pdf}
+% % \textbf{[Corridor Diagram]}\\
+% % S1 --- S2 --- S3 --- S4 --- S5\\
+% % \vspace{0.5em}
+% % $\uparrow$ Ramp1 \hspace{1cm} $\uparrow$ Ramp2
+% % \end{column}
+% \begin{column}{0.5\textwidth}
+% \centering
+% \includegraphics[width=\textwidth]{assets/fig3_micro_flow_validation.pdf}
+% \end{column}
+% \end{frame}
+
+% ==============================================================================
+% SLIDE 6: Study Corridor
+% ==============================================================================
+    \begin{frame}{Study Corridor: US-101 Northbound}
+        \begin{columns}
+            \begin{column}{0.5\textwidth}
+                \textbf{Location:} Donald Doyle Highway, California
+
+                \vspace{0.5em}
+                \textbf{Characteristics:}
+                \begin{itemize}
+                    \item 1.4 km segment
+                    \item 4 mainline lanes
+                    \item 5 loop detector stations
+                    \item 2 on-ramp merge points
+                \end{itemize}
+
+                \vspace{0.5em}
+                \textbf{Data:}
+                \begin{itemize}
+                    \item PeMS loop detector data
+                    \item 12-hour period (6 AM--6 PM)
+                    \item 15-minute aggregation intervals
+                    \item $\sim$60{,}000 vehicles total
+                \end{itemize}
+            \end{column}
+
+            \begin{column}{0.5\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{assets/datapoint.png}
+            \end{column}
+        \end{columns}
+        \note{This is a 1.4 km segment of northbound US-101. We use five mainline detector stations across four lanes, plus two on-ramp merge points. That gives us a realistic mix of lane changes and congestion. The dataset is 12 hours of PeMS observations, roughly 60,000 vehicles.}
+    \end{frame}
+
+% SPEAKER NOTES - Slide 6:
+% "Our study corridor is a 1.4 kilometer segment of US-101 in California.
+% It has four mainline lanes with five loop detector stations providing
+% ground truth for validation.
+% There are two on-ramp merge points, which create the kind of complex
+% lane-changing and congestion dynamics we want to validate.
+% We used PeMS data covering a full 12-hour period with about 60,000
+% vehicle observations."
+
+%==============================================================================
+% SLIDE 7: Results - Integrators
+%==============================================================================
+    \begin{frame}{Result 1: Numerical Integrators}
+        \begin{columns}
+            \begin{column}{0.55\textwidth}
+                \textbf{Tested integration methods:}
+                \begin{itemize}
+                    \item Euler, Heun, RK2, RK3, RK4
+                    \item Dormand-Prince (DOPRI5)
+                    \item Ballistic (simple kinematics)
+                \end{itemize}
+
+                \vspace{1em}
+                \textbf{Key Finding:}
+                \begin{itemize}
+                    \item Accuracy variation: \textbf{$<$ 1\%}
+                    \item Runtime: Ballistic is \textbf{3$\times$ faster}
+                \end{itemize}
+
+                \vspace{1em}
+                \fbox{\textbf{Recommendation: Use Ballistic}}
+            \end{column}
+            \begin{column}{0.45\textwidth}
+                \centering
+                \small
+                \begin{tabular}{lcc}
+                    \toprule
+                    \textbf{Method} & \textbf{Fitness} & \textbf{Time} \\
+                    \midrule
+                    Ballistic & 15.67 & 17 min \\
+                    RK4 & 15.72 & 51 min \\
+                    Euler & 15.79 & 44 min \\
+                    \bottomrule
+                \end{tabular}
+                \vspace{1em}
+
+                \textit{Fitness = combined flow + speed error}
+            \end{column}
+        \end{columns}
+        \note{First result: integrator choice has negligible effect on accuracy. Across methods, variation is under 1 percent. Runtime is the real difference. Ballistic is about three times faster than RK4. So the practical choice is Ballistic.}
+    \end{frame}
+% SPEAKER NOTES - Slide 7:
+% "First finding: numerical integrator choice has negligible impact.
+% We tested multiple methods, from simple Euler to fourth-order
+% Runge-Kutta to adaptive Dormand-Prince.
+% The surprising result: less than 1% variation in accuracy across all methods.
+% But runtime differs significantly - Ballistic integration runs three times
+% faster than RK4.
+% The practical recommendation: use the simplest, fastest method. There's no
+% accuracy benefit to sophisticated integrators in this context."
+
+%==============================================================================
+% SLIDE 8: Results - Arrival Process
+%==============================================================================
+    \begin{frame}{Result 2: Arrival Process Matters}
+        \begin{columns}
+            \begin{column}{0.5\textwidth}
+                \textbf{Shifted Erlang-2 vs Poisson:}
+
+                \vspace{0.5em}
+                \begin{itemize}
+                    \item Overall: \textbf{28\% more accurate}
+                    \item Sensor 1 RMSE: \textbf{47\% reduction}
+                    \begin{itemize}
+                        \item Poisson: 23.04 vehicles
+                        \item Erlang: 12.24 vehicles
+                    \end{itemize}
+                \end{itemize}
+
+                \vspace{1em}
+                \textbf{Why?}
+                \begin{itemize}
+                    \item Minimum headway ($\tau$) prevents unrealistic bunching
+                    \item Gives IDM proper spacing to work with
+                \end{itemize}
+            \end{column}
+            \begin{column}{0.5\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{assets/fig2c_cumulative_sse.pdf}
+            \end{column}
+        \end{columns}
+        \note{Second result, and the bigger one: arrival modeling changes outcomes a lot. Shifted Erlang-2 improves overall accuracy by 28 percent. At Sensor 1, RMSE drops by 47 percent versus Poisson. The key is minimum headway. It prevents unrealistic bunching and gives IDM better initial spacing.}
+    \end{frame}
+% SPEAKER NOTES - Slide 8:
+% "Now the important result: arrival process modeling makes a huge difference.
+% The shifted Erlang-2 distribution improves overall accuracy by 28 percent.
+% At Sensor 1, we see a 47 percent reduction in prediction error compared
+% to Poisson arrivals.
+% The reason is simple: the minimum headway parameter prevents vehicles from
+% arriving unrealistically close together. This gives the car-following model
+% proper spacing to work with from the start.
+% This is a much bigger effect than integrator choice."
+
+%==============================================================================
+% SLIDE 9: Results - Lane-Level
+%==============================================================================
+    \begin{frame}{Result 3: Lane-Level Reveals Hidden Dynamics}
+        \begin{columns}
+            \begin{column}{0.5\textwidth}
+                \textbf{Lane-specific patterns:}
+
+                \vspace{0.5em}
+                \textbf{Fast lanes (L1):}
+                \begin{itemize}
+                    \item Highly predictable
+                    \item Flow NRMSE: 5.8\% -- 10.3\%
+                \end{itemize}
+
+                \vspace{0.5em}
+                \textbf{Slow lanes (L4):}
+                \begin{itemize}
+                    \item High variability
+                    \item Affected by merging traffic
+                    \item Stop-and-go dynamics
+                \end{itemize}
+
+                \vspace{0.5em}
+                \textit{Aggregate metrics hide these differences!}
+            \end{column}
+            \begin{column}{0.5\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{assets/fig3_micro_flow_validation.pdf}
+            \end{column}
+        \end{columns}
+        \note{Third result comes from lane-level validation. Fast lanes are more predictable and are captured better. Slow lanes near merges are more variable and harder to match, especially under stop-and-go conditions. Corridor averages hide these differences, lane-level metrics expose them.}
+    \end{frame}
+% SPEAKER NOTES - Slide 9:
+% "The third finding comes from lane-level validation itself.
+% We see clear, consistent differences between lanes.
+% Fast lanes - the leftmost lanes - are highly predictable. The model
+% captures their behavior well.
+% Slow lanes near the merge points show much higher variability. They're
+% affected by merging vehicles and stop-and-go traffic that's harder to model.
+% This is exactly the kind of insight you lose with corridor-level validation.
+% If we only looked at totals, we'd think the model is doing fine everywhere,
+% but lane-level analysis shows where it struggles."
+
+%==============================================================================
+% SLIDE 10: Conclusions
+%==============================================================================
+    \begin{frame}{Conclusions}
+        \textbf{Three key findings:}
+
+        \vspace{0.5em}
+        \begin{enumerate}
+            \item \textbf{Numerical integrator:} Negligible impact ($<$1\%)
+            \begin{itemize}
+                \item[$\rightarrow$] Use Ballistic (simplest, 3$\times$ faster)
+            \end{itemize}
+
+            \vspace{0.5em}
+            \item \textbf{Arrival process:} Major impact (28\% improvement)
+            \begin{itemize}
+                \item[$\rightarrow$] Use Shifted Erlang-2 with minimum headway
+            \end{itemize}
+
+            \vspace{0.5em}
+            \item \textbf{Lane-level validation:} Reveals hidden dynamics
+            \begin{itemize}
+                \item[$\rightarrow$] Don't rely only on aggregate metrics
+            \end{itemize}
+        \end{enumerate}
+
+        \vspace{0.6em}
+        \textbf{Limitations:}
+        \begin{itemize}
+            \item No IDM calibration in this study (literature parameter values used)
+            \item Sensor 4 speed data required imputation (currently single-lane style)
+            \item Findings are from one corridor/time window (US-101, 12-hour period)
+        \end{itemize}
+
+        \vspace{0.2em}
+        \textbf{Future work:} Systematic IDM calibration (SPSA, GA, SA) and multi-lane imputation, evaluated with lane-level metrics.
+
+        \vspace{1em}
+        \centering
+        \Large\textbf{Questions?}
+        \note{Final takeaway: how vehicles enter the system matters more than which integrator we use. We still have three limitations: no IDM calibration yet, Sensor 4 speed imputation quality, and generalization beyond this corridor and time window. Next step is to calibrate with SPSA, GA, and SA, improve multi-lane imputation, and validate across additional sites.}
+    \end{frame}
+% SPEAKER NOTES - Slide 10:
+% "To summarize our three main contributions:
+% First, don't waste compute cycles on fancy integrators - Ballistic works
+% just as well and runs much faster.
+% Second, do invest effort in arrival process modeling. The shifted Erlang
+% distribution with a minimum headway parameter substantially improves accuracy.
+% Third, validate at the lane level. Aggregate metrics hide important dynamics,
+% especially in slower lanes affected by merging.
+% Our future work will focus on systematic calibration of IDM parameters.
+% Thank you. I'm happy to take questions."
+
+\end{document}
+
