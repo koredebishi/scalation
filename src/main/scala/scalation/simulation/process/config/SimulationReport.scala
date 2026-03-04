@@ -76,6 +76,7 @@ case class ValidationResult (sensors: Array [SensorValidation],
  *  @param nRows        number of time intervals
  */
 class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
+                        simDensity: Array [MatrixD],
                         demand: PeMSDemand, nSensors: Int = 5,
                         nLanes: Int = 4, nRows: Int = 48):
 
@@ -329,27 +330,28 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
         debug ("exportCSV", s"Exporting to log/simulation/$filename")
         val csvWriter = new EasyWriter ("simulation", filename)
 
-        // Build header: S1L1_Flow,S1L2_Flow,...,S1L1_Speed,S1L2_Speed,...
+        // Build header: S1L1_Flow,...,S5L4_Flow,S1L1_Speed,...,S5L4_Speed,S1L1_Density,...,S5L4_Density
         val header = (for s <- 1 to nSensors; l <- 1 to nLanes yield s"S${s}L${l}_Flow").mkString(",") + "," +
-                     (for s <- 1 to nSensors; l <- 1 to nLanes yield s"S${s}L${l}_Speed").mkString(",")
+                     (for s <- 1 to nSensors; l <- 1 to nLanes yield s"S${s}L${l}_Speed").mkString(",") + "," +
+                     (for s <- 1 to nSensors; l <- 1 to nLanes yield s"S${s}L${l}_Density").mkString(",")
         csvWriter.println (header)
 
-        // Get number of time rows
         val numRows = simFlow(0).dim
 
-        // Write each time row
         cfor (0, numRows) { row =>
-            // Flow values for all sensors
             val flowValues = for s <- 0 until nSensors yield
                 val flowRow = simFlow(s)(row)
                 (for lane <- 0 until nLanes yield flowRow(lane).toInt).mkString(",")
 
-            // Speed values for all sensors
             val speedValues = for s <- 0 until nSensors yield
                 val speedRow = simSpeed(s)(row)
                 (for lane <- 0 until nLanes yield f"${speedRow(lane)}%.2f").mkString(",")
 
-            val rowData = flowValues.mkString(",") + "," + speedValues.mkString(",")
+            val densityValues = for s <- 0 until nSensors yield
+                val densityRow = simDensity(s)(row)
+                (for lane <- 0 until nLanes yield f"${densityRow(lane)}%.6f").mkString(",")
+
+            val rowData = flowValues.mkString(",") + "," + speedValues.mkString(",") + "," + densityValues.mkString(",")
             csvWriter.println (rowData)
         }
 
@@ -436,20 +438,23 @@ object SimulationReport:
         debug ("fromJunctions", s"pemsIndices = ${pemsIndices.mkString(",")}")
 
         val nSensors = pemsIndices.length
-        val simFlow = new Array [MatrixD] (nSensors)
-        val simSpeed = new Array [MatrixD] (nSensors)
+        val simFlow    = new Array [MatrixD] (nSensors)
+        val simSpeed   = new Array [MatrixD] (nSensors)
+        val simDensity = new Array [MatrixD] (nSensors)
 
         cfor (0, nSensors) { s =>
             val juncIdx = pemsIndices(s)
             debug ("fromJunctions", s"  sensor $s: juncIdx=$juncIdx, junction=${junctions(juncIdx).name}")
             val (flow, speed) = junctions(juncIdx).getRecorderMat
-            debug ("fromJunctions", s"    flow: ${flow.dim}x${flow.dim2}, speed: ${speed.dim}x${speed.dim2}")
-            simFlow(s) = flow
-            simSpeed(s) = speed
+            val density       = junctions(juncIdx).getDensityMat
+            debug ("fromJunctions", s"    flow: ${flow.dim}x${flow.dim2}, speed: ${speed.dim}x${speed.dim2}, density: ${density.dim}x${density.dim2}")
+            simFlow(s)    = flow
+            simSpeed(s)   = speed
+            simDensity(s) = density
         }
 
         debug ("fromJunctions", "Report created successfully")
-        new SimulationReport (simFlow, simSpeed, demand, nSensors)
+        new SimulationReport (simFlow, simSpeed, simDensity, demand, nSensors)
     end fromJunctions
 
 end SimulationReport

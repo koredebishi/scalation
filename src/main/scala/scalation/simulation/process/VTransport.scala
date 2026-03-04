@@ -73,6 +73,15 @@ class VTransport (name: String, from_ : Component, to_ : Component,
         last
     end getLast
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the instantaneous traffic density on this segment.
+     *  density k = number of vehicles on segment / segment length  (veh/m)
+     *  Called from driveHighway after each move() to snapshot the segment state.
+     */
+    def snapshotDensity (): Double =
+        if length > 0.0 then vdeque.size.toDouble / length else 0.0
+    end snapshotDensity
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Move the entity (SimActor) smoothly down this VTransport (e.g., road).

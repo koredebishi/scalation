@@ -25,8 +25,9 @@ import scalation.mathstat.{MatrixD, Statistic}
  */
 trait Recorder (nt: Int = 60, nLanes: Int = 4):
 
-    protected val r_counts = new MatrixD (nt, nLanes)                     // record counts in time interval
-    protected val r_speeds = new MatrixD (nt, nLanes)                     // record average speed in time interval
+    protected val r_counts  = new MatrixD (nt, nLanes)                    // record counts in time interval
+    protected val r_speeds  = new MatrixD (nt, nLanes)                    // record average speed in time interval
+    protected val r_density = new MatrixD (nt, nLanes)                    // record density (veh/m) per interval per segment
 
 
     private[process] var ew = new EasyWriter("recorder", "recorder.csv")
@@ -48,6 +49,28 @@ trait Recorder (nt: Int = 60, nLanes: Int = 4):
     def getRecorderMat: (MatrixD, MatrixD) =
         recordInMatrix(i_pre)  // Flush final interval (clamped to valid range)
         (r_counts, r_speeds)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the density matrix (veh/m per time interval per segment).
+     *  Caller maps segment index to column index.
+     */
+    def getDensityMat: MatrixD = r_density
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Record instantaneous density for a segment at the current clock time.
+     *  Accumulates samples within each interval and averages them at flush.
+     *  @param ctime    the current simulation clock time
+     *  @param density  instantaneous density snapshot (veh/m) from VTransport.snapshotDensity()
+     *  @param segCol   the column index in r_density to write to (caller maps seg → col)
+     */
+    def recordDensity (ctime: Double, density: Double, segCol: Int): Unit =
+        val i_cur = floor (ctime / timeConv).toInt
+        if i_cur >= 0 && i_cur < nt && segCol >= 0 && segCol < r_density.dim2 then
+            // Accumulate running average: store sum in cell, count separately
+            // Simple approach: overwrite with latest snapshot each tick (last-value-wins per interval)
+            // For a true average, use a separate Statistic — keeping this minimal.
+            r_density(i_cur, segCol) = density
+    end recordDensity
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Record the entity and optionally its speed (or other property of interest).

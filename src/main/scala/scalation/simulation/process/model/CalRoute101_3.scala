@@ -204,8 +204,9 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
                     val target = if laneID > 0 then laneID - 1 else laneID + 1
                     route.changeLane(laneID, target, this, seg)
                 end if
-                
+
                 route.pathway(laneID).seg(seg).move ()
+
                 if junc(seg + 1).name.startsWith ("sensor") then
                     junc(seg + 1).jump ()
             }

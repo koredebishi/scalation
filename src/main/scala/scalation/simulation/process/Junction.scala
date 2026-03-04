@@ -63,6 +63,14 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int, nl: I
         tally(duration)
         accum(onJunction)
         record(actor, ctime)
+
+        // Snapshot density from the segment the vehicle just finished.
+        // actor.segId is the segment index; actor.myPathway.seg(segId) is that VTransport.
+        // segId maps directly to the column in r_density.
+        if actor.myPathway != null && actor.segId >= 0 && actor.segId < actor.myPathway.seg.length then
+            val k = actor.myPathway.seg(actor.segId).snapshotDensity()
+            recordDensity(ctime, k, actor.segId)
+
         onJunction += 1
         director.log.trace(this, s"jump for $duration", actor, director.clock)
 
