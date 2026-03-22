@@ -1,6 +1,6 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  Korede Bishe, John Miller
+/** @author  Korede Bishi, John Miller
  *  @version 2.0
  *  @date    Mon Jun  2 15:00:25 EDT 2025
  *  @see     LICENSE (MIT style license file).
@@ -29,7 +29,7 @@ import scalation.random.RandomVecD
  *  minimize    f(x)
  */
 object DifferentialEvolution
-    extends MonitorEpochs:
+       extends MonitorEpochs:
 
     private val debug = debugf ("DifferentialEvolution", true)                   // debug function
     private val eps   = 1E-12                                                    // number close to zero
@@ -47,7 +47,7 @@ object DifferentialEvolution
      */
     def optimize (f: FunctionV2S, dim: Int, bounds: (Double, Double), maxGen: Int = 400,
                   F: Double = 0.8, CR: Double = 0.9)(popSize: Int = 10 * dim):
-    (VectorD, Double) = boundary:                                        // boundary block to allow breaking early
+            (VectorD, Double) = boundary:                                        // boundary block to allow breaking early
 
         val rrv     = RandomVecD (dim, bounds._2, bounds._1)                     // random vector generator within bounds
         val pop     = Array.fill (popSize)(rrv.gen)                              // initialize population
@@ -110,9 +110,9 @@ end DifferentialEvolution
     import DifferentialEvolution._
 
     banner ("Problem: (x_0 - 3)^2 + (x_1 + 1)^2 + 1")
-    val f: FunctionV2S = (x: VectorD) => (x(0) - 3)~^2 + (x(1) + 1)~^2 + 1 + (x(2)~^2 + 1)      // test function
+    val f: FunctionV2S = (x: VectorD) => (x(0) - 3)~^2 + (x(1) + 1)~^2 + 1       // test function
 
-    val (bestSol, bestVal) = optimize (f, 3, (-5.0, 5.0))()
+    val (bestSol, bestVal) = optimize (f, 2, (-5.0, 5.0))()
 
     println (s"Best solution: $bestSol")                                         // output best solution vector
     println (s"Objective value: $bestVal")                                       // output objective function value

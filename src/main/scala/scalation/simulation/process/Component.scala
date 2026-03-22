@@ -1,4 +1,5 @@
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -16,8 +17,6 @@ import scala.collection.mutable.{ArrayBuffer => VEC}
 //import scala.collection.mutable.{ListBuffer => VEC}
 
 import scalation.mathstat.{Statistic, TimeStatistic}
-import scala.runtime.ScalaRunTime.stringOf
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Component` trait provides basic common feature for simulation components.
@@ -47,11 +46,9 @@ trait Component
      */
     def initComponent (label: String, loc: Array [Double]): Unit =
         name = label
-        println(s"(locComp:loc ${stringOf(loc)})")
         at   = loc
-        println(s"(InitComp:at ${stringOf(at)})")
         initStats (label)
-        if at == null then flaw ("init", s"component '$name' has null location")
+        //if at == null then flaw ("init", s"component '$name' has null location")
     end initComponent
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -80,9 +77,9 @@ trait Component
      *  @param label  the name of this component
      */
     protected def initStats (label: String): Unit =
-        _durationStat   = new Statistic (name)
+        _durationStat   = new Statistic (label)
         if ! this.isInstanceOf [Source] && ! this.isInstanceOf [Sink] && ! this.isInstanceOf [Gate] then
-            _persistentStat = new TimeStatistic ("p-" + name)
+            _persistentStat = new TimeStatistic ("p-" + label)
     end initStats
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

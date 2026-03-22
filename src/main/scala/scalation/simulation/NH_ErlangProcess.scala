@@ -90,30 +90,23 @@ end nH_ErlangProcessTest
 
     import scalation.modeling._
 
-//    val t1 = 20
-//    val t2 = 45
-//
-//    val fileName = "seven_sensors/402376.csv"
     val fileName = "travelTime.csv"
     val data = MatrixD.load (fileName)
-
     val ord  = 19
 
     val (t, y) = (data(?, 0) * 60.0, data(?, 1))                   // (time, vehicle count)
-    new Plot (t, y, null, "traffic data", lines = true)
+    new Plot (t, y, null, "traffic data")
     val mod = PolyRegression (t, y, ord, null, Regression.hp)
     mod.train ()
     val (yp, qof) = mod.test ()
     println (mod.report (qof))
-    new Plot (t, y, yp, "traffic: actual vs. predicted", lines = true)
+    new Plot (t, y, yp, "traffic: actual vs. predicted")
 
-    def lambdaf (tt: Double): Double = mod.predict (tt)    // lamda calculation is a function // keep predicting this 
-    // to mirror the current arrival rate
-    // keep feeding the new arrival rate
+    def lambdaf (tt: Double): Double = mod.predict (tt)
 
     val pp = new NH_ErlangProcess (t.dim-1, lambdaf)
     val flw  = pp.flow (1.0).toDouble
-    new Plot (t, y, flw, "NH_ErlangProcess cars per 15 min.", lines = true)
+    new Plot (t, y, flw, "NH_ErlangProcess cars per 1 min.")
 
     val ft = new TestFit (y.dim)
     ft.diagnose (y, flw)

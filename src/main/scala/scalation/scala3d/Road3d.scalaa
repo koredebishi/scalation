@@ -170,7 +170,6 @@ object Road3d extends JFXApp3:
                                 car.body.translateY = car.body.translateY.value
                             else
                                 car.body.translateY = car.body.translateY.value + 2
-                            end if
                         } // end northcars
                     }) // end KeyFrame
                  ) // end keyFrames

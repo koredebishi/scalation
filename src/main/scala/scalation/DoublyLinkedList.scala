@@ -12,7 +12,6 @@
 package scalation
 
 import scala.collection.mutable.{AbstractIterable, ListBuffer}
-import scala.reflect.ClassTag
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DoublyLinkedList` class provides a data structure implementing mutable doubly-linked lists.
@@ -26,7 +25,7 @@ import scala.reflect.ClassTag
  *
  *  @tparam A  the type of the elements/values in the list
  */
-class DoublyLinkedList [A: ClassTag]
+class DoublyLinkedList [A]
       extends AbstractIterable [A]
          with Serializable:
 
@@ -123,7 +122,6 @@ class DoublyLinkedList [A: ClassTag]
         if tail_ == null then                                       // if the list was empty (tail is null)
             tail_ = n                                               // set tail to the new node
         debug ("addFirst", s"added node $n as the first element in list")
-        println(s"I also executed inside the addFirst $this")
         n
     end addFirst
 

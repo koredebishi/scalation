@@ -34,6 +34,11 @@ class CoFilter_1D (width: Int = 5):
      */
     def update (vec_ : VectorD): Unit = vec = vec_
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return/get the filter coefficients (needed for forward and gradient computation)
+     */
+    def coef: VectorD = vec
+
 end CoFilter_1D
 
 
@@ -49,7 +54,7 @@ object CoFilter_1D:
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the 'valid' (no padding) convolution of cofilter vector c and
      *  input vector x.
-     *  Caveat: does not include reversal.
+     *  @caveat:  does not include reversal.
      *  @param c  the cofilter vector of coefficients
      *  @param x  the input/data vector
      */
@@ -58,7 +63,7 @@ object CoFilter_1D:
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the 'valid' (no padding) convolution of cofilter vector c and
      *  input matrix x.
-     *  Caveat: does not include reversal.
+     *  @caveat:  does not include reversal.
      *  @param c  the cofilter vector of coefficients
      *  @param x  the input/data matrix
      */

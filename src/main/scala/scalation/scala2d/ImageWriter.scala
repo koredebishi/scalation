@@ -21,31 +21,15 @@ import javax.imageio.ImageIO
  *  @param fname   the name of the file
  *  @param gframe  the gframe containing the graphics
  */
-//def writeImage (fname: String, frame: VizFrame): Unit =
-//    val bimg = new BufferedImage (frame.getSize ().width, frame.getSize ().height,
-//                                  BufferedImage.TYPE_INT_ARGB)
-//    val gr   = bimg.createGraphics ()
-//    frame.paint (gr)
-//    gr.dispose ()
-//    ImageIO.write (bimg, "png", new File ("images" + fname))
-//end writeImage
-
-
-def writeImage(fname: String, frame: VizFrame): Unit =
-    val bimg = new BufferedImage(frame.getSize().width, frame.getSize().height,
-        BufferedImage.TYPE_INT_ARGB)
-    val gr = bimg.createGraphics()
-    frame.paint(gr)
-    gr.dispose()
-    val outputFile =
-        val f = new File(fname)
-        if f.isAbsolute then f
-        else
-            val dir = new File("images")
-            if !dir.exists() then dir.mkdirs()
-            new File(dir, fname)
-    ImageIO.write(bimg, "png", outputFile)
+def writeImage (fname: String, frame: VizFrame): Unit =
+    val bimg = new BufferedImage (frame.getSize ().width, frame.getSize ().height,
+                                  BufferedImage.TYPE_INT_ARGB)
+    val gr   = bimg.createGraphics ()
+    frame.paint (gr)
+    gr.dispose ()
+    ImageIO.write (bimg, "png", new File ("images" + fname))
 end writeImage
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `writeImageTest` main function is used to test the writing an image file.

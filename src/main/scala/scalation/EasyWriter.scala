@@ -18,7 +18,7 @@ import java.io.{FileOutputStream, PrintStream, PrintWriter, Writer}
  *  > runMain scalation.redirectOutTest
  */
 @main def redirectOutTest (): Unit =
-
+ 
     val path = LOG_DIR + "outfiles" + ⁄ + "stdout"
     println (s"set stdout to $path")
     System.setOut (new PrintStream (new FileOutputStream (path)))
@@ -37,7 +37,7 @@ end redirectOutTest
  *  @param toFile    flag indicating whether to write to a file
  */
 class EasyWriter (project: String, filename: String, private var toFile: Boolean = true)
-    extends Writer ():
+      extends Writer ():
 
     private val debug = debugf ("EasyWriter", true)                    // debug function
 
@@ -122,3 +122,4 @@ end EasyWriter
     ew.finish ()
 
 end easyWriterTest
+

@@ -42,7 +42,6 @@ class WaitQueue_LCFS (name: String, at: Array [Double], cap: Int = Int.MaxValue)
 
     debug ("init", s"name = $name, located at ${stringOf (at)}")
 
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Auxiliary constructor that uses defaults for width (w) and height (h).
      *  @param name  the name of the wait-queue

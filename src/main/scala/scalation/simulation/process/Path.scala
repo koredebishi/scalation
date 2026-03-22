@@ -34,7 +34,7 @@ import scalation.scala2d.Colors._
  */
 class Path (name: String, k: Int, val from: Component, val to: Component,
             motion: Variate | Dynamics, isSpeed: Boolean = false, bend: Double = 0.0)
-    extends Component:
+      extends Component:
 
     private val GAP   = 10.0                              // gap between lanes 
     private val delta = calcShift                         // amount of shift in x and y directions
@@ -44,10 +44,10 @@ class Path (name: String, k: Int, val from: Component, val to: Component,
         val shift = VectorD ((i - (k - 1) / 2.0) * delta(0), (i - (k - 1) / 2.0) * delta(1))
         lane(i) = if motion.isInstanceOf [Variate] then
             new Transport (s"${name}_$i", from, to, motion.asInstanceOf [Variate],
-                isSpeed, bend, shift, shift)
+                           isSpeed, bend, shift, shift)
         else
             new VTransport (s"${name}_$i", from, to, motion.asInstanceOf [Dynamics],
-                isSpeed, bend, shift, shift)
+                            isSpeed, bend, shift, shift)
         subpart  += lane(i)
     end for
 
@@ -72,14 +72,14 @@ class Path (name: String, k: Int, val from: Component, val to: Component,
         if abs (l1 - l2) > 2 then
             flaw ("changeLane", s"UNSAFE to cross multiple lanes at once $l1 to #l2")
         val actor = director.theActor.asInstanceOf [Vehicle]
-        val (open, p, s) = laneOpenAt (l2, actor.disp)
+        val (open, _, _) = laneOpenAt (l2, actor.disp)        // (open, p, s)
         if open then
             debug ("changeLane", s"from lane $l1 to lane $l2")
             director.log.trace (this, s"change lane from $l1 to $l2", actor, director.clock)
-            lane(l1).asInstanceOf [VTransport].vdeque -= actor
-            lane(l2).asInstanceOf [VTransport].vdeque += actor
-        //          lane(l1).asInstanceOf [VTransport].vtree.checkedRemove (actor.disp, actor)
-        //          lane(l2).asInstanceOf [VTransport].vtree.put (actor.disp, actor)
+            lane(l1).asInstanceOf [VTransport].vtree -= actor
+            lane(l2).asInstanceOf [VTransport].vtree += actor
+//          lane(l1).asInstanceOf [VTransport].vtree.checkedRemove (actor.disp, actor)
+//          lane(l2).asInstanceOf [VTransport].vtree.put (actor.disp, actor)
         else
             director.log.trace (this, s"unable to change lane from $l1 to $l2", actor, director.clock)
     end changeLane
@@ -90,6 +90,7 @@ class Path (name: String, k: Int, val from: Component, val to: Component,
      *  @param displacement  the displacement (distance from start of the new lane)
      */
     def laneOpenAt (newLane: Int, displacement: Double): (Boolean, Vehicle, Vehicle) =
+        println (s"laneOpenAt: newLane = $newLane, displacement = $displacement")
         (false, null, null)                     // FIX -- use B+Tree to see if there is a car in the way
     end laneOpenAt
 
@@ -120,15 +121,15 @@ class Path (name: String, k: Int, val from: Component, val to: Component,
     /** Give the location of the curve to be its starting point.
      */
     override def at: Array [Double] = lane(0).at
-
+        
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Tell the animation engine to display this `Transport`.
      */
     def display (): Unit =
-        //      director.animate (this, CreateEdge, blue, QCurve (), from, to, Array (bend))
+//      director.animate (this, CreateEdge, blue, QCurve (), from, to, Array (bend))
         for l <- lane do
             director.animate (l, CreateEdge, blue, l.curve, l.from, l.to,
-                Array (l.p1(0), l.p1(1), l.pc(0), l.pc(1), l.p2(0), l.p2(1)))
+                              Array (l.p1(0), l.p1(1), l.pc(0), l.pc(1), l.p2(0), l.p2(1)))
     end display
 
 end Path
@@ -144,7 +145,7 @@ end Path
     import scalation.random.{Bernoulli, Uniform}
 
     class PathModel (name: String, nArrivals: Int, iArrivalRV: Variate, moveRV: Variate)
-        extends Model (name):
+          extends Model (name):
 
         val rng     = Bernoulli ()
         val onRamp  = new Source ("onRamp", this, () => Car (), 0, nArrivals, iArrivalRV, (100.0, 200.0))
@@ -170,3 +171,4 @@ end Path
     Model.shutdown ()
 
 end pathTest
+

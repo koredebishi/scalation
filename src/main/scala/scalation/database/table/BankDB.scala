@@ -12,8 +12,11 @@ package scalation
 package database
 package table
 
+import Tabular._
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `bankDB` main function uses the `Table` class for simple database application.
+ *  Uses the original database schema from the older editions of Korth et al.
  *  > runMain scalation.database.table.bankDB
  */
 @main def bankDB (): Unit =
@@ -42,6 +45,7 @@ package table
            .add ("Main",     905, "Mary",  1000.0)
            .add ("Alps",     906, "Mary",  2000.0)
            .add ("Lake",     907, "Joe",   1500.0)
+           .add ("Alps",     908, "Joe",   1600.0)
            .show ()
 
     loan.add ("Lake",     1001, "Peter", 1000.0)
@@ -86,11 +90,12 @@ package table
     q2_.show ()
 */
 
-    import Tabular._
 
-//  a) List the names and cities of customers who have a deposit account over $1000 in a branch located in Athens.
+//  c) List the names and cities of customers who have a deposit account over $1000 in a branch located in Athens.
 
     banner ("Q1: deposit over $1000 in Athens")
+
+    (customer ⋈ deposit).show ()
 
     val q1 = (customer ⋈ deposit.σ("balance > 1000") ⋈ branch.σ("bcity == 'Athens'")).π("cname, ccity")
     q1.show ()
@@ -98,7 +103,7 @@ package table
     val q1_ = π("cname, ccity")(customer ⋈ σ("balance > 1000")(deposit) ⋈ σ("bcity == 'Athens'")(branch))
     q1_.show ()
 
-//  b) List the names and cities of customers who have a deposit account and loan at a branch where the loan amount exceeds the balance.
+//  d) List the names and cities of customers who have a deposit account and loan at a branch where the loan amount exceeds the balance.
 
     banner ("Q2: deposit balance less then laon amount")
 
@@ -111,11 +116,62 @@ package table
     println (2 < 11)
     println ("2" < "11")
 
+// (c) List the names of customers (and the two cities) who have a deposit account in a branch
+//     located in a city preceding (alphabetically) the city they live in.
+
+    banner ("Q3: cname and bcity preceding ccity")
+
+    (customer ⋈  deposit ⋈  branch).show ()
+
+    val q3 = π("cname, ccity, bcity")(σ("bcity < ccity")(customer ⋈  deposit ⋈  branch))
+    q3.show ()
+
+// (b) List the names and cities (ccity) of customers who have deposit accounts in at least
+//     two branches located in the city of Athens.
+
+    val a = σ("bcity == 'Athens'")(deposit ⋈  branch)
+    a.show ()
+
+    val q4 = π("cname, ccity")(customer ⋈ (σ("bname != bname2")(a ⋈ ("cname == cname", a))))
+    q4.show ()
+
+// [b] List the names and cities (ccity) of customers who do not have a deposit account in the city in which they live. 
+
+    val has = π("cname, ccity")(σ("bcity == ccity")(customer ⋈  deposit ⋈  branch))
+    val q5  = π("cname, ccity")(customer) - has
+    q5.show ()
+
+// [4] List the names of customer having deposits at all branches located in the city the customer lives in.
+
+    banner ("deposits at all branches located in the city the customer lives in")
+
+    val q6 = π("cname")(customer) - π("cname")(π("cname, bname")(customer ⋈ ("ccity == bcity", branch)) - π("cname, bname")(deposit))
+    q6.show ()
+
+//    val q7 = π("cname")(π("cname, bname")(customer ⋈ deposit) ÷ π("cname, bname")(customer ⋈ ("ccity == bcity", branch)))
+    val q7a = π("cname, bname")(customer ⋈ deposit)
+    val q7b = π("cname, bname")(customer ⋈ ("ccity == bcity", branch))
+    val q7  = q7a ÷ q7b
+    q7a.show ()
+    q7b.show ()
+    q7.show ()
+
+    val q8 = π("cname")(σ("ccity == bcity")(customer ⋈ deposit ⋈ branch))
+    q8.show ()
+
+    banner ("Q9: different branches for deposits and loans in Athens")
+
+    val db = σ("bcity == 'Athens'")(branch) ⋈ deposit
+    val lb = σ("bcity == 'Athens'")(branch) ⋈ loan
+    val q9 = π("cname")(σ("bname != bname2")(db ⋈ ("cname == cname", lb)))
+    q9.show ()
+
 end bankDB
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `bankDB2` main function uses the `Table` class for simple database application.
+ *  Uses the expanded database schema from the new edition of Korth et al.
  *  > runMain scalation.database.table.bankDB2
  */
 @main def bankDB2 (): Unit =

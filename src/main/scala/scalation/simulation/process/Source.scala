@@ -36,17 +36,16 @@ import scalation.scala2d.Colors._
 class Source (name: String, director: Model, makeEntity: () => SimActor,
               esubtype: Int, units: Int,
               iArrivalTime: Variate, loc: Array [Double])
-    extends SimActor (name, director)
-        with Component:
-        //with Recorder ():
+      extends SimActor (name, director)
+         with Component
+         with Recorder ():
 
     initStats (name)
     at = loc
-    println(s"${Console.RED} initializing $this inside Source: ${stringOf (at)} ${Console.RESET}")
 
     private val debug = debugf ("Source", true)                              // debug function
-
-    debug ("Init", s"name = $name with cor_id = $id, located at ${stringOf (at)}")
+    
+    debug ("Init", s"name = $name with cor_id = $cor_id, located at ${stringOf (at)}")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.
@@ -61,7 +60,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor,
     def this (name: String, director: Model, makeEntity: () => SimActor, esubtype: Int,
               units: Int, iArrivalTime: Variate, xy: (Double, Double)) =
         this (name, director, makeEntity, esubtype, units, iArrivalTime,
-            Array (xy._1, xy._2, 20.0, 20.0))
+              Array (xy._1, xy._2, 20.0, 20.0))
     end this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -87,25 +86,18 @@ class Source (name: String, director: Model, makeEntity: () => SimActor,
                         break ()                                             // terminate source, simulation ended
                     val actor = makeEntity ()                                // make new actor
                     actor.mySource = this                                    // actor's source
-                    actor.subtype  = esubtype                                // set the entity subtype
+                    actor.subtype  = esubtype                                // set the entity subtype 
                     director.numActors += 1                                  // number of actors created by all sources, so far
-                    //if director.isAnimating then director.dgAni.updateActorCount(director.numActors)
                     director.log.trace (this, "generates", actor, director.clock)
                     director.animate (actor, CreateToken, randomColor (actor.id), Ellipse (),
-                        Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
+                                      Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
                     actor.schedule (0.0)
-//
-//                    if director.isInstanceOf[RowTimeLoader] then
-//                        val rowManager = director.asInstanceOf[RowTimeLoader]
-//                        println(s"the director clock is ${director.clock}")
-//                        rowManager.nextRow(director.clock)
-//                    end if
 
                     if i < units then
                         val duration = iArrivalTime.gen
                         val ctime    = director.clock                        // clock time
                         tally (duration)                                     // tally duration
-                        //record (actor, ctime)                                // record actor flow
+                        record (actor, ctime)                                // record actor flow
                         schedule (duration)
                         yieldToDirector ()                                   // yield and wait duration time units
                 end for
@@ -141,7 +133,7 @@ object Source:
     def apply (name: String, director: Model, makeEntity: () => SimActor, esubtype: Int, units: Int,
                iArrivalTime: Variate, xy: (Int, Int)): Source =
         new Source (name, director, makeEntity, esubtype, units, iArrivalTime,
-            Array (xy._1.toDouble, xy._2.toDouble, 20.0, 20.0))
+                    Array (xy._1.toDouble, xy._2.toDouble, 20.0, 20.0))
     end apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -156,7 +148,7 @@ object Source:
                src: (String, Int, Variate, (Int, Int))*): List [Source] =
         val sourceGroup = new VEC [Source] ()
         for s <- src do sourceGroup += Source (s._1, director, makeEntity, s._2, units, s._3,
-            (xy._1 + s._4._1, xy._2 + s._4._2))
+                                              (xy._1 + s._4._1, xy._2 + s._4._2))
         sourceGroup.toList
     end group
 
@@ -188,3 +180,4 @@ end Source
     Model.shutdown ()
 
 end sourceTest
+

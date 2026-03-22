@@ -1,5 +1,4 @@
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -26,8 +25,8 @@ import scalation.scala2d.Colors._
  *  @param at    the location of the sink (x, y, w, h)
  */
 class Sink (name: String, at: Array [Double])
-      extends Component:
-         //with Recorder (nt):
+      extends Component
+         with Recorder ():
 
     initComponent (name, at)
 
@@ -48,7 +47,7 @@ class Sink (name: String, at: Array [Double])
     /** Tell the animation engine to display this Sink.
      */
     def display (): Unit =
-        director.animate (this, CreateNode, red, Ellipse (), at)
+        director.animate (this, CreateNode, darkred, Ellipse (), at)
     end display
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -58,7 +57,7 @@ class Sink (name: String, at: Array [Double])
         val actor = director.theActor
         val ctime = director.clock                                     // clock timeA
         tally (ctime - actor.arrivalT)                                 // tally actor time in system
-        //record (actor, ctime)                                          // record actor flow
+        record (actor, ctime)                                          // record actor flow
         director.log.trace (this, "terminates", actor, director.clock)
         director.animate (actor, MoveToken, null, null, Array (at(0) + DIAM, at(1) + at(3) / 2.0 - RAD))
 

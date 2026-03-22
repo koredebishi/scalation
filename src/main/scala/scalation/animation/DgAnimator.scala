@@ -11,13 +11,15 @@
 package scalation
 package animation
 
-import java.util.concurrent.ConcurrentLinkedQueue
-import scala.math.round
-import scala.util.control.Breaks.{break, breakable}
-import scalation.scala2d.*
-import scalation.scala2d.Colors.*
-import CommandType.*
+import java.util.concurrent.ConcurrentLinkedQueue 
 
+import scala.math.round
+import scala.util.control.Breaks.{breakable, break}
+
+import scalation.scala2d._
+import scalation.scala2d.Colors._
+
+import CommandType._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DgAnimator` class is an animation engine for animating graphs.
@@ -41,10 +43,6 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     /** Clock for animation engine
      */
     private var clock = 0.0
-
-    private var actorCount = 0        // count of vehicles to be used by the run method to update actors counts real time
-
-    private var totalActorCount = 0    // totalActor counts to be used by the Model to track the total produced actors for animation purpose
 
     /** Width and height for the clock
      */
@@ -87,7 +85,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     class Canvas
           extends ZoomablePanel:
 
-        private val fsize = 18    // was originally @ 12; increased to 18.
+        private val fsize = 12
         private val f     = new Font ("Serif", Font_BOLD, fsize)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -104,13 +102,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
             g2d.setFont (f)
             g2d.setPaint (fgColor)
-            //g2d.drawString ("CLOCK = " + "%10.3f".format(clock), clockWH._1, getH - clockWH._2)
-
-            g2d.drawString(f"CLOCK = $clock%10.3f", clockWH._1, getH - clockWH._2)
-            //g2d.drawString(s"ACTORS = $actorCount" , baseX, baseY + 20)
-            g2d.drawString(s"ACTORS = $actorCount / $totalActorCount", clockWH._1, getH - clockWH._2 - 20)
-
-
+            g2d.drawString ("CLOCK = " + "%10.3f".format(clock), clockWH._1, getH - clockWH._2)
 
             //:: Display all nodes in graph and tokens bound to these nodes.
 
@@ -173,7 +165,6 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     private def invokeCommand (c: AnimateCommand): Unit =
         if c.action != MoveToken then                                          // remove if to see all move steps
             println (s"DgAnimator.invokeCommand: $c")
-        end if
 
         c.action match
         case CreateNode =>
@@ -253,9 +244,6 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                     nCmds += 1
                     invokeCommand (cmd)
 
-                    //::If the command is to create a new token, then increment the actor count
-                    if cmd.action == CreateToken then actorCount +=1
-
                     //:: Repaint the canvas.
 
                     repaint ()
@@ -300,15 +288,6 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         println (cmdQ.toString.replace ("), A", ")\nA"))
         println ("-" * 80)
     end printCommandQueue
-
-    /**
-     * @param count: The count of the actors produced/generated that the model is working with
-     * We use this to update the totalActor count once so that we can use it with the animator drawing
-     * canvas.
-     */
-    def updateActorCount(count: Int): Unit =
-        totalActorCount = count             // update the total count of actors the models is working to be used by the animator
-    end updateActorCount
 
 end DgAnimator
 
