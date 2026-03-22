@@ -29,31 +29,15 @@ import scalation.mathstat.TensorD
 class Linear (inFeatures: Int, outFeatures: Int)(using ops: AutogradOps)
       extends Module:
 
-    // Possible Improvements: Try to use different initialization methods based on the activation function used...
-
-    private val weightData: TensorD = TensorInitializers.xavierInit (1, outFeatures, inFeatures)
-    private val biasData: TensorD   = TensorInitializers.zeros (1, outFeatures, 1)
-
-//  private val weightData: TensorD = TensorD.fromMatrix (Initializer.weightMat (outFeatures, inFeatures))
-//  private val biasData: TensorD   = TensorD.fromVector (Initializer.weightVec (outFeatures), axis = 1)
+    private val weightData: TensorD = TensorD.fromMatrix (Initializer.weightMat (outFeatures, inFeatures))
+    private val biasData: TensorD = TensorD.fromVector (Initializer.weightVec (outFeatures), axis = 1)
 
     val weight: Variabl = Variabl (weightData, name = Some ("weight"))
     val bias: Variabl   = Variabl (biasData, name = Some ("bias"))
 
-    require (weightData.dims == (1, outFeatures, inFeatures),
-             s"Linear: expected weight dims (1, $outFeatures, $inFeatures), but got ${weightData.dims}")
-
-    require (biasData.dims == (1, outFeatures, 1),
-             s"Linear: expected bias dims (1, $outFeatures, 1), but got ${biasData.dims}")
-
     override def parameters: IndexedSeq [Variabl] = IndexedSeq (weight, bias)
 
-    override def forward (input: Variabl): Variabl =
-        val (_, inF, last) = input.data.dims
-        require (inF == inFeatures && last == 1,
-                 s"Linear.forward: expected input dims (B, $inFeatures, 1), but got ${input.data.dims}")
-        weight.bmm (input) + bias
-    end forward
+    override def forward (input: Variabl): Variabl = weight.bmm (input) + bias
 
 end Linear
 

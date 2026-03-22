@@ -13,9 +13,9 @@ package scalation
 package modeling
 package autograd
 
-import scala.annotation.targetName
-
 import scalation.mathstat.TensorD
+
+import scala.annotation.targetName
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Variabl` case class represents a tensor with automatic differentiation capability.
@@ -29,8 +29,6 @@ import scalation.mathstat.TensorD
  */
 case class Variabl (var data: TensorD, gradFn: Option [Function] = None, name: Option [String] = None)
                     (using ops: AutogradOps):
-
-// Representation & State
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Returns a string representation of the variable.
@@ -47,8 +45,6 @@ case class Variabl (var data: TensorD, gradFn: Option [Function] = None, name: O
      *  Initially set to a tensor of zeros with the same shape as data.
      */
     var grad: TensorD = ops.zerosLike (data)
-
-// Graph / Autograd Control
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Performs backpropagation with a default gradient of ones.
@@ -71,55 +67,11 @@ case class Variabl (var data: TensorD, gradFn: Option [Function] = None, name: O
      */
     def detach (name: Option [String] = None): Variabl = Variabl (data, name = name)
 
-// Shape & Introspection
-
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Returns the shape of the tensor data as a list of dimensions.
      *  @return a List [Int] representing the dimensions of the data.
      */
     inline def shape: List [Int] = ops.shape (data)
-
-    private type SliceArg = Char | Range
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice this tensor variable along its three dimensions.
-     *  Allows slicing using either `Range` objects or the special character `'?'`
-     *  to denote selecting the *entire* dimension (as in `x(?, 2, 5 until 10)`).
-     *  @param a the slice for dimension 0 (a `Range` or `'?'`)
-     *  @param b the slice for dimension 1 (a `Range` or `'?'`)
-     *  @param c the slice for dimension 2 (a `Range` or `'?'`)
-     *  @return a new `Variabl` representing the sliced view
-     *  @throws IllegalArgumentException if any slice argument is not a `Range` or `'?'`
-     */
-    def apply (a: SliceArg, b: SliceArg, c: SliceArg): Variabl =
-
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Convert a slice argument (`Range` or `'?'`) into a concrete `Range`.
-         *  `'?'` is interpreted as the full dimension: `0 until dim`.
-         *  @param spec  the slice specifier (`Range` or `'?'`)
-         *  @param dim   the size of the dimension
-         *  @return a normalized `Range`
-         *  @throws IllegalArgumentException if the argument is not valid
-         */
-        def normalize (spec: SliceArg, dim: Int): Range =
-            spec match
-                case c: Char if c == '?' => 0 until dim
-                case r: Range => r
-                case other =>
-                    throw new IllegalArgumentException(
-                        s"Invalid slice argument: $other (expected Range or '?')"
-                    )
-        end normalize
-
-        Slice(
-            this,
-            normalize(a, data.dim),
-            normalize(b, data.dim2),
-            normalize(c, data.dim3)
-        ).forward()
-    end apply
-
-// Factory Helpers (Same Shape)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Returns a new variable with data filled with zeros and the same shape as this variable.
@@ -138,96 +90,16 @@ case class Variabl (var data: TensorD, gradFn: Option [Function] = None, name: O
      *  @param value  the value to fill the new variable with.
      *  @return a Variabl with the specified value.
      */
-    inline def fullLike (value: Double): Variabl = Variabl (ops.fullLike (data, value))
-
-// Shape / View Operations
-
-    @targetName ("Autograd_Transpose")
-    inline def transpose (i: Int, j: Int): Variabl = Transpose (this, i, j).forward ()
-
-    @targetName ("Autograd_Permute")
-    inline def permute (axes: Seq[Int]): Variabl = Permute (this, axes).forward ()
-
-    @targetName ("Autograd_Reshape")
-    inline def reshape (newShape: Seq[Int]): Variabl = Reshape (this, newShape).forward ()
-
-// Statistical Reductions
-
-    @targetName ("Autograd_Sum")
-    inline def sum: Variabl = Sum(this).forward ()
-
-    @targetName ("Autograd_Mean")
-    inline def mean: Variabl = Mean (this).forward ()
-
-    @targetName ("Autograd_Variance")
-    inline def variance: Variabl = Variance (this).forward ()
-
-    @targetName ("Autograd_Std")
-    inline def std: Variabl = Std (this).forward ()
+    inline def fullLike(value: Double): Variabl = Variabl (ops.fullLike (data, value))
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Computes the sum of elements along the specified axis and returns the result as a new variable.
      *  @param axis  the axis along which to compute the sum.
      *  @return a Variabl representing the sum along the axis.
      */
-    inline def sumAlongAxis (axis: Int): Variabl = Variabl (ops.sumAlongAxis (data, axis))
+    inline def sumAlongAxis (axis: Int): Variabl = Variabl (ops.sumAlongAxis(data, axis))
 
-    @targetName ("Autograd_MeanAxis")
-    inline def meanAxis (axis: Int): Variabl = MeanAlongAxis (this, axis).forward ()
-
-    @targetName ("Autograd_VarAxis")
-    inline def varAxis (axis: Int): Variabl = VarianceAlongAxis (this, axis).forward ()
-
-    @targetName ("Autograd_StdAxis")
-    inline def stdAxis (axis: Int): Variabl = StdAlongAxis (this, axis).forward ()
-
-    @targetName ("Autograd_MaxValue")
-    inline def maxValue: Variabl = MaxValue (this).forward ()
-
-    @targetName ("Autograd_MinValue")
-    inline def minValue: Variabl = MinValue (this).forward ()
-
-// Elementwise Unary Math
-
-    @targetName ("Autograd_Abs")
-    inline def abs: Variabl = Abs (this).forward ()
-
-    @targetName ("Autograd_Neg")
-    inline def unary_- : Variabl = Neg (this).forward ()
-
-    @targetName ("Autograd_Reciprocal")
-    inline def reciprocal: Variabl = Reciprocal (this).forward ()
-
-    @targetName ("Autograd_Sqrt")
-    inline def sqrt: Variabl = Sqrt (this).forward ()
-
-    @targetName ("Autograd_Log")
-    inline def log: Variabl = Log (this).forward ()
-
-    @targetName ("Autograd_Log")
-    inline def logBase (base: Double): Variabl = LogBase (this, base).forward ()
-
-    @targetName ("Autograd_Exp")
-    inline def exp: Variabl = Exp (this).forward ()
-
-// Elementwise Rounding / Sign / Clamping
-
-    @targetName ("Autograd_Floor")
-    inline def floor: Variabl = Floor (this).forward ()
-
-    @targetName ("Autograd_Ceil")
-    inline def ceil: Variabl = Ceil (this).forward ()
-
-    @targetName ("Autograd_Round")
-    inline def round: Variabl = Round (this).forward ()
-
-    @targetName ("Autograd_Sign")
-    inline def sign: Variabl = Sign (this).forward ()
-
-    @targetName ("Autograd_Clip")
-    inline def clip (min: Double, max: Double): Variabl = Clip (this, min, max).forward ()
-
-// Elementwise Binary Arithmetic (Tensor-Tensor)
+    // ------------------- ARITHMETIC OPS -------------------
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Adds this variable with another variable.
@@ -301,21 +173,49 @@ case class Variabl (var data: TensorD, gradFn: Option [Function] = None, name: O
     @targetName ("Autograd_Pow")
     inline def ~^ (s: Int): Variabl = Pow (this, s).forward ()
 
-// Min / Max (Elementwise)
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns a new variable representing the square root of this variable.
+     *  @return a Variabl after applying square root.
+     */
+    @targetName ("Autograd_Sqrt")
+    inline def sqrt: Variabl = Sqrt (this).forward ()
 
-    @targetName ("Autograd_Max")
-    inline def max (other: Variabl): Variabl = Max (this, other).forward ()
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns a new variable representing the natural logarithm of this variable.
+     *  @return a Variabl after applying logarithm.
+     */
+    @targetName ("Autograd_Log")
+    inline def log: Variabl = Log (this).forward ()
 
-    @targetName ("Autograd_Min")
-    inline def min (other: Variabl): Variabl = Min (this, other).forward ()
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns a new variable representing the exponential of this variable.
+     *  @return a Variabl after applying exponential.
+     */
+    @targetName ("Autograd_Exp")
+    inline def exp: Variabl = Exp (this).forward ()
 
-    @targetName ("Autograd_MaxScalar")
-    inline def max (s: Double): Variabl = MaxScalar (this, s).forward ()
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns a new variable representing the absolute value of this variable.
+     *  @return a Variabl after applying absolute.
+     */
+    @targetName ("Autograd_Abs")
+    inline def abs: Variabl = Abs (this).forward ()
 
-    @targetName ("Autograd_MinScalar")
-    inline def min (s: Double): Variabl = MinScalar (this, s).forward ()
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns a new variable representing the negation of this variable.
+     *  @return a Variabl after applying negation.
+     */
+    @targetName("Autograd_Neg")
+    inline def unary_- : Variabl = Neg (this).forward ()
 
-// Tensor Algebra
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns a new variable representing the reciprocal of this variable.
+     *  @return a Variabl after applying reciprocal.
+     */
+    @targetName("Autograd_Reciprocal")
+    inline def reciprocal: Variabl = Reciprocal (this).forward ()
+
+    // ------------------- TENSOR OPERATIONS -------------------
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Computes the dot product of this variable with another variable.
@@ -341,10 +241,14 @@ case class Variabl (var data: TensorD, gradFn: Option [Function] = None, name: O
     @targetName ("Autograd_BatchMatmul")
     inline def bmm (other: Variabl): Variabl = BatchMatMul(this, other).forward ()
 
-// Activation Functions
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns a new variable representing the mean of the elements in this variable.
+     *  @return a Variabl after computing the mean.
+     */
+    @targetName ("Autograd_Mean")
+    inline def mean: Variabl = Mean (this).forward ()
 
-    @targetName ("Autograd_ReLU")
-    inline def id: Variabl = Identity (this).forward ()
+    // ------------------- ACTIVATION FUNCTIONS -------------------
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Applies the ReLU activation function to this variable.
@@ -396,8 +300,6 @@ case class Variabl (var data: TensorD, gradFn: Option [Function] = None, name: O
      */
     @targetName ("Autograd_Softmax")
     inline def softmax: Variabl = Softmax (this).forward ()
-
-// Functional Chaining
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Chains the provided function with this variable.
@@ -472,17 +374,7 @@ def gelu (v: Variabl): Variabl = v.gelu
  *  @param  alpha the ELU scaling parameter, default is 1.0.
  *  @return a new variable after applying ELU.
  */
-def elu (v: Variabl, alpha: Double = 1.0): Variabl = v.elu (alpha)
-
-// Loss Functions
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Computes the Sum of Squared Error (SSE) loss between two variables.
- *  @param x  the predictions variable.
- *  @param y  the target variable.
- *  @return a variable representing the computed SSE loss.
- */
-def sseLoss (x: Variabl, y: Variabl): Variabl = SSELoss (x, y).forward ()
+def elu (v: Variabl, alpha: Double = 1.0): Variabl = v.elu(alpha)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Computes the Mean Squared Error (MSE) loss between two variables.
@@ -491,32 +383,6 @@ def sseLoss (x: Variabl, y: Variabl): Variabl = SSELoss (x, y).forward ()
  *  @return a variable representing the computed MSE loss.
  */
 def mseLoss (x: Variabl, y: Variabl): Variabl = MSELoss (x, y).forward ()
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Computes the Mean Absolute Error (MAE) loss between two variables.
- *  @param x  the predictions variable.
- *  @param y  the target variable.
- *  @return a variable representing the computed MAE loss.
- */
-def maeLoss (x: Variabl, y: Variabl): Variabl = MAELoss (x, y).forward ()
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Concatenates a sequence of variables along the specified axis.
- *  @param vars  the sequence of variables to concatenate.
- *  @param axis  the axis along which to concatenate.
- *  @return a new variable representing the concatenated result.
- */
-def concat (vars: Seq [Variabl], axis: Int): Variabl = Concat (vars, axis).forward ()
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Slices a variable along its three dimensions using the specified ranges.
- * @param v  the variable to slice.
- * @param a  the range for the first dimension.
- * @param b  the range for the second dimension.
- * @param c  the range for the third dimension.
- * @return a new variable representing the sliced result.
- */
-def slice (v: Variabl, a: Range, b: Range, c: Range): Variabl = Slice (v, a, b, c).forward ()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Provides an implicit conversion from a Module to a function that maps a Variabl to a Variabl.

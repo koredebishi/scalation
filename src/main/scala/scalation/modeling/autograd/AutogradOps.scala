@@ -13,6 +13,7 @@ package modeling
 package autograd
 
 import scalation.mathstat.{TensorD, tensorize}
+import scalation.modeling.ActivationFun
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `AutogradOps` trait defines the core operations needed for automatic differentiation.
@@ -63,12 +64,7 @@ trait AutogradOps:
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clips the elements of tensor x to be within the range [min, max].
      */
-    def clipByValue (x: TensorD, min: Double, max: Double): TensorD
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Clips the elements of tensor x to have a maximum norm of maxNorm.
-     */
-    def clipByNorm (x: TensorD, maxNorm: Double): TensorD
+    def clip (x: TensorD, min: Double, max: Double): TensorD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Returns the element-wise maximum of tensors x and y.
@@ -81,11 +77,6 @@ trait AutogradOps:
     def maxScalar (x: TensorD, s: Double): TensorD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns the maximum value in tensor x.
-     */
-    def maxValue (x: TensorD): Double
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Returns the element-wise minimum of tensors x and y.
      */
     def min (x: TensorD, y: TensorD): TensorD
@@ -96,11 +87,6 @@ trait AutogradOps:
     def minScalar (x: TensorD, s: Double): TensorD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns the minimum value in tensor x.
-     */
-    def minValue (x: TensorD): Double
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Computes the mean of all elements in tensor x.
      */
     def mean (x: TensorD): Double
@@ -109,16 +95,6 @@ trait AutogradOps:
     /** Computes the mean along the specified axis of tensor x.
      */
     def meanAlongAxis (x: TensorD, axis: Int): TensorD
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Computes the Frobenius norm of tensor x.
-     */
-    def normF (x: TensorD): Double
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Computes the Frobenius norm squared of tensor x.
-     */
-    def normFSq (x: TensorD): Double
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Computes the variance of all elements in tensor x.
@@ -223,11 +199,6 @@ trait AutogradOps:
     // ---------- Tensor operations ----------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Creates a tensor consisting of scalar value s.
-     */
-    def scalar (s: Double): TensorD
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Creates a tensor with the same shape as x filled with zeros.
      */
     def zerosLike (x: TensorD): TensorD
@@ -247,20 +218,6 @@ trait AutogradOps:
      */
     def shape (x: TensorD): List [Int]
 
-    def getSlice (x: TensorD, r0: Range, r1: Range, r2: Range): TensorD
-
-    def setSlice (x: TensorD, value: TensorD, r0: Range, r1: Range, r2: Range): TensorD
-
-    def concat (tensors: Seq [TensorD], axis: Int): TensorD
-
-    def reshape (x: TensorD, newShape: Seq [Int]): TensorD
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Permutes the axes of tensor x according to the specified order.
-     */
-    def permute (x: TensorD, axes: Seq [Int]): TensorD
-
-    // FIX: Gelu doesn't pass the test
     // ---------- Activation functions ----------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -411,7 +368,6 @@ trait AutogradOps:
 
 end AutogradOps
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Companion object for AutogradOps that provides a default implementation.
  */
@@ -437,29 +393,19 @@ object AutogradOps:
 
         def reciprocal (x: TensorD): TensorD = x.reciprocal
 
-        def clipByValue (x: TensorD, min: Double, max: Double): TensorD = x.clipByValue (min, max)
-
-        def clipByNorm (x: TensorD, maxNorm: Double): TensorD = x.clipByNorm (maxNorm)
+        def clip (x: TensorD, min: Double, max: Double): TensorD = x.clip (min, max)
 
         def max (x: TensorD, y: TensorD): TensorD = TensorD.max (x, y)
 
         def maxScalar (x: TensorD, s: Double): TensorD = x.maxScalar (s)
 
-        def maxValue(x: TensorD): Double = x.maxValue
-
         def min (x: TensorD, y: TensorD): TensorD = TensorD.min (x, y)
 
         def minScalar (x: TensorD, s: Double): TensorD = x.minScalar (s)
 
-        def minValue (x: TensorD): Double = x.minValue
-
         def mean (x: TensorD): Double = x.mean
 
         def meanAlongAxis (x: TensorD, axis: Int): TensorD = x.meanAlongAxis (axis)
-
-        def normF (x: TensorD): Double = x.normF
-
-        def normFSq (x: TensorD): Double = x.normFSq
 
         def variance (x: TensorD): Double = x.variance
 
@@ -503,8 +449,6 @@ object AutogradOps:
 
         // ---------- Tensor Operations ----------
 
-        def scalar (s: Double): TensorD = TensorD.scalar (s)
-
         def zerosLike (x: TensorD): TensorD = x.zerosLike
 
         def onesLike (x: TensorD): TensorD = x.onesLike
@@ -512,19 +456,6 @@ object AutogradOps:
         def fullLike (t: TensorD, value: Double): TensorD = t.fullLike (value)
 
         def shape (x: TensorD): List [Int] = x.shape
-
-        def getSlice (x: TensorD, r0: Range, r1: Range, r2: Range): TensorD = x(r0, r1, r2)
-
-        def setSlice (x: TensorD, value: TensorD, r0: Range, r1: Range, r2: Range): TensorD =
-            x(r0, r1, r2) = value
-            x
-        end setSlice
-
-        def concat (tensors: Seq [TensorD], axis: Int): TensorD = TensorD.concat (tensors, axis)
-
-        def reshape (x: TensorD, newShape: Seq [Int]): TensorD = x.reshape (newShape)
-
-        def permute (x: TensorD, axes: Seq [Int]): TensorD = x.permute (axes)
 
         // ---------- Activation Functions ----------
 
@@ -585,14 +516,14 @@ object AutogradOps:
 
         def binaryCrossEntropy (pred: TensorD, target: TensorD): Double =
             val eps = 1e-15
-            val predSafe = pred.clipByValue (eps, 1.0 - eps)
-            val loss = TensorD.zerosLike (pred)
+            val predSafe = pred.clip(eps, 1.0 - eps)
+            val loss = TensorD.zerosLike(pred)
             cfor (pred.indices) { i =>
                 cfor (pred.indices2) { j =>
                     cfor (pred.indices3) { k =>
                         loss(i, j, k) =
-                            -target(i, j, k) * math.log (predSafe(i, j, k)) -
-                                (1.0 - target(i, j, k)) * math.log (1.0 - predSafe(i, j, k))
+                            -target(i, j, k) * math.log(predSafe(i, j, k)) -
+                                (1.0 - target(i, j, k)) * math.log(1.0 - predSafe(i, j, k))
                     } // cfor
                 } // cfor
             } // cfor
@@ -600,13 +531,13 @@ object AutogradOps:
 
         def categoricalCrossEntropy (pred: TensorD, target: TensorD): Double =
             val eps = 1e-15
-            val predSafe = pred.clipByValue (eps, 1.0 - eps)
+            val predSafe = pred.clip(eps, 1.0 - eps)
             var totalLoss = 0.0
             cfor (pred.indices) { i =>
                 cfor (pred.indices2) { j =>
                     var sampleLoss = 0.0
                     cfor (pred.indices3) { k =>
-                        sampleLoss += -target(i, j, k) * math.log (predSafe(i, j, k))
+                        sampleLoss += -target(i, j, k) * math.log(predSafe(i, j, k))
                     } // cfor
                     totalLoss += sampleLoss
                 } // cfor
@@ -614,8 +545,7 @@ object AutogradOps:
             totalLoss / (pred.dim * pred.dim2)
 
         // ---------- Matrix-like Operations ----------
-
-        def transpose (x: TensorD, i: Int, j: Int): TensorD = x.transpose(i, j)
+        def transpose(x: TensorD, i: Int, j: Int): TensorD = x.transpose(i, j)
 
         def dot (x: TensorD, y: TensorD): TensorD = x dot y
 
