@@ -21,7 +21,7 @@ import scalation.mathstat.TensorD
  *  @param momentum    momentum factor to accelerate convergence (default is 0.0).
  */
 case class SGD (parameters: IndexedSeq [Variabl], lr: Double, momentum: Double = 0.0)
-     extends Optimizer (parameters):
+     extends Optimizer (parameters, lr):
 
     /** Velocity for each parameter initialized to zeros matching the shape of parameter data.
      */
