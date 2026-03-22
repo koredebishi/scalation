@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 980 420" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f1f1f"/>
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #111111; }
+      .group { fill: none; stroke: #666666; stroke-width: 1.2; stroke-dasharray: 6 4; rx: 8; }
+      .group-title-box { fill: #ffffff; stroke: #666666; stroke-width: 1; rx: 4; }
+      .group-title { font-size: 11px; font-weight: 700; }
+      .box { fill: #ffffff; stroke: #111111; stroke-width: 1.35; rx: 6; }
+      .box-strong { fill: #ffffff; stroke: #111111; stroke-width: 1.7; rx: 6; }
+      .divider { stroke: #cfcfcf; stroke-width: 0.8; }
+      .box-title { font-size: 12px; font-weight: 700; text-anchor: middle; }
+      .body { font-size: 10px; fill: #444444; }
+      .label { font-size: 9px; fill: #555555; text-anchor: middle; }
+      .arrow { stroke: #1f1f1f; stroke-width: 1.45; fill: none; marker-end: url(#arrow); }
+      .arrow-dashed { stroke: #666666; stroke-width: 1.2; stroke-dasharray: 4 3; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="980" height="420" fill="#ffffff"/>
+
+  <!-- Group frames -->
+  <rect class="group" x="18" y="56" width="214" height="298"/>
+  <rect class="group" x="248" y="56" width="208" height="222"/>
+  <rect class="group" x="472" y="56" width="246" height="314"/>
+  <rect class="group" x="734" y="56" width="228" height="244"/>
+
+  <!-- Group titles -->
+  <rect class="group-title-box" x="28" y="46" width="130" height="20"/>
+  <text class="group-title" x="36" y="60">1. Input Configuration</text>
+
+  <rect class="group-title-box" x="258" y="46" width="114" height="20"/>
+  <text class="group-title" x="266" y="60">2. Model Assembly</text>
+
+  <rect class="group-title-box" x="482" y="46" width="126" height="20"/>
+  <text class="group-title" x="490" y="60">3. Runtime Simulation</text>
+
+  <rect class="group-title-box" x="744" y="46" width="156" height="20"/>
+  <text class="group-title" x="752" y="60">4. Validation &amp; Reporting</text>
+
+  <!-- Input Configuration -->
+  <rect class="box" x="32" y="84" width="186" height="76"/>
+  <line class="divider" x1="42" y1="109" x2="208" y2="109"/>
+  <text class="box-title" x="125" y="101">NetworkConfig</text>
+  <text class="body" x="42" y="123">US-101 Donald Doyle topology</text>
+  <text class="body" x="42" y="139">7 segments, 4 lanes</text>
+  <text class="body" x="42" y="155">2 ramps, 5 sensor locations</text>
+
+  <rect class="box" x="32" y="180" width="186" height="90"/>
+  <line class="divider" x1="42" y1="205" x2="208" y2="205"/>
+  <text class="box-title" x="125" y="197">PeMSDemand / PeMSDataHelper</text>
+  <text class="body" x="42" y="219">mainline and ramp detector files</text>
+  <text class="body" x="42" y="235">lane-level flow and speed inputs</text>
+  <text class="body" x="42" y="251">48 time bins, 15-minute intervals</text>
+  <text class="body" x="42" y="267">observed reference data</text>
+
+  <rect class="box" x="32" y="290" width="186" height="58"/>
+  <line class="divider" x1="42" y1="315" x2="208" y2="315"/>
+  <text class="box-title" x="125" y="307">DynamicsConfig</text>
+  <text class="body" x="42" y="329">IDM, solver, and CF parameters</text>
+
+  <line class="arrow" x1="125" y1="160" x2="125" y2="180"/>
+
+  <!-- Model Assembly -->
+  <rect class="box-strong" x="262" y="94" width="180" height="84"/>
+  <line class="divider" x1="272" y1="119" x2="432" y2="119"/>
+  <text class="box-title" x="352" y="111">TrafficModelBuilder</text>
+  <text class="body" x="272" y="133">binds topology, demand, and dynamics</text>
+  <text class="body" x="272" y="149">computes sensor and ramp mappings</text>
+  <text class="body" x="272" y="165">assembles runtime components</text>
+
+  <rect class="box" x="262" y="198" width="180" height="58"/>
+  <line class="divider" x1="272" y1="223" x2="432" y2="223"/>
+  <text class="box-title" x="352" y="215">ArrivalSource</text>
+  <text class="body" x="272" y="237">mainline lane sources and ramp sources</text>
+
+  <line class="arrow" x1="352" y1="178" x2="352" y2="198"/>
+
+  <!-- Runtime Simulation -->
+  <rect class="box" x="486" y="82" width="218" height="68"/>
+  <line class="divider" x1="496" y1="107" x2="694" y2="107"/>
+  <text class="box-title" x="595" y="99">CalRoute101_3 : Model</text>
+  <text class="body" x="496" y="122">corridor orchestration and registration</text>
+  <text class="body" x="496" y="138">simulation horizon = 43,200 s</text>
+
+  <rect class="box" x="486" y="170" width="218" height="62"/>
+  <line class="divider" x1="496" y1="195" x2="694" y2="195"/>
+  <text class="box-title" x="595" y="187">VSource / Vehicle Actors</text>
+  <text class="body" x="496" y="208">coroutine-based vehicle processes</text>
+  <text class="body" x="496" y="224">mainline entry and ramp entry</text>
+
+  <rect class="box-strong" x="486" y="252" width="218" height="100"/>
+  <line class="divider" x1="496" y1="277" x2="694" y2="277"/>
+  <text class="box-title" x="595" y="269">Route / Ramp / Junction / Sink</text>
+  <text class="body" x="496" y="291">lane movement and car-following</text>
+  <text class="body" x="496" y="307">ramp merging and lane changes</text>
+  <text class="body" x="496" y="323">sensor-junction recording</text>
+  <text class="body" x="496" y="339">vehicle exit and completion</text>
+
+  <line class="arrow" x1="595" y1="150" x2="595" y2="170"/>
+  <line class="arrow" x1="595" y1="232" x2="595" y2="252"/>
+
+  <!-- Validation -->
+  <rect class="box" x="748" y="92" width="200" height="88"/>
+  <line class="divider" x1="758" y1="117" x2="938" y2="117"/>
+  <text class="box-title" x="848" y="109">SimulationReport</text>
+  <text class="body" x="758" y="131">collects recorder matrices</text>
+  <text class="body" x="758" y="147">loads observed PeMS comparison data</text>
+  <text class="body" x="758" y="163">computes validation metrics</text>
+
+  <rect class="box" x="748" y="202" width="200" height="72"/>
+  <line class="divider" x1="758" y1="227" x2="938" y2="227"/>
+  <text class="box-title" x="848" y="219">Outputs</text>
+  <text class="body" x="758" y="241">macro and lane-level flow/speed metrics</text>
+  <text class="body" x="758" y="257">fitness, CSV export, text report</text>
+
+  <line class="arrow" x1="848" y1="180" x2="848" y2="202"/>
+
+  <!-- Cross-group arrows -->
+  <path class="arrow" d="M 218 122 C 240 122, 240 118, 262 118"/>
+  <text class="label" x="238" y="112">topology</text>
+
+  <path class="arrow" d="M 218 226 C 242 226, 238 136, 262 136"/>
+  <text class="label" x="236" y="194">observed demand</text>
+
+  <path class="arrow" d="M 218 319 C 242 319, 238 154, 262 154"/>
+  <text class="label" x="235" y="292">CF model / solver</text>
+
+  <path class="arrow" d="M 442 126 C 464 126, 464 116, 486 116"/>
+  <text class="label" x="464" y="108">assembles</text>
+
+  <path class="arrow" d="M 442 226 C 464 226, 462 201, 486 201"/>
+  <text class="label" x="463" y="218">injects vehicles</text>
+
+  <path class="arrow" d="M 704 302 C 726 302, 724 136, 748 136"/>
+  <text class="label" x="726" y="203">recorded flow / speed / density</text>
+
+  <path class="arrow-dashed" d="M 218 240 C 500 240, 500 166, 748 166"/>
+  <text class="label" x="504" y="232">observed reference data</text>
+</svg>

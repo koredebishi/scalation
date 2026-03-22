@@ -49,8 +49,9 @@ end Pivoting
 /** The `PivotingTest` object is used to test the `Pivoting` trait.
  *  > runMain scalation.mathstat.PivotingTest
  */
-object PivotingTest extends App with Pivoting:
+@main def PivotingTest (): Unit =
 
+    object P extends Pivoting
     val a = MatrixD ((3, 3), 1, 2, 3,
                              4, 5, 6,
                              7, 8, 9)
@@ -58,8 +59,8 @@ object PivotingTest extends App with Pivoting:
     val piv = VectorI (2, 1, 0)
 
     println (s"a  = $a")
-    println (s"a1 = ${reorderRows (a, piv)}")
-    println (s"a2 = ${reorderCols (a, piv)}")
+    println (s"a1 = ${P.reorderRows (a, piv)}")
+    println (s"a2 = ${P.reorderCols (a, piv)}")
 
 end PivotingTest
 

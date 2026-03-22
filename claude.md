@@ -25,22 +25,20 @@ US-101 corridor with IDM/Gipps/Krauss car-following dynamics.
 | Paper | Status | File |
 |-------|--------|------|
 | ANNSIM 2026 | ✅ Submitted | `context/papers/annsim-2026.md` |
-| WSC 2026 — Calibration | 🔄 In Progress | `context/papers/wsc-2026.md` |
-| WSC 2026 — Wildfire/Contraflow | 🔄 Proposed | `context/papers/wsc-2026.md` |
+| WSC 2026 — Wildfire/Contraflow | 🔄 Active Target | `context/papers/wsc-2026.md` |
 
 ## Dissertation Studies
 
 | Study | Title | Status |
 |-------|-------|--------|
 | Study 1 | Structural Sensitivity Analysis (integrators, arrivals) | ✅ ANNSIM 2026 Submitted |
-| Study 2 | Constrained Calibration: IDM vs Gipps × 5 optimizers | 🔄 WSC 2026 In Progress |
-| Study 3 | Wildfire Evacuation & Contraflow on I-10 (Palisades Fire) | 🔄 Proposed — WSC 2026 Climate Resilience Track |
+| Study 2 | Wildfire Evacuation & Contraflow on I-10 (Palisades Fire) | 🔄 WSC 2026 Climate Resilience Track — Active |
+| Study 3 | Unified Agentic Architecture (long-term, internal) | 🔄 Internal Vision — Not for committee or PI yet |
 
-**NOTE: The LLM-orchestrated causal calibration proposal was NOT accepted. Study 3 is the Wildfire/Contraflow simulation study.**
+**NOTE: Calibration is a supporting result, not a standalone paper. PI is not interested in calibration as a paper. WSC 2026 target is the Wildfire/Contraflow study aligned with Climate Resilience theme.**
 
 ## Active Focus
-**WSC 2026 (Paper 2 — Calibration)** - Deadline: April 5, 2026  
-**WSC 2026 (Paper 3 — Wildfire)** - Deadline: April 5, 2026  
+**WSC 2026 (Wildfire/Contraflow)** - Deadline: April 5, 2026  
 See `context/papers/wsc-2026.md` for timeline and checklists.
 
 ## Quick Reference

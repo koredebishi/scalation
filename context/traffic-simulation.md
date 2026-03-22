@@ -46,6 +46,13 @@ val upper = VectorD(8.0, 6.0, -1.0, 5.0, 1.5)
 - **Formula:** `0.5 * avgCountNRMSE + 0.5 * avgSpeedNRMSE`
 - **Lower is better**
 
+## Calibration Insight — Flow vs Speed Separation
+
+- **tau (arrival process headway)** controls flow and vehicle spacing. Because tau is fitted directly from PeMS data (data-driven arrival process), flow accuracy is already handled before calibration begins.
+- **IDM parameters** (T, amax, bmax, s, rt) govern speed dynamics only. Calibration improves speed prediction but does not materially improve flow.
+- **Implication:** Calibrating tau separately for flow is theoretically possible but not a research priority. The structural separation between arrival process (flow) and car-following (speed) is a key finding from Study 1 and a supporting result of Study 2.
+- **Calibration is a supporting result, not a standalone paper.** The PI is not interested in calibration as a paper contribution.
+
 ## Known Issues
 
 | Issue | Explanation |

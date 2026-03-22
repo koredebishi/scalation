@@ -1,0 +1,1508 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1200 700"
+   class="w-full h-auto"
+   style="min-height: 600px;"
+   version="1.1"
+   id="svg115"
+   sodipodi:docname="architecture-diagram (3).svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview115"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.1285714"
+     inkscape:cx="600.31646"
+     inkscape:cy="317.21519"
+     inkscape:window-width="1920"
+     inkscape:window-height="992"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg115" />
+  <defs
+     id="defs5">
+    <marker
+       id="arrowhead-data"
+       viewBox="0 0 12 12"
+       markerUnits="userSpaceOnUse"
+       markerWidth="12"
+       markerHeight="12"
+       refX="10"
+       refY="6"
+       orient="auto">
+      <polygon
+         points="0 0, 12 6, 0 12"
+         fill="#6B7280"
+         id="polygon1" />
+    </marker>
+    <marker
+       id="arrowhead-feedback"
+       viewBox="0 0 12 12"
+       markerUnits="userSpaceOnUse"
+       markerWidth="12"
+       markerHeight="12"
+       refX="10"
+       refY="6"
+       orient="auto">
+      <polygon
+         points="0 0, 12 6, 0 12"
+         fill="#DC2626"
+         id="polygon2" />
+    </marker>
+    <marker
+       id="arrowhead-control"
+       viewBox="0 0 12 12"
+       markerUnits="userSpaceOnUse"
+       markerWidth="12"
+       markerHeight="12"
+       refX="10"
+       refY="6"
+       orient="auto">
+      <polygon
+         points="0 0, 12 6, 0 12"
+         fill="#8B5CF6"
+         id="polygon3" />
+    </marker>
+    <marker
+       id="arrowhead-gradient"
+       viewBox="0 0 12 12"
+       markerUnits="userSpaceOnUse"
+       markerWidth="12"
+       markerHeight="12"
+       refX="10"
+       refY="6"
+       orient="auto">
+      <polygon
+         points="0 0, 12 6, 0 12"
+         fill="#3B82F6"
+         id="polygon4" />
+    </marker>
+    <filter
+       id="glow"
+       x="-0.034615385"
+       y="-0.052173913"
+       width="1.0692308"
+       height="1.1043478">
+      <feGaussianBlur
+         stdDeviation="3"
+         result="coloredBlur"
+         id="feGaussianBlur4" />
+      <feMerge
+         id="feMerge5">
+        <feMergeNode
+           in="coloredBlur"
+           id="feMergeNode4" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode5" />
+      </feMerge>
+    </filter>
+  </defs>
+  <g
+     id="g9">
+    <rect
+       x="8"
+       y="24"
+       width="1180"
+       height="628"
+       rx="18"
+       fill="#F8FAFC"
+       stroke="#CBD5E1"
+       stroke-width="1.5"
+       id="rect5" />
+    <rect
+       x="16"
+       y="56"
+       width="210"
+       height="338"
+       rx="14"
+       fill="#EFF6FF"
+       fill-opacity="0.55"
+       stroke="#BFDBFE"
+       stroke-width="1"
+       id="rect6" />
+    <rect
+       x="236"
+       y="106"
+       width="490"
+       height="200"
+       rx="14"
+       fill="#FAF5FF"
+       fill-opacity="0.45"
+       stroke="#DDD6FE"
+       stroke-width="1"
+       id="rect7" />
+    <rect
+       x="736"
+       y="56"
+       width="210"
+       height="338"
+       rx="14"
+       fill="#FFF7ED"
+       fill-opacity="0.55"
+       stroke="#FED7AA"
+       stroke-width="1"
+       id="rect8" />
+    <rect
+       x="956"
+       y="106"
+       width="230"
+       height="414"
+       rx="14"
+       fill="#F0FDF4"
+       fill-opacity="0.6"
+       stroke="#BBF7D0"
+       stroke-width="1"
+       id="rect9" />
+  </g>
+  <g
+     id="g35">
+    <g
+       id="g10">
+      <path
+         d="M 210 115 C 246 115, 214 197, 250 197"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path9" />
+      <path
+         d="M 210 115 C 246 115, 214 197, 250 197"
+         fill="none"
+         stroke="#6B7280"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-data)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path10" />
+    </g>
+    <g
+       id="g12">
+      <path
+         d="M 210 225 C 246 225, 214 225, 250 225"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path11" />
+      <path
+         d="M 210 225 C 246 225, 214 225, 250 225"
+         fill="none"
+         stroke="#6B7280"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-data)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path12" />
+    </g>
+    <g
+       id="g14">
+      <path
+         d="M 210 335 C 246 335, 214 253, 250 253"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path13" />
+      <path
+         d="M 210 335 C 246 335, 214 253, 250 253"
+         fill="none"
+         stroke="#6B7280"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-data)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path14" />
+    </g>
+    <g
+       id="g16">
+      <path
+         d="M 450 225 C 486 225, 454 205, 490 205"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path15" />
+      <path
+         d="M 450 225 C 486 225, 454 205, 490 205"
+         fill="none"
+         stroke="#3B82F6"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-gradient)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path16" />
+    </g>
+    <g
+       id="g18">
+      <path
+         d="M 710 173 C 746 173, 714 112.5, 750 112.5"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path17" />
+      <path
+         d="M 710 173 C 746 173, 714 112.5, 750 112.5"
+         fill="none"
+         stroke="#8B5CF6"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-control)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path18" />
+    </g>
+    <g
+       id="g20">
+      <path
+         d="M 710 237 C 746 237, 714 217.5, 750 217.5"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path19" />
+      <path
+         d="M 710 237 C 746 237, 714 217.5, 750 217.5"
+         fill="none"
+         stroke="#8B5CF6"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-control)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path20" />
+    </g>
+    <g
+       id="g22">
+      <path
+         d="M 840 155 L 840 175"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path21" />
+      <path
+         d="M 840 155 L 840 175"
+         fill="none"
+         stroke="#6B7280"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-data)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path22" />
+    </g>
+    <g
+       id="g24">
+      <path
+         d="M 840 260 L 840 280"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path23" />
+      <path
+         d="M 840 260 L 840 280"
+         fill="none"
+         stroke="#6B7280"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-data)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path24" />
+    </g>
+    <g
+       id="g26">
+      <path
+         d="M 930 312 C 966 312, 934 179.5, 970 179.5"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path25" />
+      <path
+         d="M 930 312 C 966 312, 934 179.5, 970 179.5"
+         fill="none"
+         stroke="#6B7280"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-data)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path26" />
+    </g>
+    <g
+       id="g28">
+      <path
+         d="M 930 350 C 966 350, 934 292.5, 970 292.5"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path27" />
+      <path
+         d="M 930 350 C 966 350, 934 292.5, 970 292.5"
+         fill="none"
+         stroke="#6B7280"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-data)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path28" />
+    </g>
+    <g
+       id="g30">
+      <path
+         d="M 970 316.5 L 940 316.5 L 940 560 L 600 560 L 600 290"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path29" />
+      <path
+         d="M 970 316.5 L 940 316.5 L 940 560 L 600 560 L 600 290"
+         fill="none"
+         stroke="#DC2626"
+         stroke-width="2.5"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-feedback)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path30" />
+    </g>
+    <g
+       id="g32">
+      <path
+         d="M 1170 159.5 L 1178 159.5 L 1178 620 L 540 620 L 540 290"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path31" />
+      <path
+         d="M 1170 159.5 L 1178 159.5 L 1178 620 L 540 620 L 540 290"
+         fill="none"
+         stroke="#DC2626"
+         stroke-width="2.5"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-feedback)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path32" />
+    </g>
+    <g
+       id="g34">
+      <path
+         d="M 670 120 C 710 72, 505 72, 545 120"
+         fill="none"
+         stroke="#FFFFFF"
+         stroke-width="5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         opacity="0.9"
+         pathLength="1"
+         stroke-dashoffset="0"
+         stroke-dasharray="1 1"
+         id="path33" />
+      <path
+         d="M 670 120 C 710 72, 505 72, 545 120"
+         fill="none"
+         stroke="#8B5CF6"
+         stroke-width="2"
+         stroke-dasharray="1 1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         marker-end="url(#arrowhead-control)"
+         opacity="1"
+         pathLength="1"
+         stroke-dashoffset="0"
+         id="path34" />
+    </g>
+  </g>
+  <g
+     opacity="1"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+     id="g42">
+    <rect
+       x="30"
+       y="70"
+       width="180"
+       height="90"
+       rx="6"
+       fill="#EFF6FF"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect35" />
+    <g
+       transform="translate(42 80)"
+       id="g38">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-radio"
+         version="1.1"
+         id="svg38">
+        <path
+           d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"
+           id="path35" />
+        <path
+           d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"
+           id="path36" />
+        <circle
+           cx="12"
+           cy="12"
+           r="2"
+           id="circle36" />
+        <path
+           d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"
+           id="path37" />
+        <path
+           d="M19.1 4.9C23 8.8 23 15.1 19.1 19"
+           id="path38" />
+      </svg>
+    </g>
+    <text
+       x="64"
+       y="90"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text38">PeMS Traffic Data</text>
+    <text
+       x="64"
+       y="102"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text39">Real-time Sensor Network</text>
+    <text
+       x="42"
+       y="126"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text40">• 5-min flows</text>
+    <text
+       x="42"
+       y="137"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text41">• 40K+ detectors</text>
+    <text
+       x="42"
+       y="148"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text42">• Speed/volume/occ</text>
+  </g>
+  <g
+     opacity="1"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+     id="g48">
+    <rect
+       x="30"
+       y="180"
+       width="180"
+       height="90"
+       rx="6"
+       fill="#EFF6FF"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect42" />
+    <g
+       transform="translate(42 190)"
+       id="g44">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-map"
+         version="1.1"
+         id="svg44">
+        <path
+           d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"
+           id="path42" />
+        <path
+           d="M15 5.764v15"
+           id="path43" />
+        <path
+           d="M9 3.236v15"
+           id="path44" />
+      </svg>
+    </g>
+    <text
+       x="64"
+       y="200"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text44">OpenStreetMap</text>
+    <text
+       x="64"
+       y="212"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text45">Road Network Topology</text>
+    <text
+       x="42"
+       y="236"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text46">• Graph structure</text>
+    <text
+       x="42"
+       y="247"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text47">• Lane geometry</text>
+    <text
+       x="42"
+       y="258"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text48">• Constraints</text>
+  </g>
+  <g
+     opacity="1"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+     id="g53">
+    <rect
+       x="30"
+       y="290"
+       width="180"
+       height="90"
+       rx="6"
+       fill="#EFF6FF"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect48" />
+    <g
+       transform="translate(42 300)"
+       id="g49">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-database"
+         version="1.1"
+         id="svg49">
+        <ellipse
+           cx="12"
+           cy="5"
+           rx="9"
+           ry="3"
+           id="ellipse48" />
+        <path
+           d="M3 5V19A9 3 0 0 0 21 19V5"
+           id="path48" />
+        <path
+           d="M3 12A9 3 0 0 0 21 12"
+           id="path49" />
+      </svg>
+    </g>
+    <text
+       x="64"
+       y="310"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text49">Neo4j Knowledge Graph</text>
+    <text
+       x="64"
+       y="322"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text50">Domain Ontology</text>
+    <text
+       x="42"
+       y="346"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text51">• 1M+ nodes</text>
+    <text
+       x="42"
+       y="357"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text52">• 5M+ edges</text>
+    <text
+       x="42"
+       y="368"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text53">• Rich semantics</text>
+  </g>
+  <g
+     opacity="1"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+     id="g63">
+    <rect
+       x="246"
+       y="156"
+       width="208"
+       height="138"
+       rx="8"
+       fill="#3B82F6"
+       opacity="0.2"
+       filter="url(#glow)"
+       id="rect53" />
+    <rect
+       x="250"
+       y="160"
+       width="200"
+       height="130"
+       rx="6"
+       fill="#DBEAFE"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect54" />
+    <g
+       transform="translate(262 170)"
+       id="g58">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-network"
+         version="1.1"
+         id="svg58">
+        <rect
+           x="16"
+           y="16"
+           width="6"
+           height="6"
+           rx="1"
+           id="rect55" />
+        <rect
+           x="2"
+           y="16"
+           width="6"
+           height="6"
+           rx="1"
+           id="rect56" />
+        <rect
+           x="9"
+           y="2"
+           width="6"
+           height="6"
+           rx="1"
+           id="rect57" />
+        <path
+           d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"
+           id="path57" />
+        <path
+           d="M12 12V8"
+           id="path58" />
+      </svg>
+    </g>
+    <text
+       x="284"
+       y="180"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text58">GraphRAG Retrieval</text>
+    <text
+       x="284"
+       y="192"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text59">Hybrid Retrieval System</text>
+    <text
+       x="262"
+       y="245"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text60">• text-embedding-3-large</text>
+    <text
+       x="262"
+       y="256"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text61">• BFS + PageRank</text>
+    <text
+       x="262"
+       y="267"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text62">• Cross-encoder rerank</text>
+    <text
+       x="262"
+       y="278"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text63">• Top-k=15 contexts</text>
+  </g>
+  <g
+     opacity="1"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+     id="g78">
+    <rect
+       x="486"
+       y="116"
+       width="228"
+       height="178"
+       rx="8"
+       fill="#8B5CF6"
+       opacity="0.2"
+       filter="url(#glow)"
+       id="rect63" />
+    <rect
+       x="490"
+       y="120"
+       width="220"
+       height="170"
+       rx="6"
+       fill="#FAF5FF"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect64" />
+    <g
+       transform="translate(502 130)"
+       id="g72">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-brain"
+         version="1.1"
+         id="svg72">
+        <path
+           d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"
+           id="path64" />
+        <path
+           d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"
+           id="path65" />
+        <path
+           d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"
+           id="path66" />
+        <path
+           d="M17.599 6.5a3 3 0 0 0 .399-1.375"
+           id="path67" />
+        <path
+           d="M6.003 5.125A3 3 0 0 0 6.401 6.5"
+           id="path68" />
+        <path
+           d="M3.477 10.896a4 4 0 0 1 .585-.396"
+           id="path69" />
+        <path
+           d="M19.938 10.5a4 4 0 0 1 .585.396"
+           id="path70" />
+        <path
+           d="M6 18a4 4 0 0 1-1.967-.516"
+           id="path71" />
+        <path
+           d="M19.967 17.484A4 4 0 0 1 18 18"
+           id="path72" />
+      </svg>
+    </g>
+    <text
+       x="524"
+       y="140"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text72">LLM Agent (Junior Researcher)</text>
+    <text
+       x="524"
+       y="152"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text73">GPT-4-Turbo with CoT</text>
+    <text
+       x="502"
+       y="234"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text74">• Scenario synthesis</text>
+    <text
+       x="502"
+       y="245"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text75">• Hypothesis generation</text>
+    <text
+       x="502"
+       y="256"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text76">• Temperature: 0.7/0.2</text>
+    <text
+       x="502"
+       y="267"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text77">• 128K context window</text>
+    <text
+       x="502"
+       y="278"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text78">• Tool use: DSL, sampler</text>
+  </g>
+  <g
+     opacity="1"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+     id="g85">
+    <rect
+       x="750"
+       y="70"
+       width="180"
+       height="85"
+       rx="6"
+       fill="#FFF7ED"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect78" />
+    <g
+       transform="translate(762 80)"
+       id="g81">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-file-code"
+         version="1.1"
+         id="svg81">
+        <path
+           d="M10 12.5 8 15l2 2.5"
+           id="path78" />
+        <path
+           d="m14 12.5 2 2.5-2 2.5"
+           id="path79" />
+        <path
+           d="M14 2v4a2 2 0 0 0 2 2h4"
+           id="path80" />
+        <path
+           d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"
+           id="path81" />
+      </svg>
+    </g>
+    <text
+       x="784"
+       y="90"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text81">Scenario DSL</text>
+    <text
+       x="784"
+       y="102"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text82">Scala DSL Specification</text>
+    <text
+       x="762"
+       y="121"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text83">• Traffic patterns</text>
+    <text
+       x="762"
+       y="132"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text84">• Event triggers</text>
+    <text
+       x="762"
+       y="143"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text85">• Constraints</text>
+  </g>
+  <g
+     opacity="1"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+     id="g90">
+    <rect
+       x="750"
+       y="175"
+       width="180"
+       height="85"
+       rx="6"
+       fill="#FFF7ED"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect85" />
+    <g
+       transform="translate(762 185)"
+       id="g86">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-shield-check"
+         version="1.1"
+         id="svg86">
+        <path
+           d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+           id="path85" />
+        <path
+           d="m9 12 2 2 4-4"
+           id="path86" />
+      </svg>
+    </g>
+    <text
+       x="784"
+       y="195"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text86">Formal Validator</text>
+    <text
+       x="784"
+       y="207"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text87">Pre-sim Verification</text>
+    <text
+       x="762"
+       y="226"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text88">• Schema check</text>
+    <text
+       x="762"
+       y="237"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text89">• Physical bounds</text>
+    <text
+       x="762"
+       y="248"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text90">• Safety props</text>
+  </g>
+  <g
+     opacity="1"
+     id="g95"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;">
+    <rect
+       x="750"
+       y="280"
+       width="180"
+       height="100"
+       rx="6"
+       fill="#FFF7ED"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect90" />
+    <g
+       transform="translate(762 290)"
+       id="g91">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-settings"
+         version="1.1"
+         id="svg90">
+        <path
+           d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+           id="path90" />
+        <circle
+           cx="12"
+           cy="12"
+           r="3"
+           id="circle90" />
+      </svg>
+    </g>
+    <text
+       x="784"
+       y="300"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text91">ScalaTion Engine</text>
+    <text
+       x="784"
+       y="312"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text92">Microscopic Simulator</text>
+    <text
+       x="762"
+       y="346"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text93">• IDM car-following</text>
+    <text
+       x="762"
+       y="357"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text94">• MOBIL lane-change</text>
+    <text
+       x="762"
+       y="368"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text95">• Δt=0.1s, T=1hr</text>
+  </g>
+  <g
+     opacity="1"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+     id="g100">
+    <rect
+       x="970"
+       y="120"
+       width="200"
+       height="95"
+       rx="6"
+       fill="#F0FDF4"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect95" />
+    <g
+       transform="translate(982 130)"
+       id="g96">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-circle-check"
+         version="1.1"
+         id="svg95">
+        <circle
+           cx="12"
+           cy="12"
+           r="10"
+           id="circle95" />
+        <path
+           d="m9 12 2 2 4-4"
+           id="path95" />
+      </svg>
+    </g>
+    <text
+       x="1004"
+       y="140"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text96">Runtime Invariant Monitor</text>
+    <text
+       x="1004"
+       y="152"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text97">Safety &amp; Liveness</text>
+    <text
+       x="982"
+       y="181"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text98">• LTL specifications</text>
+    <text
+       x="982"
+       y="192"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text99">• Collision detection</text>
+    <text
+       x="982"
+       y="203"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text100">• Throughput bounds</text>
+  </g>
+  <g
+     opacity="1"
+     style="transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+     id="g107">
+    <rect
+       x="970"
+       y="235"
+       width="200"
+       height="95"
+       rx="6"
+       fill="#F0FDF4"
+       stroke="#d1d5db"
+       stroke-width="1.5"
+       id="rect100" />
+    <g
+       transform="translate(982 245)"
+       id="g103">
+      <svg
+         width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#374151"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-chart-column"
+         version="1.1"
+         id="svg103">
+        <path
+           d="M3 3v16a2 2 0 0 0 2 2h16"
+           id="path100" />
+        <path
+           d="M18 17V9"
+           id="path101" />
+        <path
+           d="M13 17V5"
+           id="path102" />
+        <path
+           d="M8 17v-3"
+           id="path103" />
+      </svg>
+    </g>
+    <text
+       x="1004"
+       y="255"
+       font-size="11"
+       font-weight="600"
+       fill="#111827"
+       id="text103">Metrics Computation</text>
+    <text
+       x="1004"
+       y="267"
+       font-size="9"
+       fill="#6B7280"
+       font-family="monospace"
+       id="text104">Multi-Objective Eval</text>
+    <text
+       x="982"
+       y="296"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text105">• Travel time, TTC, PET</text>
+    <text
+       x="982"
+       y="307"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text106">• KL-div vs PeMS</text>
+    <text
+       x="982"
+       y="318"
+       font-size="9"
+       fill="#4B5563"
+       font-family="monospace"
+       id="text107">• Pareto efficiency</text>
+  </g>
+  <g
+     id="g111">
+    <rect
+       x="28"
+       y="30"
+       width="126"
+       height="24"
+       rx="12"
+       fill="#DBEAFE"
+       id="rect107" />
+    <text
+       x="40"
+       y="46"
+       font-size="11"
+       font-weight="600"
+       fill="#1E3A8A"
+       id="text108">Knowledge Layer</text>
+    <rect
+       x="248"
+       y="74"
+       width="95"
+       height="24"
+       rx="12"
+       fill="#EDE9FE"
+       id="rect108" />
+    <text
+       x="260"
+       y="90"
+       font-size="11"
+       font-weight="600"
+       fill="#5B21B6"
+       id="text109">Agent Layer</text>
+    <rect
+       x="748"
+       y="30"
+       width="121"
+       height="24"
+       rx="12"
+       fill="#FFEDD5"
+       id="rect109" />
+    <text
+       x="760"
+       y="46"
+       font-size="11"
+       font-weight="600"
+       fill="#9A3412"
+       id="text110">Simulation Layer</text>
+    <rect
+       x="968"
+       y="74"
+       width="114"
+       height="24"
+       rx="12"
+       fill="#DCFCE7"
+       id="rect110" />
+    <text
+       x="980"
+       y="90"
+       font-size="11"
+       font-weight="600"
+       fill="#166534"
+       id="text111">Evaluation Layer</text>
+  </g>
+  <g
+     id="g115">
+    <rect
+       x="480"
+       y="440"
+       width="240"
+       height="70"
+       rx="35"
+       fill="#FEF2F2"
+       stroke="#DC2626"
+       stroke-width="2"
+       stroke-dasharray="5,5"
+       opacity="1"
+       id="rect111" />
+    <g
+       transform="translate(506 462)"
+       id="g114"
+       style="transform-origin: 50% 50%; transform: rotate(88.56deg); transform-box: fill-box;">
+      <svg
+         width="16"
+         height="16"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#DC2626"
+         stroke-width="1.8"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="lucide lucide-refresh-cw"
+         version="1.1"
+         id="svg114">
+        <path
+           d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+           id="path111" />
+        <path
+           d="M21 3v5h-5"
+           id="path112" />
+        <path
+           d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+           id="path113" />
+        <path
+           d="M8 16H3v5"
+           id="path114" />
+      </svg>
+    </g>
+    <text
+       x="620"
+       y="471"
+       text-anchor="middle"
+       font-size="14"
+       font-weight="600"
+       fill="#B91C1C"
+       id="text114">Adaptive Feedback Loop</text>
+    <text
+       x="620"
+       y="486"
+       text-anchor="middle"
+       font-size="10"
+       fill="#DC2626"
+       font-family="monospace"
+       id="text115">Continuous Refinement</text>
+  </g>
+</svg>

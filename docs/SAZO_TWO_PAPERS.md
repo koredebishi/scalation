@@ -28,8 +28,8 @@ S_t = MMD²(W_t, W_{t-W})        ← distributional stationarity score
 
 g_Adam = standard Adam gradient estimate
 
-g_ZO = [L(θ + δu) - L(θ - δu)] / (2δ) · u
-       u ~ Uniform(unit sphere)  ← random directional ZO estimate
+g_ZO = (d / 2δ) · [L(θ + δu) - L(θ - δu)] · u
+       u ~ N(0, I)              ← Nesterov-Spokoiny Gaussian smoothing (Nesterov & Spokoiny, 2017)
 ```
 
 **Why this is NOT a wrapper:**
@@ -119,12 +119,13 @@ For t = 1, 2, ..., T:
              ─────────────────────           ← bias-corrected
              √(v_t/(1-β_2^t)) + ε
 
-  ── Step 5: Compute ZO Gradient Estimate
-  Sample u_t ~ Uniform(unit sphere in R^d)
+  ── Step 5: Compute ZO Gradient Estimate (Nesterov-Spokoiny)
+  Sample u_t ~ N(0, I_d)                    ← Gaussian smoothing direction
   Compute two forward passes:
     L⁺ = ℓ(f_{θ+δu}(x_t), y_t)
     L⁻ = ℓ(f_{θ-δu}(x_t), y_t)
-  ĝ_ZO = [(L⁺ - L⁻) / (2δ)] · u_t          ← two-point ZO estimator
+  ĝ_ZO = (d / 2δ) · (L⁺ - L⁻) · u_t       ← Nesterov-Spokoiny estimator
+                                              unbiased for ∇f_δ(θ), the δ-smoothed loss
 
   ── Step 6: Hybrid Update
   ĝ_hybrid = (1 - α_t) · ĝ_Adam + α_t · ĝ_ZO
@@ -143,7 +144,8 @@ Output: θ_T
 - **Why MMD over KL?** MMD is kernel-based, nonparametric, no distribution assumption. KL requires density estimation. For noisy sensor data, MMD is more robust.
 - **Why sigmoid gate over hard switch?** Differentiable interpolation avoids oscillation at the boundary. Hard switch creates instability when S_t ≈ τ.
 - **Why freeze Adam buffers at α > 0.8?** Momentum accumulates biased gradients. If allowed to accumulate during severe shift, the buffer poisons the next stationary phase. Buffer freezing is a novel sub-contribution.
-- **Why two-point ZO over one-point?** Two-point estimator has 4× lower variance. Cost: 2 forward passes vs 1. Worth it.
+- **Why Nesterov-Spokoiny (Gaussian u) over SPSA (Rademacher u)?** With u ~ N(0,I), the estimate is an unbiased estimator of the gradient of the Gaussian-smoothed loss f_δ(θ) = E[f(θ + δu)]. This smoothed loss is (L/δ)-smooth even when f is nonsmooth, enabling clean convergence bounds. SPSA uses Rademacher perturbations and lacks this smoothing interpretation.
+- **Why two-point over one-point?** Two-point estimator has 4× lower variance. Cost: 2 forward passes vs 1. Worth it.
 
 ---
 
@@ -174,7 +176,7 @@ Fixed Architecture: LSTM
 │   └── B4: RMSProp                              ← adaptive LR, no momentum
 │
 ├── GROUP C — Gradient-Free Adaptation
-│   ├── C1: SPSA                                 ← closest prior work
+│   ├── C1: Nesterov ZO (Gaussian smoothing, always ZO) ← closest prior work
 │   └── C2: CMA-ES                               ← strongest ZO baseline
 │
 ├── GROUP D — Robustness Methods
@@ -197,7 +199,7 @@ EXP-1 (Killer): Sensor Dropout
   Report:   MAE_clean, MAE_shift, Degradation(%)
   Goal:     SCD degradation < Adam degradation by ≥10%
 
-EXP-2: Sensor Drift / Calibration Error Sweep
+EXP-2: Sensor Drift
   Dataset:  METR-LA
   Shift:    N(0,σ²) noise added to speed readings, σ ∈ {0.1, 0.5, 1.0, 2.0}
             (simulates sensor calibration drift over time)
@@ -296,8 +298,8 @@ Setting:
                where ε_t is bias term, ‖ε_t‖ ≤ ε under shift
                                         ε_t = 0 at stationarity
 
-  ZO estimator: g_ZO = [L(θ+δu) - L(θ-δu)]/(2δ) · u
-  Expected value: E[g_ZO] = ∇L_δ(θ)   ← gradient of δ-smoothed loss
+  ZO estimator: g_ZO = (d / 2δ) · [L(θ+δu) - L(θ-δu)] · u,   u ~ N(0, I)
+  Expected value: E[g_ZO] = ∇f_δ(θ)      ← gradient of δ-smoothed loss (Nesterov-Spokoiny 2017)
   Bias:          ‖E[g_ZO] - ∇L(θ)‖ ≤ O(δ²)   ← independent of ε_t
   Variance:      E[‖g_ZO‖²] ≤ O(d · L²/δ²)
 
@@ -475,7 +477,7 @@ Week 13–15: Write Paper 2 → submit to AAAI (August) or AISTATS (October)
 
 | Prior Work | What They Do | What's Missing |
 |---|---|---|
-| SPSA | ZO optimization, fixed update order | No stationarity awareness, always ZO |
+| Nesterov ZO | Gaussian-smoothed ZO, always zeroth-order | No stationarity awareness, always ZO overhead |
 | CMA-ES | Evolution strategy, covariance adaptation | No gradient utilization at stationarity |
 | DRO | Robust training over shift groups | Requires known shift structure |
 | MAML | Meta-learned init for fast adaptation | Requires meta-training, 1st order at test time |

@@ -47,9 +47,9 @@ At each step t:
        → STATIONARY MODE: run Adam step normally
   4. ELSE:
        → SHIFT MODE:
-         a. Sample random direction u ~ Uniform(sphere)
-         b. Compute ZO gradient estimate:
-            g_ZO = [L(θ + δu) - L(θ - δu)] / (2δ) * u
+         a. Sample random direction u ~ N(0, I)           ← Nesterov-Spokoiny Gaussian smoothing
+         b. Compute ZO gradient estimate (Nesterov-Spokoiny):
+            g_ZO = (d / 2δ) · [L(θ + δu) - L(θ - δu)] · u
          c. Update: θ ← θ - η * g_ZO
          d. Do NOT update Adam's momentum buffers
   5. Update window W_t
@@ -132,7 +132,7 @@ ETA Model (fixed architecture: LSTM or GNN+LSTM)
 │   └── Baseline-4: RMSProp (test-time fine-tuning)
 │
 ├── Gradient-Free / ZO Optimizers
-│   ├── Baseline-5: SPSA (simultaneous perturbation)   ← closest to SAZO
+│   ├── Baseline-5: Nesterov ZO (Gaussian smoothing, always ZO)   ← closest to SAZO
 │   └── Baseline-6: CMA-ES (evolution strategy)
 │
 ├── Robustness-Aware Methods
@@ -149,7 +149,7 @@ ETA Model (fixed architecture: LSTM or GNN+LSTM)
 If time is short, you MUST have:
 - Baseline-0 (Static)
 - Baseline-2 (Adam) ← the one that matters most to reviewers
-- Baseline-5 (SPSA) ← closest competitor to SAZO
+- Baseline-5 (Nesterov ZO) ← closest competitor to SAZO
 - Baseline-8 (DRO) ← robustness oracle
 - SAZO
 
@@ -188,7 +188,7 @@ Setup:
 - Model: LSTM (train clean, 80/20 split)
 - Shift: inject 20% sensor dropout at step 500 of test
 - Adaptation: 100 steps of online adaptation after shift
-- Compare: Static | Adam | SPSA | SAZO-MMD
+- Compare: Static | Adam | Nesterov ZO | SAZO-MMD
 
 Metrics:
 - MAE before shift (steps 1–499)     ← should be equal for all
@@ -260,7 +260,7 @@ Remove each component of SAZO independently:
 | SAZO degradation < Adam degradation by 10–15% | Weak signal | ⚠️ Try PEMS-BAY too before deciding |
 | SAZO degradation < Adam degradation by <10% | Not enough | ❌ Pivot or fix the algorithm |
 | SAZO degradation > Adam degradation | Algorithm is broken | ❌ Stop, rethink ZO update rule |
-| SPSA matches SAZO within 2% | SAZO has no novelty | ❌ Need stronger shift-switching argument |
+| Nesterov ZO matches SAZO within 2% | SAZO has no novelty | ❌ Need stronger shift-switching argument |
 
 ---
 
