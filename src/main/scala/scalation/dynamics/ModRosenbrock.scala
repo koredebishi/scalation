@@ -13,7 +13,6 @@
 package scalation
 package dynamics
 
-import scala.annotation.nowarn
 import scala.math.{abs, max, min, pow}
 
 import scalation.mathstat._
@@ -235,6 +234,7 @@ object ModRosenbrock
                 val scale = max (safeScale * pow (err, - alphaDec), minScale)
                 dt *= scale
                 if dt < VSMALL then flaw ("adaptiveSolver_solve", "FatalErrorInFunction stepsize underflow")
+            end if
             if err <= 1 then go = false
         end while
 
@@ -274,9 +274,9 @@ import ModRosenbrock._
 
     // @see http://www.mathworks.com/help/techdoc/ref/ode23.html (Example 1)
 
-    @nowarn def dx_dt (t: Double, p: VectorD) =  p(1) * p(2)
-    @nowarn def dy_dt (t: Double, p: VectorD) = -p(0) * p(2)
-    @nowarn def dz_dt (t: Double, p: VectorD) = -0.51 * p(0) * p(1)
+    def dx_dt (t: Double, p: VectorD) =  p(1) * p(2)
+    def dy_dt (t: Double, p: VectorD) = -p(0) * p(2)
+    def dz_dt (t: Double, p: VectorD) = -0.51 * p(0) * p(1)
     val odes = Array [DerivativeV] (dx_dt, dy_dt, dz_dt)
 
     val ti  = 0.2

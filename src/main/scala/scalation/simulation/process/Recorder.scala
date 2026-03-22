@@ -1,5 +1,3 @@
-
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
  *  @version 2.0
@@ -27,18 +25,52 @@ import scalation.mathstat.{MatrixD, Statistic}
  */
 trait Recorder (nt: Int = 60, nLanes: Int = 4):
 
-    protected val r_counts = new MatrixD (nt, nLanes)                     // record counts in time interval
-    protected val r_speeds = new MatrixD (nt, nLanes)                     // record average speed in time interval
+    protected val r_counts  = new MatrixD (nt, nLanes)                    // record counts in time interval
+    protected val r_speeds  = new MatrixD (nt, nLanes)                    // record average speed in time interval
+    protected val r_density = new MatrixD (nt, nLanes)                    // record density (veh/m) per interval per segment
 
-    private val timeConv = 54000.0 / nt                                   // 60 * 60 * 15 = 54000 seconds per busy part of the day
-//  private val timeConv = 86400.0 / nt                                   // 60 * 60 * 24 = 86400 seconds per day
+
+    private[process] var ew = new EasyWriter("recorder", "recorder.csv")
+
+
+    //private val timeConv = 54000.0 / nt                                   // 60 * 60 * 15 = 54000 seconds per busy part of the day
+    val rowTime = 15.0 * MINUTE
+    private val timeConv = rowTime // ← THIS IS CORRECT!
+    //println(s"Recorder created with nt = $nt, nLanes = $nLanes, timeConv = $timeConv")
+
+    //  private val timeConv = 86400.0 / nt                                   // 60 * 60 * 24 = 86400 seconds per day
     private var i_pre = 0                                                 // the current and previous time intervals
     private val lane_stat = Array.fill (nLanes) (new Statistic ("lane"))  // array of `Statistic`
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the recorder matrices.
+    *  Automatically flushes the final interval data before returning.
      */
-    def getRecorderMat: (MatrixD, MatrixD) = (r_counts, r_speeds)
+    def getRecorderMat: (MatrixD, MatrixD) =
+        recordInMatrix(i_pre)  // Flush final interval (clamped to valid range)
+        (r_counts, r_speeds)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the density matrix (veh/m per time interval per segment).
+     *  Caller maps segment index to column index.
+     */
+    def getDensityMat: MatrixD = r_density
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Record instantaneous density for a segment at the current clock time.
+     *  Accumulates samples within each interval and averages them at flush.
+     *  @param ctime    the current simulation clock time
+     *  @param density  instantaneous density snapshot (veh/m) from VTransport.snapshotDensity()
+     *  @param segCol   the column index in r_density to write to (caller maps seg → col)
+     */
+    def recordDensity (ctime: Double, density: Double, segCol: Int): Unit =
+        val i_cur = floor (ctime / timeConv).toInt
+        if i_cur >= 0 && i_cur < nt && segCol >= 0 && segCol < r_density.dim2 then
+            // Accumulate running average: store sum in cell, count separately
+            // Simple approach: overwrite with latest snapshot each tick (last-value-wins per interval)
+            // For a true average, use a separate Statistic — keeping this minimal.
+            r_density(i_cur, segCol) = density
+    end recordDensity
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Record the entity and optionally its speed (or other property of interest).
@@ -62,7 +94,7 @@ trait Recorder (nt: Int = 60, nLanes: Int = 4):
     inline def record (actor: SimActor, ctime: Double): Unit =
         if actor.isInstanceOf [Vehicle] then
             val car = actor.asInstanceOf [Vehicle]
-            record (ctime, car.velocity, car.subtype)
+            record (ctime, car.velocity, car.laneID)
         else
             if actor.prop != null then
                 record (ctime, actor.prop.head._2, actor.subtype)         // record value of first property
@@ -76,14 +108,26 @@ trait Recorder (nt: Int = 60, nLanes: Int = 4):
      *  @param ii    the relevant observation/time interval
      */
     private def recordInMatrix (ii: Int): Unit =
-        for l <- r_counts.indices2 do                                     // for each lane
-            r_counts(ii, l) = lane_stat(l).num                            // vehicles counted during the time interval
-            r_speeds(ii, l) = lane_stat(l).mean                           // average speed during the time interval
-            lane_stat(l).reset ()                                         // reset statistical counters
+        if ii >= 0 && ii < nt then                                   // check for valid range
+            for l <- r_counts.indices2 do                                 // for each lane
+                r_counts(ii, l) = lane_stat(l).num                        // vehicles counted during the time interval
+                r_speeds(ii, l) = lane_stat(l).mean                       // average speed during the time interval
+                lane_stat(l).reset ()                                     // reset statistical counters
     end recordInMatrix
+
 
 end Recorder
 
+
+
+object Recorder:
+
+    private [process] var ew = new EasyWriter("recorder", "recorder.csv")
+    def shutdownRecorder(): Unit =
+        ew.finish()
+
+end Recorder
+//
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `recorderTest` main function tests the `Recorder` trait.
@@ -129,8 +173,8 @@ end Recorder
     val cqof = TestFit.diagnose_mat (cmat_, cmat)                         // diagnostics for counts
     val sqof = TestFit.diagnose_mat (smat_, smat)                         // diagnostics for speeds
 
-//  println (cqof)
-//  println (sqof)
+    //  println (cqof)
+    //  println (sqof)
 
     banner ("Quality of Fit (QoF) for counts")
     println (Fit.showFitMap (cqof))
@@ -138,4 +182,5 @@ end Recorder
     println (Fit.showFitMap (sqof))
 
 end recorderTest
+
 

@@ -12,8 +12,6 @@ package scalation
 package simulation
 package activity
 
-import scala.annotation.unused
-
 import scalation.mathstat._
 import scalation.random.{Sharp, Variate}
 
@@ -123,14 +121,12 @@ end PetriNetRules
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `petriNetRulesTest` main function is used to test the `PetriNetRules` trait.
- *  > runMain scalation.simulation.activity.petriNetRulesTest
+/** The `PetriNetRulesTest` object is used to test the `PetriNetRules` trait.
+ *  > runMain scalation.simulation.activity.PetriNetRulesTest
  */
-@main def petriNetRulesTest (): Unit =
+@main def PetriNetRulesTest (): Unit =
 
-    object PetriNetRules_ extends PetriNetRules
-    import PetriNetRules_._
-
+    object PNR extends PetriNetRules
     //:: Set the initial time.
 
     val t0 = 1.0
@@ -162,34 +158,34 @@ end PetriNetRules
 
     println ("\n *** Test token and fluid firing thresholds (t >= b_t)\n")
 
-    println ("Token threshold:  tokens required: " + thresholdI (t, b_t))
-    println ("Fluid threshold:  fluids required: " + thresholdD (f, b_f))
+    println ("Token threshold:  tokens required: " + PNR.thresholdI (t, b_t))
+    println ("Fluid threshold:  fluids required: " + PNR.thresholdD (f, b_f))
 
     println ("\n *** Test firing firing delay\n")
 
-    val d = calcFiringDelay (Sharp (1), w_t, t, w_f, f)
+    val d = PNR.calcFiringDelay (Sharp (1), w_t, t, w_f, f)
     println ("Firing delay: time for transition: " + d)
 
     println ("\n *** Test token and fluid flows: constant flow model (b)\n")
 
-    println ("Token flow:  place to transition: " + tokenFlow (t, b_t))
-    println ("Fluid flow:  place to transition: " + fluidFlow (f, b_f))
-    println ("Token flow:  transition to place: " + tokenFlow (t, b_t))
-    println ("Fluid flow:  transition to place: " + fluidFlow (f, b_f))
+    println ("Token flow:  place to transition: " + PNR.tokenFlow (t, b_t))
+    println ("Fluid flow:  place to transition: " + PNR.fluidFlow (f, b_f))
+    println ("Token flow:  transition to place: " + PNR.tokenFlow (t, b_t))
+    println ("Fluid flow:  transition to place: " + PNR.fluidFlow (f, b_f))
 
     println ("\n *** Test token and fluid flows: linear flow model (b + r * (t - b) * d\n")
 
-    println ("Token flow:  place to transition: " + tokenFlow (t, b_t, r_t, d))
-    println ("Fluid flow:  place to transition: " + fluidFlow (f, b_f, r_f, d))
-    println ("Token flow:  transition to place: " + tokenFlow (t, b_t, r_t, d))
-    println ("Fluid flow:  transition to place: " + fluidFlow (f, b_f, r_f, d))
+    println ("Token flow:  place to transition: " + PNR.tokenFlow (t, b_t, r_t, d))
+    println ("Fluid flow:  place to transition: " + PNR.fluidFlow (f, b_f, r_f, d))
+    println ("Token flow:  transition to place: " + PNR.tokenFlow (t, b_t, r_t, d))
+    println ("Fluid flow:  transition to place: " + PNR.fluidFlow (f, b_f, r_f, d))
 
     println ("\n *** Test fluid flows: differential flow model integral derv\n")
 
-    def derv1 (@unused t: Double, y: Double) = y
-    def derv2 (@unused t: Double, y: Double) = 2.0 * y
+    def derv1 (t: Double, y: Double) = y
+    def derv2 (t: Double, y: Double) = 2.0 * y
     val dervs = Array [Derivative] (derv1, derv2)
-    println ("Fluid flow:  place to transition: " + fluidFlow (f, dervs, t0, d))
+    println ("Fluid flow:  place to transition: " + PNR.fluidFlow (f, dervs, t0, d))
 
-end petriNetRulesTest
+end PetriNetRulesTest
 

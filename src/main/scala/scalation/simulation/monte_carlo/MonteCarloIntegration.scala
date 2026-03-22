@@ -34,7 +34,7 @@ object MonteCarloIntegration:
         val length = b - a
         val x   = Uniform (a, b, s)
         var sum = 0.0
-        cfor (0, m) { _ => sum += f(x.gen) }
+        for it <- 0 until m do sum += f(x.gen)
         sum * length / m
     end integrate
 

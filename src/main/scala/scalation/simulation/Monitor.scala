@@ -24,6 +24,7 @@ case class Monitor (project: String = "simulation"):
     /** Use `EasyWriter` to make it easy to switch from standard out to a (log) file
      */
     private val ew = new EasyWriter (project, "monitor.log")
+    ew.off()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Toggle output destination from default of (log) file to standard output. etc.
@@ -53,6 +54,7 @@ case class Monitor (project: String = "simulation"):
                 ew.println (s"${who.me} \t $what \t at time $when.")
             else
                 ew.println (s"${who.me} \t $what \t ${whom.me} \t at time $when.")
+            end if
         end if
     end trace
 

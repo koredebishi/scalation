@@ -1,5 +1,4 @@
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -36,7 +35,7 @@ See Example Models in sub-directories:
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SOMEModel` class defines a template for process-interaction models.
- *  @caveat:  must add 'from' and 'to' components before transport!!
+ *  Caveat: must add 'from' and 'to' components before transport!!
  *  @param name       the name of the simulation model
  *  @param reps       the number of independent replications to run
  *  @param animating  whether to animate the model

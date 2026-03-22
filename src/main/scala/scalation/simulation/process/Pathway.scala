@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Korede Bishi
  *  @version 2.0
@@ -17,8 +16,6 @@ import scalation.mathstat.VectorD
 import scalation.random.Variate
 import scalation.scala2d.Colors._
 
-//import scala.math.hypot
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Pathway` class defines a single lane with multiple segments, connected by
  *  shared junctions.
@@ -32,25 +29,43 @@ import scalation.scala2d.Colors._
  *  @param bend     curvature of the lane
  */
 class Pathway (name: String, val junc: Array [Junction], val from: Component, val to: Component,
-               motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0)
-      extends Component:
+               motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0, 
+               laneShift: VectorD = VectorD(0.0, 0.0))
+    extends Component with Joinable:
 
     private val debug = debugf ("Pathway", true)             // debug function
-//  private val GAP   = 30.0                                 // gap between lanes/pathways
-//  private val delta = calcShift
-    private val delta = VectorD (0.0, 0.0)                   // no need for calcShift since this is a single pathway (Single lane)
     val vList = DoublyLinkedList [Vehicle]                   // one lane = one doubly linked list
-    val seg   = Array.ofDim [VTransport] (junc.length + 1)   // single pathway (lane) with numJunc+1 segments
-    
+
+    // Enhanced DLL identification for debugging
+    val dllId = s"DLL_${name}_Lane"
+    private def logDLLOperation(operation: String, vehicle: Vehicle, details: String = ""): Unit =
+        debug(s"$operation", s"[$dllId] Vehicle ${vehicle.id} $details | DLL size: ${vList.size}")
+
     val points = from +: junc.toList :+ to
+    val seg = Array.ofDim[VTransport](points.length - 1)
+
     for i <- 0 until points.length - 1 do
         val p1 = points(i)
         val p2 = points(i + 1)
-        val shift = delta
-        seg(i)    = new VTransport (s"seg${i + 1}", p1, p2, motion, isSpeed, bend, shift, shift)
-        subpart  += seg(i)                                   // add to the subpart 
+        val shift = laneShift
+        
+        seg(i) = new VTransport (s"${name}_seg${i}", p1, p2, motion, isSpeed, bend, shift, shift, i)
+        subpart  += seg(i)                                   // add to the subpart
     end for
-    initComponent (name, Array ())
+
+    // -----------jun-------------jun-----------jun------------jun
+    // An array of the highway segment length
+    //get the length of each road segment, add and make it an array
+    // if a car is on this segment and I need the length of (behind segment and ahead segment)
+    // Index of the
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//    /** Return the number of segments (same for all Pathways).
+//     */
+//    def segments: Int = pathway(0).seg.length
+
+
+    initComponent(name, Array())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add a vehicle to the correct pathway's doubly linked list.
@@ -59,9 +74,11 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
      */
     def addToAlist (actor: Vehicle, other: Vehicle): Unit =
         val otherNode = if other != null then other.myPathNode.asInstanceOf [vList.Node]
-                        else null
-        debug ("addToList", s"actor = $actor follows otherNode = $otherNode")
+        else null
+//        logDLLOperation("ADD_TO_DLL", actor, s"following ${if other != null then other.name else "NONE"}")
+        actor.myPathway = this
         actor.myPathNode = vList.add (actor, otherNode)
+        actor.pathInfo = s"${dllId}" // Update path info with clear DLL identifier
     end addToAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -69,7 +86,10 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
      *  @param actor  the vehicle to remove
      */
     def removeFromAlist (actor: Vehicle): Unit =
+//        logDLLOperation("REMOVE_FROM_DLL", actor)
         vList.remove (actor.myPathNode.asInstanceOf [vList.Node])
+        actor.myPathNode = null
+        actor.myPathway  = null
     end removeFromAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -83,24 +103,32 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     /** Get the last vehicle in this pathway.
      */
     def getLast: Vehicle =
-        if vList.isEmpty then null else vList.last           // return last vehicle in this doubly linked list
+//        println(s"I only executed up to this point and the reason is,vlistSize= ${vList.size}, ${vList.toList}")
+        val car =  if vList.isEmpty then null else vList.last // return last vehicle in this doubly linked list
+        car
     end getLast
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate the shift for this lane for animation.
-     *
-    private def calcShift: VectorD =
-        val xdist = from.at(0) - to.at(0)
-        val ydist = from.at(1) - to.at(1)
-        val hyp = hypot(xdist, ydist)
-        VectorD ((ydist / hyp) * GAP, -(xdist / hyp) * GAP)
-    end calcShift
-     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the location of the first curve to be the pathway starting point.
      */
-    override def at: Array [Double] = seg(0).at
+    override def at: Array[Double] =
+        val xy = seg(0).at // (x,y) for the first curve end-point
+        Array(xy(0), xy(1), 0.0, 0.0) // add dummy width & height
+
+//
+//    def segLength(laneId: Int , car: Vehicle): Array[Double] =
+//        val pathInfo = car.pathInfo     // return the pathInfo
+//        // the length of this current segment
+//        // the length of the previous segment
+//        //the length of the ahead segment
+//        // prevSeg(lenght) current seglenght  (nextSeglenght)
+//
+//        Array(0.0)
+//    end segLength
+
+    def getSeglength: Int = seg.length
+
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the direction/turn random variate to determine next the direction.
@@ -123,11 +151,10 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
         for s <- seg.indices do
             val segment = seg(s)
             director.animate (segment, CreateEdge, blue, segment.curve, segment.from, segment.to,
-                              Array (segment.p1(0), segment.p1(1),
-                                     segment.pc(0), segment.pc(1),
-                                     segment.p2(0), segment.p2(1)))
+                Array (segment.p1(0), segment.p1(1),
+                    segment.pc(0), segment.pc(1),
+                    segment.p2(0), segment.p2(1)))
         end for
     end display
 
 end Pathway
-

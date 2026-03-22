@@ -18,7 +18,7 @@ import java.io.{FileOutputStream, PrintStream, PrintWriter, Writer}
  *  > runMain scalation.redirectOutTest
  */
 @main def redirectOutTest (): Unit =
- 
+
     val path = LOG_DIR + "outfiles" + ⁄ + "stdout"
     println (s"set stdout to $path")
     System.setOut (new PrintStream (new FileOutputStream (path)))
@@ -37,9 +37,13 @@ end redirectOutTest
  *  @param toFile    flag indicating whether to write to a file
  */
 class EasyWriter (project: String, filename: String, private var toFile: Boolean = true)
-      extends Writer ():
+    extends Writer ():
 
-    private val debug = debugf ("EasyWriter", true)                    // debug function
+    private val debug = debugf ("EasyWriter", false)                    // debug function
+
+    var on = true                                                      // whether writing is enabled
+
+    def off (): Unit = on = false
 
     /** The file path for the (log) file
      */
@@ -65,12 +69,16 @@ class EasyWriter (project: String, filename: String, private var toFile: Boolean
     /** Print/write the string s and add a newline ('\n') at the end.
      *  @param s  the string to printed/written
      */
-    def println (s: String): Unit = if toFile then pw.println (s) else Console.println (s)
+    def println (s: String): Unit = {
+        if on then if toFile then pw.println (s) else Console.println (s)
+    }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print/write a newline ('\n').
      */
-    def println (): Unit = if toFile then pw.println ("") else Console.println ()
+    def println (): Unit = {
+        if on then if toFile then pw.println ("") else Console.println ()
+    }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Write the character buffer.
@@ -122,4 +130,3 @@ end EasyWriter
     ew.finish ()
 
 end easyWriterTest
-

@@ -94,7 +94,7 @@ class TrafficDynModel (name: String = "TrafficDyn", reps: Int = 1, animating: Bo
     //--------------------------------------------------
     // Specify Scripts for each Type of Simulation Actor
 
-    case class Car () extends Vehicle ("c", this):
+    case class Car () extends SimActor ("c", this):
 
         override def act (): Unit =
             banner (s"Car $me started")

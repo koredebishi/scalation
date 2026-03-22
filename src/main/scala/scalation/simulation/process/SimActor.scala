@@ -24,17 +24,17 @@ package process
  */
 abstract class SimActor (label: String, director: Model,
                          val prop: Map [String, Double] = null)
-         extends Coroutine (label)
-            with Temporal
-            with Ordered [SimActor]
-            with Locatable:
+    extends Coroutine (label)
+        with Temporal
+        with Ordered [SimActor]
+        with Locatable:
 
     name = label                                                  // set the name for this entity `SimActor`
 
     private val flaw = flawf ("SimActor")                         // flaw function
 
     var nextTransport: Transport = null                           // next `Transport` to move along for this entity `SimActor`
-                                                                  // must be specified, e.g.,, before entering a bus (PUBLIC access required)
+    // must be specified, e.g.,, before entering a bus (PUBLIC access required)
     var subtype = 0                                               // indicator of entity subtype `SimActor`, e.g., for turning choices (PUBLIC)
 
     private [process] var arrivalT = director.clock               // time at which this entity `SimActor` arrived
@@ -92,7 +92,7 @@ abstract class SimActor (label: String, director: Model,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the `SimActor`s full name and activation time.
      */
-    override def toString: String = s"SimActor ($me with cor_id $cor_id at $actTime)"
+    override def toString: String = s"SimActor ($me with cor_id $id at $actTime)"
 
 end SimActor
 
@@ -117,19 +117,38 @@ object SimActor:
      *  @param actor  the given actor/vehicle to add
      *  @param other  the other actor/vehicle (the one ahead, null if none)
      */
-    def addToAlist (actor: SimActor, other: SimActor): Unit =
+    def addToAlist(actor: SimActor, other: SimActor): Unit =
         val other_node = if other != null then other.myNode else null
-        actor.myNode   = alist.add (actor, other_node)
+        //actor.myNode = alist.add(actor, other_node)
+        actor.myNode = alist.add(actor)
     end addToAlist
+
+//
+//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//    /** Add the given actor BEFORE the other actor in the alist, e.g., during a lane change
+//     * where the actor must be placed before another actor.2000
+//     *
+//     * @param actor the given actor/vehicle to add
+//     * @param other the other actor/vehicle (the one behind, null if none)
+//     */
+//    def addBeforeToAlist(actor: SimActor, other: SimActor): Unit =
+//        val new_node = alist.addBefore(actor, other.myNode)
+//        actor.myNode = new_node
+//        val other_node = if actor.myNode != null then alist.getBehind(actor.myNode) else null
+//        println(s"${Console.GREEN} Final state after insertion in alist: ${alist.toString()} ${Console.RESET}")
+//    end addBeforeToAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Remove the given actor from the alist, e.g., because of termination, lane change,
      *  or turn.
-     *  @param actor  the given actor/vehicle to add
+     *  @param actor  the given actor/vehicle to remove
      */
     def removeFromAlist (actor: SimActor): Unit =
+        println(s"${Console.RED} Remove car: ${actor.myNode}, from alist=${alist.toString()} ${Console.RESET}")
         alist.remove (actor.myNode)
     end removeFromAlist
 
-end SimActor
 
+
+end SimActor

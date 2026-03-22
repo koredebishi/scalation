@@ -1,0 +1,229 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 2.0
+ *  @date    Sat Nov 21 15:05:06 EDT 2009
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @note    Checkpoint/Connector between Two Pathways (Transport, VTransport, Path, or Route)
+ */
+
+package scalation
+package simulation
+package process
+
+import scala.collection.mutable.ArrayBuffer as VEC
+//import scala.runtime.ScalaRunTime.{array_clone, stringOf}
+import scala.runtime.ScalaRunTime.stringOf
+import scalation.animation.CommandType.*
+import scalation.random.{Sharp, Variate}
+import scalation.scala2d.Ellipse
+import scalation.scala2d.Colors.*
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Checkpoint` class provides a connector between two pathways.
+ *  Since `Lines` and `QCurves` have limitations (e.g., hard to make a loop back),
+ *  a Checkpoint may be needed.  Also, may be used to model road segments connected
+ *  by Checkpoints or placements of sensors.
+ *  @param name   the name of the Checkpoint
+ *  @param jTime  the jump-time through the Checkpoint
+ *  @param at     the location of the Checkpoint (x, y, w, h)
+ */
+class Checkpoint (name: String, jTime: Variate, at: Array [Double])
+    extends Component
+        with Recorder ():
+
+    initComponent (name, at)
+
+    private val debug = debugf ("Checkpoint", true)                    // debug function
+    private val flaw  = flawf("Checkpoint")
+
+    debug ("init", s"name = $name, located at ${stringOf (at)}")
+
+    private var onCheckpoint = 0                                       // number of entities/actors on this Checkpoint
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Auxiliary constructor that uses defaults for width w and height h,
+     *  as well as jTime.
+     *  @param name   the name of the Checkpoint
+     *  @param jTime  the jump-time through the Checkpoint
+     *  @param xy     the (x, y) coordinates for the top-left corner of the Checkpoint
+     */
+    def this (name: String, jTime: Variate = Sharp (1.0), xy: (Double, Double)) =
+        this (name, jTime, Array (xy._1, xy._2, 10.0, 10.0))
+    end this
+
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Tell the animation engine to display this Checkpoint.
+     */
+    def display (): Unit =
+        director.animate (this, CreateNode, purple, Ellipse (), at)
+    end display
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Jump the entity `SimActor` from the incoming "from" pathway to the
+     *  the middle of the Checkpoint.
+     */
+    def jump (l1: Int, l2: Int, lane: Array[VTransport] ): Boolean =
+
+        val actor    = director.theActor.asInstanceOf[Vehicle]
+        val duration = jTime.gen
+        val ctime    = director.clock                                // clock time
+        tally (duration)                                             // tally duration
+        accum (onCheckpoint)                                           // accumulate on Checkpoint stats
+        record (actor, ctime)                                        // record actor flow
+        onCheckpoint += 1
+        director.log.trace (this, s"jump for $duration", actor, director.clock)
+
+        director.animate (actor, MoveToken, null, null, Array (at(0) + RAD, at(1) + RAD))
+        actor.schedule (duration)
+        actor.yieldToDirector ()
+        accum (onCheckpoint)
+        onCheckpoint -= 1
+
+        println("@@@@ShowLINK")
+
+        changeLane(l1,l2, actor,lane)
+    end jump
+
+
+    //End of testing module
+    /**
+     * @param l1    the current lane of the actor
+     * @param l2    the target lane to check
+     * @param actor : The actor that needs a lane check
+     * @param lane: The array of lanes to check
+     * @return
+     */
+
+    def changeLane(l1: Int, l2: Int, actor: Vehicle, lane: Array[VTransport]): Boolean =
+        println(s"This Vehicle_id: ${actor.id}, displacement: ${actor.t_disp} is currently in lane, $l1")
+        val sDist = 20
+
+        // Calculate safety bounds for the lane change
+        val lB = (actor.t_disp - sDist).asInstanceOf[ValueType]
+        val uB = (actor.t_disp + sDist).asInstanceOf[ValueType]
+
+        println(s"lowerbound: $lB and upperbound: $uB")
+
+        // Query the B+ tree for other cars in the target lane within the safety bounds
+        val rangeVeh = lane(l2).vtree.range(lB, uB)
+
+        println(s"There are ${rangeVeh.size} vehicles in lane $l2 near vehicle: ${actor.id} in lane: $l1 in the range query: $rangeVeh")
+        //lane(l2).vtree.showLink()
+
+        if rangeVeh.isEmpty then
+             //Find the successor in the target lane's B+ tree
+            val successor = lane(l2).vtree.findFirstBeyond(uB)
+            println(s"successor: $successor")
+            // Insert the actor into the new lane's doubly linked list
+            SimActor.removeFromAlist(actor)
+            successor match
+                case Some((_, vehicle)) =>
+                    // If a successor is found, insert the actor before the successor node
+                    SimActor.addBeforeToAlist(actor, vehicle)
+                    println(s"Inserted vehicle= ${actor.id} before vehicle ${vehicle.id} in lane $l2")
+                case None =>
+                    // If no successor is found, add the actor to the end of the list
+                    SimActor.addToAlist(actor, null)
+                    println(s"Inserted vehicle ${actor.id} at the end of lane $l2")
+            true
+        else
+            val closeVehicle = rangeVeh.minBy { case (k, _) => (k.asInstanceOf[Double] - actor.disp).abs }._2
+            println(s"The closest vehicle in lane $l2 to the actor is: $closeVehicle")
+            false
+    end changeLane
+
+end Checkpoint
+
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Checkpoint` companion object provides a factory method for Checkpoints.
+ */
+object Checkpoint:
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a Checkpoint using defaults for width w and height h.
+     *  @param name   the name of the Checkpoint
+     *  @param jTime  the jump-time through the Checkpoint
+     *  @param xy     the (x, y) coordinates for the top-left corner of the Checkpoint
+     */
+    def apply (name: String, jTime: Variate, xy: (Int, Int)): Checkpoint =
+        new Checkpoint (name, jTime, Array (xy._1.toDouble, xy._2.toDouble, 10.0, 10.0))
+    end apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a group of related Checkpoints using defaults for width w and height h.
+     *  @param jTime     the jump-time through the Checkpoint
+     *  @param xy        the (x, y) coordinates for the top-left corner of the reference Checkpoint.
+     *  @param jnt       repeated Checkpoint specific info: name, offset
+     */
+    def group (jTime: Variate, xy: (Int, Int),
+               jnt: (String, (Int, Int))*): List [Checkpoint] =
+        val CheckpointGroup = new VEC [Checkpoint] ()
+        for j <- jnt do CheckpointGroup += Checkpoint (j._1, jTime, (xy._1 + j._2._1, xy._2 + j._2._2))
+        CheckpointGroup.toList
+    end group
+
+end Checkpoint
+
+//    def changeLane(l1: Int, l2: Int, actor: Vehicle, lane: Array[VTransport]): Boolean =
+//        println(s"This Vehicle_id: ${actor.id}, displacement: ${actor.t_disp} is currently in lane, $l1")
+//        val safetyDist = 20
+//
+//        val lowerBound = (actor.t_disp - safetyDist).asInstanceOf[ValueType]
+//        val upperBound = (actor.t_disp + safetyDist).asInstanceOf[ValueType]
+//
+//        println(s"lowerbound: $lowerBound and upperbound: $upperBound")
+//
+//        val otherCars = lane(l2).vtree.range(lowerBound, upperBound) // show me the cars in the range for this lane l2
+//
+//        println(s"There are ${otherCars.size} vehicles in lane $l2 near vehicle: ${actor.id} in lane: $l1 in the range query: $otherCars")
+//        lane(l2).vtree.showLink()
+//
+//        if otherCars.isEmpty then
+//            if !lane(l1).vtree.checkedRemove(actor.t_disp, actor) then // remove from vtree and check that it is the correct vehicle
+//                flaw("move", s"removed the wrong vehicle from vtree actor = $actor, actor.disp = ${actor.t_disp}")
+//            else
+//                println("Successfully removed the correct vehicle")
+//                dll.remove(actor.myNode)
+//                val successor = lane(l2).vtree.findFirstBeyond(upperBound) // Pseudo method, assumes you can find the next vehicle beyond upperBound
+//            //let the actor be removed from it's position in the doubly linked list
+//            // and to the new position in the doubly linked list.
+//            // lane0-----------5-------------3--------------1-----
+//            //lane1 ------6------------4------------2--------------
+//
+//            // car 3 changes lane to lane 2 then the new order will be
+//            // -----------5---------------------------1-----
+//            //------6------------4-------3-----2------------
+
+//<--------- fix this situation --------------->
+//            // lane0-----------5--------------------------------
+//            //lane1 ------6------------4------3------2--------------
+//
+//            // car 3 changes lane to lane 2 then the new order will be
+//            // lane0-----------5----------------3----------------
+//            //lane1------6------------4------------2------------
+
+// if there is nobody ahead of you then you have to link to the guy behind you.
+// Make a check backward too for vehicles behind you.
+// if there is nobody behind then you are independent and be added < --- SimActor add to alist
+//<------------- fix this situation ---------------->
+
+
+
+//            //effectively 5 is follow 1 and 3 is now follow 2
+//            //However, remember that the B+tree part is handled
+//            //I need help with the doubly linked list part
+//            //the doublylinked list is a global single doubly linked list.
+//            //node 3 needs to be removed, join the node 2 and node 4
+//            //node 3 needs to be added between node 2 and node 4
+//            //then 5 and 1 needs to be updated to reflect the new order
+//            true
+//        else
+//            println(s"The closest vehicle in lane $l2 to the actor is: ${otherCars.minBy { case (k, _) => (k.asInstanceOf[Double] - actor.disp).abs }._2}")
+//            false
+//    end changeLane

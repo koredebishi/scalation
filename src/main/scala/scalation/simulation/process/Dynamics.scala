@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
  *  @version 2.0
@@ -12,9 +11,28 @@ package scalation
 package simulation
 package process
 
-import scala.math.{log, min, sqrt}
 
-import Vehicle._
+import scala.math.{abs, max, min, sqrt}
+import scalation.mathstat.*
+import scalation.dynamics.*
+import Vehicle.*
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Enumeration for selecting the ODE integrator type for IDM dynamics.
+ *  Used for experimental comparison of numerical integration methods.
+ */
+enum IntegratorType:
+    case DOPRI5      // Dormand-Prince (4,5) adaptive - O(Δt⁵) - current default
+    case RK4         // Classic Runge-Kutta 4th order - O(Δt⁴)
+    case RK3         // SSPRK3 - O(Δt³)
+    case RK2         // Modified Euler (Explicit Midpoint) - O(Δt²)
+    case Heun        // Heun's method (Explicit Trapezoidal) - O(Δt²) - Treiber recommended
+    case Euler       // Forward Euler - O(Δt¹) - what SUMO uses
+    case butcher     // Butcher 5th order - O(Δt⁵)
+    case Ballistic   // Kinematic equations - O(Δt²)
+end IntegratorType
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Dynamics` trait supports physics models for the motion of vehicles, e.g.,
@@ -29,18 +47,19 @@ trait Dynamics:
     private [process] var o_velocity = velocity                     // set initial old velocity to velocity
     private [process] var acc        = 0.0                          // set initial acceleration to 0
     private [process] var o_acc      = acc                          // set initial old acceleration acc
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the values of the vehicle: velocity, and  displacement according to
+    /** Update the values of the vehicle: velocity, displacement, lane according
      *  to the car-following model being used.
-     *  @param car     the vehicle to move
-     *  @param length  the length of the road (`VTransport`)
+     *  @param motion  the dynamics/physics determining the motion (e.g., car-following model)
+     *  @param car     the vehivle to move
+ 
      */
-    def updateV (car: Vehicle, length: Double): Unit =
-        print (s"Dynamics.updateV: called ")
+    def updateV (car: Vehicle, maxDisp: Double): Unit =
+//        println (s"Dynamics.updateV: called $car")
         this match
-        case GippsDynamics => { println ("Gipps"); GippsDynamics.updateM (car, length) }
-        case _             => { println ("IDM");   IDMDynamics.updateM (car, length) }
+            case GippsDynamics => { GippsDynamics.updateM (car, maxDisp) }
+            case KraussDynamics => { KraussDynamics.updateM (car, maxDisp) }
+            case _             => { IDMDynamics.updateM (car,  maxDisp) }
     end updateV
 
 end Dynamics
@@ -51,137 +70,384 @@ end Dynamics
  *  @see https://en.wikipedia.org/wiki/Gipps%27_model
  */
 object GippsDynamics
-       extends Dynamics:
+    extends Dynamics:
 
-    private val debug   = debugf ("GippsDynamics", true)            // debug function
-    private val flaw    = flawf ("GippsDynamics")                   // flaw function
-    private val EPSILON = 0.1                                       // FIX - hack - minimum velocity
+    private val debug = debugf ("GippsDynamics", false)              // debug function
+    private[process] val easyW = new EasyWriter("simulation", "CalRoute101Model.txt")
+    
+    /** Integrator type for position update (configurable, default Ballistic) */
+    var integratorType: IntegratorType = IntegratorType.Ballistic
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the vehicle's velocity and position using Gipps' Model (located in `Motion`)
-     *  and Butcher's method for solving ordinary differential equations.
-     *  @param car     the car/vehicle whose velocity and position are to be updated
-     *  @param length  the length of the road (`VTransport`)
+    /** Update the vehicle's velocity and position using Gipps' Model.
+     *  Position update method is configurable via integratorType.
+     *
+     * @param car the car/vehicle whose velocity and position is being updated
      */
-    def updateM (car: Vehicle, length: Double): Unit =
-        debug ("updateM", s"car = $car with car.myNode = ${car.myNode}")        // may switch to myPathNode
-        val ref       = car.myNode.ahead
-        val car_ahead = if ref == null then null else ref.elem.asInstanceOf [Vehicle]
-        debug ("updateM", s"car = $car (velocity and position) based on car_ahead = $car_ahead")
+    def updateM(car: Vehicle, length: Double): Unit =
+        val ref = car.myPathNode.ahead
+        val car_ahead = if ref != null then ref.elem else null
+        val dt = prop("rt")
 
-        val v = gipps (car, car_ahead) + EPSILON                       // determine new velocity
-        debug ("updateM", s"car = $car \t the new VELOCITY is: $v")
+        // Step 1: compute next velocity using Gipps (discrete rule)
+        val v = gipps(car, car_ahead, length) + EPSILON
 
-        val x = butcher (car.t_disp, v, car.velocity, rt)              // new proposed position for car
-        debug ("updateM", s"car = $car \t the new POSITION is: $x")
+        // Step 2: update position based on configured integrator type
+        val x = integratorType match
+            case IntegratorType.Ballistic =>
+                // Ballistic: x(t+τ) = x(t) + v(t) * τ
+                car.t_disp + car.velocity * dt
+            case IntegratorType.butcher =>
+                // Butcher 5th order using past velocities
+                butcher(car.t_disp, car.velocity, car.o_velocity, dt)
+            case _ =>
+                // Default to Ballistic for any other type
+                car.t_disp + car.velocity * dt
 
-        car.o_velocity = car.velocity                                  // save the old velocity
-        car.velocity   = v                                             // assign new velocity
+        // Step 3: commit velocity state AFTER position integration
+        car.o_velocity = car.velocity
+        car.velocity = v
 
-        car.o_t_disp = car.t_disp                                      // save old car position
-        val dx       = x - car.t_disp                                  // change in car's position
-        val new_disp = if car.disp + dx <= length then car.disp + dx   // new car displacement on road
-                       else length
+        // Step 4: update displacement (segment-bounded)
+        car.o_t_disp = car.t_disp
+        val dx = x - car.t_disp
 
-        car.t_disp += new_disp - car.disp                              // new car position
-        car.disp    = new_disp                                         // displacement on road
-        debug ("updateM", s"car.disp = ${car.disp}, car.t_disp = ${car.t_disp}")
+        val new_disp =
+            if car.disp + dx <= length then car.disp + dx
+            else length
+
+        car.t_disp += new_disp - car.disp
+        car.disp = new_disp
     end updateM
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the velocity of the vehicle based on Gipps' model for a vehicle and its predecessor.
      *  @param cn  the current vehicle
-     *  @param cp  the predecessor of the current vehicle (car ahead)
+     *  @param cp  the predecessor of the current vehicle
      */
-    def gipps (cn: Vehicle, cp: Vehicle): Double =
-        if cp == null then
-            // when there is no car ahead, just tell Gipps' model it is well ahead, e.g., 1000 meters
-            gipps (amax, bmax, len, vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, vmax, rt)
+    // FIX: DLL 'ahead' tracks insertion order, NOT physical position.
+    // When cp.segId < cn.segId, the "leader" is actually BEHIND the follower physically.
+    // In this case, ignore the phantom leader and use free-flow velocity.
+    def gipps (cn: Vehicle, cp: Vehicle, length: Double): Double =
+        if cp == null || cp.segId < cn.segId then
+            gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))
         else
-            gipps (amax, bmax, len, vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, rt)
+            // Leader is in same segment or ahead segment apply car-following
+            val cp_r_disp = if cp.segId == cn.segId then cp.disp
+                            else length + cp.disp
+            gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cp_r_disp, cp.velocity, prop("rt"))
     end gipps
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the new velocity v_n(t+rt) of the vehicle n based on Gipps' model.
-     *  @seee en.wikipedia.org/wiki/Gipps%27_model
-     *  @param an  the max acceleration of drivers
-     *  @param bn  the max deceleration of drivers (negative #)
-     *  @param sp  the size of vehicles
-     *  @param Vn  the desired velocity of driver n
-     *  @param xn  the current position of driver n
-     *  @param vn  the current velocity of driver n
-     *  @param xp  the current position of the predecessor (car ahead)
-     *  @param vp  the current velocity of the predecessor (car ahead)
-     *  @param rt  the reaction time of drivers
+
+    /** Return the velocity of the vehicle based on Gipps' model.
+     *
+     * @param an the max acceleration of drivers
+     * @param bn the max deceleration of drivers (may be negative)
+     * @param sp the size of vehicles
+     * @param Vn the desired velocity of driver n
+     * @param xn the current position of driver n
+     * @param vn the current velocity of driver n
+     * @param xp the current position of the predecessor (ahead)
+     * @param vp the current velocity of the predecessor
+     * @param rt the reaction time of drivers
      */
-    private def gipps (an: Double, bn: Double, sp: Double, Vn: Double, xn: Double,
-                       vn: Double, xp: Double, vp: Double, rt: Double): Double =
+    private def gipps(an: Double, bn: Double, sp: Double, Vn: Double, xn: Double,
+                      vn: Double, xp: Double, vp: Double, rt: Double): Double =
+        // --------------- Parameters ---------------------
+        val b = abs(bn) // use positive magnitude of deceleration
+        val b_hat = b * 1.8 // expected braking ability of leader (default 0.8×b)   b_hat >= b
 
-        // when the car ahead is not close, approach desired speed
-        val free = vn + 2.5 * an * rt * (1.0 - vn / Vn) * sqrt (0.025 + vn / Vn)
+        // --------------- Free-flow branch ---------------
+        // v_free = v_n + 2.5 * a_n * τ * (1 - v_n/V_n) * sqrt(0.025 + v_n/V_n)
+        val free = vn + (2.5 * an * rt * (1.0 - vn / Vn)) * sqrt(0.025 + vn / Vn)
 
-        // when close to car ahead, hard braking (negative) is reduced based on car gap
-        val brake  = bn * rt                                           // hard braking
-        var red_sq = bn~^2 * rt~^2 - bn * (2 * (xp - sp - xn) - vn * rt - vp~^2 / bn)
-        if red_sq < 0.0 then
-            flaw ("gipps", s"braking reduction squared can't be negative red_sq = $red_sq")
-            red_sq = 0.0
-        val reduce = sqrt (red_sq)
-        val cong   = brake + reduce
+        // --------------- Congested (safety) branch -------
+        // v_cong = b * τ + sqrt(b^2 * τ^2 - b[2(gap) - v_nτ - v_p^2/b̂])
+        val gap = xp - sp - xn                                          // effective front-to-front gap
+        val phi = 2.0 * gap - (vn * rt) - (vp * vp / b_hat)             // safety term inside brackets
 
-        min (free, cong)                                               // take the minimum
+        // When phi >= 0, spacing is large enough that braking constraint is inactive.
+        // In that case, use free-flow velocity directly (skip sqrt computation).
+        if phi >= 0.0 then return free
+
+        // Otherwise, apply the congested/safety branch.
+        val inner_exp = (b * b * rt * rt) - b * phi // value inside sqrt
+        val cong = (b * rt) + sqrt(max(0.0, inner_exp)) // braking (congested) velocity
+        min(free, cong)
     end gipps
+
 
 end GippsDynamics
 
+
+
+object KraussDynamics
+    extends Dynamics:
+
+    private val debug = debugf("KraussDynamics", false)
+    
+    /** Krauss stochastic imperfection magnitude (m/s)
+     *  Must be small relative to amax*tau to allow net acceleration
+     */
+    private val sigma = 0.2
+    
+    /** Uniform random variate for stochastic noise */
+    private val noiseRV = scalation.random.Uniform(0.0, sigma)
+    
+    /** Integrator type for position update (configurable, default Ballistic) */
+    var integratorType: IntegratorType = IntegratorType.Ballistic
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update the vehicle's velocity and position using Krauss Model.
+     *  Position update method is configurable via integratorType.
+     *  @param car    the vehicle to update
+     *  @param length the segment length
+     */
+    def updateM(car: Vehicle, length: Double): Unit =
+        val ref = car.myPathNode.ahead
+        val car_ahead = if ref != null then ref.elem else null
+        val dt = prop("rt")
+
+        // Compute leader position and velocity
+        val (xp, vp): (Double, Double) =
+            if car_ahead == null || car_ahead.segId < car.segId then
+                (car.disp + 1000.0, car.vmax)  // phantom leader (free flow)
+            else if car_ahead.segId == car.segId then
+                (car_ahead.disp, car_ahead.velocity)
+            else
+                (length + car_ahead.disp, car_ahead.velocity)
+
+        // Step 1: Compute next velocity using Krauss
+        val v_new = krauss(
+            amax, bmax, len, car.vmax,
+            car.disp, car.velocity,
+            xp, vp, dt, s
+        )
+
+        // Step 2: Position update based on configured integrator type
+        val x_new = integratorType match
+            case IntegratorType.Ballistic =>
+                car.t_disp + car.velocity * dt
+            case IntegratorType.butcher =>
+                butcher(car.t_disp, car.velocity, car.o_velocity, dt)
+            case _ =>
+                car.t_disp + car.velocity * dt
+
+        // Step 3: Commit velocity state AFTER position update
+        car.o_velocity = car.velocity
+        car.velocity = v_new
+
+        // Step 4: Segment-bounded displacement update
+        car.o_t_disp = car.t_disp
+        val dx = x_new - car.t_disp
+        val new_disp = if car.disp + dx <= length then car.disp + dx else length
+
+        car.t_disp += new_disp - car.disp
+        car.disp = new_disp
+    end updateM
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute next velocity using Krauss car-following model.
+     *  Safety is enforced BEFORE stochastic noise is applied.
+     *
+     *  @param an  max acceleration
+     *  @param bn  max deceleration (negative)
+     *  @param sp  vehicle length
+     *  @param Vn  desired speed
+     *  @param xn  follower position
+     *  @param vn  follower velocity
+     *  @param xp  leader position
+     *  @param vp  leader velocity
+     *  @param rt  reaction time (timestep)
+     *  @param s0  minimum spacing
+     */
+    private def krauss(an: Double, bn: Double, sp: Double, Vn: Double,
+                       xn: Double, vn: Double, xp: Double, vp: Double,
+                       rt: Double, s0: Double): Double =
+        val b = abs(bn)
+
+        // Netto gap (front-to-rear)
+        val gap = xp - xn - sp
+        if gap <= 0.0 then return 0.0  // collision avoidance
+
+        // Krauss safe speed: v_safe = sqrt(v_leader^2 + 2*b*(gap - s0))
+        val inner = vp * vp + 2.0 * b * (gap - s0)
+        val v_safe = sqrt(max(0.0, inner))
+
+        // Acceleration constraint: v_cap = v + a_max * tau
+        val v_cap = vn + an * rt
+
+        // Desired speed constraint
+        val v_des = Vn
+
+        // Deterministic candidate (minimum of all constraints)
+        val v_star = min(v_des, min(v_safe, v_cap))
+
+        // Stochastic imperfection applied AFTER safety
+        val eps = noiseRV.gen
+        max(0.0, v_star - eps)
+    end krauss
+
+end KraussDynamics    
+    
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `IDMDynamics` object provides equations for the Intelligent Driver Model (IDM)
  *  car-following model.
  *  @see https://en.wikipedia.org/wiki/Intelligent_driver_model
  */
+
 object IDMDynamics
-       extends Dynamics:
+    extends Dynamics:
 
     private val debug = debugf ("IDMDynamics", true)                // debug function
 
-    private val FREERANGE = 50.0
+    private val FREERANGE = 150.0
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the vehicle's acceleration, velocity, and position using the
-     *  Intelligent Driver Model (located in `Motion`) and Butcher's method
-     *  for solving ordinary differential equations.
-     *  @param car     the car/vehicle whose acceleration, velocity, and position is being updated
-     *  @param length  the length of the road (`VTransport`)
+    /** Configurable integrator type for ODE solving - default Ballistic */
+    var integratorType: IntegratorType = IntegratorType.Ballistic
+
+    /** Flag to print integrator type only once per simulation run */
+    private var integratorPrinted: Boolean = false
+
+    /** Reset the print flag - call this before each new simulation */
+    def resetIntegratorPrintFlag(): Unit = integratorPrinted = false
+
+
+
+    /**
+     *  @param car     the vehicle to update
+     *  @param length  the segment length
      */
-    def updateM (car: Vehicle, length: Double): Unit =
-        debug ("updateM", s"car = $car, length = $length")
-//      var a = iDM (car, car.myNode.prev.asInstanceOf [Vehicle], del)
-        var a = iDM (car, car.myNode.ahead.asInstanceOf [Vehicle], del)
-        debug ("updateM", s"car = $car \t the new ACCELERATION is: $a")
-        if a.isNaN then         a = 0.0
-        if a.isNegInfinity then a = bmax                            // max braking acceleration
-        if a.isPosInfinity then a = amax                            // max forward acceleration
-        if a < 0.0 && a < bmax then
-            val r = log(a) / log (bmax)
-            a = if r > 5.0 then 3.0 * bmax else bmax                // FIX - unclear
-        if a > 0.0 && a > amax then a = amax 
+    def updateM(car: Vehicle, length: Double): Unit =
+        val ref = car.myPathNode.ahead
+        val car_ahead = if ref != null then ref.elem else null
+        val dt = rt
 
-        var v = butcher (car.velocity, a, car.acc, rt)
-        debug ("updateM", s"car = $car \t the new VELOCITY is: $v")
-        if v < 0.0 then v = 1.0                                     // move slowly, not stopped
+        // Snapshot leader state (frozen during integration)
+        val (x_leader, v_leader): (Double, Double) =                // leader's (position, velocity)
+            if car_ahead == null then
+                (car.t_disp + 1000.0, car.velocity)                 // no leader: free-flow
+            else if car_ahead.segId < car.segId then
+                (car.t_disp + 1000.0, car.velocity)                 // leader is behind (stale DLL node): free-flow
+            else if car_ahead.t_disp - car.t_disp > FREERANGE then
+                (car.t_disp + 1000.0, car.velocity)                 // leader is far ahead: free-flow
+            else
+                (car_ahead.t_disp, car_ahead.velocity)              // real leader: use it
 
-        val x = butcher (car.t_disp, v, car.velocity, rt) 
-        debug ("updateM", s"car = $car \t the new POSITION is: $x")
+        // ─────────────────────────────────────────────────────────────────────────
+        // STEP 2: Save old state for history tracking
+        // ─────────────────────────────────────────────────────────────────────────
+        val v_old = car.velocity
+        val x_old = car.t_disp
 
-        car.o_acc = car.acc
-        car.acc   = a
-        car.o_velocity = car.velocity
-        car.velocity = v 
-        val dx    = x - car.t_disp
-        car.disp += dx 
-        car.o_t_disp = car.t_disp
-        car.t_disp   = x
+        /**
+         * @param x_n  Current position of driver n (from ODE solver trial values, NOT car.t_disp)
+         * @param v_n  Current velocity of driver n (from ODE solver trial values, NOT car.velocity)
+         * @return     IDM acceleration clamped to physical bounds [-bmax, amax]
+        */
+        def idmAccel(x_n: Double, v_n: Double): Double =
+            val b = abs(bmax)
+
+            // Call existing iDM with snapshotted leader state
+            // iDM(an, bn, sp, Vn, xn, vn, xp, vp, T, s0, del)
+            var a = iDM(amax, b, len, car.vmax, x_n, v_n,
+                        x_leader, v_leader, T, s, del)
+
+            // Clamp acceleration to physical bounds
+            if a.isNaN || a.isInfinity then a = 0.0
+            if a < -b then a = -b
+            if a > amax then a = amax
+            a
+        end idmAccel
+
+        // Array of derivative functions: [dx/dt, dv/dt]
+        // dx/dt = v (velocity)         returned directly from state vector
+        // dv/dt = a (IDM acceleration) returned by idmAccel helper function
+        val odes: Array[DerivativeV] = Array(
+            (t: Double, y: VectorD) => y(1),                    // dx/dt = v (velocity)
+            (t: Double, y: VectorD) => idmAccel(y(0), y(1))     // dv/dt = a (IDM acceleration)
+        )
+
+        // ─────────────────────────────────────────────────────────────────────────
+        // STEP 4: Solve the coupled system with selected integrator
+        // ─────────────────────────────────────────────────────────────────────────
+        val y0 = VectorD(car.t_disp, car.velocity)                      // initial state [x(t), v(t)]
+
+        // Print integrator type ONCE per simulation (from inside updateM, not from caller)
+        if !integratorPrinted then
+            println(s"[IDMDynamics.updateM] INTEGRATOR IN USE: $integratorType")
+            integratorPrinted = true
+
+        // Select integrator based on integratorType setting
+        val y1: VectorD = integratorType match
+            case IntegratorType.DOPRI5    => DormandPrince.integrateVV(odes, y0, dt)
+            case IntegratorType.RK4       => RungeKutta2.rk4.integrateVV(odes, y0, dt)
+            case IntegratorType.RK3       => RungeKutta2.rk3.integrateVV(odes, y0, dt)
+            case IntegratorType.RK2       => RungeKutta2.rk2.integrateVV(odes, y0, dt)
+            case IntegratorType.Heun      => RungeKutta2.heun.integrateVV(odes, y0, dt)
+            case IntegratorType.Euler     => RungeKutta2.euler.integrateVV(odes, y0, dt)
+            case IntegratorType.butcher   =>
+                // Butcher's 5th-order method (J.C. Butcher) - a quadrature rule using historical samples.
+                // Apply twice: once for velocity (using acceleration history), once for position (using velocity history).
+                // This maintains 5th-order accuracy for BOTH state variables.
+                
+                // Step 1: Velocity via Butcher using acceleration history: a(t), a(t−τ)
+                // v(t+τ) = v(t) + (1/90)(7k1 + 32k3 + 12k4 + 32k5 + 7k6)τ  where k's interpolate a(t-τ) to a(t)
+                val a_idm = idmAccel(car.t_disp, car.velocity)        // a(t) from IDM
+                val v_new_b = Vehicle.butcher(
+                    car.velocity,    // v(t)   - current velocity
+                    a_idm,           // a(t)   - current acceleration
+                    car.o_acc,       // a(t−τ) - previous acceleration
+                    dt
+                )
+                
+                // Step 2: Position via Butcher using velocity history: v(t), v(t−τ)
+                // x(t+τ) = x(t) + (1/90)(7k1 + 32k3 + 12k4 + 32k5 + 7k6)τ  where k's interpolate v(t-τ) to v(t)
+                val x_new_b = Vehicle.butcher(
+                    car.t_disp,      // x(t)   - current position
+                    car.velocity,    // v(t)   - current velocity
+                    car.o_velocity,  // v(t−τ) - previous velocity
+                    dt
+                )
+                VectorD(x_new_b, v_new_b)
+            case IntegratorType.Ballistic =>
+                // Ballistic: compute IDM acceleration once, then kinematic update
+                val a_idm = idmAccel(car.t_disp, car.velocity)
+                val v_ball = car.velocity + a_idm * dt   // v(t + dt) the new velocity
+                val x_ball = car.t_disp + car.velocity * dt + 0.5 * a_idm * dt * dt  // x(t + dt)
+                VectorD(x_ball, v_ball)  // construct new state vector
+
+        // ─────────────────────────────────────────────────────────────────────────
+        // STEP 5: Extract and clamp results
+        // ─────────────────────────────────────────────────────────────────────────
+        val x_new = y1(0)                                                 // new position x(t + dt)
+        var v_new = y1(1)                                                 // new velocity v(t + dt)
+
+        // Physical constraints: velocity must be non-negative and bounded
+        if v_new < 0.0 then v_new = 0.0                                 // no backward motion
+        if v_new > car.vmax then v_new = car.vmax                       // respect max speed
+
+        // Back-calculate acceleration for state storage
+        val a = (v_new - v_old) / dt                                    // average acceleration over dt
+
+        // ─────────────────────────────────────────────────────────────────────────
+        // STEP 6: Update vehicle state
+        // ─────────────────────────────────────────────────────────────────────────
+        car.o_acc      = car.acc                                        // save old acceleration
+        car.acc        = a                                              // update acceleration
+        car.o_velocity = v_old                                          // save old velocity
+        car.velocity   = v_new                                          // update velocity
+        car.o_t_disp   = x_old                                          // save old position
+
+        // ─────────────────────────────────────────────────────────────────────────
+        // STEP 7: Segment-bounded displacement update
+        // ─────────────────────────────────────────────────────────────────────────
+        val dx = x_new - x_old                                         // change in position
+        val proposed_disp = car.disp + dx                              // proposed new displacement
+        val new_disp = if proposed_disp <= length then proposed_disp else length           // clamp to segment length
+
+        car.t_disp += new_disp - car.disp                              // update total position
+        car.disp    = new_disp                                         // update displacement on segment
     end updateM
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -189,15 +455,15 @@ object IDMDynamics
      *  for a vehicle and its predecessor.
      *  @param cn   the current vehicle
      *  @param cp   the predecessor of the current vehicle
-     *  @param del  the acceleration exponent (defaults to 4)
+     *  @param del  the acceleration exponenent (defualts to 4)
      */
     def iDM (cn: Vehicle, cp: Vehicle, del: Double = 4.0): Double =
         if cp == null then
-            iDMFree (amax, cn.velocity, vmax, del)
+            iDMFree (amax, cn.velocity, cn.vmax, del)
         else if cp.t_disp - cn.t_disp > FREERANGE then
-            iDMFree (amax, cn.velocity, vmax, del)
+            iDMFree (amax, cn.velocity, cn.vmax, del)
         else
-            iDM (amax, -bmax, len, vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, T, s, del)
+            iDM (amax, abs(bmax), len, cn.vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, T, s, del)
     end iDM
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -212,14 +478,15 @@ object IDMDynamics
      *  @param vp   the current velocity of the predecessor
      *  @param T    the safe min time headway
      *  @param s0   the safe min distance headway
-     *  @param del  the acceleration exponent (defaults to 4)
+     *  @param del  the acceleration exponenent (defualts to 4)
      */
     private def iDM (an: Double, bn: Double, sp: Double, Vn: Double, xn: Double, vn: Double,
                      xp: Double, vp: Double, T: Double, s0: Double, del: Double): Double =
-        val Δx = xp - xn - sp
-        val Δv = vn - vp
-        val ss = s0 + vn * T + (vn * Δv) / (2.0 * sqrt (an * bn))
-        an * (1.0 - (vn / Vn) ~^ del - (ss / Δx) ~^ 2.0)
+        val b = abs(bn)             // use positive magnitude of deceleration
+        val Δx = xp - xn - sp       // front to rear gap
+        val Δv = vn - vp             // approach rate
+        val ss = s0 + vn * T + (vn * Δv) / (2.0 * sqrt (an * b))     // desired gap
+        an * (1.0 - (vn / Vn) ~^ del - (ss / Δx) ~^ 2.0)            // acceleration
     end iDM
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -228,11 +495,10 @@ object IDMDynamics
      *  @param an   the max acceleration of drivers
      *  @param vn   the current velocity of driver n
      *  @param Vn   the desired velocity of driver n
-     *  @param del  the acceleration exponent (commonly to 4)
+     *  @param del  the acceleration exponenent (defualts to 4)
      */
-    private def iDMFree (an: Double, vn: Double, Vn: Double, del: Double): Double =
+    private def iDMFree (an: Double, vn: Double, Vn: Double, del: Double = 4.0): Double =
         an * (1.0 - (vn / Vn) ~^ del)
     end iDMFree
 
 end IDMDynamics
-

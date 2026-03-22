@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -44,8 +43,10 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
     initComponent (name, Array ())
 
-    private val debug = debugf ("Model", true)                      // debug function
+    private val debug = debugf ("Model", false)                      // debug function
     private val flaw  = flawf ("Model")                             // flaw function
+
+
 
     private [process] val log       = Monitor ("simulation")        // log for model execution
     private [process] var numActors = 0                             // number of actors created so far
@@ -54,16 +55,26 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     protected val agenda    = PriorityQueue.empty [SimActor]        // agenda of things to be done (time-ordered activation list)
     protected var _theActor: SimActor = null                        // currently acting actor (act one at a time)
 
+    def isAnimating:Boolean = animating             // getter for animating;
+
     director = this
-    debug ("init", s"make ${director.name} with cor_id $cor_id the director")
+    debug ("init", s"make ${director.name} with cor_id $id the director")
+
 
     private val statV    = LinkedHashMap [String, VectorD] ()       // map of stat-vectors recording means of each rep
-    private val stopTime = MAX_VALUE                                // max stop time for the model
+    //private val stopTime = MAX_VALUE                                // max stop time for the model
+    private var stopTime = MAX_VALUE                                // max stop time for the model
+
+    def setTime(sTime: Double):Unit =
+        stopTime =  sTime
+
+    def getStopTime: Double = stopTime
+
     private val parts    = VEC [Component] ()                       // List (VEC) of Components making up the model
 
     /** The animation engine
      */
-    private val dgAni = if animating then new DgAnimator ("Process Animator", black, white,
+    private [simulation] val dgAni = if animating then new DgAnimator ("Process Animator", black, white,
                                                           aniRatio, weight, height)
                         else null
 
@@ -172,45 +183,94 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
      *  and the agenda of actors until the simulation flag becomes false
      *  or the agenda (priority queue) becomes empty.
      */
-    override def act (): Unit =
-        log.trace (this, s"starts model for $reps replications", null, _clock)
+//    override def act (): Unit =
+//        log.trace (this, s"starts model for $reps replications", null, _clock)
+//
+//        for rep <- 1 to reps do                                     // LOOP THROUGH REPLICATIONS
+//            _clock = startTime
+//            if rep == 1 && animating then display ()                // turn animation on (true) off (false)
+//
+//            log.trace (this, s"starts rep $rep", null, _clock)
+////            simulating = _clock <= stopTime                         // simulate unless past stop time
 
-        for rep <- 1 to reps do                                     // LOOP THROUGH REPLICATIONS
-            _clock = startTime
-            if rep == 1 && animating then display ()                // turn animation on (true) off (false)
+//            while simulating && ! agenda.isEmpty do                 // INNER SCHEDULING LOOP
+//                _theActor = agenda.dequeue ()                       // next from priority queue
+//                if _theActor.actTime < clock then                   // out of order execution => QUIT
+//                    flaw ("act", s"actor $_theActor activation time < $_clock")
+//                    println ("QUIT")
+//                    simulating = false
+//                else
+//                    _clock    = _theActor.actTime                   // advance the time
+//                    if isAnimating then dgAni.updateActorCount(numActors) // send the total number of actors to the dgAnimator for display purpose.
+//                    debug ("act", s"${this.me} resumes ${_theActor} at clock= $clock")
+//                    log.trace (this, "resumes", _theActor, _clock)
+//                    debug ("act", s"before yyield at clock $clock")
+//                    yyield (_theActor)                              // director yields to actor
+//                    debug ("act", s"after yyield at clock $clock")
+//            end while
+//
+//            simulating = false
+//            log.trace (this, s"ends rep $rep", null, _clock)
+//
+//            fini (rep)                                              // post-run results
+//            if rep < reps then reset ()                             // reset for next replication
+//            resetStats (rep)                                        // reset and aggregate statistics
+//        end for
+//
+//        cleanup ()
+//        if reps > 1 then reportV ()
+//        println (s"coroutine counts = $counts")
+//        log.trace (this, "terminates model", null, _clock)
+//        hasFinished ()                                              // signal via semaphore that simulation is finished
+//        yyield (null, true)                                         // yield and terminate the director
+//    end act
 
-            log.trace (this, s"starts rep $rep", null, _clock)
-            simulating = _clock <= stopTime                         // simulate unless past stop time
+    override def act(): Unit =
+        log.trace(this, s"starts model for $reps replications", null, _clock)
 
-            while simulating && ! agenda.isEmpty do                 // INNER SCHEDULING LOOP
-                _theActor = agenda.dequeue ()                       // next from priority queue
-                if _theActor.actTime < clock then                   // out of order execution => QUIT
-                    flaw ("act", s"actor $_theActor activation time < $_clock")
-                    println ("QUIT")
-                    simulating = false
+        //for rep <- 1 to reps do                                         // LOOP THROUGH REPLICATIONS
+        val rep = 1
+        _clock = startTime                                          //Initialize the clock at StartTime
+        if rep == 1 && animating then display()                     // turn animation on (true) off (false)
+
+        log.trace(this, s"starts rep $rep", null, _clock)           // log this simulation
+
+        simulating = true                                           // Start the simulation as true,
+
+        while simulating && !agenda.isEmpty do                      // INNER SCHEDULING LOOP
+            _theActor = agenda.dequeue()                            // get next actor from priority queue
+            if _theActor.actTime < clock then
+                flaw("act", s"actor $_theActor activation time < $_clock")
+                println("QUIT")
+                simulating = false                                  //stop the simulation and quit
+            else
+                _clock = _theActor.actTime                          // advance time
+
+                if _clock > stopTime && _theActor.isInstanceOf[Source] then
+                    println(s"Skipping Source actor due to time limit at clock = $clock")
                 else
-                    _clock    = _theActor.actTime                   // advance the time
-                    debug ("act", s"${this.me} resumes ${_theActor} at $clock")
-                    log.trace (this, "resumes", _theActor, _clock)
-                    debug ("act", s"before yyield at $clock")
-                    yyield (_theActor)                              // director yields to actor
-                    debug ("act", s"after yyield at $clock")
-            end while
+                    if isAnimating then dgAni.updateActorCount(numActors)
+                    //debug("act", s"${this.me} resumes ${_theActor} at clock= $clock")
+                    //log.trace(this, "resumes", _theActor, _clock)
+                    yyield(_theActor) // yield to actor
+                    //debug ("act", s"after yyield at clock $clock")
+            end if
+        end while
 
-            simulating = false
-            log.trace (this, s"ends rep $rep", null, _clock)
+        simulating = false
+        log.trace(this, s"ends rep $rep", null, _clock)
 
-            fini (rep)                                              // post-run results
-            if rep < reps then reset ()                             // reset for next replication
-            resetStats (rep)                                        // reset and aggregate statistics
-        end for
+        fini(rep)
+        if rep < reps then reset()
+        resetStats(rep)
+        //end for
 
-        cleanup ()
-        if reps > 1 then reportV ()
-        println (s"coroutine counts = $counts")
-        log.trace (this, "terminates model", null, _clock)
-        hasFinished ()                                              // signal via semaphore that simulation is finished
-        yyield (null, true)                                         // yield and terminate the director
+        cleanup()
+        if reps > 1 then reportV()
+        println(s"coroutine counts = $counts")
+        log.trace(this, "terminates model", null, _clock)
+        hasFinished()
+        yyield(null, true)
     end act
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -230,11 +290,39 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
                  at: Array [Double]): Unit =
         if animating then
             val eid   = who.id
-            val label = who.name
+            //val = label = who.name
+            // Use numeric id as label for tokens so vehicle/car tokens show their number
+            val label = if what == CommandType.CreateToken then eid.toString else who.name
             debug ("animate", s"$label.$eid, $what, $color, $shape, ${stringOf (at)}")
             aniQ.add (AnimateCommand (what, eid, shape, label, true, color, at, _clock))
         end if
     end animate
+
+    // Convenience: explicit-label variant to avoid overload ambiguity
+    /** Enqueue an animation command with an explicit display label. NEW
+      * @param who    Identifiable being animated (provides unique id used as eid)
+      * @param what   Animation command (e.g., CreateToken)
+      * @param color  Paint color for the node/token
+      * @param shape  Shape to render (Ellipse, Rectangle, etc.)
+      * @param at     Location/size array for the shape (x, y, w, h) or variant
+      * @param label  The display label to show on the token/node (overrides name)
+      * Behavior:
+      * - Uses the supplied label for AnimateCommand.label; falls back to who.name
+      *   if the supplied label is null/empty.
+      * - Leaves internal ids and simulation logic unchanged; this is display-only.
+      * Used by:
+      * - VSource when creating vehicle tokens so the animator shows compact
+      *   per-source labels (e.g., M-1, R1-7) on token heads for visual validation.
+      */
+    def animateWithLabel (who: Identifiable, what: CommandType, color: Color, shape: Shape,
+                          at: Array [Double], label: String): Unit =
+        if animating then
+            val eid = who.id
+            val lbl = if label != null && label.nonEmpty then label else who.name
+            debug ("animateWithLabel", s"$lbl.$eid, $what, $color, $shape, ${stringOf (at)}")
+            aniQ.add (AnimateCommand (what, eid, shape, lbl, true, color, at, _clock))
+        end if
+    end animateWithLabel
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Put a edge command on the animation queue.
@@ -276,11 +364,12 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
      *  @param rep  the replication number (1, ... reps)
      */
     protected def fini (rep: Int): Unit =
-        report ()                                                   // report in terminal
+        //report ()                                                   // report in terminal
         if animating then
             reportF ()                                              // report in new window/frame
             if rep == 1 then dgAni.animate (0, 100000)              // only animate first rep
-//          dgAni.saveImage (DATA_DIR + name + ".png")
+            dgAni.saveImage (DATA_DIR + name + ".png")
+        end if
     end fini
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -361,7 +450,9 @@ object Model:
      *  have finished (e.g., call `waitFinished`), not just the main thread.
      *  If `shutdown` is not called, the application may hang.
      */
-    def shutdown (): Unit = Coroutine.shutdown ()
+
+    def shutdown (): Unit =
+        Recorder.shutdownRecorder()
+        Coroutine.shutdown ()
 
 end Model
-

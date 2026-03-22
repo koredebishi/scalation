@@ -25,7 +25,6 @@ package scalation
 package modeling
 package autograd
 
-import autograd.Variabl
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Optimizer` abstract class optimizes model parameters.

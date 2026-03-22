@@ -14,11 +14,10 @@ package process
 
 import scala.math.{abs, floor}
 import scala.runtime.ScalaRunTime.stringOf
-
-import scalation.animation.CommandType._
+import scalation.animation.CommandType.*
 import scalation.mathstat.VectorD
 import scalation.random.{Discrete, Variate}
-import scalation.scala2d.Colors._
+import scalation.scala2d.Colors.*
 import scalation.scala2d.QCurve
 import scalation.scala2d.QCurve.calcControlPoint2
 
@@ -41,9 +40,9 @@ class Transport (name: String, val from: Component, val to: Component,
                  shift1: VectorD = VectorD (0, 0), shift2: VectorD = VectorD (0, 0))
       extends Component:
 
-    initComponent (name, Array ())
 
-    private val debug       = debugf ("Transport", true)                // debug function
+
+    private val debug       = debugf ("Transport", false)                // debug function
 
     private val EPSILON     = 1E-7                                      // number close to zero
     private val STEP_SIZE   = 5                                         // number of units/pixels to move per step
@@ -52,6 +51,9 @@ class Transport (name: String, val from: Component, val to: Component,
     private [process] val curve    = QCurve ()                          // shadow QCurve for computing locations as tokens move along curve
     private [process] val (p1, p2) = calcEndPoints                      // first and second endpoints
     private [process] val pc       = calcControlPoint2 (p1, p2, bend)   // control point (determines curvature)
+
+    initComponent(name, (p1.toArray))
+
 
     private [process] var selector: Variate = Discrete (VectorD (0.25, 0.5, 0.25))
             // Random variate for selecting next direction, defaults to left (.25), straight (.50), right (.25)
@@ -64,14 +66,16 @@ class Transport (name: String, val from: Component, val to: Component,
         curve.setLine (p1, p2, bend)
 //      curve.setLine (p1, pc, p2)
 //      println ("loc = " + curve.getFirst)
+    end if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Give the location of the curve to be its starting point.
      */
     override def at: Array [Double] =
-       println (s"at: curve = $curve")
-       val p1 = curve.getFirst
-       Array (p1.x, p1.y)
+       //println (s"at: curve = $curve")
+       p1.toArray
+//       val p1 = curve.getFirst
+//       Array (p1.x, p1.y)
     end at
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -89,6 +93,7 @@ class Transport (name: String, val from: Component, val to: Component,
         val y2 = to.at(1) + 0.5 * h2 + shift2(1)
 
 //      if x1 < x2 then x1 += w1 else x2 += w2
+        //println(s"Vector(x1,y1)= ${VectorD(x1,y1)} : Vector(x2,y2)= ${VectorD(x2, y2)}")
         (VectorD (x1, y1), VectorD (x2, y2))
     end calcEndPoints
 
@@ -106,40 +111,42 @@ class Transport (name: String, val from: Component, val to: Component,
     /** Jump the entity `SimActor` down this transport.  Place it in the middle
      *  of the `Transport`s `QCurve` for the entire trip time.
      */
-    def jump (): Unit =
-        val actor    = director.theActor
-        val duration = if isSpeed then curve.length / motion.gen else motion.gen
-        tally (duration)
-        accum (onTransport)
-        onTransport += 1
-        director.log.trace (this, s"jumps for $duration", actor, director.clock)
-
-        curve.traj = 0.5                                                // jump to middle of curve
-        val loc = curve.next (DIAM, DIAM)
-        director.animate (actor, MoveToken, null, null, Array (loc.x, loc.y))
-
-        actor.schedule (duration)
-        actor.yieldToDirector ()
-        accum (onTransport)
-        onTransport -= 1
+    def jump (): Unit = ???
+//        val actor    = director.theActor
+//        val duration = if isSpeed then curve.length / motion.gen else motion.gen
+//        tally (duration)
+//        accum (onTransport)
+//        onTransport += 1
+//        director.log.trace (this, s"jumps for $duration", actor, director.clock)
+//
+//        curve.traj = 0.5                                                // jump to middle of curve
+//        val loc = curve.next (DIAM, DIAM)
+//        director.animate (actor, MoveToken, null, null, Array (loc.x, loc.y))
+//
+//        actor.schedule (duration)
+//        actor.yieldToDirector ()
+//        accum (onTransport)
+//        onTransport -= 1
     end jump
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Move the entity `SimActor` smoothly down this transport.  Repeatedly
-     *  move it along the `Transport`s `QCurve`.
-     *  @caveat:  tokens coordinates are computed using a shadow `QCurve`
-     *            (same coordinates as the one that will be created by the animation engine).
+     *  move it along the `Transport`s `QCurve`.  Caveat: tokens coordinates
+     *  are computed using a shadow `QCurve` (same coordinates as the one that
+     *  will be created by the animation engine).
      */
     def move (): Unit =
+        //println(s"The director in the Move Transport $director")
         val actor    = director.theActor
-        debug ("move", s"actor = $actor along the Transport")
+
+        debug ("move", s"actor = $actor this  = along the Transport")
         val duration = if isSpeed then curve.length / motion.gen else motion.gen
         tally (duration)
         accum (onTransport)
         onTransport += 1
         director.log.trace (this, s"moves for $duration", actor, director.clock)
 
-        val dist  = curve.length                                        // distance to move
+        val dist  = curve.length                             // al distance to move
         val steps = (floor (dist / STEP_SIZE)).toInt                    // number of small steps on QCurve
 //      val steps = (floor (curve.length / STEP_SIZE)).toInt            // number of small steps on QCurve
 
@@ -148,7 +155,7 @@ class Transport (name: String, val from: Component, val to: Component,
         var loc    = curve.next (DIAM, DIAM)                            // get the starting position for the entity/token
         actor.trajectory = curve.traj
 
-        cfor (0, steps) { _ =>
+        for i <- 1 to steps do
             if loc != null then
                 director.animate (actor, MoveToken, null, null, Array (loc.x, loc.y))
                 actor.schedule (duration / steps.toDouble)
@@ -159,7 +166,7 @@ class Transport (name: String, val from: Component, val to: Component,
                 actor.trajectory = curve.traj
 //              println ("Transport.move: -- after  loc = " + loc)
             end if
-        } // cfor
+        end for
 
         accum (onTransport)
         onTransport -= 1

@@ -1,4 +1,3 @@
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -46,6 +45,10 @@ class Animator (graph: Dgraph)
     /** Map allowing tokens to looked up based on their id's.
      */
     private val tokenMap = HashMap [Int, graph.Token] ()
+    /** Reverse map from token instance to eid for hit-testing/selection.
+     *  Read-only access via getTokenId.
+     */
+    private val tokenRevMap = HashMap [graph.Token, Int] ()
 
     /** Time dilation factor for speeding up/slowing down animations
      */
@@ -80,6 +83,7 @@ class Animator (graph: Dgraph)
         else
             flaw ("createNode", "for node npts = " + npts + " != 4")
             return
+        end if
 
         graph.addNode (node)
         nodeMap.put (eid, node)
@@ -108,6 +112,7 @@ class Animator (graph: Dgraph)
         if from == null || to == null then
            flaw ("createEdge", s"found null node - from with id $from_eid = $from  OR to with id $to_eid = $to")
            return
+        end if
 
         if npts == 0 then
             // Create a straight line using implicit coordinates derived from node coordinates.
@@ -132,6 +137,7 @@ class Animator (graph: Dgraph)
         else
             flaw ("createEdge", s"for edges npts = $npts != 0, 1, 4 or 6")
             return
+        end if
 
         debug ("createEdge", s"npts = $npts, edge = $edge, pts = ${stringOf (pts)}")
 
@@ -166,12 +172,14 @@ class Animator (graph: Dgraph)
             else
                 flaw ("createToken", s"for free token npts = $npts != 2 or 4")
                 return
+            end if
         else                                                // create a bound (to a node) token
             val onNode = nodeMap.get (on_eid).getOrElse (null)
 
             if onNode == null then
                flaw ("createToken", "onNode is null")
                return
+            end if
 
             if npts == 0 then
                 token = new graph.Token (shape, label, false, color, onNode, default, default)
@@ -190,9 +198,11 @@ class Animator (graph: Dgraph)
             else
                 flaw ("createToken", s"for bound token npts = $npts != 0 or 2")
                 return
+            end if
         end if
 
         tokenMap.put (eid, token)
+        tokenRevMap.put (token, eid)
     end createToken
         
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -205,6 +215,7 @@ class Animator (graph: Dgraph)
         if node == null then
            flaw ("destroyNode", s"node [eid = $eid] is null")
            return
+        end if
            
         graph.removeNode (node)
         nodeMap.remove (eid)
@@ -220,6 +231,7 @@ class Animator (graph: Dgraph)
         if edge == null then
            flaw ("destroyEdge", "edge [eid = $eid] is null")
            return
+        end if
            
         graph.removeEdge (edge)
         edgeMap.remove (eid)
@@ -235,6 +247,7 @@ class Animator (graph: Dgraph)
         if token == null then
            flaw ("destroyToken", "token is null")
            return
+        end if
            
         if token.primary then                    // destroy free token
             graph.freeTokens -= token
@@ -249,6 +262,7 @@ class Animator (graph: Dgraph)
         end if
 
         tokenMap.remove (eid)
+        tokenRevMap.remove (token)
     end destroyToken
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -265,6 +279,7 @@ class Animator (graph: Dgraph)
         else
             move (node.shape, pts)
             // FIX: also need to move the connected edges
+        end if
     end moveNode
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -281,6 +296,7 @@ class Animator (graph: Dgraph)
             flaw ("moveToken", "arbitrary moves not allowed for bound tokens")
         else
             move (token.shape, pts)
+        end if
     end moveToken
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -361,6 +377,7 @@ class Animator (graph: Dgraph)
                             moveGivenToken2Node (token, to_eid)
                             count += 1
                             if count == number then break ()
+                        end if
                     end for
                 } // end breakable
 
@@ -413,6 +430,7 @@ class Animator (graph: Dgraph)
                 val pts = Array (tLoc.x, tLoc.y)
                 moveToken (eid, pts)
                 return true                           // continuing on curve
+            end if
         end if
 
         return false                                  // exhausted the curve
@@ -432,6 +450,7 @@ class Animator (graph: Dgraph)
         else
             scale (node.shape, pts)
             // FIX: also need to move the connected edges
+        end if
     end scaleNode
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -468,6 +487,7 @@ class Animator (graph: Dgraph)
             else
                 scaleGivenTokens (oldNode.tokens, from_eid, color, -amount)  // remove fluid
                 scaleGivenTokens (newNode.tokens, to_eid, color, amount)     // add fluid
+            end if
         end if
     end scaleTokensAt
 
@@ -493,6 +513,7 @@ class Animator (graph: Dgraph)
                         scale (token.shape, Array (0.0, 0.0))
                     else                                          // rescale the token
                         scale (token.shape, Array (size, size))
+                    end if
                     done = true
                     break ()                                      // mission accomplished, return now
                 end if
@@ -506,6 +527,7 @@ class Animator (graph: Dgraph)
                 // No color match, so create a new token/fluid of that color
                 val eid = EidCounter.next ()
                 createToken (eid, Ellipse (), "t" + eid, false, color, node_eid, Array (change, change))
+            end if
         end if
     end scaleGivenTokens
 
@@ -554,6 +576,15 @@ class Animator (graph: Dgraph)
         else _timeDilationFactor = pts(0)
     end timeDilation 
 
+    // Removed getToken and getTokenId with path-dependent types to avoid exposing private graph in signatures.
+    /** Get the eid for a given token instance reference if known.
+     *  Accepts AnyRef to avoid path-dependent type exposure.
+     */
+    def getTokenIdByRef(token: AnyRef): Option[Int] = token match
+        case t: graph.Token => tokenRevMap.get(t)
+        case _              => None
+    end getTokenIdByRef
+
 end Animator
 
 
@@ -570,4 +601,3 @@ object EidCounter:
     def next (): Int = { count += 1; count }
 
 end EidCounter
-

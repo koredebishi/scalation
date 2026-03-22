@@ -1,8 +1,8 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller, Korede Bishe
+/** @author  John Miller
  *  @version 2.0
- *  @date    Thu May 15 18:19:39 EDT 2025
+ *  @date    Sat Jan 25 19:44:16 EST 2014
  *  @see     LICENSE (MIT style license file).
  *
  *  @note    Path for Modeling Multi-Lane Pathway
@@ -12,54 +12,50 @@ package scalation
 package simulation
 package process
 
-import scala.math.{abs, hypot, min}
+import scala.math.hypot
 
 import scalation.animation.CommandType._
 import scalation.mathstat.VectorD
-import scalation.random.{Bernoulli, Variate}
+import scalation.random.Variate
 import scalation.scala2d.Colors._
+import scala.math.{abs,min}
+import scalation.random.Bernoulli
 
-/*
- Example of four pathways (e.g., four lanes of an interstate highway (one direction):
- pathway1:  VSource-----------------path-----------------Junction-----------------path-----------------Sink
- pathway2:  VSource-----------------path-----------------Junction-----------------path-----------------Sink
- pathway3:  VSource-----------------path-----------------Junction-----------------path-----------------Sink
- pathway4:  VSource-----------------path-----------------Junction-----------------path-----------------Sink
-*/
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Pathway` class represents a single lane that consists of `VTransport`s and `Junction`s.
- *  As lanes come and go away, their endpoints may be a `Junction`, `VSource`, or `Sink`.
- *  Each pathway has a single `DoublyLinkedList` to keep track of cars on the pathway.
- *  On a pathway, 'your' car will follow the 'car-ahead' unless that car exits (`Ramp` or `Sink`) or changes lanes.
- *  Also, 'your' car may take an exit `Ramp` or change lanes, in which case it is no longer in the same pathway.
- *  Finally, a third car may enter your lane between 'your' car and the 'car-ahead' via an entrance `Ramp` or lane change.
- *  @param name     the name of the pathway
- *  @param k        the ?
- *  @param j        the ?
- *  @param from     the starting component
- *  @param to       the ending component
- *  @param junc     the array of junctions in the middle of the pathway
- *  @param motion   the variate or dynamics model for the speed/trip-time for motion down the `Path`
- *  @param isSpeed  whether speed or trip-time is used for motion
- *  @param bend     the bend or curvature of the `Path` (0 => line)
+/**
+ A pathway is a single lane that consists of VTransports and Junctions from Source to Sink
+ this single lane pathway is a single doublylinked list.
+ NB: the data structure that allows us query for car in a pathway is the doublylinked list
+ ------------A-doublyLinkedList-of-cars par pathway---------------------------------------------
+ pathway1//VSource-----------------path-----------------Junction-----------------path-----------------Sink
+ pathway2//VSource-----------------path-----------------Junction-----------------path-----------------Sink
+ pathway3//VSource-----------------path-----------------Junction-----------------path-----------------Sink
+ pathway4//VSource-----------------path-----------------Junction-----------------path-----------------Sink
+ *  @param name      the name of the pathway
+ *  @param from      the starting component
+ *  @param to        the ending component
+ *  @param junc  the junction in the middle of the pathway
+ *  @param motion    the variate or dynamics model for the speed/trip-time for motion down the `Path`
+ *  @param isSpeed   whether speed or trip-time is used for motion
+ *  @param bend      the bend or curvature of the `Path` (0 => line)
  */
-class Pathway (name: String, k: Int, j: Int, from: Component, val srcSensor: Junction,
-               val junc: Array [Junction], val exitSensor: Junction, val to: Component,
-               motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0)
+
+class Pathway(name: String, k: Int, j: Int, from: Component,val srcSensor: Junction, val junc: Array[Junction], val exitSensor: Junction, val to: Component,
+              motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0)
     extends Component:
 
-    private val debug = debugf ("Pathway", true)                           // debug function
-    private val flaw  = flawf ("Pathway")                                  // flaw function
+    private val GAP = 30.0
+    private val delta = calcShift
+    val coin = Bernoulli(0.9)
 
-    private val GAP   = 30.0                                               // ?
-    private val delta = calcShift                                          // ?
-    private val coin  = Bernoulli (0.9)                                    // ?
+    private val debug = debugf("Pathway", true)
+    private val flaw = flawf("Pathway")
 
     // Create pathway structure: k pathways, each with j+1 segments (including exit)
+    val pathways = Array.ofDim[VTransport](k,j+1) // Number of junctions is j, so segments must be j+1
 
-    val paths  = Array.ofDim [VTransport] (k, j+1)                         // # junctions is j, so segments must be j+1
-    val vtrees = Array.fill(k)(DoublyLinkedList [Vehicle] ())
+
 
     debug("init", s"name = $name, k = $k, from = ${from.name}, junc =, to = ${to.name}")
 
@@ -98,31 +94,31 @@ class Pathway (name: String, k: Int, j: Int, from: Component, val srcSensor: Jun
      * @param actor The vehicle attempting to change pathways
      * @return True if lane change was successful, False otherwise
      */
-    def changeLane(i: Int, j: Int, actor: Vehicle, k:Int): Boolean =
-        if abs(i - j) > 1 then
-            flaw("changePathway", s"Car: $actor UNSAFE to change multiple pathways at once: lane:$i to lane:$j")
+    def changeLane(l1: Int, l2: Int, actor: Vehicle, seg:Int): Boolean =
+        if abs(l1 - l2) > 1 then
+            flaw("changePathway", s"Car: $actor UNSAFE to change multiple pathways at once: lane:$l1 to lane:$l2")
             return false
-        println(s"Vehicle $actor needs to change lane from lane$i to lane$j with seg:$k")
-        val safeDisp = pathways(i)(k).safetydist
-        val vBehind = pathways(j)(k).getFirst
+        println(s"Vehicle $actor needs to change lane from lane$l1 to lane$l2 with seg:$seg")
+        val safeDisp = pathways(l1)(seg).safetydist
+        val vBehind = pathways(l2)(seg).getFirst    // this is logically correct
         val vAhead = if vBehind != null && vBehind.myPathNode.ahead != null then vBehind.myPathNode.ahead.elem else null
 
-        println(s"changeLane $actor in lane $i: vAhead: $vAhead and vBehind: $vBehind @ lane$j")
+        println(s"changeLane $actor in lane $l1: vAhead: $vAhead and vBehind: $vBehind @ lane$l2")
 
         //suppose car4 in pathway(i) needs to change lane to pathway(j):
-        val gapBehind = if vBehind != null then pathways(j)(k).length - vBehind.disp else safeDisp // use gap as displacement between length and car or make it 20 if otherwise
-        val gapVahead = if vAhead != null then abs(vAhead.t_disp - pathways(j)(k+1).length) else safeDisp // do same as above here too
+        val gapBehind = if vBehind != null then pathways(l2)(seg).length - vBehind.disp else safeDisp // use gap as displacement between length and car or make it 20 if otherwise
+        val gapVahead = if vAhead != null then abs(vAhead.t_disp - pathways(l2)(seg+1).length) else safeDisp // do same as above here too
 
         val gap = min(gapBehind, gapVahead) // return the minimum gap between ahead and behind, this allows for a safe lane change.
         if gap >= safeDisp
         then
-            removeFromAlist(actor, i) // remove the car from it's doublylinkedlist
-            actor.laneID = j          // update the car lane id to reflect the new lane info
-            actor.pathInfo =  pathways(j)(k).name  // update the pathway info before adding to the dll for consistency of information
-            addToAlist(actor, vAhead, j) // add the car to the new doublylinkedlist
+            removeFromAlist(actor, l1) // remove the car from it's doublylinkedlist
+            actor.laneID = l2          // update the car lane id to reflect the new lane info
+            actor.pathInfo =  pathways(l2)(seg).name  // update the pathway info before adding to the dll for consistency of information
+            addToAlist(actor, vAhead, l2) // add the car to the new doublylinkedlist
             true
         else
-            println(s"Unsafe to change lane from $i to $j because the gap is small")
+            println(s"Unsafe to change lane from $l1 to $l2 because the gap is small")
             false // gap too small, no lane change allowed.
     end changeLane
 
@@ -136,10 +132,10 @@ class Pathway (name: String, k: Int, j: Int, from: Component, val srcSensor: Jun
     def addToAlist(actor: Vehicle, other: Vehicle, j: Int): Unit =
         actor.myPathway = this                                                                                          //set the actor's pathway to this pathway
         val thisVtree = vtrees(j)                                                                                       //extract the correct vtree first
-        val otherNode = if other != null then other.myPathNode.asInstanceOf[thisVtree.Node] else null//thisVtree.headNode //maybe null                  //get the other actor's node
+        val otherNode = if other != null then other.myPathNode.asInstanceOf[thisVtree.Node] else null// thisVtree.headNode //maybe null                  //get the other actor's node
         if otherNode != null then
             println(s"the if part(addBefore method) is used otherNode: $otherNode")
-            actor.myPathNode = thisVtree.addBefore(actor, otherNode)
+            actor.myPathNode = thisVtree.add(actor, otherNode)
         else
             println(s"the else part (add method) was used otherNode: $otherNode")
             actor.myPathNode = thisVtree.add(actor, otherNode)                                                             //add the actor to the vtree

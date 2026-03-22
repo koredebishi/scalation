@@ -1,5 +1,4 @@
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
  *  @version 2.0
@@ -51,7 +50,7 @@ class Gate (name: String, director: Model, line: WaitQueue, units: Int,
  
     private var _shut = shut0                                        // initial value for _shut
 
-    debug ("init", s"name = $name with cor_id $cor_id, located at ${stringOf (at)}")
+    debug ("init", s"name = $name with cor_id , located at ${stringOf (at)}")
 
     if line == null then flaw ("init", "must have line for entities when gate is closed")
 
@@ -107,7 +106,7 @@ class Gate (name: String, director: Model, line: WaitQueue, units: Int,
     /** Specifies how the gate is controlled.
      */
     override def act (): Unit =
-        cfor (0, units) { _ =>
+        for i <- 1 to units do
             flip ()
             if ! _shut then release ()
             director.animate (this, SetPaintNode, gateColor, Rectangle (), at)            
@@ -115,7 +114,7 @@ class Gate (name: String, director: Model, line: WaitQueue, units: Int,
             tally (dur)    
             schedule (dur)
             yieldToDirector ()
-        } // cfor
+        end for
         yieldToDirector (true)    
     end act
 

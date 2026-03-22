@@ -350,7 +350,6 @@ end simpleCNN2
     new Plot (null, yy, yp(?, 0), "IGD for CNN y", lines = true)
 
     println ("Compare smape scores with Regression")
-    import scalation.modeling.Regression
     val mod = new Regression (xx, yy)
     val ypr = mod.trainNtest ()()._1
     println (s"smape = ${FitM.smapeF (yy.drop(1), ypr.drop(1))}")

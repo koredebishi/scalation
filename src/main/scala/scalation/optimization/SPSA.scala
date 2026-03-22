@@ -32,7 +32,7 @@ import scalation.random.{Bernoulli, Uniform}
  *  @param debug_    the whether to call in debug mode (does tracing)j
  */
 class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
-            lower: VectorD = null, upper: VectorD = null, debug_ : Boolean = true)
+            lower: VectorD = null, upper: VectorD = null, debug_ : Boolean = false)
       extends Minimizer
          with BoundsConstraint (lower, upper)
          with MonitorEpochs:
@@ -41,9 +41,10 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
     private val flaw  = flawf ("SPSA")                                 // flaw function
 
     private val EPS   = 1E-6
+    private val coin  = Bernoulli ()                                   // Bernoulli (0/1) RVG
     private var alpha = 0.602
     private var gamma = 0.101
-    private var A     = 100.0
+    private var A     = 0.1 * max_iter    // stability constant (~10% of max_iter per Spall (1998))
     private var a     = 0.16       // these numbers are from Spall (1998) DOI: 10.1109/7.705889
     private var c     = 1.0
 
@@ -53,7 +54,7 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
     /** Reset the parameters.
      *  @param params  the given starting parameters of a VectorD
      */
-    def reset (params: VectorD = VectorD (0.602, 0.101, 10.0, 0.16, 1.0)): Unit =
+    def reset (params: VectorD = VectorD (0.602, 0.101, 0.1 * max_iter, 0.16, 1.0)): Unit =
         if params.length != 5 then flaw ("reset", "failed! did not pass 5 parameters")
         alpha  = params(0)
         gamma  = params(1)
@@ -75,9 +76,7 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
      *  @param stream  the random number stream
      */
     def bernoulliVec (n: Int, p: Double = 0.5, stream: Int = 0): VectorD =
-        val coin = Bernoulli (p, stream)                               // Bernoulli (0/1) RVG
-        VectorD (for _ <- 0 until n yield 2.0 * coin.gen - 1.0)
-    end bernoulliVec
+        VectorD (for i <- 0 until n yield 2.0 * coin.gen - 1.0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for an optimal point by moving a distance ak in the -ghat direction.
@@ -92,6 +91,8 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
         val x      = x0.copy                                           // new point
 
         var (k, go) = (1, true)
+        val startTime = System.nanoTime()
+
         cfor (k <= max_iter && go, k += 1) {
             val ak      = a / pow (A + k + 1, alpha)                   // how far to move along gradient
             val ck      = c / pow (k + 1, gamma)                       // for x distance
@@ -113,12 +114,38 @@ class SPSA (f: FunctionV2S, max_iter: Int = 100, checkCon: Boolean = false,
             if f_x < f_best then
                 x_best = x.copy                                        // copy by value
                 f_best = f_x
-            epochLoss += f_best                                           // record best for k-th epoch
+            end if
+
+            updateMonitoring(k, f_best)                           // Called once per epoch, from the MonitorEpochs trait
             if (x - x_old).norm < toler then go = false                // stopping rule
         } // cfor
 
-        println (s"x_last is $x and y(x_last) at the end is ${f(x)} and \n " +
-                 s"lowest is $x_best and $f_best")
+        val endTime       = System.nanoTime()
+        val elapsedTimeMs = (endTime - startTime) / 1E6
+        val elapsedTimeSec= elapsedTimeMs / 1E3
+
+        finalizeMonitoring()
+        //printFooter()
+
+//
+//        println (s"x_last is $x and y(x_last) at the end is ${f(x)} and \n " +
+//                 s"lowest is $x_best and $f_best")
+        // Print clean, formatted optimization summary
+        println()
+        println(sline(70).trim)
+        println("SPSA: OPTIMIZATION SUMMARY")
+        println(sline(70).trim)
+        println(f"${"Metric"}%-25s | ${"Value"}%s")
+        println(sline(70).trim)
+        println(f"${"Final position (x_last)"}%-25s | $x")
+        println(f"${"Loss at final position"}%-25s | ${f(x)}%.8f")
+        println(f"${"Best position found"}%-25s | $x_best")
+        println(f"${"Best loss achieved"}%-25s | $f_best%.8f")
+        println(f"${"Total iterations"}%-25s | ${epochLoss.size}")
+        println(f"${"Elapsed time"}%-25s | ${elapsedTimeSec}%.4f seconds (${elapsedTimeMs}%.2f ms)")
+        println(f"${"Time per iteration"}%-25s | ${elapsedTimeMs / epochLoss.size}%.2f ms")
+        println(sline(70).trim)
+
         (f_best, x_best)
     end solve
 
@@ -134,17 +161,24 @@ end SPSA
     banner ("Minimize: (x_0 - 3)^2 + (x_1 - 4)^2 + 1")
 
 //  val noisen = Normal (0.0, 0.1)
-    val noise  = Uniform (-0.1, 0.1)
+    val noise  = Uniform (-0.1, 0.1)    // must feed it a bounded value. 
 
-    def f (x: VectorD): Double = (x(0) - 3)~^2 + (x(1) - 4)~^2 + 1 + noise.gen
+    def f (x: VectorD): Double = (x(0) - 3)~^2 + (x(1) - 4)~^2 + 1 + noise.gen     // the function you seak to optimize
 
-    val x0 = VectorD (1, 2)
-    val optimizer = new SPSA (f)
-    optimizer.reset ()
-    val opt = optimizer.solve (x0)
-    println (s"][ optimal solution (f(x), x) = $opt")
+    val x0 = VectorD (1, 2)        // initial starting value for the optimizer to look at 
+    
+    println ("\n=== Example 2: Advanced usage with custom callbacks ===")
+    val optimizer2 = new SPSA (f)
+    optimizer2.reset ()
+    optimizer2.setVerbose (1)          // Disable built-in output
+    optimizer2.setPrintEvery (20)      // Print every 10 epochs
+    val opt = optimizer2.solve (x0)
 
-    optimizer.plotLoss ()
+
+
+//    println (s"][ optimal solution (f(x), x) = $opt")
+
+    //optimizer.plotLoss ()
 
 end sPSATest
 

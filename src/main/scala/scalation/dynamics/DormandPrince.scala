@@ -1,4 +1,3 @@
-
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -11,7 +10,6 @@
 package scalation
 package dynamics
 
-import scala.annotation.nowarn
 import scala.math.{abs, E, pow}
 import scala.util.control.Breaks.{break, breakable}
 
@@ -120,6 +118,7 @@ object DormandPrince
                 if error < tol then
                     y  += h * (b1*k1 + b3*k3 + b4*k4 + b5*k5 + b6*k6)
                     tn += h
+                end if
                 debug ("integrate2", s"for step n = $n: error = $error, y = $y")
 //              if n == 10 then System.exit (0)
  
@@ -171,71 +170,85 @@ object DormandPrince
 
         var ti = 0.0
         var yi: VectorD = null
+        var n = 0
+        var go = true
+        cfor(go && n < maxSteps, n += 1) {
+            ti = tn
+            cfor(0, y.dim) { j =>
+                yi = y
+                k1(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k1 = $k1")
 
-        breakable {
-            for n <- 1 to maxSteps do
-                ti = tn
-                cfor (0, y.dim) { j => yi = y
-                                  k1(j) = f(j)(ti, yi) }
-                debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k1 = $k1")
+            ti = tn + c2 * h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a21) * h
+                k2(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k2 = $k2")
 
-                ti = tn + c2 * h
-                cfor (0, y.dim) { j => yi = y + (k1*a21) * h
-                                  k2(j) = f(j)(ti, yi) }
-                debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k2 = $k2")
+            ti = tn + c3 * h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a31 + k2 * a32) * h
+                k3(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k3 = $k3")
 
-                ti = tn + c3 * h
-                cfor (0, y.dim) { j => yi =  y + (k1*a31 + k2*a32) * h
-                                  k3(j) = f(j)(ti, yi) }
-                debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k3 = $k3")
+            ti = tn + c4 * h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a41 + k2 * a42 + k3 * a43) * h
+                k4(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k4 = $k4")
 
-                ti = tn + c4 * h
-                cfor (0, y.dim) { j => yi = y + (k1*a41 + k2*a42 + k3*a43) * h
-                                  k4(j) = f(j)(ti, yi) }
-                debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k4 = $k4")
+            ti = tn + c5 * h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a51 + k2 * a52 + k3 * a53 + k4 * a54) * h
+                k5(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k5 = $k5")
 
-                ti = tn + c5 * h
-                cfor (0, y.dim) { j => yi = y + (k1*a51 + k2*a52 + k3*a53 + k4*a54) * h
-                                  k5(j) = f(j)(ti, yi) }
-                debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k5 = $k5")
+            ti = tn + h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a61 + k2 * a62 + k3 * a63 + k4 * a64 + k5 * a65) * h
+                k6(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k6 = $k6")
 
-                ti = tn + h
-                cfor (0, y.dim) { j => yi = y + (k1*a61 + k2*a62 + k3*a63 + k4*a64 + k5*a65) * h
-                                  k6(j) = f(j)(ti, yi) }
-                debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k6 = $k6")
+            ti = tn + h
+            cfor(0, y.dim) { j =>
+                yi = y + (k1 * a71 + k2 * a72 + k3 * a73 + k4 * a74 + k5 * a75 + k6 * a76) * h
+                k7(j) = f(j)(ti, yi)
+            }
+            //debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k7 = $k7")
 
-                ti = tn + h
-                cfor (0, y.dim) { j => yi = y + (k1*a71 + k2*a72 + k3*a73 + k4*a74 + k5*a75 + k6*a76) * h
-                                  k7(j) = f(j)(ti, yi) }
-                debug ("integrateVV", s"ith stage derivatives @ ti = $ti is k7 = $k7")
+            //              debug ("integrateVV", s"h = $h, stage derivatives k = ${MatrixD (k1, k2, k3, k4, k5, k6, k7).transpose}")
 
-//              debug ("integrateVV", s"h = $h, stage derivatives k = ${MatrixD (k1, k2, k3, k4, k5, k6, k7).transpose}")
+            error = abs((b1 - b_1) * k1.norm + (b3 - b_3) * k3.norm + (b4 - b_4) * k4.norm +
+                (b5 - b_5) * k5.norm + (b6 - b_6) * k6.norm + (b7 - b_7) * k7.norm)
+            if error < tol then
+                cfor(0, y.dim) { j => y(j) += h * (b1 * k1(j) + b3 * k3(j) + b4 * k4(j) + b5 * k5(j) + b6 * k6(j)) }
+                tn += h
+            end if
+            //debug ("integrate2", s"for step n = $n: error = $error, y = $y")
+            //              if n == 4 then System.exit (0)
 
-                error = abs ( (b1-b_1) * k1.norm + (b3-b_3) * k3.norm + (b4-b_4) * k4.norm +
-                              (b5-b_5) * k5.norm + (b6-b_6) * k6.norm + (b7-b_7) * k7.norm )
-                if error < tol then
-                    cfor (0, y.dim) { j => y(j) += h * (b1*k1(j) + b3*k3(j) + b4*k4(j) + b5*k5(j) + b6*k6(j)) }
-                    tn += h
-                debug ("integrate2", s"for step n = $n: error = $error, y = $y")
-//              if n == 4 then System.exit (0)
+            val delta = 0.84 * pow(tol / error, 0.2) // error control
+            h *= (if delta <= 0.1 then 0.1 // adjust the step size
+            else if delta >= 4.0 then 4.0
+            else delta)
+            if h > hmax then h = hmax
 
-                val delta = 0.84 * pow (tol / error, 0.2)               // error control
-                h *= (if delta <= 0.1 then 0.1                          // adjust the step size
-                      else if delta >= 4.0 then 4.0
-                      else delta)
-                if h > hmax then h = hmax
+            if tn >= t then go = false // at or past end time
+            else if tn + h > t then h = t - tn // complete last time increment
+            else if h < hmin then go = false // step size too small
 
-                if tn >= t then break ()                                // at or past end time
-                else if tn + h > t then h = t - tn                      // complete last time increment
-                else if h < hmin then break ()                          // step size too small
-
-                if y.mag > ovf then flaw ("integrate2", s"probable overflow since y = $y")
-                if n % 100 == 0 then println (s"integrate2: step $n: tn = $tn, y = $y")
-            end for
-        } // breakable
+            if y.mag > ovf then flaw("integrate2", s"probable overflow since y = $y")
+            // if n % 100 == 0 then println(s"integrate2: step $n: tn = $tn, y = $y")  // commented for batch runs
+        } // cfor
         y                       // the value of the function at time t, y = f(t)
     end integrateVV
- 
+
 end DormandPrince
 
 import DormandPrince._
@@ -253,25 +266,25 @@ import DormandPrince._
     banner (s"Test ODE Solver Dormand-Prince compute y(2) where y0 = y(0) = 1")
 
     banner ("Test `integrate` on y' = f(t, u) = 2.0 * t")
-    @nowarn def derv1 (t: Double, y: Double) = y             // solution to differential equation is e^t
-    var y_ = (t: Double) => E~^t                             // symbolic solution
-    var y  = integrate (derv1, y0, t_)                       // numeric solution
+    def derv1 (t: Double, y: Double) = y             // solution to differential equation is e^t
+    var y_ = (t: Double) => E~^t                     // symbolic solution
+    var y  = integrate (derv1, y0, t_)               // numeric solution
     println (s"\n==> at t = $t_: y = $y")
     println (s"\n==> correct t~^2 + 1 = ${y_(t_)}")
     println (s"\n==> error = ${y_(t_) - y}")
 
     banner ("Test `integrate` on y' = f(t, u) = y")
-    @nowarn def derv2 (t: Double, y: Double) = 2.0 * t       // f(t, y) for differential equation is t^2 + 1
-    y_ = t => t~^2 + 1                                       // symbolic solution
-    y  = integrate (derv2, y0, t_)                           // numeric solution
+    def derv2 (t: Double, y: Double) = 2.0 * t       // f(t, y( for differential equation is t^2 + 1
+    y_ = t => t~^2 + 1                               // symbolic solution
+    y  = integrate (derv2, y0, t_)                   // numeric solution
     println (s"\n==> at t = $t_: y = $y")
     println (s"\n==> correct: E~^t = ${y_(t_)} ")
     println (s"\n==> error = ${y_(t_) - y}")
 
     banner ("Test `integrate` on y' = f(t, u) = t + y")
-    def derv3 (t: Double, y: Double) = t + y                  // f(t, y) for ordinary differential equation
-    y_ = t => 2*E~^t - t - 1                                  // symbolic solution
-    y  = integrate (derv3, y0, t_)                            // numeric solution
+    def derv3 (t: Double, y: Double) = t + y          // f(t, y) for ordinary differential equation
+    y_ = t => 2*E~^t - t - 1                          // symbolic solution
+    y  = integrate (derv3, y0, t_)                    // numeric solution
     println (s"\n==> at t = $t_: y = $y")
     println (s"\n==> correct: 2*E~^t - t - 1 = ${y_(t_)}")
     println (s"\n==> error = ${y_(t_) - y}")
@@ -290,8 +303,8 @@ end dormandPrinceTest
  */
 @main def dormandPrinceTest2 (): Unit =
 
-    @nowarn def dy0_dt (t: Double, y: VectorD) = y(0)
-    @nowarn def dy1_dt (t: Double, y: VectorD) = y(0) - y(1)
+    def dy0_dt (t: Double, y: VectorD) = y(0)
+    def dy1_dt (t: Double, y: VectorD) = y(0) - y(1)
     val odes = Array [DerivativeV] (dy0_dt, dy1_dt)
 
     def y_(t: Double): VectorD = VectorD (E~^t, 0.5 * E~^t + 1.5 * E~^(-t))
@@ -306,8 +319,8 @@ end dormandPrinceTest
     yy(0) = y_(0)
     for i <- 1 to 50 do
         t(i)  = i * 0.2
-        yy(i) = y_(t(i))                                      // symbolic solution
-        y(i)  = integrateVV (odes, y(0), t(i))                // numeric solution
+        yy(i) = y_(t(i))                                         // symbolic solution
+        y(i)  = integrateVV (odes, y(0), t(i))                   // numeric solution
     end for
 
     println (s"t  = $t")
@@ -350,9 +363,9 @@ end dormandPrinceTest2
 */
 
     banner ("Test DormandPrince on system of ODEs with y0 = 1.24 at t_ = 1.0")
-    @nowarn def dx_dt (t: Double, p: VectorD) =  p(1) * p(2)
-    @nowarn def dy_dt (t: Double, p: VectorD) = -p(0) * p(2)
-    @nowarn def dz_dt (t: Double, p: VectorD) = -.51 * p(0) * p(1)
+    def dx_dt (t: Double, p: VectorD) =  p(1) * p(2)
+    def dy_dt (t: Double, p: VectorD) = -p(0) * p(2)
+    def dz_dt (t: Double, p: VectorD) = -.51 * p(0) * p(1)
     val odes = Array [DerivativeV] (dx_dt, dy_dt, dz_dt)
 
     val ti  = 0.2
@@ -379,7 +392,7 @@ end dormandPrinceTest3
  */
 @main def dormandPrinceTest4 (): Unit =
 
-    println ("dormandPriceTest4 not yet implemented")         // FIX - implement
+    println ("dormandPriceTest4 not yet implemented")          // FIX - implement
 
 end dormandPrinceTest4
 

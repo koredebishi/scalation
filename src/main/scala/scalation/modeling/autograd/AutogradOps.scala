@@ -13,7 +13,6 @@ package modeling
 package autograd
 
 import scalation.mathstat.{TensorD, tensorize}
-import scalation.modeling.ActivationFun
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `AutogradOps` trait defines the core operations needed for automatic differentiation.
