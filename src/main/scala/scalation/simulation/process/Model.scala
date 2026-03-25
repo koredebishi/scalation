@@ -20,6 +20,8 @@ import scalation.mathstat._
 import scalation.scala2d.Colors._
 import scalation.scala2d.Shape
 
+import scala.collection.mutable.ArrayBuffer
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Model` class maintains a list of components making up the model and
  *  controls the flow of entities (`SimActor`s) through the model, following the
@@ -57,6 +59,10 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
     def isAnimating:Boolean = animating             // getter for animating;
 
+    // ── HUD stats push throttle (base infrastructure — works for any model) ──
+    private var hudPushCounter = 0                                 // counts actor activations between HUD updates
+    private val HUD_PUSH_INTERVAL = 50                             // push HUD data every N actor activations
+
     director = this
     debug ("init", s"make ${director.name} with cor_id $id the director")
 
@@ -74,7 +80,8 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
     /** The animation engine
      */
-    private [simulation] val dgAni = if animating then new DgAnimator ("Process Animator", black, white,
+    private [simulation] val dgAni = if animating then new DgAnimator ("Process Animator",
+                                                          new Color (0xD4D4D4), new Color (0x1E1E2E),
                                                           aniRatio, weight, height)
                         else null
 
@@ -178,6 +185,55 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     def reschedule (actor: SimActor): Unit = agenda += actor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Push live statistics to the animation HUD.
+     *  Scans model `parts` for VTransport segments, aggregates vehicle counts,
+     *  average speed, and per-segment density.  Called periodically from the
+     *  scheduling loop so that **any** model inheriting from `Model` gets a
+     *  live HUD without model-specific wiring.
+     */
+    private def pushHudStats (): Unit =
+        if !animating || dgAni == null then return
+
+        val vtSegs     = ArrayBuffer.empty [VTransport]
+        val segLabels  = ArrayBuffer.empty [String]
+
+        // VTransport segments live inside Pathway.subpart (or Pathway.seg),
+        // which in turn lives inside parts.  We must recurse one level.
+        for p <- parts do
+            p match
+                case pw: Pathway =>
+                    for s <- pw.seg do
+                        vtSegs    += s
+                        segLabels += s.name
+                case vt: VTransport =>          // in case a VTransport is added directly
+                    vtSegs    += vt
+                    segLabels += vt.name
+                case _ =>   // ignore non-transport parts
+
+        // -- per-segment density (veh/km) and aggregate speed ----------------
+        var totalVehicles = 0
+        var sumVelocity   = 0.0
+        val densities     = new Array [Double] (vtSegs.length)
+
+        for i <- vtSegs.indices do
+            val vt    = vtSegs(i)
+            val nVeh  = vt.vdeque.size
+            val lenKm = vt.length / 1000.0                     // convert metres → km
+            densities(i) = if lenKm > 0.0 then nVeh.toDouble / lenKm else 0.0
+            totalVehicles += nVeh
+            for v <- vt.vdeque do sumVelocity += v.velocity
+        end for
+
+        val avgSpeed   = if totalVehicles > 0 then sumVelocity / totalVehicles else 0.0
+        val elapsed    = _clock - startTime
+        val throughput = if elapsed > 0.0 then numActors / (elapsed / 3600.0) else 0.0   // veh/hr
+
+        dgAni.updateHudStats (throughput, avgSpeed)
+        if vtSegs.nonEmpty then
+            dgAni.updateSegmentDensities (densities, segLabels.toArray)
+    end pushHudStats
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The model itself is an Actor (not an ordinary `SimActor`) and may be
      *  thought of as the director.  The director iteratively manages the clock
      *  and the agenda of actors until the simulation flag becomes false
@@ -250,6 +306,11 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
                     println(s"Skipping Source actor due to time limit at clock = $clock")
                 else
                     if isAnimating then dgAni.updateActorCount(numActors)
+                    hudPushCounter += 1
+                    if isAnimating && hudPushCounter >= HUD_PUSH_INTERVAL then
+                        hudPushCounter = 0
+                        pushHudStats ()
+                    end if
                     //debug("act", s"${this.me} resumes ${_theActor} at clock= $clock")
                     //log.trace(this, "resumes", _theActor, _clock)
                     yyield(_theActor) // yield to actor

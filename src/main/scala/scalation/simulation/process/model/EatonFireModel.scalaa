@@ -1,0 +1,482 @@
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Bishi
+ *  @version 2.0
+ *  @date    Sunday Mar 22 2026
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @note    EatonFireModel: Eaton fire model — TOPOLOGY DESIGN DOCUMENT
+ *
+ *  This file is a design scratchpad (.scalaa = not compiled).
+ *  It documents the network topology decisions for the I-210 WB Eaton fire
+ *  corridor before coding the actual NetworkConfig.I210_WB_Eaton definition.
+ */
+
+package scalation
+package simulation
+package process
+package model
+
+import scalation.mathstat.{MatrixD, VectorD}
+import scalation.random.Uniform
+import scalation.simulation.process.{IntegratorType, IDMDynamics, GippsDynamics, KraussDynamics}
+import scalation.simulation.process.config.{CarFollowingModel, NetworkConfig, SimulationReport}
+import scalation.simulation.process.builder.TrafficModelBuilder
+
+
+//=============================================================================
+//  I-210 WB EATON FIRE CORRIDOR — FULL TOPOLOGY MAP
+//=============================================================================
+//
+//  Direction of travel: EAST → WEST  (upstream → downstream)
+//  PM increases eastward:  PM 13.98 (LA TUNA CANYON) ←── PM 29.88 (ROSEMEAD)
+//  Corridor length: ~16 miles, 25 ML sensors, 22 OR sensors, 18 FR sensors
+//
+//  Data source: station_map.csv (194 rows total, I-210 W subset = 77 stations)
+//  Baseline: avg of Dec 3, 10, 17 (normal Tuesday)
+//  Fire day: Jan 7, 2025 (Eaton Fire ignition ~6:18 PM PST)
+//
+//
+//  ═══════════════════════════════════════════════════════════════════════════
+//  MASTER STATION TABLE — I-210 WB (sorted by PM, east → west = upstream → downstream)
+//  ═══════════════════════════════════════════════════════════════════════════
+//
+//  ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+//  │  PM     Station  Location                Type  Lanes  Data?   Role in Simulation                       │
+//  ├──────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+//  │                                                                                                        │
+//  │  ── SECTION A: EASTERN (PM 29.9 → 24.5) — 5-lane mainline + HOV ──────────────────────────────────── │
+//  │                                                                                                        │
+//  │  29.88  717653   ROSEMEAD 1              ML     5     ✅ 100%  ★ Entry (upstream boundary)             │
+//  │  29.88  761431   ROSEMEAD 1              HV     1     ✅ 100%    HOV companion                         │
+//  │  29.88  716596   ROSEMEAD 1              OR     1     ❌   0%    null — cannot use                     │
+//  │  29.88  717652   ROSEMEAD 1              FR     1     ❌   0%    null — cannot use                     │
+//  │                                                                                                        │
+//  │  29.17  717649   SIERRA MADRE V1         ML     5     ✅ 100%  ★ ML sensor                            │
+//  │  29.17  761325   SIERRA MADRE V1         HV     1     ✅ 100%    HOV companion                         │
+//  │  29.17  716594   SIERRA MADRE V1         OR     1     ✅ 100%  ★ On-ramp (has data!)                  │
+//  │  29.17  717648   SIERRA MADRE V1         FR     3     ✅ 100%  ★ Off-ramp (has data!)                 │
+//  │                                                                                                        │
+//  │  28.58  768927   SAN GABRIEL OFF         FR     1     ✅ 100%  ★ Off-ramp (has data!)                 │
+//  │                                                                                                        │
+//  │  28.27  717644   SAN GABRIEL             ML     5     ✅ 100%  ★ ML sensor                            │
+//  │  28.27  717645   SAN GABRIEL             HV     1     ✅ 100%    HOV companion                         │
+//  │  28.27  716592   SAN GABRIEL             OR     1     ✅ 100%  ★ On-ramp (has data!)                  │
+//  │                                                                                                        │
+//  │  28.03  717642   ALTADENA                ML     5     ✅ 100%  ★ ML sensor                            │
+//  │  28.03  717643   ALTADENA                HV     1     ✅ 100%    HOV companion                         │
+//  │  28.03  716591   ALTADENA                OR     1     ✅ 100%  ★ On-ramp (has data!)                  │
+//  │                                                                                                        │
+//  │  27.64  764346   ALLEN                   FR     2     ✅ 100%  ★ Off-ramp (has data!)                 │
+//  │                                                                                                        │
+//  │  26.80  717637   HILL                    ML     5     ✅ 100%  ★ ML sensor                            │
+//  │  26.80  761322   HILL                    HV     1     ✅ 100%    HOV companion                         │
+//  │  26.80  716588   HILL                    OR     1     ✅ 100%  ★ On-ramp (has data!)                  │
+//  │  26.80  717636   HILL                    FR     1     ❌   0%    null — cannot use                     │
+//  │                                                                                                        │
+//  │  26.47  768920   LAKE 2 - OFF            FR     2     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  26.12  717634   LAKE 1                  ML     5     ✅ 100%  ★ ML sensor                            │
+//  │  26.12  761318   LAKE 1                  HV     1     ✅ 100%    HOV companion                         │
+//  │  26.12  716586   LAKE 1                  OR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  25.68  764137   MARENGO                 ML     6     ✅ 100%  ★ ML sensor (⚠ 6 lanes!)              │
+//  │  25.68  764135   MARENGO                 HV     1     ✅ 100%    HOV companion                         │
+//  │  25.68  764349   MARENGO                 FR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  25.48  773132   FAIR OAKS OFF           FR     2     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  25.40  717630   FAIR OAKS 1             ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  25.40  717632   FAIR OAKS 1             HV     1     ✅ 100%    HOV companion                         │
+//  │  25.40  716583   FAIR OAKS 1             OR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  24.98  769300   WB 210 TO ORANGE GRV    FR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  24.90  717627   WALNUT                  ML     2     ✅ 100%  ⚠ BOTTLENECK (2 lanes!)               │
+//  │  24.90  716582   WALNUT                  OR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  ── SR-134 / I-210 INTERCHANGE (~PM 24.5) ─── KEY EVACUATION SPLIT POINT ─────────────────────────── │
+//  │                                                                                                        │
+//  │  24.49  775725   WB 210 CON              FF     2     ❌   0%    null — junction routing data missing! │
+//  │  24.49  770165   EB 134 TO WB 210 CON    OR     1     ❌   0%    null — SR-134 merge data missing!    │
+//  │                                                                                                        │
+//  │  24.44  770579   WINONA WAY              ML     4     ✅ 100%  ★ ML sensor (just east of junction)    │
+//  │                                                                                                        │
+//  │  ── SECTION B: CENTRAL (PM 24.4 → 21.4) — 4–5 lane mainline, no HOV ─────────────────────────────── │
+//  │                                                                                                        │
+//  │  23.90  717624   MOUNTAIN 1              ML     5     ✅ 100%  ★ ML sensor                            │
+//  │  23.90  716579   MOUNTAIN 1              OR     1     ❌   0%    null                                  │
+//  │  23.90  717623   MOUNTAIN 1              FR     2     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  23.79  770568   HAMMOND ST.             ML     4     ✅ 100%  ★ ML sensor (close to MOUNTAIN)        │
+//  │                                                                                                        │
+//  │  23.00  717622   LINCOLN 1               ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  23.00  716578   LINCOLN 1               OR     1     ✅ 100%  ★ On-ramp (has data!)                  │
+//  │  22.98  776761   LINCOLN 1               FR     3     ✅ 100%  ★ Off-ramp (has data!)                 │
+//  │                                                                                                        │
+//  │  22.30  717615   ARROYO 1                ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  22.30  716575   ARROYO 1                OR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  21.39  770000   BERKSHIRE               ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  21.39  769999   BERKSHIRE               OR     1     ❌   0%    null                                  │
+//  │  21.39  769998   BERKSHIRE               FR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  ── SECTION C: WESTERN (PM 21.4 → 14.0) — 4 lanes, SR-2 junction ────────────────────────────────── │
+//  │                                                                                                        │
+//  │  20.98  769807   FOOTHILL                ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  20.98  769808   FOOTHILL                FR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  20.40  769983   GOULD                   ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  20.40  769985   GOULD                   OR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  19.78  769953   ANGELES CREST HWY NB    ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  19.78  769954   ANGELES CREST HWY NB    OR     1     ✅ 100%  ★ On-ramp (has data!)                  │
+//  │  19.78  769955   ANGELES CREST HWY NB    FR     1     ❌   0%    null                                  │
+//  │                                                                                                        │
+//  │  19.58  769941   ANGELES CREST HWY SB    ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  19.58  769942   ANGELES CREST HWY SB    OR     2     ✅ 100%  ★ On-ramp (has data! 2 lanes)         │
+//  │                                                                                                        │
+//  │  ── SR-2 / I-210 JUNCTION (~PM 18.3–19.1) ───────────────────────────────────────────────────────── │
+//  │                                                                                                        │
+//  │  19.08  770386   EB/NB 2 TO EB 210 CN    ML     4     ✅ 100%  ★ ML sensor (SR-2 zone)               │
+//  │  19.08  770388   EB/NB 2 TO EB 210       FF     2     ✅ 100%  ★ FF connector (has data!)            │
+//  │                                                                                                        │
+//  │  18.32  770401   EB/NB 2 TO WB 210 CN    ML     4     ✅ 100%  ★ ML sensor (SR-2 zone)               │
+//  │  18.32  770402   EB/NB 2 TO WB 210 CN    OR     3     ❌   0%    null — SR-2 merge data missing       │
+//  │                                                                                                        │
+//  │  17.88  769926   OCEAN VIEW              ML     6     ✅ 100%  ⚠ 6 lanes (SR-2 widening)             │
+//  │  17.88  769927   OCEAN VIEW              OR     1     ✅ 100%  ★ On-ramp (has data!)                  │
+//  │  17.88  769928   OCEAN VIEW              FR     1     ✅ 100%  ★ Off-ramp (has data!)                 │
+//  │                                                                                                        │
+//  │  17.38  769867   LA CRESCENTA            ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  17.38  769869   LA CRESCENTA            FR     1     ✅ 100%  ★ Off-ramp (has data!)                 │
+//  │                                                                                                        │
+//  │  16.58  769911   PENNSYLVANIA            ML     5     ✅ 100%  ⚠ 5 lanes                             │
+//  │  16.58  769912   PENNSYLVANIA            OR     1     ❌   0%    null                                  │
+//  │  16.58  769913   PENNSYLVANIA            FR     1     ✅ 100%  ★ Off-ramp (has data!)                 │
+//  │                                                                                                        │
+//  │  15.28  769965   HONOLULU                ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  15.28  769966   HONOLULU                OR     1     ✅ 100%  ★ On-ramp (has data!)                  │
+//  │                                                                                                        │
+//  │  14.18  770129   LA TUNA CANYON NB       ML     4     ✅ 100%  ★ ML sensor                            │
+//  │  14.18  770130   LA TUNA CANYON NB       OR     1     ✅ 100%  ★ On-ramp (has data!)                  │
+//  │  14.18  770131   LA TUNA CANYON NB       FR     1     ✅ 100%  ★ Off-ramp (has data!)                 │
+//  │                                                                                                        │
+//  │  13.98  770141   LA TUNA CANYON SB       ML     4     ✅ 100%  ★ Exit (downstream boundary)           │
+//  │  13.98  770142   LA TUNA CANYON SB       OR     1     ❌   0%    null                                  │
+//  └──────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+//
+//
+//  ═══════════════════════════════════════════════════════════════════════════
+//  ASCII TOPOLOGY DIAGRAM — I-210 WB (traffic flows ← left = west)
+//  ═══════════════════════════════════════════════════════════════════════════
+//
+//  Reads RIGHT to LEFT (upstream → downstream).
+//  ★ = has data (usable), ✗ = null (unusable), ? = design decision needed
+//
+//
+//  ── SECTION A: EASTERN (PM 29.9 → 24.5) ── 5 GP lanes + 1 HOV ──────────────
+//
+//           ✗OR  ★OR   ★OR  ★OR  ★OR   ✗OR         ★OR   ✗OR  ✗OR  ✗OR   ✗OR
+//            ↓    ↓     ↓    ↓    ↓     ↓           ↓     ↓    ↓    ↓     ↓
+//  ◄─[ROS]══[SIE]══[SGA]══[ALT]══[HIL]══[LAK]══[MAR]══[FAI]══[WAL]══[WIN]══[MOU]──►
+//     29.9   29.2  28.3  28.0  26.8  26.1  25.7  25.4  24.9   24.4  23.9
+//     5 ln   5 ln  5 ln  5 ln  5 ln  5 ln  6 ln  4 ln  2 ln!  4 ln  5 ln
+//            ↑     ↑           ↑                               ↑           ↑
+//           ★FR  ★FR(28.58)  ✗FR(HIL)                    ✗FR(ORGV)    ✗FR(MOU)
+//     ✗FR        ★FR(ALLEN   ✗FR(LAK2)                  ✗FR(FAI)
+//     (ROS)       27.64)     ✗FR(MAR)
+//                                                  ↑
+//                                             BOTTLENECK
+//                                             2 lanes!
+//
+//                    ▲ HOV lane starts here (PM 25.4 FAIR OAKS eastward) ▲
+//                    HV sensors at: FAI, MAR, LAK, HIL, ALT, SGA, SIE, ROS (all ✅)
+//
+//
+//  ── SR-134 / I-210 INTERCHANGE (~PM 24.5) ── EVACUATION SPLIT POINT ─────────
+//
+//                    from SR-134 EB                 to SR-134 WB
+//                         │                              ▲
+//                    ✗OR (770165)                    ✗FF (775725)
+//                    EB 134 TO WB 210               WB 210 CON
+//                         │                              │
+//                         ▼                              │
+//          ◄──── [ WINONA WAY ] ════════════════ [ ? JUNCTION ] ────►
+//                  PM 24.44                        PM ~24.5
+//                  ML ✅ 4 lanes                   Both FF sensors null!
+//                                                  No direct routing data
+//
+//        ┌─────────────────────────────────────────────────────────┐
+//        │  DECISION: How to model the SR-134 split?              │
+//        │  • FF 775725 (WB 210 CON) = ❌ null                    │
+//        │  • FF 770165 (EB 134 TO WB 210) = ❌ null              │
+//        │  • Must estimate p_t from ML flow differences:         │
+//        │    p_t = (ML_upstream − ML_downstream) / ML_upstream   │
+//        │    using MOUNTAIN(23.9) vs WALNUT(24.9) ML sensors     │
+//        └─────────────────────────────────────────────────────────┘
+//
+//
+//  ── SECTION B: CENTRAL (PM 24.4 → 21.4) ── 4 lanes, no HOV ─────────────────
+//
+//                  ✗OR   ★OR          ✗OR       ✗OR
+//                   ↓     ↓            ↓         ↓
+//  ◄──[MOU]════[HAM]══[LIN]═══[ARR]═══[BER]──►
+//      23.9    23.8  23.0    22.3    21.4
+//      5 ln    4 ln  4 ln    4 ln    4 ln
+//       ↑            ↑                ↑
+//     ✗FR(MOU)     ★FR(LIN,22.98)   ✗FR(BER)
+//
+//     Note: HAMMOND (23.8) is only 0.1 mi from MOUNTAIN (23.9)
+//           → Decision: merge into one junction or keep both?
+//
+//
+//  ── SR-2 / I-210 JUNCTION (~PM 18.3–19.1) ──────────────────────────────────
+//
+//                                      from SR-2 (Angeles Crest Hwy)
+//                                           │
+//                                      ★FF (770388) PM 19.08
+//                                      EB/NB 2 TO EB 210
+//                                      2 lanes, ✅ 100% data!
+//                                           │
+//                                           ▼
+//  ◄──[OCE]═══[EB2@18.3]═══[EB2@19.1]═══[ANG-SB]══[ANG-NB]──►
+//     17.88    18.32        19.08         19.58     19.78
+//     6 ln!    4 ln         4 ln          4 ln      4 ln
+//      ↑↓       ↓                          ↓        ↓  ↑
+//    ★OR ★FR  ✗OR(770402)               ★OR(2ln)  ★OR ✗FR
+//              SR-2 merge                          ★OR
+//              3 lanes, null!
+//
+//        ┌─────────────────────────────────────────────────────────┐
+//        │  DECISION: How to model the SR-2 merge?                │
+//        │  • FF 770388 at PM 19.08 = ✅ has data (2 lanes)       │
+//        │  • OR 770402 at PM 18.32 = ❌ null (3-lane connector)  │
+//        │  • FF data gives the freeway-to-freeway flow from SR-2 │
+//        │  • 6 lanes at OCEAN VIEW = widening for the merge      │
+//        │  • Model as: on-ramp using FF data as the source       │
+//        └─────────────────────────────────────────────────────────┘
+//
+//
+//  ── SECTION C: WESTERN (PM 21.4 → 14.0) ── 4 lanes ─────────────────────────
+//
+//           ★OR   ✗OR  ★OR  ★OR          ✗OR
+//            ↓     ↓    ↓    ↓            ↓
+//  ◄──[TUN-SB]══[TUN-NB]══[HON]══[PEN]══[CRE]──►
+//      13.98     14.18    15.28  16.58  17.38
+//      4 ln      4 ln     4 ln   5 ln   4 ln
+//                ↑               ↑      ↑
+//              ★FR(TUN)        ★FR    ★FR(CRE)
+//
+//     Note: LA TUNA CANYON has SB (13.98) + NB (14.18) only 0.2 mi apart
+//           → Decision: merge into one junction?
+//
+//
+//  ═══════════════════════════════════════════════════════════════════════════
+//  DATA AVAILABILITY SUMMARY
+//  ═══════════════════════════════════════════════════════════════════════════
+//
+//  ML (mainline):  25 stations — ALL ✅ 100%  (no gaps)
+//  HV (HOV):        8 stations — ALL ✅ 100%  (PM 25.4–29.9 only)
+//  OR (on-ramp):   22 stations — 11 ✅, 11 ❌  (50% usable)
+//  FR (off-ramp):  18 stations —  9 ✅,  9 ❌  (50% usable)
+//  FF (fwy-fwy):    2 stations —  1 ✅,  1 ❌  (SR-2 yes, SR-134 no)
+//
+//  ┌─────────────────────────────────────────────────────────┐
+//  │  USABLE RAMPS (have data — can drive simulation):      │
+//  │                                                         │
+//  │  ON-RAMPS (✅):                                         │
+//  │    770130  LA TUNA CANYON NB   PM 14.18   1 lane        │
+//  │    769966  HONOLULU            PM 15.28   1 lane        │
+//  │    769927  OCEAN VIEW          PM 17.88   1 lane        │
+//  │    769942  ANG CREST HWY SB   PM 19.58   2 lanes       │
+//  │    769954  ANG CREST HWY NB   PM 19.78   1 lane        │
+//  │    716578  LINCOLN 1           PM 23.00   1 lane        │
+//  │    716588  HILL                PM 26.80   1 lane        │
+//  │    716591  ALTADENA            PM 28.03   1 lane        │
+//  │    716592  SAN GABRIEL         PM 28.27   1 lane        │
+//  │    716594  SIERRA MADRE V1     PM 29.17   1 lane        │
+//  │                                                         │
+//  │  OFF-RAMPS (✅):                                        │
+//  │    770131  LA TUNA CANYON NB   PM 14.18   1 lane        │
+//  │    769913  PENNSYLVANIA        PM 16.58   1 lane        │
+//  │    769869  LA CRESCENTA        PM 17.38   1 lane        │
+//  │    769928  OCEAN VIEW          PM 17.88   1 lane        │
+//  │    776761  LINCOLN 1           PM 22.98   3 lanes       │
+//  │    764346  ALLEN               PM 27.64   2 lanes       │
+//  │    768927  SAN GABRIEL OFF     PM 28.58   1 lane        │
+//  │    717648  SIERRA MADRE V1     PM 29.17   3 lanes       │
+//  │                                                         │
+//  │  FF CONNECTORS (✅):                                    │
+//  │    770388  EB/NB 2 TO EB 210  PM 19.08   2 lanes (SR-2)│
+//  │                                                         │
+//  │  NULL RAMPS — need conservation-residual estimation:    │
+//  │    All ramps at: ROS, GOULD, FOOTHILL, BERKSHIRE,       │
+//  │    ARROYO, MOUNTAIN, WALNUT, FAIR OAKS, LAKE, MARENGO  │
+//  │    + SR-134 junction FF (775725) + OR (770165)          │
+//  │    + SR-2 merge OR (770402)                             │
+//  └─────────────────────────────────────────────────────────┘
+//
+//
+//  ═══════════════════════════════════════════════════════════════════════════
+//  DESIGN DECISIONS — TO BE RESOLVED
+//  ═══════════════════════════════════════════════════════════════════════════
+//
+//  ┌─────────────────────────────────────────────────────────────────────────┐
+//  │  D1. WHICH ML STATIONS BECOME SEGMENT JUNCTIONS?                      │
+//  │  ─────────────────────────────────────────────────────────────         │
+//  │  25 ML sensors is too many junctions. Candidates to merge:            │
+//  │                                                                       │
+//  │  • LA TUNA CANYON SB (13.98) + NB (14.18) → 0.2 mi apart → merge?   │
+//  │  • HAMMOND (23.79) + MOUNTAIN (23.90) → 0.11 mi apart → merge?      │
+//  │  • ANGELES CREST SB (19.58) + NB (19.78) → 0.2 mi apart → merge?   │
+//  │  • EB2@18.32 + EB2@19.08 → both SR-2 zone → one junction?           │
+//  │                                                                       │
+//  │  Minimum meaningful set (~15 junctions):                              │
+//  │    TUN, HON, PEN, CRE, OCE, [SR-2], ANG, GOU, FOO, BER,            │
+//  │    ARR, LIN, [MOU/HAM], [SR-134], WAL, FAI, MAR, LAK, HIL,          │
+//  │    ALT, SGA, SIE, ROS                                                │
+//  │                                                                       │
+//  ├─────────────────────────────────────────────────────────────────────────┤
+//  │  D2. HOW MANY LANES PER SEGMENT?                                     │
+//  │  ─────────────────────────────────────────────────────────────         │
+//  │  Lane count varies: 2, 4, 5, 6 along corridor.                       │
+//  │                                                                       │
+//  │  Option A: Fixed 4 lanes (simplest, like US-101 model)                │
+//  │  Option B: Fixed 5 lanes (modal value east of SR-134)                 │
+//  │  Option C: Per-segment lane count (most accurate, more complex)       │
+//  │            → Requires extending MainlineSpec to support variable      │
+//  │              lanesPerSegment (currently a single Int)                  │
+//  │                                                                       │
+//  │  ⚠ WALNUT (PM 24.9) = 2 lanes only! This is a real bottleneck       │
+//  │    at the SR-134 connector. Cannot ignore this.                       │
+//  │                                                                       │
+//  ├─────────────────────────────────────────────────────────────────────────┤
+//  │  D3. SR-134 INTERCHANGE (PM ~24.5)                                    │
+//  │  ─────────────────────────────────────────────────────────────         │
+//  │  Both FF sensors are null. Both junction OR sensors are null.         │
+//  │  Must estimate split ratio from ML flow conservation:                 │
+//  │    q_divert = q_ML(MOUNTAIN, 23.9) − q_ML(WALNUT, 24.9)             │
+//  │    p_t = q_divert / q_ML(MOUNTAIN)                                   │
+//  │                                                                       │
+//  │  Model as: off-ramp (diversion to SR-134) between MOU and WAL       │
+//  │           + on-ramp (merge from SR-134) — but no data for this!      │
+//  │                                                                       │
+//  ├─────────────────────────────────────────────────────────────────────────┤
+//  │  D4. SR-2 JUNCTION (PM 18.3–19.1)                                    │
+//  │  ─────────────────────────────────────────────────────────────         │
+//  │  FF 770388 at PM 19.08 HAS data (✅ 100%)                            │
+//  │  OR 770402 at PM 18.32 is null (❌)                                   │
+//  │                                                                       │
+//  │  Model as: on-ramp using FF flow as arrival rate.                     │
+//  │  OCEAN VIEW (17.88, 6 lanes) captures the post-merge widening.       │
+//  │                                                                       │
+//  ├─────────────────────────────────────────────────────────────────────────┤
+//  │  D5. NULL RAMP STRATEGY                                              │
+//  │  ─────────────────────────────────────────────────────────────         │
+//  │  ~50% of ramps have null data. Three options:                         │
+//  │                                                                       │
+//  │  Option A: Omit null ramps entirely (simpler, but loses fidelity)     │
+//  │  Option B: Estimate via ML conservation residuals                     │
+//  │            q_OR − q_FR = q_ML(downstream) − q_ML(upstream)           │
+//  │            (gives net, not individual OR/FR)                          │
+//  │  Option C: Use only ramps with data, accept the approximation        │
+//  │                                                                       │
+//  │  Recommendation: Start with Option C (usable ramps only), add        │
+//  │  Option B estimates in calibration phase.                             │
+//  │                                                                       │
+//  ├─────────────────────────────────────────────────────────────────────────┤
+//  │  D6. HOV LANE TREATMENT                                              │
+//  │  ─────────────────────────────────────────────────────────────         │
+//  │  8 HV sensors exist (PM 25.4–29.9), all ✅ 100%.                     │
+//  │  HOV only present in eastern section.                                 │
+//  │                                                                       │
+//  │  Option A: Fold HOV into ML count (like US-101 model)                 │
+//  │  Option B: Model as separate lane with restricted access              │
+//  │                                                                       │
+//  │  Recommendation: Option A for now. HOV is 1 lane — add to ML total.  │
+//  │  Eastern segments become 5+1=6 GP-equivalent lanes.                  │
+//  └─────────────────────────────────────────────────────────────────────────┘
+//
+//
+//  ═══════════════════════════════════════════════════════════════════════════
+//  LANE PROFILE (east → west, including HOV as +1 where present)
+//  ═══════════════════════════════════════════════════════════════════════════
+//
+//
+//                            I-210 WB  ◄──── traffic flows west ◄────
+//
+//  PM    29.9  29.2  28.3  28.0  26.8  26.1  25.7  25.4  24.9  24.4  23.9  23.8  23.0  22.3  21.4  21.0  20.4  19.8  19.6  19.1  18.3  17.9  17.4  16.6  15.3  14.2  14.0
+//  ML     5     5     5     5     5     5     6     4     2     4     5     4     4     4     4     4     4     4     4     4     4     6     4     5     4     4     4
+//  HV    +1    +1    +1    +1    +1    +1    +1    +1     –     –     –     –     –     –     –     –     –     –     –     –     –     –     –     –     –     –     –
+//  Tot    6     6     6     6     6     6     7     5     2     4     5     4     4     4     4     4     4     4     4     4     4     6     4     5     4     4     4
+//        ROS   SIE   SGA   ALT   HIL   LAK   MAR   FAI   WAL   WIN   MOU   HAM   LIN   ARR   BER   FOO   GOU   ANG   ANG   EB2   EB2   OCE   CRE   PEN   HON   TUN   TUN
+//                                                         │                                                                        ↑
+//                                                         │   BOTTLENECK                                                          SR-2
+//                                                         │   2→5 lanes                                                         6 lanes
+//                                                         │
+//                            ┌─────────────────────────────┤  SR-134 / I-210 INTERCHANGE  (~PM 24.5 on I-210 / ~PM 12.76 on SR-134)
+//                            │                             │
+//                            │  ✗FF (775725) WB 210 CON    │  ✗OR (770165) EB 134 TO WB 210 CON
+//                            │  to SR-134 WB  ❌ null      │  from SR-134 EB  ❌ null
+//                            │                             │
+//                            ▼                             │
+//                                                          │
+//                            SR-134 WB  ◄──── traffic flows west ◄────
+//
+//  PM   12.76  12.25  11.62  11.47  10.64  9.57  9.21  8.74  8.40  7.67  6.69  6.50  5.98
+//  ML     5      4      4      4      4     5     4     4     4     4     4     4     4
+//  HV    +1     +1     +1     +1     +1    +1    +1    +1    +1    +1    +1    +1     –
+//  Tot    6      5      5      5      5     6     5     5     5     5     5     5     4
+//        ORG    SRA    COL    FIG    TWN   FM2N  OAK   HAR   FM2S  GLE   CEN   PAC   SFE
+//         │                                 │                 │
+//         │                            SR-2 NB conn      SR-2 SB conn
+//         │                            FM 2 NB→134 EB    FM 2 SB→134
+//         │                            5 ln (widening)   ✗FF (774057) ❌ null
+//         │
+//    ORANGE GROVE
+//    Junction from I-210
+//
+//  ──────────────────────────────────────────────────────────────────────────────────────
+//  SR-134 WB Data Status:
+//    ML: 13 stations — ALL ✅ 100%
+//    HV: 12 stations — ALL ✅ 100% (⚠ fire day = PeMS imputed, not real!)
+//    OR:  7 stations — ALL ❌  0%  (persistent PeMS outage)
+//    FR:  8 stations — ALL ❌  0%  (persistent PeMS outage)
+//    FF:  3 stations — ALL ❌  0%  (773979, 773980 OAKVIEW + 774057 FM 2 SB)
+//  ──────────────────────────────────────────────────────────────────────────────────────
+//
+//
+//  ═══════════════════════════════════════════════════════════════════════════
+//  COMBINED NETWORK — BOTH CORRIDORS CONNECTED
+//  ═══════════════════════════════════════════════════════════════════════════
+//
+//                    I-210 WB (16 mi, 25 ML sensors)
+//   ◄━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//   TUN ◄── HON ◄── PEN ◄── CRE ◄── OCE ◄── [SR-2] ◄── ANG ◄── GOU ◄── FOO ◄── BER
+//   14.0    15.3    16.6    17.4    17.9      18-19      19.6    20.4    21.0    21.4
+//   4 ln    4 ln    5 ln    4 ln    6 ln      4 ln       4 ln    4 ln    4 ln    4 ln
+//
+//       ◄── ARR ◄── LIN ◄── MOU/HAM ◄═══╤═══► WAL ◄── FAI ◄── MAR ◄── LAK ◄── HIL
+//           22.3    23.0    23.9    ║    24.9    25.4    25.7    26.1    26.8
+//           4 ln    4 ln    5 ln    ║    2 ln!   4 ln    6 ln    5 ln    5 ln
+//                                  ║
+//                          SR-134  ║  INTERCHANGE
+//                          SPLIT   ║  PM ~24.5
+//                                  ║
+//       ◄── ALT ◄── SGA ◄── SIE ◄── ROS
+//           28.0    28.3    29.2    29.9                                  ╚═══════════╗
+//           5 ln    5 ln    5 ln    5 ln                                              ║
+//                                                                                     ║
+//                    SR-134 WB (7 mi, 13 ML sensors)                                  ║
+//   ◄━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╝
+//   SFE ◄── PAC ◄── CEN ◄── GLE ◄── [SR-2] ◄── HAR ◄── OAK ◄── FM2N ◄── TWN ◄── FIG ◄── COL ◄── SRA ◄── ORG
+//   5.98    6.50    6.69    7.67    8.4-9.2     8.74    9.21    9.57     10.6    11.5    11.6    12.3    12.8
+//   4 ln    5 ln    5 ln    5 ln     4-5 ln     5 ln    5 ln    6 ln     5 ln    5 ln    5 ln    5 ln    6 ln
+//
+//  ──────────────────────────────────────────────────────────────────────────────────────
+//  KEY: ◄── = segment (traffic flows west)
+//       ╤/║ = interchange connection (I-210 ↔ SR-134)
+//       [SR-2] = SR-2 / Angeles Crest Hwy junction on each freeway
+//  ──────────────────────────────────────────────────────────────────────────────────────
+
+

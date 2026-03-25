@@ -15,6 +15,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.{JButton, JToolBar, JComponent, JLabel}
 import javax.swing.KeyStroke
 import java.awt.BorderLayout
+import java.awt.{BasicStroke, GradientPaint, RenderingHints}
+import java.awt.geom.{AffineTransform, Point2D}
 import scala.math.round
 import scalation.scala2d.*
 import scalation.scala2d.Colors.*
@@ -23,7 +25,6 @@ import scala.collection.mutable.{ArrayBuffer, HashMap}
 import javax.swing.{JPanel, SwingUtilities}
 import java.awt.{GridBagLayout, GridBagConstraints}
 import java.awt.event.MouseEvent
-import java.awt.geom.Point2D
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -115,6 +116,37 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
     /** Currently selected actorId (-1 means none). */
     @volatile private var selectedActorId: Int = -1
+
+    // ── HUD data (pushed by simulation, read by renderer) ───────────────
+    @volatile private var hudModelName: String   = "IDM"
+    @volatile private var hudAvgSpeed: Double    = 0.0
+    @volatile private var hudThroughput: Double  = 0.0
+    @volatile private var hudSegDensities: Array [Double] = Array.empty  // veh/km per segment
+    @volatile private var hudSegLabels: Array [String]    = Array.empty  // e.g. "S0","S1",...
+    @volatile private var hudSpeedLimitMph: Int = 65                    // corridor speed limit for signs
+
+    /** Set the dynamics model name shown on the HUD (e.g., "IDM", "Gipps"). */
+    def setHudModelName (name: String): Unit = hudModelName = name
+
+    /** Set the corridor speed limit (mph) displayed on road signs.  Default 65. */
+    def setHudSpeedLimit (mph: Int): Unit = hudSpeedLimitMph = mph
+
+    /** Push live throughput (veh/hr) and average speed (m/s) for HUD display. */
+    def updateHudStats (throughput: Double, avgSpeed: Double): Unit =
+        hudThroughput = throughput
+        hudAvgSpeed   = avgSpeed
+    end updateHudStats
+
+    /** Push per-segment density values (veh/km) for the mini bar chart.
+     *  @param densities  array of densities, one per segment
+     *  @param labels     optional short labels for each segment
+     */
+    def updateSegmentDensities (densities: Array [Double], labels: Array [String] = null): Unit =
+        hudSegDensities = densities.clone ()
+        if labels != null then hudSegLabels = labels.clone ()
+        else if hudSegLabels.length != densities.length then
+            hudSegLabels = Array.tabulate (densities.length)(i => s"S$i")
+    end updateSegmentDensities
 
     /** Allow the simulation to set/override the token eid -> actorId mapping. */
     def setTokenActorId(tokenEid: Int, actorId: Int): Unit = vsLock.synchronized { tokenToActorId.update(tokenEid, actorId) }
@@ -291,8 +323,19 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     class Canvas
           extends ZoomablePanel:
 
+        setBackground (bgColor)                                     // dark/light theme background
+
         private val fsize = 18
-        private val f     = new Font ("Serif", Font_BOLD, fsize)
+        private val f     = new Font ("SansSerif", Font_BOLD, fsize)
+        private val roadStroke    = new BasicStroke (2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+        private val pavementStroke = new BasicStroke (10.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+        private val dashStroke     = new BasicStroke (1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
+                                         10.0f, Array (12.0f, 8.0f), 0.0f)
+        private val pavementColor  = new Color (50, 50, 58)
+        private val dashColor      = new Color (200, 200, 210, 160)
+        private val hudFont        = new Font ("SansSerif", Font_BOLD, 22)
+        private val hudFontSmall   = new Font ("SansSerif", java.awt.Font.PLAIN, 18)
+        private val hudBg          = new Color (20, 20, 28, 200)
 
         // Track press/drag to treat small drags as clicks
         private var pressX = -1
@@ -434,59 +477,285 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             super.paintComponent (gr)
             val g2d = gr.asInstanceOf [Graphics2D]            // use hi-resolution
 
+            // Anti-aliasing for smooth curves and text
+            g2d.setRenderingHint (RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+            g2d.setRenderingHint (RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+            g2d.setRenderingHint (RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+
+            // Gradient background (screen-space, before zoom transform)
+            val gradTop = new Color (
+                math.min (255, bgColor.getRed + 18),
+                math.min (255, bgColor.getGreen + 18),
+                math.min (255, bgColor.getBlue + 22))
+            g2d.setPaint (new GradientPaint (0f, 0f, gradTop, 0f, getHeight.toFloat, bgColor))
+            g2d.fillRect (0, 0, getWidth, getHeight)
+
             g2d.setTransform (at)                             // used for zooming
 
-            // Display the animation clock and actor counts
-            g2d.setFont (f)
-            g2d.setPaint (fgColor)
-            g2d.drawString(f"CLOCK = $clock%10.3f", clockWH._1, getH - clockWH._2)
-            g2d.drawString(s"ACTORS = $actorCount / $totalActorCount", clockWH._1, getH - clockWH._2 - 20)
-
-            // Optional PAUSED overlay
-            drawPausedOverlay(g2d)
 
             // Display all nodes and their bound tokens
             val nodes = graph.nodes.toList
+            val labelFont  = new Font ("SansSerif", java.awt.Font.BOLD, 11)
+            val signFont   = new Font ("SansSerif", java.awt.Font.BOLD, 10)
+            var nodeIdx = 0
             for node <- nodes do
                 g2d.setPaint (node.color)
                 g2d.fill (node.shape)
-                g2d.setPaint (black)
+                g2d.setPaint (fgColor)
                 g2d.draw (node.shape)
-                val x = node.shape.getCenterX ().asInstanceOf [Float]
-                val y = node.shape.getBounds2D.getMaxY ().asInstanceOf [Float]
-                g2d.drawString (node.label, x, y)
+
+                // ── #10  Junction label with background badge ──────────────
+                val nx = node.shape.getCenterX ()
+                val ny = node.shape.getBounds2D.getMaxY ()
+                val label = node.label
+                if label != null && label.nonEmpty then
+                    g2d.setFont (labelFont)
+                    val fm = g2d.getFontMetrics
+                    val lw = fm.stringWidth (label)
+                    val lh = fm.getHeight
+                    val lx = (nx - lw / 2.0).toInt
+                    val ly = (ny + 14).toInt
+                    val prevComp = g2d.getComposite
+                    g2d.setComposite (java.awt.AlphaComposite.getInstance (
+                        java.awt.AlphaComposite.SRC_OVER, 0.80f))
+                    g2d.setPaint (new Color (20, 20, 35))
+                    g2d.fillRoundRect (lx - 4, ly - lh + 3, lw + 8, lh + 2, 8, 8)
+                    g2d.setComposite (prevComp)
+                    g2d.setPaint (fgColor)
+                    g2d.drawString (label, lx.toFloat, ly.toFloat)
+                end if
+
+                // ── #11  Speed-limit sign at every 3rd node ────────────────
+                if nodeIdx % 3 == 0 then
+                    val sx = (node.shape.getBounds2D.getMaxX + 6).toInt
+                    val sy = (node.shape.getBounds2D.getMinY - 2).toInt
+                    val signTxt = s"${hudSpeedLimitMph}"
+                    g2d.setFont (signFont)
+                    val sfm = g2d.getFontMetrics
+                    val sw  = sfm.stringWidth (signTxt)
+                    val sh  = sfm.getHeight
+                    val pw  = sw + 8; val ph = sh + 6
+                    g2d.setPaint (white)
+                    g2d.fillRoundRect (sx, sy, pw, ph, 5, 5)
+                    g2d.setPaint (black)
+                    g2d.setStroke (new BasicStroke (1.5f))
+                    g2d.drawRoundRect (sx, sy, pw, ph, 5, 5)
+                    g2d.drawString (signTxt, sx + 4, sy + sh + 1)
+                end if
+                nodeIdx += 1
+
                 val node_tokens = node.tokens.toList
                 for token <- node_tokens do
+                    drawTokenGlow (g2d, token)
                     g2d.setPaint (token.color)
                     g2d.fill (token.shape)
                     drawTokenLabel (g2d, token)
                 end for
             end for
 
-            // Display all edges and their bound tokens
+            // Display all edges: pavement → dashed lane markings → labels/tokens
+            val defaultStroke = g2d.getStroke                 // save default stroke
             val edges = graph.edges.toList
+
+            // Layer 1: wide dark pavement behind each lane
+            g2d.setStroke (pavementStroke)
+            for edge <- edges do
+                g2d.setPaint (pavementColor)
+                g2d.draw (edge.shape)
+            end for
+
+            // Layer 2: dashed lane markings along each lane center
+            g2d.setStroke (dashStroke)
+            for edge <- edges do
+                g2d.setPaint (dashColor)
+                g2d.draw (edge.shape)
+            end for
+
+            // Layer 3: thin edge outline in lane color
+            g2d.setStroke (roadStroke)
             for edge <- edges do
                 g2d.setPaint (edge.color)
                 g2d.draw (edge.shape)
+            end for
+
+            g2d.setStroke (defaultStroke)                     // restore for labels/tokens
+            val badgeFont = new Font ("SansSerif", java.awt.Font.BOLD, 10)
+            for edge <- edges do
                 val x = edge.shape.getCenterX.asInstanceOf [Float]
                 val y = edge.shape.getCenterY.asInstanceOf [Float]
+                g2d.setPaint (fgColor)
                 g2d.drawString (edge.label, x, y)
                 val edge_tokens = edge.tokens.toList
                 for token <- edge_tokens if token.shape.getWidth () > 0.0 do
+                    drawTokenGlow (g2d, token)
                     g2d.setPaint (token.color)
                     g2d.fill (token.shape)
                     drawTokenLabel (g2d, token)
                 end for
+
+                // ── #12  Vehicle count badge ───────────────────────────────
+                val nTok = edge_tokens.size
+                if nTok > 0 then
+                    val countStr = nTok.toString
+                    g2d.setFont (badgeFont)
+                    val bfm  = g2d.getFontMetrics
+                    val bsw  = bfm.stringWidth (countStr)
+                    val brad = (math.max (bsw, bfm.getHeight) / 2 + 4).toInt
+                    val bx   = x.toInt
+                    val by   = (y - 14).toInt                // slightly above edge center
+                    val prevComp = g2d.getComposite
+                    g2d.setComposite (java.awt.AlphaComposite.getInstance (
+                        java.awt.AlphaComposite.SRC_OVER, 0.85f))
+                    g2d.setPaint (new Color (30, 30, 50))
+                    g2d.fillOval (bx - brad, by - brad, brad * 2, brad * 2)
+                    g2d.setComposite (prevComp)
+                    g2d.setPaint (white)
+                    g2d.drawString (countStr, (bx - bsw / 2.0f), (by + bfm.getAscent / 2.0f - 1))
+                end if
             end for
 
             // Display all free tokens
             val free_tokens = graph.freeTokens.toList
             for token <- free_tokens if token.shape.getWidth () > 0.0 do
+                drawTokenGlow (g2d, token)
                 g2d.setPaint (token.color)
                 g2d.fill (token.shape)
                 drawTokenLabel (g2d, token)
             end for
+
+            // ── HUD overlay (screen-space, fixed position) ──────────────────
+            val savedTransform = g2d.getTransform
+            g2d.setTransform (new AffineTransform ())         // reset to identity (screen coords)
+            drawHUD (g2d)
+            g2d.setTransform (savedTransform)                 // restore world transform
         end paintComponent
+
+        /** Draw a translucent HUD panel in the top-left corner with sim stats. */
+        private def drawHUD (g2d: Graphics2D): Unit =
+            import java.awt.AlphaComposite
+
+            val pad    = 16
+            val lineH  = 28
+            val barH   = 10                                    // height of each density bar
+            val barMaxW = 120                                  // max width of density bar (pixels)
+
+            // ── Collect on-road token count ─────────────────────────────────
+            var onRoad = 0
+            for e <- graph.edges.toList do onRoad += e.tokens.size
+            for t <- graph.freeTokens.toList do if t.shape.getWidth () > 0.0 then onRoad += 1
+
+            // ── Build text lines ────────────────────────────────────────────
+            val lines  = ArrayBuffer.empty [(String, Color, Boolean)]  // (text, color, isBold)
+
+            lines.addOne ((s"Model:  $hudModelName", fgColor, true))
+            val wallSec  = clock.toLong
+            val wallHr24 = 6 + (wallSec / 3600).toInt          // base 6 AM
+            val wallMin  = ((wallSec % 3600) / 60).toInt
+            val ampm     = if wallHr24 >= 12 then "PM" else "AM"
+            val wallHr12 = { val h = wallHr24 % 12; if h == 0 then 12 else h }
+            lines.addOne ((f"Clock:  $wallHr12%d:$wallMin%02d $ampm  ($clock%,.0f s)", fgColor, false))
+            lines.addOne ((s"Vehicles:  $onRoad on-road  /  $totalActorCount total", fgColor, false))
+            lines.addOne ((f"Throughput: $hudThroughput%,.0f veh/hr", fgColor, false))
+            lines.addOne ((f"Avg Speed:  $hudAvgSpeed%.1f m/s  (${hudAvgSpeed * 2.237}%.0f mph)", fgColor, false))
+            lines.addOne ((f"Playback:   ${speedFactor}%.2fx", fgColor, false))
+
+            if paused.get () then lines.addOne (("▐▐  PAUSED", red, true))
+
+            // spacer + legend
+            lines.addOne (("", fgColor, false))
+            lines.addOne (("Speed Legend", fgColor, true))
+            lines.addOne (("  ● free-flow",  new Color (0, 200, 0), false))
+            lines.addOne (("  ● moderate",   new Color (220, 220, 0), false))
+            lines.addOne (("  ● congested",  new Color (220, 40, 40), false))
+
+            // segment density header (only if data available)
+            val densities = hudSegDensities
+            val segLabels = hudSegLabels
+            val hasDensity = densities != null && densities.nonEmpty
+            if hasDensity then
+                lines.addOne (("", fgColor, false))
+                lines.addOne (("Segment Density (veh/km)", fgColor, true))
+
+            // ── Measure box size ────────────────────────────────────────────
+            g2d.setFont (hudFont)
+            val fmBold  = g2d.getFontMetrics
+            g2d.setFont (hudFontSmall)
+            val fmPlain = g2d.getFontMetrics
+            val maxW    = lines.map { case (txt, _, bold) =>
+                if bold then fmBold.stringWidth (txt) else fmPlain.stringWidth (txt)
+            }.max
+            // ensure box is wide enough for density bars
+            val densityRowW = if hasDensity then 50 + barMaxW + 40 else 0    // label + bar + value
+            val boxW = math.max (maxW, densityRowW) + pad * 2 + 12
+            val densityH = if hasDensity then densities.length * (barH + 6) + 4 else 0
+            val boxH = lines.length * lineH + pad * 2 + densityH
+
+            // ── Semi-transparent background with AlphaComposite ─────────────
+            val prevComposite = g2d.getComposite
+            g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, 0.88f))
+            g2d.setPaint (hudBg)
+            g2d.fillRoundRect (pad, pad, boxW, boxH, 14, 14)
+            g2d.setComposite (prevComposite)
+
+            // border
+            g2d.setPaint (new Color (80, 80, 100))
+            g2d.drawRoundRect (pad, pad, boxW, boxH, 14, 14)
+
+            // ── Draw text lines ─────────────────────────────────────────────
+            for i <- lines.indices do
+                val (txt, color, bold) = lines (i)
+                if txt.nonEmpty then
+                    g2d.setFont (if bold then hudFont else hudFontSmall)
+                    g2d.setPaint (color)
+                    g2d.drawString (txt, pad + pad / 2, pad + lineH * (i + 1))
+            end for
+
+            // ── Draw segment density mini bar chart ─────────────────────────
+            if hasDensity then
+                val maxDensity = math.max (1.0, densities.max)  // avoid div-by-zero
+                val startY = pad + lines.length * lineH + 4
+                val labelX = pad + pad / 2
+                g2d.setFont (new Font ("SansSerif", java.awt.Font.PLAIN, 12))
+                val fm12 = g2d.getFontMetrics
+
+                for i <- densities.indices do
+                    val y = startY + i * (barH + 6)
+                    // label
+                    val lbl = if i < segLabels.length then segLabels (i) else s"S$i"
+                    g2d.setPaint (fgColor)
+                    g2d.drawString (lbl, labelX, y + barH - 1)
+
+                    // bar
+                    val barX = labelX + 45
+                    val ratio = densities (i) / maxDensity
+                    val bw = (ratio * barMaxW).toInt
+                    // color: green (low) → yellow → red (high jam density ~150 veh/km)
+                    val hue = ((1.0 - math.min (1.0, densities (i) / 150.0)) * 120.0 / 360.0).toFloat
+                    g2d.setPaint (java.awt.Color.getHSBColor (hue, 0.8f, 0.9f))
+                    g2d.fillRoundRect (barX, y, math.max (2, bw), barH, 4, 4)
+
+                    // value text
+                    g2d.setPaint (fgColor)
+                    g2d.drawString (f"${densities (i)}%.0f", barX + bw + 4, y + barH - 1)
+                end for
+            end if
+        end drawHUD
+
+        /** Draw a soft glow/shadow behind a token to visually separate it from the road. */
+        private def drawTokenGlow (g2d: Graphics2D, token: graph.Token): Unit =
+            val b = token.shape.getBounds2D
+            if b.getWidth <= 0.0 then return
+            val c     = token.color
+            val glow  = new Color (c.getRed, c.getGreen, c.getBlue, 55)
+            val grow  = 4.0                                    // pixels larger on each side
+            val prevComposite = g2d.getComposite
+            g2d.setComposite (java.awt.AlphaComposite.getInstance (java.awt.AlphaComposite.SRC_OVER, 0.5f))
+            g2d.setPaint (glow)
+            g2d.fill (new java.awt.geom.RoundRectangle2D.Double (
+                b.getX - grow, b.getY - grow,
+                b.getWidth + grow * 2, b.getHeight + grow * 2, 6, 6))
+            g2d.setComposite (prevComposite)
+        end drawTokenGlow
 
     end Canvas
 
@@ -593,6 +862,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             ani.moveNode (c.eid, c.pts)
         case MoveToken =>
             ani.moveToken (c.eid, c.pts)
+            if c.color != null then ani.setPaintToken (c.eid, c.color)
         case MoveToken2Node =>
             ani.moveToken2Node (c.eid, c.from_eid)
         case MoveTokens2Node =>

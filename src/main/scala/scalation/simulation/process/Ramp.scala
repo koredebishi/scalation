@@ -75,6 +75,8 @@ class Ramp(name: String, val from: Component, val to: Component,motion: Dynamics
     def addToAlist(actor: Vehicle, other: Vehicle): Unit =
         val otherNode = if other != null then other.myPathNode.asInstanceOf[vList.Node] else null
         actor.myRamp = this
+        actor.myPathway = null                  // not on a pathway
+        actor.myFFConnector = null                   // not on an FFConnector
         actor.myPathNode = vList.add(actor, otherNode)
         actor.pathInfo = s"${dllId}" // Update path info with clear DLL identifier
     end addToAlist

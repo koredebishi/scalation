@@ -15,6 +15,7 @@ package process
 import scala.collection.mutable.Map
 import scalation.random.Uniform
 import scalation.mathstat.VectorD
+import scalation.scala2d.Colors.Color
 
 
 
@@ -61,9 +62,10 @@ abstract class Vehicle (name_ : String, director: Model)
     end setDisplayLabel
 
 
-    var myRamp      : Ramp = null // my (the actor's) node in the RAMP pred <-> me <-> succ
-    var myPathway   : Pathway = null // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
-    private [process] var myPathNode: DoublyLinkedList[Vehicle]#Node = null // my (the actor's) node in the ACTOR LIST pred <-> me <-> succ
+    var myRamp        : Ramp        = null   // current ramp this vehicle is on (null if not on a ramp)
+    var myPathway     : Pathway     = null   // current pathway/lane this vehicle is on (null if not on a pathway)
+    var myFFConnector : FFConnector = null   // current FF connector this vehicle is on (null if not on an FF)
+    private [process] var myPathNode: DoublyLinkedList[Vehicle]#Node = null   // DLL node: pred <-> me <-> succ
 
 
 
@@ -192,5 +194,18 @@ object Vehicle:
 
         Ft + _1_by_90 * (7 * k1 + 32 * k3 + 12 * k4 + 32 * k5 + 7 * k6) * rt
     end butcher
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Map a vehicle's velocity to a color on a red → yellow → green gradient.
+     *  Stopped vehicles are red, free-flow vehicles are green.
+     *  Uses HSB color space for smooth transitions.
+     *  @param v  the current velocity (m/s)
+     *  @return   a Color from red (0 m/s) through yellow to green (vmax)
+     */
+    def velocityColor (v: Double): Color =
+        val ratio = math.max (0.0, math.min (1.0, v / vmax))   // 0.0 = stopped, 1.0 = free-flow
+        val hue   = (ratio * 120.0 / 360.0).toFloat            // 0° red → 60° yellow → 120° green
+        java.awt.Color.getHSBColor (hue, 0.85f, 0.95f)
+    end velocityColor
 
 end Vehicle

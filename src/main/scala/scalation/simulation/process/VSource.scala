@@ -7,8 +7,9 @@ import scala.runtime.ScalaRunTime.stringOf
 import scala.util.control.Breaks.{break, breakable}
 import scalation.animation.CommandType.*
 import scalation.random.*
-import scalation.scala2d.Ellipse
 import scalation.scala2d.Colors.*
+
+import java.awt.geom.RoundRectangle2D
 //import scalation.simulation.process.SimActor.removeFromAlist
 
 //::::::::::::::::::for my model::::::::::::::::::::::::::::
@@ -114,8 +115,9 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                 director.numActors += 1 // number of actors created by all sources, so far
                 if director.isAnimating then director.dgAni.updateActorCount(director.numActors) // korede
                 //director.log.trace(this, "generates", actor, director.clock)
-                director.animate(actor, CreateToken, randomColor(actor.id), Ellipse(),
-                    Array(at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
+                val carShape = new RoundRectangle2D.Double (0, 0, 14, 7, 4, 4)   // car-shaped token
+                director.animate(actor, CreateToken, randomColor(actor.id), carShape,
+                    Array(at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD, 14.0, 7.0))
                 //debug("act", s"schedule actor $i")
 
                 //debug("act", s"after schedule actor $i")

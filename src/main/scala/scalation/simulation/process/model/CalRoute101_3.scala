@@ -83,6 +83,10 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
         case KraussDynamics => KraussDynamics.integratorType = IntegratorType.Ballistic
         case _              => // do nothing for unknown dynamics
 
+    // Push dynamics model name to animation HUD
+    if animating && dgAni != null then
+        dgAni.setHudModelName (dynamics.carFollowing.toString)
+
     private val rand = Uniform (0.0, 1.0)
     private val iArrivalRV      = mainlineArrivalSources(0).getDistribution
 

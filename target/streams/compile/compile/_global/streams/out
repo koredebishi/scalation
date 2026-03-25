@@ -1,23 +1,20 @@
-[0m[[0m[31merror[0m] [0m[0m[31m[31m-- [E164] Declaration Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\modeling\TranRegression2.scala:134:17 [0m[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m134 |[0m    [33moverride[0m [33mdef[0m inSample_Test (skip: [33mInt[0m = [32m0[0m, showYp: [33mBoolean[0m = [32mfalse[0m): ([33mVectorD[0m, [33mVectorD[0m) =[0m
-[0m[[0m[31merror[0m] [0m[0m[31m[31m    |[0m                 ^[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0merror overriding [33mmethod[0m [32minSample_Test[0m in [33mtrait[0m [32mPredictor[0m of type (skip: Int, showYp: Boolean): Unit;[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  [33mmethod[0m [32minSample_Test[0m of type (skip: Int, showYp: Boolean): (scalation.mathstat.VectorD,[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m  scalation.mathstat.VectorD) has incompatible type[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |---------------------------------------------------------------------------[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m Explanation (enabled by `-explain`)[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m I tried to show that[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   (skip: Int, showYp: Boolean): (scalation.mathstat.VectorD,[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   scalation.mathstat.VectorD)[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m conforms to[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   (skip: Int, showYp: Boolean): Unit[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m but none of the attempts shown below succeeded:[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m   ==> (skip: Int, showYp: Boolean): (scalation.mathstat.VectorD,[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m    scalation.mathstat.VectorD)  <:  (skip: Int, showYp: Boolean): Unit[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m     ==> (scalation.mathstat.VectorD, scalation.mathstat.VectorD)  <:  Unit  = false[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m[0m
-[0m[[0m[31merror[0m] [0m[0m[31m    |[0m The tests were made under the empty constraint[0m
-[0m[[0m[31merror[0m] [0m[0m[31m     ---------------------------------------------------------------------------[0m[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m
+[error] -- [E006] Not Found Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\model\EatonFireModel.scala:347:22 
+[error] 347 |                   && rand.gen < ff210to134.splitRatio then   // probabilistic split
+[error]     |                      ^^^^
+[error]     |                      Not found: rand - did you mean random?
+[error]     |---------------------------------------------------------------------------
+[error]     | Explanation (enabled by `-explain`)
+[error]     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+[error]     | Each identifier in Scala needs a matching declaration. There are two kinds of
+[error]     | identifiers: type identifiers and value identifiers. Value identifiers are introduced
+[error]     | by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,
+[error]     | `class`, `enum`, or `trait` declarations.
+[error]     |
+[error]     | Identifiers refer to matching declarations in their environment, or they can be
+[error]     | imported from elsewhere.
+[error]     |
+[error]     | Possible reasons why no matching declaration was found:
+[error]     |  - The declaration or the use is mis-spelt.
+[error]     |  - An import is missing.
+[error]      ---------------------------------------------------------------------------
+[error] one error found

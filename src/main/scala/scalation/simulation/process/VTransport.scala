@@ -127,7 +127,8 @@ class VTransport (name: String, from_ : Component, to_ : Component,
             end if
 
             if !done then
-                director.animate(actor, MoveToken, null, null, cp)
+                val vColor = Vehicle.velocityColor (actor.velocity)
+                director.animate(actor, MoveToken, vColor, null, cp)
             actor.schedule(Vehicle.rt)
             actor.yieldToDirector()
         end while

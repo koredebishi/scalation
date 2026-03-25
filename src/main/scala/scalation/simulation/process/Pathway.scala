@@ -77,6 +77,8 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
         else null
 //        logDLLOperation("ADD_TO_DLL", actor, s"following ${if other != null then other.name else "NONE"}")
         actor.myPathway = this
+        actor.myFFConnector = null                   // not on an FFConnector
+        actor.myRamp = null                          // not on a ramp
         actor.myPathNode = vList.add (actor, otherNode)
         actor.pathInfo = s"${dllId}" // Update path info with clear DLL identifier
     end addToAlist
