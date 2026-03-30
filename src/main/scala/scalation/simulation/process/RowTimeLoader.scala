@@ -65,7 +65,7 @@ end RowTimeLoader
 object RowTimeLoader:
 
     import scalation.simulation.process.arrival.ArrivalSource
-    import scalation.simulation.process.config.{PeMSDemand, PeMSDataHelper}
+    import scalation.simulation.process.config.{PeMSDemand, PeMSDataHelper, PeMSDataLoader, ColumnLayout, TimeWindow}
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Default implementation: Get inter-arrival time (mu) for a source.
@@ -104,6 +104,23 @@ object RowTimeLoader:
         val (_, speedMatrix) = PeMSDataHelper.loadMainlineSensor(demand, 0)
         speedMatrix
     end getSpeedMatrixDefault
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Load speed matrix from a single PeMS CSV file with custom layout/window.
+     *  Use this when the CSV format differs from the default (e.g., I-210 Eaton
+     *  5-lane, 5-min bins with TotalFlow/AvgSpeed before lane columns).
+     *
+     *  @param filePath  path to the CSV file (relative to project root)
+     *  @param window    time window (start/end row, bin seconds)
+     *  @param layout    column layout (flow/speed column indices, speed factor)
+     */
+    def getSpeedMatrixFromFile (filePath: String,
+                                window: TimeWindow = PeMSDataLoader.DefaultTimeWindow,
+                                layout: ColumnLayout = PeMSDataLoader.DefaultMainlineLayout): MatrixD =
+        val (_, speedMatrix) = PeMSDataLoader.loadMainlineSensor (filePath, window, layout)
+        speedMatrix
+    end getSpeedMatrixFromFile
 
 end RowTimeLoader
 

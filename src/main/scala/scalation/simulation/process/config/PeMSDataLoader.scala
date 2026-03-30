@@ -63,6 +63,22 @@ object PeMSDataLoader:
         speedFactor = 0.44704
     )
 
+    // I-210 Eaton corridor: 5-lane mainline, TotalFlow/AvgSpeed at cols 1-2,
+    // then Lane1..Lane5 flow/speed pairs starting at col 3.
+    // CSV format: Timestamp,TotalFlow,AvgSpeed,L1Flow,L1Speed,...,L5Flow,L5Speed
+    val I210_MainlineLayout = ColumnLayout(
+        flowCols  = VectorI(3, 5, 7, 9, 11),  // 5-lane flow columns
+        speedCols = VectorI(4, 6, 8, 10, 12), // 5-lane speed columns
+        speedFactor = 0.44704                  // mph → m/s
+    )
+
+    // I-210 Eaton: 5-min bins, 17:00–23:00 (73 rows, inclusive)
+    val I210_TimeWindow = TimeWindow(
+        startRow = 0,       // first row = 17:00
+        endRow   = 73,      // 73 rows × 5-min = 6h5m (17:00–23:00 inclusive); stop is exclusive
+        binSeconds = 300.0  // 5 minutes
+    )
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Load a mainline sensor from PeMS CSV file.
      *  Returns (flow matrix, speed matrix) where rows = time bins, cols = lanes.

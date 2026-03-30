@@ -54,9 +54,8 @@ case class StationWithCoords (record: StationRecord, screenXY: (Double, Double))
  *  to instantiate Junction, Route, VSource, Sink, and Ramp objects from a
  *  PeMS station_map.csv file.
  *
- *  This is the intermediate representation between the CSV and the model —
- *  analogous to SUMO's *.nod.xml + *.edg.xml + *.con.xml but derived from
- *  a single flat file keyed on the `Lane Type` column.
+ *  This is the intermediate representation between the raw PeMS CSV and
+ *  the simulation model — a single flat file keyed on the `Lane Type` column.
  *
  *  @param config            the NetworkConfig topology (segments, ramps, sensors)
  *  @param junctionNames     human-readable names from the CSV Location field
@@ -64,7 +63,8 @@ case class StationWithCoords (record: StationRecord, screenXY: (Double, Double))
  *  @param onRampScreenXY    screen (x, y) positions for on-ramp Junction nodes (shifted)
  *  @param offRampScreenXY   screen (x, y) positions for off-ramp Junction nodes (shifted)
  *  @param segmentLengths    physical segment lengths in meters (from postmile differences)
- *  @param ffStations        freeway-to-freeway connector records (metadata, future use)
+ *  @param ffStations        freeway-to-freeway connector station records from PeMS
+ *  @param junctionPMs       absolute postmiles for each mainline junction (empty for non-PeMS corridors)
  */
 case class CorridorLayout (config: NetworkConfig,
                            junctionNames: Array [String],
@@ -72,7 +72,8 @@ case class CorridorLayout (config: NetworkConfig,
                            onRampScreenXY: Array [(Double, Double)],
                            offRampScreenXY: Array [(Double, Double)],
                            segmentLengths: VectorD,
-                           ffStations: Array [StationRecord]):
+                           ffStations: Array [StationRecord],
+                           junctionPMs: Array [Double] = Array.empty [Double]):
 
     /** All ramp screen positions (on-ramps first, then off-ramps). */
     def allRampScreenXY: Array [(Double, Double)] = onRampScreenXY ++ offRampScreenXY
@@ -86,15 +87,51 @@ case class CorridorLayout (config: NetworkConfig,
     /** Number of off-ramps. */
     def numOffRamps: Int = offRampScreenXY.length
 
+    /** Whether this layout has postmile data (PeMS-derived corridors do, DonaldDoyle does not). */
+    def hasPMs: Boolean = junctionPMs.nonEmpty
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the name of the nearest mainline junction for a given absolute postmile.
+     *  Uses linear scan to find the junction with the smallest PM distance.
+     *  Only valid for PeMS-derived corridors that have postmile data.
+     *  @param pm  the absolute postmile to match against
+     */
+    def findJunctionByPM (pm: Double): String =
+        assert (hasPMs, s"findJunctionByPM: no postmile data for corridor '${config.mainline.id}'")
+        var bestIdx  = 0                                        // index of closest junction
+        var bestDist = math.abs (junctionPMs(0) - pm)           // distance to closest junction
+        cfor (1, junctionPMs.length) { i =>
+            val dist = math.abs (junctionPMs(i) - pm)
+            if dist < bestDist then
+                bestDist = dist
+                bestIdx  = i
+        }
+        junctionNames(bestIdx)
+    end findJunctionByPM
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the segment index where a given postmile falls.
+     *  Returns the largest junction index whose PM <= the given PM,
+     *  clamped to valid segment range [0, numSegments - 1].
+     *  @param pm  the absolute postmile to locate
+     */
+    def findSegmentByPM (pm: Double): Int =
+        assert (hasPMs, s"findSegmentByPM: no postmile data for corridor '${config.mainline.id}'")
+        var i = junctionPMs.length - 1
+        while i >= 0 && junctionPMs(i) > pm do i -= 1
+        math.max (0, math.min (i, config.mainline.segments - 1))
+    end findSegmentByPM
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute VSource center position and offsets for animation layout.
      *  Center is near the first mainline junction.  Each ramp VSource is offset
-     *  relative to this center using a large shift so it does not overlap the road.
+     *  relative to this center using a shift so it does not overlap the road.
+     *  @param dx  horizontal shift from on-ramp screen position (default 200)
+     *  @param dy  vertical shift from on-ramp screen position (default -100)
      */
-    def getVSourceCenterAndOffsets: ((Int, Int), Array [(Int, Int)]) =
+    def getVSourceCenterAndOffsets (dx: Double = 200.0, dy: Double = -100.0): ((Int, Int), Array [(Int, Int)]) =
         val centerPos = ((mainlineScreenXY(0)._1 - 50.0).toInt,
                          (mainlineScreenXY(0)._2 + 50.0).toInt)
-        val (dx, dy) = (800.0, -350.0)
         val nOR     = onRampScreenXY.length
         val offsets = new Array [(Int, Int)] (1 + nOR)
         offsets(0) = (0, 0)                                    // mainline offset
@@ -128,7 +165,8 @@ case class CorridorLayout (config: NetworkConfig,
         println ("\nJunctions (by postmile):")
         cfor (0, junctionNames.length) { i =>
             val (sx, sy) = mainlineScreenXY(i)
-            println (f"  j$i%3d  ${junctionNames(i)}%-28s  Screen($sx%7.1f, $sy%7.1f)")
+            val pmStr = if hasPMs then f"  PM=${junctionPMs(i)}%7.3f" else ""
+            println (f"  j$i%3d  ${junctionNames(i)}%-28s$pmStr  Screen($sx%7.1f, $sy%7.1f)")
         }
 
         println (s"\nOn-Ramps (${config.ramps.count (_.mode == RampMode.On)}):")
@@ -266,10 +304,12 @@ object EatonCorridorConfig:
                              corridorId: String,
                              dims: (Double, Double) = (5000.0, 3000.0),
                              rampShift: (Double, Double) = (65.0, -70.0)): CorridorLayout =
+        val flowDir = if direction == "W" || direction == "S"
+                      then FlowDirection.Descending else FlowDirection.Ascending
         val allRecords      = loadStationMap ()
         val corridorRecords = allRecords.filter (s => s.freeway == freeway && s.direction == direction)
         val corridorWithCoords = computeAllCoordinates (corridorRecords, dims)
-        buildLayoutFromCoords (corridorWithCoords, corridorId, rampShift)
+        buildLayoutFromCoords (corridorWithCoords, corridorId, rampShift, flowDir)
     end buildCorridorLayout
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -288,8 +328,8 @@ object EatonCorridorConfig:
         val allWithCoords = computeAllCoordinates (wbRecords, dims)
         val i210  = filterByFreewayDir (allWithCoords, 210, "W")
         val sr134 = filterByFreewayDir (allWithCoords, 134, "W")
-        (buildLayoutFromCoords (i210,  "I-210-W",  rampShift),
-         buildLayoutFromCoords (sr134, "SR-134-W", rampShift))
+        (buildLayoutFromCoords (i210,  "I-210-W",  rampShift, FlowDirection.Descending),
+         buildLayoutFromCoords (sr134, "SR-134-W", rampShift, FlowDirection.Descending))
     end buildSharedWBLayouts
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -306,10 +346,12 @@ object EatonCorridorConfig:
      *  @param corridorWithCoords  stations with screen coordinates (one corridor)
      *  @param corridorId          the identifier string
      *  @param rampShift           lateral pixel shift for ramp junctions
+     *  @param flowDir             the flow direction (Ascending for NB/EB, Descending for WB/SB)
      */
     private def buildLayoutFromCoords (corridorWithCoords: Array [StationWithCoords],
                                        corridorId: String,
-                                       rampShift: (Double, Double)): CorridorLayout =
+                                       rampShift: (Double, Double),
+                                       flowDir: FlowDirection = FlowDirection.Ascending): CorridorLayout =
 
         // 1. Classify by lane type (each returns sorted by absPM)
         val mlStations = filterByLaneType (corridorWithCoords, "ML")
@@ -324,10 +366,13 @@ object EatonCorridorConfig:
         val mlPMs = new Array [Double] (nML)
         cfor (0, nML) { i => mlPMs(i) = mlStations(i).record.absPM }
 
-        // 3. Lane count = statistical mode of ML station lane counts
+        // 3. Lane count = entry station's lane count (entry = traffic source)
+        //    WB/SB (Descending): entry = highest PM (last in ascending PM order)
+        //    NB/EB (Ascending):  entry = lowest PM (first in ascending PM order)
         val laneCounts = new Array [Int] (nML)
         cfor (0, nML) { i => laneCounts(i) = mlStations(i).record.lanes }
-        val lanesPerSegment = modeLanes (laneCounts)
+        val entryIdx = if flowDir == FlowDirection.Descending then nML - 1 else 0
+        val lanesPerSegment = laneCounts(entryIdx)
 
         // 4. Junction names from Location field
         val junctionNames = new Array [String] (nML)
@@ -381,7 +426,8 @@ object EatonCorridorConfig:
                 id              = corridorId,
                 segments        = nSegments,
                 lanesPerSegment = lanesPerSegment,
-                segmentLengths  = Some (segLens)
+                segmentLengths  = Some (segLens),
+                direction       = flowDir
             ),
             ramps   = onRamps.toList ++ offRamps.toList,
             sensors = sensors.toList
@@ -417,7 +463,8 @@ object EatonCorridorConfig:
             onRampScreenXY   = onRampScreenXY,
             offRampScreenXY  = offRampScreenXY,
             segmentLengths   = segLens,
-            ffStations       = ffRecords
+            ffStations       = ffRecords,
+            junctionPMs      = mlPMs                            // preserve postmiles for PM-based lookups
         )
     end buildLayoutFromCoords
 
@@ -576,7 +623,7 @@ end testEatonCorridorCoords
 
     // Verify VSource center and offsets
     banner ("VSource Positions")
-    val (center, offsets) = layout.getVSourceCenterAndOffsets
+    val (center, offsets) = layout.getVSourceCenterAndOffsets ()
     println (s"  Center: $center")
     cfor (0, offsets.length) { i =>
         val label = if i == 0 then "mainline" else s"onRamp$i"

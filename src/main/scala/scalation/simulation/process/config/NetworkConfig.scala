@@ -23,14 +23,58 @@ enum RampMode:
 end RampMode
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Enumeration for traffic flow direction relative to postmile ordering.
+ *  Ascending  — traffic flows from low PM to high PM (NB, EB).
+ *               Source at index 0 (low PM), sink at last index (high PM).
+ *               Junction array used in natural CSV order.
+ *  Descending — traffic flows from high PM to low PM (WB, SB).
+ *               Source at last index (high PM), sink at index 0 (low PM).
+ *               Junction array must be reversed from CSV order.
+ */
+enum FlowDirection:
+    case Ascending, Descending
+end FlowDirection
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Enumeration for mainline demand sourcing on a corridor.
+ *  Independent — corridor has its own mainline VSources (normal case).
+ *  Derived     — corridor receives mainline flow from an FF connector; for a derived 
+ *             corridor, the mainline VSource is not created and the first junction is a merge point.
+ *             traffic transfers from the FF connector: 
+ *                no mainline VSource is created (e.g., SR-134 fed from I-210).
+ */
+enum DemandFlag:
+    case Independent, Derived
+end DemandFlag
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `FFConnectorSpec` class specifies a freeway-to-freeway connector
+ *  linking two corridors at an interchange.  Pure data — no simulation logic.
+ *  @param id              the identifier (e.g., "FF_I210_to_SR134")
+ *  @param fromCorridorId  the source corridor ID (e.g., "I-210-W")
+ *  @param toCorridorId    the destination corridor ID (e.g., "SR-134-W")
+ *  @param fromJunction    junction name substring on the source corridor (e.g., "WINONA")
+ *  @param toJunction      junction name substring on the destination corridor (e.g., "ORANGE")
+ *  @param splitRatio      fraction of traffic that diverts (0.0–1.0)
+ *  @param lanes           number of lanes on the connector ramp
+ *  @param stationId       PeMS VDS station ID for calibration (0 if unknown)
+ */
+case class FFConnectorSpec (id: String, fromCorridorId: String, toCorridorId: String,
+                            fromJunction: String, toJunction: String,
+                            splitRatio: Double = 0.30, lanes: Int = 2,
+                            stationId: Int = 0)
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MainlineSpec` class specifies the mainline road segment properties.
  *  @param id                the identifier for this mainline (e.g., "US-101-N")
  *  @param segments          the number of segments (junctions - 1)
  *  @param lanesPerSegment   the number of lanes per segment
  *  @param segmentLengths    optional segment lengths in meters
+ *  @param direction         traffic flow direction relative to postmile ordering
  */
 case class MainlineSpec (id: String, segments: Int, lanesPerSegment: Int,
-                         segmentLengths: Option [VectorD] = None)
+                         segmentLengths: Option [VectorD] = None,
+                         direction: FlowDirection = FlowDirection.Ascending)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RampSpec` class specifies an on-ramp or off-ramp.

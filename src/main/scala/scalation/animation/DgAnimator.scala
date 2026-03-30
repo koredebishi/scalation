@@ -275,7 +275,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                 playbackMode = PlaybackMode.Idle
                 running.set(false)
                 // Small wait to allow loop to exit cleanly
-                Thread.sleep(20)
+//                Thread.sleep(20)
+                while running.get() do Thread.`yield`()
             end if
         end if
         // If a previous run loop thread finished, we will start a new one; if still running in Idle, reuse
@@ -968,6 +969,99 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         end while
         println(s"DgAnimator.run: unified loop end (processed=$nCmds, finalMode=$playbackMode, clock=$clock)")
     end run
+//
+//    def run(): Unit =
+//        println(s"DgAnimator.run: modern loop start (mode=$playbackMode)")
+//
+//        val targetFPS = 120.0
+//        val frameTimeNs = (1e9 / targetFPS).toLong
+//
+//        var lastFrameTime = System.nanoTime()
+//        lastTime = clock
+//
+//        while running.get() do
+//
+//            // ---- PAUSE HANDLING ----
+//            pauseLock.synchronized {
+//                while paused.get() && !stepOnce.get() do pauseLock.wait()
+//            }
+//
+//            val now = System.nanoTime()
+//            val elapsedNs = now - lastFrameTime
+//
+//            if elapsedNs >= frameTimeNs then
+//                lastFrameTime = now
+//
+//                playbackMode match
+//
+//                    // ================= LIVE =================
+//                    case PlaybackMode.Live =>
+//                        if !cmdQ.isEmpty then
+//                            val cmd = cmdQ.poll()
+//                            val when = cmd.time
+//
+//                            // Smooth time progression (no sleep)
+//                            val dtSim = (when - lastTime) * aniRatio * ani.timeDilationFactor
+//                            clock += math.max(0.0, dtSim)
+//
+//                            invokeCommand(cmd)
+//
+//                            // Record
+//                            frames += Frame(cmd)
+//
+//                            if cmd.action == CreateToken then actorCount += 1
+//
+//                            repaint()
+//                            lastTime = when
+//
+//                            if stepOnce.compareAndSet(true, false) then
+//                                paused.set(true)
+//                                playPauseBtn.setText("Play")
+//
+//                        else
+//                            // auto finalize
+//                            if aniDone then
+//                                println("DgAnimator: Live complete")
+//                                running.set(false)
+//                            else
+//                                Thread.`yield`() // non-blocking idle
+//
+//                    // ================= REPLAY =================
+//                    case PlaybackMode.Replay =>
+//                        if replayIndex >= replayLength then
+//                            println("DgAnimator: Replay complete")
+//                            playbackMode = PlaybackMode.Idle
+//                            running.set(false)
+//                        else
+//                            val f = frames(replayIndex).cmd
+//
+//                            val dtSim = (f.time - lastTime) * aniRatio * ani.timeDilationFactor
+//                            clock += math.max(0.0, dtSim)
+//
+//                            invokeCommand(f)
+//
+//                            if f.action == CreateToken then actorCount += 1
+//
+//                            repaint()
+//                            lastTime = f.time
+//                            replayIndex += 1
+//
+//                            if stepOnce.compareAndSet(true, false) then
+//                                paused.set(true)
+//                                playPauseBtn.setText("Play")
+//
+//                    // ================= IDLE =================
+//                    case PlaybackMode.Idle =>
+//                        running.set(false)
+//
+//            else
+//                // ultra-light wait (no busy spin, no sleep jitter)
+//                Thread.onSpinWait()
+//
+//        end while
+//
+//        println(s"DgAnimator.run: modern loop end (clock=$clock)")
+//    end run
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Start the animation by staring the animation thread. */
@@ -1039,3 +1133,5 @@ object DgAnimator:
 end DgAnimator
 
 // ...tests (dgAnimatorTest, dgAnimatorTest2, dgAnimatorTest3) can follow below if present...
+
+

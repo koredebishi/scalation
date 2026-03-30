@@ -28,12 +28,35 @@ case class PeMSArrivals(anchorFile: String, distribution: Variate, perLane: Bool
  *  @param ramps     PeMS arrival specifications for each ramp (in order)
  *  @param dataDir   directory containing PeMS CSV files
  */
-case class PeMSDemand(mainline: PeMSArrivals, ramps: List[PeMSArrivals], dataDir: String)
+case class PeMSDemand(mainline: PeMSArrivals, ramps: List[PeMSArrivals], dataDir: String,
+                     window: TimeWindow = PeMSDataLoader.DefaultTimeWindow,
+                     layout: ColumnLayout = PeMSDataLoader.DefaultMainlineLayout)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PeMSDemand` companion object provides predefined PeMS demand configurations.
  */
 object PeMSDemand:
+
+    // Base data directory for Eaton fire corridor PeMS data
+    private val EATON_BASE = "WSC-Pems-Data-Eaton-Fire/data-eaton/pems/eaton-corridor"
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** I-210 WB anchor sensor — cleaned single-sensor CSV (station 717653).
+     *  5 lanes, 5-min bins, 17:00–23:00 (72 rows).
+     *  Ramps are NOT included — use AggregatedDemand for ramps separately.
+     *  @param tau  the Erlang2S shift parameter (default 0.6)
+     */
+    def I210_WB_Anchor (tau: Double = 0.6): PeMSDemand = PeMSDemand(
+        mainline = PeMSArrivals(
+            anchorFile = "717653-i210-firstSensor-baseline.csv",
+            distribution = Erlang2S(tau),
+            perLane = true
+        ),
+        ramps = List.empty,
+        dataDir = s"$EATON_BASE/BaselineData_Dec03-10-17/eaton-i210",
+        window = PeMSDataLoader.I210_TimeWindow,
+        layout = PeMSDataLoader.I210_MainlineLayout
+    )
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create PeMS data-driven demand for US-101 Donald Doyle corridor.
@@ -94,6 +117,121 @@ object PeMSDemand:
     )
 
 end PeMSDemand
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `AggregatedDemand` case class defines PeMS demand using the aggregated
+ *  direction-bound CSV format.  One CSV per (corridor × direction × lane type).
+ *  Each CSV contains all stations of that type stacked vertically (timestamp × station).
+ *
+ *  This is the standard format going forward.  Legacy per-sensor format is
+ *  supported by `PeMSDemand` for backward compatibility with DonaldDoyle.
+ *
+ *  @param dataDir      path to data directory (relative to project root)
+ *  @param mlFile       ML_HV CSV filename — mainline flow + speed per lane
+ *  @param orFile       OR CSV filename — on-ramp flow (None if no on-ramps)
+ *  @param frFile       FR CSV filename — off-ramp flow (None if no off-ramps)
+ *  @param ffFile       FF CSV filename — FF connector flow (None if no FF)
+ *  @param intervalMin  minutes per row (5 for Eaton PeMS data)
+ *
+ *  @see config-layer-standard.md Section 5a
+ */
+case class AggregatedDemand (dataDir: String,
+                             mlFile: String,
+                             orFile: Option [String] = None,
+                             frFile: Option [String] = None,
+                             ffFile: Option [String] = None,
+                             intervalMin: Int = 5,
+                             startTime: String = "06:00:00",
+                             distribution: Variate = Erlang2S(0.6))
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `AggregatedDemand` companion object provides predefined demand
+ *  configurations for corridors using the aggregated CSV format.
+ */
+object AggregatedDemand:
+
+    // Base data directory for Eaton fire corridor PeMS data
+    private val EATON_BASE = "data/WSC-Pems-Data-Eaton-Fire/data-eaton/pems/eaton-corridor"
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** I-210 Westbound — baseline (Dec 03-10-17 average, pre-fire conditions).
+     */
+    def I210_WB_Baseline: AggregatedDemand = AggregatedDemand (
+        dataDir     = s"$EATON_BASE/BaselineData_Dec03-10-17/eaton-i210",
+        mlFile      = "eaton_i210_W_baseline_Dec03-10-17_ML_HV.csv",
+        orFile      = Some ("eaton_i210_W_baseline_Dec03-10-17_OR.csv"),
+        frFile      = Some ("eaton_i210_W_baseline_Dec03-10-17_FR.csv"),
+        ffFile      = Some ("eaton_i210_W_baseline_Dec03-10-17_FF.csv"),
+        intervalMin = 5,
+        startTime   = "17:00:00"
+    )
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** I-210 Eastbound — baseline (Dec 03-10-17 average, pre-fire conditions).
+     */
+    def I210_EB_Baseline: AggregatedDemand = AggregatedDemand (
+        dataDir     = s"$EATON_BASE/BaselineData_Dec03-10-17/eaton-i210",
+        mlFile      = "eaton_i210_E_baseline_Dec03-10-17_ML_HV.csv",
+        orFile      = Some ("eaton_i210_E_baseline_Dec03-10-17_OR.csv"),
+        frFile      = Some ("eaton_i210_E_baseline_Dec03-10-17_FR.csv"),
+        ffFile      = Some ("eaton_i210_E_baseline_Dec03-10-17_FF.csv"),
+        intervalMin = 5
+    )
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** SR-134 Westbound — baseline (Dec 03-10-17 average, pre-fire conditions).
+     *  Note: SR-134 has no EB data in the current dataset.
+     */
+    def SR134_WB_Baseline: AggregatedDemand = AggregatedDemand (
+        dataDir     = s"$EATON_BASE/BaselineData_Dec03-10-17/eaton-134",
+        mlFile      = "eaton_134_W_baseline_Dec03-10-17_ML_HV.csv",
+        orFile      = Some ("eaton_134_W_baseline_Dec03-10-17_OR.csv"),
+        frFile      = Some ("eaton_134_W_baseline_Dec03-10-17_FR.csv"),
+        ffFile      = Some ("eaton_134_W_baseline_Dec03-10-17_FF.csv"),
+        intervalMin = 5,
+        startTime   = "17:00:00"
+    )
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** I-210 Westbound — fire day (Jan 7, 2025, Eaton fire evacuation).
+     */
+    def I210_WB_FireDay: AggregatedDemand = AggregatedDemand (
+        dataDir     = s"$EATON_BASE/7thData-FireDay/eaton-i210",
+        mlFile      = "eaton_i210_W_2025_01_07_ML_HV.csv",
+        orFile      = Some ("eaton_i210_W_2025_01_07_OR.csv"),
+        frFile      = Some ("eaton_i210_W_2025_01_07_FR.csv"),
+        ffFile      = Some ("eaton_i210_W_2025_01_07_FF.csv"),
+        intervalMin = 5,
+        startTime   = "17:00:00"
+    )
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** I-210 Eastbound — fire day (Jan 7, 2025, Eaton fire evacuation).
+     */
+    def I210_EB_FireDay: AggregatedDemand = AggregatedDemand (
+        dataDir     = s"$EATON_BASE/7thData-FireDay/eaton-i210",
+        mlFile      = "eaton_i210_E_2025_01_07_ML_HV.csv",
+        orFile      = Some ("eaton_i210_E_2025_01_07_OR.csv"),
+        frFile      = Some ("eaton_i210_E_2025_01_07_FR.csv"),
+        ffFile      = Some ("eaton_i210_E_2025_01_07_FF.csv"),
+        intervalMin = 5
+    )
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** SR-134 Westbound — fire day (Jan 7, 2025, Eaton fire evacuation).
+     */
+    def SR134_WB_FireDay: AggregatedDemand = AggregatedDemand (
+        dataDir     = s"$EATON_BASE/7thData-FireDay/eaton-134",
+        mlFile      = "eaton_134_W_2025_01_07_ML_HV.csv",
+        orFile      = Some ("eaton_134_W_2025_01_07_OR.csv"),
+        frFile      = Some ("eaton_134_W_2025_01_07_FR.csv"),
+        ffFile      = Some ("eaton_134_W_2025_01_07_FF.csv"),
+        intervalMin = 5,
+        startTime   = "17:00:00"
+    )
+
+end AggregatedDemand
 
 
 

@@ -1,20 +1,7 @@
-[error] -- [E006] Not Found Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\model\EatonFireModel.scala:347:22 
-[error] 347 |                   && rand.gen < ff210to134.splitRatio then   // probabilistic split
-[error]     |                      ^^^^
-[error]     |                      Not found: rand - did you mean random?
-[error]     |---------------------------------------------------------------------------
-[error]     | Explanation (enabled by `-explain`)
-[error]     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-[error]     | Each identifier in Scala needs a matching declaration. There are two kinds of
-[error]     | identifiers: type identifiers and value identifiers. Value identifiers are introduced
-[error]     | by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,
-[error]     | `class`, `enum`, or `trait` declarations.
-[error]     |
-[error]     | Identifiers refer to matching declarations in their environment, or they can be
-[error]     | imported from elsewhere.
-[error]     |
-[error]     | Possible reasons why no matching declaration was found:
-[error]     |  - The declaration or the use is mis-spelt.
-[error]     |  - An import is missing.
-[error]      ---------------------------------------------------------------------------
+[warn] -- [E198] Unused Symbol Warning: C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\model\EatonFireModel.scala:26:85 
+[warn] 26 |import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSource, AnchorFlowArrivalSource}
+[warn]    |                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |                                                           unused import
+[error] No warnings can be incurred under -Werror
+[warn] one warning found
 [error] one error found

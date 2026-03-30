@@ -42,20 +42,23 @@ import scalation.animation.CommandType.CreateEdge
  *  @param splitRatio  the probability that a vehicle takes this connector (0.0–1.0)
  *  @param isSpeed     whether speed or trip-time is used for motion
  *  @param bend        curvature of the connector for animation
+ *  @param laneShift   perpendicular offset for visual separation of parallel FF lanes
  */
 class FFConnector (name: String, val fromJunc: Component, val toJunc: Component,
                    motion: Dynamics, var splitRatio: Double = 0.30,
-                   isSpeed: Boolean = false, bend: Double = 0.15)
+                   isSpeed: Boolean = false, bend: Double = 0.15,
+                   laneShift: VectorD = VectorD (0, 0))
     extends Component:
 
     private val debug = debugf ("FFConnector", true)
-    debug ("init", s"FFConnector [$name]: ${fromJunc.name} → ${toJunc.name}, splitRatio=$splitRatio")
+    debug ("init", s"FFConnector [$name]: ${fromJunc.name} → ${toJunc.name}, splitRatio=$splitRatio, shift=$laneShift")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The connector's single VTransport lane.
+     *  Uses laneShift to offset both endpoints for visual separation.
      */
     val lane = new VTransport (s"$name", fromJunc, toJunc, motion, isSpeed, bend,
-                               VectorD (0, 0), VectorD (0, 0), 0)
+                               laneShift, laneShift, 0)
 
     subpart += lane
     initComponent (name, Array ())

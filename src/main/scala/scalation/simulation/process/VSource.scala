@@ -104,7 +104,7 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                 //debug("act", s"make entity/vehicle $i")
 
                 val actor = makeEntity() // make new actor/vehicle
-                actor.laneID = math.min(3, subtype)   // set laneID to subtype for later use in Vehicle
+                actor.laneID = subtype   // temporary — Car.act() sets the real laneID
                 //debug("act", s"after make entity/vehicle $i: actor = $actor")
                 actor.mySource = this // actor's source
                 actor.subtype = esubtype // set the entity subtype
@@ -136,7 +136,8 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
 
                         // Get speed data from model (delegates to model's data source)
                         val speedMatrix = timeModel.getSpeedMatrix()
-                        val laneSpeed = speedMatrix(safeRow, actor.laneID)
+                        val safeLane  = math.min(actor.laneID, speedMatrix.dim2 - 1)
+                        val laneSpeed = speedMatrix(safeRow, safeLane)
 
                         actor.velocity = laneSpeed // set initial velocity of the vehicle
                         actor.vmax     = laneSpeed // set vmax of the vehicle to lane speed

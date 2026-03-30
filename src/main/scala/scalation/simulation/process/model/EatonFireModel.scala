@@ -6,9 +6,11 @@
  *
  *  @note    EatonFireModel: I-210 WB + SR-134 WB Dual-Corridor Traffic Model
  *
- *  Uses CorridorLayout auto-generated from PeMS station_map.csv.
+ *  Uses CorridorBuilder to construct topology from MultiCorridorConfig.
  *  Both corridors share one coordinate frame so they appear in correct
  *  spatial relationship in the animation.
+ *
+ *  @see config-layer-standard.md Section 4c, 7
  */
 
 package scalation
@@ -19,14 +21,15 @@ package model
 import scalation.mathstat.{MatrixD, VectorD}
 import scalation.random.{Exponential, Uniform}
 import scalation.simulation.process.{IntegratorType, IDMDynamics}
-import scalation.simulation.process.config.{CorridorLayout, EatonCorridorConfig}
-import scalation.simulation.process.config.{RampMode => ConfigRampMode}
+import scalation.simulation.process.config.{AggregatedDemand, CorridorLayout, MultiCorridorConfig, PeMSDemand}
+import scalation.simulation.process.builder.{CorridorBuilder, BuiltNetwork}
+import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSource, AggregatedRampArrivalSource}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Run the EatonFireModel simulation.
  *  > runMain scalation.simulation.process.model.runEatonFireModel
  */
-@main def runEatonFireModel (): Unit = new EatonFireModel ()
+@main def runEatonFireModel (): Unit = new EatonFireModel (synthetic = false)
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -34,7 +37,9 @@ import scalation.simulation.process.config.{RampMode => ConfigRampMode}
  *  for I-210 Westbound + SR-134 Westbound (Eaton fire evacuation).
  *
  *  Both corridors share one animation coordinate frame.
- *  Demand uses placeholder uniform arrivals until PeMS flow data is integrated.
+ *  When synthetic=true, uses fixed vehicle counts (100 mainline, 50 ramps).
+ *  When synthetic=false, loads mainline from PeMSDemand (anchor CSV),
+ *  ramps from AggregatedDemand (aggregated OR CSV).
  *
  *  Subtype encoding:
  *    0 .. numLanes210-1                           = I-210 mainline lanes
@@ -42,136 +47,187 @@ import scalation.simulation.process.config.{RampMode => ConfigRampMode}
  *    SR134_BASE+numLanes134 .. ...                = SR-134 on-ramps
  *  Note: SR-134 has NO mainline VSources.  All SR-134 mainline traffic
  *        enters via the FF connector from I-210 at the Pasadena interchange.
+ *
+ *  @param synthetic  if true, use fixed counts (100/50); if false, load PeMS data
  */
 class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
-                      animating: Boolean = true, aniRatio: Double = 500.0)
+                      animating: Boolean = true, aniRatio: Double = 500.0,
+                      synthetic: Boolean = false)
       extends Model (name, reps, animating, aniRatio)
          with RowTimeLoader:
 
     private val debug = debugf ("EatonFireModel", true)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 1: Load BOTH corridor layouts in a shared coordinate frame
+    // Constants
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    private val layout210 = EatonCorridorConfig.I210_WB
-    private val layout134 = EatonCorridorConfig.SR134_WB
-    layout210.summary ()
-    layout134.summary ()
-
-    // I-210 topology
-    private val config210      = layout210.config
-    private val numLanes210    = config210.mainline.lanesPerSegment
-    private val numSegments210 = config210.mainline.segments
-    private val nJunc210       = layout210.numJunctions
-    private val nOnRamps210    = layout210.numOnRamps
-
-    // SR-134 topology
-    private val config134      = layout134.config
-    private val numLanes134    = config134.mainline.lanesPerSegment
-    private val numSegments134 = config134.mainline.segments
-    private val nJunc134       = layout134.numJunctions
-    private val nOnRamps134    = layout134.numOnRamps
 
     private val SR134_BASE = 100                               // subtype offset for SR-134
-    private val nt         = 48                                // 48 × 15-min = 12 hours
+    private val nt         = 73                                // 73 × 5-min = 6h5m (17:00–23:00 inclusive)
 
-    debug ("init", s"I-210: lanes=$numLanes210, segs=$numSegments210, juncs=$nJunc210, onRamps=$nOnRamps210")
-    debug ("init", s"SR-134: lanes=$numLanes134, segs=$numSegments134, juncs=$nJunc134, onRamps=$nOnRamps134")
+    // Override RowTimeLoader defaults for 5-min Eaton bins (must precede setTime)
+    rowTime = 5.0 * MINUTE                                     // 300 s (overrides 15-min default)
+    override val rowTimeSlice: Double = 5.0 * MINUTE           // 300 s per bin
+
+    override def nextRow (clock: Double): Unit =
+        if clock >= rowTime then
+            curRow += 1
+            rowTime += 5.0 * MINUTE                            // 5-min increment (not 15)
+        end if
+    end nextRow
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 2: Dynamics
+    // Step 1: Dynamics (must be configured BEFORE builder call)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     private val motion = IDMDynamics
     IDMDynamics.integratorType = IntegratorType.Ballistic
-    private val iArrivalRV = Exponential (MINUTE / 10.0)
+    private val iArrivalRV = Exponential (MINUTE / 10.0)  // no need : We use getDistribution from ArrivalSource for synthetic vs. aggregated demand
     private val rand       = Uniform (0.0, 1.0)            // for FF split ratio decisions
     setTime (nt * rowTime)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 3: I-210 Junctions
+    // Step 1b: PeMS demand configs
+    //          I-210 mainline: cleaned anchor sensor CSV (same pattern as CalRoute101_3)
+    //          I-210 ramps: aggregated OR CSV (multiple ramp stations in one file)
+    //          SR-134 ramps: aggregated OR CSV
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    // Junctions are reversed: junc(0) = EASTERN end (high postmile),
-    // junc.last = WESTERN end (low postmile).  Traffic flows east → west = WB.
-    private val junc210 = Array.ofDim [Junction] (nJunc210)
-    cfor (0, nJunc210) { i =>
-        val ri = nJunc210 - 1 - i                              // reverse index
-        junc210(i) = new Junction (s"I210_${layout210.junctionNames(ri)}",
-                                   xy = layout210.mainlineScreenXY(ri), nt = nt, nl = numLanes210)
-    }
+    private val pems210     = PeMSDemand.I210_WB_Anchor ()       // anchor CSV → PeMSArrivalSource
+    private val anchorSpeed = RowTimeLoader.getSpeedMatrixFromFile (
+        pems210.dataDir + "/" + pems210.mainline.anchorFile, pems210.window, pems210.layout)
+    debug ("init", s"Anchor speed: ${anchorSpeed.dim} rows × ${anchorSpeed.dim2} lanes (m/s)")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 4: SR-134 Junctions
+    // Step 2: Build topology from config using CorridorBuilder
+    //         Replaces manual junction/route/sink/FF creation (old Steps 3-9a)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    private val junc134 = Array.ofDim [Junction] (nJunc134)
-    cfor (0, nJunc134) { i =>
-        val ri = nJunc134 - 1 - i                              // reverse index
-        junc134(i) = new Junction (s"SR134_${layout134.junctionNames(ri)}",
-                                   xy = layout134.mainlineScreenXY(ri), nt = nt, nl = numLanes134)
-    }
+    private val multiConfig = MultiCorridorConfig.EatonFire_WB ()
+    private val net         = CorridorBuilder.buildMulti (multiConfig, motion, nt)
+    private val b210        = net.corridors ("I-210-W")
+    private val b134        = net.corridors ("SR-134-W")
+
+    // Corridor summaries
+    CorridorBuilder.summary ("I-210-W", b210)
+    CorridorBuilder.summary ("SR-134-W", b134)
+
+    // Convenience aliases for Car.act()
+    private val numLanes210    = b210.numLanes
+    private val numSegments210 = b210.numSegments
+    private val numLanes134    = b134.numLanes
+    private val route210       = b210.route
+    private val route134       = b134.route
+    private val junc210        = b210.junctions
+    private val junc134        = b134.junctions
+    private val sinks210       = b210.sinks
+    private val sinks134       = b134.sinks
+    private val hwLen210       = b210.hwLen
+    private val hwLen134       = b134.hwLen
+    private val rampJoinSeg210 = b210.rampJoinSegs
+    private val rampJoinSeg134 = b134.rampJoinSegs
+    private val nOnRamps210    = b210.rampSensors.length
+    private val nOnRamps134    = b134.rampSensors.length
+
+    // FF connector (built by CorridorBuilder from FFConnectorSpec)
+    // May have multiple lanes (parallel connectors)
+    private val ffConnectors210to134: List[FFConnector] = net.ffConnectors
+    private val ff210to134: FFConnector =
+        if ffConnectors210to134.nonEmpty then ffConnectors210to134.head else null
+
+    // FF diverge/merge segment indices (for Car.act() routing)
+    private val ffDivJuncIdx210 = junc210.indexWhere (_.name.contains ("WINONA"))
+    private val ffMrgJuncIdx134 = junc134.indexWhere (_.name.contains ("ORANGE"))
+    private val ffDivSeg210 = if ffDivJuncIdx210 > 0 then ffDivJuncIdx210 - 1 else -1
+    private val ffMrgSeg134 = ffMrgJuncIdx134
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 5: Ramp Junctions (both corridors)
+    // Time-varying FF split ratios from PeMS data
+    // splitRatio(i) = flow_717603 / flow_717634 for each 5-min interval
+    // Reuses existing AggregatedDemand CSV loading — no new file I/O in model
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    private val rampSensors210 = Array.ofDim [Junction] (nOnRamps210)
-    cfor (0, nOnRamps210) { i =>
-        rampSensors210(i) = new Junction (s"I210_onRamp${i + 1}",
-                                          xy = layout210.onRampScreenXY(i), nt = nt, nl = numLanes210)
-    }
+    private val splitIntervalSec = 5.0 * MINUTE                // 300 s per PeMS interval
+    private val splitRatios: Array[Double] =
+        AggregatedArrivalSource.computeSplitRatios (
+            AggregatedDemand.I210_WB_Baseline,  717634,        // upstream: LAKE 1 on I-210
+            AggregatedDemand.SR134_WB_Baseline,  717603         // FF merge: ORANGE GROVE on SR-134
+        )
 
-    private val rampSensors134 = Array.ofDim [Junction] (nOnRamps134)
-    cfor (0, nOnRamps134) { i =>
-        rampSensors134(i) = new Junction (s"SR134_onRamp${i + 1}",
-                                          xy = layout134.onRampScreenXY(i), nt = nt, nl = numLanes134)
-    }
+    /** Look up the current split ratio from the time-varying array.
+     *  Uses the simulation clock to index into the 5-min interval array.
+     */
+    private def currentSplitRatio: Double =
+        val idx = (clock / splitIntervalSec).toInt
+        if idx >= 0 && idx < splitRatios.length then splitRatios(idx)
+        else if splitRatios.nonEmpty then splitRatios.last      // clamp to last interval
+        else 0.30                                                // ultimate fallback
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 6: Routes (each corridor has its own Route)
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    private val interJunc210 = junc210.slice (1, junc210.length - 1)
-    private val route210 = Route ("I210_Rte", numLanes210, interJunc210, junc210(0), junc210.last, motion)
-
-    private val interJunc134 = junc134.slice (1, junc134.length - 1)
-    private val route134 = Route ("SR134_Rte", numLanes134, interJunc134, junc134(0), junc134.last, motion)
-
-    debug ("init", s"I-210 Route: ${route210.pathway.length} pathways")
-    debug ("init", s"SR-134 Route: ${route134.pathway.length} pathways")
+    debug ("init", s"I-210: lanes=$numLanes210, segs=$numSegments210, " +
+                   s"onRamps=$nOnRamps210, hwLen=$hwLen210")
+    debug ("init", s"SR-134: lanes=$numLanes134, " +
+                   s"onRamps=$nOnRamps134, hwLen=$hwLen134")
+    debug ("init", s"FF: divSeg=$ffDivSeg210, mrgSeg=$ffMrgSeg134, " +
+                   f"splitRatios=${splitRatios.length} intervals, avg=${splitRatios.sum / splitRatios.length.max(1)}%.3f")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 7: Sinks (one per corridor, positioned near last junction)
+    // Step 3: Arrival Sources (same pattern as CalRoute101_3 / TrafficModelBuilder)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    // Sinks at WESTERN end (low postmile) — evacuation exit direction
-    private val (xEnd210, yEnd210) = layout210.mainlineScreenXY.head
-    private val sinks210 = Sink.group ((xEnd210.toInt - 100, yEnd210.toInt - 100),
-        ("sinkI210", (0, 0))
-    )
+    // I-210 mainline: PeMSArrivalSource from anchor CSV (same as CalRoute101_3)
+    // I-210 ramps: AggregatedRampArrivalSource from aggregated OR CSV
+    private val nLanesAnchor = anchorSpeed.dim2                    // 5 lanes from anchor sensor
+    private val (mlSources210, rampSrcArr210) =
+        if synthetic then
+            ArrivalSource.syntheticSources (100, 50, nLanesAnchor, nOnRamps210, iArrivalRV)
+        else
+            val (ml, _) = ArrivalSource.allSources (pems210, nLanesAnchor)
+            val ramps: Array[ArrivalSource] = Array.tabulate (nOnRamps210) { r =>
+                new AggregatedRampArrivalSource (AggregatedDemand.I210_WB_Baseline, r, rowTimeSlice)
+            }
+            (ml, ramps)
 
-    private val (xEnd134, yEnd134) = layout134.mainlineScreenXY.head
-    private val sinks134 = Sink.group ((xEnd134.toInt - 100, yEnd134.toInt - 100),
-        ("sinkSR134", (0, 0))
-    )
+    // SR-134 arrival sources (ramps only — no mainline sources)
+    // SR-134 has no anchor CSV; ramps still use aggregated OR
+    private val (_, rampSrcArr134) =
+        if synthetic then ArrivalSource.syntheticSources (100, 50, numLanes134, nOnRamps134, iArrivalRV)
+        else ArrivalSource.fromAggregated (AggregatedDemand.SR134_WB_Baseline, numLanes134, nOnRamps134)
+
+    debug ("init", s"synthetic=$synthetic, mlSources210=${mlSources210.length} (anchor, $nLanesAnchor lanes), rampSrcArr210=${rampSrcArr210.length}")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 8: Sources (placeholder arrivals)
+    // Step 4: Sources (model owns demand — uses ArrivalSource.getTotalVehicles)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    private val (center210, offsets210) = layout210.getVSourceCenterAndOffsets
-    private val (center134, offsets134) = layout134.getVSourceCenterAndOffsets
+    // Layouts for source positioning (screen coordinates)
+    private val layout210 = multiConfig.corridor ("I-210-W").layout
+    private val layout134 = multiConfig.corridor ("SR-134-W").layout
+    private val (center210, offsets210) = layout210.getVSourceCenterAndOffsets (200.0, -100.0)
+    private val (center134, offsets134) = layout134.getVSourceCenterAndOffsets (150.0, -80.0)  // smaller offset for SR-134 ramps
 
-    // I-210 mainline sources at EASTERN end (high postmile = Rosemead)
+    // I-210 mainline sources at EASTERN end (high postmile = entry for WB)
+    // Spaced perpendicular to road direction — matches Route lane GAP (50 px)
     private val mainlineSources210 = {
         import scala.collection.mutable.ListBuffer
         val buf = ListBuffer [VSource] ()
+        val dx  = junc210(1).at(0) - junc210(0).at(0)
+        val dy  = junc210(1).at(1) - junc210(0).at(1)
+        val hyp = math.hypot (dx, dy).max (1e-9)
+        val perpX =  dy / hyp                              // perpendicular unit vector (same as Route.calcShift2)
+        val perpY = -dx / hyp
+        val upX   = -dx / hyp                              // upstream unit vector (away from junc(1))
+        val upY   = -dy / hyp
+        val LANE_GAP  = 50.0                               // matches Route.GAP
+        val UPSTREAM  = 80.0                                // distance upstream of junc(0)
         cfor (0, numLanes210) { l =>
-            val loc = Array (layout210.mainlineScreenXY.last._1 - 50.0 + l * 10.0,
-                             layout210.mainlineScreenXY.last._2 + 50.0, 20.0, 20.0)
-            buf += new VSource (s"I210_vsrcML_L$l", this, () => Car (), l, 100, iArrivalRV, loc)
+            val physLane   = numLanes210 - 1 - l            // match Route's physical lane mapping
+            val laneOffset = (physLane - (numLanes210 - 1) / 2.0) * LANE_GAP
+            val loc = Array (junc210(0).at(0) + upX * UPSTREAM + perpX * laneOffset,
+                             junc210(0).at(1) + upY * UPSTREAM + perpY * laneOffset,
+                             20.0, 20.0)
+            val nStop = mlSources210(l).getTotalVehicles (l)   // from ArrivalSource
+            val iArrivalRV = mlSources210(l).getDistribution   // only use RV for synthetic demand
+            buf += new VSource (s"I210_vsrcML_L$l", this, () => Car (), l, nStop, iArrivalRV, loc)
         }
         buf.toList
     }
@@ -184,14 +240,15 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             val offset = offsets210(r + 1)
             val loc = Array ((center210._1 + offset._1).toDouble,
                              (center210._2 + offset._2).toDouble, 20.0, 20.0)
+            val nStop = rampSrcArr210(r).getTotalVehicles (0)   // from ArrivalSource
+            val iArrivalRV = rampSrcArr210(r).getDistribution   // only use RV for synthetic demand
             buf += new VSource (s"I210_srcRamp${r + 1}", this, () => Car (), numLanes210 + r,
-                                50, iArrivalRV, loc)
+                                nStop, iArrivalRV, loc)
         }
         buf.toList
     }
 
     // SR-134 has NO mainline VSource — all mainline traffic enters via FF from I-210.
-    // The PeMS sensor at Orange Grove measures FF-derived flow, not independent arrivals.
     // Only on-ramp VSources feed local traffic into SR-134 mid-corridor.
 
     // SR-134 ramp sources — subtypes SR134_BASE+numLanes134..
@@ -202,8 +259,10 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             val offset = offsets134(r + 1)
             val loc = Array ((center134._1 + offset._1).toDouble,
                              (center134._2 + offset._2).toDouble, 20.0, 20.0)
+            val nStop = rampSrcArr134(r).getTotalVehicles (0)   // from ArrivalSource
+            val iArrivalRV = rampSrcArr134(r).getDistribution   // only use RV for synthetic demand
             buf += new VSource (s"SR134_srcRamp${r + 1}", this, () => Car (),
-                                SR134_BASE + numLanes134 + r, 50, iArrivalRV, loc)
+                                SR134_BASE + numLanes134 + r, nStop, iArrivalRV, loc)
         }
         buf.toList
     }
@@ -211,80 +270,66 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     private val sources: List [VSource] =
         mainlineSources210 ++ rampSources210 ++ rampSources134
 
+    println (s"VSource nStop: ${sources.map (s => s"${s.name}=${s.nStop}").mkString (", ")}")
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 9: Ramp objects (both corridors)
+    // Step 4: Ramps (model owns — need VSource as `from` component)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     private val ramps210 = new Array [Ramp] (nOnRamps210)
     cfor (0, nOnRamps210) { r =>
-        ramps210(r) = new Ramp (s"I210_onRamp${r + 1}", rampSources210(r), rampSensors210(r),
+        ramps210(r) = new Ramp (s"I210_onRamp${r + 1}", rampSources210(r), b210.rampSensors(r),
                                 motion, scalation.simulation.process.RampMode.On, false, 0.1, 0.0)
     }
 
     private val ramps134 = new Array [Ramp] (nOnRamps134)
     cfor (0, nOnRamps134) { r =>
-        ramps134(r) = new Ramp (s"SR134_onRamp${r + 1}", rampSources134(r), rampSensors134(r),
+        ramps134(r) = new Ramp (s"SR134_onRamp${r + 1}", rampSources134(r), b134.rampSensors(r),
                                 motion, scalation.simulation.process.RampMode.On, false, 0.1, 0.0)
     }
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 9a: FF Connector — I-210 WB → SR-134 WB at Pasadena interchange
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // Off-ramps: from = mainline junction at diverge, to = off-ramp sink
+    // Same pattern as CalRoute101: Ramp(name, junc, sink, motion, RampMode.Off)
+    private val nOffRamps210   = b210.offRampJoinSegs.length
+    private val offRamps210    = new Array [Ramp] (nOffRamps210)
+    cfor (0, nOffRamps210) { r =>
+        offRamps210(r) = new Ramp (s"I210_offRamp${r + 1}",
+            junc210(b210.offRampJoinSegs(r)),          // from: mainline junction at diverge
+            b210.offRampSinks(r),                       // to: off-ramp sink
+            motion, scalation.simulation.process.RampMode.Off, false, -0.1, 0.0)
+    }
 
-    /** Find junction index whose name contains the given substring. */
-    private def findJuncIdx (juncs: Array [Junction], nameContains: String): Int =
-        juncs.indices.find (i => juncs(i).name.contains (nameContains)).getOrElse (-1)
+    private val nOffRamps134   = b134.offRampJoinSegs.length
+    private val offRamps134    = new Array [Ramp] (nOffRamps134)
+    cfor (0, nOffRamps134) { r =>
+        offRamps134(r) = new Ramp (s"SR134_offRamp${r + 1}",
+            junc134(b134.offRampJoinSegs(r)),          // from: mainline junction at diverge
+            b134.offRampSinks(r),                       // to: off-ramp sink
+            motion, scalation.simulation.process.RampMode.Off, false, -0.1, 0.0)
+    }
 
-    // FF diverge: I-210 at WINONA WAY (PM 24.442) — car exits I-210 here
-    // FF merge:   SR-134 at ORANGE GROVE (PM 12.763) — car enters SR-134 here
-    //             (ORANGE GROVE is the easternmost SR-134 junction = the 210/134 interchange)
-    // PeMS station 775725 "WB 210 CON" at PM 24.49: 2-lane connector ramp
-    private val ffDivJuncIdx210 = findJuncIdx (junc210, "WINONA")
-    private val ffMrgJuncIdx134 = findJuncIdx (junc134, "ORANGE")
-
-    debug ("init", s"FF interchange: I-210 divJuncIdx=$ffDivJuncIdx210 (${if ffDivJuncIdx210 >= 0 then junc210(ffDivJuncIdx210).name else "NOT FOUND"})")
-    debug ("init", s"FF interchange: SR-134 mrgJuncIdx=$ffMrgJuncIdx134 (${if ffMrgJuncIdx134 >= 0 then junc134(ffMrgJuncIdx134).name else "NOT FOUND"})")
-
-    // Create the FF connector (30% split ratio — placeholder, calibrate from PeMS)
-    private val ff210to134: FFConnector =
-        if ffDivJuncIdx210 >= 0 && ffMrgJuncIdx134 >= 0 then
-            new FFConnector ("FF_I210_to_SR134",
-                             junc210(ffDivJuncIdx210), junc134(ffMrgJuncIdx134),
-                             motion, splitRatio = 0.30, bend = 0.25)
-        else null
-
-    // The diverge segment = the segment that ENDS at the diverge junction
-    // After driving segment (ffDivJuncIdx210 - 1), car is at ffDivJuncIdx210 and decides
-    private val ffDivSeg210 = if ffDivJuncIdx210 > 0 then ffDivJuncIdx210 - 1 else -1
-    // The merge segment = where the car starts driving on SR-134 after entering
-    private val ffMrgSeg134 = ffMrgJuncIdx134
+    debug ("init", s"Off-ramps: I-210=$nOffRamps210, SR-134=$nOffRamps134")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Step 10: Register ALL components
+    // Step 5: Register ALL components
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    private val allJunctions = junc210.toList ++ rampSensors210.toList ++
-                               junc134.toList ++ rampSensors134.toList
-    private val allSinks     = sinks210 ++ sinks134
-    private val allRamps     = ramps210.toList ++ ramps134.toList
+    private val allJunctions = junc210.toList ++ b210.rampSensors.toList ++
+                               junc134.toList ++ b134.rampSensors.toList
+    private val allSinks     = sinks210 ++ sinks134 ++
+                               b210.offRampSinks.toList ++ b134.offRampSinks.toList
+    private val allRamps     = ramps210.toList ++ ramps134.toList ++
+                               offRamps210.toList ++ offRamps134.toList
 
     addComponents (sources, allJunctions, allSinks, allRamps)
-    if ff210to134 != null then addComponent (ff210to134)
+    ffConnectors210to134.foreach (addComponent (_))              // register all FF lanes
     route210.pathway.foreach (addComponent (_))
     route134.pathway.foreach (addComponent (_))
-    debug ("init", "All components registered (I-210 + SR-134 + FF)")
+    debug ("init", s"All components registered (I-210 + SR-134 + ${ffConnectors210to134.length} FF lanes)")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // Car entity — parameterized to drive either corridor
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    private val hwLen210       = junc210.length - 1
-    private val hwLen134       = junc134.length - 1
-    // Ramp join segments remapped for reversed junction order
-    private val rampJoinSeg210 = config210.ramps.filter (_.mode == ConfigRampMode.On)
-        .map (r => numSegments210 - 1 - r.joinSegment).toArray
-    private val rampJoinSeg134 = config134.ramps.filter (_.mode == ConfigRampMode.On)
-        .map (r => numSegments134 - 1 - r.joinSegment).toArray
 
     case class Car () extends Vehicle ("c", this):
 
@@ -335,25 +380,29 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                 junc(seg + 1).jump ()
 
                 // ── FF diversion: I-210 WB → SR-134 WB at interchange ──────
-                if !diverted && ff210to134 != null
+                // Time-varying split ratio from PeMS (flow_717603 / flow_717634)
+                if !diverted && ffConnectors210to134.nonEmpty
                    && subtype < SR134_BASE                    // car is on I-210
                    && seg == ffDivSeg210                      // at interchange segment
                    && ffMrgSeg134 >= 0                        // merge point valid
-                   && rand.gen < ff210to134.splitRatio then   // probabilistic split
+                   && rand.gen < currentSplitRatio then       // time-varying probabilistic split
                     diverted = true
                     // 1. Exit I-210 pathway
                     route.pathway(laneID).removeFromAlist (this)
-                    // 2. Drive the FF connector ramp
-                    val ahead = ff210to134.getLast
-                    ff210to134.addToAlist (this, ahead)
-                    ff210to134.lane.move ()
-                    ff210to134.removeFromAlist (this)
-                    // 3. Enter SR-134 at merge junction — spread across all lanes
+                    // 2. Randomly select one of the FF connector lanes
+                    val ffLaneIdx = (rand.gen * ffConnectors210to134.length).toInt.min(ffConnectors210to134.length - 1)
+                    val ffLane = ffConnectors210to134(ffLaneIdx)
+                    // 3. Drive the selected FF connector lane
+                    val ahead = ffLane.getLast
+                    ffLane.addToAlist (this, ahead)
+                    ffLane.lane.move ()
+                    ffLane.removeFromAlist (this)
+                    // 4. Enter SR-134 at merge junction — spread across all lanes
                     laneID = (rand.gen * numLanes134).toInt.min (numLanes134 - 1)
                     val carAhead = route134.pathway(laneID).seg(ffMrgSeg134).getLast
                     route134.pathway(laneID).addToAlist (this, carAhead)
                     junc134(ffMrgSeg134).jump ()
-                    // 4. Continue driving on SR-134 to its sink
+                    // 5. Continue driving on SR-134 to its sink
                     driveHighway (route134, junc134, sinks134, hwLen134, ffMrgSeg134)
                 end if
 
@@ -379,16 +428,27 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     end Car
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // RowTimeLoader (placeholder — no PeMS data yet)
+    // RowTimeLoader — delegates to ArrivalSource (mu) + anchor CSV (speed)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     def getDataDimension: Int = nt
 
+    /** Mu dispatch: routes subtype to the correct corridor's ArrivalSource objects. */
     def getMuForSource (sourceIdx: Int): VectorD =
-        VectorD.fill (nt)(MINUTE / 10.0)
+        if sourceIdx < numLanes210 + nOnRamps210 then
+            // I-210 mainline or on-ramp
+            RowTimeLoader.getMuForSourceDefault (
+                mlSources210, rampSrcArr210, numLanes210, nt, sourceIdx)
+        else if sourceIdx >= SR134_BASE then
+            // SR-134 on-ramp (remap to local index; no mainline VSources)
+            RowTimeLoader.getMuForSourceDefault (
+                Array.empty, rampSrcArr134, numLanes134, nt, sourceIdx - SR134_BASE)
+        else
+            VectorD.fill (nt)(Double.MaxValue)                 // gap between corridors
+    end getMuForSource
 
-    def getSpeedMatrix (): MatrixD =
-        MatrixD.fill (nt, math.max (numLanes210, numLanes134), 30.0)
+    /** Speed from anchor sensor (72 × 5, already m/s). */
+    def getSpeedMatrix (): MatrixD = anchorSpeed
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // Public accessors
@@ -398,6 +458,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     def getJunctions134: Array [Junction] = junc134
     def getLayout210: CorridorLayout = layout210
     def getLayout134: CorridorLayout = layout134
+    def getBuiltNetwork: BuiltNetwork = net
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // Finish
@@ -415,3 +476,4 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     Model.shutdown ()
 
 end EatonFireModel
+

@@ -4,6 +4,7 @@ package process
 
 
 import scalation.mathstat._
+import scalation.simulation.process.builder.CalibratableModel
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** General-purpose optimization framework for calibrating simulation models.

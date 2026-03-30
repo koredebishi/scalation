@@ -96,7 +96,7 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
     // Animation coordinates and junction setup
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    private val (w, h) = (1500, 1500)
+    private val (w, h) = (3000, 2000)
     private val aniCoords_Main = NetworkConfig.getMainlineCoordinates ((w, h))
     private val aniCoords_Ramp = NetworkConfig.getRampCoordinates ((w, h))
     private val (centerPos, offsets) = NetworkConfig.getVSourceCenterAndOffsets ((w, h))
@@ -290,9 +290,9 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
     // For standalone run, use @main def runCalRoute101_3
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    // simulate ()
-    // waitFinished ()
-//    Model.shutdown ()
+    simulate ()
+    waitFinished ()
+    Model.shutdown ()
 
 end CalRoute101_3
 
