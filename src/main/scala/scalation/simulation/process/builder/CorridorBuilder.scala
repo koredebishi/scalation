@@ -99,13 +99,15 @@ object CorridorBuilder:
 
         val config      = layout.config
         val nLanes      = config.mainline.lanesPerSegment
+        val lps         = config.mainline.lanesPerSeg.orNull   // per-segment lane counts (null if uniform)
         val nSegments   = config.mainline.segments
         val nJunc       = layout.numJunctions
         val nOnRamps    = layout.numOnRamps
         val pfx         = if prefix.nonEmpty then s"${prefix}_" else ""
 
         debug ("build", s"corridor='${config.mainline.id}' dir=$direction " +
-                        s"juncs=$nJunc segs=$nSegments lanes=$nLanes onRamps=$nOnRamps")
+                        s"juncs=$nJunc segs=$nSegments lanes=$nLanes onRamps=$nOnRamps" +
+                        s" lanesPerSeg=${if lps != null then lps.mkString("[",",","]") else "uniform"}")
 
         // ── Step 1: Mainline junctions ──────────────────────────────────────
         // Ascending: junctions in postmile order (junc(0) = low PM = entry)
@@ -144,7 +146,7 @@ object CorridorBuilder:
 
         val intermediateJunc = junc.slice (1, junc.length - 1)
         val route = Route (s"${pfx}Rte", nLanes, intermediateJunc,
-                           junc(0), junc.last, motion)
+                           junc(0), junc.last, motion, lanesPerSeg = lps)
 
         debug ("build", s"route: ${route.pathway.length} pathways, " +
                         s"${intermediateJunc.length} intermediate junctions")

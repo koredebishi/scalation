@@ -38,9 +38,9 @@ end FlowDirection
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Enumeration for mainline demand sourcing on a corridor.
  *  Independent — corridor has its own mainline VSources (normal case).
- *  Derived     — corridor receives mainline flow from an FF connector; for a derived 
+ *  Derived     — corridor receives mainline flow from an FF connector; for a derived
  *             corridor, the mainline VSource is not created and the first junction is a merge point.
- *             traffic transfers from the FF connector: 
+ *             traffic transfers from the FF connector:
  *                no mainline VSource is created (e.g., SR-134 fed from I-210).
  */
 enum DemandFlag:
@@ -68,13 +68,15 @@ case class FFConnectorSpec (id: String, fromCorridorId: String, toCorridorId: St
 /** The `MainlineSpec` class specifies the mainline road segment properties.
  *  @param id                the identifier for this mainline (e.g., "US-101-N")
  *  @param segments          the number of segments (junctions - 1)
- *  @param lanesPerSegment   the number of lanes per segment
+ *  @param lanesPerSegment   the number of lanes (uniform fallback / max for variable)
  *  @param segmentLengths    optional segment lengths in meters
  *  @param direction         traffic flow direction relative to postmile ordering
+ *  @param lanesPerSeg       optional per-segment lane counts (None → uniform lanesPerSegment)
  */
 case class MainlineSpec (id: String, segments: Int, lanesPerSegment: Int,
                          segmentLengths: Option [VectorD] = None,
-                         direction: FlowDirection = FlowDirection.Ascending)
+                         direction: FlowDirection = FlowDirection.Ascending,
+                         lanesPerSeg: Option [Array[Int]] = None)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RampSpec` class specifies an on-ramp or off-ramp.

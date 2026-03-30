@@ -366,20 +366,21 @@ object EatonCorridorConfig:
         val mlPMs = new Array [Double] (nML)
         cfor (0, nML) { i => mlPMs(i) = mlStations(i).record.absPM }
 
-        // 3. Lane count = entry station's lane count (entry = traffic source)
-        //    WB/SB (Descending): entry = highest PM (last in ascending PM order)
-        //    NB/EB (Ascending):  entry = lowest PM (first in ascending PM order)
+        // 3. Lane counts per station and per segment
+        //    Per-station lane counts from PeMS sensor data
         val laneCounts = new Array [Int] (nML)
         cfor (0, nML) { i => laneCounts(i) = mlStations(i).record.lanes }
-        val entryIdx = if flowDir == FlowDirection.Descending then nML - 1 else 0
-        val lanesPerSegment = laneCounts(entryIdx)
+        //    Per-segment: segment i spans station i to station i+1 → min lanes
+        val nSegments = nML - 1
+        val segLaneCounts = new Array [Int] (nSegments)
+        cfor (0, nSegments) { i => segLaneCounts(i) = math.min (laneCounts(i), laneCounts(i + 1)) }
+        val lanesPerSegment = segLaneCounts.max    // max for Route array sizing
 
         // 4. Junction names from Location field
         val junctionNames = new Array [String] (nML)
         cfor (0, nML) { i => junctionNames(i) = mlStations(i).record.location }
 
         // 5. Segment lengths from PM differences (miles → meters)
-        val nSegments = nML - 1
         val segLens   = new VectorD (nSegments)
         cfor (0, nSegments) { i => segLens(i) = (mlPMs(i + 1) - mlPMs(i)) * 1609.34 }
 
@@ -427,7 +428,8 @@ object EatonCorridorConfig:
                 segments        = nSegments,
                 lanesPerSegment = lanesPerSegment,
                 segmentLengths  = Some (segLens),
-                direction       = flowDir
+                direction       = flowDir,
+                lanesPerSeg     = Some (segLaneCounts)
             ),
             ramps   = onRamps.toList ++ offRamps.toList,
             sensors = sensors.toList

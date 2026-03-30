@@ -350,8 +350,12 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             if localSub < nLanes then
                 // Mainline entry
                 laneID = localSub
-                val carAhead = route.pathway(laneID).getLast
-                route.pathway(laneID).addToAlist (this, carAhead)
+                // Guard: ensure assigned lane exists at entry segment (seg 0)
+                if !route.laneExistsAt (laneID, 0) then
+                    laneID = route.lanesAt (0) - 1           // outermost existing lane
+                end if
+                val carAhead = route.pathway(laneID).seg(0).getLast
+                route.pathway(laneID).addToAlist (this, carAhead, 0)
                 junc(0).jump ()
                 driveHighway (route, junc, sinks, hwLen, 0)
             else
@@ -361,8 +365,12 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                 val r = ramps(rampIdx)
                 driveRamp (r)
                 val joinSeg = joinSegs(rampIdx)
+                // Guard: ensure target lane exists at join segment
+                if !route.laneExistsAt (laneID, joinSeg) then
+                    laneID = route.lanesAt (joinSeg) - 1     // outermost existing lane
+                end if
                 val carAhead = route.pathway(laneID).seg(joinSeg).getLast
-                route.pathway(laneID).addToAlist (this, carAhead)
+                route.pathway(laneID).addToAlist (this, carAhead, joinSeg)
                 junc(joinSeg).jump ()
                 driveHighway (route, junc, sinks, hwLen, joinSeg)
         end actOnCorridor
@@ -387,8 +395,9 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                    && ffMrgSeg134 >= 0                        // merge point valid
                    && rand.gen < currentSplitRatio then       // time-varying probabilistic split
                     diverted = true
-                    // 1. Exit I-210 pathway
-                    route.pathway(laneID).removeFromAlist (this)
+                    // 1. Exit I-210 pathway — remove from current segment's DLL
+                    route.pathway(laneID).seg(seg).removeFromAlist (this)
+                    myPathway = null
                     // 2. Randomly select one of the FF connector lanes
                     val ffLaneIdx = (rand.gen * ffConnectors210to134.length).toInt.min(ffConnectors210to134.length - 1)
                     val ffLane = ffConnectors210to134(ffLaneIdx)
@@ -399,18 +408,37 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                     ffLane.removeFromAlist (this)
                     // 4. Enter SR-134 at merge junction — spread across all lanes
                     laneID = (rand.gen * numLanes134).toInt.min (numLanes134 - 1)
+                    // Guard: ensure target lane exists at merge segment on SR-134
+                    if !route134.laneExistsAt (laneID, ffMrgSeg134) then
+                        laneID = route134.lanesAt (ffMrgSeg134) - 1
+                    end if
                     val carAhead = route134.pathway(laneID).seg(ffMrgSeg134).getLast
-                    route134.pathway(laneID).addToAlist (this, carAhead)
+                    route134.pathway(laneID).addToAlist (this, carAhead, ffMrgSeg134)
                     junc134(ffMrgSeg134).jump ()
                     // 5. Continue driving on SR-134 to its sink
                     driveHighway (route134, junc134, sinks134, hwLen134, ffMrgSeg134)
                 end if
 
-                if !diverted then seg += 1
+                // ── DLL hop: exit this segment's DLL, enter next segment's DLL ──
+                if !diverted then
+                    route.pathway(laneID).seg(seg).removeFromAlist (this)
+                    seg += 1
+                    if seg < hwLen then
+                        // ── Lane-end check: does my lane exist at the next segment? ──
+                        if !route.laneExistsAt (laneID, seg) then
+                            val avail = 0 until route.lanesAt (seg)
+                            laneID = route.forceMerge (laneID, avail, this, seg)
+                        end if
+                        val nextVT = route.pathway(laneID).seg(seg)
+                        val ahead  = nextVT.getLast
+                        nextVT.addToAlist (this, ahead)
+                        myPathway = route.pathway(laneID)
+                    end if
+                end if
             end while
 
             if !diverted then
-                route.pathway(laneID).removeFromAlist (this)
+                myPathway = null
                 sinks.head.leave ()
         end driveHighway
 

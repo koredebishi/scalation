@@ -178,8 +178,8 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
                 // Mainline entry - subtype 0 until numLanes
                 laneID = subtype
                 //debug ("Car.act", s"$me MAINLINE ENTRY: lane=$laneID, subtype=$subtype")
-                val carAhead = route.pathway(laneID).getLast
-                route.pathway(laneID).addToAlist (this, carAhead)
+                val carAhead = route.pathway(laneID).seg(0).getLast
+                route.pathway(laneID).addToAlist (this, carAhead, 0)
                 junc(0).jump ()
                 driveHighway ()
             else
@@ -197,7 +197,7 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
 
             if subtype >= numLanes then
                 val carAhead = route.pathway(laneID).seg(joinSeg).getLast
-                route.pathway(laneID).addToAlist (this, carAhead)
+                route.pathway(laneID).addToAlist (this, carAhead, joinSeg)
                 junc(joinSeg).jump ()
             end if
 
@@ -211,12 +211,21 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
 
                 route.pathway(laneID).seg(seg).move ()
 
+                // ── DLL hop: exit this segment's DLL, enter next segment's DLL ──
+                route.pathway(laneID).seg(seg).removeFromAlist (this)
+                if seg + 1 < highway_length then
+                    val nextVT = route.pathway(laneID).seg(seg + 1)
+                    val ahead  = nextVT.getLast
+                    nextVT.addToAlist (this, ahead)
+                end if
+
                 if junc(seg + 1).name.startsWith ("sensor") then
                     junc(seg + 1).jump ()
             }
 
             //debug ("driveHighway", s"$me EXITING at ${sinks.head.name}, lane=$laneID")
-            route.pathway(laneID).removeFromAlist (this)
+            // Final segment's removeFromAlist already done in the DLL hop above
+            myPathway = null
             sinks.head.leave ()
         end driveHighway
 

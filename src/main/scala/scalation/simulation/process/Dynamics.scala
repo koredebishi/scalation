@@ -47,6 +47,30 @@ trait Dynamics:
     private [process] var o_velocity = velocity                     // set initial old velocity to velocity
     private [process] var acc        = 0.0                          // set initial acceleration to 0
     private [process] var o_acc      = acc                          // set initial old acceleration acc
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the leader of the given vehicle using per-VTransport DLLs.
+     *  First checks within the same segment (myPathNode.ahead).
+     *  If null (car is head of its segment), looks at the next segment's DLL tail.
+     *  @param car  the vehicle whose leader we need
+     *  @return the leader vehicle, or null if free-flow
+     */
+    protected def findLeader (car: Vehicle): Vehicle =
+        // Step 1: within-segment leader (O(1) DLL lookup)
+        val ref = car.myPathNode.ahead
+        if ref != null then return ref.elem
+
+        // Step 2: cross-boundary — look at next segment's DLL tail
+        val pw = car.myPathway
+        if pw != null then
+            val segs = pw.seg
+            val nextIdx = car.segId + 1
+            if nextIdx < segs.length && segs(nextIdx) != null then
+                return segs(nextIdx).getLast              // most recently entered car in next seg
+        end if
+        null                                              // no leader: free-flow
+    end findLeader
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Update the values of the vehicle: velocity, displacement, lane according
      *  to the car-following model being used.
@@ -84,8 +108,7 @@ object GippsDynamics
      * @param car the car/vehicle whose velocity and position is being updated
      */
     def updateM(car: Vehicle, length: Double): Unit =
-        val ref = car.myPathNode.ahead
-        val car_ahead = if ref != null then ref.elem else null
+        val car_ahead = findLeader (car)
         val dt = prop("rt")
 
         // Step 1: compute next velocity using Gipps (discrete rule)
@@ -122,16 +145,13 @@ object GippsDynamics
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the velocity of the vehicle based on Gipps' model for a vehicle and its predecessor.
      *  @param cn  the current vehicle
-     *  @param cp  the predecessor of the current vehicle
+     *  @param cp  the predecessor of the current vehicle (from findLeader — always same or next segment)
      */
-    // FIX: DLL 'ahead' tracks insertion order, NOT physical position.
-    // When cp.segId < cn.segId, the "leader" is actually BEHIND the follower physically.
-    // In this case, ignore the phantom leader and use free-flow velocity.
     def gipps (cn: Vehicle, cp: Vehicle, length: Double): Double =
-        if cp == null || cp.segId < cn.segId then
+        if cp == null then
             gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))
         else
-            // Leader is in same segment or ahead segment apply car-following
+            // Leader is in same segment or adjacent next segment
             val cp_r_disp = if cp.segId == cn.segId then cp.disp
                             else length + cp.disp
             gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cp_r_disp, cp.velocity, prop("rt"))
@@ -203,13 +223,12 @@ object KraussDynamics
      *  @param length the segment length
      */
     def updateM(car: Vehicle, length: Double): Unit =
-        val ref = car.myPathNode.ahead
-        val car_ahead = if ref != null then ref.elem else null
+        val car_ahead = findLeader (car)
         val dt = prop("rt")
 
         // Compute leader position and velocity
         val (xp, vp): (Double, Double) =
-            if car_ahead == null || car_ahead.segId < car.segId then
+            if car_ahead == null then
                 (car.disp + 1000.0, car.vmax)  // phantom leader (free flow)
             else if car_ahead.segId == car.segId then
                 (car_ahead.disp, car_ahead.velocity)
@@ -319,16 +338,13 @@ object IDMDynamics
      *  @param length  the segment length
      */
     def updateM(car: Vehicle, length: Double): Unit =
-        val ref = car.myPathNode.ahead
-        val car_ahead = if ref != null then ref.elem else null
+        val car_ahead = findLeader (car)
         val dt = rt
 
         // Snapshot leader state (frozen during integration)
         val (x_leader, v_leader): (Double, Double) =                // leader's (position, velocity)
             if car_ahead == null then
                 (car.t_disp + 1000.0, car.velocity)                 // no leader: free-flow
-            else if car_ahead.segId < car.segId then
-                (car.t_disp + 1000.0, car.velocity)                 // leader is behind (stale DLL node): free-flow
             else if car_ahead.t_disp - car.t_disp > FREERANGE then
                 (car.t_disp + 1000.0, car.velocity)                 // leader is far ahead: free-flow
             else

@@ -33,26 +33,38 @@ import scala.math.{min,abs}
  *  @param bend     curvature of the lanes
  */
 class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component, to: Component,
-             motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0)
+             motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0,
+             val lanesPerSeg: Array[Int] = null)
     extends Component ():
 
 
     private val debug = debugf("Route", true)     // debug function
 
-    val pathway = Array.ofDim[Pathway](numLanes)      // create array of parallel Pathways
+    /** Number of segments in this route. */
+    private val nSegments: Int = junc.length + 1   // from + junc.length intermediates + to = junc.length+1 points → junc.length+1-1 segs ... actually segments = intermediateJunc.length + 1
+
+    /** Per-segment lane counts. If lanesPerSeg is null (uniform), fill with numLanes. */
+    private val _lanesPerSeg: Array[Int] =
+        if lanesPerSeg != null then lanesPerSeg
+        else Array.fill(junc.length + 1)(numLanes)   // junc = intermediate junctions → nSegments = junc.length + 1
+
+    /** Maximum lane count across all segments. */
+    val maxLanes: Int = if _lanesPerSeg.nonEmpty then _lanesPerSeg.max else numLanes
+
+    /** Query: how many lanes exist at segment `seg`. */
+    def lanesAt (seg: Int): Int = _lanesPerSeg(seg)
+
+    /** Query: does lane `lane` exist at segment `seg`? */
+    def laneExistsAt (lane: Int, seg: Int): Boolean = lane < _lanesPerSeg(seg)
+
+    val pathway: Array[Pathway] = Array.ofDim[Pathway](numLanes)      // create array of parallel Pathways
     private val GAP = 50.0     // pixel between lanes
 
     for i <- pathway.indices do
-        // this for loop draws n amount of pathways based on numLanes. each of these pathways
-        //consist of segment called Vtransport.
-        // we want a situation where we can make this route draw. (n-1) standard pathway
-        // and allow us to configure the last pathway such that that last pathway can
-        //mimic the last lane of a highway. it can end and continue  at the same time.
-        // something like:
-        // -------------|                  |------------------|-------------------|
         val physicalLane = numLanes - 1 - i  // Reverse: i=0 → lane 4 (rightmost), i=4 → lane 0 (leftmost)
         val shift = calcShift2 * ((physicalLane - (numLanes - 1) / 2.0) * GAP)
-        pathway(i) = new Pathway(s"${name}_$i", junc, from, to, motion, isSpeed, bend, laneShift = shift)
+        pathway(i) = new Pathway(s"${name}_$i", junc, from, to, motion, isSpeed, bend,
+                                 laneShift = shift, laneIndex = i, lanesPerSeg = _lanesPerSeg)
         subpart += pathway(i)
     end for
 
@@ -92,6 +104,9 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         var success = abs(l1 - l2) == 1
         if !success then return success
 
+        // Check if target lane exists at this segment (variable lane support)
+        if !laneExistsAt(l2, seg) then return false
+
         val fromPath = pathway(l1) // current Pathway  (lane l1)
         val toPath = pathway(l2) // target Pathway   (lane l2)
 
@@ -124,12 +139,12 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         // --- perform the lane change --------------------------------------------
         if success then
-            fromPath.removeFromAlist(actor) // detach from old lane
+            fromPath.removeFromAlist(actor, seg) // detach from old lane at this segment
             assert(actor.myPathNode == null, s"Vehicle $this not cleared before lane-change insertion!")
 
             actor.laneID = l2 // update laneID
             actor.pathInfo = toPath.seg(seg).name // update pathInfo
-            toPath.addToAlist(actor, vAhead) // insert before vAhead in target lane
+            toPath.addToAlist(actor, vAhead, seg) // insert before vAhead in target lane at this segment
         end if
 
         success
@@ -182,10 +197,10 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         val nextSeg = min(seg + 1, toPath.seg.length - 1)
         val vAhead = toPath.seg(nextSeg).getLast
 
-        fromPath.removeFromAlist(car)
+        fromPath.removeFromAlist(car, seg)
         car.laneID = bestLane
         car.pathInfo = toPath.seg(seg).name
-        toPath.addToAlist(car, vAhead)
+        toPath.addToAlist(car, vAhead, seg)
 
         bestLane
     end forceMerge

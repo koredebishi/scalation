@@ -30,11 +30,16 @@ import scalation.scala2d.Colors._
  */
 class Pathway (name: String, val junc: Array [Junction], val from: Component, val to: Component,
                motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0, 
-               laneShift: VectorD = VectorD(0.0, 0.0))
+               laneShift: VectorD = VectorD(0.0, 0.0),
+               laneIndex: Int = 0, lanesPerSeg: Array[Int] = null)
     extends Component with Joinable:
 
     private val debug = debugf ("Pathway", true)             // debug function
-    val vList = DoublyLinkedList [Vehicle]                   // one lane = one doubly linked list
+
+    /** @deprecated  Lane-spanning DLL — kept for transition period. Will be removed.
+     *  Car-following now uses per-VTransport DLLs (VTransport.vList).
+     */
+    val vList = DoublyLinkedList [Vehicle]
 
     // Enhanced DLL identification for debugging
     val dllId = s"DLL_${name}_Lane"
@@ -45,77 +50,116 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     val seg = Array.ofDim[VTransport](points.length - 1)
 
     for i <- 0 until points.length - 1 do
-        val p1 = points(i)
-        val p2 = points(i + 1)
-        val shift = laneShift
-        
-        seg(i) = new VTransport (s"${name}_seg${i}", p1, p2, motion, isSpeed, bend, shift, shift, i)
-        subpart  += seg(i)                                   // add to the subpart
+        // Only create VTransport where this lane exists
+        val exists = lanesPerSeg == null || laneIndex < lanesPerSeg(i)
+        if exists then
+            val p1 = points(i)
+            val p2 = points(i + 1)
+            val shift = laneShift
+            seg(i) = new VTransport (s"${name}_seg${i}", p1, p2, motion, isSpeed, bend, shift, shift, i)
+            subpart  += seg(i)
+        else
+            seg(i) = null                                        // lane doesn't exist at this segment
     end for
-
-    // -----------jun-------------jun-----------jun------------jun
-    // An array of the highway segment length
-    //get the length of each road segment, add and make it an array
-    // if a car is on this segment and I need the length of (behind segment and ahead segment)
-    // Index of the
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//
-//    /** Return the number of segments (same for all Pathways).
-//     */
-//    def segments: Int = pathway(0).seg.length
 
 
     initComponent(name, Array())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add a vehicle to the correct pathway's doubly linked list.
+    /** Add a vehicle to this pathway at a specific segment's DLL.
+     *  Sets pathway/connector/ramp references, then delegates to VTransport.
      *  @param actor  the vehicle to add
-     *  @param other  the other vehicle (the one ahead, null if none)
+     *  @param other  the vehicle ahead (null if none)
+     *  @param segId  the segment index within this pathway
      */
-    def addToAlist (actor: Vehicle, other: Vehicle): Unit =
-        val otherNode = if other != null then other.myPathNode.asInstanceOf [vList.Node]
-        else null
-//        logDLLOperation("ADD_TO_DLL", actor, s"following ${if other != null then other.name else "NONE"}")
+    def addToAlist (actor: Vehicle, other: Vehicle, segId: Int): Unit =
         actor.myPathway = this
         actor.myFFConnector = null                   // not on an FFConnector
         actor.myRamp = null                          // not on a ramp
-        actor.myPathNode = vList.add (actor, otherNode)
-        actor.pathInfo = s"${dllId}" // Update path info with clear DLL identifier
+        seg(segId).addToAlist (actor, other)
     end addToAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Remove a vehicle from the correct pathway's doubly linked list.
+    /** Add a vehicle — backward-compatible overload (defaults to seg 0).
+     *  Used by existing call sites that don't pass segId yet.
+     *  @param actor  the vehicle to add
+     *  @param other  the vehicle ahead (null if none)
+     */
+    def addToAlist (actor: Vehicle, other: Vehicle): Unit =
+        addToAlist (actor, other, 0)
+    end addToAlist
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Remove a vehicle from the segment's DLL it currently occupies.
+     *  Uses actor.segId to find the right VTransport.
      *  @param actor  the vehicle to remove
      */
     def removeFromAlist (actor: Vehicle): Unit =
-//        logDLLOperation("REMOVE_FROM_DLL", actor)
-        vList.remove (actor.myPathNode.asInstanceOf [vList.Node])
-        actor.myPathNode = null
-        actor.myPathway  = null
+        if actor.segId >= 0 && actor.segId < seg.length && seg(actor.segId) != null then
+            seg(actor.segId).removeFromAlist (actor)
+        end if
+        actor.myPathway = null
     end removeFromAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the first vehicle in this pathway.
+    /** Remove a vehicle from a specific segment's DLL.
+     *  @param actor  the vehicle to remove
+     *  @param segId  the segment index
+     */
+    def removeFromAlist (actor: Vehicle, segId: Int): Unit =
+        seg(segId).removeFromAlist (actor)
+        actor.myPathway = null
+    end removeFromAlist
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the first vehicle in this pathway (lead car across all segments).
+     *  Scans from last segment backward to find the first non-empty segment's head.
      */
     def getFirst: Vehicle =
-        if vList.isEmpty then null else vList.head           // return first vehicle in this doubly linked list
+        var i = seg.length - 1
+        while i >= 0 do
+            if seg(i) != null then
+                val f = seg(i).getFirst
+                if f != null then return f
+            end if
+            i -= 1
+        end while
+        null
     end getFirst
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the last vehicle in this pathway.
+    /** Get the last vehicle in this pathway (most recently entered car).
+     *  Scans from first segment forward to find the first non-empty segment's tail.
      */
     def getLast: Vehicle =
-//        println(s"I only executed up to this point and the reason is,vlistSize= ${vList.size}, ${vList.toList}")
-        val car =  if vList.isEmpty then null else vList.last // return last vehicle in this doubly linked list
-        car
+        var i = 0
+        while i < seg.length do
+            if seg(i) != null then
+                val l = seg(i).getLast
+                if l != null then return l
+            end if
+            i += 1
+        end while
+        null
     end getLast
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Check whether this lane has a VTransport at the given segment index.
+     *  @param segId  the segment index to check
+     */
+    def existsAt (segId: Int): Boolean =
+        segId >= 0 && segId < seg.length && seg(segId) != null
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the location of the first curve to be the pathway starting point.
+     *  Finds the first non-null segment for sparse pathways.
      */
     override def at: Array[Double] =
-        val xy = seg(0).at // (x,y) for the first curve end-point
-        Array(xy(0), xy(1), 0.0, 0.0) // add dummy width & height
+        val first = seg.find(_ != null)
+        if first.isDefined then
+            val xy = first.get.at
+            Array(xy(0), xy(1), 0.0, 0.0)
+        else Array(0.0, 0.0, 0.0, 0.0)
 
 //
 //    def segLength(laneId: Int , car: Vehicle): Array[Double] =
@@ -137,20 +181,24 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
      *  This allows an application model to select the next component.
      *  FIX - this won't work in general - seg(0) will only allow turns from first segment
      */
-    def selector: Variate = seg(0).selector
+    def selector: Variate =
+        val first = seg.find(_ != null)
+        if first.isDefined then first.get.selector else null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the direction/turn random variate for this pathway.
      *  FIX - this won't work in general
      *  @param selectorRV  the random variate used to select the direction
      */
-    def selector_= (selectorRV: Variate): Unit = seg(0).selector = selectorRV
+    def selector_= (selectorRV: Variate): Unit =
+        val first = seg.find(_ != null)
+        if first.isDefined then first.get.selector = selectorRV
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Display this pathway.
+    /** Display this pathway — skip null segments (lane doesn't exist there).
      */
     override def display (): Unit =
-        for s <- seg.indices do
+        for s <- seg.indices if seg(s) != null do
             val segment = seg(s)
             director.animate (segment, CreateEdge, blue, segment.curve, segment.from, segment.to,
                 Array (segment.p1(0), segment.p1(1),

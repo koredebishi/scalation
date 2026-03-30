@@ -48,27 +48,57 @@ class VTransport (name: String, from_ : Component, to_ : Component,
     val safetydist = 20.0
     
 
+    private [process] val vdeque = ArrayDeque [Vehicle] ()               // Array Deque for density tracking (entry order)
 
-    private [process] val vdeque = ArrayDeque [Vehicle] ()               // Array Deque for finding vehicles based on entry order
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Per-segment doubly linked list for car-following.
+     *  Each VTransport owns its own DLL — the car-following backbone.
+     *  Replaces the lane-spanning Pathway.vList for leader lookup.
+     */
+    private [process] val vList = DoublyLinkedList [Vehicle]
+
+    /** Debug label for this segment's DLL. */
+    val dllId = s"DLL_${name}"
 
     private[process] val easyW = new EasyWriter("simulation", "OnewayVehicle2LModel.txt")
     easyW.off()
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the first vehicle in `Vtransport` (the first element in vtree).
+    /** Add a vehicle to this segment's doubly linked list.
+     *  @param actor  the vehicle to add
+     *  @param other  the vehicle ahead (null if none)
+     */
+    def addToAlist (actor: Vehicle, other: Vehicle): Unit =
+        val otherNode = if other != null then other.myPathNode.asInstanceOf [vList.Node]
+                        else null
+        actor.myPathNode = vList.add (actor, otherNode)
+        actor.pathInfo = dllId
+    end addToAlist
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Remove a vehicle from this segment's doubly linked list.
+     *  @param actor  the vehicle to remove
+     */
+    def removeFromAlist (actor: Vehicle): Unit =
+        vList.remove (actor.myPathNode.asInstanceOf [vList.Node])
+        actor.myPathNode = null
+    end removeFromAlist
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the first vehicle in this segment (lead car, head of DLL).
      */
     def getFirst: Vehicle =
-        val first: Vehicle = if vdeque.isEmpty then null else vdeque.head
+        val first: Vehicle = if vList.isEmpty then null else vList.head
         debug ("getFirst", s"the first vehicle = $first")
         first
     end getFirst
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the last vehicle in `Vtransport` (the last element in vtree).
+    /** Get the last vehicle in this segment (most recently entered, tail of DLL).
      */
     def getLast: Vehicle =
-        val last: Vehicle = if vdeque.isEmpty then null else vdeque.last
+        val last: Vehicle = if vList.isEmpty then null else vList.last
         debug ("getLast", s"the last vehicle = $last")
         last
     end getLast
