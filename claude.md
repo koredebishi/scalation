@@ -33,6 +33,7 @@ This ensures zero loss of continuity between chat sessions.
 | Coding style & key files | `context/scalation-style.md` |
 | IDM params & domain knowledge | `context/traffic-simulation.md` |
 | HPC Sapelo2 commands | `context/hpc.md` |
+| Variable lane count problem | `context/variable-lane-architecture.md` |
 
 ## Papers
 
