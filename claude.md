@@ -73,47 +73,46 @@ sbt "runMain scalation.simulation.process.model.runEatonFireModel"
 - Calibration: `CalibrateCalRoute101.scala`
 - Dynamics: `Dynamics.scala` (IDM, Gipps, Krauss)
 
-## Session State — Last Updated: 2026-03-30
+## Session State — Last Updated: 2026-03-31
 
 ### What was completed (previous sessions)
 - ✅ All I-210 data pipeline work (anchor CSV, PeMSDemand, arrivals, ramp data) — see git history
 - ✅ Fixed lane count, off-by-one, nStop verification
+- ✅ Variable-Lane DLL Unification (Tasks 0–11) — commit `8bdf7ae12`
 
-### What was completed (this session — Variable-Lane DLL Unification)
-- ✅ **Task 0**: Design doc written to `context/variable-lane-dll-unification.md`
-- ✅ **Task 1**: VTransport owns per-segment DLL — `vList: DoublyLinkedList`, `addToAlist`/`removeFromAlist`
-- ✅ **Task 2**: Pathway delegates DLL ops to VTransport, backward-compat overloads preserved
-- ✅ **Task 3**: Dynamics `findLeader()` cross-boundary lookup via VTransport, removed `segId` patches
-- ✅ **Task 4**: CalRoute101_3 `driveHighway` uses explicit DLL re-insertion at segment transitions
-- ✅ **Task 5**: sbt compile checkpoint (green)
-- ✅ **Task 6**: Route accepts `lanesPerSeg: Array[Int]`, adds `laneExistsAt()`/`lanesAt()`/`forceMerge()`
-- ✅ **Task 7**: Pathway sparse seg array — `null` where lane doesn't physically exist
-- ✅ **Task 8**: `MainlineSpec.lanesPerSeg: Option[Array[Int]]`; EatonCorridorConfig computes per-segment lane counts from PeMS station data (min of adjacent stations)
-- ✅ **Task 9**: CorridorBuilder passes `lanesPerSeg` to Route
-- ✅ **Task 10**: EatonFireModel `driveHighway` lane-end detection with `forceMerge`
-- ✅ **Task 11**: Ramp/FFConnector merge-point lane-existence guards in `actOnCorridor` and FF diversion
-- ✅ **Full sbt compile**: 31 Scala sources, zero errors
-- ✅ **Git commit**: `8bdf7ae12` on branch `feature/variable-lane-dll-unification`
+### What was completed (this session — Graph-Derived Ramp Positioning + Visual Fixes)
+- ✅ Off-ramp same-side positioning (was on opposite side of mainline)
+- ✅ FR/OR collision nudge for same-PM stations (50px → replaced by graph-derived)
+- ✅ Shortened all labels: route `I-210-W_Rte_0_seg19` → `I210W_RL0s19`, ramps `I210_OR6` etc.
+- ✅ Ramp label declutter: 3 labels per ramp → 1 (VTransport only, Junction/VSource/Sink blanked)
+- ✅ **Graph-derived ramp positioning** — `Route.rampAttachPoint(seg)` + `perpVec`
+  - Task 0: `Route.scala` — added `rampAttachPoint`, `perpVec`, `_points` array
+  - Task 1: `CorridorBuilder.scala` — reordered: Route built first, ramp junctions derived from geometry
+  - Task 2: `EatonFireModel.scala` — ramp VSource positions use `rampAttachPoint + perpVec * RAMP_LEN`
+  - Task 3: `EatonCorridorConfig.scala` — removed `rampShift` from all methods, steps 11/12 now dummy
+  - Task 5: `sbt compile` — zero errors
+- ✅ **Side swap fix** — negated `perpVec` so ramps are on outermost lane side (not lane 0)
+- ✅ **Same-seg FR/OR nudge** — off-ramps shifted 30px downstream along road direction when sharing joinSeg with on-ramp
+- ✅ **DTA Blueprint** — `docs/2026_WSC_paper/dta-blueprint.md`
+- ✅ **Git push**: `f3515ee8d` on branch `feature/variable-lane-dll-unification`
 
 ### Files touched (this session)
 | File | Changes |
 |------|---------|
-| `VTransport.scala` | Owns DLL per-segment; `addToAlist`/`removeFromAlist`/`getLast` |
-| `Pathway.scala` | Delegates DLL ops to VTransport; sparse seg array; backward-compat overloads |
-| `Route.scala` | `lanesPerSeg` param; `laneExistsAt`/`lanesAt`/`forceMerge` |
-| `Dynamics.scala` | `findLeader()` cross-boundary via VTransport; removed segId patches |
-| `CalRoute101_3.scala` | Explicit DLL re-insertion in driveHighway |
-| `EatonFireModel.scala` | Lane-end detection + forceMerge; lane-existence guards at entry/ramp/FF |
-| `CorridorBuilder.scala` | Passes `lanesPerSeg` to Route |
-| `NetworkConfig.scala` | `MainlineSpec.lanesPerSeg: Option[Array[Int]]` |
-| `EatonCorridorConfig.scala` | Per-segment lane counts from PeMS station data |
-| `context/variable-lane-dll-unification.md` | Full design document |
+| `Route.scala` | `rampAttachPoint(seg)`, `perpVec`, `_points` array; pathway naming `L$i`; VTransport naming `s$i` |
+| `CorridorBuilder.scala` | Route-first build order; ramp positions from `rampAttachPoint`; road-direction nudge for same-seg FR/OR; shortened prefix; blanked Junction/Sink names |
+| `EatonFireModel.scala` | Ramp VSource positions from `rampAttachPoint + perpVec * RAMP_LEN`; removed `getVSourceCenterAndOffsets`; shortened all component names |
+| `EatonCorridorConfig.scala` | Removed `rampShift` from all 3 methods; steps 11/12 replaced with dummy arrays |
+| `Pathway.scala` | VTransport naming `s$i` instead of `_seg$i` |
+| `context/graph-derived-ramp-positioning.md` | Design document |
+| `docs/2026_WSC_paper/dta-blueprint.md` | DTA implementation blueprint |
 
 ### What is in progress
+- 🔄 **Visual verification** — need to run EatonFireModel and confirm ramp positions are correct after graph-derived changes
+- 🔄 **Uncommitted changes** — graph-derived ramp impl + side swap + nudge + DTA blueprint (need git commit)
 - 🔄 **End-to-end run with `synthetic=false`** — nStop verified, full simulation run not yet attempted
-- 🔄 **Runtime testing of variable-lane corridor** — I-210 has 4→5 lane transitions; needs end-to-end run to verify lane-end merges work
-- 🔄 **SR-134 ramp data quality** — all 7 SR-134 on-ramp sensors report zero flow across ALL time bins. Need alternate data source or synthetic ramp demand.
-- 🔄 **Fire-day anchor CSV** (`717653-i210-firstSensor-fireday.csv`) exists but not yet cleaned or wired
+- 🔄 **SR-134 ramp data quality** — all 7 SR-134 on-ramp sensors report zero flow
+- 🔄 **DTA Phase 1** — FireGrid + SmokeGrid (standalone, no traffic dependency)
 
 ### Known bugs / issues
 | Issue | File | Status |
@@ -122,15 +121,16 @@ sbt "runMain scalation.simulation.process.model.runEatonFireModel"
 | `srcPrefix` hardcoded for cases `0\|1\|2\|3\|4` | `VSource.scala:61` | Works for 5 lanes but fragile |
 | Fire-day data not yet wired | `DemandConfig.scala` | Need `PeMSDemand.I210_WB_FireDay_Anchor()` |
 | `forceMerge` is random lane pick | `Route.scala` | Works but could be improved with gap-based selection |
+| Ramp side may need visual tuning | `Route.perpVec` | Negated for outermost lane — needs visual confirmation |
 
-### Key decisions made
-- **VTransport owns its DLL**: each VTransport segment has its own `DoublyLinkedList[Vehicle]`, not the Pathway
-- **Pathway uses sparse seg array**: `seg(i)` returns null if lane i doesn't exist at that segment
-- **Route.forceMerge**: picks random available lane when a lane ends; acceptable for now
-- **Per-segment lane count = min(upstream station lanes, downstream station lanes)**: conservative approach
-- **MainlineSpec.lanesPerSeg is Option[Array[Int]]**: None = uniform lanes (backward compatible)
-- **Entry station defines corridor max lane count**: for Route array sizing
-- **`endRow` is exclusive**: `MatrixD.load` `stop` param is exclusive. 73 data rows → `endRow=73`.
+### Key decisions made (this session)
+- **Graph-derived ramp positioning**: `rampAttachPoint(seg)` computes outermost lane edge from `lanesAt(seg) * GAP`. Eliminates all `rampShift` magic numbers.
+- **perpVec negated**: points away from lane 0 (toward ramp side of freeway)
+- **Same-seg FR/OR nudge = 30px downstream**: uses road direction vector, not perpendicular
+- **RAMP_LEN = 150px**: consistent between CorridorBuilder (sinks) and EatonFireModel (VSources)
+- **Labels: VTransport only per ramp**: Junction/VSource/Sink names blanked to avoid clutter
+- **Prefix shortened**: `I-210-W_` → `I210W_` via `filter(_.isLetterOrDigit)`
+- **DTA architecture**: Junction = decision engine, VTransport = data provider, Route = minimal
 
 ### Verified nStop values (baseline, synthetic=false)
 ```

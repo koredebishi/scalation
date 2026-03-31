@@ -1,7 +1,39 @@
-[warn] -- [E198] Unused Symbol Warning: C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\model\EatonFireModel.scala:26:85 
-[warn] 26 |import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSource, AnchorFlowArrivalSource}
-[warn]    |                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^
-[warn]    |                                                           unused import
-[error] No warnings can be incurred under -Werror
-[warn] one warning found
-[error] one error found
+[error] -- [E006] Not Found Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\model\EatonFireModel.scala:485:39 
+[error] 485 |    def getLayout210: CorridorLayout = layout210
+[error]     |                                       ^^^^^^^^^
+[error]     |                                       Not found: layout210
+[error]     |---------------------------------------------------------------------------
+[error]     | Explanation (enabled by `-explain`)
+[error]     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+[error]     | Each identifier in Scala needs a matching declaration. There are two kinds of
+[error]     | identifiers: type identifiers and value identifiers. Value identifiers are introduced
+[error]     | by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,
+[error]     | `class`, `enum`, or `trait` declarations.
+[error]     |
+[error]     | Identifiers refer to matching declarations in their environment, or they can be
+[error]     | imported from elsewhere.
+[error]     |
+[error]     | Possible reasons why no matching declaration was found:
+[error]     |  - The declaration or the use is mis-spelt.
+[error]     |  - An import is missing.
+[error]      ---------------------------------------------------------------------------
+[error] -- [E006] Not Found Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\model\EatonFireModel.scala:486:39 
+[error] 486 |    def getLayout134: CorridorLayout = layout134
+[error]     |                                       ^^^^^^^^^
+[error]     |                                       Not found: layout134
+[error]     |---------------------------------------------------------------------------
+[error]     | Explanation (enabled by `-explain`)
+[error]     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+[error]     | Each identifier in Scala needs a matching declaration. There are two kinds of
+[error]     | identifiers: type identifiers and value identifiers. Value identifiers are introduced
+[error]     | by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,
+[error]     | `class`, `enum`, or `trait` declarations.
+[error]     |
+[error]     | Identifiers refer to matching declarations in their environment, or they can be
+[error]     | imported from elsewhere.
+[error]     |
+[error]     | Possible reasons why no matching declaration was found:
+[error]     |  - The declaration or the use is mis-spelt.
+[error]     |  - An import is missing.
+[error]      ---------------------------------------------------------------------------
+[error] two errors found

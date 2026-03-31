@@ -137,19 +137,9 @@ object CorridorBuilder:
 
         debug ("build", s"junctions: ${junc.map (_.name).mkString (", ")}")
 
-        // ── Step 2: Ramp sensor junctions ───────────────────────────────────
-        // One per on-ramp, positioned at on-ramp screen coordinates.
-        // Screen positions are physical — no reversal needed.
-
-        val rampSensors = Array.ofDim [Junction] (nOnRamps)
-        cfor (0, nOnRamps) { i =>
-            rampSensors(i) = new Junction (s"",
-                                           xy = layout.onRampScreenXY(i), nt = nt, nl = nLanes)
-        }
-
-        // ── Step 3: Route ───────────────────────────────────────────────────
-        // from = first junction (entry end), to = last junction (exit end)
-        // intermediate = all junctions between first and last
+        // ── Step 2: Route ───────────────────────────────────────────────────
+        // Built BEFORE ramp junctions so we can derive ramp positions from
+        // Route lane geometry (rampAttachPoint).
 
         val intermediateJunc = junc.slice (1, junc.length - 1)
         val route = Route (s"${pfx}R", nLanes, intermediateJunc,
@@ -158,18 +148,15 @@ object CorridorBuilder:
         debug ("build", s"route: ${route.pathway.length} pathways, " +
                         s"${intermediateJunc.length} intermediate junctions")
 
-        // ── Step 4: Sinks ───────────────────────────────────────────────────
-        // Positioned near the exit end (junc.last) with a small offset.
+        // ── Step 3: Sinks ───────────────────────────────────────────────────
 
-        val exitXY = junc.last.at                              // exit junction position
+        val exitXY = junc.last.at
         val sinks = Sink.group (
             (exitXY(0).toInt - 100, exitXY(1).toInt - 100),
             (s"${pfx}sink", (0, 0))
         )
 
-        // ── Step 5: Ramp join segments ──────────────────────────────────────
-        // On-ramps only.  Ascending: joinSegment as-is.
-        // Descending: remapped to (nSegments - 1 - joinSegment).
+        // ── Step 4: Ramp join segments ──────────────────────────────────────
 
         val onRampConfigs = config.ramps.filter (_.mode == ConfigRampMode.On)
         val rampJoinSegs  = new Array [Int] (onRampConfigs.length)
@@ -184,23 +171,9 @@ object CorridorBuilder:
                 }
         end match
 
-        debug ("build", s"rampJoinSegs: ${rampJoinSegs.mkString (", ")}")
-
-        // ── Step 6: Off-ramp sinks and join segments ─────────────────────────
-        // One Sink per off-ramp, positioned at offRampScreenXY.
-        // Join segments remapped the same way as on-ramps.
-
-        val offRampConfigs = config.ramps.filter (_.mode == ConfigRampMode.Off)
-        val nOffRamps      = offRampConfigs.length
-        val offRampSinks   = new Array [Sink] (nOffRamps)
+        val offRampConfigs  = config.ramps.filter (_.mode == ConfigRampMode.Off)
+        val nOffRamps       = offRampConfigs.length
         val offRampJoinSegs = new Array [Int] (nOffRamps)
-
-        cfor (0, nOffRamps) { r =>
-            val xy = layout.offRampScreenXY(r)
-            offRampSinks(r) = new Sink (s"",
-                                        (xy._1 + 200.0, xy._2 - 100.0))  // same distance as on-ramp VSource
-        }
-
         direction match
             case FlowDirection.Ascending =>
                 cfor (0, nOffRamps) { r =>
@@ -212,18 +185,51 @@ object CorridorBuilder:
                 }
         end match
 
+        debug ("build", s"rampJoinSegs: ${rampJoinSegs.mkString (", ")}")
         debug ("build", s"offRamps=$nOffRamps, offRampJoinSegs: ${offRampJoinSegs.mkString (", ")}")
 
-        // ── Step 7: Off-ramp diverge junctions ──────────────────────────────
-        // Mirrors Step 2 (on-ramp sensor junctions).
-        // One per off-ramp, positioned at off-ramp screen coordinates.
-        // Used as `from` for off-ramp Ramp objects so the VTransport draws
-        // from the road edge to the sink (not from mainline center).
+        // ── Step 5: Ramp junctions — derived from Route lane geometry ───────
+        // rampAttachPoint(seg) returns the outermost lane edge at that segment.
+        // Ramp VTransport extends outward from there by RAMP_LEN pixels.
 
+        val RAMP_LEN  = 150.0                                   // visual ramp length (px)
+        val FR_NUDGE  = 30.0                                    // downstream nudge for off-ramps at same seg as on-ramp (px)
+        val (perpX, perpY) = route.perpVec                       // outward unit vector
+
+        // Road direction unit vector (downstream = from → to)
+        val rdx = junc.last.at(0) - junc(0).at(0)
+        val rdy = junc.last.at(1) - junc(0).at(1)
+        val rhyp = math.hypot (rdx, rdy).max (1e-9)
+        val roadDirX = rdx / rhyp
+        val roadDirY = rdy / rhyp
+
+        // Build set of on-ramp join segments for collision detection
+        val onRampSegSet = rampJoinSegs.toSet
+
+        // On-ramp sensor junctions (road-edge end of ramp)
+        val rampSensors = Array.ofDim [Junction] (nOnRamps)
+        cfor (0, nOnRamps) { i =>
+            val (ax, ay) = route.rampAttachPoint (rampJoinSegs(i))
+            rampSensors(i) = new Junction (s"", xy = (ax, ay), nt = nt, nl = nLanes)
+        }
+
+        // Off-ramp sensor junctions (road-edge end of off-ramp)
+        // Nudged downstream if an on-ramp shares the same joinSeg.
         val offRampSensors = Array.ofDim [Junction] (nOffRamps)
         cfor (0, nOffRamps) { r =>
+            val (ax, ay) = route.rampAttachPoint (offRampJoinSegs(r))
+            val nudge = if onRampSegSet.contains (offRampJoinSegs(r)) then FR_NUDGE else 0.0
             offRampSensors(r) = new Junction (s"",
-                                              xy = layout.offRampScreenXY(r), nt = nt, nl = nLanes)
+                xy = (ax + roadDirX * nudge, ay + roadDirY * nudge), nt = nt, nl = nLanes)
+        }
+
+        // Off-ramp sinks (extend outward from attach point, with same nudge)
+        val offRampSinks = new Array [Sink] (nOffRamps)
+        cfor (0, nOffRamps) { r =>
+            val (ax, ay) = route.rampAttachPoint (offRampJoinSegs(r))
+            val nudge = if onRampSegSet.contains (offRampJoinSegs(r)) then FR_NUDGE else 0.0
+            offRampSinks(r) = new Sink (s"", (ax + perpX * RAMP_LEN + roadDirX * nudge,
+                                               ay + perpY * RAMP_LEN + roadDirY * nudge))
         }
 
         BuiltCorridor (

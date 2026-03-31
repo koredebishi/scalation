@@ -298,18 +298,16 @@ object EatonCorridorConfig:
      *  @param direction  the direction (e.g., "W", "E")
      *  @param corridorId the identifier string (e.g., "I-210-W")
      *  @param dims       animation window dimensions (width, height) in pixels
-     *  @param rampShift  lateral pixel shift for ramp junctions so they don't overlap mainline
      */
     def buildCorridorLayout (freeway: Int, direction: String,
                              corridorId: String,
-                             dims: (Double, Double) = (5000.0, 3000.0),
-                             rampShift: (Double, Double) = (30.0, -40.0)): CorridorLayout =
+                             dims: (Double, Double) = (5000.0, 3000.0)): CorridorLayout =
         val flowDir = if direction == "W" || direction == "S"
                       then FlowDirection.Descending else FlowDirection.Ascending
         val allRecords      = loadStationMap ()
         val corridorRecords = allRecords.filter (s => s.freeway == freeway && s.direction == direction)
         val corridorWithCoords = computeAllCoordinates (corridorRecords, dims)
-        buildLayoutFromCoords (corridorWithCoords, corridorId, rampShift, flowDir)
+        buildLayoutFromCoords (corridorWithCoords, corridorId, flowDir)
     end buildCorridorLayout
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -318,18 +316,16 @@ object EatonCorridorConfig:
      *  This is the preferred entry point for the Eaton fire model.
      *
      *  @param dims       animation window dimensions (width, height) in pixels
-     *  @param rampShift  lateral pixel shift for ramp junctions
      */
-    def buildSharedWBLayouts (dims: (Double, Double) = (5000.0, 3000.0),
-                              rampShift: (Double, Double) = (30.0, -40.0)): (CorridorLayout, CorridorLayout) =
+    def buildSharedWBLayouts (dims: (Double, Double) = (5000.0, 3000.0)): (CorridorLayout, CorridorLayout) =
         val allRecords = loadStationMap ()
         val wbRecords  = allRecords.filter (s =>
             (s.freeway == 210 || s.freeway == 134) && s.direction == "W")
         val allWithCoords = computeAllCoordinates (wbRecords, dims)
         val i210  = filterByFreewayDir (allWithCoords, 210, "W")
         val sr134 = filterByFreewayDir (allWithCoords, 134, "W")
-        (buildLayoutFromCoords (i210,  "I-210-W",  rampShift, FlowDirection.Descending),
-         buildLayoutFromCoords (sr134, "SR-134-W", rampShift, FlowDirection.Descending))
+        (buildLayoutFromCoords (i210,  "I-210-W",  FlowDirection.Descending),
+         buildLayoutFromCoords (sr134, "SR-134-W", FlowDirection.Descending))
     end buildSharedWBLayouts
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -345,12 +341,10 @@ object EatonCorridorConfig:
      *
      *  @param corridorWithCoords  stations with screen coordinates (one corridor)
      *  @param corridorId          the identifier string
-     *  @param rampShift           lateral pixel shift for ramp junctions
      *  @param flowDir             the flow direction (Ascending for NB/EB, Descending for WB/SB)
      */
     private def buildLayoutFromCoords (corridorWithCoords: Array [StationWithCoords],
                                        corridorId: String,
-                                       rampShift: (Double, Double),
                                        flowDir: FlowDirection = FlowDirection.Ascending): CorridorLayout =
 
         // 1. Classify by lane type (each returns sorted by absPM)
@@ -447,30 +441,10 @@ object EatonCorridorConfig:
         val mainlineScreenXY = new Array [(Double, Double)] (nML)
         cfor (0, nML) { i => mainlineScreenXY(i) = mlStations(i).screenXY }
 
-        // 11. Screen coordinates — on-ramps with lateral shift
-        val onRampScreenXY = new Array [(Double, Double)] (orStations.length)
-        cfor (0, orStations.length) { i =>
-            val (sx, sy) = orStations(i).screenXY
-            onRampScreenXY(i) = (sx + rampShift._1, sy + rampShift._2)
-        }
-
-        // 12. Screen coordinates — off-ramps (same side as on-ramps)
-        //     FR stations that share a PM with an OR (±0.02) get a 50 px x-nudge
-        //     so they don't overlap.  All others get standard rampShift only.
-        val orPMs = new Array [Double] (orStations.length)
-        cfor (0, orStations.length) { i => orPMs(i) = orStations(i).record.absPM }
-
+        // 11–12. Ramp screen coords are now derived from Route geometry in CorridorBuilder.
+        //        Dummy arrays kept for CorridorLayout backward compatibility.
+        val onRampScreenXY  = new Array [(Double, Double)] (orStations.length)
         val offRampScreenXY = new Array [(Double, Double)] (frStations.length)
-        cfor (0, frStations.length) { i =>
-            val (sx, sy) = frStations(i).screenXY
-            val frPM     = frStations(i).record.absPM
-            var collides = false
-            cfor (0, orPMs.length) { j =>
-                if math.abs (frPM - orPMs(j)) < 0.02 then collides = true
-            }
-            val nudge = if collides then 50.0 else 0.0         // 50 px downstream separation
-            offRampScreenXY(i) = (sx + rampShift._1 + nudge, sy + rampShift._2)
-        }
 
         // 13. FF station records (metadata)
         val ffRecords = new Array [StationRecord] (ffStations.length)

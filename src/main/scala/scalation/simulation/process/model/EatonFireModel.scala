@@ -199,11 +199,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     // Step 4: Sources (model owns demand — uses ArrivalSource.getTotalVehicles)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    // Layouts for source positioning (screen coordinates)
-    private val layout210 = multiConfig.corridor ("I-210-W").layout
-    private val layout134 = multiConfig.corridor ("SR-134-W").layout
-    private val (center210, offsets210) = layout210.getVSourceCenterAndOffsets (200.0, -100.0)
-    private val (center134, offsets134) = layout134.getVSourceCenterAndOffsets (150.0, -80.0)  // smaller offset for SR-134 ramps
+    private val RAMP_LEN = 150.0                                 // visual ramp length (px) — matches CorridorBuilder
 
     // I-210 mainline sources at EASTERN end (high postmile = entry for WB)
     // Spaced perpendicular to road direction — matches Route lane GAP (50 px)
@@ -232,16 +228,16 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
         buf.toList
     }
 
-    // I-210 ramp sources — subtypes numLanes210..numLanes210+nOnRamps210-1
+    // I-210 ramp sources — positioned at rampAttachPoint + outward * RAMP_LEN
     private val rampSources210 = {
         import scala.collection.mutable.ListBuffer
         val buf = ListBuffer [VSource] ()
+        val (px, py) = route210.perpVec
         cfor (0, nOnRamps210) { r =>
-            val offset = offsets210(r + 1)
-            val loc = Array ((center210._1 + offset._1).toDouble,
-                             (center210._2 + offset._2).toDouble, 20.0, 20.0)
-            val nStop = rampSrcArr210(r).getTotalVehicles (0)   // from ArrivalSource
-            val iArrivalRV = rampSrcArr210(r).getDistribution   // only use RV for synthetic demand
+            val (ax, ay) = route210.rampAttachPoint (rampJoinSeg210(r))
+            val loc = Array (ax + px * RAMP_LEN, ay + py * RAMP_LEN, 20.0, 20.0)
+            val nStop = rampSrcArr210(r).getTotalVehicles (0)
+            val iArrivalRV = rampSrcArr210(r).getDistribution
             buf += new VSource (s"", this, () => Car (), numLanes210 + r,
                                 nStop, iArrivalRV, loc)
         }
@@ -251,16 +247,16 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     // SR-134 has NO mainline VSource — all mainline traffic enters via FF from I-210.
     // Only on-ramp VSources feed local traffic into SR-134 mid-corridor.
 
-    // SR-134 ramp sources — subtypes SR134_BASE+numLanes134..
+    // SR-134 ramp sources — positioned at rampAttachPoint + outward * RAMP_LEN
     private val rampSources134 = {
         import scala.collection.mutable.ListBuffer
         val buf = ListBuffer [VSource] ()
+        val (px, py) = route134.perpVec
         cfor (0, nOnRamps134) { r =>
-            val offset = offsets134(r + 1)
-            val loc = Array ((center134._1 + offset._1).toDouble,
-                             (center134._2 + offset._2).toDouble, 20.0, 20.0)
-            val nStop = rampSrcArr134(r).getTotalVehicles (0)   // from ArrivalSource
-            val iArrivalRV = rampSrcArr134(r).getDistribution   // only use RV for synthetic demand
+            val (ax, ay) = route134.rampAttachPoint (rampJoinSeg134(r))
+            val loc = Array (ax + px * RAMP_LEN, ay + py * RAMP_LEN, 20.0, 20.0)
+            val nStop = rampSrcArr134(r).getTotalVehicles (0)
+            val iArrivalRV = rampSrcArr134(r).getDistribution
             buf += new VSource (s"", this, () => Car (),
                                 SR134_BASE + numLanes134 + r, nStop, iArrivalRV, loc)
         }
@@ -486,8 +482,8 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
 
     def getJunctions210: Array [Junction] = junc210
     def getJunctions134: Array [Junction] = junc134
-    def getLayout210: CorridorLayout = layout210
-    def getLayout134: CorridorLayout = layout134
+    def getLayout210: CorridorLayout = multiConfig.corridor ("I-210-W").layout
+    def getLayout134: CorridorLayout = multiConfig.corridor ("SR-134-W").layout
     def getBuiltNetwork: BuiltNetwork = net
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

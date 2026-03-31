@@ -1,5 +1,3 @@
-
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 2.0
@@ -246,11 +244,36 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
      */
     def segments: Int = pathway(0).seg.length
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** All junction points in order: from +: junc :+ to.
+     *  points(seg) is the upstream junction of segment `seg`.
+     */
+    private val _points: Array [Component] = (from +: junc.toIndexedSeq :+ to).toArray
 
-     // reurn the pathway of this lane
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perpendicular unit vector pointing outward from road centerline
+     *  toward the ramp side (opposite from lane 0 / rightmost lane).
+     */
+    val perpVec: (Double, Double) =
+        val v = calcShift2
+        (-v(0), -v(1))                                          // negate: away from lane 0
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the screen (x, y) at the outermost lane edge of segment `seg`.
+     *  Adapts to variable lane counts: more lanes → further from centerline.
+     *  Points toward the ramp side (away from lane 0).
+     *  @param seg  segment index (0 .. nSegments-1)
+     */
+    def rampAttachPoint (seg: Int): (Double, Double) =
+        val pt      = _points(seg)                              // junction at segment boundary
+        val nHere   = lanesAt(seg)
+        val offset  = ((nHere - 1) / 2.0 + 0.5) * GAP          // half-GAP beyond outermost lane center
+        (pt.at(0) + perpVec._1 * offset,
+         pt.at(1) + perpVec._2 * offset)
+    end rampAttachPoint
 
-    // 90-degree unit vector to the road centre-line
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     /** Calculate the amount of shift in the x and y directions.
      */
     private def calcShift2: VectorD =
