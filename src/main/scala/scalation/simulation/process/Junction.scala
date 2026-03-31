@@ -67,7 +67,8 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int, nl: I
         // Snapshot density from the segment the vehicle just finished.
         // actor.segId is the segment index; actor.myPathway.seg(segId) is that VTransport.
         // segId maps directly to the column in r_density.
-        if actor.myPathway != null && actor.segId >= 0 && actor.segId < actor.myPathway.seg.length then
+        if actor.myPathway != null && actor.segId >= 0 && actor.segId < actor.myPathway.seg.length
+           && actor.myPathway.seg(actor.segId) != null then
             val k = actor.myPathway.seg(actor.segId).snapshotDensity()
             recordDensity(ctime, k, actor.segId)
 

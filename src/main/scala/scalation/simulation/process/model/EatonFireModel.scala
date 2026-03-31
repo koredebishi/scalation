@@ -29,7 +29,7 @@ import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSou
 /** Run the EatonFireModel simulation.
  *  > runMain scalation.simulation.process.model.runEatonFireModel
  */
-@main def runEatonFireModel (): Unit = new EatonFireModel (synthetic = false)
+@main def runEatonFireModel (): Unit = new EatonFireModel (synthetic = true)
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -52,7 +52,7 @@ import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSou
  */
 class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                       animating: Boolean = true, aniRatio: Double = 500.0,
-                      synthetic: Boolean = false)
+                      synthetic: Boolean = true)
       extends Model (name, reps, animating, aniRatio)
          with RowTimeLoader:
 
@@ -227,7 +227,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                              20.0, 20.0)
             val nStop = mlSources210(l).getTotalVehicles (l)   // from ArrivalSource
             val iArrivalRV = mlSources210(l).getDistribution   // only use RV for synthetic demand
-            buf += new VSource (s"I210_vsrcML_L$l", this, () => Car (), l, nStop, iArrivalRV, loc)
+            buf += new VSource (s"I210_ML$l", this, () => Car (), l, nStop, iArrivalRV, loc)
         }
         buf.toList
     }
@@ -242,7 +242,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                              (center210._2 + offset._2).toDouble, 20.0, 20.0)
             val nStop = rampSrcArr210(r).getTotalVehicles (0)   // from ArrivalSource
             val iArrivalRV = rampSrcArr210(r).getDistribution   // only use RV for synthetic demand
-            buf += new VSource (s"I210_srcRamp${r + 1}", this, () => Car (), numLanes210 + r,
+            buf += new VSource (s"", this, () => Car (), numLanes210 + r,
                                 nStop, iArrivalRV, loc)
         }
         buf.toList
@@ -261,7 +261,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                              (center134._2 + offset._2).toDouble, 20.0, 20.0)
             val nStop = rampSrcArr134(r).getTotalVehicles (0)   // from ArrivalSource
             val iArrivalRV = rampSrcArr134(r).getDistribution   // only use RV for synthetic demand
-            buf += new VSource (s"SR134_srcRamp${r + 1}", this, () => Car (),
+            buf += new VSource (s"", this, () => Car (),
                                 SR134_BASE + numLanes134 + r, nStop, iArrivalRV, loc)
         }
         buf.toList
@@ -278,33 +278,33 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
 
     private val ramps210 = new Array [Ramp] (nOnRamps210)
     cfor (0, nOnRamps210) { r =>
-        ramps210(r) = new Ramp (s"I210_onRamp${r + 1}", rampSources210(r), b210.rampSensors(r),
+        ramps210(r) = new Ramp (s"I210_OR${r + 1}", rampSources210(r), b210.rampSensors(r),
                                 motion, scalation.simulation.process.RampMode.On, false, 0.1, 0.0)
     }
 
     private val ramps134 = new Array [Ramp] (nOnRamps134)
     cfor (0, nOnRamps134) { r =>
-        ramps134(r) = new Ramp (s"SR134_onRamp${r + 1}", rampSources134(r), b134.rampSensors(r),
+        ramps134(r) = new Ramp (s"S134_OR${r + 1}", rampSources134(r), b134.rampSensors(r),
                                 motion, scalation.simulation.process.RampMode.On, false, 0.1, 0.0)
     }
 
-    // Off-ramps: from = mainline junction at diverge, to = off-ramp sink
-    // Same pattern as CalRoute101: Ramp(name, junc, sink, motion, RampMode.Off)
+    // Off-ramps: from = off-ramp diverge junction (side of road), to = off-ramp sink
+    // Mirrors on-ramp pattern: both endpoints on same side, not crossing all lanes.
     private val nOffRamps210   = b210.offRampJoinSegs.length
     private val offRamps210    = new Array [Ramp] (nOffRamps210)
     cfor (0, nOffRamps210) { r =>
-        offRamps210(r) = new Ramp (s"I210_offRamp${r + 1}",
-            junc210(b210.offRampJoinSegs(r)),          // from: mainline junction at diverge
-            b210.offRampSinks(r),                       // to: off-ramp sink
+        offRamps210(r) = new Ramp (s"I210_FR${r + 1}",
+            b210.offRampSensors(r),                        // from: diverge junction (road edge)
+            b210.offRampSinks(r),                           // to: off-ramp sink
             motion, scalation.simulation.process.RampMode.Off, false, -0.1, 0.0)
     }
 
     private val nOffRamps134   = b134.offRampJoinSegs.length
     private val offRamps134    = new Array [Ramp] (nOffRamps134)
     cfor (0, nOffRamps134) { r =>
-        offRamps134(r) = new Ramp (s"SR134_offRamp${r + 1}",
-            junc134(b134.offRampJoinSegs(r)),          // from: mainline junction at diverge
-            b134.offRampSinks(r),                       // to: off-ramp sink
+        offRamps134(r) = new Ramp (s"S134_FR${r + 1}",
+            b134.offRampSensors(r),                        // from: diverge junction (road edge)
+            b134.offRampSinks(r),                           // to: off-ramp sink
             motion, scalation.simulation.process.RampMode.Off, false, -0.1, 0.0)
     }
 
@@ -314,8 +314,8 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     // Step 5: Register ALL components
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    private val allJunctions = junc210.toList ++ b210.rampSensors.toList ++
-                               junc134.toList ++ b134.rampSensors.toList
+    private val allJunctions = junc210.toList ++ b210.rampSensors.toList ++ b210.offRampSensors.toList ++
+                               junc134.toList ++ b134.rampSensors.toList ++ b134.offRampSensors.toList
     private val allSinks     = sinks210 ++ sinks134 ++
                                b210.offRampSinks.toList ++ b134.offRampSinks.toList
     private val allRamps     = ramps210.toList ++ ramps134.toList ++
@@ -356,6 +356,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                 end if
                 val carAhead = route.pathway(laneID).seg(0).getLast
                 route.pathway(laneID).addToAlist (this, carAhead, 0)
+                segId = 0                                  // set before jump so density records correctly
                 junc(0).jump ()
                 driveHighway (route, junc, sinks, hwLen, 0)
             else
@@ -371,6 +372,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                 end if
                 val carAhead = route.pathway(laneID).seg(joinSeg).getLast
                 route.pathway(laneID).addToAlist (this, carAhead, joinSeg)
+                segId = joinSeg                            // set before jump so density records correctly
                 junc(joinSeg).jump ()
                 driveHighway (route, junc, sinks, hwLen, joinSeg)
         end actOnCorridor

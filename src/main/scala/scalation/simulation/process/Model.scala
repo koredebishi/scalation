@@ -202,7 +202,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
         for p <- parts do
             p match
                 case pw: Pathway =>
-                    for s <- pw.seg do
+                    for s <- pw.seg if s != null do
                         vtSegs    += s
                         segLabels += s.name
                 case vt: VTransport =>          // in case a VTransport is added directly

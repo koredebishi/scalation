@@ -36,15 +36,6 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
 
     private val debug = debugf ("Pathway", true)             // debug function
 
-    /** @deprecated  Lane-spanning DLL — kept for transition period. Will be removed.
-     *  Car-following now uses per-VTransport DLLs (VTransport.vList).
-     */
-    val vList = DoublyLinkedList [Vehicle]
-
-    // Enhanced DLL identification for debugging
-    val dllId = s"DLL_${name}_Lane"
-    private def logDLLOperation(operation: String, vehicle: Vehicle, details: String = ""): Unit =
-        debug(s"$operation", s"[$dllId] Vehicle ${vehicle.id} $details | DLL size: ${vList.size}")
 
     val points = from +: junc.toList :+ to
     val seg = Array.ofDim[VTransport](points.length - 1)
@@ -56,7 +47,7 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
             val p1 = points(i)
             val p2 = points(i + 1)
             val shift = laneShift
-            seg(i) = new VTransport (s"${name}_seg${i}", p1, p2, motion, isSpeed, bend, shift, shift, i)
+            seg(i) = new VTransport (s"${name}s${i}", p1, p2, motion, isSpeed, bend, shift, shift, i)
             subpart  += seg(i)
         else
             seg(i) = null                                        // lane doesn't exist at this segment

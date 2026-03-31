@@ -180,6 +180,7 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
                 //debug ("Car.act", s"$me MAINLINE ENTRY: lane=$laneID, subtype=$subtype")
                 val carAhead = route.pathway(laneID).seg(0).getLast
                 route.pathway(laneID).addToAlist (this, carAhead, 0)
+                segId = 0                                  // set before jump so density records correctly
                 junc(0).jump ()
                 driveHighway ()
             else
@@ -198,6 +199,7 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
             if subtype >= numLanes then
                 val carAhead = route.pathway(laneID).seg(joinSeg).getLast
                 route.pathway(laneID).addToAlist (this, carAhead, joinSeg)
+                segId = joinSeg                            // set before jump so density records correctly
                 junc(joinSeg).jump ()
             end if
 

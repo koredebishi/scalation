@@ -75,22 +75,45 @@ sbt "runMain scalation.simulation.process.model.runEatonFireModel"
 
 ## Session State — Last Updated: 2026-03-30
 
-### What was completed
-- ✅ Cleaned I-210 anchor sensor CSV (`717653-i210-firstSensor-baseline.csv`): 13 cols, 73 rows, 5-min bins 17:00–23:00 inclusive
-- ✅ Added `I210_MainlineLayout` and `I210_TimeWindow` to `PeMSDataLoader.scala`
-- ✅ Added `getSpeedMatrixFromFile` helper to `RowTimeLoader` companion object
-- ✅ Overrode `rowTime`, `rowTimeSlice`, `nextRow` in EatonFireModel for 5-min bins (300s)
-- ✅ Fixed VSource laneID bug: `actor.laneID = subtype` + `safeLane` clamp at speed lookup
-- ✅ **Mainline arrivals now use CalRoute101_3 pattern**: Added `window`/`layout` fields to `PeMSDemand` (backward-compatible defaults). Added `PeMSDemand.I210_WB_Anchor()` factory pointing to cleaned anchor CSV. `PeMSArrivalSource` now passes `demand.window`/`demand.layout` to `PeMSDataHelper`. Factory uses `demand.window.binSeconds` for rowTime (not hardcoded 900). EatonFireModel uses `ArrivalSource.allSources(pems210, nLanesAnchor)` — **same pattern as CalRoute101_3**.
-- ✅ **Deleted dead code**: Removed `AnchorFlowArrivalSource` class, `fromAnchorAndRamps` factory, `loadFlowAndSpeedFromFile` helper. All were unnecessary — existing `PeMSArrivalSource` handles Eaton data via demand config.
-- ✅ **Fixed I-210 lane count**: Changed `EatonCorridorConfig.buildLayoutFromCoords` from `modeLanes()` (statistical mode=4) to entry station's lane count (station 717653 = 5 lanes). For WB, entry = highest PM. Now `numLanes210=5` matches anchor CSV.
-- ✅ **Fixed off-by-one in TimeWindow**: `endRow` changed from 72 to 73. `MatrixD.load` `stop` param is exclusive — CSV has 73 data rows (17:00–23:00 inclusive). Updated `nt=73` in EatonFireModel. **nStop values now match manual calculation exactly**: L0=5326, L1=5174, L2=4019, L3=3281, L4=1873.
-- ✅ **Verified I-210 ramp data**: 22 ramps from aggregated OR CSV. 10 have traffic (2234, 2165, 1960, 3522, 744, 1539, 549, 2315, 5456, 53), 12 have zero flow. All match CSV data exactly.
+### What was completed (previous sessions)
+- ✅ All I-210 data pipeline work (anchor CSV, PeMSDemand, arrivals, ramp data) — see git history
+- ✅ Fixed lane count, off-by-one, nStop verification
+
+### What was completed (this session — Variable-Lane DLL Unification)
+- ✅ **Task 0**: Design doc written to `context/variable-lane-dll-unification.md`
+- ✅ **Task 1**: VTransport owns per-segment DLL — `vList: DoublyLinkedList`, `addToAlist`/`removeFromAlist`
+- ✅ **Task 2**: Pathway delegates DLL ops to VTransport, backward-compat overloads preserved
+- ✅ **Task 3**: Dynamics `findLeader()` cross-boundary lookup via VTransport, removed `segId` patches
+- ✅ **Task 4**: CalRoute101_3 `driveHighway` uses explicit DLL re-insertion at segment transitions
+- ✅ **Task 5**: sbt compile checkpoint (green)
+- ✅ **Task 6**: Route accepts `lanesPerSeg: Array[Int]`, adds `laneExistsAt()`/`lanesAt()`/`forceMerge()`
+- ✅ **Task 7**: Pathway sparse seg array — `null` where lane doesn't physically exist
+- ✅ **Task 8**: `MainlineSpec.lanesPerSeg: Option[Array[Int]]`; EatonCorridorConfig computes per-segment lane counts from PeMS station data (min of adjacent stations)
+- ✅ **Task 9**: CorridorBuilder passes `lanesPerSeg` to Route
+- ✅ **Task 10**: EatonFireModel `driveHighway` lane-end detection with `forceMerge`
+- ✅ **Task 11**: Ramp/FFConnector merge-point lane-existence guards in `actOnCorridor` and FF diversion
+- ✅ **Full sbt compile**: 31 Scala sources, zero errors
+- ✅ **Git commit**: `8bdf7ae12` on branch `feature/variable-lane-dll-unification`
+
+### Files touched (this session)
+| File | Changes |
+|------|---------|
+| `VTransport.scala` | Owns DLL per-segment; `addToAlist`/`removeFromAlist`/`getLast` |
+| `Pathway.scala` | Delegates DLL ops to VTransport; sparse seg array; backward-compat overloads |
+| `Route.scala` | `lanesPerSeg` param; `laneExistsAt`/`lanesAt`/`forceMerge` |
+| `Dynamics.scala` | `findLeader()` cross-boundary via VTransport; removed segId patches |
+| `CalRoute101_3.scala` | Explicit DLL re-insertion in driveHighway |
+| `EatonFireModel.scala` | Lane-end detection + forceMerge; lane-existence guards at entry/ramp/FF |
+| `CorridorBuilder.scala` | Passes `lanesPerSeg` to Route |
+| `NetworkConfig.scala` | `MainlineSpec.lanesPerSeg: Option[Array[Int]]` |
+| `EatonCorridorConfig.scala` | Per-segment lane counts from PeMS station data |
+| `context/variable-lane-dll-unification.md` | Full design document |
 
 ### What is in progress
 - 🔄 **End-to-end run with `synthetic=false`** — nStop verified, full simulation run not yet attempted
-- 🔄 **SR-134 ramp data quality** — all 7 SR-134 on-ramp sensors report zero flow across ALL time bins (entire CSV = 0). Need alternate data source or synthetic ramp demand for SR-134.
-- 🔄 **Fire-day anchor CSV** (`717653-i210-firstSensor-fireday.csv`) exists but not yet cleaned or wired — needs `PeMSDemand.I210_WB_FireDay_Anchor()` factory
+- 🔄 **Runtime testing of variable-lane corridor** — I-210 has 4→5 lane transitions; needs end-to-end run to verify lane-end merges work
+- 🔄 **SR-134 ramp data quality** — all 7 SR-134 on-ramp sensors report zero flow across ALL time bins. Need alternate data source or synthetic ramp demand.
+- 🔄 **Fire-day anchor CSV** (`717653-i210-firstSensor-fireday.csv`) exists but not yet cleaned or wired
 
 ### Known bugs / issues
 | Issue | File | Status |
@@ -98,12 +121,15 @@ sbt "runMain scalation.simulation.process.model.runEatonFireModel"
 | SR-134 OR CSV has zero flow everywhere | `eaton_134_W_baseline_Dec03-10-17_OR.csv` | **Data quality** — sensors not reporting |
 | `srcPrefix` hardcoded for cases `0\|1\|2\|3\|4` | `VSource.scala:61` | Works for 5 lanes but fragile |
 | Fire-day data not yet wired | `DemandConfig.scala` | Need `PeMSDemand.I210_WB_FireDay_Anchor()` |
+| `forceMerge` is random lane pick | `Route.scala` | Works but could be improved with gap-based selection |
 
 ### Key decisions made
-- **Mainline arrivals follow CalRoute101_3 pattern**: `PeMSDemand` → `PeMSArrivalSource` → `PeMSDataHelper`. No new arrival source classes needed.
-- **`PeMSDemand` carries `window`/`layout`**: backward-compatible defaults (900s/4-lane). Eaton overrides via `I210_WB_Anchor()`.
-- **Ramps from aggregated OR CSV**: `AggregatedRampArrivalSource` correct for multi-station ramp data.
-- **Entry station defines corridor lane count**: replaces `modeLanes()` which picked mode=4. Anchor sensor 717653 has 5 lanes → corridor has 5 lanes.
+- **VTransport owns its DLL**: each VTransport segment has its own `DoublyLinkedList[Vehicle]`, not the Pathway
+- **Pathway uses sparse seg array**: `seg(i)` returns null if lane i doesn't exist at that segment
+- **Route.forceMerge**: picks random available lane when a lane ends; acceptable for now
+- **Per-segment lane count = min(upstream station lanes, downstream station lanes)**: conservative approach
+- **MainlineSpec.lanesPerSeg is Option[Array[Int]]**: None = uniform lanes (backward compatible)
+- **Entry station defines corridor max lane count**: for Route array sizing
 - **`endRow` is exclusive**: `MatrixD.load` `stop` param is exclusive. 73 data rows → `endRow=73`.
 
 ### Verified nStop values (baseline, synthetic=false)

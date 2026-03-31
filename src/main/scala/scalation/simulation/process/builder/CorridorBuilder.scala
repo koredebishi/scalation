@@ -26,7 +26,7 @@ package builder
 import scalation.mathstat.VectorD
 import scalation.simulation.process.config.{CorridorLayout, FlowDirection, MultiCorridorConfig}
 import scalation.simulation.process.config.{RampMode => ConfigRampMode}
-
+import scala.collection.mutable.ListBuffer
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BuiltCorridor` case class bundles the topology products of building
  *  one corridor.  The model uses these fields directly in `Car.act()`.
@@ -38,7 +38,8 @@ import scalation.simulation.process.config.{RampMode => ConfigRampMode}
  *  `offRampSinks(r)` as `to`.
  *
  *  @param junctions        mainline junctions, ordered by flow direction
- *  @param rampSensors      on-ramp merge point junctions
+ *  @param rampSensors      on-ramp merge point junctions (positioned at on-ramp screen XY)
+ *  @param offRampSensors   off-ramp diverge point junctions (positioned at off-ramp screen XY)
  *  @param route            multi-lane route across all segments
  *  @param sinks            sink(s) at the exit end of the corridor
  *  @param rampJoinSegs     segment indices where on-ramps merge (remapped by direction)
@@ -50,6 +51,7 @@ import scalation.simulation.process.config.{RampMode => ConfigRampMode}
  */
 case class BuiltCorridor (junctions:       Array [Junction],
                           rampSensors:     Array [Junction],
+                          offRampSensors:  Array [Junction],
                           route:           Route,
                           sinks:           List [Sink],
                           rampJoinSegs:    Array [Int],
@@ -99,11 +101,16 @@ object CorridorBuilder:
 
         val config      = layout.config
         val nLanes      = config.mainline.lanesPerSegment
-        val lps         = config.mainline.lanesPerSeg.orNull   // per-segment lane counts (null if uniform)
+        val lpsRaw      = config.mainline.lanesPerSeg.orNull   // per-segment lane counts (null if uniform)
+        // Reverse lanesPerSeg for Descending direction (same as junctions and ramp join segments)
+        val lps: Array[Int] = if lpsRaw == null then null
+            else direction match
+                case FlowDirection.Ascending  => lpsRaw
+                case FlowDirection.Descending => lpsRaw.reverse
         val nSegments   = config.mainline.segments
         val nJunc       = layout.numJunctions
         val nOnRamps    = layout.numOnRamps
-        val pfx         = if prefix.nonEmpty then s"${prefix}_" else ""
+        val pfx         = if prefix.nonEmpty then s"${prefix.filter (_.isLetterOrDigit)}_" else ""
 
         debug ("build", s"corridor='${config.mainline.id}' dir=$direction " +
                         s"juncs=$nJunc segs=$nSegments lanes=$nLanes onRamps=$nOnRamps" +
@@ -136,7 +143,7 @@ object CorridorBuilder:
 
         val rampSensors = Array.ofDim [Junction] (nOnRamps)
         cfor (0, nOnRamps) { i =>
-            rampSensors(i) = new Junction (s"${pfx}onRamp${i + 1}",
+            rampSensors(i) = new Junction (s"",
                                            xy = layout.onRampScreenXY(i), nt = nt, nl = nLanes)
         }
 
@@ -145,7 +152,7 @@ object CorridorBuilder:
         // intermediate = all junctions between first and last
 
         val intermediateJunc = junc.slice (1, junc.length - 1)
-        val route = Route (s"${pfx}Rte", nLanes, intermediateJunc,
+        val route = Route (s"${pfx}R", nLanes, intermediateJunc,
                            junc(0), junc.last, motion, lanesPerSeg = lps)
 
         debug ("build", s"route: ${route.pathway.length} pathways, " +
@@ -190,8 +197,8 @@ object CorridorBuilder:
 
         cfor (0, nOffRamps) { r =>
             val xy = layout.offRampScreenXY(r)
-            offRampSinks(r) = new Sink (s"${pfx}offRampSink${r + 1}",
-                                        (xy._1, xy._2))
+            offRampSinks(r) = new Sink (s"",
+                                        (xy._1 + 200.0, xy._2 - 100.0))  // same distance as on-ramp VSource
         }
 
         direction match
@@ -207,9 +214,22 @@ object CorridorBuilder:
 
         debug ("build", s"offRamps=$nOffRamps, offRampJoinSegs: ${offRampJoinSegs.mkString (", ")}")
 
+        // ── Step 7: Off-ramp diverge junctions ──────────────────────────────
+        // Mirrors Step 2 (on-ramp sensor junctions).
+        // One per off-ramp, positioned at off-ramp screen coordinates.
+        // Used as `from` for off-ramp Ramp objects so the VTransport draws
+        // from the road edge to the sink (not from mainline center).
+
+        val offRampSensors = Array.ofDim [Junction] (nOffRamps)
+        cfor (0, nOffRamps) { r =>
+            offRampSensors(r) = new Junction (s"",
+                                              xy = layout.offRampScreenXY(r), nt = nt, nl = nLanes)
+        }
+
         BuiltCorridor (
             junctions       = junc,
             rampSensors     = rampSensors,
+            offRampSensors  = offRampSensors,
             route           = route,
             sinks           = sinks,
             rampJoinSegs    = rampJoinSegs,
@@ -252,7 +272,7 @@ object CorridorBuilder:
         // Look up fromJunction and toJunction by name in the built corridors.
         // Create `spec.lanes` parallel connectors with visual offsets.
 
-        val ffList = scala.collection.mutable.ListBuffer [FFConnector] ()
+        val ffList = ListBuffer [FFConnector] ()
         for spec <- config.interchanges do
             val fromCorridor = corridorMap.getOrElse (spec.fromCorridorId,
                 throw new IllegalArgumentException (

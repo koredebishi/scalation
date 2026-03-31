@@ -63,7 +63,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     for i <- pathway.indices do
         val physicalLane = numLanes - 1 - i  // Reverse: i=0 → lane 4 (rightmost), i=4 → lane 0 (leftmost)
         val shift = calcShift2 * ((physicalLane - (numLanes - 1) / 2.0) * GAP)
-        pathway(i) = new Pathway(s"${name}_$i", junc, from, to, motion, isSpeed, bend,
+        pathway(i) = new Pathway(s"${name}L$i", junc, from, to, motion, isSpeed, bend,
                                  laneShift = shift, laneIndex = i, lanesPerSeg = _lanesPerSeg)
         subpart += pathway(i)
     end for
@@ -82,7 +82,9 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         val offsets = new Array[Double](n + 1)  // array to hold offsets
         offsets(0) = 0.0  // starting offset is 0.0
         for i <- 0 until n do
-            offsets(i + 1) = offsets(i) + pathway(0).seg(i).length  // cumulative sum of segment lengths
+            // Find a non-null VTransport at this segment index (any lane will do — same geometry)
+            val vt = pathway.map(_.seg(i)).find(_ != null).orNull
+            offsets(i + 1) = offsets(i) + (if vt != null then vt.length else 0.0)
         end for
         offsets
     end segmentOffsets
@@ -106,6 +108,8 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
 
         // Check if target lane exists at this segment (variable lane support)
         if !laneExistsAt(l2, seg) then return false
+        // Check if source lane exists at this segment (car can't be here if lane is null)
+        if !laneExistsAt(l1, seg) then return false
 
         val fromPath = pathway(l1) // current Pathway  (lane l1)
         val toPath = pathway(l2) // target Pathway   (lane l2)
@@ -118,7 +122,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         // vehicles to check in target lane
         val vBehind = toPath.seg(seg).getFirst // car behind in same seg
-        val vAhead = if seg + 1 < toPath.seg.length
+        val vAhead = if seg + 1 < toPath.seg.length && toPath.seg(seg + 1) != null
             then toPath.seg(seg + 1).getLast else null
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -170,17 +174,20 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
             if pathway(i) != null then
                 //val vAhead = pathway(i).seg(seg+1).getLast     // the vehicle ahead is the vehicle in the connecting segment and that vehcle is in seg+1
                 val nextSeg = min(seg + 1, pathway(i).seg.length - 1)  // ensure we don't go out of bounds
-                val vAhead  = pathway(i).seg(nextSeg).getLast   // vehicle ahead in next seg, check for null pathway first
+                val segVT   = pathway(i).seg(nextSeg)
+                if segVT != null then                              // guard: lane may not exist at nextSeg (variable lanes)
+                    val vAhead = segVT.getLast   // vehicle ahead in next seg
 
-                // compute the gap ahead:
-                // if there is no vehicle ahead, then the gap is infinite
-                //else the gap is the distance from the start of the next segment to the vehicle ahead's rear bumper
-                val gapAhead = if vAhead == null then Double.PositiveInfinity
-                else pathway(i).seg(seg + 1).length - (vAhead.disp - Vehicle.len)
+                    // compute the gap ahead:
+                    // if there is no vehicle ahead, then the gap is infinite
+                    //else the gap is the distance from the start of the next segment to the vehicle ahead's rear bumper
+                    val gapAhead = if vAhead == null then Double.PositiveInfinity
+                    else segVT.length - (vAhead.disp - Vehicle.len)
 
-                if gapAhead > minGap then
-                    minGap = gapAhead
-                    bestLane = i
+                    if gapAhead > minGap then
+                        minGap = gapAhead
+                        bestLane = i
+                    end if
                 end if
             end if
         }
@@ -195,11 +202,15 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         // force insert even if safety fails (lane ends)
         val toPath = pathway(bestLane)
         val nextSeg = min(seg + 1, toPath.seg.length - 1)
-        val vAhead = toPath.seg(nextSeg).getLast
+        val segVT   = toPath.seg(nextSeg)
+        val vAhead  = if segVT != null then segVT.getLast else null
 
-        fromPath.removeFromAlist(car, seg)
+        // Only remove if the car is still in a DLL (caller may have already detached)
+        if car.myPathNode != null && fromPath.seg(seg) != null then
+            fromPath.removeFromAlist(car, seg)
+        end if
         car.laneID = bestLane
-        car.pathInfo = toPath.seg(seg).name
+        if toPath.seg(seg) != null then car.pathInfo = toPath.seg(seg).name
         toPath.addToAlist(car, vAhead, seg)
 
         bestLane
