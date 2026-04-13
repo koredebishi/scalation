@@ -34,6 +34,7 @@ This ensures zero loss of continuity between chat sessions.
 | IDM params & domain knowledge | `context/traffic-simulation.md` |
 | HPC Sapelo2 commands | `context/hpc.md` |
 | Variable lane count problem | `context/variable-lane-architecture.md` |
+| Ramp physics + density lane assignment | `context/ramp-physics-and-density-lane-assignment.md` |
 
 ## Papers
 
@@ -108,8 +109,9 @@ sbt "runMain scalation.simulation.process.model.runEatonFireModel"
 | `docs/2026_WSC_paper/dta-blueprint.md` | DTA implementation blueprint |
 
 ### What is in progress
+- 🔄 **Ramp physics fixes (Phase A)** — 6 bugs diagnosed, implementation plan in `context/ramp-physics-and-density-lane-assignment.md`
+- 🔄 **Density-based lane assignment (Phase B)** — design complete, not yet implemented
 - 🔄 **Visual verification** — need to run EatonFireModel and confirm ramp positions are correct after graph-derived changes
-- 🔄 **Uncommitted changes** — graph-derived ramp impl + side swap + nudge + DTA blueprint (need git commit)
 - 🔄 **End-to-end run with `synthetic=false`** — nStop verified, full simulation run not yet attempted
 - 🔄 **SR-134 ramp data quality** — all 7 SR-134 on-ramp sensors report zero flow
 - 🔄 **DTA Phase 1** — FireGrid + SmokeGrid (standalone, no traffic dependency)
@@ -117,13 +119,51 @@ sbt "runMain scalation.simulation.process.model.runEatonFireModel"
 ### Known bugs / issues
 | Issue | File | Status |
 |-------|------|--------|
+| `findLeader` returns null on ramp → free-flow | `Dynamics.scala:58-72` | ✅ **Fixed** — wired `targetPathway`/`targetSegId` in EatonFireModel |
+| `t_disp` domain mismatch at ramp→mainline | `Dynamics.scala:345-351` | 🔴 **Critical** — IDM sees phantom gaps after merge |
+| No gap acceptance at merge | `EatonFireModel.scala:370` | 🟡 **Major** — unconditional DLL insertion |
+| No lane change in EatonFireModel | `EatonFireModel.scala:384` | 🟡 **Major** — 20K ramp vehicles stuck in outermost lane |
+| Animation teleportation at merge | `EatonFireModel.scala:444-451` | 🟡 **Major** — car jumps from ramp to mainline |
+| Stale `segId` comparison in IDM | `Dynamics.scala:348` | 🟡 Minor — `segId <` doesn't work across domains |
 | SR-134 OR CSV has zero flow everywhere | `eaton_134_W_baseline_Dec03-10-17_OR.csv` | **Data quality** — sensors not reporting |
 | `srcPrefix` hardcoded for cases `0\|1\|2\|3\|4` | `VSource.scala:61` | Works for 5 lanes but fragile |
 | Fire-day data not yet wired | `DemandConfig.scala` | Need `PeMSDemand.I210_WB_FireDay_Anchor()` |
-| `forceMerge` is random lane pick | `Route.scala` | Works but could be improved with gap-based selection |
+| `forceMerge` was over-complex + double insertion | `Route.scala` | ✅ **Fixed** — simple lane-drop: target = `availLanes.last` |
 | Ramp side may need visual tuning | `Route.perpVec` | Negated for outermost lane — needs visual confirmation |
 
 ### Key decisions made (this session)
+- **Ramp physics: 6 bugs identified** — traced full lifecycle: `driveRamp` → `addToAlist` → `move()` → `findLeader`
+- **Density-based lane assignment over speed-based**: density is macroscopic LOS indicator, doesn't require per-lane PeMS data
+- **Junction = decision engine**: shared cross-section senses `snapshotDensity()` across all lanes at each segment boundary
+- **±1 lane constraint**: only adjacent lane changes, with existing `Route.changeLane()` safety check
+- **Implementation order**: P0 → P5 → P1 → P2 → D0 → D1 → D2 → P3 → P4 → D3
+- **t_disp rebase via `route.toCumulative(joinSeg, 0.0)`**: aligns ramp vehicle to mainline coordinate system
+- **Dual-leader for ramp**: `findLeader` will peek at mainline DLL when `myRamp != null` (Treiber §11.3)
+- **Ramp stores merge target**: `Ramp.targetPathway` + `Ramp.targetSegId` fields (cleaner than Vehicle fields)
+
+### Key decisions made (session 2026-04-04 — Ramp Physics Fix)
+
+#### Coding Style: No Surgical Fixes
+- **Separate `b` (comfortable) from `b_emergency` (physical max):** IDM's `bmax = -2.0 m/s²` is the comfortable deceleration used in the `s*` desired-gap formula. The emergency braking floor `b_emergency = -9.0 m/s²` (0.9g) is a separate physical quantity. Declared at the same level as `bmax` in `Vehicle.def_prop` with its own `inline def` accessor. All three models (IDM, Gipps, Krauss) use `b_emergency` for clamps. Treiber & Kesting 2013, Table 11.1 distinguishes these explicitly.
+- **`LeaderResult` enum replaces naked `Vehicle` return from `findLeader`:** The root cause of the cross-domain gap bug is that `findLeader` returns `Vehicle | null` with no context about which coordinate system the leader's `disp` lives in. The caller (`updateM`) cannot distinguish same-segment, next-segment, or cross-domain leaders — leading to `segId` type confusion. Fix: `findLeader` returns `enum LeaderResult` with exhaustive `match/case`. The compiler enforces all cases are handled. No if/else branching. Each variant carries exactly the data needed for gap computation. This protects all three car-following models uniformly.
+- **No deep if/else nesting for domain logic.** Use Scala 3 `enum` + pattern matching to make the contract between `findLeader` and its callers explicit and compiler-enforced.
+- **Parameters declared at the level of their peers.** New physics constants (like `b_emergency`) go in `Vehicle.def_prop` alongside `bmax`, `amax`, etc. — not as local vals inside functions.
+
+### Key decisions made (session 2026-04-08 — forceMerge Simplification)
+
+#### Lane-Drop forceMerge: Simple English
+A highway goes from 5 lanes to 4 lanes. One lane dies (dead-ends).
+Every vehicle in that dying lane has exactly **one option**: merge into the adjacent surviving lane.
+It's a **zipper/bottleneck** — vehicles funnel into the next lane, like a highway lane closure with cones.
+There is no "best lane search." There is no scanning lanes 0–2. The dying lane feeds into its neighbor. Period.
+
+- `forceMerge` does the **full job**: remove from dead lane DLL, insert into surviving lane behind leader, return new laneID.
+- Caller just uses the returned laneID and updates `myPathway`. No DLL work by caller.
+- Old code did DLL work inside AND the caller did it again → **double insertion bug**, now fixed.
+- Target lane = `availLanes.last` = highest surviving lane = adjacent to the dead one.
+- For 5→4: car in lane 4 → target lane 3. Done.
+
+### Previous session decisions (preserved)
 - **Graph-derived ramp positioning**: `rampAttachPoint(seg)` computes outermost lane edge from `lanesAt(seg) * GAP`. Eliminates all `rampShift` magic numbers.
 - **perpVec negated**: points away from lane 0 (toward ramp side of freeway)
 - **Same-seg FR/OR nudge = 30px downstream**: uses road direction vector, not perpendicular
@@ -138,3 +178,94 @@ I-210 Mainline (5 lanes): L0=5326, L1=5174, L2=4019, L3=3281, L4=1873
 I-210 Ramps (22): 0,2234,2165,1960,3522,0,0,0,0,0,744,0,0,0,1539,549,0,2315,0,5456,53,0
 SR-134 Ramps (7): all zero (data quality issue)
 ```
+
+## Session State — 2026-04-13 (Road Rendering & Physics Audit)
+
+### What was completed this session
+- ✅ **Full codebase audit of animation engine** — read every rendering line in `DgAnimator.scala` (1138 lines), `Animator.scala`, `Dgraph.scala`, `VTransport.scala`, `Vehicle.scala`, `Route.scala`, `EatonFireModel.scala`
+- ✅ **Diagnosed ramp `gap = -4` root cause** — NOT a braking/clamp issue. Root cause: `VTransport.move()` line 135 sets `actor.disp = 0.0` for every vehicle entering. When VSource spawns ramp vehicles faster than the ramp drains them, multiple vehicles sit at `disp=0.0` → `gap = 0 - 0 - 4(len) = -4`. The collision clamp computes `x_safe = 0 - 4 - 4 = -8 → max(0, -8) = 0` — can't fix it. This is a **spawning/insertion problem**, not a dynamics problem. Fix = VSource back-pressure (don't emit if no space).
+- ✅ **Created implementation plan** — `context/visual-physics-upgrade-plan.md` (10 tasks, 3 phases, ~175 lines total)
+- ✅ **Identified existing features often assumed missing**:
+  - Speed-based velocity coloring ALREADY LIVE: `Vehicle.velocityColor()` (HSB red→green) called in `VTransport.move()` line 160
+  - Vehicle shape ALREADY car-shaped: `VSource.scala` line 118 uses `RoundRectangle2D.Double(0, 0, 14, 7, 4, 4)`, not 8×8 Ellipse
+  - HUD overlay, vehicle inspector, replay system — all functional
+  - `scala3d/` directory = dead prototype by Jacobi Coleman, `.scalaa` extension (won't compile), has merge conflicts — leave it alone
+
+### What is in progress — ACTIVE NEXT TASK
+- 🔄 **R1: Road polygon rendering** — THE priority. Replace spaghetti-line roads with filled asphalt polygons.
+  - **File:** `DgAnimator.scala` — `Canvas.paintComponent()` (~line 557)
+  - **Current state:** Each lane is a separate edge drawn with `pavementStroke = BasicStroke(10.0f)` — roads look like individual strands, not a surface
+  - **Target:** Insert Layer 0 before existing Layer 1. Group edges by segment (parse label pattern `L{lane}s{seg}`). For each segment group, compute a filled `Path2D` polygon covering full road width. Fill with `pavementColor = Color(50, 50, 58)`.
+  - **Also:** R2 (lane markings: solid white edges, dashed white interior) depends on same edge-grouping
+
+### Known architecture for the rendering (so next chat doesn't need to re-discover)
+
+#### How DgAnimator.paintComponent renders (current layer order):
+```
+Layer 1: pavementStroke (BasicStroke 10px) on each edge → dark strip per lane
+Layer 2: dashStroke (dashed 1px) on each edge → dashed line per lane  
+Layer 3: roadStroke (BasicStroke 2.5px) in edge.color → thin colored outline per lane
+Layer 4: edge labels + tokens (vehicle dots) + vehicle count badges
+Layer 5: free tokens
+Layer 6: HUD overlay (screen-space)
+```
+
+#### Key rendering constants (DgAnimator.Canvas, ~line 329):
+```scala
+pavementStroke = BasicStroke(10.0f, CAP_ROUND, JOIN_ROUND)
+dashStroke     = BasicStroke(1.0f, CAP_BUTT, JOIN_MITER, 10.0f, Array(12.0f, 8.0f), 0.0f)
+roadStroke     = BasicStroke(2.5f, CAP_ROUND, JOIN_ROUND)
+pavementColor  = Color(50, 50, 58)
+dashColor      = Color(200, 200, 210, 160)
+```
+
+#### How vehicles are drawn:
+- Created in `VSource.act()` line 118: `RoundRectangle2D.Double(0, 0, 14, 7, 4, 4)` + `velocityColor`
+- Moved in `VTransport.move()` line 161: `director.animate(actor, MoveToken, vColor, null, cp)`
+- Rendered in `DgAnimator.paintComponent` line 590: `g2d.fill(token.shape)` with glow behind
+- Token default size = 8.0 (in `Animator.createToken`) but VSource overrides to 14×7
+
+#### Edge (road lane) data flow:
+- `Pathway.display()` calls `director.animate(lane, CreateEdge, ...)` for each VTransport
+- Each VTransport is a `QCurve` from junction[i] to junction[i+1]
+- Label pattern: `"L{lane}s{seg}"` (e.g., `"L0s0"`, `"L4s19"`)
+- Stored in `Dgraph.edges` as flat list — no segment grouping
+- Edge shape = `QCurve` with start/end points accessible via `shape.getP1()`, `shape.getP2()`
+
+#### Route geometry available:
+- `Route._points` array: junction (x,y) positions
+- `Route.rampAttachPoint(seg)`: outermost lane edge position
+- `Route.perpVec`: perpendicular to road direction (outward from lane 0)
+- `Route.GAP = 50.0` pixels between lanes
+- `Route.lanesAt(seg)`: lane count at each segment
+
+#### What NOT to touch:
+- `Dgraph.scala` — Dr. Miller's graph data structure
+- `Animator.scala` — Dr. Miller's command processor  
+- `AnimateCommand.scala` — command protocol
+- `Model.scala` — simulation engine core
+
+### Decisions made this session
+
+#### Road rendering approach (approved direction):
+1. **Java2D only** — no JavaFX, no ScalaFX, no 3D. Java2D `Graphics2D` + `Path2D` + `AffineTransform` gives everything SUMO-gui does at top-down 2D.
+2. **Enhance DgAnimator in-place** — don't create a new animation class. The command queue, replay, inspector all work. The problem is **what it draws**, not how.
+3. **Edge-grouping by label parsing** — group `Dgraph.edges` by segment using label pattern `L{lane}s{seg}`. Zero changes to `Dgraph.scala`.
+4. **Vehicle rotation via position delta** (Approach A) — compute heading from consecutive MoveToken positions, store in HashMap inside DgAnimator. No changes to `Animator.scala` or `AnimateCommand` protocol.
+
+#### Ramp gap = -4 diagnosis (corrected):
+- **P0 in the plan was WRONG** — the `-4` gap on ramp vehicles at `disp=0, v=0` is a spawning problem, not braking
+- **Correct fix** = VSource back-pressure (don't emit if ramp tail hasn't cleared `len + s` from position 0)
+- **Deferred** — user chose to focus on road rendering first
+
+### Files created this session
+| File | Purpose |
+|------|---------|
+| `context/visual-physics-upgrade-plan.md` | Full implementation plan (10 tasks, 3 phases) |
+
+### Implementation plan summary (for reference)
+| Phase | Tasks | Status |
+|-------|-------|--------|
+| Phase 1: Physics | P0 (corrected: VSource back-pressure), P1 (lane change), P2 (gap acceptance) | ⏸ Deferred |
+| Phase 2: Road Rendering | R1 (road polygon), R2 (lane markings), R3 (vehicle rotation), R4 (ramp surface) | 🔄 **ACTIVE — Start R1** |
+| Phase 3: Polish | M1 (smooth merge), R5 (shoulders), Labels (shields) | ⏸ Deferred |

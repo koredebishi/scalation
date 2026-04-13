@@ -13,7 +13,7 @@ package process
 
 
 import scalation.mathstat.VectorD
-import scala.math.{min,abs}
+import scala.math.{min, abs}
 //import scalation.random.Variate
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -153,65 +153,55 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     end changeLane
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Merge a ramp vehicle into the mainline at the given lane and segment.
+     *  Remove from ramp, look who's ahead in the merge segment, insert behind them.
+     *  IDM in Dynamics handles car-following after insertion.
+     *
+     *  @param lane     the target mainline lane
+     *  @param seg      the merge segment index
+     *  @param car      the merging vehicle (just finished driving the ramp)
+     *  @param fromRamp the ramp the vehicle came from (null if direct)
+     */
+    def mergeFromRamp (lane: Int, seg: Int, car: Vehicle,
+                       fromRamp: Ramp = null): Unit =
+        val effectiveLane = if laneExistsAt (lane, seg) then lane else lanesAt (seg) - 1
+        if fromRamp != null then fromRamp.removeFromAlist (car)
+        car.disp = 0.0
+        val vAhead = pathway(effectiveLane).seg(seg).getLast
+        pathway(effectiveLane).addToAlist (car, vAhead, seg)
+    end mergeFromRamp
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     /**
-     * A forcemerge that allows a vehicle to make mandatory lane changes,
-     * as in the case of highway offramps where the vehicles that did not exit
-     * must merge back into the mainline traffic.
+     * Lane-drop forced merge.  A lane dies (e.g. 5 lanes → 4 lanes).
+     * Every vehicle in the dying lane moves into the adjacent surviving lane.
+     * If there's a car ahead in that lane, slot behind it.  That's it.
+     *
+     * This method does the FULL job: remove from dead lane, insert into
+     * surviving lane.  Caller just uses the returned laneID and moves on.
+     *
+     * @param l1          the vehicle's current lane (dead at this segment)
+     * @param availLanes  the lanes that exist at this segment (e.g. 0 until 4)
+     * @param car         the vehicle being merged
+     * @param seg         the segment index where the lane drop occurs
+     * @return            the new lane index
      */
-    def forceMerge(l1:Int, availLanes: Range, car: Vehicle, seg:Int): Int =
+    def forceMerge(l1: Int, availLanes: Range, car: Vehicle, seg: Int): Int =
+        val target = availLanes.last                             // adjacent surviving lane
 
-        //fllfflf
-        val fromPath = pathway(l1) // current Pathway  (lane l1)
-        var bestLane = -1     // initialize best lane to -1 (no best lane found for now)
-        var minGap = -1.0      //fromPath.seg(seg).safetydist  // initialize minGap to a large value
-
-
-        // look for the best lane to merge into using max space availability as the criteria
-        cfor(availLanes){ i =>
-            if pathway(i) != null then
-                //val vAhead = pathway(i).seg(seg+1).getLast     // the vehicle ahead is the vehicle in the connecting segment and that vehcle is in seg+1
-                val nextSeg = min(seg + 1, pathway(i).seg.length - 1)  // ensure we don't go out of bounds
-                val segVT   = pathway(i).seg(nextSeg)
-                if segVT != null then                              // guard: lane may not exist at nextSeg (variable lanes)
-                    val vAhead = segVT.getLast   // vehicle ahead in next seg
-
-                    // compute the gap ahead:
-                    // if there is no vehicle ahead, then the gap is infinite
-                    //else the gap is the distance from the start of the next segment to the vehicle ahead's rear bumper
-                    val gapAhead = if vAhead == null then Double.PositiveInfinity
-                    else segVT.length - (vAhead.disp - Vehicle.len)
-
-                    if gapAhead > minGap then
-                        minGap = gapAhead
-                        bestLane = i
-                    end if
-                end if
-            end if
-        }
-
-        if bestLane == -1 then bestLane = availLanes.start  // no available lane found, stay in the same lane
-
-        // we can try standard adjacent lane change first
-        val adjacent = abs(bestLane - l1) == 1    // adjacent lane
-        val changed = adjacent && changeLane(l1, bestLane, car, seg)   // try standard lane change
-        if changed then return bestLane    // successful standard lane change
-
-        // force insert even if safety fails (lane ends)
-        val toPath = pathway(bestLane)
-        val nextSeg = min(seg + 1, toPath.seg.length - 1)
-        val segVT   = toPath.seg(nextSeg)
-        val vAhead  = if segVT != null then segVT.getLast else null
-
-        // Only remove if the car is still in a DLL (caller may have already detached)
-        if car.myPathNode != null && fromPath.seg(seg) != null then
-            fromPath.removeFromAlist(car, seg)
+        // 1. Remove from dead lane (if still attached)
+        if car.myPathNode != null && pathway(l1) != null && pathway(l1).seg(seg) != null then
+            pathway(l1).removeFromAlist(car, seg)
         end if
-        car.laneID = bestLane
-        if toPath.seg(seg) != null then car.pathInfo = toPath.seg(seg).name
-        toPath.addToAlist(car, vAhead, seg)
 
-        bestLane
+        // 2. Insert into surviving lane — slot behind whoever is ahead
+        val ahead = pathway(target).seg(seg).getLast
+        car.laneID = target
+        pathway(target).addToAlist(car, ahead, seg)
+
+        println(f"[forceMerge] ${car.displayLabel}%-12s lane $l1 → $target at seg $seg  (lane drop)")
+        target
     end forceMerge
 
 
@@ -267,7 +257,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     def rampAttachPoint (seg: Int): (Double, Double) =
         val pt      = _points(seg)                              // junction at segment boundary
         val nHere   = lanesAt(seg)
-        val offset  = ((nHere - 1) / 2.0 + 0.5) * GAP          // half-GAP beyond outermost lane center
+        val offset  = (nHere - numLanes / 2.0 - 0.4) * GAP       // slightly inside lane edge for visual snugness
         (pt.at(0) + perpVec._1 * offset,
          pt.at(1) + perpVec._2 * offset)
     end rampAttachPoint

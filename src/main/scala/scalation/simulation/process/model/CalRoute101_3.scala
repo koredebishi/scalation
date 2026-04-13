@@ -158,6 +158,12 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
     private val ramps: Array [Ramp] = builder.buildRamps (motion, rampSources, ramp_sensors)
     debug ("init", s"Created ${ramps.length} ramps")
 
+    // P1: wire merge target so ramp vehicles can see mainline traffic (Treiber §11.3)
+    for i <- ramps.indices do
+        ramps(i).targetPathway = route.pathway(numLanes - 1)
+        ramps(i).targetSegId   = rampJoinSeg(i)
+    end for
+
     // Register components
     debug ("init", "Registering components with model...")
     addComponents (sources, junc.toList ++ ramp_sensors.toList, sinks, ramps.toList)
@@ -197,8 +203,9 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
             //debug ("driveHighway", s"$me starting at seg=$joinSeg, lane=$laneID")
 
             if subtype >= numLanes then
-                val carAhead = route.pathway(laneID).seg(joinSeg).getLast
-                route.pathway(laneID).addToAlist (this, carAhead, joinSeg)
+                // P2: gap acceptance — wait for safe gap before merging
+                val onRamp = ramps(subtype - numLanes)
+                route.mergeFromRamp (laneID, joinSeg, this, onRamp)
                 segId = joinSeg                            // set before jump so density records correctly
                 junc(joinSeg).jump ()
             end if
@@ -240,9 +247,10 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
             if r.mode == RampMode.On then
                 r.lane.move ()
                 r.to.asInstanceOf [Junction].jump ()
+            else
+                r.removeFromAlist (this)         // off-ramp: remove immediately
             end if
-
-            r.removeFromAlist (this)
+            // On-ramp: car stays in Ramp DLL — removal deferred to mergeFromRamp (FIFO)
         end driveRamp
 
     end Car

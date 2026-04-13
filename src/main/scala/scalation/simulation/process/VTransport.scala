@@ -136,7 +136,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
         actor.pathInfo = name     //update the current actor's lane_ID with the Vtransport_ID it is moving in
 
         //val segTT = if lastSeg >= 0 then f"${now - actor.segmentEnterTime}%.2f" else "N/A"
-        easyW.println(s"[t=$now] Vehicle ${actor.displayLabel} enters seg=${actor.segId} (from seg=$lastSeg), enterT=$now")
+        //easyW.println(s"[t=$now] Vehicle ${actor.displayLabel} enters seg=${actor.segId} (from seg=$lastSeg), enterT=$now")
 
         //debug("move", s"actor = $actor, disp=${actor.disp} along the VTransport")
         vdeque += actor
@@ -163,7 +163,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
             actor.yieldToDirector()
         end while
 
-        //debug("moveFinal", s" $actor: Final actor displacement: t_disp = ${actor.t_disp}")
+        //println(f"[move EXIT] ${actor.displayLabel}%-12s seg=${actor.segId} disp=${actor.disp}%.2f v=${actor.velocity}%.2f length=${length}%.2f vt=$name")
     end move
 
     def calcPoint2(s: Double): Array[Double] =

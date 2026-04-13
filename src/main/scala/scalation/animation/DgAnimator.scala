@@ -686,7 +686,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                 if bold then fmBold.stringWidth (txt) else fmPlain.stringWidth (txt)
             }.max
             // ensure box is wide enough for density bars
-            val densityRowW = if hasDensity then 50 + barMaxW + 40 else 0    // label + bar + value
+            val densityRowW = if hasDensity then 110 + barMaxW + 40 else 0   // label(110) + bar + value
             val boxW = math.max (maxW, densityRowW) + pad * 2 + 12
             val densityH = if hasDensity then densities.length * (barH + 6) + 4 else 0
             val boxH = lines.length * lineH + pad * 2 + densityH
@@ -727,7 +727,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                     g2d.drawString (lbl, labelX, y + barH - 1)
 
                     // bar
-                    val barX = labelX + 45
+                    val barX = labelX + 110
                     val ratio = densities (i) / maxDensity
                     val bw = (ratio * barMaxW).toInt
                     // color: green (low) → yellow → red (high jam density ~150 veh/km)

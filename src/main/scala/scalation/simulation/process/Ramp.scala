@@ -32,6 +32,15 @@ class Ramp(name: String, val from: Component, val to: Component,motion: Dynamics
     private val debug = debugf("Ramp", false)
     debug("init", s"Ramp [$name] direction: ${from.name} → ${to.name} , $mode")
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Mainline merge target — set by the model after construction.
+     *  Enables dual-leader car-following: ramp vehicles peek at the mainline
+     *  DLL at (targetPathway, targetSegId) to see approaching traffic.
+     *  @see Treiber & Kesting 2013, §11.3
+     */
+    var targetPathway: Pathway = null
+    var targetSegId  : Int     = -1
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Calculate lateral shift vector for ramp visualization.

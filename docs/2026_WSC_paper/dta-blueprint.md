@@ -430,3 +430,22 @@ Each phase has a **regression gate**: the previous behavior must be unchanged wh
 2. **Run EatonFireModel** — visual verification of ramp positioning
 3. **Start Phase 1** — FireGrid + SmokeGrid (standalone, no traffic dependency)
 
+
+
+My ideas dumps:
+i do not wan to enable lane change first. Yes it's important but It's artifical fix to me based on the pemps upstream sensor. we do not know what amount of vehicle lane chnages and this is the dynamic traffic assignment that I am talking about.
+at each segment, sensing has to happen at the junction since they share same unified junction.
+the junction can say. what is the density of this segment. compare to all the lanes entering that segment. say. what is the density of the ahead segments compare and make dynamic vehicle reasignment based on lane chnage safe logic (a vehicle in lane 1 can't chnage to lane 4) it has to be +1 or -1 lane change or stay in your lane if the density of that upconneting lane is heavy so there needs to be some density information calculation here.
+I need to document all these Idea I am putting out to make this work a solid work.
+we need a task flow of what we want to do to fix all these physics one after the other pls
+
+
+One last fundamental request. Ramp entering is more like a vibe now. No literature backed mathodology. no safety check, I mean if it exist I need to see it.
+virtually, what I see is vehicle entering from onramp and does not care if there is a close car at the mainline already. there should be something that slows vehicle down at that point and let is behave using the IDM physics. if we do not have this then this is just some fancy animation code and not Micro simulation according to Treiber on what a real micro simulatione engine must obey.
+A vehicle can't overun a leader vehicle... the follower must be braking according to it's leader and that should be across board.
+Car following model cars about leader and follower dynamics and this DLL is a good way to do that. if you are in a node, and you kept moving. you can't over take your leader ..
+You should stop or willing to stop if your leader is stoping or slowing down.
+Vsource kept producing cars even wen the segment is filled up: where is the dynamic traffic here?
+onramp just enter without caring if there is a car that is close. they can only enter when the cost is clear or enter in a systemic manner by waiting at their junction
+these are fundamentals. We need to investigate what we have and what we don't have.
+read only investigation

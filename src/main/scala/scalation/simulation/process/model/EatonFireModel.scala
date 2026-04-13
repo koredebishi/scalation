@@ -24,6 +24,8 @@ import scalation.simulation.process.{IntegratorType, IDMDynamics}
 import scalation.simulation.process.config.{AggregatedDemand, CorridorLayout, MultiCorridorConfig, PeMSDemand}
 import scalation.simulation.process.builder.{CorridorBuilder, BuiltNetwork}
 import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSource, AggregatedRampArrivalSource}
+import scala.collection.mutable.ListBuffer
+import scalation.simulation.process.RampMode
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Run the EatonFireModel simulation.
@@ -53,8 +55,8 @@ import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSou
 class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                       animating: Boolean = true, aniRatio: Double = 500.0,
                       synthetic: Boolean = true)
-      extends Model (name, reps, animating, aniRatio)
-         with RowTimeLoader:
+  extends Model (name, reps, animating, aniRatio)
+    with RowTimeLoader:
 
     private val debug = debugf ("EatonFireModel", true)
 
@@ -164,11 +166,11 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
         else 0.30                                                // ultimate fallback
 
     debug ("init", s"I-210: lanes=$numLanes210, segs=$numSegments210, " +
-                   s"onRamps=$nOnRamps210, hwLen=$hwLen210")
+      s"onRamps=$nOnRamps210, hwLen=$hwLen210")
     debug ("init", s"SR-134: lanes=$numLanes134, " +
-                   s"onRamps=$nOnRamps134, hwLen=$hwLen134")
+      s"onRamps=$nOnRamps134, hwLen=$hwLen134")
     debug ("init", s"FF: divSeg=$ffDivSeg210, mrgSeg=$ffMrgSeg134, " +
-                   f"splitRatios=${splitRatios.length} intervals, avg=${splitRatios.sum / splitRatios.length.max(1)}%.3f")
+      f"splitRatios=${splitRatios.length} intervals, avg=${splitRatios.sum / splitRatios.length.max(1)}%.3f")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // Step 3: Arrival Sources (same pattern as CalRoute101_3 / TrafficModelBuilder)
@@ -204,7 +206,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     // I-210 mainline sources at EASTERN end (high postmile = entry for WB)
     // Spaced perpendicular to road direction — matches Route lane GAP (50 px)
     private val mainlineSources210 = {
-        import scala.collection.mutable.ListBuffer
+        
         val buf = ListBuffer [VSource] ()
         val dx  = junc210(1).at(0) - junc210(0).at(0)
         val dy  = junc210(1).at(1) - junc210(0).at(1)
@@ -219,8 +221,8 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             val physLane   = numLanes210 - 1 - l            // match Route's physical lane mapping
             val laneOffset = (physLane - (numLanes210 - 1) / 2.0) * LANE_GAP
             val loc = Array (junc210(0).at(0) + upX * UPSTREAM + perpX * laneOffset,
-                             junc210(0).at(1) + upY * UPSTREAM + perpY * laneOffset,
-                             20.0, 20.0)
+                junc210(0).at(1) + upY * UPSTREAM + perpY * laneOffset,
+                20.0, 20.0)
             val nStop = mlSources210(l).getTotalVehicles (l)   // from ArrivalSource
             val iArrivalRV = mlSources210(l).getDistribution   // only use RV for synthetic demand
             buf += new VSource (s"I210_ML$l", this, () => Car (), l, nStop, iArrivalRV, loc)
@@ -230,7 +232,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
 
     // I-210 ramp sources — positioned at rampAttachPoint + outward * RAMP_LEN
     private val rampSources210 = {
-        import scala.collection.mutable.ListBuffer
+        
         val buf = ListBuffer [VSource] ()
         val (px, py) = route210.perpVec
         cfor (0, nOnRamps210) { r =>
@@ -239,7 +241,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             val nStop = rampSrcArr210(r).getTotalVehicles (0)
             val iArrivalRV = rampSrcArr210(r).getDistribution
             buf += new VSource (s"", this, () => Car (), numLanes210 + r,
-                                nStop, iArrivalRV, loc)
+                nStop, iArrivalRV, loc)
         }
         buf.toList
     }
@@ -249,7 +251,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
 
     // SR-134 ramp sources — positioned at rampAttachPoint + outward * RAMP_LEN
     private val rampSources134 = {
-        import scala.collection.mutable.ListBuffer
+        
         val buf = ListBuffer [VSource] ()
         val (px, py) = route134.perpVec
         cfor (0, nOnRamps134) { r =>
@@ -258,7 +260,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             val nStop = rampSrcArr134(r).getTotalVehicles (0)
             val iArrivalRV = rampSrcArr134(r).getDistribution
             buf += new VSource (s"", this, () => Car (),
-                                SR134_BASE + numLanes134 + r, nStop, iArrivalRV, loc)
+                SR134_BASE + numLanes134 + r, nStop, iArrivalRV, loc)
         }
         buf.toList
     }
@@ -275,13 +277,13 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     private val ramps210 = new Array [Ramp] (nOnRamps210)
     cfor (0, nOnRamps210) { r =>
         ramps210(r) = new Ramp (s"I210_OR${r + 1}", rampSources210(r), b210.rampSensors(r),
-                                motion, scalation.simulation.process.RampMode.On, false, 0.1, 0.0)
+            motion, RampMode.On, false, 0.1, 0.0)
     }
 
     private val ramps134 = new Array [Ramp] (nOnRamps134)
     cfor (0, nOnRamps134) { r =>
         ramps134(r) = new Ramp (s"S134_OR${r + 1}", rampSources134(r), b134.rampSensors(r),
-                                motion, scalation.simulation.process.RampMode.On, false, 0.1, 0.0)
+            motion, RampMode.On, false, 0.1, 0.0)
     }
 
     // Off-ramps: from = off-ramp diverge junction (side of road), to = off-ramp sink
@@ -292,7 +294,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
         offRamps210(r) = new Ramp (s"I210_FR${r + 1}",
             b210.offRampSensors(r),                        // from: diverge junction (road edge)
             b210.offRampSinks(r),                           // to: off-ramp sink
-            motion, scalation.simulation.process.RampMode.Off, false, -0.1, 0.0)
+            motion, RampMode.Off, false, -0.1, 0.0)
     }
 
     private val nOffRamps134   = b134.offRampJoinSegs.length
@@ -301,21 +303,32 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
         offRamps134(r) = new Ramp (s"S134_FR${r + 1}",
             b134.offRampSensors(r),                        // from: diverge junction (road edge)
             b134.offRampSinks(r),                           // to: off-ramp sink
-            motion, scalation.simulation.process.RampMode.Off, false, -0.1, 0.0)
+            motion, RampMode.Off, false, -0.1, 0.0)
     }
 
     debug ("init", s"Off-ramps: I-210=$nOffRamps210, SR-134=$nOffRamps134")
+
+    // Wire merge targets so ramp vehicles can see mainline traffic (Treiber §11.3).
+    // Without this, findLeader Step 3 fails → ramp cars drive blind at free-flow speed.
+    cfor (0, nOnRamps210) { r =>
+        ramps210(r).targetPathway = route210.pathway(numLanes210 - 1)   // outermost lane
+        ramps210(r).targetSegId   = rampJoinSeg210(r)                    // merge segment
+    }
+    cfor (0, nOnRamps134) { r =>
+        ramps134(r).targetPathway = route134.pathway(numLanes134 - 1)
+        ramps134(r).targetSegId   = rampJoinSeg134(r)
+    }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // Step 5: Register ALL components
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     private val allJunctions = junc210.toList ++ b210.rampSensors.toList ++ b210.offRampSensors.toList ++
-                               junc134.toList ++ b134.rampSensors.toList ++ b134.offRampSensors.toList
+      junc134.toList ++ b134.rampSensors.toList ++ b134.offRampSensors.toList
     private val allSinks     = sinks210 ++ sinks134 ++
-                               b210.offRampSinks.toList ++ b134.offRampSinks.toList
+      b210.offRampSinks.toList ++ b134.offRampSinks.toList
     private val allRamps     = ramps210.toList ++ ramps134.toList ++
-                               offRamps210.toList ++ offRamps134.toList
+      offRamps210.toList ++ offRamps134.toList
 
     addComponents (sources, allJunctions, allSinks, allRamps)
     ffConnectors210to134.foreach (addComponent (_))              // register all FF lanes
@@ -329,13 +342,15 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
 
     case class Car () extends Vehicle ("c", this):
 
-        override def act (): Unit =
-            if subtype < SR134_BASE then actOnCorridor (
+        override def act (): Unit = {
+            // Determine corridor based on subtype encoding, then drive on that corridor's topology.
+            if subtype < SR134_BASE then actOnCorridor (            // I-210 entry
                 subtype, numLanes210, route210, junc210, sinks210, ramps210, rampJoinSeg210, hwLen210
             )
-            else actOnCorridor (
+            else actOnCorridor (                                   // SR-134 entry
                 subtype - SR134_BASE, numLanes134, route134, junc134, sinks134, ramps134, rampJoinSeg134, hwLen134
             )
+        }
         end act
 
         /** Drive a car on any corridor — mainline or ramp entry. */
@@ -382,16 +397,26 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             var diverted = false
 
             while seg < hwLen && !diverted do
+                // ── Lane change: decongest by moving inward when anyone is ahead ──
+                // COMMENTED OUT FOR TESTING
+//                val leader = getCarAhead(this)
+//                if leader != null then
+//                    val target = if laneID > 0 then laneID - 1 else laneID + 1
+//                    if target >= 0 && target < route.lanesAt(seg) then
+//                        route.changeLane(laneID, target, this, seg)
+//                    end if
+//                end if
+
                 route.pathway(laneID).seg(seg).move ()
                 junc(seg + 1).jump ()
 
                 // ── FF diversion: I-210 WB → SR-134 WB at interchange ──────
                 // Time-varying split ratio from PeMS (flow_717603 / flow_717634)
                 if !diverted && ffConnectors210to134.nonEmpty
-                   && subtype < SR134_BASE                    // car is on I-210
-                   && seg == ffDivSeg210                      // at interchange segment
-                   && ffMrgSeg134 >= 0                        // merge point valid
-                   && rand.gen < currentSplitRatio then       // time-varying probabilistic split
+                  && subtype < SR134_BASE                    // car is on I-210
+                  && seg == ffDivSeg210                      // at interchange segment
+                  && ffMrgSeg134 >= 0                        // merge point valid
+                  && rand.gen < currentSplitRatio then       // time-varying probabilistic split
                     diverted = true
                     // 1. Exit I-210 pathway — remove from current segment's DLL
                     route.pathway(laneID).seg(seg).removeFromAlist (this)
@@ -426,10 +451,12 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                         if !route.laneExistsAt (laneID, seg) then
                             val avail = 0 until route.lanesAt (seg)
                             laneID = route.forceMerge (laneID, avail, this, seg)
+                            // forceMerge did the full job: remove + insert.  Just update myPathway.
+                        else
+                            val nextVT = route.pathway(laneID).seg(seg)
+                            val ahead  = nextVT.getLast
+                            nextVT.addToAlist (this, ahead)
                         end if
-                        val nextVT = route.pathway(laneID).seg(seg)
-                        val ahead  = nextVT.getLast
-                        nextVT.addToAlist (this, ahead)
                         myPathway = route.pathway(laneID)
                     end if
                 end if
@@ -444,7 +471,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
         private def driveRamp (r: Ramp): Unit =
             val carAhead = r.getLast
             r.addToAlist (this, carAhead)
-            if r.mode == scalation.simulation.process.RampMode.On then
+            if r.mode == RampMode.On then
                 r.lane.move ()
                 r.to.asInstanceOf [Junction].jump ()
             end if
@@ -502,4 +529,3 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     Model.shutdown ()
 
 end EatonFireModel
-

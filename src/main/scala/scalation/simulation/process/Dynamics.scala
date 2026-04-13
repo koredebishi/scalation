@@ -50,15 +50,22 @@ trait Dynamics:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the leader of the given vehicle using per-VTransport DLLs.
-     *  First checks within the same segment (myPathNode.ahead).
-     *  If null (car is head of its segment), looks at the next segment's DLL tail.
+     *  Step 1: within-segment leader (myPathNode.ahead).
+     *  Step 2: cross-boundary — next segment's DLL tail (mainline vehicles).
+     *  Step 3: ramp dual-leader — peek at mainline merge target (Treiber §11.3).
      *  @param car  the vehicle whose leader we need
      *  @return the leader vehicle, or null if free-flow
      */
     protected def findLeader (car: Vehicle): Vehicle =
+        val onRamp = car.myRamp != null                                   // DIAG
+
+        if car.myPathNode == null then return null                        // between DLLs → free-flow
+
         // Step 1: within-segment leader (O(1) DLL lookup)
         val ref = car.myPathNode.ahead
-        if ref != null then return ref.elem
+        if ref != null then
+            if onRamp then println(f"[findLeader] ${car.displayLabel}%-12s STEP1 ldr=${ref.elem.displayLabel} ldr.disp=${ref.elem.disp}%.2f ldr.v=${ref.elem.velocity}%.2f me.disp=${car.disp}%.2f me.v=${car.velocity}%.2f")  // DIAG
+            return ref.elem
 
         // Step 2: cross-boundary — look at next segment's DLL tail
         val pw = car.myPathway
@@ -66,9 +73,20 @@ trait Dynamics:
             val segs = pw.seg
             val nextIdx = car.segId + 1
             if nextIdx < segs.length && segs(nextIdx) != null then
-                return segs(nextIdx).getLast              // most recently entered car in next seg
+                return segs(nextIdx).getLast
         end if
-        null                                              // no leader: free-flow
+
+        // Step 3: ramp → peek at mainline merge segment (dual-leader)
+        val ramp = car.myRamp
+        if ramp != null && ramp.targetPathway != null && ramp.targetSegId >= 0 then
+            val targetVT = ramp.targetPathway.seg(ramp.targetSegId)
+            if targetVT != null then
+                val ml = targetVT.getLast
+                if ml != null then return ml
+            end if
+        end if
+
+        null
     end findLeader
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -107,6 +125,11 @@ object GippsDynamics
      *
      * @param car the car/vehicle whose velocity and position is being updated
      */
+    /** Update the vehicle's velocity and position using Gipps' Model.
+     *  All gap and position computations use segment-local `disp` — consistent with
+     *  per-segment DLLs where the leader is always in the same or adjacent segment.
+     *  `t_disp` is updated as a derived statistic only.
+     */
     def updateM(car: Vehicle, length: Double): Unit =
         val car_ahead = findLeader (car)
         val dt = prop("rt")
@@ -114,42 +137,47 @@ object GippsDynamics
         // Step 1: compute next velocity using Gipps (discrete rule)
         val v = gipps(car, car_ahead, length) + EPSILON
 
-        // Step 2: update position based on configured integrator type
+        // Step 2: update position in segment-local coordinates
         val x = integratorType match
             case IntegratorType.Ballistic =>
-                // Ballistic: x(t+τ) = x(t) + v(t) * τ
-                car.t_disp + car.velocity * dt
+                car.disp + car.velocity * dt
             case IntegratorType.butcher =>
-                // Butcher 5th order using past velocities
-                butcher(car.t_disp, car.velocity, car.o_velocity, dt)
+                butcher(car.disp, car.velocity, car.o_velocity, dt)
             case _ =>
-                // Default to Ballistic for any other type
-                car.t_disp + car.velocity * dt
+                car.disp + car.velocity * dt
 
         // Step 3: commit velocity state AFTER position integration
         car.o_velocity = car.velocity
         car.velocity = v
 
-        // Step 4: update displacement (segment-bounded)
+        // Step 4: segment-bounded + collision-free displacement update
         car.o_t_disp = car.t_disp
-        val dx = x - car.t_disp
 
-        val new_disp =
-            if car.disp + dx <= length then car.disp + dx
-            else length
+        // --- Collision-free position clamp (SUMO/VISSIM/Aimsun standard practice) ---
+        // Even if the velocity model overshoots, clamp position to maintain gap ≥ s0
+        // behind leader.  Uses segment-local leader position (cross-seg already handled).
+        var x_safe = x
+        if car_ahead != null then
+            val xl = if car_ahead.segId == car.segId then car_ahead.disp
+                     else length + car_ahead.disp
+            if xl - x_safe - len < s then x_safe = xl - len - s      // park at min gap behind leader
+        end if
+        // val new_disp = max(0.0, if x <= length then x else length)   // OLD: no collision-free clamp
+        val new_disp = max(0.0, if x_safe <= length then x_safe else length)
 
-        car.t_disp += new_disp - car.disp
+        car.t_disp += new_disp - car.disp                           // derive t_disp from clamped delta
         car.disp = new_disp
     end updateM
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the velocity of the vehicle based on Gipps' model for a vehicle and its predecessor.
+     *  With per-segment DLLs, leader is always same-seg or next-seg.  All positions are segment-local.
      *  @param cn  the current vehicle
      *  @param cp  the predecessor of the current vehicle (from findLeader — always same or next segment)
      */
     def gipps (cn: Vehicle, cp: Vehicle, length: Double): Double =
         if cp == null then
-            gipps (amax, bmax, len, cn.vmax, cn.t_disp, cn.velocity, cn.t_disp + 1000, cn.vmax, prop("rt"))
+            gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cn.disp + 1000, cn.vmax, prop("rt"))
         else
             // Leader is in same segment or adjacent next segment
             val cp_r_disp = if cp.segId == cn.segId then cp.disp
@@ -218,7 +246,9 @@ object KraussDynamics
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Update the vehicle's velocity and position using Krauss Model.
-     *  Position update method is configurable via integratorType.
+     *  All gap and position computations use segment-local `disp` — consistent with
+     *  per-segment DLLs where the leader is always in the same or adjacent segment.
+     *  `t_disp` is updated as a derived statistic only.
      *  @param car    the vehicle to update
      *  @param length the segment length
      */
@@ -226,7 +256,7 @@ object KraussDynamics
         val car_ahead = findLeader (car)
         val dt = prop("rt")
 
-        // Compute leader position and velocity
+        // Compute leader position and velocity (segment-local)
         val (xp, vp): (Double, Double) =
             if car_ahead == null then
                 (car.disp + 1000.0, car.vmax)  // phantom leader (free flow)
@@ -242,25 +272,31 @@ object KraussDynamics
             xp, vp, dt, s
         )
 
-        // Step 2: Position update based on configured integrator type
+        // Step 2: Position update in segment-local coordinates
         val x_new = integratorType match
             case IntegratorType.Ballistic =>
-                car.t_disp + car.velocity * dt
+                car.disp + car.velocity * dt
             case IntegratorType.butcher =>
-                butcher(car.t_disp, car.velocity, car.o_velocity, dt)
+                butcher(car.disp, car.velocity, car.o_velocity, dt)
             case _ =>
-                car.t_disp + car.velocity * dt
+                car.disp + car.velocity * dt
 
         // Step 3: Commit velocity state AFTER position update
         car.o_velocity = car.velocity
         car.velocity = v_new
 
-        // Step 4: Segment-bounded displacement update
+        // Step 4: Segment-bounded + collision-free displacement update
         car.o_t_disp = car.t_disp
-        val dx = x_new - car.t_disp
-        val new_disp = if car.disp + dx <= length then car.disp + dx else length
 
-        car.t_disp += new_disp - car.disp
+        // --- Collision-free position clamp (SUMO/VISSIM/Aimsun standard practice) ---
+        var x_safe = x_new
+        if car_ahead != null && xp - x_safe - len < s then
+            x_safe = xp - len - s                                    // park at min gap behind leader
+        end if
+        // val new_disp = max(0.0, if x_new <= length then x_new else length) // OLD: no collision-free clamp
+        val new_disp = max(0.0, if x_safe <= length then x_safe else length)
+
+        car.t_disp += new_disp - car.disp                           // derive t_disp from clamped delta
         car.disp = new_disp
     end updateM
 
@@ -334,6 +370,10 @@ object IDMDynamics
 
 
     /**
+     *  Update the vehicle's velocity and position using the Intelligent Driver Model.
+     *  All gap and position computations use segment-local `disp` — consistent with
+     *  per-segment DLLs where the leader is always in the same or adjacent segment.
+     *  `t_disp` is updated as a derived statistic only.
      *  @param car     the vehicle to update
      *  @param length  the segment length
      */
@@ -341,53 +381,59 @@ object IDMDynamics
         val car_ahead = findLeader (car)
         val dt = rt
 
-        // Snapshot leader state (frozen during integration)
-        val (x_leader, v_leader): (Double, Double) =                // leader's (position, velocity)
+        // ─────────────────────────────────────────────────────────────────────────
+        // STEP 1: Snapshot leader state in SEGMENT-LOCAL coordinates.
+        // With per-segment DLLs, findLeader returns same-seg or next-seg only.
+        // ─────────────────────────────────────────────────────────────────────────
+        val (x_leader, v_leader): (Double, Double) =
             if car_ahead == null then
-                (car.t_disp + 1000.0, car.velocity)                 // no leader: free-flow
-            else if car_ahead.t_disp - car.t_disp > FREERANGE then
-                (car.t_disp + 1000.0, car.velocity)                 // leader is far ahead: free-flow
+                (car.disp + 1000.0, car.velocity)                    // no leader: free-flow
             else
-                (car_ahead.t_disp, car_ahead.velocity)              // real leader: use it
+                val xl = if car_ahead.segId == car.segId then car_ahead.disp
+                         else length + car_ahead.disp                // next segment
+                // Fix 2: skip FREERANGE for ramp cars — ramp must always track the
+                // mainline dual-leader to decelerate before merge (Treiber §11.3).
+                if xl - car.disp > FREERANGE && car.myRamp == null then
+                    (car.disp + 1000.0, car.velocity)                // leader far ahead: free-flow
+                else
+                    (xl, car_ahead.velocity)                          // real leader
 
         // ─────────────────────────────────────────────────────────────────────────
         // STEP 2: Save old state for history tracking
         // ─────────────────────────────────────────────────────────────────────────
         val v_old = car.velocity
-        val x_old = car.t_disp
+        val x_old = car.disp                                          // segment-local
 
         /**
-         * @param x_n  Current position of driver n (from ODE solver trial values, NOT car.t_disp)
-         * @param v_n  Current velocity of driver n (from ODE solver trial values, NOT car.velocity)
-         * @return     IDM acceleration clamped to physical bounds [-bmax, amax]
+         * @param x_n  Current position of driver n (segment-local, from ODE solver trial values)
+         * @param v_n  Current velocity of driver n (from ODE solver trial values)
+         * @return     IDM acceleration clamped to physical bounds [-b_emergency, amax]
         */
         def idmAccel(x_n: Double, v_n: Double): Double =
-            val b = abs(bmax)
+            val b = abs(bmax)                                            // comfortable decel for IDM s* formula
 
-            // Call existing iDM with snapshotted leader state
-            // iDM(an, bn, sp, Vn, xn, vn, xp, vp, T, s0, del)
             var a = iDM(amax, b, len, car.vmax, x_n, v_n,
                         x_leader, v_leader, T, s, del)
 
-            // Clamp acceleration to physical bounds
+            val a_raw = a                                                 // save before clamp
             if a.isNaN || a.isInfinity then a = 0.0
-            if a < -b then a = -b
+//            if a < -b then a = -b                                     // OLD: comfortable clamp (bmax = 2.0)
+            val a_floor = max(b_emergency, -v_n / dt)                    // SUMO-style: can't decel past stopping
+            if a < a_floor then a = a_floor                              // allows b_emergency at high v, gentler at low v
             if a > amax then a = amax
             a
         end idmAccel
 
         // Array of derivative functions: [dx/dt, dv/dt]
-        // dx/dt = v (velocity)         returned directly from state vector
-        // dv/dt = a (IDM acceleration) returned by idmAccel helper function
         val odes: Array[DerivativeV] = Array(
             (t: Double, y: VectorD) => y(1),                    // dx/dt = v (velocity)
             (t: Double, y: VectorD) => idmAccel(y(0), y(1))     // dv/dt = a (IDM acceleration)
         )
 
         // ─────────────────────────────────────────────────────────────────────────
-        // STEP 4: Solve the coupled system with selected integrator
+        // STEP 4: Solve the coupled system in segment-local coordinates
         // ─────────────────────────────────────────────────────────────────────────
-        val y0 = VectorD(car.t_disp, car.velocity)                      // initial state [x(t), v(t)]
+        val y0 = VectorD(car.disp, car.velocity)                      // segment-local initial state
 
         // Print integrator type ONCE per simulation (from inside updateM, not from caller)
         if !integratorPrinted then
@@ -403,72 +449,79 @@ object IDMDynamics
             case IntegratorType.Heun      => RungeKutta2.heun.integrateVV(odes, y0, dt)
             case IntegratorType.Euler     => RungeKutta2.euler.integrateVV(odes, y0, dt)
             case IntegratorType.butcher   =>
-                // Butcher's 5th-order method (J.C. Butcher) - a quadrature rule using historical samples.
-                // Apply twice: once for velocity (using acceleration history), once for position (using velocity history).
-                // This maintains 5th-order accuracy for BOTH state variables.
-                
-                // Step 1: Velocity via Butcher using acceleration history: a(t), a(t−τ)
-                // v(t+τ) = v(t) + (1/90)(7k1 + 32k3 + 12k4 + 32k5 + 7k6)τ  where k's interpolate a(t-τ) to a(t)
-                val a_idm = idmAccel(car.t_disp, car.velocity)        // a(t) from IDM
+                val a_idm = idmAccel(car.disp, car.velocity)
                 val v_new_b = Vehicle.butcher(
-                    car.velocity,    // v(t)   - current velocity
-                    a_idm,           // a(t)   - current acceleration
-                    car.o_acc,       // a(t−τ) - previous acceleration
+                    car.velocity,    // v(t)
+                    a_idm,           // a(t)
+                    car.o_acc,       // a(t−τ)
                     dt
                 )
-                
-                // Step 2: Position via Butcher using velocity history: v(t), v(t−τ)
-                // x(t+τ) = x(t) + (1/90)(7k1 + 32k3 + 12k4 + 32k5 + 7k6)τ  where k's interpolate v(t-τ) to v(t)
                 val x_new_b = Vehicle.butcher(
-                    car.t_disp,      // x(t)   - current position
-                    car.velocity,    // v(t)   - current velocity
-                    car.o_velocity,  // v(t−τ) - previous velocity
+                    car.disp,        // x(t)   — segment-local
+                    car.velocity,    // v(t)
+                    car.o_velocity,  // v(t−τ)
                     dt
                 )
                 VectorD(x_new_b, v_new_b)
             case IntegratorType.Ballistic =>
-                // Ballistic: compute IDM acceleration once, then kinematic update
-                val a_idm = idmAccel(car.t_disp, car.velocity)
-                val v_ball = car.velocity + a_idm * dt   // v(t + dt) the new velocity
-                val x_ball = car.t_disp + car.velocity * dt + 0.5 * a_idm * dt * dt  // x(t + dt)
-                VectorD(x_ball, v_ball)  // construct new state vector
+                val a_idm = idmAccel(car.disp, car.velocity)
+                val v_ball = car.velocity + a_idm * dt
+                val x_ball = car.disp + car.velocity * dt + 0.5 * a_idm * dt * dt
+                VectorD(x_ball, v_ball)
 
         // ─────────────────────────────────────────────────────────────────────────
         // STEP 5: Extract and clamp results
         // ─────────────────────────────────────────────────────────────────────────
-        val x_new = y1(0)                                                 // new position x(t + dt)
-        var v_new = y1(1)                                                 // new velocity v(t + dt)
+        val x_new = y1(0)                                                 // new segment-local position
+        var v_new = y1(1)                                                 // new velocity
 
         // Physical constraints: velocity must be non-negative and bounded
         if v_new < 0.0 then v_new = 0.0                                 // no backward motion
         if v_new > car.vmax then v_new = car.vmax                       // respect max speed
 
         // Back-calculate acceleration for state storage
-        val a = (v_new - v_old) / dt                                    // average acceleration over dt
+        val a = (v_new - v_old) / dt
 
         // ─────────────────────────────────────────────────────────────────────────
         // STEP 6: Update vehicle state
         // ─────────────────────────────────────────────────────────────────────────
-        car.o_acc      = car.acc                                        // save old acceleration
-        car.acc        = a                                              // update acceleration
-        car.o_velocity = v_old                                          // save old velocity
-        car.velocity   = v_new                                          // update velocity
-        car.o_t_disp   = x_old                                          // save old position
+        car.o_acc      = car.acc
+        car.acc        = a
+        car.o_velocity = v_old
+        car.velocity   = v_new
+        car.o_t_disp   = car.t_disp                                     // track old t_disp for stats
 
         // ─────────────────────────────────────────────────────────────────────────
-        // STEP 7: Segment-bounded displacement update
+        // STEP 7: Segment-bounded + collision-free displacement update
         // ─────────────────────────────────────────────────────────────────────────
-        val dx = x_new - x_old                                         // change in position
-        val proposed_disp = car.disp + dx                              // proposed new displacement
-        val new_disp = if proposed_disp <= length then proposed_disp else length           // clamp to segment length
+        // --- Collision-free position clamp (SUMO/VISSIM/Aimsun standard practice) ---
+        // Even if IDM + integrator overshoots, clamp position to maintain gap ≥ s0
+        // behind leader.  Uses x_leader from STEP 1 (cross-seg already resolved).
+        // Breaks deadlock: overshoot → clamp to safe gap → IDM gives positive accel
+        // next timestep when leader moves.  No backward motion possible.
+        var x_safe = x_new
+        if car_ahead != null && x_leader - x_safe - len < s then     // would violate min gap?
+            x_safe = x_leader - len - s                               // park at min gap behind leader
+        end if
+        // val new_disp = max(0.0, if x_new <= length then x_new else length) // OLD: no collision-free clamp
+        val new_disp = max(0.0, if x_safe <= length then x_safe else length)
 
-        car.t_disp += new_disp - car.disp                              // update total position
-        car.disp    = new_disp                                         // update displacement on segment
+        car.t_disp += new_disp - car.disp                               // derive t_disp from clamped delta
+        car.disp    = new_disp
+
+        // DIAG: final state for ramp vehicles — detect overtaking
+        if car.myRamp != null then
+            val ldrD = if car_ahead != null then car_ahead.disp else -1.0
+            val gapF = if car_ahead != null then ldrD - new_disp - len else 999.0
+            val flag = if car_ahead != null && car_ahead.segId == car.segId && new_disp > ldrD then " *** OVERTOOK ***" else ""
+            println(f"[STEP7] ${car.displayLabel}%-12s disp=${new_disp}%.2f v=${car.velocity}%.2f ldr=${if car_ahead != null then car_ahead.displayLabel else "null"} ldrD=${ldrD}%.2f gap=${gapF}%.2f$flag")
+        end if  // DIAG
     end updateM
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the acceleration of the vehicle based on the Intelligent Driver Model
-     *  for a vehicle and its predecessor.
+     *  for a vehicle and its predecessor.  Uses segment-local `disp` for gap computation.
+     *  NOTE: updateM uses the raw iDM directly; this is a convenience for external callers.
      *  @param cn   the current vehicle
      *  @param cp   the predecessor of the current vehicle
      *  @param del  the acceleration exponenent (defualts to 4)
@@ -476,10 +529,8 @@ object IDMDynamics
     def iDM (cn: Vehicle, cp: Vehicle, del: Double = 4.0): Double =
         if cp == null then
             iDMFree (amax, cn.velocity, cn.vmax, del)
-        else if cp.t_disp - cn.t_disp > FREERANGE then
-            iDMFree (amax, cn.velocity, cn.vmax, del)
         else
-            iDM (amax, abs(bmax), len, cn.vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, T, s, del)
+            iDM (amax, abs(bmax), len, cn.vmax, cn.disp, cn.velocity, cp.disp, cp.velocity, T, s, del)
     end iDM
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

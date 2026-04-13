@@ -114,11 +114,12 @@ object Vehicle:
      */
     val def_prop = Map ("rt"   -> 0.5,                       // driver reaction time
         "amax" -> 4.0,                       // max acceleration
-        "bmax" -> -2.0,                      // max deceleration use to be -1.5
+        "bmax" -> -2.0,                      // comfortable deceleration (IDM s* formula) use to be -1.5
+        "b_emergency" -> -9.0,               // physical max braking (0.9g) — clamp floor for all CFMs
         "v0"   -> 4.0,                       // starting velocity // v0 should be adjustable to 0
         "vmax" -> 33.528,                    // max velocity
         "T"    -> 3.0,                       // safe min time headway
-        "s"    -> 5.0,                       // safe min distance headway
+        "s"    -> 4.0,                       // safe min distance headway (bumped from 5.0 for visual spacing)
         "len"  -> 4.0,                       // length of the vehicles
         "del"  -> 4.0)                       // acceleration exponent (delta)
 
@@ -132,7 +133,8 @@ object Vehicle:
      */
     inline def rt: Double   = prop("rt")                     // driver reaction time
     inline def amax: Double = prop("amax")                   // max acceleration
-    inline def bmax: Double = prop("bmax")                   // max deceleration
+    inline def bmax: Double = prop("bmax")                   // comfortable deceleration (IDM s* formula)
+    inline def b_emergency: Double = prop("b_emergency")     // physical max braking (0.9g) — clamp floor
     inline def v0: Double   = prop("v0")                     // starting velocity
     inline def vmax: Double = prop("vmax")                   // max velocity
     inline def T: Double    = prop("T")                      // min time headway
@@ -153,7 +155,8 @@ object Vehicle:
 
         val new_prop = Map("rt" -> params(4), // driver reaction time
             "amax" -> params(1), // max acceleration
-            "bmax" -> params(2), // max deceleration
+            "bmax" -> params(2), // comfortable deceleration
+            "b_emergency" -> def_prop("b_emergency"), // physical max braking (not calibrated)
             "v0" -> def_prop("v0"), // starting velocity // v0 should be adjustable to 0
             "vmax" -> def_prop("vmax"), // max velocity
             "T" -> params(3), // safe min time headway
