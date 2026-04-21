@@ -36,6 +36,9 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
 
     private val debug = debugf ("Pathway", true)             // debug function
 
+    /** Back-reference to the parent Route (set by Route constructor). */
+    var parentRoute: Route = null
+
 
     val points = from +: junc.toList :+ to
     val seg = Array.ofDim[VTransport](points.length - 1)
@@ -67,6 +70,7 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
         actor.myPathway = this
         actor.myFFConnector = null                   // not on an FFConnector
         actor.myRamp = null                          // not on a ramp
+        if parentRoute != null then actor.myRoute = parentRoute
         seg(segId).addToAlist (actor, other)
     end addToAlist
 

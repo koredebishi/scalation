@@ -44,11 +44,16 @@ class Sink (name: String, at: Array [Double])
         this (name, Array (xy._1, xy._2, 20.0, 20.0))
     end this
 
+    /** Color used when displaying this sink node.  Set to a fully
+     *  transparent color (alpha = 0) to hide the node in the animation.
+     */
+    var displayColor: java.awt.Color = red
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Tell the animation engine to display this Sink.
      */
     def display (): Unit =
-        director.animate (this, CreateNode, red, Ellipse (), at)
+        director.animate (this, CreateNode, displayColor, Ellipse (), at)
     end display
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -1,0 +1,184 @@
+# Ph.D. Student Status Update and Self Evaluation
+## School of Computing, UGA, Spring 2026
+
+**Last Name, First Name:** BISHI, Rahman KOREDE
+
+**Last four digits of UGA ID:** 3422
+
+**Semester and Year when you joined the Ph.D. program:** Fall, 2022
+
+**Date when this form is being submitted:** 04/15/2026
+
+**Name of the Major Professor:** Dr. John A. Miller
+
+**Names of the PhD Advisory Committee:**
+
+- Committee Member: Dr. John A. Miller (Major Professor)
+- Committee Member: Dr. Qianwen Li
+- Committee Member: Dr. Ingrid Maria Hybinette
+- Committee Member: ____________________________
+
+---
+
+## MILESTONES
+
+**Formation of PhD advisory committee (completion of the G130 Form):** Summer, 2025
+
+**Core competency:** Passed — July 20, 2025 (Core GPA: 3.566)
+
+**Preliminary Doctoral Program of Study Form:** Fall, 2023
+
+**Paper Submission before Comprehensive Exam:** Spring, 2026
+
+- **Title:** "Beyond Corridor Averages: Lane-Level Validation of Microscopic Freeway Simulation with Data-Driven Arrivals"
+- **Conference/Journal:** Annual Modeling and Simulation Conference (ANNSIM 2026)
+
+**Final Program of Study Form (G138):** NM (Spring, 2026)
+
+**Comprehensive Exam:**
+
+- **Written Exam:** In progress — Spring, 2026
+- **Oral Exam:** NM (Summer, 2026)
+
+**Application for Admission to Candidacy:** NM (Summer, 2026)
+
+**Paper Accepted Before Prospectus:** Spring, 2026
+
+- **Title:** "Beyond Corridor Averages: Lane-Level Validation of Microscopic Freeway Simulation with Data-Driven Arrivals"
+- **Conference/Journal:** Annual Modeling and Simulation Conference (ANNSIM 2026) — Accepted
+
+**Prospectus:** NM (Fall, 2026)
+
+**Application for Graduation Form:** NM (Spring, 2028)
+
+**Defense:** NM (Spring, 2028)
+
+---
+
+## RESEARCH PROGRESS
+
+### Research Progress Summary
+
+My dissertation investigates empirically validated microscopic traffic simulation for infrastructure resilience analysis, organized around three studies. **Study 1** (ANNSIM 2026, accepted) establishes which modeling decisions materially affect simulation accuracy: we show that arrival-process choice has far greater impact than numerical integrator choice — the shifted Erlang-2 distribution reduced flow prediction error by ~28% compared to Poisson, while integrator choice produced <1% variation. **Study 2** (in preparation) applies the validated simulation to wildfire evacuation resilience, reconstructing the 2025 Palisades Fire evacuation on I-210 and evaluating contraflow strategies through counterfactual scenarios calibrated against PeMS fire-day sensor data. **Study 3** (proposed) envisions a unified agentic architecture where LLM-driven agents autonomously design, execute, and refine simulation experiments over a validated digital twin, enabling scenario exploration at a scale infeasible through manual experimentation.
+
+The simulation engine is built within the ScalaTion 2.0 framework and includes three car-following models (IDM, Gipps, Krauss), a MOBIL lane-change model, on-ramp merge behavior, variable-lane doubly-linked-list vehicle tracking, and a Java2D rendering engine with OpenStreetMap background maps. Calibration experiments run on the GACRC Sapelo2 cluster using SPSA and Nelder-Mead optimizers. I am currently preparing for my written candidacy examination.
+
+### List of Publications
+
+1. **Bishi, K.R.**, Bowman, J., Miller, J.A. (2026). "Beyond Corridor Averages: Lane-Level Validation of Microscopic Freeway Simulation with Data-Driven Arrivals." *Annual Modeling and Simulation Conference (ANNSIM 2026)*. **[Accepted]**
+
+2. **Bishi, K.R.**, Miller, J.A. (2026). "Evaluating Evacuation Resilience Under Wildfire Disruption: A PeMS-Calibrated Microscopic Simulation of I-210 During the 2025 Palisades Fire." *Winter Simulation Conference (WSC 2026)*. **[Manuscript in Preparation]**
+
+---
+
+## COURSE WORK PROGRESS
+
+**Number of credit hours completed by end of current semester:** ____
+
+**Number of credit hours completed by end of current semester that count towards program of study:** ____
+
+**Coursework completed or to be completed by end of this semester:**
+
+**No. of hours completed from preliminary focus by end of this semester:** ____
+
+**No. of hours completed from the primary focus area by the end of this semester:** ____
+
+**No. of hours of 8000-level CSCI coursework:** ____
+
+**No. of hours of graduate-level CSCI coursework:** ____
+
+**No. of hours of doctoral minor coursework (if doing a minor):** None
+
+**No. of hours of CSCI 9300 Doctoral Dissertation:** ____
+
+---
+
+## ACTIVITIES DURING CURRENT YEAR (Summer 2025, Fall 2025 and Spring 2026)
+
+### Research Activities During this Academic Year Including Publications
+
+- Designed and built a microscopic traffic simulation of the US-101 freeway corridor (Willow Road to Marsh Road, ~2 miles) within the ScalaTion 2.0 discrete-event simulation framework
+- Implemented three car-following dynamics — Intelligent Driver Model (IDM), Gipps safe-distance model, and Krauss stochastic model — with configurable numerical integrators (Euler through Dormand-Prince RK45)
+- Built lane-level validation infrastructure comparing simulated per-lane flow and speed against PeMS sensor data at five detector stations
+- Developed a shifted Erlang-2 arrival process that enforces realistic minimum headways, reducing flow prediction error by ~28% versus standard Poisson arrivals
+- Implemented MOBIL lane-change model (Treiber & Kesting, 2007) within the simulation engine, including safety criterion, incentive criterion, and anti-oscillation cooldown
+- Built variable-lane doubly-linked-list architecture supporting segments with different lane counts (e.g., 4-lane mainline with 2-lane on-ramps)
+- Ran calibration experiments on the GACRC Sapelo2 HPC cluster using SPSA optimizer with SLURM array jobs
+- Built a second simulation model for the I-210 / SR-134 corridor (Eaton Fire evacuation study, dual-corridor with on-ramps and off-ramps)
+- Developed a rendering engine using Java2D: road polygons, lane markings, rotated velocity-colored vehicles, OpenStreetMap background map overlay with auto-download, HUD overlay
+- Paper accepted at ANNSIM 2026: "Beyond Corridor Averages: Lane-Level Validation of Microscopic Freeway Simulation with Data-Driven Arrivals"
+
+### Course-related Activities During this Academic Year
+
+*(Fill in your Summer 2025, Fall 2025, Spring 2026 courses here — example format:)*
+
+- CSCI 9000 — Summer 2025
+- CSCI 9000 — Fall 2025
+- CSCI 9000 — Spring 2026
+
+### Degree-related Milestones Achieved During This Academic Year
+
+- Core Competency certified — July 20, 2025 (Core GPA 3.566, approved by full committee)
+- PhD Advisory Committee formed — Summer, 2025 (Dr. Miller, Dr. Li, Dr. Hybinette)
+- First paper submitted and accepted — ANNSIM 2026
+- Written candidacy examination — in progress (Spring, 2026)
+
+---
+
+## NOTABLE ACHIEVEMENTS/RECOGNITIONS YOU MAY HAVE HAD DURING THIS YEAR
+
+None
+
+---
+
+## DEVIATIONS FROM PLAN THAT YOU PROVIDED LAST YEAR
+
+Last year I planned to submit a paper on "Dual Training of Foundation Models Using Simulation and Digital Twins" to IEEE BigData. My research direction shifted after closer work with Dr. Miller toward microscopic traffic simulation and empirical validation against PeMS sensor data. The paper I ended up writing and getting accepted at ANNSIM 2026 addresses lane-level validation of freeway simulation with data-driven arrivals — a more focused and empirically grounded topic than the original plan. The core competency form, which was completed but not yet submitted last year, was formally signed and certified in July 2025. The committee was also formed this year, which was on track with my estimated timeline from last year (Fall 2024 estimate, completed Summer 2025).
+
+---
+
+## PLANS FOR THE NEXT YEAR
+
+### Research-related Plans
+
+I plan to complete my written and oral candidacy examinations by Summer 2026. My next research target is a paper on wildfire evacuation resilience, using the I-210 corridor simulation I have already built to evaluate contraflow strategies during the 2025 Palisades Fire. I will calibrate the model against PeMS fire-day sensor data and run counterfactual scenarios comparing baseline, partial contraflow, and full contraflow configurations. I also plan to continue improving the simulation engine — gap acceptance at ramp merges, density-based lane assignment, and further calibration work on Sapelo2. I expect to submit one more paper by end of 2026.
+
+### Course Work-Related Plans
+
+I have completed most of my required coursework. Unless directed otherwise by my major professor, I do not plan on taking additional courses beyond research hours (CSCI 9000/9300).
+
+### Degree-related Milestones
+
+- Complete written candidacy exam — Spring 2026
+- Complete oral candidacy exam — Summer 2026
+- Admission to candidacy — Summer 2026
+- Submit second paper — Fall 2026
+- Prospectus — Fall 2026 or Spring 2027
+
+---
+
+## FUNDING HISTORY
+
+| Semester and Year | Funding Type | Unit Providing Funding | If funded as RA, faculty name(s) |
+|---|---|---|---|
+| Fall 2022 | TA | SoC | |
+| Spring 2023 | TA | SoC | |
+| Summer 2023 | TA | SoC | |
+| Summer 2023 | RA | EETI | Dr. Nathaniel Hunsu |
+| Fall 2023 | TA | SoC | |
+| Spring 2024 | TA | SoC | |
+| Summer 2024 | _(fill in)_ | _(fill in)_ | |
+| Fall 2024 | _(fill in)_ | _(fill in)_ | |
+| Spring 2025 | _(fill in)_ | _(fill in)_ | |
+| Summer 2025 | _(fill in)_ | _(fill in)_ | |
+| Fall 2025 | _(fill in)_ | _(fill in)_ | |
+| Spring 2026 | _(fill in)_ | _(fill in)_ | |
+
+---
+
+**SIGNATURES:**
+
+Signature of Student: _________________________ Date: _____________
+
+Signature of Major Professor: _________________________ Date: _____________
+

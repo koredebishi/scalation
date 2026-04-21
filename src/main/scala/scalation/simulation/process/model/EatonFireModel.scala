@@ -19,7 +19,7 @@ package process
 package model
 
 import scalation.mathstat.{MatrixD, VectorD}
-import scalation.random.{Exponential, Uniform}
+import scalation.random.{Erlang2S, Uniform}
 import scalation.simulation.process.{IntegratorType, IDMDynamics}
 import scalation.simulation.process.config.{AggregatedDemand, CorridorLayout, MultiCorridorConfig, PeMSDemand}
 import scalation.simulation.process.builder.{CorridorBuilder, BuiltNetwork}
@@ -84,7 +84,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
 
     private val motion = IDMDynamics
     IDMDynamics.integratorType = IntegratorType.Ballistic
-    private val iArrivalRV = Exponential (MINUTE / 10.0)  // no need : We use getDistribution from ArrivalSource for synthetic vs. aggregated demand
+    private val iArrivalRV = Erlang2S (6.0)             // Erlang2S: tau=0.6s minimum inter-arrival gap (prevents ramp over-spawning)
     private val rand       = Uniform (0.0, 1.0)            // for FF split ratio decisions
     setTime (nt * rowTime)
 
@@ -227,7 +227,10 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             val iArrivalRV = mlSources210(l).getDistribution   // only use RV for synthetic demand
             buf += new VSource (s"I210_ML$l", this, () => Car (), l, nStop, iArrivalRV, loc)
         }
-        buf.toList
+        val result = buf.toList
+        val _transparent = new java.awt.Color (0, 0, 0, 0)
+        result.foreach (_.displayColor = _transparent)
+        result
     }
 
     // I-210 ramp sources — positioned at rampAttachPoint + outward * RAMP_LEN
@@ -243,7 +246,9 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             buf += new VSource (s"", this, () => Car (), numLanes210 + r,
                 nStop, iArrivalRV, loc)
         }
-        buf.toList
+        val result = buf.toList
+        result.foreach (_.displayColor = new java.awt.Color (0, 0, 0, 0))
+        result
     }
 
     // SR-134 has NO mainline VSource — all mainline traffic enters via FF from I-210.
@@ -262,7 +267,9 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             buf += new VSource (s"", this, () => Car (),
                 SR134_BASE + numLanes134 + r, nStop, iArrivalRV, loc)
         }
-        buf.toList
+        val result = buf.toList
+        result.foreach (_.displayColor = new java.awt.Color (0, 0, 0, 0))
+        result
     }
 
     private val sources: List [VSource] =
@@ -377,12 +384,12 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                 val r = ramps(rampIdx)
                 driveRamp (r)
                 val joinSeg = joinSegs(rampIdx)
-                // Guard: ensure target lane exists at join segment
+                // mergeFromRamp handles lane guard + DLL insertion + ramp removal
+                route.mergeFromRamp (laneID, joinSeg, this, r)
+                // Sync laneID: mergeFromRamp may clamp to outermost existing lane
                 if !route.laneExistsAt (laneID, joinSeg) then
-                    laneID = route.lanesAt (joinSeg) - 1     // outermost existing lane
+                    laneID = route.lanesAt (joinSeg) - 1
                 end if
-                val carAhead = route.pathway(laneID).seg(joinSeg).getLast
-                route.pathway(laneID).addToAlist (this, carAhead, joinSeg)
                 segId = joinSeg                            // set before jump so density records correctly
                 junc(joinSeg).jump ()
                 driveHighway (route, junc, sinks, hwLen, joinSeg)
@@ -397,15 +404,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             var diverted = false
 
             while seg < hwLen && !diverted do
-                // ── Lane change: decongest by moving inward when anyone is ahead ──
-                // COMMENTED OUT FOR TESTING
-//                val leader = getCarAhead(this)
-//                if leader != null then
-//                    val target = if laneID > 0 then laneID - 1 else laneID + 1
-//                    if target >= 0 && target < route.lanesAt(seg) then
-//                        route.changeLane(laneID, target, this, seg)
-//                    end if
-//                end if
+                // Lane change now handled by MOBIL in VTransport.move() — no model-level logic needed
 
                 route.pathway(laneID).seg(seg).move ()
                 junc(seg + 1).jump ()
@@ -474,8 +473,10 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             if r.mode == RampMode.On then
                 r.lane.move ()
                 r.to.asInstanceOf [Junction].jump ()
+            else
+                r.removeFromAlist (this)         // off-ramp: remove immediately
             end if
-            r.removeFromAlist (this)
+            // On-ramp: car stays in Ramp DLL — removal deferred to mergeFromRamp (FIFO)
         end driveRamp
 
     end Car
@@ -523,6 +524,18 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
         println ("=" * 70)
         super.fini (rep)
     end fini
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // Step 8: Background map — OSM road network as visual context
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    private val osmGpsAnchors = {
+        val stations = config.EatonCorridorConfig.loadStationMap ()
+        val wbStations = stations.filter (s =>
+            (s.freeway == 210 || s.freeway == 134) && s.direction == "W")
+        wbStations.map (s => (s.latitude, s.longitude))
+    }
+    loadOsmBackground ("data/osm/eaton_roads.json", osmGpsAnchors, (5000.0, 3000.0))
 
     simulate ()
     waitFinished ()

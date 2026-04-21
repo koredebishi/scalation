@@ -64,11 +64,16 @@ class Source (name: String, director: Model, makeEntity: () => SimActor,
             Array (xy._1, xy._2, 20.0, 20.0))
     end this
 
+    /** Color used when displaying this source node.  Set to a fully
+     *  transparent color (alpha = 0) to hide the node in the animation.
+     */
+    var displayColor: java.awt.Color = limegreen
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Display this source as a node on the animation canvas.
      */
     def display (): Unit =
-        director.animate (this, CreateNode, limegreen, Ellipse (), at)
+        director.animate (this, CreateNode, displayColor, Ellipse (), at)
     end display
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

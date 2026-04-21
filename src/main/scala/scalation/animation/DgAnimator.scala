@@ -16,7 +16,7 @@ import javax.swing.{JButton, JToolBar, JComponent, JLabel}
 import javax.swing.KeyStroke
 import java.awt.BorderLayout
 import java.awt.{BasicStroke, GradientPaint, RenderingHints}
-import java.awt.geom.{AffineTransform, Point2D}
+import java.awt.geom.{AffineTransform, Path2D, Point2D, QuadCurve2D}
 import scala.math.round
 import scalation.scala2d.*
 import scalation.scala2d.Colors.*
@@ -108,6 +108,12 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
     private val vehicleStateRegistry = new HashMap[Int, VehicleState]()
 
+    /** Map token eid -> heading angle (radians) computed from consecutive positions. */
+    private val tokenHeading  = new HashMap [Int, Double] ()
+
+    /** Map token eid -> previous (x, y) for heading computation. */
+    private val prevTokenPos  = new HashMap [Int, (Double, Double)] ()
+
     /** Map token eid -> actorId (defaults to identity when unknown). */
     private val tokenToActorId = new HashMap[Int, Int]()
 
@@ -150,6 +156,30 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
     /** Allow the simulation to set/override the token eid -> actorId mapping. */
     def setTokenActorId(tokenEid: Int, actorId: Int): Unit = vsLock.synchronized { tokenToActorId.update(tokenEid, actorId) }
+
+    // ── Background OSM road network (Layer M-1) ─────────────────────────────
+    @volatile private var backgroundRoads: Array [Array [(Double, Double)]] = null
+    @volatile private var backgroundRoadTypes: Array [String] = null
+    @volatile private var backgroundPlaces: Array [OsmPlace] = null
+
+    /** Push background road network polylines for map context rendering.
+     *  Called by `Model.loadOsmBackground` after projection to screen space.
+     *  @param roads     screen-space polylines, one per road segment
+     *  @param roadTypes OSM highway tags ("motorway", "primary", etc.)
+     */
+    def setBackgroundRoads (roads: Array [Array [(Double, Double)]],
+                            roadTypes: Array [String] = null): Unit =
+        backgroundRoads = roads
+        backgroundRoadTypes = roadTypes
+    end setBackgroundRoads
+
+    /** Push geographic place labels from OSM data.
+     *  Called by `Model.loadOsmBackground` — data comes from the JSON file.
+     *  @param places  array of `OsmPlace` with screen-space positions
+     */
+    def setBackgroundPlaces (places: Array [OsmPlace]): Unit =
+        backgroundPlaces = places
+    end setBackgroundPlaces
 
     /** Public hook for the simulation to push state updates. */
     def updateVehicleState(actorId: Int, state: VehicleState): Unit =
@@ -246,6 +276,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         graph.nodes.clear()
         graph.edges.clear()
         graph.freeTokens.clear()
+        tokenHeading.clear ()
+        prevTokenPos.clear ()
         actorCount = 0
         clock = 0.0
         repaint()
@@ -333,7 +365,10 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         private val dashStroke     = new BasicStroke (1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
                                          10.0f, Array (12.0f, 8.0f), 0.0f)
         private val pavementColor  = new Color (50, 50, 58)
-        private val dashColor      = new Color (200, 200, 210, 160)
+        private val shoulderColor  = new Color (35, 35, 42)          // darker than pavement for shoulder strips
+        private val shoulderWidth  = 3.5                              // shoulder strip width in pixels
+         private val dashColor      = new Color (200, 200, 210, 160)
+         private val edgeLineStroke = new BasicStroke (1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND)
         private val hudFont        = new Font ("SansSerif", Font_BOLD, 22)
         private val hudFontSmall   = new Font ("SansSerif", java.awt.Font.PLAIN, 18)
         private val hudBg          = new Color (20, 20, 28, 200)
@@ -494,12 +529,75 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             g2d.setTransform (at)                             // used for zooming
 
 
+            // ── Layer M-1: background OSM road network ──────────────────
+            // Thin muted lines for every road in the area (visual context).
+            // Drawn BEFORE everything so simulation polygons sit on top.
+            val bgRoads = backgroundRoads                        // snapshot volatile
+            if bgRoads != null then
+                val bgTypes  = backgroundRoadTypes
+                // Per-class stroke widths and colors — major roads prominent, minor subtle
+                val strokeMotorway  = new BasicStroke (10.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                val strokeLink      = new BasicStroke (7.0f,  BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                val strokePrimary   = new BasicStroke (6.0f,  BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                val strokeSecondary = new BasicStroke (5.0f,  BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                val strokeMinor     = new BasicStroke (3.6f,  BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                for i <- bgRoads.indices do
+                    val road = bgRoads (i)
+                    if road.length >= 2 then
+                        val roadType = if bgTypes != null && i < bgTypes.length then bgTypes (i) else ""
+                        val (c, stroke) = roadType match
+                            case "motorway" | "trunk"            => (new Color (160, 165, 190, 200), strokeMotorway)
+                            case "motorway_link" | "trunk_link"  => (new Color (140, 145, 170, 180), strokeLink)
+                            case "primary" | "primary_link"      => (new Color (130, 135, 155, 170), strokePrimary)
+                            case "secondary" | "secondary_link"  => (new Color (115, 118, 140, 150), strokeSecondary)
+                            case "tertiary" | "tertiary_link"    => (new Color (100, 103, 125, 130), strokeMinor)
+                            case _                               => (new Color (85, 88, 108, 100), strokeMinor)
+                        g2d.setStroke (stroke)
+                        g2d.setPaint (c)
+                        for j <- 0 until road.length - 1 do
+                            g2d.drawLine (road(j)._1.toInt, road(j)._2.toInt,
+                                          road(j+1)._1.toInt, road(j+1)._2.toInt)
+                        end for
+                    end if
+                end for
+            end if
+
+
+            // ── Layer M-1b: OSM place labels (cities, suburbs, neighbourhoods) ─
+            // Rendered from OSM data — no hardcoded names.
+            // Font size driven by OSM place type: city > town > suburb > neighbourhood > hamlet.
+            val bgPlaces = backgroundPlaces                      // snapshot volatile
+            if bgPlaces != null && bgPlaces.nonEmpty then
+                val prevComp = g2d.getComposite
+                for place <- bgPlaces do
+                    val (fontSize, alpha) = place.placeType match
+                        case "city"          => (16, 0.50f)
+                        case "town"          => (14, 0.45f)
+                        case "suburb"        => (12, 0.40f)
+                        case "neighbourhood" => (10, 0.35f)
+                        case _               => ( 9, 0.30f)    // village, hamlet
+                    g2d.setFont (new Font ("SansSerif", java.awt.Font.BOLD, fontSize))
+                    val fm = g2d.getFontMetrics
+                    val txt = place.name.toUpperCase
+                    val tw  = fm.stringWidth (txt)
+                    g2d.setComposite (java.awt.AlphaComposite.getInstance (
+                        java.awt.AlphaComposite.SRC_OVER, alpha))
+                    g2d.setPaint (new Color (220, 225, 240))
+                    g2d.drawString (txt, (place.x - tw / 2.0).toFloat,
+                        (place.y + fm.getAscent / 2.0).toFloat)
+                end for
+                g2d.setComposite (prevComp)
+            end if
+
+
             // Display all nodes and their bound tokens
             val nodes = graph.nodes.toList
             val labelFont  = new Font ("SansSerif", java.awt.Font.BOLD, 11)
             val signFont   = new Font ("SansSerif", java.awt.Font.BOLD, 10)
             var nodeIdx = 0
             for node <- nodes do
+              val visible = node.color != null && node.color.getAlpha > 0
+              if visible then
                 g2d.setPaint (node.color)
                 g2d.fill (node.shape)
                 g2d.setPaint (fgColor)
@@ -544,6 +642,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                     g2d.drawString (signTxt, sx + 4, sy + sh + 1)
                 end if
                 nodeIdx += 1
+              end if
 
                 val node_tokens = node.tokens.toList
                 for token <- node_tokens do
@@ -558,23 +657,214 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             val defaultStroke = g2d.getStroke                 // save default stroke
             val edges = graph.edges.toList
 
-            // Layer 1: wide dark pavement behind each lane
-            g2d.setStroke (pavementStroke)
+            // ── Layer 0: filled road surface for parallel-edge bundles ───────
+            // Edges sharing the same (from, to) node pair form a bundle (e.g.,
+            // the lanes of one road segment).  Bundles of 2+ edges produce a
+            // filled polygon spanning the outermost edges.  Single edges and
+            // non-QuadCurve shapes fall through to the Layer 1 stroke below.
+            val halfPave = pavementStroke.getLineWidth / 2.0
+            val bundles  = new HashMap [(graph.Node, graph.Node),
+                                        ArrayBuffer [graph.Edge]] ()
+            val bundledEdges = scala.collection.mutable.HashSet.empty [graph.Edge]
+            val outerEdges   = scala.collection.mutable.HashSet.empty [graph.Edge]
+            val bundleNodes  = scala.collection.mutable.HashSet.empty [graph.Node]
+            val taperedEdges = scala.collection.mutable.HashSet.empty [graph.Edge]
             for edge <- edges do
-                g2d.setPaint (pavementColor)
-                g2d.draw (edge.shape)
+                bundles.getOrElseUpdate ((edge.from, edge.to),
+                                         ArrayBuffer.empty) += edge
             end for
 
-            // Layer 2: dashed lane markings along each lane center
-            g2d.setStroke (dashStroke)
-            for edge <- edges do
+            for ((fromTo, bundle) <- bundles if bundle.size >= 2) do
+                val (fn, tn) = fromTo
+                val dx   = tn.shape.getCenterX () - fn.shape.getCenterX ()
+                val dy   = tn.shape.getCenterY () - fn.shape.getCenterY ()
+                val dLen = math.sqrt (dx * dx + dy * dy)
+                if dLen > 0.001 then
+                    val nx = -dy / dLen                   // perpendicular unit vector
+                    val ny =  dx / dLen
+                    // Sort by signed perpendicular projection to find outermost edges
+                    val sorted = bundle.sortBy { e =>
+                        val ex = e.shape.getCenterX - fn.shape.getCenterX ()
+                        val ey = e.shape.getCenterY - fn.shape.getCenterY ()
+                        ex * nx + ey * ny
+                    }
+                    val loEdge = sorted.head                  // min-perp edge
+                    val hiEdge = sorted.last                  // max-perp edge
+                    val lo = loEdge.shape
+                    val hi = hiEdge.shape
+                    (lo, hi) match
+                        case (loQ: QuadCurve2D, hiQ: QuadCurve2D) =>
+                            val road = new Path2D.Double ()
+                            // lo edge forward, offset outward (−n direction)
+                            road.moveTo (loQ.getX1 - nx * halfPave,
+                                         loQ.getY1 - ny * halfPave)
+                            loQ match
+                                case qc: QCurve if !qc.straight =>
+                                    road.quadTo (qc.getCtrlX - nx * halfPave,
+                                                 qc.getCtrlY - ny * halfPave,
+                                                 qc.getX2    - nx * halfPave,
+                                                 qc.getY2    - ny * halfPave)
+                                case _ =>
+                                    road.lineTo (loQ.getX2 - nx * halfPave,
+                                                 loQ.getY2 - ny * halfPave)
+                            // cross to hi edge end
+                            road.lineTo (hiQ.getX2 + nx * halfPave,
+                                         hiQ.getY2 + ny * halfPave)
+                            // hi edge backward, offset outward (+n direction)
+                            hiQ match
+                                case qc: QCurve if !qc.straight =>
+                                    road.quadTo (qc.getCtrlX + nx * halfPave,
+                                                 qc.getCtrlY + ny * halfPave,
+                                                 qc.getX1    + nx * halfPave,
+                                                 qc.getY1    + ny * halfPave)
+                                case _ =>
+                                    road.lineTo (hiQ.getX1 + nx * halfPave,
+                                                 hiQ.getY1 + ny * halfPave)
+                            road.closePath ()
+                            g2d.setPaint (pavementColor)
+                            g2d.fill (road)
+                            // ── Layer 0b: road shoulders (thin darker strips) ──
+                            val shW = shoulderWidth
+                            // Lo shoulder (−n side)
+                            val shLo = new Path2D.Double ()
+                            shLo.moveTo (loQ.getX1 - nx * halfPave,
+                                         loQ.getY1 - ny * halfPave)
+                            loQ match
+                                case qc: QCurve if !qc.straight =>
+                                    shLo.quadTo (qc.getCtrlX - nx * halfPave,
+                                                 qc.getCtrlY - ny * halfPave,
+                                                 qc.getX2    - nx * halfPave,
+                                                 qc.getY2    - ny * halfPave)
+                                case _ =>
+                                    shLo.lineTo (loQ.getX2 - nx * halfPave,
+                                                 loQ.getY2 - ny * halfPave)
+                            shLo.lineTo (loQ.getX2 - nx * (halfPave + shW),
+                                         loQ.getY2 - ny * (halfPave + shW))
+                            loQ match
+                                case qc: QCurve if !qc.straight =>
+                                    shLo.quadTo (qc.getCtrlX - nx * (halfPave + shW),
+                                                 qc.getCtrlY - ny * (halfPave + shW),
+                                                 qc.getX1    - nx * (halfPave + shW),
+                                                 qc.getY1    - ny * (halfPave + shW))
+                                case _ =>
+                                    shLo.lineTo (loQ.getX1 - nx * (halfPave + shW),
+                                                 loQ.getY1 - ny * (halfPave + shW))
+                            shLo.closePath ()
+                            g2d.setPaint (shoulderColor)
+                            g2d.fill (shLo)
+                            // Hi shoulder (+n side)
+                            val shHi = new Path2D.Double ()
+                            shHi.moveTo (hiQ.getX1 + nx * halfPave,
+                                         hiQ.getY1 + ny * halfPave)
+                            hiQ match
+                                case qc: QCurve if !qc.straight =>
+                                    shHi.quadTo (qc.getCtrlX + nx * halfPave,
+                                                 qc.getCtrlY + ny * halfPave,
+                                                 qc.getX2    + nx * halfPave,
+                                                 qc.getY2    + ny * halfPave)
+                                case _ =>
+                                    shHi.lineTo (hiQ.getX2 + nx * halfPave,
+                                                 hiQ.getY2 + ny * halfPave)
+                            shHi.lineTo (hiQ.getX2 + nx * (halfPave + shW),
+                                         hiQ.getY2 + ny * (halfPave + shW))
+                            hiQ match
+                                case qc: QCurve if !qc.straight =>
+                                    shHi.quadTo (qc.getCtrlX + nx * (halfPave + shW),
+                                                 qc.getCtrlY + ny * (halfPave + shW),
+                                                 qc.getX1    + nx * (halfPave + shW),
+                                                 qc.getY1    + ny * (halfPave + shW))
+                                case _ =>
+                                    shHi.lineTo (hiQ.getX1 + nx * (halfPave + shW),
+                                                 hiQ.getY1 + ny * (halfPave + shW))
+                            shHi.closePath ()
+                            g2d.setPaint (shoulderColor)
+                            g2d.fill (shHi)
+                            bundle.foreach (bundledEdges += _)
+                            outerEdges += loEdge
+                            outerEdges += hiEdge
+                            bundleNodes += fn
+                            bundleNodes += tn
+                        case _ =>                         // non-QCurve — no polygon
+                    end match
+                end if
+            end for
+
+            // Layer 1: pavement surface for non-bundled edges.
+            // All QuadCurve2D edges get a filled polygon.  Edges touching a
+            // bundle node taper toward the junction; others use uniform width.
+            // Non-QuadCurve shapes (Petri nets, etc.) keep the legacy stroke.
+            val narrow = halfPave * 0.5
+            for edge <- edges if !bundledEdges (edge) do
+                val atFrom = bundleNodes (edge.from)
+                val atTo   = bundleNodes (edge.to)
+                edge.shape match
+                    case qc: QuadCurve2D =>
+                        val x1 = qc.getX1; val y1 = qc.getY1
+                        val x2 = qc.getX2; val y2 = qc.getY2
+                        val edx = x2 - x1; val edy = y2 - y1
+                        val eLen = math.sqrt (edx * edx + edy * edy)
+                        if eLen > 0.001 then
+                            val enx = -edy / eLen; val eny = edx / eLen
+                            val w1 = if atFrom then narrow else halfPave
+                            val w2 = if atTo   then narrow else halfPave
+                            val ramp = new Path2D.Double ()
+                            ramp.moveTo (x1 - enx * w1, y1 - eny * w1)
+                            qc match
+                                case sc: QCurve if !sc.straight =>
+                                    val wc = (w1 + w2) / 2.0
+                                    ramp.quadTo (sc.getCtrlX - enx * wc,
+                                                 sc.getCtrlY - eny * wc,
+                                                 x2 - enx * w2, y2 - eny * w2)
+                                case _ =>
+                                    ramp.lineTo (x2 - enx * w2, y2 - eny * w2)
+                            ramp.lineTo (x2 + enx * w2, y2 + eny * w2)
+                            qc match
+                                case sc: QCurve if !sc.straight =>
+                                    val wc = (w1 + w2) / 2.0
+                                    ramp.quadTo (sc.getCtrlX + enx * wc,
+                                                 sc.getCtrlY + eny * wc,
+                                                 x1 + enx * w1, y1 + eny * w1)
+                                case _ =>
+                                    ramp.lineTo (x1 + enx * w1, y1 + eny * w1)
+                            ramp.closePath ()
+                            g2d.setPaint (pavementColor)
+                            g2d.fill (ramp)
+                            taperedEdges += edge
+                        else
+                            g2d.setStroke (pavementStroke)
+                            g2d.setPaint (pavementColor)
+                            g2d.draw (edge.shape)
+                            taperedEdges += edge
+                        end if
+                    case _ =>
+                        g2d.setStroke (pavementStroke)
+                        g2d.setPaint (pavementColor)
+                        g2d.draw (edge.shape)
+                end match
+            end for
+
+            // Layer 2a: solid edge lines on road boundaries (outermost lanes
+            // of each bundle).  Interior lanes get dashed dividers below.
+            g2d.setStroke (edgeLineStroke)
+            for edge <- outerEdges do
                 g2d.setPaint (dashColor)
                 g2d.draw (edge.shape)
             end for
 
-            // Layer 3: thin edge outline in lane color
+            // Layer 2b: dashed lane dividers on interior bundled lanes and
+            // on non-bundled, non-tapered edges (Petri nets, etc.).
+            // Tapered edges (ramps) already have a filled polygon surface.
+            g2d.setStroke (dashStroke)
+            for edge <- edges if !outerEdges (edge) && !taperedEdges (edge) do
+                g2d.setPaint (dashColor)
+                g2d.draw (edge.shape)
+            end for
+
+            // Layer 3: colored outline — only for non-bundled, non-tapered edges.
+            // Bundled edges (road lanes) and tapered edges (ramps) need no
+            // outline; the polygon surface provides the visual.
             g2d.setStroke (roadStroke)
-            for edge <- edges do
+            for edge <- edges if !bundledEdges (edge) && !taperedEdges (edge) do
                 g2d.setPaint (edge.color)
                 g2d.draw (edge.shape)
             end for
@@ -588,10 +878,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                 g2d.drawString (edge.label, x, y)
                 val edge_tokens = edge.tokens.toList
                 for token <- edge_tokens if token.shape.getWidth () > 0.0 do
-                    drawTokenGlow (g2d, token)
-                    g2d.setPaint (token.color)
-                    g2d.fill (token.shape)
-                    drawTokenLabel (g2d, token)
+                    drawTokenRotated (g2d, token)
                 end for
 
                 // ── #12  Vehicle count badge ───────────────────────────────
@@ -618,10 +905,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             // Display all free tokens
             val free_tokens = graph.freeTokens.toList
             for token <- free_tokens if token.shape.getWidth () > 0.0 do
-                drawTokenGlow (g2d, token)
-                g2d.setPaint (token.color)
-                g2d.fill (token.shape)
-                drawTokenLabel (g2d, token)
+                drawTokenRotated (g2d, token)
             end for
 
             // ── HUD overlay (screen-space, fixed position) ──────────────────
@@ -758,6 +1042,28 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             g2d.setComposite (prevComposite)
         end drawTokenGlow
 
+        /** Draw a token with heading-based rotation.  If the token has a
+         *  recorded heading (from consecutive MoveToken positions), the
+         *  Graphics2D transform is rotated around the token's center so the
+         *  shape aligns with the direction of travel.  Falls back to axis-
+         *  aligned drawing when no heading is available.
+         */
+        private def drawTokenRotated (g2d: Graphics2D, token: graph.Token): Unit =
+            val prevXform = g2d.getTransform
+            ani.getTokenIdByRef (token) match
+                case Some (eid) =>
+                    val h = tokenHeading.getOrElse (eid, 0.0)
+                    if h != 0.0 then
+                        val b = token.shape.getBounds2D
+                        g2d.rotate (h, b.getCenterX, b.getCenterY)
+                case None =>
+            drawTokenGlow (g2d, token)
+            g2d.setPaint (token.color)
+            g2d.fill (token.shape)
+            drawTokenLabel (g2d, token)
+            g2d.setTransform (prevXform)
+        end drawTokenRotated
+
     end Canvas
 
     //================================================================================
@@ -859,9 +1165,22 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             ani.destroyEdge (c.eid)
         case DestroyToken =>
             ani.destroyToken (c.eid)
+            tokenHeading.remove (c.eid)
+            prevTokenPos.remove (c.eid)
         case MoveNode =>
             ani.moveNode (c.eid, c.pts)
         case MoveToken =>
+            // Compute heading from consecutive positions (R3: vehicle rotation)
+            if c.pts != null && c.pts.length >= 2 then
+                val nx = c.pts (0); val ny = c.pts (1)
+                prevTokenPos.get (c.eid) match
+                    case Some ((ox, oy)) =>
+                        val dx = nx - ox; val dy = ny - oy
+                        if dx * dx + dy * dy > 1.0 then         // moved > 1 px
+                            tokenHeading (c.eid) = math.atan2 (dy, dx)
+                    case None =>
+                prevTokenPos (c.eid) = (nx, ny)
+            end if
             ani.moveToken (c.eid, c.pts)
             if c.color != null then ani.setPaintToken (c.eid, c.color)
         case MoveToken2Node =>

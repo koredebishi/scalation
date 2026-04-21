@@ -211,12 +211,7 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
             end if
 
             cfor (joinSeg, highway_length) { seg =>
-                // Deterministic lane change: if car ahead is slow, change lanes
-                val carAhead = getCarAhead(this)
-                if carAhead != null && carAhead.velocity < 0.1 * vmax then
-                    val target = if laneID > 0 then laneID - 1 else laneID + 1
-                    route.changeLane(laneID, target, this, seg)
-                end if
+                // Lane change now handled by MOBIL in VTransport.move() — no model-level logic needed
 
                 route.pathway(laneID).seg(seg).move ()
 
@@ -308,6 +303,13 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
     // Note: simulate() and waitFinished() are called from CalibrationFramework
     // For standalone run, use @main def runCalRoute101_3
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // Step 8: Background map — OSM road network as visual context
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    private val osmGpsAnchors = NetworkConfig.mainlineGPSAnchors
+    loadOsmBackground ("data/osm/us101_roads.json", osmGpsAnchors, (w.toDouble, h.toDouble))
 
     simulate ()
     waitFinished ()

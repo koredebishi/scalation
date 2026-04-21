@@ -15,7 +15,7 @@ import scala.collection.mutable.{ArrayBuffer => VEC}
 import scala.collection.mutable.{LinkedHashMap, PriorityQueue}
 import scala.runtime.ScalaRunTime.stringOf
 
-import scalation.animation.{AnimateCommand, CommandType, DgAnimator}
+import scalation.animation.{AnimateCommand, CommandType, DgAnimator, OsmRoadNetwork}
 import scalation.mathstat._
 import scalation.scala2d.Colors._
 import scalation.scala2d.Shape
@@ -101,6 +101,58 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
      *  @param _parts  the lists of component parts (need List rather than VEC)
      */
     def addComponents (_parts: List [Component]*): Unit = for p <- _parts; q <- p do parts += q
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Load an OpenStreetMap road network as background map context.
+     *  If the JSON file does not exist, it is auto-downloaded from the Overpass
+     *  API using the Python script.  Bounding box is computed from `gpsAnchors`
+     *  with a margin.  After first download, the cached file is reused.
+     *
+     *  Any model subclass can call this to add geographic context.
+     *  @param jsonPath    path to cached OSM JSON (e.g., "data/osm/eaton_roads.json")
+     *  @param gpsAnchors  junction GPS coordinates (lat, lon) — for projection alignment
+     *  @param dims        screen canvas dimensions (width, height)
+     */
+    protected def loadOsmBackground (jsonPath: String,
+                                      gpsAnchors: Array [(Double, Double)],
+                                      dims: (Double, Double)): Unit =
+        if dgAni == null || gpsAnchors.isEmpty then return
+
+        // ── Auto-download if JSON doesn't exist ─────────────────────────
+        val file = new java.io.File (jsonPath)
+        if !file.exists () then
+            val lats = gpsAnchors.map (_._1)
+            val lons = gpsAnchors.map (_._2)
+            val margin = 0.01                                  // ~1 km padding
+            val south = lats.min - margin
+            val north = lats.max + margin
+            val west  = lons.min - margin
+            val east  = lons.max + margin
+            // Derive area name from filename: "data/osm/eaton_roads.json" → "eaton"
+            val areaName = file.getName.replace ("_roads.json", "")
+            val outDir   = file.getParent
+            val script   = "src/main/scala/scalation/simulation/scripts/download_osm_geometry.py"
+            val cmd = Array ("python", script,
+                "--south", f"$south%.6f", "--west",  f"$west%.6f",
+                "--north", f"$north%.6f", "--east",  f"$east%.6f",
+                "--name",  areaName,      "--outdir", outDir)
+            println (s"OSM JSON not found: $jsonPath — downloading from Overpass API...")
+            try
+                val proc = Runtime.getRuntime.exec (cmd)
+                val exit = proc.waitFor ()
+                if exit == 0 then println (s"OSM download complete: $jsonPath")
+                else
+                    val err = scala.io.Source.fromInputStream (proc.getErrorStream).mkString
+                    println (s"OSM download failed (exit=$exit): $err")
+            catch case e: Exception =>
+                println (s"OSM download error: ${e.getMessage}")
+        end if
+
+        // ── Load and push to animator ───────────────────────────────────
+        val net = OsmRoadNetwork.load (jsonPath, gpsAnchors, dims)
+        dgAni.setBackgroundRoads (net.polylines, net.roadTypes)
+        if net.places.nonEmpty then dgAni.setBackgroundPlaces (net.places)
+    end loadOsmBackground
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the current acting actor.

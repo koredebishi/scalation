@@ -232,6 +232,17 @@ object CorridorBuilder:
                                                ay + perpY * RAMP_LEN + roadDirY * nudge))
         }
 
+        // ── Step 6: Hide infrastructure nodes in animation ────────────────
+        // Traffic models render roads as filled polygons; the junction/sink
+        // circles are visual clutter.  Set displayColor to fully transparent
+        // so DgAnimator's alpha gate skips them.
+        val transparent = new java.awt.Color (0, 0, 0, 0)
+        for j <- junc          do j.displayColor = transparent
+        for j <- rampSensors   do j.displayColor = transparent
+        for j <- offRampSensors do j.displayColor = transparent
+        for s <- sinks         do s.displayColor = transparent
+        for s <- offRampSinks  do s.displayColor = transparent
+
         BuiltCorridor (
             junctions       = junc,
             rampSensors     = rampSensors,

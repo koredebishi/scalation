@@ -65,6 +65,9 @@ abstract class Vehicle (name_ : String, director: Model)
     var myRamp        : Ramp        = null   // current ramp this vehicle is on (null if not on a ramp)
     var myPathway     : Pathway     = null   // current pathway/lane this vehicle is on (null if not on a pathway)
     var myFFConnector : FFConnector = null   // current FF connector this vehicle is on (null if not on an FF)
+    var myRoute       : Route       = null   // parent Route this vehicle belongs to (set by Pathway.addToAlist)
+    var exitRampIdx   : Int          = -1    // index into route.offRampSpecs (-1 = through traffic → drives to Sink)
+    var lastLaneChangeTime: Double  = -10.0  // simulation clock when last lane change occurred (cooldown)
     private [process] var myPathNode: DoublyLinkedList[Vehicle]#Node = null   // DLL node: pred <-> me <-> succ
 
 
@@ -121,7 +124,10 @@ object Vehicle:
         "T"    -> 3.0,                       // safe min time headway
         "s"    -> 4.0,                       // safe min distance headway (bumped from 5.0 for visual spacing)
         "len"  -> 4.0,                       // length of the vehicles
-        "del"  -> 4.0)                       // acceleration exponent (delta)
+        "del"  -> 4.0,                       // acceleration exponent (delta)
+        "p_mobil" -> 0.2,                    // MOBIL politeness factor (Treiber & Kesting 2007)
+        "da_th"   -> 0.2,                    // MOBIL lane-change threshold (m/s²)
+        "b_safe"  -> 4.0)                    // MOBIL max safe braking for new follower (m/s²)
 
     /** current values for driver/vehicle characteristics/properties
      */
@@ -141,6 +147,9 @@ object Vehicle:
     inline def s: Double    = prop("s")                      // min distance headway
     inline def len: Double  = prop("len")                    // length of the vehicles
     inline def del: Double  = prop("del")                    // acceleration exponent (delta)
+    inline def p_mobil: Double = prop("p_mobil")             // MOBIL politeness factor
+    inline def da_th: Double   = prop("da_th")               // MOBIL lane-change threshold (m/s²)
+    inline def b_safe: Double  = prop("b_safe")              // MOBIL max safe braking for new follower (m/s²)
 
 
     def setInitialSpeed(v0: Double):Unit =

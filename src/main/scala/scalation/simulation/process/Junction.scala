@@ -50,8 +50,13 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int, nl: I
         this(name, Sharp(1.0), Array(xy._1, xy._2, 20.0, 20.0), nt, nl)
     end this
 
+    /** Color used when displaying this junction node.  Set to a fully
+     *  transparent color (alpha = 0) to hide the node in the animation.
+     */
+    var displayColor: java.awt.Color = purple
+
     override def display(): Unit =
-        director.animate(this, CreateNode, purple, Ellipse(), at)
+        director.animate(this, CreateNode, displayColor, Ellipse(), at)
     end display
 
     override def toString: String = name

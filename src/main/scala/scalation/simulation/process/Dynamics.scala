@@ -64,7 +64,14 @@ trait Dynamics:
         // Step 1: within-segment leader (O(1) DLL lookup)
         val ref = car.myPathNode.ahead
         if ref != null then
-            if onRamp then println(f"[findLeader] ${car.displayLabel}%-12s STEP1 ldr=${ref.elem.displayLabel} ldr.disp=${ref.elem.disp}%.2f ldr.v=${ref.elem.velocity}%.2f me.disp=${car.disp}%.2f me.v=${car.velocity}%.2f")  // DIAG
+//            if onRamp then
+//                val ldr = ref.elem
+//                val mePath = if car.myPathway != null then car.myPathway.name else "null"
+//                val meRamp = if car.myRamp != null then car.myRamp.name else "null"
+//                val ldrPath = if ldr.myPathway != null then ldr.myPathway.name else "null"
+//                val ldrRamp = if ldr.myRamp != null then ldr.myRamp.name else "null"
+//                println(f"[findLeader] ${car.displayLabel}%-12s STEP1 seg=${car.segId} path=$mePath ramp=$meRamp | ldr=${ldr.displayLabel} ldr.seg=${ldr.segId} ldr.path=$ldrPath ldr.ramp=$ldrRamp | me.disp=${car.disp}%.2f me.v=${car.velocity}%.2f ldr.disp=${ldr.disp}%.2f ldr.v=${ldr.velocity}%.2f")
+//            end if  // DIAG
             return ref.elem
 
         // Step 2: cross-boundary — look at next segment's DLL tail
@@ -510,12 +517,18 @@ object IDMDynamics
         car.disp    = new_disp
 
         // DIAG: final state for ramp vehicles — detect overtaking
-        if car.myRamp != null then
-            val ldrD = if car_ahead != null then car_ahead.disp else -1.0
-            val gapF = if car_ahead != null then ldrD - new_disp - len else 999.0
-            val flag = if car_ahead != null && car_ahead.segId == car.segId && new_disp > ldrD then " *** OVERTOOK ***" else ""
-            println(f"[STEP7] ${car.displayLabel}%-12s disp=${new_disp}%.2f v=${car.velocity}%.2f ldr=${if car_ahead != null then car_ahead.displayLabel else "null"} ldrD=${ldrD}%.2f gap=${gapF}%.2f$flag")
-        end if  // DIAG
+        // (disabled — high-volume console output starves the animator's EDT)
+//        if car.myRamp != null then
+//            val ldrD = if car_ahead != null then car_ahead.disp else -1.0
+//            val gapF = if car_ahead != null then ldrD - new_disp - len else 999.0
+//            val flag = if car_ahead != null && car_ahead.segId == car.segId && new_disp > ldrD then " *** OVERTOOK ***" else ""
+//            val mePath = if car.myPathway != null then car.myPathway.name else "null"
+//            val meRamp = if car.myRamp != null then car.myRamp.name else "null"
+//            val ldrPath = if car_ahead != null && car_ahead.myPathway != null then car_ahead.myPathway.name else "null"
+//            val ldrRamp = if car_ahead != null && car_ahead.myRamp != null then car_ahead.myRamp.name else "null"
+//            val ldrName = if car_ahead != null then car_ahead.displayLabel else "null"
+//            println(f"[STEP7] ${car.displayLabel}%-12s seg=${car.segId} path=$mePath ramp=$meRamp | ldr=$ldrName ldr.seg=${if car_ahead != null then car_ahead.segId else -1} ldr.path=$ldrPath ldr.ramp=$ldrRamp | disp=${new_disp}%.2f v=${car.velocity}%.2f ldrD=${ldrD}%.2f gap=${gapF}%.2f$flag")
+//        end if  // DIAG
     end updateM
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -569,3 +582,154 @@ object IDMDynamics
     end iDMFree
 
 end IDMDynamics
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MOBIL` object implements the MOBIL (Minimize Overall Braking Induced by
+ *  Lane changes) lane-change decision model (Treiber & Kesting, 2007).
+ *
+ *  MOBIL uses IDM accelerations to evaluate whether a lane change is both
+ *  safe and beneficial.  Two criteria must be satisfied:
+ *
+ *  '''Safety criterion''' (hard constraint):
+ *  {{{
+ *      ã_f  ≥  -b_safe
+ *  }}}
+ *  where `ã_f` is the IDM acceleration of the new follower in the target lane
+ *  after the subject vehicle cuts in, and `b_safe` is the maximum acceptable
+ *  braking imposed on that follower.
+ *
+ *  '''Incentive criterion''' (soft):
+ *  {{{
+ *      ã_s − a_s  +  p · (ã_f − a_f)  >  Δa_th
+ *  }}}
+ *  where:
+ *    - `a_s`   = subject's IDM acceleration in current lane (with current leader)
+ *    - `ã_s`  = subject's IDM acceleration in target lane (with target leader)
+ *    - `a_f`   = target follower's current IDM acceleration (before cut-in)
+ *    - `ã_f`  = target follower's IDM acceleration after cut-in (subject becomes leader)
+ *    - `p`     = politeness factor ∈ [0,1].  p=0 selfish, p=1 fully altruistic
+ *    - `Δa_th` = acceleration threshold to prevent frivolous lane changes
+ *
+ *  @see Treiber, M. & Kesting, A. (2007). "Modeling lane-changing decisions with MOBIL."
+ *       Traffic and Granular Flow '07, pp. 211–221, Springer.
+ *  @see Treiber, M. & Kesting, A. (2013). Traffic Flow Dynamics. Springer, Ch. 11.
+ */
+object MOBIL:
+
+    import Vehicle.{amax, bmax, len, T, s, del, p_mobil, da_th, b_safe}
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute IDM acceleration for a hypothetical leader-follower pair.
+     *  Uses the raw IDM equation: a = amax * [1 - (v/v0)^δ - (s*(v,Δv)/Δx)^2]
+     *  @param follower  the vehicle whose acceleration we compute
+     *  @param leader    the vehicle ahead (null → free-flow)
+     *  @param segLen    segment length (for cross-segment gap adjustment)
+     *  @return IDM acceleration (m/s²)
+     */
+    private def idmAccelFor (follower: Vehicle, leader: Vehicle, segLen: Double): Double =
+        if follower == null then return 0.0
+        val an = amax
+        val bn = abs (bmax)
+        if leader == null then
+            // free-flow: a = amax * [1 - (v/v0)^δ]
+            return an * (1.0 - (follower.velocity / follower.vmax) ~^ del)
+        end if
+        // bumper-to-bumper gap (segment-local)
+        val xl = if leader.segId == follower.segId then leader.disp
+                 else segLen + leader.disp
+        val gap = xl - follower.disp - len
+        if gap <= 0.0 then return -bn                     // touching → full comfortable braking
+        val dv  = follower.velocity - leader.velocity      // approach rate
+        val ss  = s + follower.velocity * T + (follower.velocity * dv) / (2.0 * sqrt (an * bn))
+        an * (1.0 - (follower.velocity / follower.vmax) ~^ del - (ss / gap) ~^ 2.0)
+    end idmAccelFor
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Evaluate MOBIL for a single candidate target lane.
+     *  @param car      the subject vehicle considering a lane change
+     *  @param route    the Route containing all Pathways
+     *  @param seg      the segment index the vehicle is currently in
+     *  @param curLane  the vehicle's current lane index
+     *  @param tgtLane  the candidate target lane index
+     *  @param segLen   the segment length
+     *  @return the MOBIL incentive value (positive = beneficial), or -∞ if unsafe
+     */
+    private def mobilIncentive (car: Vehicle, route: Route, seg: Int,
+                                curLane: Int, tgtLane: Int, segLen: Double): Double =
+        // --- Target lane neighbors ---
+        val tgtVT = route.pathway(tgtLane).seg(seg)
+        if tgtVT == null then return Double.MinValue
+
+        // Leader in target lane: last vehicle in this segment's DLL (ahead of insertion point)
+        val tgtLeader   = tgtVT.getLast
+        // Follower in target lane: first vehicle in this segment's DLL (behind insertion point)
+        val tgtFollower = tgtVT.getFirst
+
+        // --- Current lane leader (same as findLeader would give) ---
+        val curVT = route.pathway(curLane).seg(seg)
+        val curLeader = if curVT != null then
+            val ref = car.myPathNode
+            if ref != null && ref.ahead != null then ref.ahead.elem else null
+        else null
+
+        // --- 4 IDM acceleration computations ---
+        // a_s:  subject's acceleration in CURRENT lane (with current leader)
+        val a_s  = idmAccelFor (car, curLeader, segLen)
+
+        // ã_s: subject's acceleration in TARGET lane (with target leader)
+        val a_s_tilde = idmAccelFor (car, tgtLeader, segLen)
+
+        // a_f:  target follower's CURRENT acceleration (before cut-in)
+        val a_f  = idmAccelFor (tgtFollower, tgtLeader, segLen)
+
+        // ã_f: target follower's acceleration AFTER cut-in (subject becomes their new leader)
+        val a_f_tilde = idmAccelFor (tgtFollower, car, segLen)
+
+        // --- Safety criterion: ã_f ≥ -b_safe ---
+        if a_f_tilde < -b_safe then return Double.MinValue
+
+        // --- Incentive criterion: ã_s - a_s + p·(ã_f - a_f) > Δa_th ---
+        val incentive = (a_s_tilde - a_s) + p_mobil * (a_f_tilde - a_f)
+        incentive
+    end mobilIncentive
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Check both adjacent lanes and return the best lane-change direction.
+     *  Called every timestep from VTransport.move() after updateV().
+     *  @param car    the vehicle evaluating lane change
+     *  @param route  the parent Route
+     *  @param seg    the current segment index
+     *  @param lane   the current lane index
+     *  @return -1 (move to lane-1), 0 (stay), +1 (move to lane+1)
+     */
+    def checkLaneChange (car: Vehicle, route: Route, seg: Int, lane: Int): Int =
+        if car.myRamp != null then return 0                    // ramp vehicles don't lane-change
+        val segLen = route.pathway(lane).seg(seg).length
+
+        var bestDir   = 0
+        var bestValue = da_th                                  // must exceed threshold to trigger
+
+        // Check left (lane - 1)
+        if lane - 1 >= 0 && route.laneExistsAt (lane - 1, seg) then
+            val inc = mobilIncentive (car, route, seg, lane, lane - 1, segLen)
+            if inc > bestValue then
+                bestDir   = -1
+                bestValue = inc
+            end if
+        end if
+
+        // Check right (lane + 1)
+        if lane + 1 < route.maxLanes && route.laneExistsAt (lane + 1, seg) then
+            val inc = mobilIncentive (car, route, seg, lane, lane + 1, segLen)
+            if inc > bestValue then
+                bestDir   = +1
+                bestValue = inc
+            end if
+        end if
+
+        bestDir
+    end checkLaneChange
+
+end MOBIL
+
