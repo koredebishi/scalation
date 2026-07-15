@@ -101,12 +101,6 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
              var offRampSpecs: List[OffRampSpec] = Nil)
     extends Component ():
 
-    // ── Off-ramp infrastructure (set once by wireOffRamps, used by tryExitRamp) ──
-    private var _offRamps:     Array[Ramp] = null          // off-ramp Ramp objects (indexed same as offRampSpecs)
-    private var _offRampSinks: Array[Sink] = null          // off-ramp Sink objects
-    private var _exitRV:       Discrete    = null          // Discrete variate for full-route spawn
-    private var _downstreamRVs: Array[Discrete] = null     // per-on-ramp Discrete (downstream-only specs)
-
 
     private val debug = debugf("Route", true)     // debug function
 
@@ -272,6 +266,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         car.laneID = target
         pathway(target).addToAlist(car, ahead, seg)
 
+        println(f"[forceMerge] ${car.displayLabel}%-12s lane $l1 → $target at seg $seg  (lane drop)")
         target
     end forceMerge
 
@@ -281,148 +276,44 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
      *  If the vehicle is within the mandatory lane-change zone, override MOBIL
      *  and force one lane change toward the exit lane per call.
      *
-     *  Called every timestep from VTransport.move() — only when car.exitRampIdx >= 0.
+     *  Called every timestep from VTransport.move() — only when car.exitRampId != null.
      *
-     *  @param car    the vehicle with exitRampIdx >= 0
-     *  @param seg    the vehicle's current segment index
+     *  @param car  the vehicle with a non-null exitRampId
+     *  @param seg  the vehicle's current segment index
      *  @param clock  current simulation time (for cooldown)
      */
     def exitCheckAndSteer (car: Vehicle, seg: Int, clock: Double): Unit =
-        if car.exitRampIdx < 0 || car.exitRampIdx >= offRampSpecs.length then return
-        val spec = offRampSpecs(car.exitRampIdx)                 // O(1) — index, not .find
+        // Find the matching off-ramp spec
+        val spec = offRampSpecs.find (_.rampId == car.exitRampId).orNull
+        if spec == null then return                              // no matching spec (shouldn't happen)
 
+        // Distance to diverge point (in segments, converted to meters)
         val segsRemaining = spec.divergeSeg - seg
-        if segsRemaining <= 0 then return                        // already past it
+        if segsRemaining <= 0 then return                        // already past it — missed exit handled in act()
 
         val distToExit = {
             var d = 0.0
-            val lane0 = pathway.find (_ != null).get
+            val lane0 = pathway.find (_ != null).get             // any lane for geometry
             for s <- seg until min (spec.divergeSeg, lane0.seg.length) do
                 if lane0.seg(s) != null then d += lane0.seg(s).length
             d
         }
 
-        if car.laneID == spec.exitLane then return               // already in exit lane
+        // Already in exit lane?
+        if car.laneID == spec.exitLane then return               // nothing to do — stay put
 
-        val cooldown = if distToExit < 200.0 then 1.0
-                        else if distToExit < 500.0 then 2.0
+        // Determine urgency zone
+        val cooldown = if distToExit < 200.0 then 1.0           // aggressive: 1s cooldown
+                        else if distToExit < 500.0 then 2.0     // mandatory: 2s cooldown
                         else return                              // > 500m: let MOBIL handle it
 
-        if (clock - car.lastLaneChangeTime) < cooldown then return
+        if (clock - car.lastLaneChangeTime) < cooldown then return  // respect cooldown
 
+        // One step toward exit lane
         val dir = if spec.exitLane > car.laneID then 1 else -1
         val ok = changeLane (car.laneID, car.laneID + dir, car, seg)
         if ok then car.lastLaneChangeTime = clock
     end exitCheckAndSteer
-
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** One-call off-ramp setup.  Builds specs, Discrete variates, and stores
-     *  the Ramp/Sink arrays so that tryExitRamp can do the full job.
-     *
-     *  Example: wireOffRamps(offRamps, sinks, joinSegs, 4, 0.15, onRampJoinSegs)
-     *    → builds 1 OffRampSpec per off-ramp, all exiting from lane 4 at 15%
-     *    → builds Discrete variate for mainline spawn
-     *    → pre-builds per-on-ramp downstream Discrete variates
-     *
-     *  @param ramps           the off-ramp Ramp objects (same order as joinSegs)
-     *  @param sinks           the off-ramp Sink objects (same order)
-     *  @param joinSegs        segment indices where each off-ramp diverges
-     *  @param exitLane        which lane vehicles must reach (usually nLanes-1)
-     *  @param turnoffPct      fraction of mainline vehicles exiting at each ramp
-     *  @param onRampJoinSegs  on-ramp join segments (for downstream filtering at ramp spawn)
-     */
-    def wireOffRamps (ramps: Array[Ramp], sinks: Array[Sink],
-                      joinSegs: Array[Int], exitLane: Int, turnoffPct: Double,
-                      onRampJoinSegs: Array[Int] = Array.empty): Unit =
-        _offRamps     = ramps
-        _offRampSinks = sinks
-        val n = ramps.length
-        val specs = new Array[OffRampSpec](n)
-        cfor (0, n) { r =>
-            specs(r) = OffRampSpec (ramps(r).name, joinSegs(r), exitLane, turnoffPct)
-        }
-        offRampSpecs = specs.toList
-        _exitRV = OffRampSpec.buildExitDist (offRampSpecs)
-
-        // Pre-build per-on-ramp downstream Discrete variates + index maps
-        _downstreamRVs = new Array[Discrete](onRampJoinSegs.length)
-        _downstreamIdxMaps = new Array[Array[Int]](onRampJoinSegs.length)
-        cfor (0, onRampJoinSegs.length) { r =>
-            val buf = scala.collection.mutable.ArrayBuffer[Int]()
-            cfor (0, n) { i =>
-                if specs(i).divergeSeg > onRampJoinSegs(r) then buf += i
-            }
-            _downstreamIdxMaps(r) = buf.toArray
-            val downSpecs = _downstreamIdxMaps(r).map(i => offRampSpecs(i)).toList
-            _downstreamRVs(r) = OffRampSpec.buildExitDist (downSpecs)
-        }
-    end wireOffRamps
-
-    // Per-on-ramp maps: downstream Discrete index → global offRampSpecs index
-    private var _downstreamIdxMaps: Array[Array[Int]] = null
-
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Assign an off-ramp exit destination to a vehicle at spawn time.
-     *  Sets car.exitRampIdx (or leaves it -1 for through traffic).
-     *
-     *  Example (mainline):  assignExitAtSpawn(car)        → rolls full Discrete
-     *  Example (ramp #2):   assignExitAtSpawn(car, 2)     → rolls downstream-only Discrete
-     *
-     *  @param car         the vehicle being spawned
-     *  @param onRampIdx   on-ramp index for downstream filtering (-1 = mainline entry)
-     */
-    def assignExitAtSpawn (car: Vehicle, onRampIdx: Int = -1): Unit =
-        if offRampSpecs.isEmpty || _exitRV == null then return
-        if onRampIdx < 0 then
-            // Mainline entry — full route eligible
-            val idx = _exitRV.gen.toInt
-            car.exitRampIdx = if idx < offRampSpecs.length then idx else -1
-        else if _downstreamRVs != null && onRampIdx < _downstreamRVs.length then
-            // Ramp entry — only downstream off-ramps eligible
-            val rv      = _downstreamRVs(onRampIdx)
-            val idxMap  = _downstreamIdxMaps(onRampIdx)
-            val localIdx = rv.gen.toInt
-            car.exitRampIdx = if localIdx < idxMap.length then idxMap(localIdx) else -1
-        end if
-    end assignExitAtSpawn
-
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check if the vehicle should exit at its assigned off-ramp at this segment.
-     *  If yes: drives the off-ramp, leaves at the off-ramp sink, returns true.
-     *  If past the diverge: resets exitRampIdx to -1 (missed exit), returns false.
-     *  Otherwise: returns false (not at diverge yet).
-     *
-     *  Example: if route.tryExitRamp(this, seg) then exited = true
-     *
-     *  @param car  the vehicle (must have exitRampIdx set)
-     *  @param seg  the current segment index (after incrementing past previous seg)
-     *  @return     true if the vehicle exited via off-ramp
-     */
-    def tryExitRamp (car: Vehicle, seg: Int): Boolean =
-        if car.exitRampIdx < 0 then return false
-        if _offRamps == null || car.exitRampIdx >= offRampSpecs.length then return false
-
-        val spec = offRampSpecs(car.exitRampIdx)                 // O(1)
-
-        if seg == spec.divergeSeg && car.laneID == spec.exitLane then
-            val ramp = _offRamps(car.exitRampIdx)
-            val sink = _offRampSinks(car.exitRampIdx)
-            car.myPathway = null
-            // Off-ramp: add then immediately remove (pass-through for DLL bookkeeping)
-            val ahead = ramp.getLast
-            ramp.addToAlist (car, ahead)
-            ramp.removeFromAlist (car)
-            sink.leave ()
-            true
-        else if seg > spec.divergeSeg then
-            car.exitRampIdx = -1                                  // missed exit → through traffic
-            false
-        else
-            false
-    end tryExitRamp
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

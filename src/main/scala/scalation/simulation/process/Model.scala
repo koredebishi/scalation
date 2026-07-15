@@ -266,21 +266,31 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
         var totalVehicles = 0
         var sumVelocity   = 0.0
         val densities     = new Array [Double] (vtSegs.length)
+        val velocities    = scala.collection.mutable.ArrayBuffer.empty [Double]   // for median
 
         for i <- vtSegs.indices do
             val vt    = vtSegs(i)
-            val nVeh  = vt.vdeque.size
+            val nVeh  = vt.vCount                              // O(1) — was: vt.vdeque.size
             val lenKm = vt.length / 1000.0                     // convert metres → km
             densities(i) = if lenKm > 0.0 then nVeh.toDouble / lenKm else 0.0
             totalVehicles += nVeh
-            for v <- vt.vdeque do sumVelocity += v.velocity
+            for v <- vt.vList do
+                sumVelocity += v.velocity
+                velocities  += v.velocity                       // collect for median
+            end for
         end for
 
-        val avgSpeed   = if totalVehicles > 0 then sumVelocity / totalVehicles else 0.0
+        val meanSpeed = if totalVehicles > 0 then sumVelocity / totalVehicles else 0.0
+        // Median speed — robust to stopped-car tail at jammed merges
+        val medSpeed = if velocities.isEmpty then 0.0 else
+            val sorted = velocities.toArray.sorted
+            val n = sorted.length
+            if n % 2 == 1 then sorted (n / 2)
+            else (sorted (n / 2 - 1) + sorted (n / 2)) / 2.0
         val elapsed    = _clock - startTime
         val throughput = if elapsed > 0.0 then numActors / (elapsed / 3600.0) else 0.0   // veh/hr
 
-        dgAni.updateHudStats (throughput, avgSpeed)
+        dgAni.updateHudStats (throughput, meanSpeed, medSpeed)
         if vtSegs.nonEmpty then
             dgAni.updateSegmentDensities (densities, segLabels.toArray)
     end pushHudStats
@@ -569,3 +579,24 @@ object Model:
         Coroutine.shutdown ()
 
 end Model
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

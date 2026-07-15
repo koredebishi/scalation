@@ -19,7 +19,6 @@ package process
 import scalation.animation.CommandType._
 //import scalation.database.BpTreeMap
 import scalation.mathstat._
-import scala.collection.mutable.ArrayDeque
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VTransport` class provides a variable-speed pathway between two other components.
@@ -48,14 +47,18 @@ class VTransport (name: String, from_ : Component, to_ : Component,
     val safetydist = 20.0
     
 
-    private [process] val vdeque = ArrayDeque [Vehicle] ()               // Array Deque for density tracking (entry order)
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Per-segment doubly linked list for car-following.
      *  Each VTransport owns its own DLL — the car-following backbone.
-     *  Replaces the lane-spanning Pathway.vList for leader lookup.
+     *  Single source of truth for both car-following AND density tracking.
      */
     private [process] val vList = DoublyLinkedList [Vehicle]
+
+    /** O(1) occupancy counter, mirrors `vList.size`.
+     *  Maintained in `addToAlist` / `removeFromAlist`.  Replaces the former
+     *  `vdeque` ArrayDeque so density and DLL state cannot disagree.
+     */
+    private [process] var vCount: Int = 0
 
     /** Debug label for this segment's DLL. */
     val dllId = s"DLL_${name}"
@@ -74,6 +77,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
                         else null
         actor.myPathNode = vList.add (actor, otherNode)
         actor.pathInfo = dllId
+        vCount += 1
     end addToAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -83,6 +87,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
     def removeFromAlist (actor: Vehicle): Unit =
         vList.remove (actor.myPathNode.asInstanceOf [vList.Node])
         actor.myPathNode = null
+        if vCount > 0 then vCount -= 1
     end removeFromAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -109,7 +114,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
      *  Called from driveHighway after each move() to snapshot the segment state.
      */
     def snapshotDensity (): Double =
-        if length > 0.0 then vdeque.size.toDouble / length else 0.0
+        if length > 0.0 then vCount.toDouble / length else 0.0
     end snapshotDensity
 
 
@@ -139,7 +144,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
         //easyW.println(s"[t=$now] Vehicle ${actor.displayLabel} enters seg=${actor.segId} (from seg=$lastSeg), enterT=$now")
 
         //debug("move", s"actor = $actor, disp=${actor.disp} along the VTransport")
-        vdeque += actor
+        // NOTE: vCount already incremented by caller's addToAlist before move() runs.
 
         tally(Vehicle.rt)
 
@@ -161,7 +166,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
                     end if
                 end if
                 // 2. Exit steering — runs independently, has its own cooldown
-                if actor.exitRampIdx >= 0 then
+                if actor.exitRampId != null then
                     route.exitCheckAndSteer (actor, actor.segId, director.clock)
                 end if
             end if
@@ -170,7 +175,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
             //debug ("move", s"${actor.displayLabel}, check if actor.disp = ${actor.disp} >= curve.length = ${curve.length}")
             if actor.disp >= length then
                 done = true
-                vdeque -= actor
+                // NOTE: vCount will be decremented by caller's removeFromAlist after move() returns.
             end if
 
             if !done then

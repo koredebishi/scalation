@@ -126,6 +126,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     // ── HUD data (pushed by simulation, read by renderer) ───────────────
     @volatile private var hudModelName: String   = "IDM"
     @volatile private var hudAvgSpeed: Double    = 0.0
+    @volatile private var hudMedSpeed: Double    = 0.0
     @volatile private var hudThroughput: Double  = 0.0
     @volatile private var hudSegDensities: Array [Double] = Array.empty  // veh/km per segment
     @volatile private var hudSegLabels: Array [String]    = Array.empty  // e.g. "S0","S1",...
@@ -137,10 +138,17 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     /** Set the corridor speed limit (mph) displayed on road signs.  Default 65. */
     def setHudSpeedLimit (mph: Int): Unit = hudSpeedLimitMph = mph
 
-    /** Push live throughput (veh/hr) and average speed (m/s) for HUD display. */
-    def updateHudStats (throughput: Double, avgSpeed: Double): Unit =
+    /** Push live throughput (veh/hr), mean speed (m/s, all on-road vehicles, all
+     *  segments, all lanes), and median speed (m/s, robust to stopped-car tails
+     *  at jammed merges).
+     *  @param throughput  vehicles per hour through the model
+     *  @param meanSpeed   arithmetic mean of vehicle.velocity over all on-road vehicles
+     *  @param medSpeed    median of vehicle.velocity over all on-road vehicles
+     */
+    def updateHudStats (throughput: Double, meanSpeed: Double, medSpeed: Double = 0.0): Unit =
         hudThroughput = throughput
-        hudAvgSpeed   = avgSpeed
+        hudAvgSpeed   = meanSpeed
+        hudMedSpeed   = medSpeed
     end updateHudStats
 
     /** Push per-segment density values (veh/km) for the mini bar chart.
@@ -941,7 +949,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             lines.addOne ((f"Clock:  $wallHr12%d:$wallMin%02d $ampm  ($clock%,.0f s)", fgColor, false))
             lines.addOne ((s"Vehicles:  $onRoad on-road  /  $totalActorCount total", fgColor, false))
             lines.addOne ((f"Throughput: $hudThroughput%,.0f veh/hr", fgColor, false))
-            lines.addOne ((f"Avg Speed:  $hudAvgSpeed%.1f m/s  (${hudAvgSpeed * 2.237}%.0f mph)", fgColor, false))
+            lines.addOne ((f"Mean Speed (all): $hudAvgSpeed%.1f m/s  (${hudAvgSpeed * 2.237}%.0f mph)", fgColor, false))
+            lines.addOne ((f"Median Speed:     $hudMedSpeed%.1f m/s  (${hudMedSpeed * 2.237}%.0f mph)", fgColor, false))
             lines.addOne ((f"Playback:   ${speedFactor}%.2fx", fgColor, false))
 
             if paused.get () then lines.addOne (("▐▐  PAUSED", red, true))
@@ -1452,5 +1461,4 @@ object DgAnimator:
 end DgAnimator
 
 // ...tests (dgAnimatorTest, dgAnimatorTest2, dgAnimatorTest3) can follow below if present...
-
 

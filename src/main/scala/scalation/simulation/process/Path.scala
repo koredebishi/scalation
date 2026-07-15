@@ -76,8 +76,10 @@ class Path (name: String, k: Int, val from: Component, val to: Component,
         if open then
             debug ("changeLane", s"from lane $l1 to lane $l2")
             director.log.trace (this, s"change lane from $l1 to $l2", actor, director.clock)
-            lane(l1).asInstanceOf [VTransport].vdeque -= actor
-            lane(l2).asInstanceOf [VTransport].vdeque += actor
+            // NOTE: vdeque removed — VTransport.vCount is the single source of truth,
+            // maintained via VTransport.addToAlist / removeFromAlist (call those instead
+            // if reviving this path).  This `if open` branch is currently dead because
+            // laneOpenAt always returns (false, null, null).
         //          lane(l1).asInstanceOf [VTransport].vtree.checkedRemove (actor.disp, actor)
         //          lane(l2).asInstanceOf [VTransport].vtree.put (actor.disp, actor)
         else

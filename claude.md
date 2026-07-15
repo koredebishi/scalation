@@ -10,9 +10,6 @@ US-101 corridor with IDM/Gipps/Krauss car-following dynamics.
 - **Always ask permission before writing or modifying code**
 - **Do not plagiarize** - all paper text must be original
 - **Do not hallucinate** - if unsure, say so
-- **ScalaTion-native first** — use ScalaTion's own RNG/math (e.g. `Discrete`, `VectorD`) before `java.util.Random` or Scala functional chains
-- **Imperative style** — prefer `cfor`, indexed loops, direct assignment over `.map().toArray`, `:+`, functional chains
-- **Scaladoc with examples** — every public method's Scaladoc must include a concrete example with numbers showing what goes in and what comes out (see `OffRampSpec.buildExitDist` / `assignExit` in `Route.scala` as the gold standard)
 
 ## Chat Continuation Protocol
 
@@ -38,7 +35,6 @@ This ensures zero loss of continuity between chat sessions.
 | HPC Sapelo2 commands | `context/hpc.md` |
 | Variable lane count problem | `context/variable-lane-architecture.md` |
 | Ramp physics + density lane assignment | `context/ramp-physics-and-density-lane-assignment.md` |
-| Off-ramp exit design | `context/offramp-exit-design.md` |
 | Model template (standard) | `context/model-template.md` |
 | OSM road geometry plan | `context/osm-road-geometry-plan.md` |
 
@@ -55,13 +51,35 @@ This ensures zero loss of continuity between chat sessions.
 |-------|-------|--------|
 | Study 1 | Structural Sensitivity Analysis (integrators, arrivals) | ✅ ANNSIM 2026 Submitted |
 | Study 2 | Wildfire Evacuation & Contraflow on I-10 (Palisades Fire) | ❌ WSC 2026 deadline missed — retarget to next venue |
-| Study 3 | Unified Agentic Architecture (long-term, internal) | 🔄 Internal Vision — Not for committee or PI yet |
+| Study 3 | Unified Agentic Architecture (long-term, internal) |  Internal Vision — Not for committee or PI yet |
 
 **NOTE: Calibration is a supporting result, not a standalone paper. PI is not interested in calibration as a paper.**
 
 ## Active Focus
-**Simulation engine development** — rendering, ramp physics, lane change, calibration.  
-Next paper target TBD.
+**PhD Written Comprehensive Exam (3 weeks)** — write one question per week and produce one final PDF with 3 sections (Q1, Q2, Q3).
+
+- Primary workspace: `docs/candidacy_exam/PhD-Candidacy-Exam`
+- Writing workflow: edit in IDE -> push to GitHub -> pull/sync on Overleaf for rendering checks
+- Citation workflow: maintain **separate bib files per question** (`refQ1.bib`, `refQ2.bib`, `refQ3.bib`) while drafting each answer
+- Simulation engine feature work is **paused** unless directly needed as evidence for exam writing
+
+## Comprehensive Exam Plan (May 2026)
+
+### Deliverable
+- One PDF containing 3 sections:
+  1. Q1 + answer + Q1 references
+  2. Q2 + answer + Q2 references
+  3. Q3 + answer + Q3 references
+
+### Weekly cadence
+1. **Week 1 (Q1):** AutoTrafficSim V&V, runtime invariants, scientific soundness, anti-overfitting loop
+2. **Week 2 (Q2):** Evacuation/contraflow behavior assumptions, why agentic framework vs fit-only workflow
+3. **Week 3 (Q3):** Hybrid meso-micro literature critique, DES↔discrete-time synchronization, full mathematical treatment
+
+### Non-negotiables for exam writing
+- **Do not plagiarize** — all prose must be original
+- **Do not hallucinate citations** — include only verifiable references actually read/confirmed
+- **Question-first writing** — each section must quote the exact question text, then answer directly
 
 ## Quick Reference
 
@@ -153,11 +171,11 @@ Model.loadOsmBackground(jsonPath, gpsAnchors, dims)
 
 | Issue | Status |
 |-------|--------|
-| No gap acceptance at merge | 🟡 Major — both models unconditionally insert (no safe-gap wait). If you yield to director while waiting, follower ramp vehicles are blind and drive over the waiting vehicle. |
-| Animation teleportation at merge | 🟡 Cosmetic — car jumps from ramp endpoint to mainline segment (no smooth visual transition). Fix: interpolate screen position over ~0.5s or use a short auxiliary VTransport bridging ramp end → mainline lane. ~30 lines. |
-| Ramp `gap = -4` from VTransport coroutine yield | 🟡 Benign — multiple ramp vehicles at `disp=0` on same ramp DLL. IDM clamp holds at `v=0` until leader clears. Root cause: VSource spawns while prior car is still inside `move()` yield. Not a physics error — just queuing. |
-| Outer lane crowding after ramp merge | 🟡 Minor — ramp vehicles merge into outermost lane, MOBIL moves them inward but throughput limited by 3s cooldown. Multiple lane changes needed (4→3→2) take 6+ seconds. Realistic behavior — real highways show same pattern near on-ramps. |
-| vdeque density mismatch after mid-segment lane change | 🟡 Minor — when MOBIL triggers `changeLane` inside `move()`, vehicle stays in old VTransport's `vdeque` but moves to new lane's DLL. Density stats off for that segment. Won't crash. |
+| No gap acceptance at merge |  Major — both models unconditionally insert (no safe-gap wait). If you yield to director while waiting, follower ramp vehicles are blind and drive over the waiting vehicle. |
+| Animation teleportation at merge |  Cosmetic — car jumps from ramp endpoint to mainline segment (no smooth visual transition). Fix: interpolate screen position over ~0.5s or use a short auxiliary VTransport bridging ramp end → mainline lane. ~30 lines. |
+| Ramp `gap = -4` from VTransport coroutine yield |  Benign — multiple ramp vehicles at `disp=0` on same ramp DLL. IDM clamp holds at `v=0` until leader clears. Root cause: VSource spawns while prior car is still inside `move()` yield. Not a physics error — just queuing. |
+| Outer lane crowding after ramp merge |  Minor — ramp vehicles merge into outermost lane, MOBIL moves them inward but throughput limited by 3s cooldown. Multiple lane changes needed (4→3→2) take 6+ seconds. Realistic behavior — real highways show same pattern near on-ramps. |
+| vdeque density mismatch after mid-segment lane change |  Minor — when MOBIL triggers `changeLane` inside `move()`, vehicle stays in old VTransport's `vdeque` but moves to new lane's DLL. Density stats off for that segment. Won't crash. |
 | SR-134 OR CSV has zero flow | Data quality — sensors not reporting |
 | Fire-day data not yet wired | Need `PeMSDemand.I210_WB_FireDay_Anchor()` |
 
@@ -180,12 +198,11 @@ Model.loadOsmBackground(jsonPath, gpsAnchors, dims)
 
 ## What Is In Progress — ACTIVE NEXT TASKS
 
-1. ✅ **MOBIL lane change** — implemented, tested, working. Vehicles spread across lanes.
-2. 🔄 **Visual verification** — run both models, confirm spreading + no crashes over full simulation
-3. 🔄 **LOS road coloring** — color road polygons by density (green→yellow→red)
-4. ⏸ **Gap acceptance at merge** — ramp vehicles wait for safe gap before inserting (coroutine yield issue)
-5. ⏸ **Animation teleportation fix** — smooth visual transition at ramp→mainline merge
-6. ⏸ **Density-based lane assignment (Phase B)** — design complete, not yet implemented
+1. ✅ **Exam template setup** — exam repo/workspace initialized and synchronized with Overleaf/GitHub workflow.
+2. 🔄 **Q1 drafting** — build argument structure and add references directly into `refQ1.bib` while writing.
+3. 🔄 **Q2 drafting prep** — queue behavior-model citations and evidence claims in `refQ2.bib`.
+4. 🔄 **Q3 grounding (priority risk)** — literature-first pass and equation scaffolding in `refQ3.bib` before full drafting.
+5. ⏸ **Simulation engine development tasks** — paused until comprehensive exam submission is complete.
 
 ## Session State — 2026-04-15
 
@@ -209,10 +226,97 @@ April 15, 2026
 
 ### Known Bugs Found
 - **MOBIL oscillation without cooldown** — discovered and fixed. Without the 3s cooldown, `changeLane` alters DLL composition which reverses MOBIL incentive, causing infinite flip-flop inside `move()`.
-- **vdeque density mismatch** — when MOBIL changes lane mid-segment, vehicle remains in old VTransport's `vdeque` but moves to new lane's DLL. Density tracking wrong for that segment. Non-critical.
+- **vdeque removed (2026-04-23)** — single source of truth is now `VTransport.vList` (DLL) with O(1) `vCount`. The old "density mismatch when MOBIL changes lane mid-segment" bug auto-resolved because `Route.changeLane` already maintains the DLL correctly via `removeFromAlist`/`addToAlist`.
 
 ### Key Decisions Made
 - **MOBIL in engine, not model** — lane-change logic in `VTransport.move()`, removed from model `act()`. Any model gets MOBIL for free.
 - **Keep `changeLane` gap check** — redundant with MOBIL safety criterion but serves as physical safety net.
 - **Rejected per-vehicle Uniform selectors** — no calibration data to parameterize. All vehicles share same MOBIL params for now.
 - **3-second cooldown** — standard anti-oscillation (SUMO uses 2-5s). Prevents flip-flop but limits throughput to 1 lane change per 3s per vehicle.
+
+
+
+Any Agent that read's this claude.md should first remind me of this concept. I need to work on it once I resume working 
+in this code base. the concept is below (1,2,3)
+
+if Agents are connected linkes (roads) that send and schedule vehicles events between each other,
+because these nodes are linked:
+1. The flow rate inside each link (serving time is or can be know)
+--We need a standard mechanism to calculate flow rate inside a link + a spill back rate congetion effect. florate: length of linklist/ window size. 
+length of Vtransport.vList / window size.
+2. the connecting downstream rate (congestion signal) can also be sense
+3. One can also mentain a traffic signal (dynamic routing at the lane level)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Traditional: deterministic pipeline
+class CheckoutService:
+    def process_order(self, cart: Cart) -> OrderResult:
+        validated = self.validate_items(cart) #A
+        priced = self.calculate_total(validated) #B
+        payment = self.charge_payment(priced) #C
+        confirmation = self.send_receipt(payment) #D
+        return confirmation
+
+
+class CheckoutService:
+    def process_order(cert: str): Unit = {
+        val validated   = validateItems(cert) //A
+        val priced      = calculateTotal(validated) //B
+        val payment     = chargePayment(priced) //C
+        val confirmation = sendReceipt(payment) //D
+        confirmation
+    }
+
+#A Perceive: What did the user mean? (Interpretation varies per invocation)
+#B Reason: What should I do next? (Decision made by the LLM, not the developer)
+#C Act: Execute—might fail, might hallucinate, might take an unexpected path
+#D Reflect: Did that work? (Self-evaluation determines whether to loop or stop)
+# Agent-based: probabilistic reasoning loop
+
+
+class AgentCheckout:
+    def process_order(user_request: str): Unit = {
+        while (!isComplete()) {
+            val observation = perceive(user_request) //A
+            val plan = reason(observation) //B
+            val result = act(plan) //C
+            reflect(result) //D
+        }
+        summarize()
+    }
+
+class AgentCheckout:
+    def process_order(self, user_request: str) -> str:
+        while not self.is_complete():
+        observation = self.perceive(user_request) #A
+        plan = self.reason(observation) #B
+        result = self.act(plan) #C
+        self.reflect(result) #D
+        return self.summarize()
+
+
+

@@ -64,14 +64,14 @@ trait Dynamics:
         // Step 1: within-segment leader (O(1) DLL lookup)
         val ref = car.myPathNode.ahead
         if ref != null then
-//            if onRamp then
-//                val ldr = ref.elem
-//                val mePath = if car.myPathway != null then car.myPathway.name else "null"
-//                val meRamp = if car.myRamp != null then car.myRamp.name else "null"
-//                val ldrPath = if ldr.myPathway != null then ldr.myPathway.name else "null"
-//                val ldrRamp = if ldr.myRamp != null then ldr.myRamp.name else "null"
-//                println(f"[findLeader] ${car.displayLabel}%-12s STEP1 seg=${car.segId} path=$mePath ramp=$meRamp | ldr=${ldr.displayLabel} ldr.seg=${ldr.segId} ldr.path=$ldrPath ldr.ramp=$ldrRamp | me.disp=${car.disp}%.2f me.v=${car.velocity}%.2f ldr.disp=${ldr.disp}%.2f ldr.v=${ldr.velocity}%.2f")
-//            end if  // DIAG
+            if onRamp then
+                val ldr = ref.elem
+                val mePath = if car.myPathway != null then car.myPathway.name else "null"
+                val meRamp = if car.myRamp != null then car.myRamp.name else "null"
+                val ldrPath = if ldr.myPathway != null then ldr.myPathway.name else "null"
+                val ldrRamp = if ldr.myRamp != null then ldr.myRamp.name else "null"
+                println(f"[findLeader] ${car.displayLabel}%-12s STEP1 seg=${car.segId} path=$mePath ramp=$meRamp | ldr=${ldr.displayLabel} ldr.seg=${ldr.segId} ldr.path=$ldrPath ldr.ramp=$ldrRamp | me.disp=${car.disp}%.2f me.v=${car.velocity}%.2f ldr.disp=${ldr.disp}%.2f ldr.v=${ldr.velocity}%.2f")
+            end if  // DIAG
             return ref.elem
 
         // Step 2: cross-boundary — look at next segment's DLL tail
@@ -517,18 +517,17 @@ object IDMDynamics
         car.disp    = new_disp
 
         // DIAG: final state for ramp vehicles — detect overtaking
-        // (disabled — high-volume console output starves the animator's EDT)
-//        if car.myRamp != null then
-//            val ldrD = if car_ahead != null then car_ahead.disp else -1.0
-//            val gapF = if car_ahead != null then ldrD - new_disp - len else 999.0
-//            val flag = if car_ahead != null && car_ahead.segId == car.segId && new_disp > ldrD then " *** OVERTOOK ***" else ""
-//            val mePath = if car.myPathway != null then car.myPathway.name else "null"
-//            val meRamp = if car.myRamp != null then car.myRamp.name else "null"
-//            val ldrPath = if car_ahead != null && car_ahead.myPathway != null then car_ahead.myPathway.name else "null"
-//            val ldrRamp = if car_ahead != null && car_ahead.myRamp != null then car_ahead.myRamp.name else "null"
-//            val ldrName = if car_ahead != null then car_ahead.displayLabel else "null"
-//            println(f"[STEP7] ${car.displayLabel}%-12s seg=${car.segId} path=$mePath ramp=$meRamp | ldr=$ldrName ldr.seg=${if car_ahead != null then car_ahead.segId else -1} ldr.path=$ldrPath ldr.ramp=$ldrRamp | disp=${new_disp}%.2f v=${car.velocity}%.2f ldrD=${ldrD}%.2f gap=${gapF}%.2f$flag")
-//        end if  // DIAG
+        if car.myRamp != null then
+            val ldrD = if car_ahead != null then car_ahead.disp else -1.0
+            val gapF = if car_ahead != null then ldrD - new_disp - len else 999.0
+            val flag = if car_ahead != null && car_ahead.segId == car.segId && new_disp > ldrD then " *** OVERTOOK ***" else ""
+            val mePath = if car.myPathway != null then car.myPathway.name else "null"
+            val meRamp = if car.myRamp != null then car.myRamp.name else "null"
+            val ldrPath = if car_ahead != null && car_ahead.myPathway != null then car_ahead.myPathway.name else "null"
+            val ldrRamp = if car_ahead != null && car_ahead.myRamp != null then car_ahead.myRamp.name else "null"
+            val ldrName = if car_ahead != null then car_ahead.displayLabel else "null"
+            println(f"[STEP7] ${car.displayLabel}%-12s seg=${car.segId} path=$mePath ramp=$meRamp | ldr=$ldrName ldr.seg=${if car_ahead != null then car_ahead.segId else -1} ldr.path=$ldrPath ldr.ramp=$ldrRamp | disp=${new_disp}%.2f v=${car.velocity}%.2f ldrD=${ldrD}%.2f gap=${gapF}%.2f$flag")
+        end if  // DIAG
     end updateM
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

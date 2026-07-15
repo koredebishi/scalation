@@ -66,7 +66,7 @@ abstract class Vehicle (name_ : String, director: Model)
     var myPathway     : Pathway     = null   // current pathway/lane this vehicle is on (null if not on a pathway)
     var myFFConnector : FFConnector = null   // current FF connector this vehicle is on (null if not on an FF)
     var myRoute       : Route       = null   // parent Route this vehicle belongs to (set by Pathway.addToAlist)
-    var exitRampIdx   : Int          = -1    // index into route.offRampSpecs (-1 = through traffic → drives to Sink)
+    var exitRampId    : String       = null   // off-ramp destination (null = through traffic → drives to Sink)
     var lastLaneChangeTime: Double  = -10.0  // simulation clock when last lane change occurred (cooldown)
     private [process] var myPathNode: DoublyLinkedList[Vehicle]#Node = null   // DLL node: pred <-> me <-> succ
 

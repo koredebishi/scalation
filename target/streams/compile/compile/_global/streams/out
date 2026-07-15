@@ -1,0 +1,43 @@
+[error] -- [E006] Not Found Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\animation\DgAnimator.scala:945:48 
+[error] 945 |            lines.addOne ((f"Median Speed:     $hudMedSpeed%.1f m/s  (${hudMedSpeed * 2.237}%.0f mph)", fgColor, false))
+[error]     |                                                ^^^^^^^^^^^
+[error]     |                                                Not found: hudMedSpeed
+[error]     |---------------------------------------------------------------------------
+[error]     | Explanation (enabled by `-explain`)
+[error]     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+[error]     | Each identifier in Scala needs a matching declaration. There are two kinds of
+[error]     | identifiers: type identifiers and value identifiers. Value identifiers are introduced
+[error]     | by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,
+[error]     | `class`, `enum`, or `trait` declarations.
+[error]     |
+[error]     | Identifiers refer to matching declarations in their environment, or they can be
+[error]     | imported from elsewhere.
+[error]     |
+[error]     | Possible reasons why no matching declaration was found:
+[error]     |  - The declaration or the use is mis-spelt.
+[error]     |  - An import is missing.
+[error]      ---------------------------------------------------------------------------
+[error] -- [E006] Not Found Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\animation\DgAnimator.scala:945:72 
+[error] 945 |            lines.addOne ((f"Median Speed:     $hudMedSpeed%.1f m/s  (${hudMedSpeed * 2.237}%.0f mph)", fgColor, false))
+[error]     |                                                                        ^^^^^^^^^^^
+[error]     |                                                Not found: hudMedSpeed
+[error]     |---------------------------------------------------------------------------
+[error]     | Explanation (enabled by `-explain`)
+[error]     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+[error]     | Each identifier in Scala needs a matching declaration. There are two kinds of
+[error]     | identifiers: type identifiers and value identifiers. Value identifiers are introduced
+[error]     | by `val`, `def`, or `object` declarations. Type identifiers are introduced by `type`,
+[error]     | `class`, `enum`, or `trait` declarations.
+[error]     |
+[error]     | Identifiers refer to matching declarations in their environment, or they can be
+[error]     | imported from elsewhere.
+[error]     |
+[error]     | Possible reasons why no matching declaration was found:
+[error]     |  - The declaration or the use is mis-spelt.
+[error]     |  - An import is missing.
+[error]      ---------------------------------------------------------------------------
+[error] -- Error: C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\Model.scala:293:53 
+[error] 293 |        dgAni.updateHudStats (throughput, meanSpeed, medSpeed)
+[error]     |                                                     ^^^^^^^^
+[error]     |too many arguments for method updateHudStats in class DgAnimator: (throughput: Double, avgSpeed: Double): Unit
+[error] three errors found

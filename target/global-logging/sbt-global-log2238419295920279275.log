@@ -1,0 +1,175 @@
+[debug] > Exec(early(addDefaultCommands), None, None)
+[debug] > Exec(addDefaultCommands, None, None)
+[debug] > Exec(early(initialize), None, None)
+[debug] > Exec(initialize, None, None)
+[debug] > Exec(early(addPluginSbtFile="""C:/Users/kored/AppData/Local/Temp/idea12091976570268922609.sbt"""), None, None)
+[debug] > Exec(addPluginSbtFile="""C:/Users/kored/AppData/Local/Temp/idea12091976570268922609.sbt""", None, None)
+[debug] > Exec(boot, None, None)
+[debug] > Exec(writeSbtVersion, None, None)
+[debug] > Exec(reload, None, None)
+[debug] > Exec(sbtStashOnFailure, None, None)
+[debug] > Exec(onFailure loadFailed, None, None)
+[debug] > Exec(loadp, None, None)
+[info] welcome to sbt 1.11.3 (Oracle Corporation Java 25)
+[debug]       Load.loadUnit: plugins took 156.227ms
+[debug]       Load.loadUnit: defsScala took 0.5315ms
+[debug] [Loading] Scanning directory C:\Users\kored\.sbt\1.0\plugins
+[debug] [Loading] Found non-root projects 
+[debug] [Loading] Done in C:\Users\kored\.sbt\1.0\plugins, returning: ()
+[debug] deducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.ScriptedPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.SbtPlugin),Set(Atom(sbt.ScriptedPlugin)))
+[debug] Clause(Atom(sbt.plugins.SemanticdbPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.MiniDependencyTreePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.SemanticdbPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin))))
+[debug]   :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,sbt.plugins.MiniDependencyTreePlugin,sbt.plugins.JUnitXmlReportPlugin,sbt.plugins.SemanticdbPlugin)
+[debug] Plugins.deducer#function took 32.067 ms
+[debug]           Load.resolveProject(global-plugins) took 71.0814ms
+[debug]         Load.loadTransitive: finalizeProject(Project(id global-plugins, base: C:\Users\kored\.sbt\1.0\plugins, plugins: List(<none>))) took 137.5098ms
+[debug] [Loading] Done in C:\Users\kored\.sbt\1.0\plugins, returning: (global-plugins)
+[debug]       Load.loadUnit: loadedProjectsRaw took 172.8758ms
+[debug]       Load.loadUnit: cleanEvalClasses took 0.423ms
+[debug]     Load.loadUnit(file:/C:/Users/kored/.sbt/1.0/plugins/, ...) took 346.3534ms
+[debug]   Load.apply: load took 677.9167ms
+[debug]   Load.apply: resolveProjects took 15.4617ms
+[debug]   Load.apply: finalTransforms took 106.9942ms
+[debug]   Load.apply: config.delegates took 12.4726ms
+[debug]   Load.apply: Def.make(settings)... took 603.0499ms
+[debug]   Load.apply: structureIndex took 135.6963ms
+[debug]   Load.apply: mkStreams took 1.3757ms
+[info] loading global plugins from C:\Users\kored\.sbt\1.0\plugins
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[debug] Load.defaultLoad until apply took 4090.1692ms
+[debug]                 Load.loadUnit: plugins took 39.5562ms
+[debug]                 Load.loadUnit: defsScala took 0.0042ms
+[debug] [Loading] Scanning directory C:\Simulation\scalation_2.0\project\project
+[debug]                   Load.loadUnit: mkEval took 9.4678ms
+[debug] [Loading] Found non-root projects 
+[debug] [Loading] Done in C:\Simulation\scalation_2.0\project\project, returning: ()
+[debug] deducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.ScriptedPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.SbtPlugin),Set(Atom(sbt.ScriptedPlugin)))
+[debug] Clause(Atom(sbt.plugins.SemanticdbPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.MiniDependencyTreePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.SemanticdbPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin))))
+[debug]   :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,sbt.plugins.MiniDependencyTreePlugin,sbt.plugins.JUnitXmlReportPlugin,sbt.plugins.SemanticdbPlugin)
+[debug] Plugins.deducer#function took 2.0181 ms
+[info] loading settings for project scalation_2-0-build-build from metals.sbt...
+[debug]                     Load.resolveProject(scalation_2-0-build-build) took 4.7329ms
+[debug]                   Load.loadTransitive: finalizeProject(Project(id scalation_2-0-build-build, base: C:\Simulation\scalation_2.0\project\project, plugins: List(<none>))) took 7.353ms
+[debug] [Loading] Done in C:\Simulation\scalation_2.0\project\project, returning: (scalation_2-0-build-build)
+[debug]                 Load.loadUnit: loadedProjectsRaw took 170.079ms
+[debug]                 Load.loadUnit: cleanEvalClasses took 8.2881ms
+[debug]               Load.loadUnit(file:/C:/Simulation/scalation_2.0/project/project/, ...) took 218.9849ms
+[debug]             Load.apply: load took 220.5725ms
+[debug]             Load.apply: resolveProjects took 0.1273ms
+[debug]             Load.apply: finalTransforms took 10.9315ms
+[debug]             Load.apply: config.delegates took 0.4887ms
+[debug]             Load.apply: Def.make(settings)... took 91.0504ms
+[debug]             Load.apply: structureIndex took 46.4776ms
+[debug]             Load.apply: mkStreams took 0.0027ms
+[info] loading project definition from C:\Simulation\scalation_2.0\project\project
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[debug]           Load.loadUnit: plugins took 694.1334ms
+[debug]           Load.loadUnit: defsScala took 0.0046ms
+[debug] [Loading] Scanning directory C:\Simulation\scalation_2.0\project
+[debug]             Load.loadUnit: mkEval took 0.5086ms
+[debug] [Loading] Found non-root projects 
+[debug] [Loading] Done in C:\Simulation\scalation_2.0\project, returning: ()
+[debug] deducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.ScriptedPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.SbtPlugin),Set(Atom(sbt.ScriptedPlugin)))
+[debug] Clause(Atom(sbt.plugins.SemanticdbPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.MiniDependencyTreePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(bloop.integrations.sbt.BloopPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.SemanticdbPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(bloop.integrations.sbt.BloopPlugin))))
+[debug]   :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,bloop.integrations.sbt.BloopPlugin,sbt.plugins.MiniDependencyTreePlugin,sbt.plugins.JUnitXmlReportPlugin,sbt.plugins.SemanticdbPlugin)
+[debug] Plugins.deducer#function took 2.1847 ms
+[info] loading settings for project scalation_2-0-build from metals.sbt, plugins.sbt, idea12091976570268922609.sbt...
+[debug]               Load.resolveProject(scalation_2-0-build) took 30.3041ms
+[debug]             Load.loadTransitive: finalizeProject(Project(id scalation_2-0-build, base: C:\Simulation\scalation_2.0\project, plugins: List(<none>))) took 33.1539ms
+[debug] [Loading] Done in C:\Simulation\scalation_2.0\project, returning: (scalation_2-0-build)
+[debug]           Load.loadUnit: loadedProjectsRaw took 2561.3343ms
+[debug]           Load.loadUnit: cleanEvalClasses took 11.5264ms
+[debug]         Load.loadUnit(file:/C:/Simulation/scalation_2.0/project/, ...) took 3268.2755ms
+[debug]       Load.apply: load took 3270.0786ms
+[debug]       Load.apply: resolveProjects took 0.1334ms
+[debug]       Load.apply: finalTransforms took 14.9592ms
+[debug]       Load.apply: config.delegates took 0.3548ms
+[debug]       Load.apply: Def.make(settings)... took 72.1922ms
+[debug]       Load.apply: structureIndex took 28.4955ms
+[debug]       Load.apply: mkStreams took 0.0031ms
+[info] loading project definition from C:\Simulation\scalation_2.0\project
+[debug] Evaluating tasks: bloopInstall
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[success] Generated .bloop\scalation_2-0-build.json
+[success] Total time: 8 s, completed May 20, 2026, 4:07:19 PM
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[debug]     Load.loadUnit: plugins took 11276.5893ms
+[debug]     Load.loadUnit: defsScala took 0.0028ms
+[debug] [Loading] Scanning directory C:\Simulation\scalation_2.0
+[debug]       Load.loadUnit: mkEval took 0.4739ms
+[debug] [Loading] Found root project scalation w/ remaining 
+[debug] deducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.ScriptedPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.SbtPlugin),Set(Atom(sbt.ScriptedPlugin)))
+[debug] Clause(Atom(sbt.plugins.SemanticdbPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JUnitXmlReportPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.MiniDependencyTreePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(bloop.integrations.sbt.BloopPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbtassembly.AssemblyPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(org.jetbrains.sbt.GenerateAllManagedSourcesPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(org.jetbrains.sbt.StructurePlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(org.jetbrains.sbt.IdeaShellPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.IvyPlugin)))
+[debug] Clause(Atom(sbt.plugins.IvyPlugin),Set(Atom(sbt.plugins.JvmPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.SemanticdbPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.JUnitXmlReportPlugin)))
+[debug] Clause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(bloop.integrations.sbt.BloopPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbtassembly.AssemblyPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(org.jetbrains.sbt.GenerateAllManagedSourcesPlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(org.jetbrains.sbt.StructurePlugin)))
+[debug] Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(org.jetbrains.sbt.IdeaShellPlugin))))
+[debug]   :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,bloop.integrations.sbt.BloopPlugin,org.jetbrains.sbt.GenerateAllManagedSourcesPlugin,sbt.plugins.SemanticdbPlugin,sbt.plugins.JUnitXmlReportPlugin,sbtassembly.AssemblyPlugin,org.jetbrains.sbt.IdeaShellPlugin,org.jetbrains.sbt.StructurePlugin,sbt.plugins.MiniDependencyTreePlugin)
+[debug] Plugins.deducer#function took 2.2035 ms
+[info] loading settings for project scalation from build.sbt...
+[debug]         Load.resolveProject(scalation) took 49.866ms
+[debug]       Load.loadTransitive: finalizeProject(Project(id scalation, base: C:\Simulation\scalation_2.0, plugins: List(<none>))) took 53.4688ms
+[debug] [Loading] Done in C:\Simulation\scalation_2.0, returning: (scalation)
+[debug]     Load.loadUnit: loadedProjectsRaw took 2693.3411ms
+[debug]     Load.loadUnit: cleanEvalClasses took 54.5165ms
+[debug]   Load.loadUnit(file:/C:/Simulation/scalation_2.0/, ...) took 14025.5973ms
+[debug] Load.apply: load took 14028.3517ms
+[debug] Load.apply: resolveProjects took 0.3267ms
+[debug] Load.apply: finalTransforms took 24.8674ms
+[debug] Load.apply: config.delegates took 0.2911ms
+[debug] Load.apply: Def.make(settings)... took 61.1255ms
+[debug] Load.apply: structureIndex took 27.1533ms
+[debug] Load.apply: mkStreams took 0.0027ms
+[info] set current project to scalation (in build file:/C:/Simulation/scalation_2.0/)
+[debug] > Exec(sbtPopOnFailure, None, None)
+[debug] > Exec(resumeFromFailure, None, None)
+[debug] > Exec(notifyUsersAboutShell, None, None)
+[debug] > Exec(iflast shell, None, None)
+[debug] > Exec(idea-shell, None, None)
