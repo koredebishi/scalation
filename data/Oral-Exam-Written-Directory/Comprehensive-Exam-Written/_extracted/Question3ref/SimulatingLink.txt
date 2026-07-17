@@ -1,0 +1,1188 @@
+===== PAGE 1 =====
+
+Simulation Modelling Practice and Theory 147 (2026) 103252
+Contents lists available at ScienceDirect
+SimulationModellingPracticeandTheory
+journal homepage: www.elsevier.com/locate/simpat
+Simulatinglink-levelinterruptedflowtrafficdynamicsandthe
+comparisonbetweendifferentmodelsforurbanroadnetworks
+Ying-Chuan Ni ∗, Anastasios Kouvelas , Michail A. Makridis
+Traffic Engineering Group, Institute for Transport Planning and Systems, ETH Zurich,Stefano-Franscini-Platz 5,Zürich,8093,Switzerland
+A R T I C L E I N F O A B S T R A C T
+Dataset link:LIFT: Link-level Interrupted Flow T Dynamic traffic models that reproduce the pattern of congestion propagation in urban road
+raffic dynamics simulation (Original data) networks are essential for the evaluation of traffic management strategies and prediction of
+traffic states. Many approaches developed in the past simplified the movement of vehicles and
+Keywords:
+Backward traveling space
+the propagation of traffic waves. The overlooked problems can be particularly influential for
+Congestion propagation
+the simulation of interrupted flow with traffic signal control due to the frequent accumulation
+Interrupted traffic flow and dissipation of the waiting queue on a road link. This study first reviews state-of-the-art
+Mesoscopic traffic simulation macroscopic and mesoscopic link-level urban traffic flow models and provides a comparative
+Queue spillback discussion of their similarities, differences, and gaps. We then put forward an event-based
+Urban road network mesoscopic model to simulate link-level interrupted flow traffic dynamics (LIFT). The model (i)
+simulates the transmission of vehicles between links based on the demand and supply of exit
+and entry events, (ii) monitors queue spillback through the consideration of backward traveling
+spaces, and (iii) adheres to first-in-first-out at intersections for congested situations. Taking
+the outcomes generated from microscopic simulation as ground-truth, the case studies show
+that LIFT outperforms the other models by accurately capturing the evolution of link densities
+and mean path speeds in congested conditions. It is reliable even in complex scenarios with
+diverge blocking phenomena and desired speed heterogeneity. Without having to simulate the
+interaction between individual vehicles, the model also becomes much more computationally
+efficient than microscopic simulation. It can be applied in simulation-based optimization or
+control problems which require the consideration of finer-level details that macroscopic models
+are unable to offer.
+1. Introduction
+The spatiotemporal propagation pattern of traffic congestion in an urban road network has been analyzed with various
+macroscopic models that contain plenty of simplification and microscopic simulation tools that require intensive computation for
+relatively large networks. Fig. 1 summarizes traffic flow modeling approaches at different levels of aggregation and their principles.
+Region-level urban traffic modeling based on network fundamental diagrams (NFDs) has become a popular approach in recent
+years considering its superior computation efficiency for network-wide traffic management strategies, including perimeter control [1]
+and toll pricing [2]. Johari et al. [3] provided an in-depth review on the development of this type of approach. Nevertheless, the
+shape of an NFD is subject to changes of the origin–destination (OD) demand and trip pattern within the network [4–6], indicating
+that it may not be a suitable option to be used in traffic control strategies when adaptive route choice behavior is considered.
+Moreover, changes in road infrastructure supply, e.g., road closure or dynamic bus lane allocation, also affect the shape of an NFD.
+∗ Corresponding author.
+E-mail address: ying-chuan.ni@ivt.baug.ethz.ch (Y.-C. Ni).
+https://doi.org/10.1016/j.simpat.2026.103252
+Received 10 April 2025; Received in revised form 19 December 2025; Accepted 11 January 2026
+Available online 14 January 2026
+1569-190X/© 2026 The Authors. Published by Elsevier B.V. This is an open access article under the CC BY license
+(h ttp://creativecommons.org/licenses/by/4.0/ ).
+
+===== PAGE 2 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 1. Classification of traffic flow models based on levels-of-aggregation.
+Defining regions with sufficiently homogeneous traffic dynamics so that the NFD can be representative is also a major obstacle when
+attempting to use these approaches [7]. In view of these limitations, approaches that simulate urban traffic dynamics at a finer level
+are still of significant importance. They play a founding role in the development of region-level traffic models as well.
+At a finer level relative to region-level traffic flow models, congestion propagation can be monitored by investigating the
+evolution of traffic density on each link in the urban road network. The average link travel speed decreases as the density increases
+after a critical point, as reflected on the trapezoidal fundamental diagram (FD) of urban traffic flow [8]. When a road link reaches the
+saturated state, link travel time increases drastically. Once the link becomes oversaturated, spillback occurs due to the long vehicle
+queue and hence reduces the flow that can enter from the upstream. The congestion then begins from a single link and spreads
+throughout the network. The linkage of congested clusters eventually leads to the breakdown of network traffic flow. Following
+such a concept, Saberi et al. [9] described the process of congestion propagation and dissipation dynamics with a system of ordinary
+differential equations, which was inspired by the spread of contagious diseases within a population. Ambühl et al. [10] also modeled
+this process and concluded that the collapse of network traffic flow occurs when the percolation of congested links transforms into
+a large connected cluster.
+An accurate and efficient traffic model that can reproduce the congestion dynamics described above and help identify bottleneck
+locations is useful for the design of a road network or the development of urban traffic management strategies. Mesoscopic traffic
+simulation models that follow the property of macroscopic traffic flow and in the meantime possess the merit of microscopic
+simulation have gained a lot of attention among modelers. However, the performance of these mesoscopic models with regard
+to accuracy has not been thoroughly discussed before.
+In this study, a mesoscopic traffic flow model is proposed to simulate link-level interrupted flow traffic dynamics (LIFT) exhibited
+by urban road links with traffic signal control. The model, hereinafter referred to as LIFT, is anticipated to outperform other
+macroscopic and mesoscopic models in capturing the evolution of link traffic states before, during, and after congestion. The
+following are the main features of LIFT.
+• Simulating vehicle movements between links efficiently based on the demand and supply of entry and exit events at boundaries
+• Monitoring the occurrence of queue spillback accurately by utilizing the concept of backward traveling spaces
+• Adhering to exact first-in-first-out (FIFO) at urban intersections particularly for diverge blocking situations caused by queue
+spillback
+The remainder of the paper is structured as follows. In Section 2, we first review past studies on macroscopic traffic modeling
+and mesoscopic traffic simulation and point out the problems which still require careful attention for urban traffic flow modeling in
+particular. Section 3 then explains the model formulation of LIFT, and Section 4 describes the design of case studies. The comparison
+between all the selected models is then presented in Section 5, while Section 6 summarizes the contribution of this study.
+2. State-of-the-art models
+In this section, we review several macroscopic and mesoscopic traffic models and their applications in the context of urban traffic
+flow. The drawbacks when using these models, especially magnified by the distinct property of interrupted traffic flow dynamics,
+are highlighted.
+2
+
+===== PAGE 3 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+2.1. Macroscopic-level urban traffic flow modeling
+Macroscopic traffic flow models describe traffic dynamics by capturing the movement of flow (aggregated vehicle behavior).
+Many studies related to urban traffic modeling adapted macroscopic models that were originally proposed for uninterrupted flow
+on motorways. For instance, Simoni and Claudel [11] modified the Hamilton–Jacobi formulation of the Lighthill–Whitham–Richards
+(LWR) model, which was originally proposed in [12], to evaluate the effect of traffic signal control. There were also studies that
+extended the cell transmission model (CTM) [13], a spatiotemporal discretization of the LWR model solved with the Godunov
+scheme [14], for urban traffic flow [15–17]. The delay at signalized intersections and the reduced queue discharge rate caused
+by the switching of signal phases are considered. However, deliberately capturing the progression of uninterrupted vehicle flow
+between cells on urban links has little positive contribution to the modeling accuracy and is considered unnecessarily refined. The
+computation requirement also becomes a concern when applying CTM to a large-scale network due to the division of a road link
+into multiple cells.
+Compared to CTM, link transmission model (LTM), which is proposed based on Newell’s formulation of the LWR model [18],
+has gained a lot of attention in dynamic traffic modeling due to its improved accuracy derived from continuous-space consideration
+within the link and better computation efficiency by taking the entire road link as a unit [19]. In the extended LTM formulation
+for urban traffic flow proposed in [20], intersection delay is considered by quantifying the time-aggregated impact of signals on
+link outflow capacity. The outflow capacity is reduced based on the green-to-cycle ratio. This type of approach was later called
+continuous signalized node modeling, which is a simplified yet efficient way to model traffic flow in urban road networks [21–23],
+especially for cases with complicated intersection geometries (multiple incoming and outgoing links) and signal timing optimization
+or control purposes using LTM [24,25]. However, as this study only focuses on the discussion of modeling accuracy, only the precise
+‘‘on-and-off’’ signal timing model would be used.
+In macroscopic CTM and LTM, the time step size and the cell/link length must follow the Courant–Friedrichs–Lewy (CFL)
+condition. For traffic modeling of an urban road network with various link lengths, it is quite impractical for the model to comply
+with this requirement, especially when those short links act as critical bottlenecks in the network and should not be combined into a
+long road link. In addition, to model the on-and-off signal control, traffic signal timing imposes another specific requirement on these
+models that the time step size should be a common divisor of all the signal phases. This either limits the possible signal timing plans
+that the model can consider or leads to a rather small time step size and again causes high computational cost. Therefore, macroscopic
+LTM has rarely been applied to large-scale networks with complex signal timing plans and road geometries. To overcome this kind
+of limitation, methods that solve LTM in an event-based resolution [26] or using an iterative algorithm with linear interpolation on
+a solution grid [27] can be considered.
+For the modeling of interrupted traffic flow in particular, Gazis and Potts [28] proposed the store-and-forward (SaF) model,
+where each road link is considered a queue system of vehicles. The signal timing plan is explicitly included as parameters in the
+discrete-time model formulation. Therefore, the model has often been utilized to optimize traffic signal timing [29–31]. However,
+it is known that the simplified assumption of a vertical link queue ignores the time required for vehicles to travel through the link,
+which deteriorates the model performance in under-saturated conditions.
+To consider link travel time and available storage space in the downstream link, Lin et al. [32] proposed the S model by separating
+the moving and queuing vehicles. The transfer of vehicle flows within a link, hence, also needs to be modeled at every time step.
+By keeping track of the queue tail position, they aimed to capture the stop-and-go movement in detail. There were also other
+studies that utilized link-level macroscopic urban traffic models for other problems. Tsitsokas et al. [33] extended the SaF model
+and integrated it into an optimization problem for dedicated bus lane allocation. Different from the original SaF model, the extended
+SaF (eSaF) additionally incorporates the computation of delay within the link by separating the moving and queuing vehicles, the
+same feature applied in the BLX model and S model [32]. Therefore, the transfer of flows between these two groups within a link
+needs to be updated at every time step. Wei et al. [34] proposed a link-based flow model that follows a similar principle but consider
+time-varying free-flow speed to better capture its impact on queue outflow. However, for these models, the transmission between
+moving and queuing vehicles can be problematic due to the discrete-time setup. Moreover, these models neglect the fact that the
+number of waiting vehicles does not always represent the queue tail position. During the dissipation of a queue, the number of
+waiting vehicles decreases, while the queue tail position remains. Hence, the length of the upstream free-flow segment on the link
+should stay the same in such a situation. The problem can be understood by looking at the two cases in the exemplary Fig. 2 where
+there is the same number of vehicles in the downstream queue but different lengths of the available space (or free-flow segment)
+at the upstream of the link.
+In Fig. 2a, a static queue formed during the red phase of the downstream traffic signal is shown. In eSaF, the available space for
+entry vehicles coming from the upstream links is estimated by computing the difference between the maximum number of vehicles
+that the link can accommodate and the actual number on the link. However, when the waiting vehicles in the queue are discharging,
+the available space remains unchanged even though the number of vehicles in the queue decreases at the beginning of the green
+phase, as illustrated in Fig. 2b. Many macroscopic traffic models developed in the past assume a theoretical stationary traffic state
+on a link and presume that the available space length can be directly derived by simply knowing the number of vehicles in the
+queue. Without considering the dynamics at the downstream end of the link in a simulation model, the overestimation of available
+space would falsely speed up the transmission of vehicles between links in oversaturated conditions.
+Besides the constraints and problems mentioned so far, it is also known that macroscopic traffic models face other difficulties,
+while notable ones being the FIFO adherence at the vehicle-level and the inclusion of driving behavioral heterogeneity among
+vehicles in the multi-commodity setup. In order to achieve multi-commodity flow modeling, Raadsen and Bliemer [35] proposed the
+3
+
+===== PAGE 4 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 2. Overestimation of available space in the eSaF model.
+concept of mixture propagation and distribution in a continuous-time event-based LTM. However, there was no discussion pertaining
+to FIFO adherence in the study. The violation of FIFO may become significant when there is queue spillback in the network. To
+ensure perfect FIFO or minimize FIFO violation for macroscopic traffic modeling, interested readers are referred to Bar-Gera and
+Carey [36,37]. The in-depth discussion of this aspect is considered out-of-the-scope here.
+Although FIFO may not always hold when overtaking is considered in multi-lane conditions, the interrupted flow dynamics in an
+urban road network reduces overtaking frequency due to the division of links based on signalized intersections (nodes). Compared
+to the case of uninterrupted traffic flow on motorways, vehicles cannot easily perform lane-changing to gain speed. Most of the lane-
+changing behaviors in an urban road network are actually strategic lane-changing for downstream turning directions. Therefore,
+FIFO becomes important to follow when modeling interrupted traffic flow. In addition, FIFO violation is of particular concern for
+traffic flow modeling of a limited urban road environment in which there are no dedicated lanes to accommodate different turning
+directions. When vehicles in different commodities appear on a single-lane road, macroscopic models are unable to maintain the
+order of commodities exiting the link, making it difficult to precisely simulate the rapid propagation of congestion due to queue
+spillback in this type of urban road network.
+2.2. Mesoscopic-level urban traffic flow simulation
+The previous subsection mainly raises the concern related to the ignorance of thorough link-level queue dynamics when using
+several macroscopic traffic models. Such a problem can also exist in mesoscopic traffic models.
+Based on the definition of mesoscopic traffic simulation in this study, individual vehicles or packets, i.e., groups of vehicles,
+are tracked while their movements follow the property of macroscopic traffic flow instead of behavioral description in microscopic
+models. Compared to macroscopic models, these models possess the advantage of exact FIFO in multi-commodity flow modeling
+with route choice and the ability to consider vehicle acceleration dynamics and behavioral heterogeneity at a finer level.
+Di Gangi [38] performed dynamic network loading by modeling traffic flow as continuous packets, in which vehicles are
+uniformly distributed in both time and space. To avoid numerical difficulties when link density changes between time steps, more
+studies adopted the discrete packet approach, which puts multiple vehicles in a packet at one point in time [39,40]. Mesoscopic
+simulation tools, such as DYNASMART [41] and DynaMIT [42], can be regarded as implementations of these discrete packet
+approaches with the individual vehicle representation.
+In TRAFFMED [40] and DynaMIT, an arc is divided into a running segment and a queuing segment, as illustrated in Fig. 3,
+while the queue tail location is updated at each time step based on the loading condition. However, the problem of overestimated
+available space, identical to the problem in the eSAF mentioned in the previous subsection, again arises. These models also ignore
+the fact that the number of vehicles in the queueing segment cannot be directly translated into the queue tail location. The partition
+of an urban road link into free-flow (running) and congested (queueing) segments is a problematic approach.
+Fig. 3. Representation of the queueing model in TRAFFMED and DynaMIT.
+Moreover, in these models, the speed of vehicles on the running segment is determined in an aggregated manner based on a
+function of density following the assumption of homogeneous traffic state on the segment. In reality, this assumption cannot hold
+on a road link due to the unsteadiness of its traffic state, similar to the hysteresis formed on an FD [43]. Especially on a signalized
+urban road, such an effect is amplified by the frequent stop-and-go movements caused by traffic signal control. Determining the
+link speed based on a speed-density function problematically slows down vehicles and results in very low outflow demand from
+the running segment to the queueing segment. Therefore, in the replication of DynaMIT for the case study in this work, the speed
+4
+
+===== PAGE 5 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+function is replaced with the free-flow speed to prevent such a problem. We also found that the description of the original DynaMIT
+in [44] complies better with this logic.
+In Simulation of Urban MObility (SUMO), an open-source package [45], the mesoscopic simulation function does not rely on any
+car-following model but controls the exit headway at boundaries according to the states of the current and downstream edges [46],
+as shown in Fig. 4. Vehicles are ready to exit the link after the free-flow link travel time. Each edge is classified as free-flow or
+congested based on its density (occupancy). The update of headway is carried out based on the edge states at every discrete time
+step. Between two congested edges, the entry headway is computed as the time required for an empty space to travel backward to
+the upstream end. Unlike all the aforementioned mesoscopic models, this kind of approach does not require tracking of the exact
+individual vehicle or packet location on the link to determine the link traffic state and speed, ensuring faster computation.
+Fig. 4. Representation of Eissfeldt’s model.
+Nevertheless, the model seeks to consider the edge-internal heterogeneity, which is a feature of LTM, but in the meantime
+contradictorily assumes traffic homogeneity within an edge so that the edge state can be known by simply comparing its density
+with the critical density, which is a concept applied in CTM. The same number of vehicles on a short edge can represent multiple
+conditions, e.g., vehicles are equally spaced, the queue is accumulating, or the queue is dissipating. Since it is impossible to tell
+the vehicle distribution within an edge in a mesoscopic model, spillback condition is not explicitly monitored in the discrete-time
+formulation of the model.
+Consequently, Eissfeldt’s model contains several downsides. First, when the headway is determined based on the travel time of
+a backward space for ‘‘congested’’ links instead of ‘‘fully-jammed’’ links, the delay is overestimated. Second, while the number of
+vehicles on the link decreases because of the exit of a vehicle, the entry headway changes regardless of the headway computed
+in the previous time step. Vehicles may enter the link even though the empty space is still propagating backward and has not yet
+arrived at the upstream end. The memoryless setting in this aspect leads to a lack of spatial–temporal correlation when determining
+the headway. As a result, spillback queues dissipate earlier than in reality, and links accommodate more vehicles than the number
+that its available space can store. The influence of such problems could be significant particularly for urban traffic flow because of
+the frequent queue accumulation and dissipation in congested conditions.
+Charypar et al. [47] proposed a queue-based model with a similar concept in a discrete-event formulation. The difference
+compared to the model proposed in [46] is that the entry headway of a congested link does not depend on the link density
+anymore but the exact time when a space is available at the upstream boundary of the link. It can be regarded as the mesoscopic
+implementation of the two-queue LTM concept in an event-based formulation, which was proposed in [48] and described in [49] in
+detail. The model was originally included in MATSim [50] as the function Java Discrete Event Queue Simulation (JDEQSIM), but it
+does not function in scenarios with traffic lights. Also, JDEQSim has not been widely-adopted and may not be supported anymore
+due to lack of maintenance. Agarwal et al. [51] further utilized its discrete-time counterpart and extended it to consider mixed traffic
+conditions. Still, the validity of this approach was never tested. Knowing that time-discretization only yields an approximation of
+the exact solution to the LWR model and sacrifices accuracy, de Souza et al. [52] later proposed another form of mesoscopic LTM
+in a discrete-time formulation by associating the cumulative inflow and outflow to each vehicle so that their movements can be
+handled individually and in the meantime ensuring the consistency between the continuous cumulative curves in macroscopic LTM
+and the modeled discrete cumulative curves because the flow between boundaries should always be an integer. This approach can
+be more computationally efficient than the event-based formulation.
+Most studies on mesoscopic traffic flow modeling mainly discussed its contribution to computation efficiency for large-scale
+network case study. The validation highly relied on calibrating the route choice behavior and OD demand to fit the aggregated
+empirical measurements, while the verification of its simulated traffic dynamics was often neglected. As a result, the problem of
+oversimplifying traffic flow dynamics was covered up.
+It should be noted that commercial traffic simulation tools, including Dynameq [53], PTV Vissim [54], and Aimsun [55], provide
+event-based mesoscopic traffic simulation functions. However, longitudinal behaviors in these software applications are based on
+a car-following model with relatively few parameters [56]. Therefore, following the definition in this study, they are regarded as
+microscopic models, albeit much simplified.
+2.3. Summary
+According to our review of traffic flow models for urban road networks, the concept of LTM is considered the most suitable
+modeling principle for urban traffic flow due to its ability to capture link-level interrupted flow traffic dynamics at both macroscopic
+and mesoscopic levels. In this study, we first implement a mesoscopic traffic flow model by building on the approach developed
+in [47]. Instead of only the software architecture introduced in that paper, a clear description of the model is provided in Section 3.
+Several other link-level macroscopic and mesoscopic models, including SaF, eSAF, LTM, DynaMIT, and Eissfeldt’s model
+(mesoscopic simulation function in SUMO at the moment of this study), are selected for comparison. The accuracy of all these
+traffic flow models, which has seldom been discussed in research endeavors with similar purposes in the past, is evaluated through
+case studies and compared with ground-truth outcomes generated using the microscopic simulation function in SUMO.
+5
+
+===== PAGE 6 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+3. Model description
+In this section, the model formulation of LIFT is introduced. Table 1 summarizes the notations used to describe the traffic
+dynamics on a single link 𝑖 in this paper. Detailed definitions and calculations are described in the corresponding subsections.
+Table 1
+List of notations.
+Parameters
+𝐿 𝑖 Link length 𝑉f Free-flow speed
+𝑞sat Saturation flow rate 𝑉space Backward space traveling speed
+𝑙eff Effective vehicle length 𝑟 Reaction time
+𝑘m 𝑖 ax Maximum (jammed) number of vehicles 𝐺 𝑖 Green length
+𝐶 𝑖 Cycle length
+Variables
+𝑡entry Recorded entry time of the previous vehicle 𝑡exit Recorded exit time of the previous vehicle
+𝑁𝑖in−1 𝑁𝑖 out−1
+𝑠entry Entry supply time 𝑠exit Exit supply time
+𝑁𝑖 𝑖𝑛 𝑁𝑖 out
+𝑑exit Exit demand time 𝑘veh Number of vehicles on the link
+𝑁𝑖 out 𝑖
+𝑘space Number of spaces on the link 𝑘sb Threshold number indicating spillback
+𝑖 𝑖
+𝑝
+𝜙
+𝑁
+𝑖
+𝑖 out P
+T
+o
+im
+si
+e
+ti
+-
+o
+in
+n
+- c
+o
+y
+f
+c l
+t
+e
+he next exiting vehicle 𝑝
+𝑡
+𝑆𝑖 next P
+C
+o
+u
+s
+r
+i
+r
+t
+e
+io
+n
+n
+t s
+o
+im
+f t
+u
+h
+l
+e
+a ti
+n
+o
+e
+n
+x t
+t i
+a
+m
+rr
+e
+iving backward space
+Objects
+𝑁in Order of the next entering vehicle 𝑁out Order of the next exiting vehicle
+𝑖 𝑖
+𝑆next Order of the next arriving backward space
+𝑖
+3.1. General concept
+Instead of tracking the exact position of each individual vehicle, LIFT considers each road link as a queue system that stores
+vehicles and updates the remaining link travel distance of each vehicle at every event step. Fig. 5 illustrates the modeling principle
+on a single link 𝑖. Unlike in microscopic models, vehicles simulated in LIFT do not affect others movement. Instead of their exact
+position, only the link where they are located is tracked. Vehicles are ready to exit the link after spending the minimum link travel
+time, which can be calculated based on the link length 𝐿 and the free-flow speed 𝑉f (speed limit or desired speed). Under such
+𝑖
+a formulation, FIFO can be fully ensured as the order of vehicles in the queue is maintained. 𝑁in and 𝑁out are the orders of the
+𝑖 𝑖
+vehicles that are about to enter and exit the link, respectively.
+Fig. 5. Representation of LIFT on a single link.
+At the upstream boundary of the link, the entry is limited by an entry supply time 𝑠entry, which can normally be determined based
+𝑁𝑖𝑛
+𝑖
+on the saturation flow rate 𝑞sat. A vehicle always maintains a minimum headway of 1 with the previous entry vehicle 𝑁𝑖𝑛−1.
+𝑞sat 𝑖
+If there is a queue spillback condition, meaning that there is an idle vehicle at the link tail blocking the entry vehicles, the entry
+supply time becomes the time when the next backward traveling space reaches the upstream link boundary.
+3.2. Backward traveling space
+It is important to note that spillback occurs not only when the link is fully occupied, indicating that the maximum number
+of vehicles on the link is reached, as illustrated in Fig. 6a. In Fig. 6b, a spillback condition is shown with fewer vehicles than
+the maximum number of the link during queue dissipation. The misconsideration of a dissipating queue leads to an overestimated
+available space for entry vehicles at the upstream boundary of a link. For motorway traffic flow, such dissipation does not often
+occur, while it constantly happens for urban traffic flow between signal phase transitions and should therefore be even more carefully
+considered.
+Considering the aforementioned phenomenon, a method to monitor the spillback condition on an urban link can be designed
+by using not only the number of vehicles but also the number of backward traveling spaces on the link. The concept of backward
+traveling space indicates that a space is created at the downstream link boundary due to the exit movement of a vehicle. The space
+6
+
+===== PAGE 7 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 6. Visualization of a full link and the waiting queue dissipation on a link.
+then travels upstream until it arrives at the upstream end of the link. Similarly to the movement of vehicles described in Section 3.1,
+the spaces would not interact with each other while propagating along the link. What matters is the moment at which they reach
+the upstream end of the link as it is when a new space at the boundary becomes available for the next entering vehicle. The speed
+of the space can be determined by 𝑉space =𝑙eff∕𝑟, where 𝑙eff denotes the effective length of a vehicle, i.e., the sum of the vehicle
+length and safety gap, and 𝑟 is the reaction time for the vehicle to start moving after the preceding vehicle. Note that the value of
+𝑟 should theoretically result in a 𝑉space that matches the backward wave speed shown on the triangular FD.
+As illustrated in Fig. 7, the void spaces between the discharging vehicles are created when a virtual space passes through the
+vehicle. A virtual space has the size of the effective vehicle length, including the vehicle length and a standstill distance gap. That is,
+for a single-lane link, the link length consists of the total effective length of all vehicles and virtual spaces on the link. Therefore, the
+threshold number of vehicles determining whether there is queue spillback on the link is a dynamic variable and can be calculated
+by 𝑘sb = 𝑘max−𝑘space. If the number of vehicles on the link 𝑘veh is equal to the threshold, this indicates that there is a spillback
+𝑖 𝑖 𝑖 𝑖
+condition. No vehicles are allowed to enter the link under such a circumstance until the next backward traveling space arrives at
+the upstream boundary. Therefore, the remaining travel distance for every space is tracked at every event step.
+Fig. 7. Tracking of the backward traveling spaces (blue dashed).
+LIFT simulates the propagation of backward traveling spaces to monitor the available space at the upstream end of a link and
+update the entry supply time, which would be introduced in the next subsection. This approach can also be understood as the
+mesoscopic counterpart of the calculation of the state variable ‘‘vacancy size’’, which indicates the occurrence of queue spillback
+on a link, mentioned in [57].
+3.3. Update of supply and demand for entry and exit at link boundaries
+Accordingly, the entry supply time (earliest possible time) for the next entry vehicle 𝑁in on link 𝑖 can be written as Eq. (1).
+𝑖
+𝑡entry denotes the actual entry time of the previous entry vehicle. When there is a spillback condition, the model takes into account
+𝑁in−1
+𝑖
+the arrival time of the next backward traveling space 𝑆next, as calculated in the second case in Eq. (1). Note that 𝑡 indicates the
+𝑖
+current time in the model, while 𝑝 𝑆next represents the position of the next arrival space.
+𝑖
+⎧𝑡entry + 1 , if𝑘veh<𝑘sb
+𝑠entry= ⎪𝑁 𝑖 in−1 𝑞sat 𝑖 𝑖 (1)
+𝑁 𝑖 in ⎨ ⎪ ⎩ max(𝑡e 𝑁 n 𝑖 i t n r − y 1 + 𝑞s 1 at ,𝑡+(𝐿 𝑖 −𝑝 𝑆 𝑖 next)∕𝑉space), otherwise
+For the exit at the downstream end of the link, the time of the exit demand can be calculated by the remaining travel distance
+of the next exit vehicle 𝑁out, as written in the first case in Eq. (2). An exit request is created when the next exit vehicle reaches
+𝑖
+the boundary. In addition, the vehicle may need to wait until the start of the next green phase if the downstream signal is still red.
+Hence, the remaining time for the signal to turn green is considered. In Eq. (2), 𝑝 𝑁out denotes the remaining distance for vehicle
+𝑖
+𝑁out to travel on link 𝑖, and 𝐺 is the green length in the signal timing plan at the downstream of link 𝑖, while 𝜙 represents the
+𝑖 𝑖 𝑖
+time-in-cycle of the signal. 𝜙 =0 indicates the start of the green phase at the downstream of link 𝑖, while 𝐶 being the cycle length
+𝑖 𝑖
+of the signal timing plan. During red, the next exiting vehicle must wait until the signal turns green at 𝑡+(𝐶 −𝜙) to exit the link.
+𝑖 𝑖
+Depending on the elements in the signal timing plan, including cycle length, green length, and offset, 𝜙 is different for every link
+7
+
+===== PAGE 8 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+in the same event step.
+𝑑exit =
+⎧
+⎪
+𝑡+(𝐿
+𝑖
+−𝑝
+𝑁 𝑖
+out)∕𝑉f, if𝜙
+𝑖
+≤𝐺
+𝑖 (2)
+𝑁 𝑖 out ⎨ ⎪ max(𝑡+(𝐿 𝑖 −𝑝 𝑁 𝑖 out)∕𝑉f,𝑡+(𝐶 𝑖 −𝜙 𝑖 )), otherwise
+⎩
+The actual exit time is limited by the exit supply, which is normally influenced by the saturation flow rate. Vehicles 𝑁out can
+𝑖
+only exit 1 after the actual exit time of the previous exit vehicle at 𝑡exit . In addition, the entry supply of the downstream link
+𝑞sat 𝑁out−1
+𝑖
+for vehicle 𝑁out, which is denoted by 𝑖+1 in Eq. (3) also needs to be checked. If there is a spillback condition on link 𝑖+1, the
+𝑖
+downstream link of the next exit vehicle, the vehicle would need to wait until the downstream waiting queue is resolved. Vehicles
+behind 𝑁out are, therefore, blocked due to the FIFO principle.
+𝑖
+𝑠exit =max(𝑡exit + 1 ,𝑠entry) (3)
+𝑁 𝑖 out 𝑁 𝑖 out−1 𝑞sat 𝑁 𝑖 i + n 1
+The actual time of the next exiting vehicle 𝑁out can then be determined by comparing the updated demand and supply times,
+𝑖
+as shown in Eq. (4). The same logic also applies to the determination of the actual time of the next vehicle entry event.
+𝑡exit =max(𝑑exit ,𝑠exit ) (4)
+𝑁out 𝑁out 𝑁out
+𝑖 𝑖 𝑖
+The implementation of demand and supply for the entry and exit of vehicles at link boundaries is quite similar to the formulation
+of trip-based NFD modeling approach for region-level traffic dynamics described in [58]. In this study, the formulation is applied
+to link-level traffic modeling instead. The update mechanism designed for these two variables resembles the derivation of receiving
+and sending functions of macroscopic LTM but in a mesoscopic format. While macroscopic LTM calculates the number of vehicles
+(flow) that can be transmitted to the next link at every discrete time step, as documented in Appendix A, LIFT determines when
+each individual vehicle is allowed to enter the next link based on its exit request time and the arrival time of the next backward
+traveling space in the downstream link at every event step.
+The following summarizes the numerical procedure of the event-based resolution scheme of LIFT. These steps are performed at
+every event step during the simulation.
+1. Initialize all vehicle entry requests at every inflow origin node by assigning the desired entry time, path ID, and the first link
+length as the remaining link travel distance. Set the entry and exit supply times to a negative value.
+2. For all links, update the exit demand time using Eq. (2).
+3. For all links, determine the next actual vehicle entry and exit times according to the logic in Eq. (4).
+4. For all links, determine the next event step and step size by finding the event with the minimum (closest) vehicle entry,
+vehicle exit, or space arrival time. Note that it is possible to have multiple events on multiple links taking place at the same
+event step.
+5. For all existing vehicles and backward traveling spaces, update their remaining link travel distances based on the free-flow
+speed 𝑉f, backward space speed 𝑉space, and the event step size determined in step 4.
+6. For each link, insert and/or remove a vehicle and/or space according to the events determined in step 4.
+7. For all links, update the entry and exit supply times using Eqs. (1) and (3).
+8. Return to step 2 until the simulation time period ends or all the vehicles have finished their trips.
+It should be noted that, unlike the event-based scheme of the mesoscopic traffic models in the commercial tools, the switch
+between green and red signal phases does not need to be treated as an event in step 2 since it is considered when determining the
+exit demand time in Eq. (2). A vehicle will only make an exit request from a link when the downstream signal phase is green.
+The steps introduced above provide a rather intuitive understanding of the model. As the vehicle exit demand time and backward
+space arrival time actually only depend on the link length 𝐿, free-flow speed 𝑉f, and backward space speed 𝑉space, which are all
+𝑖
+known information, step 5 can be integrated into step 6 by calculating and storing these two time values at the link boundaries in
+advance whenever a vehicle or space is inserted into the link. By doing so, although the number of events to be executed would
+increase, we can potentially speed up the simulation since the process does not need to traverse through all the existing vehicles
+and spaces to update their locations. Note that the arrival of spaces is also a type of event that would be identified in step 4 in this
+case. This is especially beneficial for a network with a large number of circulating vehicles. LIFT is less sensitive to the number of
+vehicles in the network compared to microscopic simulation. Algorithm 1 explains the modeling logic in a more detailed way with
+a pseudocode.
+Before the code begins, it is assumed that all entry requests have been initialized and stored in the 𝑙𝑖𝑛𝑘.𝑒𝑛𝑡𝑟𝑦_𝑑𝑒𝑚𝑎𝑛𝑑 list. Every
+link contains a 𝑣𝑒ℎ𝑖𝑐𝑙𝑒𝑠 list and a 𝑠𝑝𝑎𝑐𝑒𝑠 list to store the downstream exit demand time of vehicles and upstream arrival time of
+spaces. 𝑉𝐸𝐻_𝑇𝑇 and 𝑆𝑃𝐴𝐶𝐸_𝑇𝑇 denote the link travel time required by a vehicle and a backward space, respectively. Each event
+type is represented by a string tag (‘‘entry’’: vehicle entry, ‘‘exit’’: vehicle exit, ‘‘arrival’’: space arrival).
+Note that entry events only take place if a vehicle just enters the network. An entry event into the downstream link is executed
+together with the exit event. The 𝑛𝑒𝑥𝑡_𝑙𝑖𝑛𝑘 variable used in the pseudocode is determined by the downstream link of the next
+exiting vehicle on the link. As mentioned, the vehicle exit demand and backward space arrival times are calculated and included
+into 𝑙𝑖𝑛𝑘.𝑣𝑒ℎ𝑖𝑐𝑙𝑒𝑠, 𝑛𝑒𝑥𝑡_𝑙𝑖𝑛𝑘.𝑣𝑒ℎ𝑖𝑐𝑙𝑒𝑠, and 𝑙𝑖𝑛𝑘.𝑠𝑝𝑎𝑐𝑒𝑠 directly so that the code does not need to update the position for all vehicles
+and spaces at every event step.
+8
+
+===== PAGE 9 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Algorithm 1: LIFT pseudocode
+𝐸𝑉𝐸𝑁𝑇_𝑇𝑌𝑃𝐸𝑆←[‘‘𝑒𝑛𝑡𝑟𝑦’’,‘‘𝑒𝑥𝑖𝑡’’,‘‘𝑎𝑟𝑟𝑖𝑣𝑎𝑙’’] ;
+𝑡𝑖𝑚𝑒← 0 ;
+while 𝑡𝑖𝑚𝑒≤𝑇𝐼𝑀𝐸 do
+𝑒𝑣𝑒𝑛𝑡_𝑙𝑖𝑛𝑘𝑠← [] ;
+for 𝑙𝑖𝑛𝑘∈𝐿𝐼𝑁𝐾𝑆 do
+𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡_𝑒𝑣𝑒𝑛𝑡𝑠← [] ;
+𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡[‘‘𝑒𝑛𝑡𝑟𝑦’’]←max(𝑡,𝑙𝑖𝑛𝑘.𝑒𝑛𝑡𝑟𝑦_𝑑𝑒𝑚𝑎𝑛𝑑[0],𝑙𝑖𝑛𝑘.𝑒𝑛𝑡𝑟𝑦_𝑠𝑢𝑝𝑝𝑙𝑦) ;
+𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡[‘‘𝑒𝑥𝑖𝑡’’]←max(𝑡,𝑙𝑖𝑛𝑘.𝑣𝑒ℎ𝑖𝑐𝑙𝑒𝑠[0],𝑙𝑖𝑛𝑘.𝑒𝑥𝑖𝑡_𝑠𝑢𝑝𝑝𝑙𝑦) ;
+𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡[‘‘𝑎𝑟𝑟𝑖𝑣𝑎𝑙’’]←𝑙𝑖𝑛𝑘.𝑠𝑝𝑎𝑐𝑒𝑠[0] ;
+𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡_𝑒𝑣𝑒𝑛𝑡_𝑡𝑖𝑚𝑒←min(𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡[‘‘𝑒𝑛𝑡𝑟𝑦’’],𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡[‘‘𝑒𝑥𝑖𝑡’’],𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡[‘‘𝑎𝑟𝑟𝑖𝑣𝑎𝑙’’]) ;
+for 𝑒𝑣𝑒𝑛𝑡∈𝐸𝑉𝐸𝑁𝑇_𝑇𝑌𝑃𝐸𝑆 do
+if 𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡[𝑒𝑣𝑒𝑛𝑡]=𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡_𝑒𝑣𝑒𝑛𝑡_𝑡𝑖𝑚𝑒 then
+𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡_𝑒𝑣𝑒𝑛𝑡𝑠+[𝑒𝑣𝑒𝑛𝑡] ;
+end
+end
+end
+𝑡𝑖𝑚𝑒←min([𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡_𝑒𝑣𝑒𝑛𝑡_𝑡𝑖𝑚𝑒for𝑙𝑖𝑛𝑘∈𝐿𝐼𝑁𝐾𝑆]) ;
+for 𝑙𝑖𝑛𝑘∈𝐿𝐼𝑁𝐾𝑆 do
+if 𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡_𝑒𝑣𝑒𝑛𝑡_𝑡𝑖𝑚𝑒=𝑡𝑖𝑚𝑒 then
+𝑒𝑣𝑒𝑛𝑡_𝑙𝑖𝑛𝑘𝑠+[𝑙𝑖𝑛𝑘] ;
+end
+end
+for 𝑙𝑖𝑛𝑘∈𝑒𝑣𝑒𝑛𝑡_𝑙𝑖𝑛𝑘𝑠 do
+if ‘‘𝑒𝑛𝑡𝑟𝑦’’∈𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡_𝑒𝑣𝑒𝑛𝑡𝑠 then
+𝑙𝑖𝑛𝑘.𝑝𝑟𝑒𝑣𝑖𝑜𝑢𝑠_𝑒𝑛𝑡𝑟𝑦←𝑡𝑖𝑚𝑒 ;
+𝑙𝑖𝑛𝑘.𝑣𝑒ℎ𝑖𝑐𝑙𝑒𝑠+[𝑡𝑖𝑚𝑒+𝑙𝑖𝑛𝑘.𝑉𝐸𝐻_𝑇𝑇] ;
+DELETE 𝑙𝑖𝑛𝑘.𝑒𝑛𝑡𝑟𝑦_𝑑𝑒𝑚𝑎𝑛𝑑[0] ;
+end
+if ‘‘𝑒𝑥𝑖𝑡’’∈𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡_𝑒𝑣𝑒𝑛𝑡𝑠 then
+𝑙𝑖𝑛𝑘.𝑝𝑟𝑒𝑣𝑖𝑜𝑢𝑠_𝑒𝑥𝑖𝑡←𝑡𝑖𝑚𝑒 ;
+𝑙𝑖𝑛𝑘.𝑠𝑝𝑎𝑐𝑒𝑠+[𝑡𝑖𝑚𝑒+𝑙𝑖𝑛𝑘.𝑆𝑃𝐴𝐶𝐸_𝑇𝑇] ;
+𝑛𝑒𝑥𝑡_𝑙𝑖𝑛𝑘.𝑝𝑟𝑒𝑣𝑖𝑜𝑢𝑠_𝑒𝑛𝑡𝑟𝑦←𝑡𝑖𝑚𝑒 ;
+𝑛𝑒𝑥𝑡_𝑙𝑖𝑛𝑘.𝑣𝑒ℎ𝑖𝑐𝑙𝑒𝑠+[𝑡𝑖𝑚𝑒+𝑛𝑒𝑥𝑡_𝑙𝑖𝑛𝑘.𝑉𝐸𝐻_𝑇𝑇] ;
+DELETE 𝑙𝑖𝑛𝑘.𝑣𝑒ℎ𝑖𝑐𝑙𝑒𝑠[0] ;
+end
+if ‘‘𝑎𝑟𝑟𝑖𝑣𝑎𝑙’’∈𝑙𝑖𝑛𝑘.𝑛𝑒𝑥𝑡_𝑒𝑣𝑒𝑛𝑡𝑠 then
+DELETE 𝑙𝑖𝑛𝑘.𝑠𝑝𝑎𝑐𝑒𝑠[0] ;
+end
+end
+for 𝑙𝑖𝑛𝑘∈𝐿𝐼𝑁𝐾𝑆 do
+𝑙𝑖𝑛𝑘.𝑒𝑛𝑡𝑟𝑦_𝑠𝑢𝑝𝑝𝑙𝑦←UPDATE_ENTRY_SUPPLY(𝑙𝑖𝑛𝑘.𝑝𝑟𝑒𝑣𝑖𝑜𝑢𝑠_𝑒𝑛𝑡𝑟𝑦,𝑙𝑖𝑛𝑘.𝑠𝑝𝑎𝑐𝑒𝑠) ;
+end
+for 𝑙𝑖𝑛𝑘∈𝐿𝐼𝑁𝐾𝑆 do
+𝑙𝑖𝑛𝑘.𝑒𝑥𝑖𝑡_𝑠𝑢𝑝𝑝𝑙𝑦←UPDATE_EXIT_SUPPLY(𝑙𝑖𝑛𝑘.𝑝𝑟𝑒𝑣𝑖𝑜𝑢𝑠_𝑒𝑥𝑖𝑡,𝑛𝑒𝑥𝑡_𝑙𝑖𝑛𝑘.𝑒𝑛𝑡𝑟𝑦_𝑠𝑢𝑝𝑝𝑙𝑦) ;
+end
+end
+The calculations of entry supply and exit supply times are simplified by two update functions, UPDATE_ENTRY_SUPPLY and
+UPDATE_EXIT_SUPPLY, in the pseudocode. The update of 𝑙𝑖𝑛𝑘.𝑒𝑛𝑡𝑟𝑦_𝑠𝑢𝑝𝑝𝑙𝑦 requires the previous entry time and the condition of
+backward traveling spaces, while 𝑙𝑖𝑛𝑘.𝑒𝑥𝑖𝑡_𝑠𝑢𝑝𝑝𝑙𝑦 depends on the previous exit time and the updated 𝑛𝑒𝑥𝑡_𝑙𝑖𝑛𝑘.𝑒𝑛𝑡𝑟𝑦_𝑠𝑢𝑝𝑝𝑙𝑦. For more
+information, the reader is referred to the repository via this URL: https://github.com/YCNi/LIFT.git [59].
+4. Case study design
+In this work, we mainly focus on verifying the accuracy of LIFT with traffic flow theoretical properties. Two case studies are
+designed to test its ability to capture the congestion propagation pattern. SUMO is used to generate ground-truth microscopic traffic
+9
+
+===== PAGE 10 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+simulation outcomes. This section describes the parameter setups, network layouts, and OD path compositions. In addition, an
+empirical validation of LIFT using trajectory data on an urban road link can be found in Appendix D.
+4.1. Parameter settings
+In the first two case studies, there is no heterogeneity considered among drivers. The desired speed in the car-following model
+is 𝑉f=12.5 m/s (45 km/h). The resulting saturation flow rate 𝑞sat becomes 0.625 veh/s. To consider the smaller saturation flow at
+the beginning of a green phase due to the start-up lost time, a smaller 𝑞sat of 0.5 veh/s is used for the first time step after the green
+phase starts in the macroscopic models, including SaF, eSaF, and LTM. In addition, for turning paths, a smaller 𝑞sat of 0.4 veh/s
+and hence a larger headway is applied considering the slower speed for turning maneuvers because of the radius. These values are
+larger than the values typically used in practice since a homogeneous driving behavior is considered. It is also worth noting that
+the setting of a different 𝑞sat for turning vehicles is only achievable in a mesoscopic model that tracks the movement of individual
+vehicles, while macroscopic models can only apply a saturation flow rate to a group of vehicles (flow) without differentiating their
+downstream turning directions.
+To better reflect the traffic environment in reality, case study 3 considers the desired speed heterogeneity among drivers. The
+desired speeds follow a normal distribution with a standard deviation of 1.875 m/s (6.75 km/h). In case study 4, a multi-lane
+condition is implemented so that the overtaking maneuvers can be included. As a result, the free-flow speed and saturation flow
+rate in LIFT need to be changed and are determined after several preliminary simulation trials in SUMO. Fig. 8 shows the free-flow
+traffic states of case studies 3 and 4 obtained by simulating a road link with varying inflow demand. The free-flow speeds are
+obtained by fitting a linear curve representing the free-flow branch of the triangular FD. As shown, for the single-lane condition in
+case study 3, the desired speed heterogeneity greatly affects the average speed from a macroscopic perspective due to the moving
+bottleneck effect, while overtaking behavior (discretionary/tactical lane-changing) in the multi-lane condition mitigates the impact
+so that the average speed in case study 4 becomes slightly larger. As the impact of desired speed heterogeneity and overtaking
+behavior on the macroscopic flow property are quantified by the fitted free-flow speeds and saturation flow rates, these parameters
+would then be used for the mesoscopic simulation of LIFT in case studies 3 and 4. The resulting effect of desired speed heterogeneity
+on the simulation outcomes will be presented in Section 5.4.
+Fig. 8. SUMO simulated free-flow traffic states for (a) case study 3 and (b) case study 4 (per lane).
+For all microscopic simulation cases that use SUMO in this study, its default car-following (Krauss) and lane-changing (LC2013)
+models are used. The time step size is set to 0.25 s instead of the typically-used 1 s to increase the accuracy of the ground-truth
+results since the proposed continuous-time event-based mesoscopic model can also achieve a similar level of temporal resolution.
+The influence of step size on the simulation outcome will be discussed at the beginning of the next section. Note that the action
+step length, the frequency of drivers’ decision-making, remains to be 1 s. This setting not only better reflects the reality but also
+reduces the computation demand. On the other hand, the time step size in the compared macroscopic models is 5 s.
+The start-up delay in SUMO is set to 0.75 s, which leads to a reaction time 𝑟 of approximately 1 s. The effective vehicle length 𝑙eff
+is set to 7.5 m, the summation of 5 m vehicle length and 2.5 m standstill gap. Accordingly, the speed of a backward traveling space
+𝑉space becomes 7.5 m/s following the calculation mentioned in the previous section. Fig. 9 plots the triangular FD that reflects the
+determined traffic flow parameters in the first two case studies when there is no desired speed heterogeneity. Table 2 summarizes
+the LIFT parameters in every case study.
+Table 2
+LIFT parameters.
+Parameter Cases 1 & 2 Case 3 Case 4
+Free-flow speed 𝑉f [m/s] 12.50 9.45 9.92
+Saturation flow 𝑞sat [veh/s/lane] 0.625 0.57
+Effective vehicle length 𝑙eff [m] 7.5
+Backward space speed 𝑉space [m/s] 7.5
+It is worth noting that the speed of backward traveling spaces should theoretically be identical to the backward wave speed
+shown on a triangular FD, which was the setup in [51], but it may be different in this work. The wave speed captures the moment
+10
+
+===== PAGE 11 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 9. Triangular FD for parameter settings in case studies 1 and 2.
+when the flow of a certain location attains the queue discharge rate. However, considering a spillback condition in SUMO, the
+space at the upstream boundary becomes available immediately after the last queueing vehicle starts moving. Hence, using the
+macroscopic wave speed as the space travel speed in LIFT can result in an underestimation of traffic performance compared to
+theoretical ground-truth obtained from microscopic simulation. Still, the parameter may be calibrated differently depending on
+the real-world condition. On the other hand, this discrepancy can also be interpreted as a characteristic of interrupted traffic flow
+dynamics. The frequent stop-and-go movements during the accumulation and dissipation of the queue on an urban road link due to
+traffic signal control amplify the traffic state unsteadiness [43], which cannot be properly described with a typical triangular FD.
+The parameter setups for Eissfeldt’s model (the mesoscopic simulation function in SUMO) in this work can be found in Appendix
+B.
+4.2. Network layouts, OD paths, and demand profiles
+A case study on a one-way single-lane corridor with a homogeneous link length of 125 m, as illustrated in Fig. 10, is first designed
+to evaluate the model performance. The link length results in a free-flow link travel time of 10 s and a backward space link travel
+time of around 15 s, which are equivalent to two and three time steps in the macroscopic models, respectively. This enables the
+comparison of LIFT with the macroscopic models.
+Fig. 10. Corridor and OD nodes designed in case study 1.
+The signals along the corridor have a uniform green length 𝐺 of 25 s and a cycle length 𝐶 of 60 s. A certain degree of signal
+coordination is designed by setting the downstream offset to half of the free-flow link travel time 𝐿∕𝑉f∕2, which is 5 s in this case.
+𝑖
+The main traffic enters from O1 and exits at D1. Links are numbered from right to left. There is no endogenous bottleneck since
+the lane configuration and green-to-cycle ratio are both identical along the corridor. The disruption of traffic flow on the corridor
+is resulted from a turning path that joins from the minor road at the fourth intersection (upstream of link 4). The impact of turning
+on network traffic performance was showcased in [60]. The turning path is expected to generate long vehicle queues on link 4. The
+spillback would then spread upstream, affecting links 3, 2, and 1 sequentially until the low inflow demand resolves the congestion.
+As all vehicles from O2 will enter the corridor and exit at D1 together with the major demand, this scenario can be modeled in
+a single-commodity setup without the need to differentiate vehicles using different paths.
+In case study 2, we further extend the case study to the network-scale so that the influence of spillback onto the upstream vertical
+links with turning paths can also be tested. The purpose is also to test the ability of LIFT in tackling the FIFO condition when there
+are more than one exiting OD paths. A 2 × 4 one-way single-lane network grid is designed with a uniform link length of 125 m,
+as shown in Fig. 11. Table 3 lists all OD paths in the network grid of case study 2. The traffic signal timing plan follows the same
+setting mentioned in case study 1 instead for a bottleneck intersection right before nodes D1 and D6 (highlighted in red). The green
+11
+
+===== PAGE 12 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 11. Network grid and OD nodes designed in case study 2.
+Table 3
+OD paths in case study 2.
+Path OD Link sequence Path OD Link sequence
+1 O1 - D1 1-2-3 8 O4 - D4 8
+2 O2 - D2 4-5-6 9 O4 - D6 5-6-10
+3 O2 - D6 4-5-6-10 10 O5 - D1 9-3
+4 O3 - D1 7-1-2-3 11 O5 - D5 9
+5 O3 - D3 7 12 O5 - D6 6-10
+6 O3 - D6 4-5-6-10 13 O6 - D6 10
+7 O4 - D1 8-2-3
+length 𝐺 of the traffic signal timing plan at the downstream of links 3 and 10 is shortened from 25 s to 20 s. It is anticipated that
+the queue building up on these two links due to the shortened green length will spill over to their upstream links.
+A three-hour scenario with varying inflow loading is implemented to mimic the onset and recovery of congestion during a typical
+peak period. For case study 1, the inflow loading profiles of the OD paths can be found in Fig. 12. The three-hour period is divided
+into twelve 15-minute time windows, while each window has a number of entry requests. The demand on path 2 (O2-D1) is 3/5 of
+the base demand on path 1 (O1-D1). The inflow loading profiles for case study 2 follow a similar setup but are too complex to be
+explained in this section. They can be found in Appendix C.
+Fig. 12. Inflow loading profiles of the OD paths in case study 1.
+In case study 1, a uniform entry interval (headway) is implemented based on the number of entry requests in each window. For
+case study 2, on the other hand, the arrival pattern of different commodities is influential. Fig. 13 uses a situation at a T-intersection
+to describe the importance of the entry sequence on a link. When there is a spillback condition on one of the downstream links,
+whether blockage to the upstream link would occur or not depends on the downstream link of the next exit vehicle, as considered
+by Eq. (3). This affects the delay experienced by the vehicles in the upstream link. This problem is particularly critical for urban
+roads with limited space. It is referred to as ‘‘diverge blocking’’ in [37]. Hence, to account for the stochasticity of the arrival pattern
+in both LIFT and SUMO, the entry intervals in case study 2 follow exponential distributions with the mean values computed based
+on the number of entry requests in each window. By doing so, the entry sequence of vehicles with different OD paths (commodities)
+is randomized rather than following a fixed pattern. Five simulation runs are conducted with different random seeds.
+12
+
+===== PAGE 13 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 13. Example of a diverge blocking situation.
+In case studies 3 and 4, the corridor layout of case study 1 is used. The change is that the demand is down-scaled considering
+the reduced free-flow speed and saturation flow rate due to the desired speed heterogeneity. Also, we transform the road links from
+single-lane into two-lane in case study 4.
+5. Results
+This section presents the case study results and discusses the performance of every tested model in terms of accuracy by examining
+the density evolution on each link and the mean speed evolution of each path. Note that the mean path speeds are computed using
+the recorded travel times when vehicles enter the network without taking into account the vertical queueing time outside of the
+boundary so that the measurement can align with the E3 detector in SUMO. Both indicators are aggregated for every 5-minute
+interval.
+Besides the rather qualitative comparison by looking at the evolution patterns, the mean absolute error (MAE) of link density
+of every link over the simulation time period is computed to quantify the deviation between the models applied and SUMO
+microsimulation ground-truth in case study 1, as summarized in Table 4.
+5.1. Comparison with the macroscopic models
+Fig. 14 shows the average density on each link in the peak period in case study 1 and can help us to understand the congestion
+pattern along the corridor. As can be seen from the colors, link 4 is the first to become congested due to the inflow of path 2. The
+queue spillback then propagates upstream to links 3, 2, and 1, increasing the density of those links. Links 5 and 6 are not influenced
+as they are at the downstream of the bottleneck. The congestion recovery begins when the demand of path 2 decreases so that the
+waiting queue on link 4 starts becoming shorter.
+Fig. 14. Average link densities at the interval between 3600 s and 3900 s in case study 1 shown on SUMO graphical user interface.
+Before showing the outcomes of the macroscopic models and LIFT, the influence of step size in the microscopic traffic simulation
+using SUMO is first discussed. Ideally, microsimulation should also follow the CFL condition. Otherwise, a relatively large time step
+size may cause a smaller outflow than the saturation flow due to the inconsistency between the minimum headway (saturation flow
+rate) and time step size.
+Fig. 15 plots the SUMO outcomes with time step sizes from 1 s to 0.125 s. The difference between different time step sizes
+can easily be observed during the recovery from congestion. On all links, the settings of 1 s and 0.5 s show significantly slower
+queue dissipation. In these cases, the corridor cannot be recovered back to the initial undersaturated state within the simulation
+period. By further reducing the time step size to 0.25 s and 0.125 s, the queue can be completely dissipated, and the outcomes
+also converge. This implies the importance of setting a step size that is sufficiently small to avoid any numerical problem while not
+exceedingly small to avoid a high computation cost. Hence, the time step size in SUMO is set to 0.25 s in the following case studies
+for comparison with LIFT.
+The results of case study 1 with a uniformly-distributed departure headway in every 15-minute interval using the macroscopic
+models and LIFT are shown in Fig. 16. It is found that the original SaF model slows down the onset of congestion due to the
+13
+
+===== PAGE 14 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 15. Link density evolutions in case study 1 using SUMO with different time step sizes.
+Fig. 16. Link density evolutions in case study 1 using different macroscopic models.
+misconsideration of link travel time, while the eSaF model accelerates the accumulation of vehicles because of the overestimation
+of available downstream link space, as mentioned in Section 2.1. The problem can easily be found by looking at the density evolution
+at the beginning of the simulation on every link and the overall density on links 5 and 6. The density values on links 1–4, which
+are affected by the queue spillback, shown by both SaF and eSaF are also significantly larger than SUMO ground-truth during
+the congestion dissipation. This is because the inflow and outflow are balanced, implying that the queue spillback is not properly
+modeled.
+14
+
+===== PAGE 15 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 17. Link density evolutions in case study 1 using different mesoscopic models.
+On the other hand, LTM manages to capture the general pattern of density evolution thanks to its consideration of backward wave
+speed compared to the two SaF models. The only major difference is that there is a slight overestimation of maximum densities, which
+is caused by the discrete-time formulation of macroscopic LTM. This problem is comparatively minor compared to the inaccuracy
+shown by the SaF models. Comparatively, the results of LIFT comply with SUMO ground-truth even better because of its ability to
+monitor spillback more accurately and the continuous-time modeling setup facilitated by the event-based resolution scheme.
+The quantitative comparison of performance between different models can be found in Table 4. Both the SaF and eSaF models
+have MAEs of link density which are larger than 20 veh/km on many links, indicating its inability to accurately reproduce the
+congestion propagation. When using LTM, the average MAEs drop below 10 veh/km. The MAEs further drop below 5 veh/km when
+using LIFT, which shows its exceptional performance in modeling link-level traffic dynamics along the corridor.
+5.2. Comparison with the mesoscopic models
+In this subsection, we further compare the performance of LIFT with the other two mesoscopic models in a scenario with
+exponentially-distributed departure headways. As can be seen in Fig. 17, DynaMIT exhibits a pattern similar to that shown by the
+eSaF. The maximum density is larger than ground-truth on links 1 and 4, where the inflow demand enters, due to the overestimated
+available link space. This implies the accommodation of more vehicles than the amount that can be stored in the actual available
+space. Consequently, earlier congestion dissipation can be observed on all links due to the underestimated influence of congestion
+on the vehicle progression between links. The plateaus of link density evolutions during congestion also explain the erroneous queue
+tail location update.
+As mentioned in Section 2.2, Eissfeldt’s model falsely speeds up vehicle progression because of the problematic update of exit
+headway to a downstream full link. This delays the occurrence of congestion propagation and accelerates congestion dissipation.
+Such phenomena can be observed from the results in Fig. 17. On links 1–3, congestion occurs later and is resolved earlier. The
+maximum density attained on these links is also smaller than ground-truth. On link 4–6 where there is no downstream spillback
+queue, the problem is minor at the onset of congestion, but the density still decreases to the minimum sooner. This is because
+vehicles in general finish their trips earlier in the simulation period so that the corridor recovers from congestion faster.
+The advantage of Eissfeldt’s model over DynaMIT is that it does not have that much of a problem in uncongested conditions.
+The quantitative assessment of the mesoscopic modeling outcomes is summarized in Table 4.
+Fig. 18 plots the evolution of the mean path speed during the simulation period. The mean speed values are unable to be
+retrieved from Eissfeldt’s model from the mescoscopic simulation function in SUMO. It can be seen that DynaMIT underestimates
+the congestion influence for path 1 and overestimates it for path 2. However, LIFT successfully captures the magnitude and duration
+of the speed drop for the two paths during congestion. The slight overestimation shown by the mean speed of path 2 is likely due
+to the misconsideration of detailed vehicle dynamics during acceleration. Using the desired speed in the free-flow condition slightly
+underestimates the actual link travel time.
+15
+
+===== PAGE 16 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Table 4
+MAEs of average density (veh/km) on every link in case study 1.
+Link Macroscopic Mesoscopic
+SaF eSaF LTM DynaMIT Eissfeldt LIFT
+1 21.9 18.5 9.3 28.3 22.59 5.6
+2 22.7 19.3 8.6 23.5 23.80 3.9
+3 17.5 12.6 8.4 18.9 22.14 4.3
+4 25.1 24.8 6.2 25.7 14.45 5.0
+5 22.9 40.4 2.8 22.8 11.05 2.5
+6 26.2 38.9 5.7 21.9 8.57 3.7
+Fig. 18. Mean path speed evolutions in case study 1 using DynaMIT, LIFT, and SUMO.
+5.3. Performance with diverge blocking phenomena
+Case study 2 is designed to help demonstrate the ability of LIFT to handle FIFO in situations with diverge blockings between
+vehicles with different OD paths (commodities) particularly in congested conditions. The evolution pattern of link densities and
+path-mean speeds hence become different among scenarios with different random seeds. Therefore, for both the link densities and
+mean path speeds, the range between the maximum and minimum values at each aggregated time interval would be shown.
+Fig. 19. Average link densities at the interval between 3000 s and 3300 s in case study 2 shown on SUMO graphical user interface.
+We first investigate the overall congestion pattern by looking at the SUMO outcome shown in Fig. 19, while Fig. 20 plots the
+density evolution patterns of every link. According to the SUMO outcomes, we can see that long-lasting congestion occurs primarily
+on links 1–3 and 10, where paths 1 and 10 that have the highest demand pass through. Due to the congestion on link 10 directly
+caused by the bottleneck and those OD paths which go from link 6 to link 10, links 4–6 also have build-up queues for a period of
+time, albeit shorter than the congestion duration on links 1–3. Vertical links with a large number of exiting vehicles that seek to turn
+to links 1–3, including links 7 and 8, also experience density growth due to the blockage caused by spillback on the downstream
+horizontal links. The queue spillback from the bottleneck also affects the density of link 9 but is minimal due to the relatively mild
+congestion on link 3, where the congestion starts, as can be seen from its smaller maximum link density compared to links 1 and 2.
+Looking at the density evolution patterns produced by LIFT in Fig. 20, we can see that it successfully captures the pattern of all
+link densities in the network grid. The maximum density on each link is quite close to the ground-truth situation.
+As shown in Fig. 21, the drop and recovery of mean path speeds also align with the ground-truth pattern remarkably. In particular,
+the fluctuation of speeds on those paths that go through the vertical links caused by the stochastic entry sequence of different
+commodities can also be closely reproduced by LIFT. The slight overestimation shown on paths 5, 8, and 11 may be caused by
+misconsideration of acceleration dynamics, the relatively small number of samples, and the relatively short amount of time these
+vehicles spend in the network (short path length).
+With these two case studies, we show the problems of several macroscopic and mesoscopic models proposed in the past and the
+ability of LIFT to accurately capture the evolution of link traffic states and path-level performance.
+Besides simulation accuracy, the required computation time compared to microsimulation is also important for future studies
+related to urban traffic management to apply LIFT. For the scenario in case study 1, the run time required by SUMO microscopic
+16
+
+===== PAGE 17 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 20. Link density evolutions of case study 2 using LIFT and SUMO.
+simulation is approximately 4 s with the output data storage considered on a device with a 4-core Intel Core i7 CPU running at
+2.80 GHz, while it takes LIFT around 1.2 s, which is more than three times faster than SUMO. For the scenario in case study 2,
+which has more inflow demand and a larger network than in case study 1, SUMO needs approximately 8 s, while LIFT only spends
+2.1 s. The slightly greater difference explains that the improvement on computation efficiency would become even more significant
+in scenarios where there are more vehicles co-existing in the network at the same moment, namely when it is more congested,
+or simply when the network is larger. This is because microscopic simulation has to update the position and speed for all vehicles
+before proceeding to the next step, LIFT only iterates through all links in the network regardless of the number of vehicles. This again
+demonstrates the superiority of LIFT for applications in control problems that demand real-time decision-making or optimization
+problems that contain numerous simulation runs. The implementation of LIFT for case study 2 can be found in [59].
+5.4. Performance with desired speed heterogeneity
+Figs. 22 and 23 show the impact of the desired speed heterogeneity in case studies 3 and 4 by comparing the link density
+evolution with that of the scenario with a homogeneous desired speed. As vehicles with a relatively slow desired speed affect the
+saturation flow rate and free-flow speed along the corridor, one can observe that link density increases significantly after considering
+heterogeneity in the single-lane condition in case study 3. It also takes longer for congestion to resolve. These imply that speed
+heterogeneity is indeed a crucial factor influencing congestion propagation.
+On the other hand, the negative impact is greatly mitigated in the multi-lane condition in case study 4. Maximum link densities
+are closer to the scenario with a homogeneous desired speed although there is still a delayed congestion recovery. This is because
+17
+
+===== PAGE 18 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 21. Mean path speed evolutions of case study 2 using LIFT and SUMO.
+fast vehicles can utilize the additional lane to overtake those slow vehicles and reduce the moving bottleneck effect. Therefore, the
+free-flow speed would not decrease drastically.
+To demonstrate the ability of LIFT to replicate traffic dynamics in scenarios with desired speed heterogeneity, the scenarios of
+case studies 3 and 4 are simulated with updated LIFT macroscopic parameters. Link density evolutions are shown in Figs. 24 and 25.
+As can be seen, LIFT is able to reproduce the traffic dynamics along the corridor even when the desired speed heterogeneity is
+considered simply by using the well-calibrated macroscopic parameters. The maximum link densities and the onset and recovery of
+congestion queues align fairly well with ground-truth microscopic simulation outcomes in both case studies.
+6. Concluding remarks
+This study first reviews link-level traffic flow models used in the past and points out their problems that are particularly influential
+for urban road networks considering the dynamics exhibited by interrupted flow due to traffic signal control, i.e., the frequent
+accumulation and dissipation of waiting queues on a road. Second, LIFT, an implementation of the macroscopic LTM concept at
+the mesoscopic level specifically for urban traffic flow, is developed. The key advantage of LIFT in comparison to other models is
+its ability to monitor queue spillback on an urban link by utilizing the concept of backward traveling spaces. With the event-based
+resolution scheme, we enable continuous-time modeling for multi-commodity flow with fully-ensured FIFO in diverge blocking
+situations.
+The theoretical validity of the model, which was rarely discussed before in previous studies that have similar purposes, is
+examined by comparing with the outcomes generated using SUMO microscopic traffic simulation. We also evaluate the performance
+18
+
+===== PAGE 19 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 22. Impact of desired speed heterogeneity in case study 3 (single-lane).
+Fig. 23. Impact of desired speed heterogeneity in case study 4 (multi-lane, per lane density).
+of LIFT and compare it with the other models in one of the case studies. According to the link density evolutions analyzed, the case
+studies show that LIFT can accurately reproduce the congestion propagation pattern along a signalized corridor and within a network
+grid. It outperforms the SaF models and DynaMIT by solving the problem of overestimated available downstream link space. The
+proper consideration of backward traveling spaces also provides a way to update the entry and exit conditions at link boundaries
+more appropriately compared to Eissfeldt’s model, which is currently being used as the mesoscopic modeling function in SUMO. In
+addition, a validation with empirical trajectory data on a lane in a real-world urban road is performed and can be found in Appendix
+19
+
+===== PAGE 20 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. 24. Link density evolutions of case study 3 using LIFT and SUMO.
+Fig. 25. Link density evolutions of case study 4 using LIFT and SUMO (per lane density).
+D. The occurrences of queue spillback in every signal cycle can be correctly replicated with LIFT. Based on these results, we can
+conclude that it is important to design a mesoscopic traffic flow model that carefully follows the principle of the LWR model or its
+discrete-time correspondence, such as CTM and LTM.
+The case study results also demonstrate that it is possible for a mesoscopic-level modeling approach to obtain outcomes that
+are sufficiently close to the microscopic simulation output for an urban road network given a fixed signal timing plan even in
+20
+
+===== PAGE 21 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+scenarios with driving behavioral heterogeneity considered. In addition, the ability to capture the mean speed of OD paths at every
+time interval allows the model to incorporate path choice behavior for each individual vehicle/traveler considering the travel time
+affected by congestion in a DTA framework.
+LIFT can be regarded as the discrete-event interrupted flow version of the discrete-time model proposed in [52]. While they
+aimed at replicating the macroscopic continuous counterpart, LIFT is validated against microscopic simulation output. Therefore,
+many types of microscopic behavioral heterogeneity, such as the relatively long headway between turning movements, can be better
+implemented into such a model formulation so that the modeling accuracy can be significantly improved.
+In terms of computation efficiency, LIFT can be considered an alternative that lies between the mesoscopic simulation function
+in commercial traffic simulation tools that still considers the interaction between individual vehicles with simplified car-following
+models and macroscopic link-level traffic modeling approaches that model the propagation of aggregated flow. For the traffic
+performance assessment of large-scale urban road networks that contain multiple ODs and are heavily congested due to frequent
+queue spillback phenomena, the computation requirement can be significantly reduced when using LIFT compared to choosing
+microscopic simulation, while the accuracy can still be preserved to a great extent. The advantage on computation efficiency
+makes LIFT a suitable option for optimization problems that take traffic into account, e.g., network design, multi-modal road space
+allocation, and real-time routing strategy, etc.
+In this study, mandatory (strategic) lane-changing within a road link for the downstream turning direction is not considered in
+the design of LIFT. We assume that vehicles would conduct lane-selection before entering the link, as modeled in the mesoscopic
+function of Aimsun [55]. However, this excludes the potential disruption caused by lane-changing in the middle of a link. To
+enhance the reliability of LIFT in multi-lane urban road networks, future work can focus on capturing the influence of mandatory
+lane-changing behaviors on the efficiency of interrupted traffic flow on a road link [61]. Furthermore, the extension by incorporating
+more sources of heterogeneity and uncertainty in a multi-modal urban road network with buses and bicycles can also be considered.
+This is beneficial for the applicability of LIFT in various strategic-level or policy-making problems.
+Declaration of competing interest
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared
+to influence the work reported in this paper.
+Acknowledgments
+The authors would like to thank Dr. Chris Tampère at Katholieke Universiteit Leuven, Dr. Lukas Ambühl at Transcality AG,
+SUMO team at Deutsches Zentrum für Luft- und Raumfahrt e.V., and Dr. Kai Nagel at Technische Universität Berlin for the fruitful
+discussions, which shaped the direction of this study. We also want to thank Jasso Espadaler-Clapés at Ecole Polytechnique Fédérale
+de Lausanne for sharing the processed vehicle trajectory data that were used in the empirical validation.
+Appendix A. Macroscopic LTM
+The formulation of the original macroscopic LTM for single-commodity traffic flow modeling with traffic signals proposed in [20]
+is elaborated in this section. Eqs. (A.1) and (A.2) are the sending and receiving functions which show the maximum number of
+vehicles that can exit and enter the link. 𝑁0 and 𝑁𝐿 represent the cumulative number of vehicles passing through the upstream
+𝑎 𝑎
+and downstream ends of the link 𝑎. 𝜏f and 𝜏w denote the time steps required for a vehicle and a backward traveling space to
+𝑎 𝑎
+traverse through the link, respectively. These two equations resemble the update of demand and supply for entry and exit in LIFT,
+as written in those equations in Section 3 of the main text. The main difference is that LIFT determines the movement between links
+for individual vehicles instead of aggregated flow.
+𝑆 (𝑡)=min(𝑁0(𝑡+1−𝜏f)−𝑁L(𝑡),𝑞sat) (A.1)
+𝑎 𝑎 𝑎 𝑎
+𝑅 (𝑡)=min(𝑁L(𝑡+1−𝜏w)−𝑁0(𝑡),𝑞sat) (A.2)
+𝑎 𝑎 𝑎 𝑎
+The outflow from link 𝑎 to link 𝑖 is controlled by a binary indicator 𝜂 , showing whether the traffic signal from link 𝑎 to link 𝑖 is
+𝑎𝑖
+green, and determined by the minimum between the number of vehicles which desire to go from link 𝑎 to link 𝑖 and the available
+space (receiving function) on link 𝑖, as expressed in Eq. (A.3). 𝜃 denotes the split ratio of vehicles going to link 𝑖 among all vehicles
+𝑎𝑖
+on link 𝑎. Eqs. (A.4) and (A.5) then calculate the total number of vehicles entering the link and exiting the link.
+𝑢 (𝑡)=𝜂 ⋅min(𝑆 (𝑡)⋅𝜃 ,𝑅(𝑡)) (A.3)
+𝑎𝑖 𝑎𝑖 𝑎 𝑎𝑖 𝑖
+∑
+𝑞in(𝑡)= 𝑢 (𝑡) (A.4)
+𝑎 𝑖𝑎
+𝑖∈𝐼(𝑎)
+∑
+𝑞out(𝑡)= 𝑢 (𝑡) (A.5)
+𝑎 𝑎𝑖
+𝑖∈𝑂(𝑎)
+21
+
+===== PAGE 22 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Eqs. (A.6) and (A.7) update the cumulative numbers of vehicles which pass through the upstream and downstream ends of the
+link, respectively, which are used in the computation of sending 𝑆 and receiving 𝑅 functions.
+𝑁0(𝑡+1)=𝑁0(𝑡)+𝑞in(𝑡) (A.6)
+𝑎 𝑎 𝑎
+𝑁L(𝑡+1)=𝑁L(𝑡)+𝑞out(𝑡) (A.7)
+𝑎 𝑎 𝑎
+Appendix B. Parameters for the mesoscopic model in SUMO
+Table B.1 shows the parameters specified for the mesoscopic simulation function in SUMO which is based on Eissfeldt’s
+model [46]. Other parameters that are not mentioned here follow the default setting in SUMO. Note that edgelength needs to
+be carefully selected otherwise an inappropriate spatial discretization may largely underestimate the jam density. The edge state
+is determined based on the critical density shown on an FD if jam-threshold is set to −1. Instead of using any continuous node
+modeling approach to approximate traffic signal control by changing TLS-Flow-Penalty, the explicit on-and-off logic is applied.
+Table B.1
+Parameters used in Eissfeldt’s model.
+Parameter Description Value
+edgelength Length of a homogeneous edge segment 50 m
+tauff Factor for calculating the net time headway between two free edges 1.20
+taufj Factor for calculating the net time headway from a free edge to a jammed edge 1.20
+taujf Factor for calculating the net time headway from a jammed edge to a free-flow edge 1.20
+taujj Factor for calculating the time headway between two jammed edges 1.00
+(Time for a backward traveling space to propagate an effective vehicle length)
+jam-threshold Occupancy threshold to consider a segment jammed −1
+junction-control Enable traffic signal timing modeling True
+lane-queue Separate queues on different lanes True
+Appendix C. Inflow loading profiles in case study 2
+Table C.1 contains the inflow loading in each time window (per 15 min) of every OD path in case study 2. Paths 1 and 13 which
+intersect with each other at the bottleneck node are chosen to be the paths that have the largest inflow demand so that congestion
+can be easily generated.
+Table C.1
+Inflow loading profiles of every OD path in case study 2.
+Path Base inflow loading profile (veh/15-min)
+Path 1 (O1 - D1) [50, 75, 100, 100, 100, 75, 50, 25, 25, 25, 25, 25]
+Path 2 (O2 - D2) 1/5 of the base profile
+Path 3 (O2 - D6) 4/5 of the base profile
+Path 4 (O3 - D1) 3/5 of the base profile
+Path 5 (O3 - D3) 1/5 of the base profile
+Path 6 (O3 - D6) 1/5 of the base profile
+Path 7 (O4 - D1) 3/5 of the base profile
+Path 8 (O4 - D4) 1/5 of the base profile
+Path 9 (O4 - D6) 1/5 of the base profile
+Path 10 (O5 - D1) 3/5 of the base profile
+Path 11 (O5 - D5) 1/5 of the base profile
+Path 12 (O5 - D6) 1/5 of the base profile
+Path 13 (O6 - D6) The same as the base profile
+Appendix D. Empirical validation
+To validate the interrupted traffic flow dynamics exhibited by LIFT for a real-world road traffic scenario, trajectory data that
+contain exact knowledge of inflow demand and link outflow are required. Therefore, we decide to use the data collected by drones
+in the pNEUMA dataset [62] for this case study. Trajectories on the center lane of a 150-m long road link on the north-west section
+of Alexandras Avenue in Athens, Greece from 10:00:30 to 10:13:30 in the morning are selected, as documented in [63].
+The validation of the model against trajectory data aims at showing the ability of LIFT to capture the empirical traffic dynamics,
+particularly the queue spillback phenomenon. Compared to other studies that calibrated and validated the OD demand, route choice
+behavior, and network supply parameters in a mesoscopic traffic model directly using detector count data, such as Ben-Akiva et al.
+[42], the objective in this work is at a finer level and should be considered essentially different. On the other hand, compared
+to Celikoglu and Dell’Orco [39] that only checked the outflow on a bridge and de Souza et al. [52] that used loop detector data on
+a motorway to validate the flow and density evolution, this approach that utilizes trajectory data allows us to observe and validate
+the occurrence of queue spillback by knowing the exact link traffic state.
+22
+
+===== PAGE 23 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. D.1. Time–space diagram of the empirical scenario.
+Fig. D.2. Dissipating shockwaves (red) shown on the time–space diagram of the empirical scenario.
+Table D.2
+LIFT parameters.
+Parameter Empirical scenario
+Free-flow speed 𝑉f [m/s] 11.5
+Saturation flow 𝑞sat [veh/s/lane] 0.35
+Effective vehicle length 𝑙eff [m] 6.5
+Backward space speed 𝑉space [m/s] 4.5
+Fig. D.1 shows the vehicle trajectories on the lane. Vehicles that performed lane-changing to leave the lane are removed.
+Motorcycles are also excluded as they are mostly shown to ride near the edges of the lane, minimizing their impact on car traffic
+dynamics. The long queues in every signal cycle indicate that there are sufficient queue accumulation and dissipation phenomena
+in the scenario, making it a proper case for validation of congestion dynamics.
+First, the macroscopic traffic flow parameters used in LIFT need to be determined using the trajectories. To know the maximum
+number of vehicles the lane can accommodate, the effective vehicle length is obtained by analyzing the queue length and number of
+queueing vehicles. The free-flow speed is the average maximum speed of every included vehicle. The saturation flow is calculated
+by taking the average of outflow in every green duration. The backward space speed is estimated by averaging the dissipating wave
+speeds, as shown in Fig. D.2. The vehicle entry times and signal timing plan in each cycle are prepared according to the time–space
+diagram. Table D.2 summarizes the parameters. One may see the notable difference of saturation flow and backward space speed
+with the values used in the simulation experiment in Section 4.
+The validation outcome is examined by looking at the link traffic state evolution and checking if the occurrence of queue spillback
+phenomena can be replicated. Fig. D.3 demonstrates that the evolution of number of vehicles simulated with LIFT matches the
+empirical pattern. The relatively large difference at around 700 s is caused by a greater saturation outflow than the average in
+that particular green duration, showing the great uncertainty of urban traffic flow in reality. Furthermore, the blue curve in the
+figure shows the evolution of available space at the upstream end of the lane. Zero available space indicates the occurrence of
+queue spillback. One can see that they are successfully replicated at the moment that the accumulating shockwaves propagate to
+the upstream end of the lane. The available space also does not always grow as the number of vehicles on the lane decreases. Instead,
+a time lag exists between these two types of event because the available space should only grow whenever a backward traveling
+space reaches the upstream end of the link. This again verifies the ability of LIFT to capture the queue dynamics within a road link
+without additionally relying on optimization methods to calibrate the parameters.
+23
+
+===== PAGE 24 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+Fig. D.3. Evolution of number of vehicles and available space on the lane.
+It is worth mentioning that, compared to motorway traffic, empirical validation for urban traffic flow models still faces significant
+challenges due to the lack of precise signal timing information, complex vehicle movements, great behavioral stochasticity, and
+mixed (multi-modal) road traffic environment. This case study serves as an example for such an attempt and can still be improved.
+Data availability
+The source code of the Python implementation of LIFT for the 2 x 4 grid network described in case study 2 in this work is openly
+available and can be accessed via the following link.
+LIFT: Link-level Interrupted Flow Traffic dynamics simulation (Original data) (Github)
+References
+[1] M. Keyvan-Ekbatani, A. Kouvelas, I. Papamichail, M. Papageorgiou, Exploiting the fundamental diagram of urban networks for feedback-based gating,
+Transp. Res. B 46 (10) (2012) 1393–1403, http://dx.doi.org/10.1016/j.trb.2012.06.008.
+[2] Z. Gu, M. Saberi, Simulation-based optimization of toll pricing in large-scale urban networks using the network fundamental diagram: A cross-comparison
+of methods, Transp. Res. C 122 (2021) 102894, http://dx.doi.org/10.1016/j.trc.2020.102894.
+[3] M. Johari, M. Keyvan-Ekbatani, L. Leclercq, D. Ngoduy, H.S. Mahmassani, Macroscopic network-level traffic models: Bridging fifty years of development
+toward the next era, Transp. Res. C 131 (2021) 103334, http://dx.doi.org/10.1016/j.trc.2021.103334.
+[4] V.L. Knoop, S.P. Hoogendoorn, J.W.C. Van Lint, Routing strategies based on macroscopic fundamental diagram, Transp. Res. Rec.: J. Transp. Res. Board
+2315 (1) (2012) 1–10, http://dx.doi.org/10.3141/2315-01.
+[5] L. Leclercq, C. Parzani, V.L. Knoop, J. Amourette, S.P. Hoogendoorn, Macroscopic traffic dynamics with heterogeneous route patterns, Transp. Res. C 59
+(2015) 292–307, http://dx.doi.org/10.1016/j.trc.2015.05.006.
+[6] G. Mariotte, L. Leclercq, Heterogeneous perimeter flow distributions and MFD-based traffic simulation, Transp. B 7 (1) (2019) 1378–1401, http:
+//dx.doi.org/10.1080/21680566.2019.1627954.
+[7] S. Jiang, M. Keyvan-Ekbatani, D. Ngoduy, Partitioning of urban networks with polycentric congestion pattern for traffic management policies: Identifying
+protected networks, Comput.-Aided Civ. Infrastruct. Eng. 38 (4) (2023) 508–527, http://dx.doi.org/10.1111/mice.12895.
+[8] X. Wu, H.X. Liu, N. Geroliminis, An empirical analysis on the arterial fundamental diagram, Transp. Res. B 45 (1) (2011) 255–266, http://dx.doi.org/10.
+1016/j.trb.2010.06.003.
+[9] M. Saberi, H. Hamedmoghadam, M. Ashfaq, S.A. Hosseini, Z. Gu, S. Shafiei, D.J. Nair, V. Dixit, L. Gardner, S.T. Waller, M.C. González, A simple contagion
+process describes spreading of traffic jams in urban networks, Nat. Commun. 11 (1) (2020) 1616, http://dx.doi.org/10.1038/s41467-020-15353-2.
+[10] L. Ambühl, M. Menendez, M.C. González, Understanding congestion propagation by combining percolation theory with the macroscopic fundamental
+diagram, Commun. Phys. 6 (1) (2023) 26, http://dx.doi.org/10.1038/s42005-023-01144-w.
+[11] M.D. Simoni, C.G. Claudel, A semi-analytic approach to model signal plans in urban corridors and its application in metaheuristic optimization, Transp.
+B 7 (1) (2019) 185–201, http://dx.doi.org/10.1080/21680566.2017.1370397.
+[12] P.-E. Mazaré, A.H. Dehwah, C.G. Claudel, A.M. Bayen, Analytical and grid-free solutions to the Lighthill–Whitham–Richards traffic flow model, Transp.
+Res. B 45 (10) (2011) 1727–1748, http://dx.doi.org/10.1016/j.trb.2011.07.004.
+[13] C.F. Daganzo, The cell transmission model: A dynamic representation of highway traffic consistent with the hydrodynamic theory, Transp. Res. B 28 (4)
+(1994) 269–287, http://dx.doi.org/10.1016/0191-2615(94)90002-7.
+[14] S.K. Godunov, A finite difference method for the numerical computation of discontinuous solutions of the equations of fluid dynamics, Mat. Sb. 47 (1959)
+271–306.
+[15] A. Srivastava, W.-L. Jin, J.-P. Lebacque, A modified cell transmission model with realistic queue discharge features at signalized intersections, Transp. Res.
+B 81 (2015) 302–315, http://dx.doi.org/10.1016/j.trb.2015.05.013.
+[16] L. Adacher, M. Tiriolo, A macroscopic model with the advantages of microscopic model: A review of cell transmission model’s extensions for urban traffic
+networks, Simul. Model. Pr. Theory 86 (2018) 102–119, http://dx.doi.org/10.1016/j.simpat.2018.05.003.
+[17] Z. Hao, R. Boel, Z. Li, Model based urban traffic control, part I: Local model and local model predictive controllers, Transp. Res. C 97 (2018) 61–81,
+http://dx.doi.org/10.1016/j.trc.2018.09.026.
+24
+
+===== PAGE 25 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+[18] G. Newell, A simplified theory of kinematic waves in highway traffic, part I: General theory, Transp. Res. B 27 (4) (1993) 281–287, http://dx.doi.org/10.
+1016/0191-2615(93)90038-C.
+[19] I. Yperman, The Link Transmission Model for Dynamic Network Loading (Ph.D. thesis), Katholieke Universiteit Leuven, 2007.
+[20] I. Yperman, C. Tampère, B. Immers, A kinematic wave dynamic network loading model including intersection delays, in: The 86th Annual Meeting of the
+Transportation Research Board, Washington DC,USA, 2007.
+[21] K. Han, V.V. Gayah, B. Piccoli, T.L. Friesz, T. Yao, On the continuum approximation of the on-and-off signal control on dynamic traffic networks, Transp.
+Res. B 61 (2014) 73–97, http://dx.doi.org/10.1016/j.trb.2014.01.001.
+[22] K. Han, V.V. Gayah, Continuum signalized junction model for dynamic traffic networks: Offset, spillback, and multiple signal phases, Transp. Res. B 77
+(2015) 213–239, http://dx.doi.org/10.1016/j.trb.2015.03.005.
+[23] R. Yahyamozdarani, C.M. Tampère, The continuous signalized (COS) node model for dynamic traffic assignment, Transp. Res. B 168 (2023) 56–80,
+http://dx.doi.org/10.1016/j.trb.2022.12.003.
+[24] G.S. van de Weg, H.L. Vu, A. Hegyi, S.P. Hoogendoorn, A hierarchical control framework for coordination of intersection signal timings in all traffic
+regimes, IEEE Trans. Intell. Transp. Syst. 20 (5) (2019) 1815–1827, http://dx.doi.org/10.1109/TITS.2018.2837162.
+[25] G.S. van de Weg, M. Keyvan-Ekbatani, A. Hegyi, S.P. Hoogendoorn, Linear MPC-based urban traffic control using the link transmission model, IEEE Trans.
+Intell. Transp. Syst. 21 (10) (2020) 4133–4148, http://dx.doi.org/10.1109/TITS.2019.2938795.
+[26] M.P. Raadsen, M.C. Bliemer, M.G. Bell, An efficient and exact event-based algorithm for solving simplified first order dynamic network loading problems
+in continuous time, Transp. Res. B 92 (2016) 191–210, http://dx.doi.org/10.1016/j.trb.2015.08.004.
+[27] W. Himpe, R. Corthout, M.C. Tampère, An efficient iterative link transmission model, Transp. Res. B 92 (2016) 170–190, http://dx.doi.org/10.1016/j.trb.
+2015.12.013.
+[28] D. Gazis, R. Potts, The oversaturated intersection, in: Proceedings of the Second International Symposium on Traffic Theory, London, UK, 1963, pp.
+221–237.
+[29] K. Aboudolas, M. Papageorgiou, E. Kosmatopoulos, Store-and-forward based methods for the signal control problem in large-scale congested urban road
+networks, Transp. Res. C 17 (2) (2009) 163–174, http://dx.doi.org/10.1016/j.trc.2008.10.002.
+[30] A. Kouvelas, J. Lioris, S.A. Fayazi, P. Varaiya, Maximum pressure controller for stabilizing queues in signalized arterial networks, Transp. Res. Rec.: J.
+Transp. Res. Board 2421 (1) (2014) 133–141, http://dx.doi.org/10.3141/2421-15.
+[31] F. de Souza, R.C. Carlson, E.R. Muller, K. Ampountolas, Multi-commodity traffic signal control and routing with connected vehicles, IEEE Trans. Intell.
+Transp. Syst. 23 (5) (2022) 4111–4121, http://dx.doi.org/10.1109/TITS.2020.3041436.
+[32] S. Lin, B. De Schutter, Y. Xi, H. Hellendoorn, Efficient network-wide model-based predictive control for urban traffic networks, Transp. Res. C 24 (2012)
+122–140, http://dx.doi.org/10.1016/j.trc.2012.02.003.
+[33] D. Tsitsokas, A. Kouvelas, N. Geroliminis, Modeling and optimization of dedicated bus lanes space allocation in large networks with dynamic congestion,
+Transp. Res. C 127 (2021) 103082, http://dx.doi.org/10.1016/j.trc.2021.103082.
+[34] L. Wei, S.T. Waller, Y. Mei, P. Chen, Y. Wang, M. Wang, A link-based flow model with turn-level queue transmission and time-varying free-flow speed
+for urban road networks, Transp. Res. C 170 (2025) 104937, http://dx.doi.org/10.1016/j.trc.2024.104937.
+[35] M.P. Raadsen, M.C. Bliemer, Continuous-time general link transmission model with simplified fanning, part II: Event-based algorithm for networks, Transp.
+Res. B 126 (2019) 471–501, http://dx.doi.org/10.1016/j.trb.2018.01.003.
+[36] H. Bar-Gera, M. Carey, Representation requirements for perfect first-in-first-out verification in continuous flow dynamic models, Transp. Res. B 100 (2017)
+284–301, http://dx.doi.org/10.1016/j.trb.2017.02.002.
+[37] H. Bar-Gera, M. Carey, Constructing a cell transmission model solution adhering fully to first-in-first-out conditions, Transp. Res. B 161 (2022) 247–267,
+http://dx.doi.org/10.1016/j.trb.2022.04.002.
+[38] M. Di Gangi, Modelling dynamic network loading on transportation networks through a continuous packet approach, Math. Model. Syst. 2 (3) (1996)
+175–196, http://dx.doi.org/10.1080/13873959608837037.
+[39] H.B. Celikoglu, M. Dell’Orco, Mesoscopic simulation of a dynamic link loading process, Transp. Res. C 15 (5) (2007) 329–344, http://dx.doi.org/10.1016/
+j.trc.2007.05.003.
+[40] M. Di Gangi, Modeling evacuation of a transport system: Application of a multimodal mesoscopic dynamic traffic assignment model, IEEE Trans. Intell.
+Transp. Syst. 12 (4) (2011) 1157–1166, http://dx.doi.org/10.1109/TITS.2011.2143408.
+[41] R. Jayakrishnan, H.S. Mahmassani, T.-Y. Hu, An evaluation tool for advanced traffic information and management systems in urban networks, Transp.
+Res. C 2 (3) (1994) 129–147, http://dx.doi.org/10.1016/0968-090X(94)90005-1.
+[42] M.E. Ben-Akiva, S. Gao, Z. Wei, Y. Wen, A dynamic traffic assignment model for highly congested urban networks, Transp. Res. C 24 (2012) 62–82,
+http://dx.doi.org/10.1016/j.trc.2012.02.006.
+[43] J.A. Laval, Hysteresis in traffic flow revisited: An improved measurement method, Transp. Res. B 45 (2) (2011) 385–391, http://dx.doi.org/10.1016/j.trb.
+2010.07.006.
+[44] M. Ben-Akiva, M. Bierlaire, D. Burton, H.N. Koutsopoulos, R. Mishalani, Network state estimation and prediction for real-time traffic management, Netw.
+Spat. Econ. 1 (3–4) (2001) 293–318, http://dx.doi.org/10.1023/A:1012883811652.
+[45] P.A. Lopez, E. Wiessner, M. Behrisch, L. Bieker-Walz, J. Erdmann, Y.-P. Flotterod, R. Hilbrich, L. Lucken, J. Rummel, P. Wagner, Microscopic
+traffic simulation using SUMO, in: 2018 21st International Conference on Intelligent Transportation Systems, ITSC, IEEE, 2018, pp. 2575–2582,
+http://dx.doi.org/10.1109/ITSC.2018.8569938.
+[46] N.G. Eissfeldt, Vehicle-Based Modelling of Traffic. Theory and Application to Environmental Impact Modelling (Ph.D. thesis), Universität zu Köln, 2004.
+[47] D. Charypar, K.W. Axhausen, K. Nagel, Event-driven queue-based traffic flow microsimulation, Transp. Res. Rec.: J. Transp. Res. Board 2003 (1) (2007)
+35–40, http://dx.doi.org/10.3141/2003-05.
+[48] C. Osorio, G. Flötteröd, M. Bierlaire, Dynamic network loading: A stochastic differentiable model that derives link state distributions, Transp. Res. B 45
+(9) (2011) 1410–1423, http://dx.doi.org/10.1016/j.trb.2011.05.014.
+[49] C. Osorio, G. Flötteröd, Capturing dependency among link boundaries in a stochastic dynamic network loading model, Transp. Sci. 49 (2) (2015) 420–431,
+http://dx.doi.org/10.1287/trsc.2013.0504.
+[50] K.W. Axhausen, A. Horni, K. Nagel, The Multi-Agent Transport Simulation MATSim, Ubiquity Press, 2016, http://dx.doi.org/10.5334/baw.
+[51] A. Agarwal, G. Lämmel, K. Nagel, Incorporating within link dynamics in an agent-based computationally faster and scalable queue model, Transp. A 14
+(5–6) (2018) 520–541, http://dx.doi.org/10.1080/23249935.2017.1364802.
+[52] F. de Souza, O. Verbas, J. Auld, C.M. Tampère, A mesoscopic link-transmission-model able to track individual vehicles, Simul. Model. Pr. Theory 140
+(2025) 103088, http://dx.doi.org/10.1016/j.simpat.2025.103088.
+[53] M. Mahut, M. Florian, Traffic simulation with dynameq, 2010, pp. 323–361, http://dx.doi.org/10.1007/978-1-4419-6142-6_9.
+[54] S. Or, Mesoscopic and Hybrid Simulations in PTV Vissim, Technical Report, 2024, URL: https://blog.ptvgroup.com/en/modelling-and-simulation-technology/
+mesoscopic-and-hybrid-simulations-in-ptv-vissim/.
+[55] Aimsun, Aimsun Next User’s Manual 22.0.1: Meso Traffic Modeling, Technical Report, 2024, URL: https://docs.aimsun.com/next/22.0.1/UsersManual/
+MesoTrafficModelling.html.
+[56] M. Mahut, A Discrete Flow Model for Dynamic Network Loading (Ph.D. thesis), Université de Montréal, 2001.
+25
+
+===== PAGE 26 =====
+
+Y.-C. Ni et al. Simulation Modelling Practice and Theory 147 (2026) 103252
+[57] W.-L. Jin, Continuous formulations and analytical properties of the link transmission model, Transp. Res. B 74 (2015) 88–103, http://dx.doi.org/10.1016/
+j.trb.2014.12.006.
+[58] G. Mariotte, L. Leclercq, Flow exchanges in multi-reservoir systems with spillbacks, Transp. Res. B 122 (2019) 327–349, http://dx.doi.org/10.1016/j.trb.
+2019.02.014.
+[59] Y.-C. Ni, LIFT: Link-level interrupted flow traffic dynamics modeling, 2024, URL: https://github.com/YCNi/LIFT.git.
+[60] V.V. Gayah, C.F. Daganzo, Effects of turning maneuvers and route choice on a simple network, Transp. Res. Rec.: J. Transp. Res. Board 2249 (1) (2011)
+15–19, http://dx.doi.org/10.3141/2249-03.
+[61] J. Espadaler-Clapés, E. Barmpounakis, N. Geroliminis, Empirical investigation of lane usage, lane changing and lane choice phenomena in a multimodal
+urban arterial, Transp. Res. A 172 (2023) 103674, http://dx.doi.org/10.1016/j.tra.2023.103674.
+[62] E. Barmpounakis, N. Geroliminis, On the new era of urban traffic monitoring with massive drone data: The pNEUMA large-scale field experiment, Transp.
+Res. C 111 (2020) 50–71, http://dx.doi.org/10.1016/j.trc.2019.11.023.
+[63] J. Espadaler-Clapés, E. Barmpounakis, N. Geroliminis, Traffic congestion and noise emissions with detailed vehicle trajectories from UAVs, Transp. Res. D
+121 (2023) 103822, http://dx.doi.org/10.1016/j.trd.2023.103822.
+26

@@ -1,0 +1,983 @@
+% =============================================================================
+%  Q3 -- Hybrid Meso-Micro Traffic Simulation
+%  References for this question live in refQ3.bib
+%
+%  GROUNDED WORKFLOW FOR THIS ANSWER:
+%    1. Start from the real Q3 PDFs in:
+%         assets/Candidacy-Paper-reference/Question3ref/
+%    2. Use extracted text only as a search aid:
+%         assets/Candidacy-Paper-reference/_extracted/Question3ref/
+%    3. Use the generated index only for quick orientation:
+%         assets/Candidacy-Paper-reference/Question3ref/Question3ref.md
+%    4. Final claims must be grounded in:
+%         (a) PDF-verified literature,
+%         (b) AutoTrafficSim architecture,
+%         (c) Korede's real traffic-simulation experience, or
+%         (d) clearly marked proposal language.
+%
+%  MAIN ANSWER LOGIC:
+%    - Hybrid meso--micro simulation is not just a compromise between fast
+%      and detailed models. It is an interface problem: vehicle conservation,
+%      route continuity, downstream supply, queue spillback, and boundary
+%      loading must remain valid when a vehicle crosses model resolution.
+%    - Not all mesoscopic models are discrete-event. CTM is a discrete-time
+%      finite-difference model rooted in LWR/Newell/Daganzo. Burghout's
+%      Mezzo-style model is the event-based mesoscopic model that directly
+%      matches the committee's synchronization wording.
+%    - AutoTrafficSim should be positioned modestly as a proposed discipline
+%      for checking interface invariants and grounding model choices, not as
+%      a completed hybrid simulator or as a source of empirical results.
+%
+%  STYLE AND DEFENSIBILITY:
+%    - Use first-person proposal voice only where AutoTrafficSim is discussed.
+%    - Do not cite papers only because they are in the bibliography.
+%    - Do not claim density must exactly match across boundaries; the safer
+%      and source-grounded claim is vehicle conservation, supply/capacity
+%      consistency, route continuity, queue transfer, and feasible loading.
+%    - Keep the equations oral-exam defensible: define variables and explain
+%      what each equation is doing.
+% =============================================================================
+\begin{bibunit}[plainnat]
+
+% -----------------------------------------------------------------------------
+%  KOREDE'S WORKING NOTES (kept in source for reference; not rendered in PDF).
+%  The substantive content has been migrated into the formal Q3 body below.
+%  Wrapped in \iffalse...\fi so the notes survive in source but do not render.
+% -----------------------------------------------------------------------------
+\iffalse
+Simulation models generally can be classified into three main parts based on \italics: time of change, aggregation level and randomness. Classification
+using time of change can be \italics coontinuous, discrete time and discrete event. For Aggregation level, \italic one may have microscopic simulation model, macroscopic simulation 
+models and mesoscopic models which sits between the micro and macro models. For randomness, one may have stochastic and determinsitic models. 
+
+
+For Traffic simulation models the general classification according to the literarure is  macroscopic, mesoscopic and microscopic models \cite{wilco desertation, treiber textbook}.
+Microscopic traffic simulation models are generally disrete time models due to their granularity of details and modeling after the basic fundamental of 
+traffic flow for individual vehicles such as flow, speed and density. These models are specifically use to model details such as how individal vehucles interact at bottle 
+neck links (eg onramp and offramp). They model vehicles car following details, lane changing details and dynamic route choice details and as such limited 
+to small study due to computationally involved in modeling these behaviors at a large scale. 
+these models also suffer from calibration problemmdue to dimentionality of vehicle parameters for individual vehicles 
+
+Macro models uses aggregated information to model vehicle details and bevavior. LWR \cite (the both papers), models these 
+bevaious using the conservation law princible of fluid as traffic flow modeling space and time as continous while using differencials to estimate the 
+speed-density relation. daganzo went further to discretize this model by presentating each road as as a cell. where each cell has it's own density 
+and the amount of vehicle that can flow into a downstream cell is proposiotnal to the uplink cell. this way, one can estimate and calculate the speed-density 
+of each cells and vehicle entering from once cell to the other via intersection. These models was popular because flow and speed 
+data naturally comes in aggregated format which further cemented the success of these models. 
+
+Mesoscopic models on the other hand are models that sits between micro and macro models. Networks are sometimes represented by links and nodes while cars are 
+in a packet. the speed of the packet determines the speed of the car and it's car dynamics. A car is only allow to leave a packet and join another packet 
+and not overtake another car in the packet. Although this model has the advantage of link conservation and ability to model city wide traffic since the approach does 
+not care more for individal car follow details rather for behavioral appraoch that can be estimated from packet, link and nodes interaction. The representation above is one way
+to discribe mesoscopic model. Another way is to represent vehicles in a cell that travels the link. A queue server approach is also discussed where speed is a function
+of density in a queue. An approach \cite \{wilco} used to develop Mezzo a mesoscopic traffic simulation model.
+
+
+A hybrid micro-meso model for effective city wide. 
+Wilco boughout made a solid work in this regard by explaining in details the hybrid approach of 
+micro-meso model for effective city wide simulation. Micro models are intergated with meso model such that large scale traffic modeling 
+can be achieved. A paradigm that tends to solve the limitation of using a pure microscopic model that has dimentionality of params problem for calibraiton 
+and computaitonality problem for city wide network simulation, Also the meso model is used when details is not needed eg when behavioral characteristics is needed. 
+this approach, ensured that mime \cite{boughout} was formulated in his dissertation by intergrating Matsimlab a microscopic model 
+with mezzo a mesoscopic model. 
+
+
+The Interface problem of intergating meso model with microscopic model:
+For an effective city wide hybrid model that solves the computationally problem of microscopic model without sacrificing too much detials 
+and take advantage of the large scale effectiveness of meso model, the major problem documented in the literarure is the 
+--Interface / boundry problem. 
+
+An hybrid model must be able to intergate effectively this boundry problem that exist between macro-meso model as documented
+by \wilco Boughout
+
+1. Adaptabilility: Source code availability between both models, Major problem if either of the models 
+are propeatry and not open sourced. I believe sumo should have solved this problem. this is me thinking lound
+
+2. Meso Micro communication : This is still opensourcesss of codes and approach.
+3. Meso Micro synchronization : This is arguably the major problem that I think is largely the decided for
+meso micro simulation. The notion of time, event synchronization. fixed time steps vs event as a trigger of state change synchronization
+4. Simpless traffic representation between the boundries: As in representation of anything, this is another difficult problem that pose a bottleneck
+aggregation and disaggregation paradigm. A car that is part of a packet/ cell unit needs to be individualized with 
+all it's traffic flow properties at the microscopic level for a hybrid model to materialize. 
+At the link , cars like bits must be unbundled and represent at that level to accout for the 
+transitioning. 
+
+mesoscopic traffic models are event based models eg when a vehicle enters a link, when a vehicle is generated, when a vehicle exit a link.
+While micro sim compute every time steps due to the details it need. 
+
+
+The events in the mezzo simulation are ordered in an event list. And each process that generate event is called an action. there are 4 actions types. 
+ODAction does the origin destination when a vehicle is generated at source, Daction is the one that kills a vehicle at the sink. 
+TurnAction is when a vehicle generates a turn event at a junction And MatrixAction does a demand for One or more OD pairs. 
+
+Each action does a certian change to the statre of the system by a way of boking itsel in the event list with a new time. 
+The event list simply calls each Action as their event becomes the first in the list.
+The new time for the next event is generated stochastically, depending on the kind
+of action, by a ‘server’. This server draws random time intervals given a certain
+mean and standard deviation, and the next time the Action is called is the current
+calls time plus the generated time interval. Depending on their function (for traffic
+generation, turning movements, or other) servers can draw time intervals according
+to user-specified distributions such as Normal, Negative Exponential
+
+
+Input to a mesoscopic model: 
+1. A network discription:
+2. Route: Origin destiond and list of links
+3. Travel time 
+4. Demads Origin / Destinaton 
+5. Vehicle max
+6. Server rate
+
+Output:
+MOEs: Measure of effectiveness, flow, density , outflow, queue length 
+Link times: 
+Vehicle trips:
+
+
+Mezzo (mesoscopic):
+1. Network structure:
+1.1 The link, node and turning server.
+2. Speed density function: greenshild, greenback any works
+3. the problem of shockwave that arise due to inhomogeneous traffic condition
+4. Route choice and operational issues. 
+--trip (OD matrix) and event as the mode of implementation. 
+
+Hybrid: Chapter 4.
+
+The major problem is the consistency problem for an hybrid model. (this is important for this write up)
+ 
+1. structural compatibility in modeling traffic flow in the two models
+
+Wilco discussed 3 things:
+1. requirement for integration of micro meso model
+1.1 Route choice and network representation consistency: 
+--Road network, path, route choice consistency with the most been travel time consistency. 
+this I believe is the discrete time and event synchronization
+1.2. Boundary traffic dynamic consisteny: 
+--- e.g traffic queue consistency at boundries of the micro meso model.
+same queue should be consistent across both models for effective integration
+1.3 Traffic performance consistency t the sub models
+-- Result consistency , link speed, flow , density should be consistent at 
+the boundries. Result produced by each model should be consistent. Specifically 
+Wilco stated that " For those facilities that can be simulated sufficiently well by both models, they need to produce
+(nearly) the same results on the meso level of aggregation."
+
+1.4 Communication and data exchange transparency:
+Because micro is discrete time and can generate a huge amount of data 
+and meso is discrete event and can generate fewer data, the integration must be
+efficient such that the synchronization paradign is the one that minimize
+the generation of large data. Else hybrid model amy die on the amount of data generated. 
+1.5 Integration framwork and architecture:
+---
+Since micro and meso uses the same individual vehicle represention but different 
+approach to modeling traffic dynamic and representation eg route choice. 
+to synced both model, there route choice model must be the same/shared and operate on te 
+complete network graph for both the micro and meso area.  
+
+Specifically: "The paths
+should be defined over this common network graph, and the link travel time
+database should cover the entire network, and also be shared by both models."
+
+  
+MESO Model, shares (travel time)<--------> and receive (route choice from common module)<----> |Common Module|shares (travel time)<--------> and receive (route choice from common module)<------->MICRO model
+
+
+            Common Module components
+Travel behaviour Table                              Database Table
+1. pre trip, en-route, path gen   <--->       network graph, trave time, paths, OD flow
+
+The boundry problem is solved by the above framework and specifically a virtual link that connects the meso to the micro at each end point. 
+
+meso ---->    micro -------> meso  (the micro virtual link)
+A vehicle may travel million of discrete time inside the micro model that is never recorded at the meso unit model. 
+the meso model only see the virtual single link that estends the movement of the car from the meso to the micro and out of the model like a one shot movement. 
+so event is only captured at that point via interleving eg, event is triggered that a vehicle entered a micro link (virtual link). and 
+event is triggeted when the vehicle exit the virtual link. even though the car made 100th of discrete time steps of movement inside the virtual micro link. 
+
+The virtual link movement is determined prior to the simulation in terms of the vehicle that will use this link. 
+
+So the virtual link is the main solution here because, once simulation is determined and the route choice is chosen, the vehicles that chose to use 
+the micro model route with a corresponding virtual link in the meso model, the disctrete time steps that generats the huge time tick computation data is 
+disable since the virtual link is also available in the meso model as a single event unit. 
+
+The concept of the virtual link is the main idea of sycnronization because mesomodel sees a single event when a vehicle entered 
+a micro virtual link, and a micro model at that boundry moved the vehicle multple steps outword based on the choice the vehicle 
+is going since the route choice table is shared between both model. So when a vehicle entered a micro model 
+from a meso model, information is not lost rather consevered, the micro model just check where is this vehicle 
+going base ont he same common route table and move the vehicle to it's destination. 
+
+
+
+"""this is from Wilco"""""
+Similarly the micro network is expanded with the addition of micro virtual links to the
+micro subnetwork (Figure 2c). The virtual links allow the micro model to deal with
+en-route choice in the micro subnetwork. Since each path from an exit point in the
+micro network to a destination in the meso network is represented by a virtual link
+in the micro model a change of route for a vehicle in the micro sub-network can
+effectively mean a different exit point into the meso network.
+The common module also includes the OD matrix for the entire network. To
+simplify the information exchange and facilitate a transparent data input interface,
+the current implementation assumes that all origin and destination nodes in the
+network belong to the meso subnetwork. This assumption is by no means
+restrictive, since an origin or destination node in the micro area can always be
+designated as a boundary node in meso connected directly to the micro
+subnetwork.
+The above considerations simplify the initial architecture considerably in the case
+where integration of existing simulation models takes place (Figure 3). Under this
+architecture, and based on the OD matrix representation discussed earlier, the meso
+model is solely responsible for all pre-trip decisions, while en-route decisions are
+the responsibility of the respective subnetwork. This architecture has a number of
+practical advantages compared to the initial one. While the initial architecture would
+be preferable in the case of a new meso-micro model, it would require large
+amounts of communication overhead when combining two existing models. With
+the above modifications this overhead is avoided.
+""""""Wilco""""""""""""""""
+
+
+The problem of inconsistent Queue representation:
+
+Since meso model hypothetically do not have lanes and micro models does have lanes.
+there is a problem of queue representation at the boundry specifially the virtual link solved this problem by 
+""
+ a queue on one lane in micro, even if the other lanes remain open, will
+block the boundary node completely, unless the exchange of vehicles at the
+boundary is taking place properly. The virtual links in the meso subnetwork play
+an important role in solving the problem of inconsistent queue representation.
+Virtual links that represent paths that can only use the blocked lanes will be
+blocked, while virtual links representing paths that use open lanes will have
+available capacity and allow the proper advancement of the corresponding vehicles.
+""
+also, the boundry from meso micro should allow vehicle in front need to be in accordance with the traffic situation
+upstream and downstream of the boundary in other for speed, acceleration and time-headway consistency. specifically
+same condition from meso micro meso must be met at the booundry to allow a steady stream of vehicle acorss model. 
+The notion of a virtual vehicle is used to ensure consistency:
+Specifically:
+"""
+every vehicle in the micro area that has no leading vehicle in front of it
+(provided the next link is a meso link) will follow a virtual vehicle whose position
+and speed is determined as follows:
+1. The current time tcurrent and the time the last vehicle (on that lane) exited texit
+2. The speed that was assigned in meso to the exited vehicle vvirtual (as a
+function of the density on the meso link)
+3. The extrapolated position: end of micro link + vvirtual * (tcurrent-texit)
+"""
+
+Also speed at the meso is determined by density purely. 
+
+
+
+
+The Implementation and sycnronization problem: A case for information communication and aligment
+Micro meso model hybrid must commuicate at the same threshold. vehicle, travel time, traffic condition need be sycnronization such that
+one model is not running faster than the other model. 
+
+Message passing in the virtual machine for hybrid model. A message signature one synonimou to how tcp/ip transfer message is used. 
+This message signature contains information of vehicles that are trying to cross the boundry such that the common table can be use to look up the necessary information needed to 
+keep moving this vehicle from the event spectrum to discrete time spectrum. One may look this as a routing table or Arp table in computer network. 
+
+""
+The boundary-out and boundary-in nodes in the meso model
+are converted into micro entry node and micro exit node. The meso vehicle speed
+is communicated, but (at this moment) not used, as the microscopic model has its
+own loading mechanism, and the mesoscopic model uses speed/density functions
+to assign speeds upon entry of a vehicle. The vehicle length is communicated
+explicitly to ensure that the density of a specific traffic stream remains the same
+whether it is in micro or mesoscopic representation. (different vehicle lengths result
+in different densities). The timestamp indicates the exact moment the vehicle
+""
+
+My Summary of 2005 Wilco paper hybrid model:
+He presented the hybrid model by stating the micro simulation problem of computation overhead for large scale 
+traffic modeling and the overhead associated with calibration due to dimentionality problem associated with individual 
+vehicle params. 
+
+He the stated the problem of meso which is the fact that it's more of an aggregated approach paradigm that does not represented 
+traffic flow dynamics in a detailt that is suitable for dynamic traffic modeling specifically for boundaries. 
+
+
+However, since both meso and micro models units of represent of vehicle is the same, he stated that both models power 
+can be annes with a hybrid model that takes advantage of the best of both world. He then went on to note the two major problems 
+that must be solved to effectively integrate both models for city wide simulation. 
+
+Problems1. The traffic representation problem at the boundry of both models (aggregation and disaggregation problem). Solved this using a virtual link that synchronize 
+discrete event of meso with the discrete time of micro. once the OD of a car is determined during simulation, the route choice 
+takes account of the events that will trigger a virtual link usage, and a virtual link usage means micro (discrete time) boundry
+is to be accessed. the meso model owns the route and the link so a virtual link usage is an event usage therefore there is no 
+need to keep the discrete time computaitonality overhead when a  vihicle use the micro virtual link. although vehicle dynamics is 
+kept same at those boundry to allow for synchronization of traffic dynamics at those links. The meso sees a vehicle using the virtual link and 
+as such can use the speed - density relation to calculate traffic flow while at the detail level the micro can advance the vehicle 
+at the details needed to study dynamic traffic information due to the problem2 been solved. 
+
+Problem2. The common table. the common table helps to synced bth world specifially with route choice and travel time message passing. 
+the message passing packet, contains information that can be understood by both models world such that information carried via message by a car entring a virtual link 
+by a way of meso - micro - meso is consistent to calculate/translate traffic flow information. 
+The meso and micro models need to communicate with each other to hand over vehicles that cross the boundaries,
+and inform each other of traffic conditions downstream of the boundaries, so that traffic upstream can react to these.
+Hence, in order to facilitate the proper modeling of the traffic dynamics at the interfaces, as outlined above, the
+following information is exchanged between the submodels:
+1. vehicles passing the boundaries between the models and their characteristics
+2. link blocking/unblocking information
+3. density on micro segments
+4. information for virtual vehicles (speed and entry time of vehicle that last crossed the border)
+
+
+
+The shockwave effect that can arise at the boundry of micro-meso model and how to address it. 
+Because the boundery problem is an important aspect of ensuring the hybridization of micro-meso framework. shockwave
+is a major problem that must be address at this boundary aside from the alignment of the two models paradigm. Shockwave is the 
+effect that arise at the boundary of two different traffic flow states, specifially a sudden change in density. And the shock front corresponds to the 
+specific position where the change is happening. inhomogeneous in traffic specifically at this boundry and the sped of shockwave must be solved in other to ensure a 
+smooth hybrid integration using: wAB =( qA – qB)/( kA – kB).
+where wAB   --- 
+qA  is 
+qB  is 
+kA  is 
+kB  is 
+Specifically we have meso ----- common table -----micro.
+
+Transparent communication and data exchanges
+Consistency in traffic performance for meso and micro submodels
+Consistency of traffic dynamics at meso-micro boundaries
+
+
+Proposed loading method
+We propose a new loading method that aims at loading vehicles in a way that is more consistent with
+their behavior when they enter the network. In microscopic simulation models the car-following is
+one of the main models used to move vehicles in the network. Typical car-following models relate the
+acceleration of a vehicle to the behavior of the surrounding vehicles, especially the speed of, and the
+distance to the leading vehicle. The proposed method assigns speed to the vehicles entering the
+network (either loaded at the origin, or transferred from the mesoscopic part of the network) using a
+multi-regime approach based on the time headway between the entering vehicle and its leading vehicle
+(in the same lane):
+· Regime 1 (bounded traffic): t1 < th ≤ t2 seconds
+o V = Vfront
+· Regime 2 (partially bounded traffic): t2 < th ≤ t3 seconds
+o a = ( th- t2)/(t3 - t2)
+o V = a*Vdesired + (1-a)*Vfront
+· Regime 3 (unbounded traffic): th > t3 seconds
+o V = Vdesired
+where,
+V: assigned initial speed,
+Vfront: speed of the vehicle in front (in the same lane),
+Vdesired: vehicle’s desired speed,
+th: time headway to the vehicle in front (in the same lane).
+a: parameter (0,1] that interpolates between the desired speed and the speed of the leading
+vehicle. If Vfront > Vdesired, V=Vdesired.
+ti,: time headway thresholds, determined/calibrated from field data, i ∈ {1, 2, 3}.
+
+
+
+
+database with the network graph, the travel time tables, the set of paths and the origin
+destination (OD) flows, as well as a travel behavior component with route choice models and path generation
+algorithms.
+
+
+2. Integration architecture that meets (1) above
+3. implementation is then discribed for effective city usage
+
+
+
+
+Critics:
+
+For the later critic of the literature, I think the major issue from the literture out of the 
+listed problem that Wilco discussed is the open code and approach  taken by
+the traffic communitity. 
+I believe SUMO has done a big leep and may have allieate 2 out of the 4 problems Wilco listed. 
+
+The table below gives a summary overview of the models as it partain to traffic simulation 
+
+
+
+The Daganzo (1993 paper summary and words):
+
+This work solved one problem: The classical shockwave problem that LWR (hydrodynamic) conservation law 
+introduce especially at the end of a queue due to jump in density. He solved this 
+by automatically generating appropriate change in density at those shockwave points. Automatically solving the 
+shockwave complex calculate task. 
+
+The case for Dynamic traffic flow assignment for hybrid modelf to effective city wide simulation. 
+
+this is is proposal by daganzo: ni+1(t + 1) = ni(t),   (this is the discrete time discribe by Hu, need to note this)
+Thus, the CTM is define as the:
+occupancies at time t+1  = occupancies at t + the inflow - the outflow. 
+
+n(t+1)  = n(t) + y(t) - yi+1(t)
+
+
+
+
+Creating and Validating Hybrid Large-Scale, Multi-Modal Traffic
+Simulations for Efficient Transport Planning
+This paper present HybridPY:
+
+This paper contributes to the state of the art by presenting a toolchain, named hybridPY,
+to efficiently generate hybrid traffic models by combining the open-source traffic
+simulation frameworks SUMO and MATSim. The method presented makes it possible
+to bridge the differences between MATSim and SUMO by synchronizing the networks
+and, based on this, to transfer the predicted user equilibrium from the meso-level to the
+micro-level. The proposed tool-chain is applied to a case study, in Munich, Schwabing. The
+results are validated using flow measurements and speed profiles obtained from floating
+car data. The remainder of this section describes the state of the art and defines the goals of
+this paper.
+
+current problem: (i) Current approaches lack a framework for creating hybrid traffic simulations
+using open-source simulators.
+(ii) Multi-modal, large-scale
+hybrid models have not been thoroughly validated with daily and hourly link-by-link
+comparisons. While some efforts have been made to address certain aspects, they are not
+comprehensive.
+\fi
+% -----------------------------------------------------------------------------
+%  END OF KOREDE'S WORKING NOTES
+% -----------------------------------------------------------------------------
+
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{1.55cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Scale} & \textbf{Representation} & \textbf{Main mechanism} & \textbf{Examples} & \textbf{Good for} & \textbf{Main limitation} \\
+\midrule
+Macroscopic
+&
+Aggregate flow, density, and speed.
+&
+Conservation law, fundamental diagram, and cell or link flow propagation.
+&
+LWR, CTM, METACOR.
+&
+Large networks and long time periods.
+&
+No individual vehicles, lane changes, or driver interactions.
+\\
+\addlinespace
+Mesoscopic
+&
+Packets, cells, or individual vehicles with simplified behavior.
+&
+Speed-density relation, queue-server discharge, link travel time, and route choice.
+&
+CONTRAM, DYNASMART, DYNAMIT, Mezzo, POLARIS.
+&
+Large dynamic networks and hybrid background regions.
+&
+Vehicle position, acceleration, and lane-changing behavior are approximate.
+\\
+\addlinespace
+Microscopic
+&
+Individual vehicles with position, speed, lane, route, leader, and follower.
+&
+Car-following, lane-changing, gap acceptance, and signal response.
+&
+AIMSUN, MITSIMLab, SUMO, ScalaTion.
+&
+Bottlenecks, merges, ramps, signals, ITS, and local interactions.
+&
+High calibration burden, many parameters, and high city-scale cost.
+\\
+\addlinespace
+Hybrid meso--micro
+&
+A mesoscopic network surrounds one or more microscopic windows.
+&
+Boundary transfer, dynamic loading, route continuity, queue transfer, and synchronization.
+&
+MiMe, MATSim--SUMO, BEAM--SUMO, hybridPY.
+&
+City-wide simulation with local microscopic detail.
+&
+Boundary errors can create artificial queues, lost vehicles, unrealistic gaps, or inconsistent routes.
+\\
+\bottomrule
+\end{tabularx}
+\caption{Traffic simulation scales used in hybrid meso--micro modeling, based on \citet{burghout2004thesis}.}
+\label{tab:q3-model-scales}
+\end{table}
+
+
+\section{Q3.\ Hybrid Meso-Micro Traffic Simulation}
+
+\begin{quote}\itshape
+Review and critique the research literature on hybrid meso-micro traffic simulation.
+Explain in detail how meso-scale models work and how they can be integrated with micro-scale models for effective city-wide traffic simulation.
+As meso-scale models are discrete-event and micro-scale models are discrete-time, how can they be synced up.
+Your answer should explain the situation all the way down to mathematical equations.
+\end{quote}
+
+\subsection{Q3.1\ Review and critique the research literature on hybrid meso-micro traffic simulation}
+
+\textit{Review and critique the research literature on hybrid meso-micro traffic simulation.}
+
+Simulation models in general can be classified along three axes. These are time of change, level of aggregation, and randomness. By time of change a model is \textit{continuous}, \textit{discrete-time}, or \textit{discrete-event}. By aggregation it is \textit{microscopic}, \textit{mesoscopic}, or \textit{macroscopic}. By randomness it is stochastic or deterministic. Traffic simulation inherits this classification directly, and the literature normally groups traffic models as macroscopic, mesoscopic, and microscopic \citep{burghout2004thesis}. The three-axis view explains why the meso--micro hybrid problem is hard before any equations are written. The two submodels do not share a notion of time, do not share a notion of vehicle aggregation, and do not always share a notion of randomness. Hybrid simulation has to reconcile all three.
+
+Microscopic traffic models usually use discrete time. They represent individual vehicles at small time steps with car-following and lane-changing behavior \citep{treiber2000idm,kesting2007mobil}. In a model such as MITSIMLab, this is also coupled with dynamic route choice \citep{burghout2004thesis}. They are well suited to bottleneck links such as on-ramps and off-ramps, but they are computationally heavy at city scale and can be difficult to calibrate because detailed behavioral models introduce many parameters. Macroscopic models work on aggregate flow, density, and speed. \citet{lighthill1955kinematic} and \citet{richards1956shock} introduced the conservation-law framing of traffic flow as a fluid.
+\[
+  \frac{\partial \rho}{\partial t}
+  + \frac{\partial(\rho V)}{\partial x}
+  = \frac{\partial \rho}{\partial t} + \frac{\partial Q}{\partial x}
+  = 0,
+\]
+where $\rho$ is density, $V$ is speed, and $Q=\rho V$ is flow. \citet{newell1993simplified} reframed the same theory through cumulative count curves for queues and multi-destination flow. \citet{daganzo1994ctm} discretized this hydrodynamic theory into the Cell Transmission Model (CTM) by representing each road segment as a cell and propagating flow cell-by-cell with upstream demand, capacity, and downstream empty space. CTM is a cell-based discrete-time model, not the event-based meso model meant in Q3.3. That distinction matters because the committee's wording (discrete-event meso, discrete-time micro) applies cleanly to the Burghout/Mezzo case, not CTM.
+
+Mesoscopic models sit between micro and macro. There are at least three representations in the literature. Vehicles can be grouped into packets moving on links, with vehicles allowed to leave a packet at a node but not to overtake within it. Vehicles can be represented individually but advanced cell-by-cell in discrete time, which is the CTM line. Vehicles can be represented individually with a queue-server discharge at nodes and a speed--density function on the running portion of each link, which is the Mezzo line \citep{burghout2006discrete}. The Mezzo representation is the one that supports event-based simulation directly, because link entry, link exit, queue joining, queue service, and route choice are scheduled as events on a \textit{future event list} rather than computed every tick.
+
+\subsubsection{The Burghout foundation}
+
+The main meso--micro hybrid line is \citet{burghout2004thesis}'s MiMe model, which integrates the event-based mesoscopic model Mezzo with the microscopic model MITSIMLab \citep{burghout2005hybrid,burghout2006discrete}. This is the work that names the hybrid problem as a \textit{consistency problem} rather than a software-coupling problem. \citet{burghout2004thesis} identifies five requirements:
+\begin{itemize}
+  \item network and route-choice consistency
+  \item boundary traffic-dynamic consistency
+  \item traffic-performance consistency at the submodels
+  \item communication and data-exchange transparency
+  \item a workable integration architecture
+\end{itemize}
+\citet{burghout2006loading} adds the loading problem, because if vehicles are inserted into the microscopic region with unrealistic speed, headway, or lane state, the loading mechanism itself creates artificial shockwaves, reduces effective capacity, and distorts calibration. I have hit this failure mode in practice. In a microscopic model with a Poisson arrival source, the generator occasionally placed two vehicles on the same lane at the same discrete tick. It produced an artificial shockwave that took weeks of trace inspection to attribute to the arrival generator rather than to the car-following model. The implication is direct. A hybrid model can be wrong even when both submodels are individually verifiable.
+
+I read the newer papers as taking different parts of this problem. \citet{gomes2022otm} puts the interface itself inside the model design. \citet{desouza2019mesoscopic} improves the mesoscopic side for large-scale agent-based simulation instead of inserting a microscopic region. \citet{schweizer2024hybridpy} and \citet{schuhmann2025hybrid} make the meso-to-micro toolchain practical with MATSim or BEAM and SUMO. \citet{son2022differentiable} solves a different hybrid problem, passing gradients through macro--micro representations for optimization and control. These papers do not replace Burghout's question for me. They give newer ways to ask whether the traffic state remains credible when the resolution changes.
+
+\subsubsection{Q3.1.1\ My critique}
+
+\paragraph*{Main criticism.}
+My main criticism of recent hybrid toolchains is that connecting two simulators is not the same as showing that traffic remains believable where one model hands a vehicle to the other. The route must remain consistent, a blocked downstream lane must stop an upstream release, the density and queue must be communicated back, and a newly loaded vehicle must not create an artificial shockwave. Open-source access helps the implementation problem, but it does not by itself demonstrate these conditions.
+
+\citet{burghout2004thesis} is the work that named the hybrid problem as a consistency problem rather than a software-coupling problem. He identified five requirements and four practical barriers (source-code adaptability, meso--micro communication, meso--micro synchronization, and seamless traffic representation at the boundary). \citet{burghout2006loading} develops the loading problem in focused detail and evaluates a proposed multi-regime loading mechanism. Taken together, this is the most complete meso--micro interface treatment in the literature I reviewed. It includes the common module, virtual links, message exchange, multi-regime loading, and the virtual vehicle. The honest limit is narrower than I first wrote. MiMe is evaluated on the Brunnsviken network, which includes signal-controlled urban elements and a roundabout, but Burghout also reports simplified traffic-signal operation and the need for more validation.
+
+\citet{daganzo1994ctm} provides the mathematical foundation for the cell-based hybrid line. CTM gives a discrete and conservative version of the kinematic-wave theory of \citet{lighthill1955kinematic} and \citet{richards1956shock} through a minimum-flow rule. The limits matter for this question. CTM is discrete-time rather than discrete-event, and its cell representation does not by itself give the vehicle-level loading and lane state needed at a meso--micro boundary. Burghout is the line I need for Q3.3 because the meso side is event-based.
+
+\subsubsection{HPDES: Hybrid parallel discrete-event simulation}
+
+The next step I see is to run a hybrid meso--micro model under PDES. I call
+this \textit{Hybrid Parallel Discrete-Event Simulation (HPDES)}. The idea is
+to keep a city-scale mesoscopic model in parallel, but open microscopic
+windows where detailed vehicle interaction matters.
+
+Mobiliti gives me the parallel mesoscopic foundation. It is already a
+city-scale mesoscopic PDES simulator. Links are actors, individual vehicles
+move between links as timestamped events, the network is partitioned across
+processors, and Time Warp rollback preserves causal order
+\citep{chan2023dynamicrerouting}.
+
+Burghout gives me the meso--micro interface. His MiMe architecture explains
+how a microscopic region can be represented by virtual links while vehicle
+loading, spillback, route continuity, and micro time-step synchronization
+remain consistent \citep{burghout2004thesis,burghout2005hybrid}.
+
+A virtual link represents each microscopic window inside the mesoscopic
+network. The open problem is the boundary protocol. Vehicle-transfer events,
+downstream blocking, rerouting information, and micro time steps must remain
+causally consistent while the mesoscopic side executes in parallel.
+
+\paragraph*{The synchronization question.}
+Mobiliti uses optimistic PDES with Time Warp. This raises a design question that
+does not appear in the sequential MiMe interface. If an event entering the
+microscopic window is later rolled back, should the microscopic model also roll
+back to an earlier tick, or should the hybrid boundary use a conservative rule
+that releases only causally safe events? This is the HPDES problem I want to
+study.
+
+\subsubsection{How the newer papers address the boundary problem}
+
+\citet{gomes2022otm} is the newer paper that comes closest to the concern I took from Burghout. OTM states two basic interface requirements directly. Vehicles must not be created or destroyed across the interface, and their characteristics must be conserved. Its experiment also makes congestion propagate across a modeling interface. The limitation is also direct. The demonstration is a simple linear network, and the paper states that vehicle types, lane changing, the node model, and control structures are left for future work. So I read OTM as getting the interface question right, but not yet testing the difficult city boundary case.
+
+\citet{schweizer2024hybridpy} solves a practical toolchain problem. It transfers demand or plans from a large MATSim or BEAM CORE setting into a smaller SUMO area and demonstrates this for Schwabing and San Francisco. What I take from this paper is the computational argument for hybrid simulation. The full metropolitan models are not reasonably micro-simulated when iterative runs are needed. Its result is a working open-source workflow and a scale argument, not a boundary-dynamics validation result.
+
+\citet{schuhmann2025hybrid} goes further on validation. In the Munich/Schwabing case, the authors validate flows and floating-car-data speeds, and report that the microscopic SUMO part agrees better with observed speeds than the mesoscopic part. To me, that is evidence for putting microscopic detail where local interaction affects speed. It does not yet answer the exact boundary question I carry from Burghout. The question is whether loading, blockage, density feedback, and queue continuation remain consistent when vehicles pass between models.
+
+\citet{desouza2019mesoscopic} is a different response to the scale problem. POLARIS is macroscopic at the link level and microscopic at the node level, while travelers remain traceable for agent-based decisions. It was applied on a mid-sized network with individual trips, and the paper leaves higher-fidelity simulation on a subset of links as future work. I therefore do not read POLARIS as solving the meso--micro boundary. It delays that boundary by making the mesoscopic model itself more useful.
+
+\citet{son2022differentiable} is useful as a contrast, but it is a macro--micro hybrid paper rather than a direct answer to Burghout's meso--micro interface. It introduces a differentiable conversion component so gradients can pass between continuous and discrete representations for traffic control and optimization. My concern is simple. A conversion can be differentiable without proving that vehicle loading, route continuation, or queue transfer is traffic-consistent. The authors also identify metropolitan-scale application, realistic lane changing, and real-world data as future work.
+
+The open question is whether a hybrid model preserves vehicle conservation,
+feasible loading, downstream blocking, and queue propagation when vehicles
+cross the model boundary.
+
+\subsection{Q3.2\ Explain in detail how meso-scale models work and how they can be integrated with micro-scale models for effective city-wide traffic simulation}
+
+\textit{Explain in detail how meso-scale models work and how they can be integrated with micro-scale models for effective city-wide traffic simulation.}
+
+\subsubsection{Q3.2.1\ Two families of meso-scale models}
+
+I would separate mesoscopic models into two families for this question:
+cell-based discrete-time models and event-based vehicle models. Both are less
+detailed than microscopic car-following, but they answer Q3.3's synchronization
+question differently. The cell-based family discretizes traffic flow in space
+and advances cell occupancies at fixed clock ticks. The event-based family
+keeps individual vehicles but schedules changes in traffic state only when an
+event occurs.
+
+\paragraph*{Cell-based CTM.}
+\citet{daganzo1994ctm} divide a road into cells and update the number of vehicles
+in each cell at every clock tick. The occupancy recursion is
+\[
+  n_i(t+1)=n_i(t)+y_i(t)-y_{i+1}(t),
+\]
+where the inflow to cell $i$ is
+\[
+  y_i(t)=\min\{n_{i-1}(t),Q_i(t),N_i(t)-n_i(t)\}.
+\]
+Here $n_i(t)$ is the number of vehicles in cell $i$ at time $t$, $y_i(t)$ is
+the inflow into cell $i$ during the interval after $t$, $Q_i(t)$ is the inflow
+capacity of cell $i$, and $N_i(t)$ is its holding capacity. The third term is
+the important point for this question. A nearly full downstream cell restricts
+upstream flow. CTM is therefore useful context for conservation and spillback,
+but it is discrete-time. Q3.3 is about an event-based mesoscopic model coupled
+with a discrete-time microscopic model.
+
+\paragraph*{Event-based (mesoscopic model) Mezzo.}
+Mezzo keeps individual vehicles but does not calculate every microscopic
+movement at a small time step. A Mezzo link has a \textit{running part} and a
+\textit{queue part}. The queue part begins at the downstream node and grows
+toward the upstream node when incoming flow exceeds outgoing capacity. A vehicle
+entering a link receives a speed based on the density $k$ on the running part
+\citep{burghout2006discrete}:
+\[
+V(k)=
+\begin{cases}
+V_{\mathrm{free}}, & k<k_{\min},\\[2pt]
+V_{\min}+(V_{\mathrm{free}}-V_{\min})
+\left[1-\left(\dfrac{k-k_{\min}}{k_{\max}-k_{\min}}\right)^a\right]^b,
+& k_{\min}\leq k\leq k_{\max},\\[2pt]
+V_{\min}, & k>k_{\max}.
+\end{cases}
+\]
+Here $V(k)$ is the speed assigned to the entering vehicle, $V_{\mathrm{free}}$
+is free-flow speed, $V_{\min}$ is minimum speed, $k_{\min}$ and $k_{\max}$ are
+density thresholds, and $a$ and $b$ are model parameters. Density is calculated
+on the running part only. If the queued vehicles were included, queue delay
+would be counted once in the traversal speed and again at the downstream node.
+
+Mezzo processes changes through a future event list. Its four named Actions are
+\texttt{ODAction}, \texttt{DAction}, \texttt{TurnAction}, and
+\texttt{MatrixAction} \citep{burghout2004thesis}. An \texttt{ODAction}
+generates vehicle-arrival events for an OD pair. A \texttt{DAction} removes
+vehicles at a destination. A \texttt{TurnAction} processes vehicles at turning
+movements. A \texttt{MatrixAction} marks a change in demand for one or more OD
+pairs. Each Action changes the system state and books itself into the event list
+with a new time.
+
+Mezzo also models the shockwave that propagates upstream when a queue begins to
+dissolve from the downstream node \citep{burghout2006discrete}:
+\[
+  w_{AB}=\frac{q_A-q_B}{k_A-k_B},
+\]
+where $w_{AB}$ is shockwave speed, $q_A$ and $q_B$ are flows upstream and
+downstream of the node, and $k_A$ and $k_B$ are densities upstream and
+downstream of the node. This matters for integration because queues should
+continue across a meso--micro boundary as if the boundary were not there.
+
+\subsubsection{Q3.2.2\ Integrating event-based meso with discrete-time micro}
+
+\paragraph*{What the microscopic side computes.}
+A microscopic model updates each vehicle at a small time step. I use the
+Gipps-style safe-speed rule from my microscopic-simulation coursework as a
+concrete example because it makes the discrete-time calculation explicit:
+\[
+  v_{\mathrm{safe}}(s,v_l)
+  =
+  -b\Delta t+
+  \sqrt{
+    b^2\Delta t^2+v_l^2+2b(s-s_0)
+  },
+\]
+\[
+  v(t+\Delta t)
+  =
+  \min\left\{
+    v(t)+a\Delta t,\;
+    v_0,\;
+    v_{\mathrm{safe}}(s,v_l)
+  \right\}.
+\]
+Here $s$ is the gap to the leader, $s_0$ is the minimum gap, $v_l$ is the
+leader's speed, $a$ is maximum acceleration, $b$ is the braking rate, $v_0$ is
+desired speed, and $\Delta t$ is the microscopic time step. The vehicle cannot
+accelerate beyond its acceleration limit, exceed its desired speed, or move
+faster than the available gap safely permits.
+
+The contrast with Mezzo is then direct. Mezzo assigns a link-entry speed from
+its speed--density function and schedules the vehicle's next event on the event
+list. A microscopic model recomputes vehicle movement at every $\Delta t$,
+whether or not anything has changed. This is one reason the meso side scales
+better than the micro side, and it is why the integration has to be careful
+about how often the two clocks meet.
+
+\paragraph*{Common module.}
+Burghout's integration framework begins with a common module shared by both
+submodels \citep{burghout2004thesis,burghout2005hybrid}. The database contains
+the network graph, travel-time tables, paths, and OD flows. The travel-behavior
+component contains route-choice models and path-generation algorithms. Both
+models update the travel-time database for their subnetworks. When a vehicle
+makes a route choice in either model, the common module is consulted.
+
+I think of this much like a shared routing table in a TCP/IP network. Both
+models need a consistent view of paths and travel times before a vehicle
+crossing the boundary can be interpreted correctly. The analogy is explanatory,
+not literal.
+
+\paragraph*{Boundary location.}
+The location of the boundary matters. Burghout recommends placing the boundary
+in the middle of a link, with exactly one entry and one exit segment
+\citep{burghout2005hybrid}. If the boundary is placed at an intersection, the
+two models may need to represent the same signal operation or gap-acceptance
+behavior at different levels of detail. The microscopic side may require
+positions, speeds, and gaps that are not available from the mesoscopic side.
+
+\paragraph*{Virtual links.}
+A path through the microscopic area is represented in the mesoscopic network
+as a \textit{virtual link} between a boundary entry node and a boundary exit
+node \citep{burghout2004thesis,burghout2005hybrid}. The mesoscopic model
+collects travel times for the virtual link and uses it in route choice like any
+other link. The microscopic network is also expanded with \textit{micro virtual
+links}. These represent continuation paths from exits in the micro network to
+destinations in the meso network. This allows en-route route choice to remain
+consistent when a vehicle changes model resolution.
+
+\paragraph*{Queue representation.}
+Virtual links also help with the inconsistent-queue problem. The microscopic
+model can represent lane-specific queues, while the mesoscopic model may not
+represent lanes explicitly. A queue on one microscopic lane should not block
+every movement if other lanes remain open. Burghout handles this by blocking
+virtual links whose paths can use only blocked lanes, while virtual links whose
+paths use open lanes retain available capacity \citep{burghout2005hybrid}.
+
+\paragraph*{Information exchanged at the boundary.}
+Burghout lists four types of information exchanged between the two models
+\citep{burghout2005hybrid}:
+\begin{enumerate}
+  \item vehicles passing the boundary and their characteristics;
+  \item link blocking and unblocking information;
+  \item density on microscopic segments;
+  \item information for virtual vehicles, including the speed and entry time
+        of the vehicle that last crossed the border.
+\end{enumerate}
+
+The thesis gives more detail about the vehicle signature
+\citep{burghout2004thesis}. It includes vehicle ID, vehicle type, path,
+boundary node conversion, vehicle length, and timestamp. Vehicle length is
+communicated explicitly because different vehicle lengths produce different
+densities. The timestamp records the exact moment the vehicle reaches the
+boundary node.
+
+\paragraph*{Communication overhead.}
+The microscopic model may calculate many small time-step movements while the
+mesoscopic model represents the path through the microscopic area as one
+virtual link. The models should exchange the traffic information needed at the
+boundary, but the mesoscopic model should not reproduce every microscopic
+movement. Burghout identifies this as a communication-design problem. The
+amount and frequency of data exchange should be minimized so that communication
+overhead does not become too large \citep{burghout2005hybrid}.
+
+\paragraph*{Meso-to-micro vehicle loading.}
+A vehicle entering the microscopic region needs an initial lane, time headway,
+speed, and acceleration. These values must match the traffic conditions around
+the boundary. Otherwise, the loading mechanism itself creates unnecessary
+acceleration, deceleration, and upstream shockwaves
+\citep{burghout2006loading}.
+
+\citet{burghout2006loading} propose a multi-regime loading rule based on the
+time headway $t_h$ between the entering vehicle and the leading vehicle in the
+same lane:
+\[
+V =
+\begin{cases}
+V_{\mathrm{front}},
+& t_1 < t_h \leq t_2, \\[4pt]
+
+\alpha V_{\mathrm{desired}}+(1-\alpha)V_{\mathrm{front}},
+\quad
+\alpha=\dfrac{t_h-t_2}{t_3-t_2},
+& t_2 < t_h \leq t_3, \\[8pt]
+
+V_{\mathrm{desired}},
+& t_h > t_3.
+\end{cases}
+\]
+Here $V$ is the assigned initial speed, $V_{\mathrm{front}}$ is the speed of
+the leading vehicle in the same lane, and $V_{\mathrm{desired}}$ is the
+entering vehicle's desired speed. The thresholds $t_1$, $t_2$, and $t_3$ are
+calibrated from field data. If $V_{\mathrm{front}}>V_{\mathrm{desired}}$, then
+$V=V_{\mathrm{desired}}$.
+
+I read $t_1$ as the minimum loading threshold. If $t_h \leq t_1$, the vehicle
+should not enter the microscopic region. The point is simple. A vehicle
+entering close behind another vehicle should inherit the traffic condition in
+front of it. It should not be inserted at an unrealistic speed that creates an
+artificial shockwave that then propagates upstream.
+
+\paragraph*{Micro-to-meso virtual vehicle.}
+The reverse direction has a different problem. When a microscopic vehicle
+approaches the end of the microscopic region, its actual leader may already
+have entered the mesoscopic region. The detailed position of that leader is no
+longer represented. Burghout projects a \textit{virtual vehicle} into the
+imaginary continuation of the microscopic link
+\citep{burghout2004thesis,burghout2005hybrid}.
+
+If $t_{\mathrm{current}}$ is the current simulation time,
+$t_{\mathrm{exit}}$ is the time the last vehicle on that lane exited the
+microscopic region, and $v_{\mathrm{virtual}}$ is the speed assigned to that
+vehicle in the mesoscopic model, then its extrapolated position is
+\[
+  x_{\mathrm{virtual}}(t_{\mathrm{current}})
+  =
+  x_{\text{end of micro link}}
+  +
+  v_{\mathrm{virtual}}
+  (t_{\mathrm{current}}-t_{\mathrm{exit}}).
+\]
+A microscopic vehicle with no physical leader in front of it follows this
+virtual vehicle as if it were a normal leader. This keeps downstream traffic
+conditions from disappearing when the vehicle crosses the boundary.
+
+\paragraph*{Boundary consistency checks.}
+The literature mechanisms above suggest checks that should be recorded directly
+during execution. The first is conservation. OTM states this requirement
+directly: vehicles must not be created or destroyed across the interface, and
+their tracked characteristics must be conserved \citep{gomes2022otm}.
+
+The second check is blocked-link release. If the microscopic entry is blocked,
+the mesoscopic side must stop releasing vehicles until it receives an unblock
+message \citep{burghout2005hybrid}. Daganzo's downstream-empty-space term in
+Q3.2.1 gives the same physical intuition. A downstream region cannot receive
+vehicles when it has no available space.
+
+The third check is queue continuation. A queue that reaches the boundary should
+continue into the other submodel as it would if the boundary were not present
+\citep{burghout2005hybrid}. I would therefore record vehicles created or lost
+during transfer, infeasible insertions, releases into blocked links, and queues
+that fail to propagate across the model boundary.
+
+\subsubsection{Q3.2.3\ Why this matters for effective city-wide simulation}
+
+City-wide simulation is not solved by scaling the most detailed model. A large
+mesoscopic model gives coverage, while smaller microscopic regions give the
+local detail needed at selected sites. The newer toolchains in Q3.1 make this
+computational argument clearly. \textit{hybridPY}, for example, transfers
+demand and routes from MATSim or BEAM CORE into a smaller SUMO region and shows
+why the hybrid approach is useful for Munich and San Francisco
+\citep{schweizer2024hybridpy}. \citet{schuhmann2025hybrid} then show the
+practical benefit of the microscopic region for speed behavior in the
+Munich/Schwabing case.
+
+For me, the remaining question is not whether a meso--micro toolchain can be
+built. It is whether the transfer between the two regions preserves the
+boundary conditions in Q3.2.2. The model must keep route continuity, stop
+releasing vehicles into blocked links, preserve vehicle characteristics, and
+allow queues to propagate across the boundary.
+
+This is where HPDES enters. The mesoscopic background should not only scale by
+using a lower-resolution model. It should also run as PDES, as Mobiliti already
+shows is possible at city scale. The open problem is to embed microscopic
+regions inside that parallel mesoscopic background while preserving the same
+boundary conditions. Under HPDES, the meso--micro boundary may also cross a
+processor boundary, so vehicle transfer and queue propagation must remain
+causally consistent.
+
+\subsection{Q3.3\ As meso-scale models are discrete-event and micro-scale models are discrete-time, how can they be synced up}
+
+\textit{As meso-scale models are discrete-event and micro-scale models are discrete-time, how can they be synced up.}
+
+\iffalse
+I initially read meso--micro synchronization as mainly a discrete-event versus discrete-time issue. \citet{burghout2004thesis} changed that view for me. The clock only tells the models when to exchange information. A credible hybrid model must also preserve route choice, queue propagation, downstream blockage, density feedback, and feasible vehicle loading across that exchange. So synchronization in Q3.3 has three parts: a clock part, a route part, and a traffic-state part. The clock part is handled by treating each microscopic time step as an external event in the mesoscopic event list \citep{burghout2006discrete}. The route part is handled by the common module and virtual links. The traffic-state part is handled by message exchange and the boundary-loading mechanisms in Q3.2.2.
+
+\subsubsection*{Q3.3.1\ Discrete-event meso and discrete-time micro: the formal view}
+
+In Hu's formal terminology, the clock part couples a discrete-event model specified in DEVS with a discrete-time model \citep{hu2023ddds}. In Burghout's traffic implementation, the practical rule is clear: each MITSIMLab time step sends the relevant information to Mezzo, and Mezzo treats that message as an external event and sends relevant information back \citep{burghout2005hybrid,burghout2006discrete}. I keep DEVS named here because it explains the event/time-step coupling, but the traffic meaning is in the common module, virtual links, and the state being exchanged at the boundary.
+
+\subsubsection*{Q3.3.2\ How they can be synced up}
+
+At each microscopic time step, the message exchange has to do more than keep time. A vehicle that crosses the boundary needs to carry the information both model worlds can use: its identifying characteristics and path, the boundary traffic condition, the density feedback needed upstream, and the virtual-vehicle information needed downstream. If the micro boundary is blocked, the message must cause the meso side to stop releasing vehicles into it \citep{burghout2006loading}. That is why I do not read synchronization as simply matching an event list to a clock.
+
+So the virtual link is the main idea of synchronization for me. The meso model can represent a path through the micro area by a virtual link and handle route choice on that representation. The micro model can advance the vehicle at its own discrete time steps. The two models synchronize at each micro step through messages, while only the traffic information needed for consistent route choice and boundary dynamics is exchanged. The clock is necessary, but boundary consistency is the test of whether the hybrid model works.
+\fi
+
+\subsubsection{Q3.3.1\ Synchronizing the two clocks}
+
+The microscopic side advances at fixed time steps. In the Gipps-style example
+from Q3.2.2, each vehicle receives a new speed at every $\Delta t_\mu$ using
+the safe-speed rule. The mesoscopic side is different. Mezzo processes vehicle
+movement and traffic-state changes only when their scheduled events come up in
+the event list.
+
+Burghout's synchronization rule is simple. Each microscopic time step enters
+Mezzo as an external event \citep{burghout2005hybrid,burghout2006discrete}.
+In the thesis implementation, MITSIMLab sends a message to Mezzo at every
+microscopic time step, normally every $0.1$ seconds. Mezzo sends a reply,
+books the next communication event at $t+0.1$, and continues processing its
+internal events until that communication event comes up
+\citep{burghout2004thesis}.
+
+At synchronization time $T_k$, the microscopic model advances each vehicle
+using its fixed time step $\Delta t_\mu$. In the Gipps-style example from
+Q3.2.2, this means
+
+\[
+  v_i(T_k+\Delta t_\mu)
+  =
+  \min\left\{
+    v_i(T_k)+a_i\Delta t_\mu,\;
+    v_{0,i},\;
+    v_{\mathrm{safe},i}(T_k)
+  \right\}.
+\]
+
+The microscopic model then sends a message to Mezzo. Burghout's implementation
+treats that message as an external event in the mesoscopic event list and books
+the next communication event one microscopic time step later
+\citep{burghout2004thesis,burghout2005hybrid,burghout2006discrete}. I write this
+bridge compactly as
+
+\[
+  T_{k+1}=T_k+\Delta t_\mu,
+  \qquad
+  c_k=(m_k,T_k),
+\]
+
+\[
+  \text{Gipps update at }T_k
+  \longrightarrow
+  \text{message }m_k
+  \longrightarrow
+  \text{external event }c_k\text{ in Mezzo}.
+\]
+
+Here $T_k$ is the $k$-th microscopic synchronization time,
+$\Delta t_\mu$ is the microscopic time-step length, $m_k$ is the message sent
+at that time, and $c_k$ is the corresponding external event in Mezzo.
+
+\subsubsection{Q3.3.2\ Synchronizing the traffic state}
+
+Matching the clocks is necessary, but it is not enough. The messages must also
+carry the traffic information needed at the boundary. As discussed in Q3.2.2,
+this includes vehicle transfer, blocking and unblocking, downstream density,
+and virtual-vehicle information \citep{burghout2005hybrid}. The virtual links
+also preserve the route representation when a vehicle moves between the two
+models.
+
+This is the part that makes synchronization a traffic problem rather than only
+a software timing problem. A vehicle should not disappear during transfer. A
+blocked microscopic entry should stop releases from the mesoscopic side. A
+queue that reaches the boundary should continue into the other model.
+
+\subsubsection{Q3.3.3\ Extending the mechanism to HPDES}
+
+Burghout solves the synchronization problem between a sequential event-based
+mesoscopic model and a discrete-time microscopic model. HPDES adds one more
+requirement. The mesoscopic event list is now partitioned across processors.
+A boundary transfer may therefore also become a timestamped event crossing a
+processor boundary.
+
+Mobiliti shows how a city-scale mesoscopic PDES model can preserve causal order
+using Time Warp. My proposed HPDES extension is to apply that same causal-order
+requirement to the meso--micro communication event. The microscopic window
+still advances at its own time step. The communication message still enters the
+mesoscopic side as an external event. What changes is that the event must remain
+causally consistent across the parallel mesoscopic partitions.
+
+\bigskip
+\phantomsection
+\addcontentsline{toc}{subsection}{References}
+\putbib[refQ3]
+\end{bibunit}

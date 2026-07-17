@@ -317,3 +317,43 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
 
 end CalRoute101_3
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//  DUMMY / SCAFFOLD — NOT WIRED, NOT COMPILED (fully commented)
+//  Purpose: sketch the LOCAL node-handoff design (Boundary v0) in place so it
+//  can be fleshed out later.  Deletes nothing, replaces nothing.
+//  See context/current-system-diagram.md  (PART II, sections 8 + 11).
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//  ---- 1. Link contract (a link minds its own business) -------------------
+//  trait Link:
+//      def releaseReady: Boolean                 // a vehicle is at my exit
+//      def gapAt (entry: Boolean): Double        // my entry-side gap (bumper-to-bumper)
+//      def accept (v: Vehicle): Boolean          // take a vehicle at my entry
+//      // NOTE: today VTransport already exposes the pieces this needs —
+//      //   getLast / getFirst / disp / safetydist / addToAlist
+//      //   (see VTransport.scala + Route.changeLane:169-220 for the gap math)
+//
+//  ---- 2. Node handoff (the node owns the move A -> B) ---------------------
+//  class BoundaryNode (inLink: Link, outLink: Link):
+//      // replaces the BLIND insert in Route.mergeFromRamp (Route.scala:232-238)
+//      // and the inline DLL hop in EatonFireModel.driveHighway (:446, :455-457)
+//      def tryHandoff (v: Vehicle): Boolean =
+//          if !inLink.releaseReady then false
+//          else
+//              val safe = outLink.gapAt (entry = true) >= SAFE_DISP   // gap check
+//              if safe then
+//                  // inLink.release (v); outLink.accept (v)          // move
+//                  true
+//              else
+//                  false                                             // v waits on inLink
+//
+//  ---- 3. How CalRoute101_3 would use it (illustrative only) ---------------
+//  // val merge = BoundaryNode (rampLink, mainlineLink)
+//  // ... at the merge segment, instead of route.mergeFromRamp(...):
+//  // if !merge.tryHandoff (car) then  /* car holds on ramp, IDM clamps v=0 */
+//
+//  ---- what stays untouched --------------------------------------------------
+//  //  IDM / MOBIL physics · vList DLL · Vehicle coroutine · DES director
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+

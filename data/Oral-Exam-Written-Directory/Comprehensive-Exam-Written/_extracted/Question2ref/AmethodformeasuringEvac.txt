@@ -1,0 +1,573 @@
+===== PAGE 1 =====
+
+A Methodology for Estimating
+Emergency Evacuation Times
+STEPHEN W. TWEEDIE
+JAMES R. ROWLAND
+STEPHEN J. WALSH
+RONALD P. RHOTEN
+Oklahoma State University
+PAUL I. HAGLE
+Fort Worth Texas
+A methodology based on probabilistic mobilization time curves and pertinent evacua-
+tion network details is described for estimating the times required for the partial or total
+evacuation of an emergency planning zone (EPZ). Such an EPZ evacuation study is
+required by the U.S. Nuclear Regulatory Commission (NRC) for existing and
+proposed nuclear power operating plants. Inputs and outputs for the resulting
+computer model developed from the methodology are discussed for a nuclear power
+plant licensing application by Public Service Company of Oklahoma. With typical
+input conditions for the example under consideration, the computer model predicted
+an average total evacuation time of approximately two and a half hours, excluding
+notification and confirmation times.
+Following the Three Mile Island (TMI) accident, the U.S. Nuclear Regulatory
+Commission (NRC) now requires that estimates be provided for all existing and proposed
+nuclear power plant facilities predicting the times required for partial and total evacuation
+of the population within a IO-mile radius of the facility, an area referred to as the plume
+exposure Emergency Planning Zone (EPZ).’ Partial evacuations involve combinations of
+90-degree sectors and 2-, 5-, and IO-mile radii.2 In brief, the NRC requires 88 separate
+evacuation time estimates based on 10 different area1 configurations in both normal and
+adverse weather conditions, and 4 “incident time of occurrence” (ITO) cases.
+The Social Science Journal, Volume 23, Number 2, pages 189-204.
+Copyright @ 1986 by JAI Press, Inc.
+All rights of reproduction in any form reserved. ISSN: 00317634.
+
+===== PAGE 2 =====
+
+190 THE SOCIAL SCIENCE JOURNAL Vol. 23/No. 2/1966
+Previously, Hans and Sell evaluated the risks of evacuation by summarizing data for
+54 incidents of all types involving the evacuation of over 1.1 million people during the
+period from 1960 to 1973.3 In January 1980, Hubenette et al. determined evacuation time
+estimates for areas near the Ranch0 Seco Power Plant in California.4 Reported the same
+month were evacuation time estimates for the EPZ surrounding the Trojan nuclear
+power plant located near the boundary of Oregon and Washington.s Current guidelines
+for determining evacuation time estimates set up general performance specifications that
+indicate a need for traffic network details based on the Highway Capacity Manual.6
+Urbanick et al. suggested some basic techniques for transportation planning in June
+1980, and described the state-of-the-art in estimating EPZ evacuation times.’ Sheffi,
+Mahmassani, and Powell, in 1981, developed the NETVACI (a simulation model that
+describes the traffic pattern in a transportation network during an emergency evacua-
+tion), and applied it to determine emergency evacuation times around four nuclear
+plants.R Kahn developed a local area traffic model (TRAFIC), which is designed to
+provide three basic transportation planning functions: (1) trip generation, (2) trip
+distribution, and (3) traffic assignment.’ More recently, Moeller, Urbanick, and
+Derosiers developed the Calculate Logical Evacuation and Response (CLEAR) model
+for estimating evacuation times with features including a random starting time and a
+random loading pattern on roadways.”
+Prior to the 1979 accident at TMI, formal planning for protective actions including
+evacuation time was generally not required beyond the low-population zone (LPZ). The
+LPZ is defined as “an area containing residents, the total number and density of which
+are such that there is a reasonable probability that appropriate protective measures can
+be taken on their behalf in the event of a serious accident.“” In 1979. the NRC-EPA task
+force recommended that a IO-mile radius Emergency Planning Zone (EPZ) be defined
+around each nuclear station, and to be termed the Plume Exposure Zone. Within the
+IO-mile radius planning zone, the task force suggested that shelter and/or evacuation
+would likely be the immediate protective actions recommended for the general public.
+Evacuation is especially recommended for the population within 5 miles of a reactor.”
+Zeigler, Brunn, and Johnson identified the spatial and temporal parameters of
+evacuation behavior among residents surrounding the Three Mile Island nuclear power
+plant.” Their research provides a conceptual model of evacuation decision making in
+response to a nuclear emergency. They indicate that voluntary evacuation following the
+emergency at TM1 clearly reveals a distance-decay relationship that illustrates the
+evacuation shadow phenomena (tendency of an official evacuation advisory to cause
+departure from a much larger area than was originally intended) and the effect of
+government evacuation directives.‘4
+The TMI experience indicated the need for contingency plans including evacuations
+based upon different kinds of accidents, with different time scales and different radiation
+exposures. I5 “Societies using nuclear power today must accept major accidents not only
+as a theoretical possibility of no practical consequence, but as a risk to include in actual
+planning.“”
+This article describes a methodology, developed concurrently but independently of the
+NETVACI and CLEAR models, for estimating emergency evacuation times around a
+proposed nuclear power plant. As with both of the other models, the methodology
+presented here determines travel times over local access roads and primary network
+
+===== PAGE 3 =====
+
+A Methodology for Estimating Emergency Evacuation Times 191
+routes having traffic congestion. Unlike these previous models that determine typical
+evacuation time estimates, the methodology here uses statistical analysis with repeated
+Monte Carlo runs to provide both average results and expected variations in these
+evacuation time estimates.
+The evacuation planning criteria and assumptions contained within this model are
+inherent within the existing NRC federal emergency planning guidelines. Therefore, evacu-
+ation methodology designed within this model is restricted to the defined NRC guidelines,
+which include, for example, statements regarding evacuation planning regions and popula-
+tion notification assumptions. The NRC evacuation planning guidelines regarding manda-
+tory evacuation planning must be adhered to for nuclear power plant licensing.
+DESCRIPTIONA ND FORMULATION
+The case study used to illustrate the methodology is the Public Service of Oklahoma
+(PSO) proposed Black Fox Station (BFS), located about 23 miles east of Tulsa in a
+gently rolling plains region containing scattered farmsteads and generally low population
+densities. While there is only one incorporated town in the EPZ (Inola, Oklahoma: 1980
+population 1,650) the western portion of the EPZ includes the fringe of suburban
+Broken Arrow, a city that is part of the expanding Tulsa metropolitan area.
+Information to estimate evacuation time includes a complete description of the
+population at risk and the transportation systems available. The database development
+began with a “windshield”survey of the IO-mile radius area, wherein every building was
+located by utility company employees. The buildings were entered on a datasheet and
+included information about building use (residence, business, school, etc.), number of
+parking spaces, and other pertinent descriptors. Information concerning the road
+network was collected at this same time, with all roads described as to number of lanes,
+surface type, traffic controls, and bridge types. A set of black-and-white aerial
+photographs of the entire area was taken at a scale of approximately 1 inch to 400 feet
+(1:4800), and was used to verify residential and business locations and to update road
+maps. The population for 1980 was projected to the year 2020 for all population types
+(existing residential, new residents expected from the growth of the nearby Tulsa
+metropolitan area, the nuclear plant workforce, population growth due to the economic
+impact of the plant, institutionalized persons, and visitors to recreation sites).
+A 24 X 24 mile square area was centered on the BFS site in order to accommodate the
+IO-mile radius planning region around the proposed nuclear power station as specified in
+NRC evacuation guidelines. This area was divided into square cells of one-half-mile
+sides, creating a 48 X 48 cell grid or 2,304 basic area data cells. Because of the prevalence
+of the Federal Rectangular Survey system in the area, these population ceils, oriented in
+cardinal directions, correspond to quarter-sections with each cell bounded on two
+adjacent sides by a section line and usually a section line road. Estimates of populations
+were made for four IT0 cases (nighttime, worktime, Sunday morning, and summer
+Saturday) and for each of the six population types.
+For partial evacuation cases, 90-degree sectors were oriented geographically to place
+boundaries through zones of low population density (see Figure 1). As examples, the
+Inola community falls with the North sector (NlO), and the Broken Arrow suburban
+area is contained within the West sector (WlO).
+
+===== PAGE 4 =====
+
+I -
+192
+
+===== PAGE 5 =====
+
+A Methodology for Estimating Emergency Evacuation Times 193
+Walsh et al. describe the development of estimated evacuation times completed for the
+BFS. The estimated evacuation time was completed in three major stages: (1) generation
+of an appropriate database, (2) prediction of pertinent variables over the expected 40-
+year life of the nuclear station, and (3) development of a computer simulation program
+that modeled the evacuation process.16
+The problem was to formulate a methodology based on this gridded structure that
+would estimate emergency evacuation times by taking into account details of the
+evacuation network itself.
+EVACUATION NETWORK ORGANIZATION
+Each cell of the gridded EPZ was viewed as a point of origin for evacuating population
+with exit routes determined for every one-quarter-square-mile cell. This step involves a
+number of assumptions about highway quality, capacity, speed, traffic control, and
+individual decisions. These detailed assumptions could easily be modified, if deemed
+questionable, without altering the methodology.
+For most cells there was a clear “best” route based on (I) travel away from the nuclear
+site, (2) by the shortest route, and (3) on the best quality road. Although arbitrary
+decisions were necessary in some cases, such assignments were made with a “worst case”
+rationale by assigning all of them to a logical but probably most congested route. The
+model could be modified to allow a selection of alternative routes in a probabilistic
+fashion. However, it should be recognized that irrational human behavior programmed
+as a random input may unduly complicate a computer model with only marginal gains in
+predictability. Further studies are needed to determine the appropriate level of model
+sophistication.
+Three types of nodes on the evacuation network shown in Figure 2 were defined as
+having special functions in the evacuation process, with some nodes having more than
+one functional role.
+1. Collector nodes. Each individual cell was assigned an exit route linking it with an
+intersection where individual vehicles would be able to enter the traffic flow of a
+major evacuation route. Collector nodes outside the plume exposure EPZ were
+identified as Nodes I through 26; those inside were identified as Nodes 27 through
+56 in Figure 2. The number of vehicles using each of these nodes under the 1980
+nighttime population distribution is listed in Table I.
+2. Exit nodes. On any given evacuation route, the first recognized node that is
+outside the plume exposure EPZ was called an exit node, identified as Nodes I
+through 26 (see Figure 2). Each exit node is located at an intersection on a major
+evacuation route. All exit nodes also serve as collector nodes for their own
+localized area because some vehicles travel directly to them and enter a major
+highway at that point. Some exit nodes, such as Node I on SH 33 West, also serve
+as important traffic nodes since vehicles from other collector nodes (defined in
+[3.]) must travel through them. The number of vehicles collecting at each of these
+nodes is given in Table I. The total number of vehicles exiting through each of
+these nodes is also recorded in Table 1.
+
+===== PAGE 6 =====
+
+194
+
+===== PAGE 7 =====
+
+A Methodology for Estimating Emergency Evacuation Times 195
+Table 7. Information for Collector and Exit Nodes: 1980 Nighttime Case.
+Traffic Collector Nodes Exit Nodes Traffic Collector Nodes
+Nodes (Vehicles Entering (Vehicles Nodes (Vehicles Entering
+Number Evacuation Route) Leavine EPZ) Number Evacuation Route)
+1 0 1537 29 69
+2 41 41 30 31
+3 6 6 31 108
+4 104 104 32 60
+5 115 416 33 55
+6 9 9 34 87
+7 21 27 35 206
+8 15 15 36 318
+9 9 358 37 61
+10 14 14 38 25
+II 16 16 39 19
+12 31 31 40 139
+13 I 7 41 25
+14 18 18 42 29
+15 II II 43 13
+16 19 19 44 14
+17 8 8 45 24
+18 43 256 46 145
+19 142 142 47 54
+20 I 1 48 9
+21 40 40 49 72
+22 22 22 50 7
+23 36 36 51 14
+24 4 1272 52 424
+25 95 95 53 428
+26 9 9 54 363
+27 484 55 53
+28 119 56 213
+3. Traffic nodes. Exit nodes and collector nodes are located at intersections on major
+evacuation routes to enable the model to simulate traffic flow conditions and
+predict possible points of congestion associated with those key intersections. Thus,
+both exit nodes and collector nodes also serve as traffic nodes, and traffic flow
+conditions through those nodes are to be monitored. Beyond the exit nodes, 10
+additional exterior intersection nodes (Nodes 57 through 66 in Figure 2) were
+identified as potential traffic bottlenecks, possibly affecting exiting vehicles. These
+are included in the methodology to determine if traffic congestion at these nodes
+could cause traffic to back up into the plume exposure EPZ, thus increasing
+evacuation time.
+The evacuation for each population cell is divided into two parts: (1) travel time over
+local access roads to reach its collector node, and (2) travel time on primary network
+roads, which is the time required to exit the EPZ from its collector node.
+
+===== PAGE 8 =====
+
+1% THE SOCIAL SCIENCE JOURNAL Vol. 23/No. 2/1986
+METHODOLOGY AND COMPUTER MODEL CONSTRUCTION
+Under NRC policy guidelines, the total time required for evacuation of an EPZ had four
+main components:
+1. Notification time (time needed to notify all population to be evacuated after an
+emergency evacuation decisions has been made);
+2. Mobilization time (time span between notification of the population and their
+departure-this is sometimes called preppardon time);
+3. Travel time (following departure from their location when notified-this is the
+time actually expended in moving out of the EPZ); and
+4. Confirmation time (time required to confirm that the population at risk has been
+evacuated).
+The notification time was viewed as a separate problem and is not considered further in
+this article. Confirmation time is also considered separately once the actual evacuation is
+completed or near completion. Thus, for purposes of this methodology, the components
+of evacuation time are estimates of mobilization time (TM), travel time over local access
+roads (7’1571, and travel time on primary network roads (TPT). The total evacuation
+time for a given vehicle (TTOT) is given by:
+TTOT= TM+ TLT+ TPT.
+Sheffi et al. treat travel time through the network (clearance time) as a single
+component, and their NETVACl model apparently uses a graph representation of the
+entire road network (see note 8). Such an approach may be more appropriate for an area
+with a dendritic road pattern than one gridded by section line roads where the number of
+links, intersections, and potential exit routes expands rapidly. The local access road
+component of time (TLT) in the equation above simplifies the network flow analysis by
+eliminating a large number of links and nodes that would be used by very few vehicles.
+A flowchart of the computer model developed for the evacuation time estimate
+methodology is shown in Figure 3. The 5 modules of the model perform the following
+functions:
+1. Model inputs and initialization;
+2. Determine mobilization time (TM);
+3. Calculate travel time over local access roads (TLT);
+4. Determine movement time over primary network routes (TPT); and
+5. Perform statistical analysis.
+Each of these modules is determined in detail in the remainder of this section.
+Model Inputs and Initialization
+Module 1 of the computer model performs the initialization of the program, including
+the insertion of all physical data describing the EPZ boundaries, the population in each
+cell, the primary road network segments in terms of lengths (miles), capacities (vehicles
+
+===== PAGE 9 =====
+
+A Methodology for Estimating Emergency Evacuation Times 197
+MODULE 1
+DETERMlNE MOSlLlZATlON TIME (TM)
+FOR ALL VEHICLES MODULE 2
+/e
+l
+CALCULATE TRAVEL TIME OVER ALL MOD”LE 3
+I
+CONSIDER
+EARLIEST ARRIVING
+VEHICLE NOT YET ON PRIMARY ROAD
+ENTER VEHICLE ONTO PRMARY ROAD
+AND MOVE TOWARD ZONE BOUNDARY
+AMlD TRAFFIC CONGESTION I
+MODULE 4
+PRIMARY ROAD SEEN
+MODULE 5
+MODULE 6
+Figure 3. Flowchart of the Computer Model for Estimating
+Emergency Evacuation Times.
+
+===== PAGE 10 =====
+
+198 THE SOCIAL SCIENCE JOURNAL Vol. 23/No. 2/W%
+per hour), and densities (vehicles per mile); and all local access roads with their lengths,
+capacities, densities, and conditions (paved, gravel, or dirt). In addition, Module 1
+indicates the “incident time of occurrence” (ITO) and whether normal or adverse
+whether conditions are in effect.
+The capacity (vehicles per hour) and density (vehicles per mile) of each highway
+segment were determined from its length, number of lanes, speed of traffic, and headway,
+based on the Highway Capacity Manual (see note 6). The present example assumes a
+speed of 30 mph for maximum capacity under normal weather conditions, and 15 mph
+under adverse weather conditions. Other traffic speeds can be selected by the user as
+desired. The complex interrelationships between speed, capacity, and density are
+included in the model. As speeds are reduced due to congestion, the capacity of each
+road segment is reduced accordingly, and its density is increased.
+Procedure for Determining Mobilization Time
+Previous evacuation studies proved to be of only minimal aid in estimating
+mobilization time parameters due to their partial and highly tentative nature (see notes 1
+and 2). In the absence of an appropriate empirical precedent, mobilization time
+parameters were determined from information obtained during several meetings with
+key experts within the state Civil Defense Office. In particular, these experts were
+questioned to determine the specific amounts of time for which given percentages of the
+evacuating population could normally be expected to be mobilized. Figure 4 shows a
+0 20 40 60 80 100 120
+MOBILIZATION TIME (MINUTES)
+figure 4. Data for Mobilization Time.
+
+===== PAGE 11 =====
+
+A Methodology for Estimating Emergency Evacuation Times 199
+plot of these data, which were then utilized in Module 2 of the model to form a
+probability distribution function for mobilization time. The data in Figure 4 can be
+approximated by the Rayleigh probability distribution function given by:
+F( TM) = 1 - exp(-7’M)*/ 1800),
+where TM is the mobilization time in minutes. Other parameters that correspond to
+different mobilization time assumptions could be selected for cases involving other EPZ
+evacuations.
+Modeling Movement and Movement Times
+In Module 3, capacities, speed of travel, and lengths of local access roads from
+Module 1 are used to calculate the travel time over local access roads (TLT). The sum of
+TM and TLT is formed and arranged in ascending order for all vehicles assigned to a
+particular node for entrance into the primary roadway network. A vehicle that has
+arrived at a node on the primary roadway network is either allowed to enter on the
+primary road immediately, or, if the segment is filled to capacity, wait until the congested
+traffic has cleared enough to provide a space for another vehicle. Time is incremented
+while the vehicle waits in the queue, thus adding to the time of travel along the primary
+road (TPT). When a space is available, the vehicle enters the primary road and travels
+amid congested traffic along this road toward the exit node at the zone boundary. Time
+is also incremented for vehicles already on a primary exit route that cannot continue into
+a congested segment, thereby increasing their time of travel on primary routes (TPT).
+Vehicles approaching an intersection along a main highway have priority over those
+entering from a side road.
+The two alternating steps in the process of load and flow occur during a user-specified
+time interval to produce an effective “pulsating” operation in terms of calculations
+performed for this potential “stop-and-go” traffic pattern. One-minute intervals were
+considered sufficient for this study area. Shorter intervals might be more appropriate in a
+densely settled region and could easily be entered as inputs to the model. The primary
+travel time (TPT) for a given vehicle is determined when the vehicle leaves the evacuation
+zone. These operations in modules 2,3, and 4 are repeated for all primary roadways. As
+with the NETVACI model (see note 8), this model could also be modified to include
+random interruptions (accidents or disabled vehicles) or the effects of traffic control.
+Statistical Analysis
+Repeated Monte Carlo trials were performed as indicated in Figure 3 to form a
+sufficient statistical base for estimating evacuation time. The computer model simulates
+evacuation by using 25 different sets of random mobilization times in order to provide a
+range of time estimates, as well as an average expected result and normal variations
+(standard deviations). Twenty-five replications were judged to provide a sufficiently large
+sample for purposes of statistical analysis. The number of runs could be increased
+arbitrarily if desired.
+Module 5 performs these statistical analysis calculations. Since in reality there is no
+way to predict who will be on the road in 15 minutes and who will take an hour or
+
+===== PAGE 12 =====
+
+200 THE SOCIAL SCIENCE JOURNAL Vol. 23/No. 2/1986
+longer, this approach allows for the possibility that those who are slow to pack up could
+be located anywhere within the plume exposure EPZ. By using 25 separate and different
+simulations, the probability of being misled by a single, unusually rapid (or unusually
+slow) evacuation is greatly reduced.
+SAMPLE INTERPRETATIONS
+Outputs from the computer model include an estimate of the average evacuation time
+(excluding notification and confirmation time) as shown in Table 2 for the 1980
+population. Estimates of the corresponding standard deviations are given in parentheses.
+All ten evacuation areas are considered in Table 2 with both normal and adverse weather
+conditions and the four “incident time of occurrence” cases, a total of 88 separate
+simulations, each involving 25 runs with different random mobilization times.
+Also provided as output from the computer model are tables that show the detailed
+progress of the evacuation every 5 minutes by major exit routes and nodes. For example,
+Table 3 shows the details for one representative evacuation of the total 1980 nighttime
+population under normal weather conditions. Table 2 shows that for 25 simulation runs
+the 4,510 vehicles were evacuated in an average time of 143 minutes with a standard
+deviation of 8 minutes.
+Assuming the results can be approximated by a normal distribution implies that the
+evacuation would be completed within 159 minutes 97.5% of the time (plus two standard
+deviations); and that the evacuation time would exceed 167 minutes (plus three standard
+deviations) only once in approximately 200 runs. The 25 simulations yielded an evacuation
+time ranging from a low of 127 minutes to a maximum of 160 minutes. Thus, the output
+from the model gives decision makers a range of time estimates using a variety of assump-
+tions, allowing the flexibility of planning for either average or worst-case situations.
+The model can also be used to identify specific problem areas. When traffic congestion
+occurs, the output lists the node involved and the number of vehicles delayed. Two types
+of traffic problems are monitored. First, a node may become a bottleneck causing traffic
+to back up along a major exit route (nodes 24 and 52 on 7 1s t Street near Broken Arrow
+could be examples of this problem). Second, a major route may be operating at or near
+capacity, resulting in a delay for vehicles attempting to enter the evacuation network at
+nodes along that portion of the route (i.e., an entry queue forms). Nodes 52 and 53 on
+71st Street encounter this problem.
+In spite of the predicted traffic congestion on 71st Street, State Highway 33 heading
+toward Tulsa was the last route to clear for 17 of the 25 trials. Due to the lnola
+population, the larger number of vehicles assigned to that route increases the probability
+that one of those vehicles will be among the last to mobilize, start on the road, encounter
+road congestion, and, thus, the last to exit.
+In this specific case study, mobilization time was found to be the major component of
+total evacuation time. For most vehicles, travel time is relatively brief. While 99% of the
+population is assumed to be ready to move in 85 minutes, the achievement of 99%
+evacuation occurs about 20 minutes later at the 105-minute mark. On the average, an
+additional 39 minutes are required for the evacuation of stragglers, i.e., those with the
+largest mobilization times. Finally, adverse weather conditions increased evacuation time
+estimates in most cases by about 20% (20-25 minutes).
+
+===== PAGE 13 =====
+
+A Methodology for Estimating Emergency Evacuation Times 201
+Table 2. A Summary of Computer Model Predictions for
+the Total Evacuation of the 1980 Population
+(Evacuation Time in Minutes).
+Nighttime Worktime
+Area
+Evacuated* Vehicles Normal Adverse Vehicles Normal Adverse
+NE2 73 121 (9) 146 (9) 30 109 (II) 134 (11)
+SW2 61 II7 (9) 142 (9) 27 109 (12) 133 (12)
+N5 1201 140 (8) 163 (9) 761 134 (9) I56 (7)
+E5 369 130 (12) I54 (12) I58 124 (12) 146 (12)
+s5 190 126 (II) I51 (11) 78 II8 (9) 143 (9)
+WS 198 124 (II) 148 (12) II6 II7 (12) 139 (13)
+NIO 1601 140 (8) 162 (8) 964 I35 (8) I57 (8)
+El0 582 133 (IO) I55 (1 I) 229 125 (13) 148 (14)
+SIO 684 129 (II) I51 (I 1) 277 123 (15) 146 (16)
+WI0 2219 134 (8) 211 (I) 983 127 (IO) 142 (13)
+Total 4510 143 (8) 220 (I) 2175 139 (8) I59 (9)
+Sunday Morning Summer Saturday
+Area
+Evacuated’ Vehicles Norma/ Adverse Vehicles Normal Adverse
+NE2 80 II9 (IO) 145 (II) I I4 (II) 140 (II)
+SW2 69 II9 (9) 143 (10) 235 130 (13) I54 (13)
+N5 I235 141 (9) I64 (9) I040 140 (8) 163 (8)
+E5 358 129 (II) I52 (11) 450 134 (II) I58 (12)
+s5 217 I31 (12) I55 (12) 521 136 (IO) I61 (11)
+w5 205 126 (13) 149 (14) 369 130 (II) 154 (11)
+NIO 1617 140 (8) 162 (7) I320 I41 (8) I64 (7)
+El0 568 132 (II) I53 (I 1) 613 134 (12) 159 (11)
+SIO 659 129 (IO) 152 (11) 865 137 (9) I59 (IO)
+WI0 1992 133 (9) 183 (I) I779 132 (7) I54 (6)
+Total 4264 I41 (8) 192 (1) 3596 144 (9) I66 (9)
+Now: *The notation NIO refers to evacuation of the north sector ouf to the IO-mile radius; NS would be included within
+NIO. Sums of partial evacuation exceed the total due to double-counting along sector boundaries.
+CONFIRMATION TIME ESTIMATES
+Confirmation time estimates can be based both on results of the statistical time analysis
+of Module 5 and the particular assignments of evacuation confirmation teams to given
+areas within the plume exposure EPZ boundary. The number of confirmation team
+personnel to be assigned to each area depends upon the relative estimated evacuation
+
+===== PAGE 14 =====
+
+202 THE SOCIAL SCIENCE JOURNAL Vol. 23/No. 2/1986
+Table 3. Computer Model Output Showing the Average Exiting Time for the
+Total 1980 Nighttime Population.
+Time Number of Cars Exited by Route or Node
+Elapsed Total Cars Cars
+(Minutes) 18 21 4 25 88N 33E 77ST 33W Other Exited Exited(%)
+^
+5 0 2 I2 3 0 0 0 L IO 0.22
+IO 0 3 5 6 7 2 21 4 I3 61 1.35
+I5 0 5 7 IO I4 2 76 20 27 171 3.79
+20 3 II I4 20 34 8 I45 69 49 353 7.83
+25 9 I3 20 26 64 I8 216 127 69 562 12.46
+30 I8 20 29 31 89 39 286 230 103 845 18.74
+35 33 23 39 41 122 77 358 338 I45 II76 26.08
+40 53 26 51 45 I59 II7 433 485 I83 1552 34.4 I
+45 82 26 61 55 196 I50 506 633 232 1941 43.04
+50 IO1 28 66 59 255 192 580 767 278 2326 51.57
+55 II8 31 80 68 295 336 651 904 316 2688 59.60
+60 142 31 84 76 332 225 719 1033 339 3011 66.76
+65 167 32 89 82 358 275 792 II39 364 3298 73.13
+70 180 34 93 87 372 299 867 1227 384 3543 78.56
+75 197 34 100 90 384 315 936 I294 393 3743 82.99
+80 206 37 102 90 392 328 1001 1366 408 3930 87.14
+85 216 38 102 93 401 337 1056 141 I 417 407 I 90.27
+90 229 39 102 95 408 345 II08 1459 422 4207 93.28
+95 240 39 103 95 41 I 351 II71 I485 424 4319 95.76
+100 246 39 103 95 41 I 356 1219 1503 427 4399 97.54
+105 248 39 103 95 412 357 1266 1514 431 4465 99.00
+I10 251 40 103 95 413 357 1269 1520 431 4479 99.31
+115 253 40 103 95 414 357 1270 1527 431 4490 99.56
+120 254 40 103 95 415 357 1270 I53 I 431 4496 99.69
+125 255 40 104 95 415 357 1270 1533 431 4500 99.78
+130 255 40 104 95 416 357 1271 I536 431 4505 99.89
+135 256 40 104 95 416 357 1272 1536 431 4507 99.93
+140 256 40 104 95 416 358 I272 1537 431 4509 99.98
+144 256 40 104 95 416 358 1272 1537 432 4510 100.00
+time, the population density, and the total number of miles of local access roads within
+that area. These teams would begin their confirmation tasks even before the last evacuees
+have left the area. For example, confirmation within an area might begin when 99% of
+the population has been evacuated, which can be estimated from the output of Module 5
+of the model. The remaining 1% can be identified by the confirmation team, and their
+evacuation can be verified when they arrive at a particular collector node for entry into a
+primary road. In the case shown in Table 3, confirmation could begin at the 105-minute
+mark. In any of the low population sectors, confirmation could reasonably be started
+even earlier.
+CONCLUSIONS
+A methodology has been described for estimating the emergency evacuation times of a
+partial or total EPZ. This methodology involves a computer model that requires as
+
+===== PAGE 15 =====
+
+A Methodology for Fstimafing Emergency Evacuation Times 203
+inputs mobilization time curves and details of roadways forming an evacuation network.
+Outputs of the computer model provide information on average evacuation times with
+standard deviations for the 10 (partial or total) evacuation areas with normal or adverse
+weather and 4 IT0 cases. Bottlenecks can be identified from the computer model outputs
+to aid in implementing reassignment of vehicle routes and/or improved traffic control
+during evacuation.
+The time required for total evacuation depends on assumptions about the time of
+departure and movement of the last vehicle to “clear” the plume exposure EPZ
+boundary. However, the evacuation model can provide estimates of the number (or
+percentage of the total number) of vehicles that have “cleared” at any of a varied
+selection of time intervals after the evacuation order has been given-30 minutes after,
+45 minutes, 1 hour, 80 minutes, 3 hours, or other periods of elapsed time.
+One general assumption is that mobilization time of individual household units can be
+adequately described by a probability density function. Traffic capacities (vehicles per
+hour) and node segment densities (vehicles per mile) are used as model inputs to predict
+traffic movement. Another assumption is that the use of repeated computer runs (Monte
+Carlo trials) provides a statistical base that can be analyzed in order to assess expected
+model accuracy.
+REFERENCE NOTES
+I. E. Rubinstein, “Three Mile Island and the Future of Nuclear Power.” I.&X? Specrrum 16(November
+1979):30+2.
+2. B.K. Grimes and R.G. Ryan, “Criteria for Preparation and Evaluation of Radiological Emergency
+Response Plans and Preparedness in Support of Nuclear Power Plants.” Report for U.S. Nuclear Regulatory
+Commission (NUREG-0654) and Federal Emergency Management Agency (FEMA-REP-I) (November
+1980).
+3. J.M. Hans, Jr. and T.C. Sell, “Evacuation Risks: An Evaluation.” Report No. EPA-520/6-74-002,
+U.S. Environmental Protection Agency, Las Vegas Nevada (June 1974).
+4. R. Hubenette, C. Byrd, Jr., R. Gerber, G. Kopp, and C.T. Rainey, “Evacuation Time Estimates for
+Areas Near Ranch0 Seco Power Plant.” Report for Sacramento Municipal Utility District by Center for
+Planning and Research (January 1980).
+5. “Trojan Nuclear Power Plant Evacuation on Time Estimates for Columbia County. Oregon and
+Cowlitz County, Washington.” Report by Portland General Electric (January 1980).
+6. U.S. Highway Research Board, “Highway Capacity Manual.” Highway Research Board Special
+Report, No. 87, Washington, D.C. (1965).
+7. T. Urbanick, A.E. Derosiers, M.K. Lindell, and C.R. Schuller. “Analysis of Techniques for
+Estimating Evacuation Times for Emergency Planning Zones.” NUREG-CR-1745 (June 1980).
+8. Y. Sheff, H. Mahmassani, and W.B. Powell, “Evacuation Studies for Nuclear Power Plant Sites: A
+New Challenge for Transportation Engineers.” ITE Journal (June 1981):25-28.
+9. R. Kahn, “Development of a Local Area Traffic Model.” fTE Journal (June 1981): 18-24.
+10. N.P. Moeller, T. Urbanick, and A.E. Derosiers, “CLEAR (Calculate Logical Evacuation and
+Response): A Generic Transportation Network Model for the Calculation of Evacuation Time Estimates.”
+NUREG-CR-2504 (March 1982).
+Il. A.P. Hull. Emergency Preparedness for What?: Implications of the TMI-2 Accident.” Nuclear NUMBS
+(April 1981):61+7.
+12. Ibid.
+13. R.J. Zeigler, SD. Brunn, and J.H. Johnson, Jr., “Evacuation from a Nuclear Technological
+Disaster.” Pp. l-16 in The Geographical Review, Vol. 71 (January 1981).
+14. T.H. Pigford, “The Management of Nuclear Safety: A Review of TM1 After Two Years.” Nuclear
+News (March 1981):4148.
+
+===== PAGE 16 =====
+
+204 THE SOCIAL SCIENCE JOURNAL Vol. 23/No. 2/1986
+15. B. Sorenson, “Nuclear Power: The Answer That Became a Question.” Amhio 8( 1979): 17.
+16. S.J. Walsh, R.P. Rhoten, SW. Teedie, J.R. Rowland, P. Hagle. “Applications for Population
+Projections and Remote Sensing for Nuclear Power Plant Licensing.” The Social Science Journal
+20(4):89-102.

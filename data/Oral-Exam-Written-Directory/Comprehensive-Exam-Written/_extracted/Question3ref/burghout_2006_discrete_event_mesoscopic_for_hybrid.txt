@@ -1,0 +1,513 @@
+===== PAGE 1 =====
+
+A Discrete-Event Mesoscopic Traffic Simulation Model for Hybrid
+Traffic simulation
+Wilco Burghout, Haris N. Koutsopoulos and Ingmar Andreasson
+Abstract—The paper presents a mesoscopic traffic simulation speed/density relationships on the link, use stochastic queue-
+model, particularly suited for the development of integrated servers at the nodes to account for delays caused by traffic
+meso-micro traffic simulation models. The model combines a signals and the interaction with traffic from other directions
+number of the recent advances in simulation modeling, such as
+(e.g. FASTLANE [3]). DYNAMEQ [5-7] works in a similar
+discrete-event time resolution and combined queue-server and
+fashion, but the link dynamics of vehicles are captured by a
+speed-density modeling, with a number of new features such as
+simplified car-following relationship. Lanes are explicitly
+the ability to integrate with microscopic models to create hybrid
+traffic simulation. The ability to integrate with microscopic represented including lane-change operations.
+models extends the area of use to include evaluation of ITS Macroscopic models [22, 23] are mostly used for planning
+systems, which often require the detailed modeling of vehicles in applications, and operations control design, involving large
+areas of interest, combined with a more general modeling of
+networks and long time periods. Microscopic models (e.g.
+large surrounding areas to capture network effects of local
+[14]) are suited to model vehicle interactions at the high
+phenomena. The paper discusses the structure of the model,
+level of detail required for the evaluation of many Intelligent
+presents a framework for integration with micro models, and
+illustrates its validity through a case study with a congested Transportation Systems (ITS), but are limited to small areas,
+network north of Stockholm. It also compares its performance due to the large amounts of input data, and the extensive
+with a hybrid model applied to the same network. calibration requirements.
+Mesoscopic models provide a middle ground with their
+I. INTRODUCTION
+ability to model large networks with limited network coding
+T R AFFIC simulation models are usually macroscopic, and calibration effort, while providing a better representation
+mesoscopic or microscopic. Macroscopic models of the traffic dynamics and individual travel behavior than
+represent traffic as a (indivisible) flow, whereas microscopic their macroscopic counterparts. Mesoscopic models are
+models describe the behavior of individual drivers, their used for both planning, and real time (online) operations.
+vehicles and their interactions. Mesoscopic models maintain They are more flexible than macroscopic models for
+individual vehicle representation but with a more aggregate modeling important elements, such as travel behavior (i.e.
+representation of traffic dynamics. route choice). However, they are still limited in their ability
+A number of mesoscopic models exists in the literature. to represent detailed traffic operations, especially as related
+CONTRAM [1], for instance, represents the network by to ITS systems.
+nodes and links, and the vehicles on those links are grouped In response to the need for models that can capture both
+into packets that travel from origins to destinations (although local traffic phenomena in detail, and effects on a larger
+packets may consist of only one vehicle). DYNAMIT [2] surrounding network, hybrid models have recently appeared
+uses individual vehicles moving along segments according to [8-13]. [8, 9, 12, 13] integrate mesoscopic and microscopic
+speed-density relationships and queuing models. Lanes are models, while [10-11] integrate macroscopic and
+represented in detail only when congestion builds up and microscopic models.
+queues develop. These queues are then lane-specific. The objective of this paper is to present a new mesoscopic
+Operations at intersections are captured by the corresponding model, MEZZO, which combines the state-of-the-art
+capacities. DYNASMART [4] also uses speed/density mesoscopic modeling mechanisms with the ability to be
+relationships but has adopted a more detailed representation integrated with microscopic models. The paper also presents
+of signalized intersections (at the traffic light level) to model a framework for the integration of microscopic and
+delays at these facilities. mesoscopic simulation models.
+Other models that represent individual vehicles following The remainder of this paper is organized as follows. First
+the general structure of MEZZO is described in terms of
+network representation and the mechanisms to capture the
+Manuscript received March 20, 2006.
+traffic dynamics. An overall integration framework is also
+Wilco Burghout and Ingmar Andreasson are with the Centre for Traffic
+Research, Royal Institute of Technology, Stockholm, SE-100 44 Sweden discussed. The results of the application on a small network
+(Wilco Burghout is the corresponding author, phone: +46 8 7908896; fax: in Stockholm are presented. These results are compared to
++46 8 7908461; e-mail: wilco@ctr.kth.se).
+the application of a hybrid model of MEZZO and
+Haris N. Koutsopoulos is with the Department of Civil and
+Environmental Engineering, NorthEastern University, Boston, MA 02115- MITSIMLab [14] on the same network.
+5000 USA (e-mail: haris@coe.neu.edu).
+
+===== PAGE 2 =====
+
+II. MEZZO When a vehicle enters a link, it enters the running part
+with a speed that is a function of the density on the running
+Many mesoscopic (and microscopic) simulation models are
+part. A large number of functional forms for speed-density
+time-based. As a result, even in situations where no changes
+functions (see for example, [15] [16]) have been discussed in
+in traffic state are occurring, such as when vehicles are
+the literature. Following other models (e.g. [2], [4]) the
+queued in a traffic jam, the ‘state’ of each vehicle is re-
+speed-density relationship in eq. (1) is currently employed:
+evaluated in every time-step. MEZZO is an event-based
+simulator with changes in traffic states calculated only V , if k<k
+free min
+‘when something happens’ (DYNAMEQ [5-7] is another   ( )    k- k a  b
+exa
+E
+m
+ve
+p
+n
+le
+ts
+o
+i
+f
+n
+e
+M
+ve
+E
+nt
+Z
+-b
+Z
+a
+O
+s e
+a
+d
+r e
+s i
+d
+m
+e
+u
+fi
+l
+n
+at
+e
+i
+d
+o n
+b
+)
+y
+.
+vehicles entering a link,
+V(k)=
+
+V
+min
++V
+free
+- V
+min 
+1-
+
+
+k max -
+m
+k m
+in
+in 
+
+  
+if k˛ [k
+min
+,k
+max
+] (1)
+exiting a link, making a new route choice, etc (see [8] for V if k>k
+min max
+more details). Apart from the computational advantages of
+where
+this method of simulation, the use of event-based simulation
+V(k) = speed assigned to the vehicle
+in the mesoscopic model provides a natural way of
+k = the current density on the running part of the link
+synchronizing with the usually time-based microscopic
+V = minimum speed
+models. Each time-step of the microscopic model enters as min
+V = free flow speed
+an external event in the event list of the mesoscopic model. free
+k = minimum density
+MEZZO is a synthesis of a number of models and min
+k = maximum density
+max
+processes that capture all the important aspects of the
+a, b = model parameters
+operations of traffic networks. These models and processes
+include the network representation, the movement of Different sets of parameters (V min , V freee , k min , k max , a, b)
+vehicles on links and intersections, and travel behavior (e.g. can be specified for different link types (e.g. ramp weaving
+route choice). section, etc) in order to capture the different performance
+characteristics of the various elements of the road network.
+A. Network representation
+In applying the speed-density relationship, the density is
+The traffic network is represented by a graph that consists of calculated on the running part only. This is needed to ensure
+nodes and links. The nodes are the points where multiple that there is no double counting of the delay a vehicle
+traffic streams join or diverge, such as intersections, on/off experiences. If the density of the whole link were used for
+ramps, as well as origins or destinations of traffic. Links the speed/density function that determines the speed of
+represent the roadway between such nodes, and are vehicles, the delay caused by the queued vehicles would be
+unidirectional. The lanes on a road are not represented counted twice: first in the traversal speed (which is low due
+separately. Nodes have usually multiple incoming and to the high density in the queue) and second in the queue
+outgoing links, and are considered the main sources of delay. It is also important to note that the traffic dynamics
+friction in the traffic streams for the density regime beyond k is captured by the queue-
+max
+server mechanism at the node, described below.
+B. Vehicle movement
+The calculated speed is used to estimate the earliest time a
+Vehicle movements are governed by the traversal of links
+vehicle can reach the downstream node (earliest exit time).
+and the crossing of intersections. They are captured by two
+The vehicles on the link are ordered according to their
+models, the link model and the node model.
+earliest exit time, and this defines which vehicles are in the
+Link Model. A MEZZO link is divided into two parts, the queue part at any point in time. The queue part at any
+running part and the queue part. The queue part starts at the (simulation) time t, is defined to contain those vehicles that
+downstream node and grows towards the upstream node, have an earliest exit time smaller than t. In other words it
+when the incoming flow exceeds the outgoing capacity. For includes all vehicles that should have exited the link, if it
+instance, when a traffic light at the downstream node were not for some delay caused at the downstream node.
+becomes red, the queue part will grow. Note that the queue mechanism in MEZZO represents the
+The running part is the part of the link that contains additional delay experienced by vehicles on links, caused by
+vehicles that are on their way to the downstream node, but limited capacity of turning movements at nodes. This differs
+are not (yet) delayed by the downstream capacity limit (for from queues in real life, in which the queuing process
+instance the traffic light). This means that the boundary incorporates both the additional delay and the time it takes to
+between the running part and queue part is dynamic. It varies advance in the queue towards the stop line.
+over time, depending on the variations in the inflow and
+Node Model. Links are connected to downstream links
+outflow. In the case of an empty link, there is no queue, and
+through nodes. Each connection of an incoming to an
+the running part occupies the whole link. Conversely, if the
+outgoing link represents a turning movement (e.g. the
+whole link is full, the queue occupies the whole link, and
+through movement). Turning movements have a limited
+there is no running part.
+capacity for moving vehicles to the corresponding
+
+===== PAGE 3 =====
+
+downstream links. This capacity may depend on various capture the shockwave that travels upstream when a queue
+factors. In the case of a signalized intersection, these are begins to dissolve (from the downstream node), the speed of
+mainly the green time that is allocated to the turning the start-up shockwave is calculated using the density
+movement, possible interactions with opposing turning upstream and downstream of the node [15]:
+movements (for instance vehicles in a left turn that wait for w = ( q – q )/( k – k ) (2)
+AB A B A B
+the traffic going straight ahead in the opposite direction) and
+where,
+queuing vehicles from other turning movements blocking the w = shockwave speed,
+access. In order to capture these complications, signalized AB
+q q = flow upstream and downstream of the node,
+intersections are represented by signal control objects that A, B
+k , k = densities upstream and downstream of the node.
+follow signal plans, activating and de-activating specific A B
+turning movements at the appropriate times. Using this speed, the earliest exit time of all vehicles in
+The capacity of turning movements is represented by the queue-part is updated by calulating when the shockwave
+queue-servers. The vehicles that are part of the queue reaches them and how long it would then take them to drive
+segment are processed, one a time, by such a server and to the exit (based on the downstream density). This solves a
+transferred to the next link, if there is available space). common problem of queue-server mesoscopic models, where
+Each turning movement has one or more stochastic turning the space of a vehicle that exits downstream immediately
+servers that transfer vehicles to the next link. The number of becomes available upstream. In addition, this feature
+servers per turning movement is based on the minimum facilitates the integration with a microscopic model. Such
+number of lanes in the incoming and outgoing links. Having integration requires correct handling of start-up shockwaves
+one server for each lane through the turning movement, in the mesoscopic model, in case queues spill over the meso-
+instead of one for all of them, ensures a more correct micro boundary [8].
+headway distribution at the outgoing link, which is important
+C. Demand and Travel Behavior
+when MEZZO is coupled with a microscopic model, as the
+arrival process there needs to be as realistic as possible [8]. The demand is represented by time-dependent origin-
+The structure of the model allows for any stochastic process destination (OD) matrices. The model handles multiple
+for the servers, but currently a truncated normal distribution vehicle classes based on their length, permissions, and
+is used. percentage in the vehicle mix. The traffic generation is based
+The turning servers only process the vehicles whose route on a Poisson process for each OD pair so that the inter-
+requires them to make that turning. Figure 1 shows three arrival times follow a negative exponential distribution.
+turning movements: through, left and right turn. The server The pre-trip route choice in the MEZZO model is based
+for the vehicles moving straight cannot process more on a set of known routes and historical link travel times for
+vehicles until the destination link has become unblocked. all links. These travel times are time dependent. When a
+vehicle is created at an origin, it makes a pre-trip route
+choice according to a multinomial logit (MNL) [17] model,
+blocked
+from the set of known routes that connect its origin to its
+destination. Any utility specification may be used, and
+Running part Queue Part
+models that correct for the violation of the IIA property in
+case of overlapping paths (such as CLogit [18] or Path Size
+Fig 1. Queue servers at turning movements serving vehicles. Logit [19]) can be easily implemented.
+The queue of one turning movement can block access to En-route drivers may switch route if traffic conditions are
+the other turning movements. For instance, it may be worse than expected or if they receive travel information.
+unlikely that the last vehicle in the queue (diagonal stripes) Again the decision is made using a MNL model that may
+could pass the whole queue of vehicles heading straight, and include a bias towards the current path.
+make the left turn. On the other hand, it may be possible for MEZZO supports an iterative process for the estimation of
+the vehicles heading for the right turn (vertical stripes) to travel times that represents a “learning” mechanism. The set
+pass, depending on the exact configuration of the approach of known routes and the historical link travel times are
+(e.g. number of lanes and length of turning pockets). Each generated iteratively, starting with the free-flow link travel
+turning movement has a queue look-back limit, which is the times, and assigning the shortest paths in the first iteration.
+maximum number of vehicles from the front of the (1- The resulting link travel times are weighted with the input
+dimensional) queue that a server can “look back” to find a travel times, to provide the ‘historical travel times’ for
+vehicle that is heading for its specific turning movement. iteration two, which consists of a new shortest-path search
+The queue-servers at the node provide adequate (based on the updated travel times), where the newly found
+mechanisms for representing traffic dynamics, such as queue paths are added to the set of known paths from previous
+build-up and dissipation. In addition, the model explicitly iterations. This is followed by a new assignment, and the
+represents the start-up shockwave of a dissipating queue. To iterations continue until no new paths are found and the
+historical link travel times do not change from one iteration
+
+===== PAGE 4 =====
+
+to the next (given a defined margin). This approach is similar a) route choice models with the same structure and
+to the one presented in [7]. parameters in the two sub-models, and
+b) consistent path choice set (defined over the entire
+III. MESO-MICRO INTEGRATION FRAMEWORK
+network).
+MEZZO has been developed especially to facilitate
+To maintain the required consistency in this case, the
+integration with microscopic traffic simulation models
+micro and meso networks are enhanced with the addition of
+(existing, or new models). A generic integration framework,
+virtual links that correspond to the paths in the remaining
+that is supported by MEZZO’s functionality and modular
+network. More specifically, the meso network includes
+design, is illustrated in Figure 2 [9].
+virtual links for each path connecting boundary nodes in the
+micro network. This representation guarantees that each
+Common Module
+relevant path through the micro model is represented
+Travel behaviour Database correctly in the meso route choice. The meso model collects
+travel times for the virtual links, and uses them in the route
+Pre-trip Network graph
+choice like any other link in the network. Similarly the
+Travel times
+En-Route micro network is expanded with the addition of micro virtual
+Paths
+links to the micro sub-network. The virtual links allow the
+Path generation
+OD flows
+micro model to deal with en-route choice in the micro sub-
+Route choices, Route choices, network. Since each path from an exit point in the micro
+Travel Times Travel Times network to a destination in the meso network is represented
+by a virtual link in the micro model, a change of route for a
+Meso Model Micro Model
+Vehicles, vehicle in the micro sub-network can effectively mean a
+Traffic conditions
+different exit point into the meso network. There are no
+Fig. 2. Hybrid simulation framework limitations in the framework regarding the number of virtual
+links, nor the recalculation of the virtual links due to
+The common module consists of models and components
+shared by both the meso and micro models. The travel changing traffic conditions.
+behavior component in the common module uses the These considerations simplify the initial architecture
+database that contains the complete network representation, considerably in the case where integration of existing
+link travel times and known paths for the entire network. simulation models takes place (Figure 3).
+Both the micro and meso models supply descriptions of their
+sub-networks, from which the network representation is
+Meso Micro
+constructed. Each time a vehicle makes a route choice vehicles
+(whether in micro or meso), the common module is invoked. Network traffic Sub-network
+For the common route choice module to operate properly, Virtual Links conditions Virtual Links
+the meso and micro models need to update the travel time
+database regularly with the link travel times in their sub- Link travel times Link travel times
+travel
+networks. Paths times Sub-paths
+The common module also includes the OD matrix for the
+OD flows
+entire network. To simplify the information exchange and
+facilitate a transparent data input interface, it is assumed that Route choice: Route choice:
+all origin and destination nodes in the network belong to the • Pre-trip • En-route
+meso sub-network. This assumption is not restrictive, since • En-route
+an origin or destination node in the micro area can always be
+designated as a boundary node in meso connected directly to Fig. 3. Simplified hybrid simulation framework
+the micro sub-network.
+Under this architecture, and based on the OD matrix
+The above architecture is applicable in the case where the representation discussed earlier, the meso model is solely
+two simulation models to be integrated have an open responsible for all pre-trip decisions, while en-route
+architecture or are new models, developed with integration in decisions are the responsibility of the respective subnetwork
+mind. In integrating existing models, that are not as flexible, (using the correct path definitions residing inside the meso
+the implementation of the integration framework needs to be model). This architecture has a number of practical
+adjusted to minimize inter-model communication, and use advantages compared to the initial one. The initial
+functionalities that are implemented separately in each model architecture, preferable in the case of a new meso-micro
+in a consistent way. For example, the simulation models model, requires large amounts of communication overhead
+may have their own route choice models. In this case, when combining two existing models. With the above
+consistent route choice behavior across sub-models requires modifications this overhead is avoided.
+two conditions:
+
+===== PAGE 5 =====
+
+IV. CASE STUDY
+The results overall indicate that, given the high level of
+The performance of MEZZO was validated in a case study
+congestion in the network, both models reproduce the flows
+with a heavily congested network north of Stockholm
+over time at the measurement locations with reasonable
+(Brunnsviken). We report the results of the performance of
+accuracy. According to the RMSNE values, the hybrid
+both MEZZO and compare it against the performance of a
+model (MiMe) performed better than MEZZO alone, due to
+hybrid model, MiMe. MiMe consists of MEZZO integrated
+the fact that the signal controlled portion of the network is
+with MITSIMLab [14]. The integration took place following
+now simulated at microscopic detail. The Theil U value
+the framework described earlier.
+sensor indicates that the MEZZO model has a larger systematic
+locations error than MiMe. To further explore the nature of the
+differences, Table 1 reports the RMSNE for sensors located
+Meso in different parts of the network (Meso network is the part of
+E4 the network modeled by Meso in the hybrid model, and
+Micro network is the part of the network modeled by
+MITSIMLab in the hybrid model). The part of the network
+modeled by MITSIMLab in the hybrid model application is
+very congested and contains a number of complex signalized
+M icro
+intersections.
+While the RMSNE values show small improvement for
+the hybrid model over the MEZZO model alone, the Theil U
+Fig. 4. Brunnsviken Validation Network
+statistics highlight the importance of modeling congested
+parts of the network in detail. In particular, the UM
+The northern part of the network (Figure 4) consists
+proportion has a value of 0.147 for the MEZZO model and
+mainly of freeways, whereas the southern part consists of a
+0.075 for the Hybrid model. The UM value measures the bias
+number of complex intersections with coordinated signal
+in the model. Values higher than 0.10 indicate high bias and
+control and a large roundabout. In the hybrid model the
+are not desirable. Clearly, the detailed modeling of the
+northern part (meso) is simulated by MEZZO and the
+intersections in the southern part of the network has led to a
+southern part (micro) by MITSIMLab [14]. The area is
+significant reduction in the bias. Figure 5 shows the flows at
+highly congested during the studied period, which is the
+the north-west sensor location (E4) of the network in the
+morning peak, 6:45 – 9:00 a.m. Sensor count data from 12
+southbound direction. It illustrates a good fit of the MEZZO
+locations across the network, averaged over 15 minute
+simulated data to the measured flows, although for the first
+intervals, was available from May 2000. The OD matrix
+15 min. period MEZZO underestimates the flows, due to
+used for this case study was estimated in [20]. The results
+simulation starting from an empty network (i.e. it is the
+are based on 10 replications of the simulation model.
+warm-up period).
+The performance of the hybrid model is compared against
+MEZZO alone using the RMSNE (Root Mean Squared
+1600
+Normalized Error) relative to observed flow values and
+1400
+Theil inequality coefficient U [21]. The U error proportions
+UM, US, and UC are also used to measure the systematic 1200
+(bias) (UM), variance (US), and non-systematic (covariance) 1000
+(UC) proportions of the errors. For a more detailed 800 Actual
+description of the Theil U statistic and its use as a goodness- 600 Mezzo
+of-fit measure see [8]. 400
+Table 1 summarizes the results. 200
+0
+MEZZO Hybrid (MiMe) 06:45 07:00 07:15 07:30 07:45 08:00 08:15 08:30 08:45
+RMSNE
+Entire network 16% 15%
+Fig. 5. Flows E4 Southbound, MEZZO
+Meso network 13% 11%
+In summary, the results illustrate the importance of the
+Micro network 18% 17%
+more detailed representation. Not only the accuracy of the
+Theil U 0.055 0.054
+simulation improves in the micro network but also in the
+UM 0.147 0.075 meso network, presumably due to better flow propagation.
+US 0.002 0.017 In addition, the results point to an inherent limitation of
+UC 0.852 0.909 mesoscopic models rooted at their more aggregate
+representation of intersection operations. In particular, the
+Table. 1. Brunnsviken Validation Results
+)enal/h/hev(
+wolF
+Time
+
+===== PAGE 6 =====
+
+model bias increases when simulating complex facilities. Board, Washington DC, 2003.
+This behavior is one of the motivations for the development [8] W. Burghout, "Hybrid Microscopic-Mesoscopic Traffic
+of hybrid models that combine mesoscopic simulation for Simulation," PhD thesis. Stockholm: Royal Institute of
+most of the network with microscopic simulation of the Technology, 2004, pp. 210.
+critical facilities. [9] W. Burghout, H. Koutsopoulos, and I. Andreasson,
+More calibration and validation results for both MEZZO "Hybrid mesoscopic-microscopic traffic simulation,"
+Transportation Research Record: 1934, pp. 218-225,
+and the hybrid model, including speed data, can be found in
+2005.
+[8]. In addition, both models need to be validated more
+[10] E. Bourrel, "Modélisation dynamique de l'ecoulement
+extensively, especially with travel time data, in addition to
+du traffic routier: du macroscopique au microscopique."
+flow data.
+PhD thesis, Lyon: L' Institut National des Sciences
+Appliquées de Lyon, 2003.
+V. CONCLUSION
+[11] E. Bourrel and J.-B. Lesort, "Mixing Micro and Macro
+In this paper a new mesoscopic model is presented, which is Representations of Traffic Flow: a Hybrid Model Based
+especially suited for integration in hybrid microscopic- on the LWR Theory.," Transportation Research Board,
+mesoscopic models. It combines a number of recent Washington DC, 2003.
+advances in simulation modeling with new features, such as [12] Q. Yang and H. Slavin, "High Fidelity, Wide Area
+start-up shockwaves, to create the flexibility necessary for Traffic Simulation Model." Caliper Corporation, Boston,
+integration with microscopic models. The model is validated USA., 2002.
+on a network in North Stockholm and the results show a [13] Q. Yang and D. Morgan, "A Hybrid Traffic Simulation
+good replication of the actual conditions. Model," presented at 85th Meeting of the Transportation
+However, the real potential of the model is its seamless Research Board CD-ROM, Washington DC, 2006.
+integration in the context of hybrid microscopic-mesoscopic [14] M. Ben-Akiva, H. N. Koutsopoulos, R. Mishalani, and
+models. In such models the more complicated areas in a Q. Yang, "Simulation Laboratory for Evaluating
+traffic network (such as large roundabouts, complex Dynamic Traffic Management Systems," ASCE Journal
+intersections) benefit from the additional detail provided by of Transportation Engineering, vol. 123, 1997.
+the microscopic component. The results presented in this [15] A. D. May, Traffic Flow Fundamentals. NJ: Englewood
+paper support the above observation and highlight the Cliffs, 1990.
+importance of hybrid simulation models. [16] J. M. DelCastillo and F. G. Benitez, "On the functional
+form of the speed-density relationship I: general theory,"
+REFERENCES Transportation Research, vol. 29B, pp. 373-389, 1995.
+[1] D. R. Leonard, P. Power, and N. B. Taylor, [17] M. E. Ben-Akiva and S. R. Lerman, Discrete Choice
+"CONTRAM: structure of the model," Transportation Analysis: Theory and Application to Travel Demand.
+Research Laboratory, Crowthorn TRL Report RR 178, Cambridge MA: MIT Press, 1985.
+1989. [18] E. Cascetta, A. Nuzzolo, F. Russo, and A. Vitetta, "A
+[2] Ben-Akiva, M., M. Bierlaire, D. Burton, H.N. Modified Logit Route Choice Model Overcoming Path
+Koutsopoulos, and R. Mishalani, “Network State Overlapping Problems: Specification and some
+Estimation and Prediction for Real-Time Transportation Calibration Results for Interurban Networks," presented
+Mangement Applications,” Networks and Spatial at Thirteenth International Symposium on Transportation
+Economics, Vol 1, No. 3/4, pp 293-318, 2001. and Traffic Theory, Lyon, France, 1996.
+[3] C. Gawron, "Simulation-Based Traffic Assignment; [19] M. S. Ramming, "Network Knowledge and Route
+Computing User Equilibria in Large Street Networks." Choice," PhD thesis, Cambridge MA, USA: dept. Civil
+PhD thesis, Cologne: University of Cologne, 1998. and Environmental Engineering, Massachusetts Institute
+[4] R. Jayakrishnan, H. S. Mahmassani, and T. Y. Hu, "An of Technology, 2002.
+Evaluation Tool for Advanced Traffic Information and [20] T. Toledo, H. Koutsopoulos, A. Davol, M. E. Ben-
+Management Systems in Urban Networks," Akiva, W. Burghout, I. Andreasson, T. Johansson, and C.
+Transportation Research C, vol. 2C, pp. 129-147, 1994. Lundin, "Calibration and validation of microscopic
+[5] M. Mahut, "A multi-lane extension of the Space-Time traffic simulation tools: Stockholm Case Study,"
+Queue Model of Traffic Dynamics," presented at Transportation Research Record, vol. 1831, pp. 65-75,
+TRISTAN IV, Azores Islands, 2001. 2003.
+[6] M. Mahut, M. Florian, and N. Tremblay, "Application of [21] H. Theil, Economic forecasts and policy. Amsterdam:
+a simulation-based dynamic traffic assignment model," North Holland, 1961.
+IEEE 5th Int. Conf. on Intelligent Transportation [22] Elloumi, N., H. Haj-Salem & M. Papageorgiou,
+Systems, Signapore, 2002. METACOR: A macroscopic Modelling Tool for Urban
+[7] M. Mahut, M. Florian, and N. Tremblay, "Space-Time Corridor. TRISTAN, Capri, 1994.
+Queues and Dynamic Traffic Assignment: A model, [23] Daganzo, C., The lagged cell-transmission model.
+algorithm and applications," Transportation Research International Symposium on Transportation and Traffic
+Theory, A. Ceder, Ed., New York, Pergamon, 1999.

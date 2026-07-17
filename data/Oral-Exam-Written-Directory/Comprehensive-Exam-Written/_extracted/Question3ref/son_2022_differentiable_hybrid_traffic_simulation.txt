@@ -1,0 +1,1552 @@
+===== PAGE 1 =====
+
+Differentiable Hybrid Traffic Simulation
+SANGHYUN SON,UniversityofMaryland,CollegePark,USA
+YI-LING QIAO,UniversityofMaryland,CollegePark,USA
+JASON SEWALL,NVIDIA,USA
+MING C. LIN,UniversityofMaryland,CollegePark,USA
+Weintroduceanoveldifferentiablehybridtrafficsimulator,whichsimulates
+trafficusingahybridmodelofbothmacroscopicandmicroscopicmodelsand
+canbedirectlyintegratedintoaneuralnetworkfortrafficcontrolandflow
+optimization.Thisisthefirstdifferentiabletrafficsimulatorformacroscopic
+andhybridmodelsthatcancomputegradientsfortrafficstatesacrosstime
+stepsandinhomogeneouslanes.Tocomputethegradientflowbetweentwo
+typesoftrafficmodelsinahybridframework,wepresentanovelintermediate
+conversioncomponentthatbridgesthelanesinadifferentiablemanneraswell.
+Wealsoshowthatwecanuseanalyticalgradientstoacceleratetheoverall
+processandenhancescalability.Thankstothesegradients,oursimulatorcan
+providemoreefficientandscalablesolutionsforcomplexlearningandcontrol
+problemsposedintrafficengineeringthanotherexistingalgorithms.Referto
+https://sites.google.com/umd.edu/diff-hybrid-traffic-simforourproject.
+CCSConcepts:•Computingmethodologies→Agent/discretemodels; Fig.1. Trafficsimulationinanurbanenvironment.Trafficsimulation
+Continuoussimulation;Continuousmodels;Real-timesimulation;Mul- canbeusedtoanalyzecomplextrafficdynamics.Amongtwopopular
+tiscalesystems;Simulationbyanimation;Simulationenvironments. trafficmodels,bysimulatingareasofinterestwiththemicroscopic
+oneandusingmacroscopicsimulationelsewhere,wecanreducethe
+AdditionalKeyWordsandPhrases:TrafficSimulation,DifferentiablePro-
+overallcomputationalcostwithoutcompromisingsignificantdetails.
+gramming,MachineLearning
+Forinstance,thecenterofintersectioncanbesimulatedwithdiscrete,
+ACMReferenceFormat: agent-basedmodelsforhigher-fidelityinter-vehicledynamicinteraction.
+SanghyunSon,Yi-LingQiao,JasonSewall,andMingC.Lin.2022.Differ- (ThissceneisrenderedinCARLA[Dosovitskiyetal.2017].)
+entiableHybridTrafficSimulation.ACMTrans.Graph.41,6,Article258
+Macroscopicmodelsdescribetrafficevolutionasasystemofpartial
+(December2022),13pages.https://doi.org/10.1145/3550454.3555492
+differentialequations(PDE),andthetrafficstateisrepresentedas
+1 INTRODUCTION acontinuumofvaluesacrosstheroadnetwork.Sincewetreatvehi-
+clesasparticlestranslatedbyconvectionunderthisassumption,it
+Automobiletrafficisadynamicphenomenonthatemergesfromthe
+iscomputationallyefficientbutprovidescoarsesimulationresults.
+interactionsofamultitudeofdistinctentities,anditscomplexityhas
+Incontrast,microscopicmodelsrepresenttrafficthroughindividual
+ledanalyststorelyonsimulationstosolvecomplexreal-worldtraffic
+vehicles,oragents,thatareevolvedindividuallyandwhichtogether
+problems,suchassignalcontrol,congestion,roaddesign,andurban
+characterizethetrafficstateoftheroadnetwork[Sewalletal.2011].
+planning[LiebermanandRathi1997].Trafficsimulationhasbecome
+Therefore,thisapproachgivesusfine-graineddetailsbutoftenre-
+increasinglymoreimportantduetopopulationgrowth,fast-growing
+quiresmuchmorecomputationresourcesthanmacroscopicmodels.
+technologies,anddemandsforautonomousdriving.Autonomous
+Inthiswork,weproposetoadoptbothmicroscopicandmacro-
+drivingagentsneedaccurateandefficientmodelstosimulatealltypes
+scopicmodelstocreateamoregeneraltrafficsimulatorthatisdiffer-
+ofplausibletrafficscenariostocapturecornercasesandaccelerate
+entiable(Figure1).Thiskindofhybridapproachhasalreadybeen
+learning-basedtrainingthatrequiresdatanoteasilyavailablefrom
+proventosimulatelarge-scaletrafficenvironmentsmuchmoreeffi-
+real-worldcapturing[Akhaurietal.2020].
+cientlythaneitheroftheapproacheswhilemaintainingintegrity[Se-
+Techniquesfortrafficsimulationcanbebroadlyclassifiedaseither
+walletal.2011].Hereweleveragethepowerofthehybridapproach
+macroscopicormicroscopicbasedontheirmodelingassumptions.
+to support large-scale traffic scenes, which will be demonstrated
+Authors’ addresses: Sanghyun Son, University of Maryland, College Park, USA, in our experiments. During simulation, our framework computes
+shh1295@umd.edu; Yi-Ling Qiao, University of Maryland, College Park, USA,
+gradientinformationthatprovidesabundantinsightintotrafficdy-
+yilingq@umd.edu;JasonSewall,NVIDIA,USA,jasonsewall@gmail.com;MingC.
+Lin,UniversityofMaryland,CollegePark,USA,lin@umd.edu. namics.Thisapproachresultsinenhancedsampleefficiencyinour
+simulation,aseachsampleoftrafficsimulationcomeswithgradient
+Permissiontomakedigitalorhardcopiesofallorpartofthisworkforpersonalor
+classroomuseisgrantedwithoutfeeprovidedthatcopiesarenotmadeordistributed informationexplaininghowandwhysuchaneventhasoccurred.
+forprofitorcommercialadvantageandthatcopiesbearthisnoticeandthefullcitation Moreover,thisdifferentiabilityallowsustointegrateourframework
+onthefirstpage.CopyrightsforcomponentsofthisworkownedbyothersthanACM
+withneuralnetworkstosupportawiderangeoftrafficcontrol,plan-
+mustbehonored.Abstractingwithcreditispermitted.Tocopyotherwise,orrepublish,
+topostonserversortoredistributetolists,requirespriorspecificpermissionand/ora ning,management,andflowoptimizationproblems.
+fee.Requestpermissionsfrompermissions@acm.org. We first derive the analytical formulation of the differentiable
+©2022AssociationforComputingMachinery.
+trafficmodelsforbothmacroscopicandmicroscopicparadigms.The
+0730-0301/2022/12-ART258$15.00
+https://doi.org/10.1145/3550454.3555492 resultingrepresentationscansimulatetrafficonroadnetworksfor
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+2202
+tcO
+41
+]RG.sc[
+1v64080.0122:viXra
+
+===== PAGE 2 =====
+
+258:2 • SanghyunSon,Yi-LingQiao,JasonSewall,andMingC.Lin
+anymetropolitanregionmoreefficiently.Furthermore,wepresenta macroscopicmodels.However,theircomputationalcostispropor-
+probabilisticmethodtoconverttrafficstatesbetweenmacroscopic tionaltothenumberofvehiclesinthescene,whichmakesthem
+andmicroscopicones,whichisalsodifferentiable.Withthisnovel hardertobeadoptedforlarge-scalesimulations.
+differentiable traffic simulation model, we can find near-optimal Hybridmodelsseektocombinethesemodelsinvariousfashions
+solutionstosometrafficproblemsthatwereotherwisenotpreviously totakeadvantageoftheircomplementaryproperties;[Bourreland
+solvable,andwecandosoefficiently.Tosummarize,inthispaper Lesort2003;Magneetal.2000;Mammaretal.2006;Sewalletal.
+weintroducethefollowingmainresults: 2011]fallintothiscategoryandshowthecomputationalgainswe
+• Derivationofadifferentiablemacroscopictrafficmodelbased cangetfromthesemodels.Thishybridizationiscommonlyaspatial
+onARZmodel[AwandRascle2000;Zhang2002](Sec.3); one,withdifferentpartsofanetworkrunningunderdistinctregimes.
+• AnalyticalformulationofdifferentiableIntelligentDriverModel That is, these models often simulate only the regions of interest
+[Treiberetal.2000]foragent-basedvehicledynamics(Sec.4); withmicroscopicmodelsforaccuracyandusemacroscopicmodels
+• Differentiableconversionbetweendeterministicandproba- elsewheretomaintaintheoverallflowcorrectnesswhileattaining
+bilisticinstantiationoftwotrafficmodels(Sec.5); computationalefficiency.Thistypicallynecessitatesatechniquefor
+• Applicationofthefirstdifferentiablehybridtrafficsimulation convertingbetweendifferenttrafficflowrepresentations[Bourreland
+frameworktotrafficcontrol(Sec.6). Lesort2003].Inthiswork,weadoptthishybridapproachtosupport
+Inourexperiments,weobserveuptoanorderofmagnitudespeedup large-scalescenariosandletoursimulatorbemoregeneralsothat
+inruntimeperformance,inbothforwardsimulationandbackpropa- userscanselectthesimulationmodesbasedontheirneeds.
+gationprocess,comparedtoabaselinedifferentiablesimulatorbased
+onautomaticdifferentiation. 2.2 Differentiablemodels
+Differentiablemodelshavebeenwidelyusedingraphicsandrobotics
+applicationslikevisualization[Lietal.2018;Nimier-Davidetal.
+2019],design[Cascavaletal.2021;Duetal.2020],andcontrol[Hei-
+denetal.2021].Thisparadigmenablesgradientinformationtoflow
+2 PREVIOUSWORK
+acrosscomplicatedfunctions,andfacilitatesthemachinelearning
+2.1 Trafficmodels processbyimprovingsampleefficiency[Moraetal.2021;Shenetal.
+Thepreponderanceofmacroscopicmodelsarebasedonthedensity 2021].Theyoftenshowbetterresultsinfindingoptimalsolutionsfor
+andfluxofthetrafficflow;[LighthillandWhitham1955;Richards varioushigh-dimensionalproblems[Huetal.2020;Maetal.2021].
+1956]suggestedoneoftheearliestmodelsbasedonthisidea;the Relatedtotrafficsimulation,thereespeciallyhavebeenanum-
+LWR model is a non-linear PDE on the density of vehicles. To berofdifferentiablesimulationsforavarietyofsystemsincluding
+overcomethelimitationsofthismodel,[Payne1971;Whitham2011] rigidbodies[deAvilaBelbute-Peresetal.2018;Qiaoetal.2020],
+addedamomentumtermtotheLWRmodel,whichallowedformore ariticulatedbodies[Qiaoetal.2021b],softbodies[Duetal.2021;
+complextrafficdynamicsthanbefore.However,modelingtrafficflow Geilingeretal.2020;Qiaoetal.2021a],cloth[Lietal.2022],and
+asisotropic[CassidyandWindover1995;Daganzo1995]ledtonon- fluids[Holletal.2020;Takahashietal.2021].
+physicalbehavior,suchasnegativevelocity.Basedontheobservation Becausemanytrafficmodelsaredifferentiableinnature,wecan
+thattrafficflowisanisotropic,[AwandRascle2000;Zhang2002] applythistechniquetotrafficsimulationandcontrol.Recently,[An-
+modifiedthemomentumterminthepreviousmodel.TheARZmodel delfinger 2021] has presented a differentiable agent-based traffic
+has been used to visually simulate the traffic flow [Sewall et al. simulation,andshowedhowitcanbeusedtosolvetrafficsignal
+2010],andtosolvetrafficcongestionproblems[YuandKrstic2019]. controlproblems.However,thescopeofthisworkwaslimitedto
+Becauseofthebasicassumption,thecomputationalcostofthese microscopic models for traffic, and the implementation relies on
+macroscopicmodelsisproportionaltothelengthofthesimulated automaticdifferentiation,whichcanbecomputationallyinefficient.
+road,notthenumberofvehiclestherein.Therefore,theyareoften Inadditiontotraffic,thishybriddifferentiablesimulationframework
+morecomputationallyefficientthantheothermodelsforlarge-scale canpotentiallygeneralizetootherlarge-scale,multi-agentsystems,
+environments.However,theyarenotsuitableforsimulationswhere suchascrowds,insects,fluids,grains,etc.[Colasetal.2022;Hädrich
+finedetails,suchasthebehaviorofindividualvehicles,areneeded. etal.2021;Heetal.2020;Ishiwakaetal.2021]aswell.
+Microscopicmodelsdescribethemotionofindividualvehicles,
+typicallytrackingvelocity,thebumper-to-bumperdistancetoitslead- 3 MACROSCOPICMODEL
+ingvehicle,andtherelativevelocitybetweenthem[Kestingetal. Inamacroscopictrafficmodel,trafficevolutionisdescribedbya
+2007].Theresearchhistorydatesbackto[Gazisetal.1959,1961] systemofPartialDifferentialEquations(PDEs)ontheroadnetwork.
+and[Newell1961].Modernvariationsofthemodelofteninclude
+behavioraltraitsofindividualvehicles,whichmakethesimulation 3.1 Formulation
+morerealisticanddescriptive.[Bandoetal.1995;Gipps1981;Jiang TheARZ[AwandRascle2000;Zhang2002]modeldescribesve-
+et al. 2001; Treiber et al. 2000] are such models. These models hicleflowinasinglelaneoftrafficthroughthefollowingsystemof
+arewidelyadoptedincurrentagent-basedtrafficsimulators,such differentialequationsinonedimension:
+as[Lopezetal.2018].Sinceeveryindividualvehicleobservesits
+surroundingenvironmentsanddecidesitsactionsinthesemodels, (cid:20)𝜌𝑢(cid:21)
+wecangetmorefine-graineddetailsofvehiclemotionsthaninthe
+q𝑡 +f(q)𝑥 =0, f(q)=q𝑢 =
+𝑦𝑢
+(1a)
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 3 =====
+
+DifferentiableHybridTrafficSimulation • 258:3
+whereq(𝑥,𝑡) = [𝜌(𝑥,𝑡),𝑦(𝑥,𝑡)] ⊺ ;𝜌 denotesthedensityoftraffic 3.3.1 Time step sizes. Wehavederivedthesegradientsunder
+(cars per car length),𝑦 is the relative flow of traffic, and𝑢 is the theassumptionthatΔ𝑡 isconstantandsatisfiestheCFLandstability
+velocityoftraffic.Asperthenotation,thesetermsareobservedat conditions[LeVequeetal.2002]fortheentiresimulation.Itwould
+acertainposition𝑥 atatime𝑡,andtheyarerelatedtoeachotheras bepossibletohaveadynamicΔ𝑡,sincethisisalsodifferentiable
+follows: (thespeed𝜆isdeterminedbytheeigenvaluesofthefluxfunctionf).
+𝑦(𝜌,𝑢)=𝜌(cid:0)𝑢−𝑢
+eq
+(𝜌)(cid:1)
+(1b)
+H
+us
+o
+e
+w
+a
+e
+c
+v
+o
+e
+n
+r,
+s
+f
+ta
+o
+n
+r
+t
+th
+Δ
+e
+𝑡
+s
+t
+a
+o
+k
+e
+e
+n
+o
+su
+f
+r
+t
+e
+he
+th
+h
+a
+y
+t
+b
+th
+ri
+e
+d
+m
+ap
+ic
+p
+r
+r
+o
+o
+s
+a
+c
+c
+o
+h
+p
+w
+ic
+e
+si
+u
+m
+lt
+u
+im
+la
+a
+ti
+t
+o
+e
+n
+ly
+is
+us
+s
+e
+ta
+,
+b
+w
+le
+e
+.
+𝑢 eq (𝜌)=𝑢 max (cid:0) 1−𝜌𝛾(cid:1) (1c)
+where𝑢 max denotesthemaximumvelocity,orspeedlimit,ofthe 3.3.2 Continuityissues. Wehavecomputedthegradientsabove
+givenlane,and0 <𝛾 < 1isaconstanttuningparameter.Concep- assumingthattheupdateschemeisdifferentiable,andinfact,wecan
+tually,𝑢 eqrepresentsa‘comfortable’velocitybasedondensity.We seethatitiscontinuousandpiece-wisedifferentiableacrossmost
+used𝛾 =0.5inalloftheexperiments. casessuggestedinAppendixA.
+Notethatthesystem(1a)isaconservativesystem,wherethesum Wedonotproveitthoroughlyhere,asitisgenerallytrivialwhen
+of𝜌and𝑦overtheentirelaneisconserved,excludingtheincoming wekeepinmindthatlim𝑢𝑙→𝑢𝑟 q𝑚 =q𝑙.However,Case1isexcep-
+andoutgoingfluxesatthebordersofthelane. tional;thereisashockbetweenthephasestates𝑞 𝑙 and𝑞 𝑚,which
+makesthetwostatesdiscontinuous.Specifically,wecannotguaran-
+3.2 NumericalSolution
+teethat𝑞
+𝑚
+convergesto𝑞
+𝑙
+when𝜆
+𝑠
+<0convergesto0.Therefore,
+thegradientswecomputewhen𝜆 𝑠 isnearzerocouldbecomeun-
+ConservationlawsliketheARZsystemofPDEsaretypicallydis- stable.However,inmostcasesinoursimulation,thesecasesrarely
+cretizedwiththeFiniteVolumeMethod(FVM)[LeVequeetal.2002] happenedanddidnotaffectthequalityofoursolutionevenwhen
+andintegratedexplicitlyintime.Thediscretizedquantitiesinalane weusedthepossiblyunstablegradientsastheyare;itispossiblethat
+areQ 𝑛 𝑖 ,where𝑛referstothetimestepand𝑖 referstothe𝑖th cell. numericalviscosityplaysarolehere.
+Thesolutionprocedurefollows:
+(1) Computewavespeeds𝜆andfluxesf(fromEq.(1a))bysolving 4 MICROSCOPICMODEL
+theRiemannproblemattheinterfaceofeachadjacentcell. Inamicroscopictrafficmodel,trafficflowisdescribedbyinteractions
+(2) Compute global time step Δ𝑡 ≤ max|𝜆|; in this work we betweenmultiplediscretevehiclesthatfollowcertainrules.Here
+chooseaconservative,constantΔ𝑡.
+weusetheIntelligentDriverModel(IDM)[Treiberetal.2000]to
+(3) Integrate: Q 𝑛 𝑖 +1 = Q 𝑛 𝑖 − Δ Δ 𝑥 𝑡 [f(q(𝑏))−f(q(𝑎))]. q(𝑎) and simulatesuchvehicles.
+q(𝑏))aretheintermediatestatesidentifiedbetween (cid:16) Q 𝑛 ,Q 𝑛(cid:17)
+𝑖−1 𝑖
+and (cid:16) Q 𝑛,Q 𝑛 (cid:17) respectively.Δ𝑥 isthelengthofcell𝑖. 4.1 Formulation
+𝑖 𝑖+1
+Under the microscopic viewpoint, we can describe the state of a
+Detailscanbefoundin[Sewall2011];AppendixA.1reproduces discretevehicleas
+(cid:20)𝑝(𝑡)(cid:21)
+thesixrelevantcasesfortheARZRiemannproblems. q(𝑡)= , (3)
+𝑣(𝑡)
+where𝑝and𝑣denotethepositionandvelocityofthevehiclerespec-
+3.3 Differentiation tivelyforagiventime𝑡.
+Ourdifferentialtechniquebuiltonthisrequiresanalyticalgradients Usingthesestatestodescribediscretevehiclesoccupyingalane,
+oftheabove;thesegradientsformthebasisofstillothergradients IDMdescribesthemotionofeachindividualvehiclebasedonits
+thatareusedinsolvingmorecomplextrafficcontrolproblems. relationshipwiththevehicledirectlyaheadofit;theleadingvehicle.
+Inourupdatescheme,wecomputethegradientsofQ
+𝑖
+𝑛+1 using Forthe𝑖thvehicle,letℎ(𝑖)thitsleadingvehicle.Accordingtothe
+Q 𝑛
+𝑖−1
+,Q 𝑛
+𝑖
+,andQ 𝑛
+𝑖+1
+: IDM,theaccelerationofthe𝑖thvehicleisdeterminedasfollows:
+𝜕 𝜕 Q Q 𝑛 𝑖 𝑛 𝑖− + 1 1 =− Δ Δ 𝑥 𝑡 (cid:20) −f′(q(𝑎)) 𝜕 𝜕 Q q( 𝑛 𝑖 𝑎 − ) 1 (cid:21) (2a) Δ Δ 𝑝 𝑣 = =𝑣 𝑝 𝑖 ℎ ( ( 𝑡 𝑖 ) ) ( − 𝑡) 𝑣 ℎ − (𝑖 𝑝 ) 𝑖 ( ( 𝑡 𝑡 ) )−𝑙𝑒𝑛𝑔𝑡ℎ ℎ(𝑖) ( ( 4 4 b a ) )
+𝜕 𝜕 Q Q 𝑛 𝑖 𝑛 𝑖 +1 =I− Δ Δ 𝑥 𝑡 (cid:20) f′(q(𝑏)) 𝜕 𝜕 q Q (𝑏 𝑛 𝑖 ) −f′(q(𝑎)) 𝜕 𝜕 q Q (𝑎 𝑛 𝑖 )(cid:21) (2b) 𝑠 opt =𝑠 min +𝑣 𝑖(𝑡)𝑇 pref + 2 √ 𝑎 𝑣 𝑖 m (𝑡 a ) x Δ 𝑎 𝑣 pref (4c)
+𝜕 𝜕 Q Q 𝑛 𝑖 𝑛 𝑖+ + 1 1 =− Δ Δ 𝑥 𝑡 (cid:20) f′(q(𝑏)) 𝜕 𝜕 Q q( 𝑛 𝑖 𝑏 +1 )(cid:21) (2c) 𝑎 𝑖(𝑡)=𝑎 max (cid:34) 1− (cid:18) 𝑣 𝑣 t 𝑖 a (𝑡 rg )(cid:19)𝛿 − (cid:18)𝑠 Δ op 𝑝 t (cid:19)2(cid:35) (4d)
+𝜕q
+W
+(𝑎
+e
+)
+th
+𝜕
+u
+q
+s
+(𝑏
+n
+)
+eed
+𝜕q
+th
+(𝑏
+e
+)
+Jacobianf(q)andthepartialderivatives 𝜕 𝜕 Q q( 𝑛 𝑖 𝑎 −1 ) , cha T r h ac e t r e e ri a z r e e a v v a e ri h o i u cl s e’ h s y m pe o r t p io a n r ; a s m e e e t A er p s p i e n n c d lu ix d B ed .1 in fo t r h m e o m re o d d e e t l a . i T ls h . e In y
+R
+𝜕
+i
+Q
+em
+𝑛 𝑖
+a
+,
+nn
+𝜕Q
+pr
+𝑛 𝑖
+ob
+,
+le
+𝜕
+m
+Q
+s
+𝑛 𝑖+1
+as
+;
+s
+t
+h
+h
+o
+is
+w
+a
+n
+ri
+i
+s
+n
+e
+A
+s
+p
+fr
+p
+o
+e
+m
+ndi
+d
+x
+if
+A
+fe
+.
+r
+2
+e
+.
+n
+T
+ti
+h
+a
+e
+ti
+a
+n
+n
+g
+al
+s
+y
+o
+t
+l
+i
+u
+ca
+ti
+l
+o
+g
+n
+r
+s
+ad
+to
+i-
+o
+ev
+u
+e
+r
+r
+e
+y
+x
+s
+p
+i
+e
+n
+r
+g
+im
+le
+e
+v
+n
+e
+t
+h
+s,
+ic
+w
+le
+e
+.
+r
+N
+an
+o
+d
+te
+o
+t
+m
+ha
+ly
+tw
+in
+e
+iti
+c
+a
+o
+l
+m
+ize
+p
+d
+ut
+t
+e
+h
+𝑠
+o
+o
+s
+p
+e
+t
+h
+b
+y
+e
+p
+f
+e
+o
+r
+r
+p
+e
+a
+w
+ra
+e
+m
+c
+e
+o
+te
+m
+rs
+pu
+fo
+te
+r
+entscomputedhereplayanimportantroleinacceleratingourtraffic theaccelerationterm.Itrepresentstheoptimalspacethatthevehicle
+simulator,asshowninSection6. shouldhavetoavoidcollisiontoitsleadingvehicle.
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 4 =====
+
+258:4 • SanghyunSon,Yi-LingQiao,JasonSewall,andMingC.Lin
+Withtheacceleration𝑎 𝑖(𝑡),wecanupdatethevehicle’sstateusing vehicle.Thevelocityofthiscellcanbetheaveragevelocitiesofall
+Euler’smethod. thevehiclestherein.
+4.2 Differentiation
+5.3 Differentiation
+Basedonthisupdatescheme,wecancomputetheanalyticalgradients
+We have described two types of discrete processes: instantiation
+of the IDM. Since the derivation is straightforward, we offer the
+ofvehicles,andtheindicatorfunction.Automaticdifferentiationis
+analytical gradients in Appendix B.2. Note that compared to the
+abletocomputethegradientsofvelocities𝑣 butcannothandlethe
+macroscopicmodel,thereisnosignificanttheoreticalchallengethat
+gradientsofdensities𝜌.Tobackpropagatederivativestothedensities
+wehavetodealwithintheIDM.
+𝜌,wefirstcreateanancillaryvariable𝑎 𝑖 =1foreachdiscretevehicle.
+WerewriteEquation7as:
+5 MACRO-MICRO-MACROCONVERSION
+𝑛
+O
+ba
+u
+s
+r
+ed
+tra
+m
+ffi
+ac
+c
+ro
+si
+s
+m
+co
+u
+p
+la
+ic
+ti
+m
+on
+od
+c
+e
+a
+l
+n
+a
+t
+n
+ra
+d
+n
+t
+s
+h
+i
+e
+tio
+d
+n
+isc
+b
+r
+e
+e
+t
+t
+w
+e,
+e
+a
+e
+g
+n
+e
+t
+n
+h
+t
+e
+-b
+c
+a
+o
+se
+n
+d
+tin
+m
+u
+i
+o
+c
+u
+ro
+s
+s
+,
+c
+fl
+o
+o
+p
+w
+ic
+- 𝜌(𝑙,𝑟)= 𝑟− 1 𝑙 ∑︁
+𝑖=1
+1 (𝑙,𝑟] (𝑝 𝑖)·𝑎 𝑖 (8)
+model.Weneedtoconsiderthedifferentiationacrosstheinterfaces. Sincewealwaysset𝑎 𝑖 =1,theequationconstantlyholdsforforward
+simulation.But𝑎 𝑖 canalsoreceivethegradientsfordiscretevehicles
+5.1 MacrotoMicro
+fromthefollowingmacrolanes.Let𝐿bethelossfunction;thenfor
+Givenalaneinthemacroscopicregimethatflowsintoamicroscopic eachvehiclein(𝑙,𝑟]:
+lane,wemustconvertthecontinuousrepresentationsthereintodis- 𝜕𝐿 𝜕𝐿
+= (9)
+cretevehiclesattheirjunction.Thiscanbedoneinadeterministicor 𝜕𝑎 𝑖 𝜕𝜌(𝑙,𝑟)
+stochasticfashion. Thenextchallengefordifferentiationisthevehicleinstantiation
+process in the macro to micro conversion. We will start with the
+5.1.1 DeterministicInstantiation. Assumethat𝜌(𝑡)isthedensity
+deterministicstrategy:assumethatthetotalnumberofvehiclesreach
+ofthetrafficflowattheendofamacrolaneontime𝑡,and𝑣(𝑡)is
+thevelocity.Wecansetafluxcapacitor(c.f.[Sewall2011])atthe 𝑛 and𝑛+1attime𝑡 1 and𝑡 2,respectively.Wethereforehavethe
+followingequation
+interface;thiscountsthetotalnumberofvehicles𝑁 𝑑(𝑡) thathave
+∫ 𝑡
+reachedthispoint: 𝑛+1=𝑛+ 2 𝜌(𝑡)𝑣(𝑡)𝑑𝑡 =𝑛+𝑎 𝑖 (10)
+(cid:22)∫ 𝑡 (cid:23) 𝑡
+𝑁 𝑑(𝑡)= 0 𝜌(𝑡)𝑣(𝑡)𝑑𝑡 (5) wherethe𝑖𝑡ℎ vehicleistheon 1 einstantiatedat𝑡 2.Sofor𝑡 ∈ (𝑡 1 ,𝑡 2 ],
+where ⌊𝑥⌋ isthefloorfunctionthatgivesthegreatestintegerless 𝜕𝐿 = 𝜕𝐿 𝑣(𝑡)𝑑𝑡 (11)
+thanorequaltotherealnumber𝑥.𝑁 𝑑(𝑡)willthenstartfrom0,and 𝜕𝜌(𝑡) 𝜕𝑎 𝑖
+wewillinstantiateavehiclewhenitincreasesby1.Thevelocity Forthestochasticcase,wecanfirstcomputetheexpectationvalue
+oftheinstantiatedvehicleissettobethemacroscopictrafficflow’s ofthetotalnumberofvehiclesaccordingtothePoissondistribution
+velocity. ∫ 𝑡 ∫ 𝑡
+𝐸[𝑁 𝑠(𝑡)] = 𝐸[𝑋(𝑡)] = 𝜌(𝑡)𝑣(𝑡)𝑑𝑡. (12)
+5.1.2 StochasticInstantiation. Anotherpossibleinterpretation 0 0
+ofthemacrotomicroconversionisasaPoissonprocess.Thefluxof Wenoticethattheexpectationvalueof𝑁 𝑠(𝑡)isthesameastheflux
+thetrafficflowcanbeviewedastheintensityofaPoissonprocess. capacitorinthedeterministicstrategy.Similarly,wecanfindtime
+Ineachtimestepoflength𝑑𝑡,thenumberofinstantiatedvehicles 𝑡 1and𝑡 2whenthetotalnumberofvehiclesreach𝑛and𝑛+1.For
+𝑘 𝑋 ) (𝑡 = ) 𝑒 fo − l 𝜌 lo (𝑡 w )𝑣 s (𝑡 a )𝑑 P 𝑡 o (𝜌 is ( s 𝑡 o ) n 𝑣( d 𝑡 i ) s 𝑑 t 𝑡 ri ) b 𝑘 u 𝑘 t ! i − o 1 n . 𝑋 Si ( m 𝑡) il ∼ arl 𝑃 y, (𝜌 th ( e 𝑡) t 𝑣 o ( t 𝑡 a ) l 𝑑 n 𝑡 u ), m 𝑃 b ( e 𝑋 ro = f a it ll m ti e m an e s s t t h e e p d 𝑡 e ∈ ns ( i 𝑡 t 1 y , i 𝑡 s 2 ] h , ig 𝜕 h 𝜌 𝜕 e 𝐿 ( r 𝑡) th = an 𝜕 𝜕 t 𝑎 𝐿 h 𝑖 e 𝑣( d 𝑡 e ) s 𝑑 i 𝑡 re . d In l t e u v i e ti l v a e n ly d , w if e 𝜕 𝜕 n 𝑎 𝐿 e 𝑖 e ≤ dt 0 o ,
+vehicles𝑁 𝑠(𝑡)canbeexpressedas
+decreasetheintensityofthePoissonprocess.Wewillalsovalidate
+∫ 𝑡 inournumericalexperimentsthatsuchestimationofgradientscan
+𝑁 𝑠(𝑡)= 𝑋(𝑡) (6)
+effectivelyoptimizeourobjectivefunction.
+0
+Asabove,thevelocityoftheemitteddiscretevehicleisthevelocity
+ofthemacroscopicstateatthejunctionofthetwolanes. 6 EXPERIMENTALRESULTS
+Weshowtheeffectivenessofourdifferentiablehybridtrafficsimu-
+5.2 MicrotoMacro
+latorwithapplicationtosolveavarietyoftrafficproblems.Wefirst
+Comparedtothemacrotomicroconversion,agent-basedinformation showthatwecanacceleratethedifferentiabletrafficsimulatorwith
+canbeconvertedtoacontinuumrepresentationmoresimply.The theanalyticalgradientsthatwehavecomputedabovebycomparing
+densityofacellattheinterval(𝑙,𝑟]inamacrolanecanbedefinedas itagainstabaselinesimulatorusingautomaticdifferentiation.Atthe
+𝑛 sametime,wewilljustifytheuseofthehybridmodelbycomparing
+1 ∑︁
+𝜌(𝑙,𝑟)= 𝑟−𝑙 1 (𝑙,𝑟] (𝑝 𝑖) (7) itscomputationtimewithotherapproachesinlarge-scalescenarios.
+𝑖=1 Then,weprovethecorrectnessandefficacyofouranalyticalgradi-
+where1(·)istheindicatorfunctionthatidentifiesvehiclesthatliein entsbysolvingparameterestimationproblems.Lastly,weconduct
+theinterval,𝑛isthenumberofvehiclesand𝑝 𝑖 isthepositionof𝑖𝑡ℎ experimentswithtrafficcontrolproblemstoillustratehowwecan
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 5 =====
+
+DifferentiableHybridTrafficSimulation • 258:5
+integrateoursimulatorwithneuralnetworksandhowwecanuseour Table1. Comparisonofourtechniqueagainstautomaticdifferentiation
+forvarioustypesofsimulations.Scaledenotesnumberoftimesteps
+simulatortosolvereal-worldtrafficproblems.
+takenandthenumberofcells(formacroscopic,andhybrid)/numberof
+WehaveimplementedourtrafficsimulatorwithPython,andused
+vehicles(microscopic).FW:forwardsimulation;BP:backpropagation.
+PyTorch1.9[Paszkeetal.2019]forautomaticdifferentiation.All
+Oursoutperformsautodifferentiationinbothforwardpassesandback-
+experimentswererunonanIntel®Xeon®W-2255CPU@3.70GHz,
+propagation,byuptoafactorof18.77,7.84,and15.27inmacroscopic,
+andtrafficrenderingwasmainlybasedonourownimplementation
+microscopic,andhybridtrafficsimulation,respectively.
+onUnityEngine.
+6.1 Acceleration Scale 10/1K 50/5K
+6.1.1 AnalyticalGradients. Herewepresenthowouranalytical
+gradientscancontributetotheaccelerationofbothforwardsimula-
+tionandbackwardpropagationinoursimulator.Wehavecompared
+oursimulatortothebaselinesimulatorthatreliesonautomaticdif-
+ferentiationtocomputethegradientsinthesystem.Forallofthe
+simulations, we have computed the gradients of the states at the
+lasttimestepwithrespecttothestatesattheinitialtimestep.For
+macroscopic and microscopic simulations, we used a single lane.
+Forhybridsimulation,weused3lanes,whichistheminimumcase
+tocoverbothmacro-to-microandmicro-to-macroconversion.The
+firstandthirdlanesaresetasmacroscopiclanesandthesecondone
+isamicroscopiclane.Toshowhowthecomputationtimechanges
+withthescaleofthesimulation,wehaveexperimentedwithdifferent
+scalesofsettings.
+Table1showsthatouranalyticalgradientallowsustorunboth
+forwardsimulation(FW)andbackpropagation(BP)ofthesystem
+muchfasterthanthebaselineframework.Inmacroscopicandhybrid
+simulations,thespeedupwasupto4xtimesforforwardsimulation,
+and18xforbackpropagation.Inthemicroscopicsimulation,the
+speedupwasupto6xtimesforforwardsimulation,and7xtimes
+forbackpropagation.Thisshowsthecomputationalefficiencyof
+ourframework,whichisnecessarytoimplementlarge-scaletraffic
+simulation.
+6.1.2 HybridModel. Inthispaper,weselectedthehybridmodel
+torunlarge-scaletrafficsimulationsininteractivetime,whilenot
+losingtheirfidelity.Tojustifythisdesignchoice,herewepresent
+theaverageframerateforsimulatingalargeenvironment,which
+includesapproximately10Kvehicles.Notethatwecanspecifythe
+ratio𝜖ofthevehicleswhichwouldbesimulatedusingamicroscopic
+model;𝜖couldberegardedasaninterpolantbetweenthetwomodels,
+where 𝜖 = 0 means macroscopic and 𝜖 = 1 means microscopic
+approach.Wemeasuredtheaverageframeratefordifferent𝜖using
+singlecore;seeFigure2.Notethattheaverageframeratesdecreases
+as𝜖increasesandthusthesimulationbecomesmore"microscopic".
+6.2 ParameterEstimationProblem
+Oneofthemostfundamentalproblemsthatwecansolvewithour
+framework is the parameter estimation problem. There are many
+parametersinvolvedinoursystem;thespeedlimitisthemosttypical
+example.Inourformulation,wefocusonretrievingprecedingstates
+inthesystembasedongivensubsequentones.Thesimplestformof
+thisproblemwouldbe,assuming0 ≤𝑡 ≤ 1,estimatingtheinitial
+stateq(0)giventhelaststateq(1).Thisproblemisconsideredtobe
+themostbasicformulationtosolve,asitonlyrequiresfundamental
+gradientscomputedanalytically.
+cipocsorcaM
+FW(Auto) 5.28s±0.16s 125.88s±5.66s
+FW(Ours) 1.42s±0.04s 30.06s±0.88s
+Speedup 3.71x 4.19x
+BP(Auto) 2.42s±0.20s 71.08s±6.01s
+BP(Ours) 0.18s±0.03s 3.79s±0.25s
+Speedup 13.73x 18.77x
+cipocsorciM
+FW(Auto) 1.54s±0.08s 66.74s±1.67s
+FW(Ours) 0.45s±0.02s 10.86s±0.24s
+Speedup. 3.42x 6.15x
+BP(Auto) 1.58s±0.06s 45.36s±0.95s
+BP(Ours) 0.20s±0.03s 7.10s±0.42s
+Speedup 7.84x 6.39x
+dirbyH
+FW(Auto) 11.81s±0.42s 310.67s±15.02s
+FW(Ours) 3.41s±0.06s 66.52s±0.47s
+Speedup 3.47x 4.67x
+BP(Auto) 2.70s±0.11s 111.06s±3.09s
+BP(Ours) 0.38s±0.02s 7.27s±0.13s
+Speedup 7.13x 15.27x
+3
+2
+1
+0.01 0.02 0.05 0.1 0.2 0.5
+𝜖=Ratioofmicroscopicvehicles
+)SPF(dnoceSrePemarF
+Fig.2. Comparisonontheaverageframerate(FPS)underthehybrid
+model,withdifferent𝜖.Thetotalnumberofvehiclesissettobe10K,
+andthe𝜖valuedenotestheratioofmicroscopicvehiclesamongthem.
+Inourexperiments,thesimulationlengthwassetas10secondsfor
+everysetting.Theoretically,wecanuseanysimulationlengthsfor
+thisexperiment,butwefoundoutthattoolongsimulationlengths
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 6 =====
+
+258:6 • SanghyunSon,Yi-LingQiao,JasonSewall,andMingC.Lin
+(a)Macroscopic (b)Microscopic
+(c)Hybrid(Macro-Micro-Macro) (d)Hybrid(Micro-Macro-Micro)
+Fig.4. 4x4GridofIntersections.Hybridtrafficsimulationata4x4grid
+Fig. 3. Parameter estimation problem. For given final states of the of intersections: the density of each cell is rendered in red, which
+system,onehastoestimatetheinitialstatesthatleadtothefinalstates. showsthevolumeoftrafficagentstocrosstheintersection.Onehas
+(a)–(d)Ourresultsrenderedinblueexhibitmuchfasterconvergence to optimize time allocations for traffic lights at each intersection to
+tothecorrectsolutionsthantheotherstate-of-the-artgradient-free maximizeoveralltrafficflow.
+optimizationmethodsbyuptooneorderofmagnitude.
+makethisproblemmuchharderthanitshouldbeand10secondsisa
+properlengthtoproveourapproach’sefficacy.Underthissetting,we
+havetoestimatetheinitialtrafficstatesthatwouldendupinthegiven
+finaltrafficstatesin10seconds.Foraproposedestimateqest (0),we
+cancomputetheestimationerrorwiththefollowinglossfunction,
+where𝑛denotesthesizeofthestatevector:
+1
+𝐿=
+𝑛
+|q(1)−qest (1)|2 (a)Macroscopic (b)Hybrid
+Fig.5. ITSCP.(a),(b)Learninggraphsformacroscopicandhybridsim-
+Wehavecomparedourframeworkwithothergradient-freeopti- ulations.Ourframeworkshowsbetterconvergenceratesandresults
+mizationalgorithms:CMA-ES[Hansen2006],SLSQP[Kraftetal. thanotherRLalgorithms.
+1988],andNelder-Mead[NelderandMead1965]algorithm.Exper-
+imentswererunfivetimeswithrandomlyinitializedinitialstates
+befedintooursimulator.Thenwecancomputethegradientofthe
+for each of the algorithms and for each of the simulation modes.
+aggregatedrewardofeachepisodewithrespecttoeachcontrolinput
+Inthehybridsetting,weused3sequentiallyconnectedlanes.One
+therein,andapplygradientdescenttodirectlymaximizethereward.
+oftheexperimentswasdoneformacro-micro-macrolanes,andthe
+Notethatthisapproachissameasanalyticalpolicygradient(APG)
+otherwasdoneformicro-macro-microlanes.Thelossgraphforeach
+method.Thenwecompareourresultstootherbaselinegradient-free
+settingisshowninFigure3.Wecanobservethatourframework
+RLalgorithms,astheyarewidelyusedtosolvethesekindsofcontrol
+retrievesmorepreciseinitialstatesfasterthanotheralgorithmsfor
+problems.
+everysetting.
+6.3.1 ITSCP. ITSCP is one of the most widely studied traffic
+6.3 TrafficControlProblems
+controlproblems,becauseofitssignificanceincontrollingtraffic
+Ourdifferentiabletrafficsimulatorcanbeintegratedwithneuralnet- congestioninurbanenvironment[EomandKim2020].Wehave
+workstoenhanceitsabilitytolearnandcontrolagiventask.Totest devisedascenariothatfallsintothiscategory,whereanagenthasto
+ourframework’scapability,wehaveexperimentedwiththe“inter- computetheoptimaltimeallocationsfortrafficlights(Figure4).
+sectionsignalcontrolproblem”(ITSCP)formacroscopicandhybrid Inthisscenario,therearetwodifferenttrafficlightsatagiven
+simulation,andthepacecarproblemformicroscopicsimulation. intersection:oneisgreenacrosstheWest-Eastdirection(WE-light),
+Foralltheexperiments,weusedtwofullyconnectedlayersas and the other one is across the North-South direction (NS-light).
+ourneuralnetwork,whereeachofthelayershas256nodes.The Whenoneofthelightsisturnedon,theotheronehasturnedoff
+neuralnetworkistrainedtoemitpropercontrolinput,whichwould automatically.Inasinglesignalphase,theWE-lightisturnedonfirst,
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 7 =====
+
+DifferentiableHybridTrafficSimulation • 258:7
+(a)Time=0sec,InitialStates
+(b)Time=10sec,TargetSpeedLimit=30m/sec
+(c)Time=20sec,TargetSpeedLimit=10m/sec
+Fig.6. PaceCarProblem.Sequenceofsimulationimagesintimeorder,fromtoptobottom.(a)Apacecarrenderedingreenguidesfollowing
+vehiclestomaintainatargetspeedlimit,whichvariesovertime.Itfailswhenitrunstoofast,tooslow,orgoesoutofthelane.(b)Whenahigh
+targetspeedlimit(30m/sec)isgiven,thepacecaracceleratesfast,andkeepsawidedistancefromitsfollowingvehiclestoletthemrunfast.(c)
+However,whenthetargetspeedlimitisreduced(10m/sec),itswiftlydeceleratesandkeepsshortdistancefromthefollowingvehicles,toprevent
+themfromrunningoverthetargetspeedlimit.
+andthentheNS-lightisturnedonnext.Therearemultiplesignal
+phasesduringtheentiresimulation,andtheagenthastodetermine
+optimaltimeallocationsforeachlightineachsignalphase.
+Theinputtotheneuralnetworkisgivenasthescheduleofincom-
+ingtrafficflowforeverylane.Ourexperimentswereinspiredbya
+synthetictrafficscenariodevisedforanotherITSCPexperiment[Wei
+etal.2018].Wealsofollowedaconventionalschemetocomputethe
+reward[EomandKim2020].Therewardforanactioniscomputedas
+theweightedsumoftrafficflowthatcrossestheintersection(𝑅 𝑓)and
+thelengthofwaitingqueueineachlane(𝑅 𝑞),whichisformulatedas
+follows:
+𝑅=𝑐
+1
+·𝑅
+𝑓
++𝑐
+2
+·𝑅
+𝑞
+.
+Forourexperiments,𝑐 1issetas1and𝑐 2issetas-1,tomaximizethe
+trafficflowandminimizethelengthofwaitingqueue.Inmacroscopic
+environments,thelengthofthequeueiscomputedasthenumberof
+cellsthathavespeedlessthancertainthreshold.Inhybridenviron-
+ments,thetrafficflowiscomputedasthenumberofdiscretevehicles
+Fig.7. PaceCarLearningGraph.Ourresultrenderedinblueshows
+crossing the intersection, as the central part of an intersection is
+farbetterperformance(asindicatedbyhigherrewardvalues)than
+simulatedwithamicroscopicmodel.
+otheralgorithms,whichmakenosignificantgainsinlearningeven
+Forcomparison,weusedthreebaselinemodel-freeRLalgorithms;
+afterlongperiods.
+DDPG [Lillicrap et al. 2015], PPO [Schulman et al. 2017], and
+SAC[Haarnojaetal.2018].Notethatthesealgorithmsdonotuse
+Table2. Comparisonofmaximumrewardsfromeachcontrolproblem.
+gradient information that our simulator provides. In contrast, our
+Our framework is able to find better solutions (indicated by higher
+gradient-basedoptimizationalgorithmusesthisinformationtoop-
+reward values) than the other baseline, model-free RL algorithms
+timizetheobjectivefunction.Experimentswererunfivetimesfor
+(DDPG,PPO,orSAC)foreveryexperimentsetting(Macro,Micro,or
+each algorithm, and Figure 5 shows the learning graphs of both
+Hybrid).
+macroscopicandhybridenvironment.Inthemacroscopicsetting,
+ourframeworkconvergedtothenear-optimalsolutionveryquickly,
+Ours DDPG PPO SAC
+whileDDPGfailedtolearnatallandPPOandSAClearned,but
+Macro 124.38 113.62 104.53 115.73
+nottotheextentofours.Inhybridsetting,ourframeworkandSAC
+Micro 4482.87 4.97 3218.19 3373.99
+bothsucceededinconvergingtothebestsolution,butoursconverged
+Hybrid 208.48 174.18 158.18 191.51
+fasterthanSAC.Also,Table2showsthatourbestrewardisbetter
+thananyotheralgorithmsforbothsettings.
+Theoptimalsolutionforthisproblemiscleartothehumanob-
+6.3.2 PaceCarProblem. Inthisproblem,weassumethereisa server;allvehiclesshouldmaintainthedesiredspeedlimit.However,
+discretepacecar,whichrunsinfrontofothervehiclesthatfollow thepacecarhastodeterminebothaccelerationandsteeringatevery
+the IDM. The pace car leads the vehicles to enforce a specified frametoremainontheroadandleadthevehiclesatthesametime.
+targetspeedlimit,whichisoftensmallerthanthelane’sspeedlimit Tointroduceevenmorecomplexity,inourexperiments,weuseda
+(Figure6). speedlimittargetthatvariesovertime.Therefore,theneuralnetwork
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 8 =====
+
+258:8 • SanghyunSon,Yi-LingQiao,JasonSewall,andMingC.Lin
+receivesothervehicle’sstatesandthespeedlimitasinput,andhasto 7.2 LimitationsandFutureDirections
+computetheoptimalaccelerationandsteeringfornextseveralframes, Giventhesepromisingresults,weplantofurtheraugmentthecapa-
+whichisquitechallenging.Therewardisformulatedasfollows: bilityandapplicationofoursimulator.First,whilehybridtechniques
+𝑡 𝑛 arenaturallysuitedtometropolitan-scalescenarios,wehavenotyet
+∑︁∑︁
+𝑅= 𝐶 max −(𝑣 targ −𝑣 𝑖,𝑗)2 (13) appliedthisdifferentiablehybridtechniquetothese;weexpectto
+𝑖=1𝑗=1 achieveevenhigherperformanceimprovementsfromthesemega-
+where𝐶 max denotes an arbitrary constant value, 𝑡 and 𝑛 denote scaleexperiments.Wecanalsointegraterealisticvehiclemotions,
+numberofframesandnumberofvehiclesrespectively.𝑣 targand𝑣 𝑖,𝑗 suchaslanechanging,tofurthercapturecomplextrafficdynamics
+representthetargetspeedlimitand𝑗thvehicle’sspeedatthegiven inhigherfidelity.Finally,weusedsimulateddataforsolvingtraffic
+frame𝑖. controlproblemsinthispaper,butweexpectthatoursimulatoris
+WealsousedthreebaselineRLalgorithmsforcomparison,each applicabletoreal-worlddataaswell.
+ofwhichwererun5times.ThelearninggraphinFigure7andthe
+maximum rewards in Table 2 show that our framework achieved
+farbetteroverallrewardthantheotheralgorithms.PPOandSAC
+alsosucceededinaccomplishinginitialhighrewardsbuttheirper-
+formancesoonplunged.Ourframeworkcontinuouslylearnedand
+achievedbetterandimprovedresults.
+7 CONCLUSIONS
+Wehaveproposedanoveldifferentiablehybridtrafficsimulator.In
+our simulator, gradients of traffic states across the time steps are
+computedanalyticallyandpropagatedacrosslanesmodeledunder
+complimentarybutdeeplydifferentregimes.Thiswasmadepossible
+withournoveldiscrete-continuousdifferentiableconversionmodule.
+Further,ouranalyticformulationismuchmoreefficientthanone
+basedonautomaticdifferentiation;therefore,ourtechniquecanoffer
+real-timetrafficsimulation,asshowninFigure8,thatwouldnot
+havebeenpossibleotherwise.
+Wehavealsoshownthatwecanusethegradientstosolveclas-
+sic traffic problems. For the parameter estimation problems, our
+frameworkisabletofindfarbetterestimatesthanothergradient-free
+optimizationalgorithms.Forcontrolproblems,ourframeworksuc-
+ceededinfindingnear-optimalpolicies,whichwasnotpossiblewith
+othermodel-freeRLalgorithms.
+7.1 Generalization
+Theconceptofhybridsimulationisapplicabletomanydifferenttypes
+ofdynamicalsystems,suchasfluids[Golasetal.2012;Mohamed
+andMohamad2010;Narainetal.2010],crowd[Narainetal.2009;
+Treuilleetal.2006],andmanyothermulti-agentsystems[Zheng
+etal.2017].And,ourmethodtodifferentiatetheconversionbetween
+macroandmicrotrafficflowisapplicabletoabroadrangeofdynam-
+icalsystemsthataresimulatedbyhybridtechniques,transitioning
+between continuous and discrete simulation domains. In general,
+otherdeterministicorstochasticinstantiationprocesscanalsotake
+Fig.8. Large-scaleHybridTrafficsimulation.Thesetrafficscenescon-
+advantageofourtechniqueintroducedinthispaper.Forexample,the
+sistofmanyhundredsofvehiclesacrossanurbanscenesimulated
+microandmacrorepresentationsforcrowdsharemanysimilarities
+andcontrolledinrealtimeusingadifferentiablehybridtrafficmodel.
+withtraffic.Theconversionbetweenindividualpedestriansandthe
+crowdflowisanalogoustotheprocessofinstantiatingandremoving
+ACKNOWLEDGMENTS
+vehiclesintheroads.Wealsohypothesizethatthealgorithmicand
+computationalframeworkondifferentiablehybridsimulation,aspro- ThisresearchissupportedinpartbyDr.BarryMerskyandCapi-
+posedhere,canalsobeextendedtohybridcontrolofcomplexand talOneE-NnovateEndowedProfessorships,andARLCooperative
+autonomoussystems[Branickyetal.1998;Fierroetal.2001]. AgreementW911NF2120076.
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 9 =====
+
+DifferentiableHybridTrafficSimulation • 258:9
+REFERENCES YuanmingHu,LukeAnderson,Tzu-MaoLi,QiSun,NathanCarr,JonathanRagan-
+ShivamAkhauri,LauraYZheng,andMingCLin.2020.Enhancedtransferlearning Kelley,andFrédoDurand.2020.DiffTaichi:DifferentiableProgrammingforPhysical
+forautonomousdrivingwithsystematicaccidentsimulation.In2020IEEE/RSJ Simulation.InICLR.
+InternationalConferenceonIntelligentRobotsandSystems(IROS).IEEE,5986– YukoIshiwaka,XiaoSZeng,MichaelLeeEastman,ShoKakazu,SarahGross,Ryosuke
+5993. Mizutani,andMasakiNakada.2021. Foids:bio-inspiredfishsimulationforgen-
+PhilippAndelfinger.2021.DifferentiableAgent-BasedSimulationforGradient-Guided eratingsyntheticdatasets. ACMTransactionsonGraphics(TOG)40,6(2021),
+Simulation-BasedOptimization.InProceedingsofthe2021ACMSIGSIMConfer- 1–15.
+enceonPrinciplesofAdvancedDiscreteSimulation.27–38. RuiJiang,QingsongWu,andZuojinZhu.2001.Fullvelocitydifferencemodelfora
+AATMAwandMichelRascle.2000.Resurrectionof"secondorder"modelsoftraffic car-followingtheory.PhysicalReviewE64,1(2001),017101.
+flow.SIAMjournalonappliedmathematics60,3(2000),916–938. ArneKesting,MartinTreiber,andDirkHelbing.2007.Generallane-changingmodel
+Masako Bando, Katsuya Hasebe, Akihiro Nakayama, Akihiro Shibata, and Yuki MOBILforcar-followingmodels.TransportationResearchRecord1999,1(2007),
+Sugiyama.1995.Dynamicalmodeloftrafficcongestionandnumericalsimulation. 86–94.
+PhysicalreviewE51,2(1995),1035. DieterKraftetal.1988. Asoftwarepackageforsequentialquadraticprogramming.
+EmmanuelBourrelandJean-BaptisteLesort.2003.Mixingmicroscopicandmacroscopic (1988).
+representationsoftrafficflow:HybridmodelbasedonLighthill–Whitham–Richards RandallJLeVequeetal.2002.Finitevolumemethodsforhyperbolicproblems.Vol.31.
+theory.TransportationResearchRecord1852,1(2003),193–200. Cambridgeuniversitypress.
+MichaelSBranicky,VivekSBorkar,andSanjoyKMitter.1998.Aunifiedframework Tzu-MaoLi,MiikaAittala,FrédoDurand,andJaakkoLehtinen.2018.Differentiable
+forhybridcontrol:Modelandoptimalcontroltheory.IEEEtransactionsonautomatic MonteCarloraytracingthroughedgesampling.ACMTrans.Graph.37,6(2018).
+control43,1(1998),31–45. YifeiLi,TaoDu,KuiWu,JieXu,andWojciechMatusik.2022.DiffCloth:Differentiable
+DanCascaval,MiraShalah,PhillipQuinn,RastislavBodik,ManeeshAgrawala,and ClothSimulationwithDryFrictionalContact.ACMTrans.Graph.(2022).
+AdrianaSchulz.2021.Differentiable3DCADProgramsforBidirectionalEditing. EdwardLiebermanandAjayKRathi.1997. Trafficsimulation. Trafficflowtheory
+arXivpreprintarXiv:2110.01182(2021). (1997).
+MichaelJamesLighthillandGeraldBeresfordWhitham.1955.OnkinematicwavesII.
+MichaelJCassidyandJohnRWindover.1995.vÍethodologyforAssessingDynamics
+Atheoryoftrafficflowonlongcrowdedroads.ProceedingsoftheRoyalSocietyof
+ofFreewayTrafficFlow.(1995).
+London.SeriesA.MathematicalandPhysicalSciences229,1178(1955),317–345.
+AdèleColas,WoutervanToll,KatjaZibrek,LudovicHoyet,Anne-HélèneOlivier,and
+TimothyPLillicrap,JonathanJHunt,AlexanderPritzel,NicolasHeess,TomErez,
+JulienPettré.2022.InteractionFields:IntuitiveSketch-basedSteeringBehaviorsfor
+YuvalTassa,DavidSilver,andDaanWierstra.2015.Continuouscontrolwithdeep
+CrowdSimulation.InComputerGraphicsForum.
+reinforcementlearning.arXivpreprintarXiv:1509.02971(2015).
+CarlosFDaganzo.1995.Requiemforsecond-orderfluidapproximationsoftrafficflow.
+PabloAlvarezLopez,MichaelBehrisch,LauraBieker-Walz,JakobErdmann,Yun-Pang
+TransportationResearchPartB:Methodological29,4(1995),277–286.
+Flötteröd,RobertHilbrich,LeonhardLücken,JohannesRummel,PeterWagner,
+FilipedeAvilaBelbute-Peres,KevinSmith,KelseyAllen,JoshTenenbaum,andJZico
+andEvamarieWießner.2018.Microscopictrafficsimulationusingsumo.In2018
+Kolter.2018.End-to-enddifferentiablephysicsforlearningandcontrol.Advancesin
+21stInternationalConferenceonIntelligentTransportationSystems(ITSC).IEEE,
+neuralinformationprocessingsystems31(2018),7178–7189.
+2575–2582.
+AlexeyDosovitskiy,GermanRos,FelipeCodevilla,AntonioLopez,andVladlenKoltun.
+Pingchuan Ma, Tao Du, John Z Zhang, Kui Wu, Andrew Spielberg, Robert K
+2017.CARLA:AnOpenUrbanDrivingSimulator.InProceedingsofthe1stAnnual
+Katzschmann,andWojciechMatusik.2021. Diffaqua:Adifferentiablecompu-
+ConferenceonRobotLearning.1–16.
+tationaldesignpipelineforsoftunderwaterswimmerswithshapeinterpolation.ACM
+TaoDu,KuiWu,PingchuanMa,SebastienWah,AndrewSpielberg,DanielaRus,and
+TransactionsonGraphics(TOG)40,4(2021),1–14.
+WojciechMatusik.2021.DiffPD:DifferentiableProjectiveDynamicswithContact.
+LaurentMagne,SylvestreRabut,andJean-FrançoisGabard.2000.Towardsanhybrid
+arXiv:2101.05917(2021).
+macro-microtrafficflowsimulationmodel.InINFORMSspring2000meeting.
+TaoDu,KuiWu,AndrewSpielberg,WojciechMatusik,BoZhu,andEftychiosSifakis.
+SalimMammar,SaïdMammar,andJean-PatrickLebacque.2006.Highwaytraffichybrid
+2020.FunctionalOptimizationofFluidicDeviceswithDifferentiableStokesFlow.
+macro-microsimulationmodel.IFACProceedingsVolumes39,12(2006),627–632.
+ACMTrans.Graph.(2020).
+KhaledMMohamedandAAMohamad.2010.Areviewofthedevelopmentofhybrid
+MyungeunEomandByung-InKim.2020. Thetrafficsignalcontrolproblemfor
+atomistic–continuummethodsfordensefluids.MicrofluidicsandNanofluidics8,3
+intersections:areview.Europeantransportresearchreview12,1(2020),1–20.
+(2010),283–302.
+RafaelFierro,AveekKDas,VijayKumar,andJamesPOstrowski.2001.Hybridcontrol
+MiguelAngelZamoraMora,MomchilPPeychev,SehoonHa,MartinVechev,and
+offormationsofrobots.InProceedings2001ICRA.IEEEInternationalConference
+StelianCoros.2021.PODS:PolicyOptimizationviaDifferentiableSimulation.In
+onRoboticsandAutomation(Cat.No.01CH37164),Vol.1.IEEE,157–162.
+InternationalConferenceonMachineLearning.PMLR,7805–7817.
+DenosCGazis,RobertHerman,andRenfreyBPotts.1959.Car-followingtheoryof
+RahulNarain,AbhinavGolas,SeanCurtis,andMingCLin.2009.Aggregatedynamics
+steady-statetrafficflow.Operationsresearch7,4(1959),499–505.
+fordensecrowdsimulation.InACMSIGGRAPHAsia2009papers.1–8.
+DenosCGazis,RobertHerman,andRichardWRothery.1961.Nonlinearfollow-the-
+RahulNarain,AbhinavGolas,andMingCLin.2010.Free-flowinggranularmaterials
+leadermodelsoftrafficflow.Operationsresearch9,4(1961),545–567.
+withtwo-waysolidcoupling.InACMSIGGRAPHAsia2010papers.1–10.
+MoritzGeilinger,DavidHahn,JonasZehnder,MoritzBächer,BernhardThomaszewski,
+JohnANelderandRogerMead.1965.Asimplexmethodforfunctionminimization.
+andStelianCoros.2020.ADD:Analyticallydifferentiabledynamicsformulti-body
+Thecomputerjournal7,4(1965),308–313.
+systemswithfrictionalcontact.ACMTransactionsonGraphics(TOG)39,6(2020).
+GordonFrankNewell.1961.Nonlineareffectsinthedynamicsofcarfollowing.Opera-
+PeterGGipps.1981. Abehaviouralcar-followingmodelforcomputersimulation.
+tionsresearch9,2(1961),209–229.
+TransportationResearchPartB:Methodological15,2(1981),105–111.
+MerlinNimier-David,DelioVicini,TizianZeltner,andWenzelJakob.2019.Mitsuba2:
+AbhinavGolas,RahulNarain,JasonSewall,PavelKrajcevski,PradeepDubey,andMing
+Aretargetableforwardandinverserenderer.ACMTransactionsonGraphics(TOG)
+Lin.2012.Large-scalefluidsimulationusingvelocity-vorticitydomaindecomposi-
+38,6(2019).
+tion.ACMTransactionsonGraphics(TOG)31,6(2012),1–9.
+AdamPaszke,SamGross,FranciscoMassa,AdamLerer,JamesBradbury,Gregory
+TuomasHaarnoja,AurickZhou,PieterAbbeel,andSergeyLevine.2018. Softactor-
+Chanan,TrevorKilleen,ZemingLin,NataliaGimelshein,LucaAntiga,etal.2019.
+critic:Off-policymaximumentropydeepreinforcementlearningwithastochastic
+Pytorch:Animperativestyle,high-performancedeeplearninglibrary.Advancesin
+actor.InInternationalconferenceonmachinelearning.PMLR,1861–1870.
+neuralinformationprocessingsystems32(2019),8026–8037.
+TorstenHädrich,DanielTBanuti,WojtekPałubicki,SörenPirk,andDominikLMichels.
+HaroldJPayne.1971. Modeloffreewaytrafficandcontrol. MathematicalModelof
+2021. Fireinparadise:mesoscalesimulationofwildfires. ACMTransactionson
+PublicSystem(1971),51–61.
+Graphics(TOG)40,4(2021),1–15.
+Yi-LingQiao,JunbangLiang,VladlenKoltun,andMingC.Lin.2020.ScalableDiffer-
+NikolausHansen.2006.TheCMAevolutionstrategy:acomparingreview.Towardsa
+entiablePhysicsforLearningandControl.InICML.
+newevolutionarycomputation(2006),75–102.
+Yi-LingQiao,JunbangLiang,VladlenKoltun,andMingC.Lin.2021a. Differen-
+FeixiangHe,YuanhangXiang,XiZhao,andHeWang.2020.Informativescenedecom-
+tiableSimulationofSoftMulti-bodySystems.InConferenceonNeuralInformation
+positionforcrowdanalysis,comparisonandsimulationguidance.ACMTransactions
+ProcessingSystems(NeurIPS).
+onGraphics(TOG)39,4(2020),50–1.
+Yi-LingQiao,JunbangLiang,VladlenKoltun,andMingC.Lin.2021b. Efficient
+EricHeiden,MilesMacklin,YashrajSNarang,DieterFox,AnimeshGarg,andFabio
+DifferentiableSimulationofArticulatedBodies.InICML.
+Ramos.2021.DiSECt:ADifferentiableSimulationEngineforAutonomousRobotic
+PaulIRichards.1956.Shockwavesonthehighway.Operationsresearch4,1(1956),
+Cutting.InProceedingsofRobotics:ScienceandSystems.Virtual. https://doi.org/
+42–51.
+10.15607/RSS.2021.XVII.067
+JohnSchulman,FilipWolski,PrafullaDhariwal,AlecRadford,andOlegKlimov.2017.
+PhilippHoll,VladlenKoltun,KiwonUm,andNilsThuerey.2020.phiflow:Adifferen-
+Proximalpolicyoptimizationalgorithms.arXivpreprintarXiv:1707.06347(2017).
+tiablepdesolvingframeworkfordeeplearningviaphysicalsimulations.InNeurIPS
+JasonSewall,DavidWilkie,andMingCLin.2011. Interactivehybridsimulationof
+Workshop.
+large-scaletraffic.InProceedingsofthe2011SIGGRAPHAsiaConference.1–12.
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 10 =====
+
+258:10 • SanghyunSon,Yi-LingQiao,JasonSewall,andMingC.Lin
+JasonSewall,DavidWilkie,PaulMerrell,andMingCLin.2010. Continuumtraffic
+simulation.InComputerGraphicsForum,Vol.29.WileyOnlineLibrary,439–448.
+JasonDouglasSewall.2011.Efficient,scalabletrafficandcompressiblefluidsimulations
+usinghyperbolicmodels.Ph.D.Dissertation.TheUniversityofNorthCarolinaat
+ChapelHill.
+SiyuanShen,YangYin,TianjiaShao,HeWang,ChenfanfuJiang,LeiLan,andKun
+Zhou.2021.High-orderdifferentiableautoencoderfornonlinearmodelreduction.
+arXivpreprintarXiv:2102.11026(2021).
+TetsuyaTakahashi,JunbangLiang,Yi-LingQiao,andMingCLin.2021.Differentiable
+FluidswithSolidCouplingforLearningandControl.InProceedingsoftheAAAI
+ConferenceonArtificialIntelligence,Vol.35.6138–6146.
+MartinTreiber,AnsgarHennecke,andDirkHelbing.2000.Congestedtrafficstatesin
+empiricalobservationsandmicroscopicsimulations.PhysicalreviewE62,2(2000),
+1805.
+AdrienTreuille,SethCooper,andZoranPopovic´.2006. Continuumcrowds. ACM
+TransactionsonGraphics(TOG)25,3(2006),1160–1168.
+HuaWei,GuanjieZheng,HuaxiuYao,andZhenhuiLi.2018.Intellilight:Areinforce-
+mentlearningapproachforintelligenttrafficlightcontrol.InProceedingsofthe24th
+ACMSIGKDDInternationalConferenceonKnowledgeDiscovery&DataMining.
+2496–2505.
+GeraldBeresfordWhitham.2011.Linearandnonlinearwaves.Vol.42.JohnWiley&
+Sons.
+HuanYuandMiroslavKrstic.2019.TrafficcongestioncontrolforAw–Rascle–Zhang
+model.Automatica100(2019),38–51.
+HMichaelZhang.2002.Anon-equilibriumtrafficmodeldevoidofgas-likebehavior.
+TransportationResearchPartB:Methodological36,3(2002),275–290.
+YuanshiZheng,JingyingMa,andLongWang.2017.Consensusofhybridmulti-agent
+systems.IEEEtransactionsonneuralnetworksandlearningsystems29,4(2017),
+1359–1365.
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 11 =====
+
+DifferentiableHybridTrafficSimulation • 258:11
+A SOLUTIONTOTHERIEMANNPROBLEMINARZMODEL
+A.1 Formulation
+Forthegivenleftstateq
+l
+andrightstateqr,wecandeterminetheintermediatestateq0asfollows.
+Case0:𝑢
+𝑙
+=𝑢
+𝑟
+𝑞 0 =𝑞 𝑙 (14)
+Case1:𝑢
+𝑙
+>𝑢
+𝑟
+(cid:40)
+𝑞 0 = 𝑞 𝑞 𝑚 𝑙 i i f f 𝜆 𝜆 𝑠 𝑠 < ≥ 0 0 (𝜆 𝑠 = 𝜌 𝑚 𝜌 𝑢 𝑚 𝑚 − − 𝜌 𝜌 𝑙 𝑙 𝑢 𝑙 ) (15)
+𝛾
+Case2:𝑢
+𝑟
+−𝑢
+𝑚𝑎𝑥
+𝜌
+𝑙
+<𝑢
+𝑙
+<𝑢
+𝑟
+𝑞 0 =
+ 𝑞
+𝑞 𝑚
+𝑙
+i
+i
+f
+f
+𝜆
+𝜆
+0
+0
+𝑚
+𝑙 ≥
+≤
+0
+0 (16)
+ 𝑞˜(0) if𝜆
+0𝑙
+<0,𝜆
+0𝑚
+>0
+
+where
+𝛾
+𝜆
+0𝑙
+=𝑢
+𝑙
+−𝑢
+𝑚𝑎𝑥
+𝛾𝜌
+𝑙
+𝛾
+𝜆
+0𝑚
+=𝑢 𝑚−𝑢
+𝑚𝑎𝑥
+𝛾𝜌
+𝑚
+𝛾
+=𝑢
+𝑟
+−𝑢
+𝑚𝑎𝑥
+𝛾𝜌
+𝑙
++𝛾(𝑢
+𝑟
+−𝑢 𝑙).
+𝛾
+Case3:𝑢
+𝑙
+≤𝑢
+𝑟
+−𝑢
+𝑚𝑎𝑥
+𝜌
+𝑙
+(cid:40)
+𝑞 0 = 𝑞 𝑞˜ 𝑙 (0) i i f f 𝜆 𝜆 0 0 𝑙 𝑙 < ≥ 0 0 (17)
+Case4:𝜌
+𝑙
+=0,𝜌
+𝑟
+>0
+(cid:20) (cid:21)
+0
+𝑞 0 =𝑞 𝑙 = 0 (18)
+Case5:𝜌 𝑙 >0,𝜌 𝑟 =0
+SameasCase3.
+Fromabove,𝑞 𝑚 isgivenas
+𝜌 𝑚 =(𝜌 𝑙 𝛾 + 𝑢 𝑢 𝑙 −𝑢 𝑟 )𝛾 1
+𝑚𝑎𝑥
+𝑢
+𝑚
+=𝑢
+𝑟
+𝑦
+𝑚
+=𝜌 𝑚(𝑢 𝑚−𝑢 𝑒𝑞(𝜌 𝑚)),
+and𝑞˜(0)isgivenas
+𝛾
+𝜌˜(0)=(
+𝑢
+𝑙
++𝑢
+𝑚𝑎𝑥
+𝜌
+𝑙 )𝛾 1
+(𝛾+1)𝑢
+𝑚𝑎𝑥
+𝑢˜(0)= 𝜌 𝑙 𝜌 + 𝑙 1 (𝑢 𝑙 +𝑢 𝑚𝑎𝑥 𝜌 𝑙 𝛾 )
+𝑦˜(0)=𝜌˜(0)(𝑢˜(0)−𝑢 𝑒𝑞(𝜌˜(0))).
+A.2 Differentiation
+Wecanseefromtheaboveformulationthatwehavetocomputethepartialderivativesof𝑞 𝑙 ,𝑞 𝑚 ,and𝑞˜(0)withrespectto𝑞 𝑙 and𝑞 𝑟,asthose
+valuescomprisethesolutionsoftheRiemannproblem.Wecancomputethepartialderivativesasshownbelow.
+TheJacobianoffis:
+(cid:34)𝑢 𝑒𝑞+𝜌𝑢 𝑒 ′ 𝑞 1 (cid:35)
+f′(q)= 𝑦𝑢 𝑒 ′ 𝑞− 𝜌 𝑦 2 2 2 𝜌 𝑦 +𝑢 𝑒𝑞 (19)
+Partialderivativesofq
+l
+𝜕𝑞
+𝜕𝑞
+𝑙 =𝐼
+2×2
+𝑙
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 12 =====
+
+258:12 • SanghyunSon,Yi-LingQiao,JasonSewall,andMingC.Lin
+𝜕𝑞 𝑙 (cid:20) 0 0 (cid:21)
+=
+𝜕𝑞 𝑟 0 0
+Partialderivativesofqm
+𝜕𝑞
+(cid:34)𝜕𝜌𝑚 𝜕𝜌𝑚(cid:35)
+𝜕𝑞 𝑚 = 𝜕 𝜕 𝑦 𝜌 𝑚 𝑙 𝜕 𝜕 𝑦 𝑦 𝑚 𝑙
+𝑙 𝜕𝜌𝑙 𝜕𝑦𝑙
+where
+𝜕𝜌 𝑚 = 1 (𝜌 𝛾 + 𝑢 𝑙 −𝑢 𝑟 ) 1 𝛾 −𝛾 (𝛾𝜌 𝛾−1+ 1 𝜕𝑢 𝑙 ),
+𝜕𝜌 𝛾 𝑙 𝑢 𝑙 𝑢 𝜕𝜌
+𝑙 𝑚𝑎𝑥 𝑚𝑎𝑥 𝑙
+𝜕𝜌 𝑚 = 1 (𝜌 𝛾 + 𝑢 𝑙 −𝑢 𝑟 ) 1 𝛾 −𝛾 ( 1 𝜕𝑢 𝑙 ),
+𝜕𝑦 𝛾 𝑙 𝑢 𝑢 𝜕𝑦
+𝑙 𝑚𝑎𝑥 𝑚𝑎𝑥 𝑙
+𝜕𝑦 𝜕𝜌 𝜕𝜌
+𝜕𝜌 𝑚 = 𝜌 𝑚 (𝑢 𝑚−𝑢 𝑒𝑞(𝜌 𝑚))+𝜌 𝑚(−𝑢 𝑒 ′ 𝑞(𝜌 𝑚) 𝜕𝜌 𝑚 ),
+𝑙 𝑙 𝑙
+𝜕𝑦 𝜕𝜌 𝜕𝜌
+𝜕𝑦 𝑚 = 𝑦 𝑚 (𝑢 𝑚−𝑢 𝑒𝑞(𝜌 𝑚))+𝜌 𝑚(−𝑢 𝑒 ′ 𝑞(𝜌 𝑚) 𝜕𝑦 𝑚 ).
+𝑙 𝑙 𝑙
+𝜕𝑞
+(cid:34)𝜕𝜌𝑚 𝜕𝜌𝑚(cid:35)
+𝜕𝑞 𝑚 𝑟 = 𝜕 𝜕 𝜕 𝑦 𝜌 𝜌 𝑚 𝑟 𝑟 𝜕 𝜕 𝜕 𝑦 𝑦 𝑦 𝑚 𝑟 𝑟
+where
+𝜕𝜌 𝑚 = 1 (𝜌 𝛾 + 𝑢 𝑙 −𝑢 𝑟 ) 1 𝛾 −𝛾 (− 1 𝜕𝑢 𝑟 ),
+𝜕𝜌 𝛾 𝑙 𝑢 𝑢 𝜕𝜌
+𝑟 𝑚𝑎𝑥 𝑚𝑎𝑥 𝑟
+𝜕𝜌 𝑚 = 1 (𝜌 𝛾 + 𝑢 𝑙 −𝑢 𝑟 ) 1 𝛾 −𝛾 (− 1 𝜕𝑢 𝑟 ),
+𝜕𝑦 𝛾 𝑙 𝑢 𝑢 𝜕𝑦
+𝑟 𝑚𝑎𝑥 𝑚𝑎𝑥 𝑟
+𝜕 𝜕 𝑦 𝜌 𝑚 = 𝜕 𝜌 𝜌 𝑚 (𝑢 𝑚−𝑢 𝑒𝑞(𝜌 𝑚))+𝜌 𝑚( 𝜕 𝜕𝑢 𝜌 𝑟 −𝑢 𝑒 ′ 𝑞(𝜌 𝑚) 𝜕 𝜕 𝜌 𝜌 𝑚 ),
+𝑟 𝑟 𝑟 𝑟
+𝜕 𝜕 𝑦 𝑦 𝑚 = 𝜕 𝑦 𝜌 𝑚 (𝑢 𝑚−𝑢 𝑒𝑞(𝜌 𝑚))+𝜌 𝑚( 𝜕 𝜕 𝑢 𝑦 𝑟 −𝑢 𝑒 ′ 𝑞(𝜌 𝑚) 𝜕 𝜕 𝜌 𝑦 𝑚 ).
+𝑟 𝑟 𝑟 𝑟
+Partialderivativesofq˜(0)
+𝜕𝑞˜(0)
+=
+(cid:34)𝜕
+𝜕
+𝜌˜
+𝜌
+(0
+𝑙
+) 𝜕
+𝜕
+𝜌˜
+𝑦
+(0
+𝑙
+)(cid:35)
+𝜕𝑞 𝜕𝑦˜(0) 𝜕𝑦˜(0)
+𝑙 𝜕𝜌𝑙 𝜕𝑦𝑙
+where
+𝛾
+𝜕𝜌 𝜕 ˜ 𝜌 (0 𝑙 ) = 𝛾 1 ( 𝑢 (𝛾 𝑙 + + 𝑢 1 𝑚 )𝑢 𝑎 𝑚 𝑥 𝜌 𝑎𝑥 𝑙 ) 1 𝛾 −𝛾 ( (𝛾+1 1 )𝑢 𝑚𝑎𝑥 )( 𝜕 𝜕𝑢 𝜌 𝑙 𝑙 +𝑢 𝑚𝑎𝑥 𝛾𝜌 𝑙 𝛾−1),
+𝛾
+𝜕𝜌˜(0) = 1 ( 𝑢 𝑙 +𝑢 𝑚𝑎𝑥 𝜌 𝑙 ) 1 𝛾 −𝛾 ( 1 )( 𝜕𝑢 𝑙 ),
+𝜕𝑦
+𝑙
+𝛾 (𝛾+1)𝑢
+𝑚𝑎𝑥
+(𝛾+1)𝑢
+𝑚𝑎𝑥
+𝜕𝑦
+𝑙
+𝜕𝑦˜(0) 𝜕𝜌˜(0) 𝜕𝑢˜(0) 𝜕𝜌˜(0)
+𝜕𝜌 = 𝜕𝜌 (𝑢˜(0)−𝑢 𝑒𝑞(𝜌˜(0)))+𝜌˜(0)( 𝜕𝜌 −𝑢 𝑒 ′ 𝑞(𝜌˜(0)) 𝜕𝜌 ),
+𝑙 𝑙 𝑙 𝑙
+𝜕𝑦˜(0) 𝜕𝜌˜(0) 𝜕𝑢˜(0) 𝜕𝜌˜(0)
+𝜕𝑦 = 𝜕𝑦 (𝑢˜(0)−𝑢 𝑒𝑞(𝜌˜(0)))+𝜌˜(0)( 𝜕𝑦 −𝑢 𝑒 ′ 𝑞(𝜌˜(0)) 𝜕𝑦 ).
+𝑙 𝑙 𝑙 𝑙
+𝜕𝑞˜(0) (cid:20) 0 0 (cid:21)
+=
+𝜕𝑞 𝑟 0 0
+B DIFFERENTIATINGIDM
+B.1 Hyperparameters
+IntheIDM,followinghyperparametersareusedtodescribedifferentbehavioraltraitsofdiscretevehicles[Treiberetal.2000].
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.
+
+===== PAGE 13 =====
+
+DifferentiableHybridTrafficSimulation • 258:13
+• 𝑠 𝑚𝑖𝑛:Minimumdesireddistancetotheleadingvehicle.
+• 𝑇 𝑝𝑟𝑒𝑓:Desiredtimetomoveforwardwithcurrentspeed.
+• 𝑎 𝑚𝑎𝑥:Upperboundofthecomputedacceleration.
+• 𝑎 𝑝𝑟𝑒𝑓:Comfortablebrakingdeceleration,positivevalue.
+• 𝑣 𝑡𝑎𝑟𝑔:Targetvelocityitwantstomaintain.
+• 𝑙𝑒𝑛𝑔𝑡ℎ 𝑖:Lengthofthe𝑖-thvehicle.
+B.2 Differentiation
+Firstwecomputethegradientsofa
+i
+(𝑡)withrespecttop
+i
+(𝑡),v
+i
+(𝑡),p
+h(i)
+(𝑡),andv
+h(i)
+(𝑡),whereℎ(𝑖)-thvehicleistheleadingvehicleof𝑖-th
+vehicle.
+𝜕a i (𝑡) =−2𝑎
+𝑚𝑎𝑥
+𝑠 𝑜𝑝𝑡 2 ,
+𝜕p
+i
+(𝑡) (𝑝
+ℎ(𝑖)
+(𝑡)−𝑝 𝑖(𝑡)−𝑙𝑒𝑛𝑔𝑡ℎ
+ℎ(𝑖)
+)3
+𝜕a i (𝑡) =2𝑎
+𝑚𝑎𝑥
+𝑠 𝑜𝑝𝑡 2 ,
+𝜕p
+h(i)
+(𝑡) (𝑝
+ℎ(𝑖)
+(𝑡)−𝑝 𝑖(𝑡)−𝑙𝑒𝑛𝑔𝑡ℎ
+ℎ(𝑖)
+)3
+𝜕a i (𝑡) =𝑎 𝑚𝑎𝑥(−𝛿 𝑣 𝑖(𝑡)𝛿−1 −2 𝑠 𝑜𝑝𝑡 𝜕𝑠 𝑜𝑝𝑡 ),
+𝜕v i (𝑡) 𝑣 𝑡𝑎𝑟𝑔 𝛿 (𝑝 ℎ(𝑖) (𝑡)−𝑝 𝑖(𝑡)−𝑙𝑒𝑛𝑔𝑡ℎ ℎ(𝑖) )2 𝜕𝑣 𝑖(𝑡)
+𝜕a i (𝑡) =𝑎 𝑚𝑎𝑥(−2 𝑠 𝑜𝑝𝑡 𝜕𝑠 𝑜𝑝𝑡 ),
+𝜕v h(i) (𝑡) (𝑝 ℎ(𝑖) (𝑡)−𝑝 𝑖(𝑡)−𝑙𝑒𝑛𝑔𝑡ℎ ℎ(𝑖) )2 𝜕𝑣 ℎ(𝑖) (𝑡)
+where
+𝜕 𝜕 𝑣 𝑠 𝑖 𝑜 ( 𝑝 𝑡 𝑡 ) =𝑇 𝑝𝑟𝑒𝑓 + 2𝑣 2 𝑖 √ (𝑡 𝑎 ) 𝑚 − 𝑎𝑥 𝑣 𝑎 ℎ 𝑝 (𝑖 𝑟 ) 𝑒 ( 𝑓 𝑡) ,
+𝜕𝑠 𝑜𝑝𝑡 −𝑣 𝑖(𝑡)
+= √ .
+𝜕𝑣 ℎ(𝑖) (𝑡) 2 𝑎 𝑚𝑎𝑥 𝑎 𝑝𝑟𝑒𝑓
+Nowforarbitrary𝑖and𝑗,wecancomputethegradientofthestateofthe𝑖-thvehiclewithrespecttothatofthe𝑗-thvehiclebyplugginginthe
+abovevalues.Notethatthegradientisnon-zeroonlywhen𝑗 equalsto𝑖orℎ(𝑖).
+𝜕p
+i
+(𝑡+1)
+=
+ 1
+0
+i
+i
+f
+f
+𝑗
+𝑗
+=
+=ℎ
+𝑖
+(𝑖) (20)
+𝜕p (𝑡)
+j 0 if𝑒𝑙𝑠𝑒
+
+𝜕p
+i
+(𝑡+1)
+=
+
+0
+Δ𝑡 i
+i
+f
+f
+𝑗
+𝑗
+=
+=ℎ
+𝑖
+(𝑖) (21)
+𝜕v (𝑡)
+j 0 if𝑒𝑙𝑠𝑒
+
+𝜕v
+𝜕 i p
+(𝑡
+j (
++
+𝑡)
+1)
+=
+
+0
+Δ
+Δ
+𝑡
+𝑡
+(
+(
+−
+2𝑎
+2
+𝑚
+𝑎 𝑚
+𝑎𝑥
+𝑎𝑥
+(𝑝
+(
+ℎ
+𝑝
+(
+ℎ
+𝑖)
+(𝑖
+(
+)
+𝑡
+(
+)
+𝑡
+−
+)
+𝑝
+−
+𝑖 𝑠
+𝑝
+( 𝑜
+𝑖
+𝑡
+𝑠
+𝑝
+(
+)
+𝑜
+𝑡
+𝑡
+−
+𝑝
+2
+) 𝑡
+𝑙
+−
+𝑒
+2 𝑙
+𝑛
+𝑒
+𝑔
+𝑛
+𝑡
+𝑔
+ℎ
+𝑡
+ℎ
+ℎ
+(
+ℎ
+𝑖)
+(
+)
+𝑖)
+3
+)
+)
+3 )
+i
+i
+i
+f
+f
+f𝑒
+𝑗
+𝑗
+𝑙𝑠
+=
+=
+𝑒
+ℎ
+𝑖
+(𝑖) (22)
+
+𝜕v 𝜕 i v (𝑡 j ( + 𝑡) 1) =   1
+0
+Δ𝑡 + 𝑎 𝑚 Δ𝑡 𝑎 𝑎 𝑥 𝑚 (− 𝑎𝑥 2 ( ( − 𝑝 ℎ 𝛿 (𝑖 𝑣 ) 𝑖 𝑣 ( 𝑡 ( 𝑡 𝑎 𝑡 ) 𝑟 ) − 𝑔 𝛿− 𝛿 𝑝 1 𝑖 𝑠 ( 𝑜 𝑡 − 𝑝 )− 𝑡 2 𝑙𝑒 ( 𝑛 𝑝 𝑔 ℎ 𝑡 ( ℎ 𝑖) ℎ ( ( 𝑡 𝑖 ) ) − )2 𝑝𝑖 2 𝑠 ( √ 𝑜 𝑡 𝑝 ) 𝑎 − 𝑡 − 𝑚 𝑙 𝑣 𝑒 𝑎 𝑖 𝑛 𝑥 ( 𝑔 𝑡 𝑎 𝑡 ) 𝑝 ℎ 𝑟 ℎ 𝑒𝑓 (𝑖) ) )2 (𝑇 𝑝𝑟𝑒𝑓 + 2 2 √ 𝑣𝑖 𝑎 ( 𝑚 𝑡) 𝑎 − 𝑥𝑎 𝑣𝑗 𝑝 ( 𝑟 𝑡 𝑒 ) 𝑓 )) i i
+i
+f f
+f𝑒
+𝑗 𝑗
+𝑙𝑠
+= =
+𝑒
+ℎ 𝑖 (𝑖) (23)
+
+ACMTrans.Graph.,Vol.41,No.6,Article258.Publicationdate:December2022.

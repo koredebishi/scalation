@@ -1,0 +1,1834 @@
+===== PAGE 1 =====
+
+arXiv:cond-mat/0002177v2 [cond-mat.stat-mech] 30 Aug 2000
+Congested Traﬃc States in Empirical Observations and
+Microscopic Simulations
+Martin Treiber, Ansgar Hennecke, and Dirk Helbing
+II. Institute of Theoretical Physics, University of Stuttg art, Pfaﬀenwaldring 57, D-70550
+Stuttgart, Germany
+http://www.theo2.physik.uni-stuttgart.de/treiber/, h elbing/
+(April 26, 2024)
+Abstract
+We present data from several German freeways showing diﬀere nt kinds of
+congested traﬃc forming near road inhomogeneities, speciﬁ cally lane clos-
+ings, intersections, or uphill gradients. The states are lo calized or extended,
+homogeneous or oscillating. Combined states are observed a s well, like the
+coexistence of moving localized clusters and clusters pinn ed at road inhomo-
+geneities, or regions of oscillating congested traﬃc upstr eam of nearly ho-
+mogeneous congested traﬃc. The experimental ﬁndings are co nsistent with
+a recently proposed theoretical phase diagram for traﬃc nea r on-ramps [D.
+Helbing, A. Hennecke, and M. Treiber, Phys. Rev. Lett. 82, 4360 (1999)].
+We simulate these situations with a novel continuous micros copic single-lane
+model, the “intelligent driver model” (IDM), using the empi rical boundary
+conditions. All observations, including the coexistence o f states, are qualita-
+tively reproduced by describing inhomogeneities with loca l variations of one
+model parameter. We show that the results of the microscopic model can be
+understood by formulating the theoretical phase diagram fo r bottlenecks in a
+more general way. In particular, a local drop of the road capa city induced by
+parameter variations has practically the same eﬀect as an on -ramp.
+Typeset using REVTEX
+1
+
+===== PAGE 2 =====
+
+I. INTRODUCTION
+Recently, there is much interest in the dynamics of traﬃc bre akdowns behind bottle-
+necks [1–15]. Measurements of traﬃc breakdowns on various f reeways in the USA [13,1,2,6],
+Germany, [3,4,16,17], Holland [18–22], and Korea [12] sugg est that many dynamic aspects
+are universal and therefore accessible to a physical descri ption. One common property is the
+capacity drop (typically of the order of 20%) associated wit h a breakdown [1,13,6], which
+leads to hysteresis eﬀects and is the basis of applications l ike dynamic traﬃc control with
+the aim of avoiding the breakdown. In the majority of cases, t raﬃc breaks down upstream
+of a bottleneck and the congestion has a stationary donstrea m front at the bottleneck. The
+type of bottleneck, e.g., on-ramps [2,13,12,4], lane closi ngs, or uphill gradients [17], seems
+not to be of importance. Several types of congested traﬃc hav e been found, among them
+extended states with a relatively high traﬃc ﬂow. These stat es, sometimes referred to as
+“synchronized traﬃc” [4], can be more or less homogeneously ﬂowing, or show distinct oscil-
+lations in the time series of detector data [3]. Very often, t he congested traﬃc ﬂow is, apart
+from ﬂuctuations, homogeneous near the bottleneck, but osc illations occur further upstream
+[7]. In other cases, one ﬁnds isolated stop-and-go waves tha t propagate in the upstream
+direction with a characteristic velocity of about 15 km/h [2 3,16]. Finally, there is also an
+observation of a traﬃc breakdown to a pinned localized clust er near an on-ramp [12].
+There are several possibilities to delineate traﬃc mathema tically, among them macro-
+scopic models describing the dynamics in terms of aggregate quantities like density or ﬂow
+[24–27,10], and microsopic models describing the motion of individual vehicles. The lat-
+ter include continuous-in-time models (car-following mod els) [28–37], and cellular automata
+[38–43]. Traﬃc breakdowns behind bottlenecks have been sim ulated with the non-local,
+gaskinetic-based traﬃc model (GKT model) [27], the K¨ uhne- Kerner-Konh¨ auser-Lee model
+(KKKL model) [44,26,10], and with a new car-following model , which will be reported below.
+For a direct comparison with empirical data, one would prefe r car-following models. As
+the position and velocity of each car is known in such models, one can reconstruct the
+way how data are obtained by usual induction-loop detectors . To this end, one introduces
+“virtual” detectors recording passage times and velocitie s of crossing vehicles and compares
+this ouput with the empirical data. Because traﬃc density is not a primary variable, this
+avoids the problems associated with determining the traﬃc d ensity by temporal averages
+[18].
+The present study refers to publication [14], where, based o n a gas-kinetic-based macro-
+scopic simulation model, it has been concluded that there sh ould be ﬁve diﬀerent congested
+traﬃc states on freeways with inhomogeneities like on-ramp s. The kind of congested state
+depends essentially on the inﬂow into the considered freewa y section and on the “bottleneck
+strength” characterizing the inhomogeneity. This can be su mmarized by a phase diagram
+depicting the kind of traﬃc state as a function of these two pa rameters. A similar phase
+diagram has been obtained for the KKKL model [11]. The questi on is, whether this ﬁnding
+is true for some macroscopic models only, or universal for a l arger class of traﬃc models and
+conﬁrmed by empirical data.
+The relative positions of some of the traﬃc states in this pha se space has been qualita-
+tively conﬁrmed for a Korean freeway [12], but only one type o f extended state has been
+measured there. Furthermore, this state did not have the cha racteristic properties of ex-
+2
+
+===== PAGE 3 =====
+
+tended congested traﬃc on most other freeways, cf. e.g., [4] . It is an open question to
+conﬁrm the relative position of the other states. Moreover, to our knowledge, there are no
+direct simulations of the diﬀerent breakdowns using empiri cal data as boundary conditions,
+neither with microscopic nor with macroscopic models.
+Careful investigations with a new follow-the-leader model (the IDM model) [36,37] show
+that (i) the conclusions of Ref [14] are also valid for certai n microscopic traﬃc models (at
+least deterministic models with a metastable density range ), (ii) the results can be sys-
+tematically transferred to more general (in particular ﬂow -conserving) kinds of bottlenecks,
+and a formula allowing to quantify the bottleneck strength i s given [see Eq. (15)], (iii) the
+existence of all predicted traﬃc states is empirically supp orted, and ﬁnally, (iv) all diﬀer-
+ent kinds of breakdowns can be simulated with the IDM model wi th empirically measured
+boundary conditions, varying only one parameter (the avera ge time headway T), which is
+used to specify the capacity of the stretch.
+The applied IDM model belongs to the class of deterministic f ollow-the-leader models
+like the optimal velocity model by Bando et al. [31], but it ha s the following advantages: (i)
+it behaves accident-free because of the dependence on the re lative velocity, (ii) for similar
+reasons and because of metastability, it shows the self-org anized characteristic traﬃc con-
+stants demanded by Kerner et al. [26] (see Fig. 4), hysteresi s eﬀects [45,13], and complex
+states [3,7], (iii) all model parameters have a reasonable i nterpretation, are known to be
+relevant, are empirically measurable, and have the expecte d order of magnitude [37], (iv)
+the fundamental diagram and the stability properties of the model can be easily (and sep-
+arately) calibrated to empirical data, (v) it allows for a fa st numerical simulation, and (vi)
+an equivalent macroscopic version of the model is known [46] , which is not the case for most
+other microscopic traﬃc models.
+These aspects are discussed in Sec. II, while Sec. III is not m odel-speciﬁc at all. Section
+III presents ways to specify and quantify bottlenecks, as we ll as the traﬃc states resulting for
+diﬀerent traﬃc volumes and bottleneck strengths. The analy tical expressions for the phase
+boundaries of the related phase diagram allow to conclude th at similar results will be found
+for any other traﬃc model with a stable, metastable, and unst able density range. Even such
+subtle features like tristability ﬁrst found in macroscopi c models [11,37] are observed. It
+would be certainly interesting to investigate in the future , whether the same phenomena are
+also found for CA models or stochastic traﬃc models like the o ne by Krauss [32].
+Section IV discusses empirical data using representative e xamples out of a sample of
+about 100 investigated breakdowns. Thanks to a new method fo r presenting the cross
+section data (based on a smoothing and interpolation proced ure), it is possible to present 3d
+plots of the empirical density or average velocity as a funct ion of time and space. This allows
+a good imagination of the traﬃc patterns and a direct visual c omparison with simulation
+results. In the IDM microsimulations, we used a very restric ted data set, namely only the
+measured ﬂows and velocities at the upstream and downstream boundaries omitting the data
+of the up to eight detectors in between. Although the simulat ed sections were up to 13 km
+long and the boundaries were typically outside of congestio ns, the simulations reproduced
+qualitatively the sometimes very complex observed collect ive dynamics.
+All in all the study supports the idea of the suggested phase d iagram of congested traﬃc
+states quite well and suggests ways to simulate real traﬃc br eakdowns at bottlenecks with
+empirical boundary conditions.
+3
+
+===== PAGE 4 =====
+
+II. THE MICROSCOPIC “INTELLIGENT DRIVER MODEL” (IDM)
+For about ﬁfty years now, researchers model freeway traﬃc by means of continuous-in-
+time microscopic models (car-following models) [47]. Sinc e then, a multitude of car-following
+models have been proposed, both for single-lane and multi-l ane traﬃc including lane changes.
+We will restrict, here, to phenomena for which lane changes a re not important and only
+consider single-lane models. To motivate our traﬃc model we ﬁrst give an overview of the
+dynamical properties of some popular microscopic models.
+A. Dynamic Properties of Some Car-F ollowing Models
+Continuous-time single-lane car-following models are deﬁ ned essentially by their acceler-
+ation function. In many of the earlier models [48–51], the ac celeration ˙vα(t + Tr) of vehicle
+α, delayed by a reaction time Tr, can be written as
+˙vα(t + Tr) = −λvm
+α ∆vα
+sl
+α
+. (1)
+The deceleration − ˙vα(t + Tr) is asumed to be proportional to the approaching rate
+∆vα(t) := vα(t) − vα−1(t) (2)
+of vehicle α with respect to the leading vehicle ( α − 1). In addition, the acceleration may
+depend on the own velocity vα [50] and decrease with some power of the net (bumper-to-
+bumper) distance
+sα = xα−1 − xα − lα (3)
+to the leading vehicle (where lα is the vehicle length) [50,51]. Since, according to Eq. (1),
+the acceleration depends on a leading vehicle, these models are not applicable for very low
+traﬃc densities. If no leading vehicle is present (correspo nding to sα → ∞ ), the acceleration
+is either not determined ( l = 0) or zero ( l > 0), regardless of the own velocity. However,
+one would expect in this case that drivers accelerate to an in dividual desired velocity. The
+car-following behavior in dense traﬃc is also somewhat unre alistic. In particular, the gap
+sα to the respective front vehicle does not necessarily relax t o an equilibrium value. Even
+small gaps will not induce braking reactions if the velocity diﬀerence ∆ vα is zero.
+These problems are solved by the car-following model of Newe ll [28]. In this model, the
+velocity at time ( t + Tr) depends adiabatically on the gap, i.e., the vehicle adapts exactly to
+a distance-dependent function V within the reaction time Tr,
+vα(t + Tr) = V
+(
+sα(t)
+)
+. (4)
+The “optimal velocity function” V (s) = v0{1− exp[−(s− s0)/(v0T )]}includes both, a desired
+velocity v0 for vanishing interactions ( s → ∞ ) and a safe time headway T characterizing the
+car-following behavior in dense (equilibrium) traﬃc. The N ewell model is collision-free, but
+the immediate dependence of the velocity on the density lead s to very high accelerations of
+4
+
+===== PAGE 5 =====
+
+the order of v0/Tr. Assuming a typical desired velocity of 30 m/s and Tr = 1 s, this would
+correspond to 30 m/s 2, which is clearly unrealistic [33,52].
+More than 30 years later, Bando et al. suggested a similar model,
+˙vα = V (sα) − vα
+τ (5)
+with a somewhat diﬀerent optimal velocity function. This “o ptimal-velocity mdoel” has
+been widely used by physicists because of its simplicity, an d because some results could be
+derived analytically. The dynamical behavior does not grea tly diﬀer from the Newell model,
+since the reaction time delay Tr of the Newell model can be compared with the velocity
+relaxation time τ of the optimal-velocity model. However, realistic velocit y relaxation times
+are of the order of 10 s (city traﬃc) to 40 s (freeway traﬃc) and therefore much larger than
+reaction delay times (of the order of 1 s). For typical values of the other parameters of the
+optimal-velocity model [31], crashes are only avoided if τ < 0.9 s, i.e., the velocity relaxation
+time is of the order of the reaction time, leading again to unr ealistically high values v0/τ of
+the maximum acceleration. The reason of this unstable behav ior is that eﬀects of velocity
+diﬀerences are neglected. However, they play an essential s tabilizing role in real traﬃc,
+especially when approaching traﬃc jams. Moreover, in model s (4) and (5), accelerations
+and decelerations are symmetric with respect to the deviati on of the actual velocity from
+the equilibrium velocity, which is unrealistic. The absolu te value of braking decelerations is
+usually stronger than that of accelerations.
+A relatively simple model with a generalized optimal veloci ty function incorporating
+both, reactions to velocity diﬀerences and diﬀerent rules f or acceleration and braking has
+been proposed rather recently [33]. This “generalized-for ce model” could successfully repro-
+duce the time-dependent gaps and velocities measured by a se nsor-equipped car in congested
+city traﬃc. However, the acceleration and deceleration tim es in this model are still unreal-
+istically small which requires ineﬃciently small time step s for the numerical simulation.
+Besides these simple models intended for basic investigati ons, there are also highly com-
+plex “high-ﬁdelity models” like the Wiedemann model [30] or MITSIM [34], which try to
+reproduce traﬃc as realistically as possible, but at the cos t of a large number of parameters.
+Other approaches that incorporate “intelligent” and reali stic braking reactions are the
+simple and fast stochastic models proposed by Gipps [29,53] and Krauss [32]. Despite their
+simplicity, these models show a realistic driver behavior, have asymmetric accelerations and
+decelerations, and produce no accidents. Unfortunately, t hey lose their realistic properties
+in the deterministic limit. In particular, they show no traﬃ c instabilities or hysteresis eﬀects
+for vanishing ﬂuctuations.
+B. Model Equations
+The acceleration assumed in the IDM is a continuous function of the velocity vα, the gap
+sα, and the velocity diﬀerence (approaching rate) ∆ vα to the leading vehicle:
+˙vα = a(α)
+
+ 1 −
+(
+vα
+v(α)
+0
+)δ
+−
+(
+s∗(vα, ∆vα)
+sα
+)2
+ . (6)
+5
+
+===== PAGE 6 =====
+
+This expression is an interpolation of the tendency to accel erate with af (vα) := a(α)[1 −
+(vα/v(α)
+0 )δ] on a free road and the tendency to brake with deceleration −bint(sα, vα, ∆vα) :=
+−a(α)(s∗/sα)2 when vehicle α comes too close to the vehicle in front. The deceleration ter m
+depends on the ratio between the “desired minimum gap” s∗ and the actual gap sα, where
+the desired gap
+s∗(v, ∆v) = s(α)
+0 + s(α)
+1
+√ v
+v(α)
+0
++ T αv + v∆v
+2
+√
+a(α)b(α)
+(7)
+is dynamically varying with the velocity and the approachin g rate.
+In the rest of this paper, we will study the case of identical v ehicles whose model pa-
+rameters v(α)
+0 = v0, s(α)
+0 = s0, T (α) = T , a(α) = a, b(α) = b, and δ are given in Table I. Here,
+our emphasis is on basic investigations with models as simpl e as possible, and therefore we
+will set sα
+1 = 0 resulting in a model where all parameters have an intuitiv e meaning with
+plausible and often easily measurable values. While the emp irical data presented in this
+paper can be nevertheless reproduced, a distinction of diﬀe rent driver-vehicle types and/or
+a nonzero s1 [37] is necessary for a more quantitative agreement. A nonze ro s1 would also be
+necessary for features requiring an inﬂection point in the e quilibrium ﬂow-density relation,
+e.g., for certain types of multi-scale expansions [54].
+C. Dynamic Single-V ehicle Properties
+Special cases of the IDM acceleration (6) with s1 = 0 include the following driving modes:
+a. Equilibrium traﬃc: In equilibrium traﬃc of arbitrary density ( ˙ vα = 0, ∆ vα = 0),
+drivers tend to keep a velocity-dependent equilibrium gap se(vα) to the front vehicle given
+by
+se(v) = s∗(v, 0)
+[
+1 −
+( v
+v0
+)δ] − 1
+2
+= (s0 + vT )
+[
+1 −
+( v
+v0
+)δ] − 1
+2
+. (8)
+In particular, the equilibrium gap of homogeneous congested traﬃc (with vα ≪ v0) is essen-
+tially equal to the desired gap, se(v) ≈ s0 + vT , i.e., it is composed of a bumper-to-bumper
+space s0 kept in standing traﬃc and an additional velocity-dependen t contribution vT corre-
+sponding to a constant safe time headway T . This high-density limit is of the same functional
+form as that of the Newell model, Eq. (4). Solving Eq. (8) for v := Ve(s) leads to simple
+expressions only for δ = 1, δ = 2, or δ → ∞ . In particular, the equilibium velocity for δ = 1
+and s0 = 0 is
+Ve(s)|δ=1,s0=0 = s2
+2v0T 2
+
+ −1 +
+√
+1 + 4T 2v2
+0
+s2
+
+ . (9)
+Further interesting cases are
+Ve(s)|δ=2,s0=0 = v0
+√
+1 + v2
+0T 2
+s2
+, (10)
+6
+
+===== PAGE 7 =====
+
+and
+Ve(s)|δ→∞ = min{v0, (s − s0)/T }. (11)
+From a macroscopic point of view, equilibrium traﬃc consisting of identical ve hicles can be
+characterized by the equilibrium traﬃc ﬂow Qe(ρ) = ρVe(ρ) (vehicles per hour and per lane)
+as a function of the traﬃc density ρ (vehicles per km and per lane). For the IDM model, this
+“fundamental diagram” follows from one of the equilibrium r elations (8) to (11), together
+with the micro-macro relation between gap and density:
+s = 1/ρ − l = 1/ρ − 1/ρmax. (12)
+Herein, the maximum density ρmax is related to the vehicle length l by ρmaxl = 1. Figure
+1 shows the fundamental diagram and its dependence on the par ameters δ, v0, and T . In
+particular, the fundamental diagram for s0 = 0 and δ = 1 is identical to the equilibrium
+relation of the macroscopic GKT model, if the GKT parameter ∆ A is set to zero (cf. Eq.
+(23) in Ref. [27]), which is a necessary condition for a micro -macro correspondence [46].
+b. Acceleration to the desired velocity: If the traﬃc density is very low ( s is large), the
+interaction term is negligible and the IDM acceleration red uces to the free-road acceleration
+af (v) = a(1 − v/v0)δ, which is a decreasing function of the velocity with a maximu m value
+af (0) = a and af (v0) = 0. In Fig. 2, this regime applies for times t ≤ 60 s. The acceleration
+exponent δ speciﬁes how the acceleration decreases when approaching t he desired velocity.
+The limiting case δ → ∞ corresponds to approaching v0 with a constant acceleration a, while
+δ = 1 corresponds to an exponential relaxation to the desired v elocity with the relaxation
+time τ = v0/a. In the latter case, the free-traﬃc acceleration is equival ent to that of the
+optimal-velocity model (5) and also to acceleration functi ons of many macroscopic models
+like the KKKL model [26], or the GKT model [27]. However, the m ost realistic behavior
+is expected in between the two limiting cases of exponential acceleration (for δ = 1) and
+constant acceleration (for δ → ∞ ), which is conﬁrmed by our simulations with the IDM.
+Throughout this paper we will use δ = 4.
+c. Braking as reaction to high approaching rates: When approaching slower or standing
+vehicles with suﬃciently high approaching rates ∆ v > 0, the equilibrium part s0 + vT of the
+dynamical desired distance s∗, Eq. (7), can be neglected with respect to the nonequilibriu m
+part, which is proportional to v∆v. Then, the interaction part −a(s∗/s)2 of the acceleration
+equation (6) is given by
+bint(s, v, ∆v) ≈ (v∆v)2
+4bs2 . (13)
+This expression implements anticipative “intelligent” br aking behavior, which we disuss now
+for the spacial case of approaching a standing obstacle (∆ v = v). Anticipating a constant
+deceleration during the whole approaching process, a minim um kinematic deceleration bk :=
+v2/(2s) is necessary to avoid a collision. The situation is assumed to be “under control”,
+if bk is smaller than the “comfortable” deceleration given by the model parameter b, i.e.,
+β := bk/b ≤ 1. In contrast, an emergency situation is characterized by β > 1. With these
+deﬁnitions, Eq. (13) becomes
+bint(s, v, v) = b2
+k
+b = βbk. (14)
+7
+
+===== PAGE 8 =====
+
+While in safe situations the IDM deceleration is less than th e kinematic collision-free decel-
+eration, drivers overreact in emergency situations to get t he situation again under control. It
+is easy to show that in both cases the acceleration approache s ˙v = −b under the deceleration
+law (14). Notice that this stabilizing behavior is lost if on e replaces in Eq. (6) the braking
+term −a(s∗/s)2 by −a′(s∗/s)δ′
+with δ′ ≤ 1 corresponding to bint(s, v, v) = βδ′−1bk. The
+“intelligent” braking behavior of drivers in this regime ma kes the model collision-free. The
+right parts of the plots of Fig. 2 ( t > 70 s) show the simulated approach of an IDM vehicle
+to a standing obstacle. As expected, the maximum decelerati on is of the order of b. For
+low velocities, however, the equilibrium term s0 + vT of s∗ cannot be neglected as assumed
+when deriving Eq. (14). Therefore, the maximum deceleratio n is somewhat lower than b
+and the deceleration decreases immediately before the stop while, under the dynamics (14),
+one would have ˙v = −b.
+Similar braking rules have been implemented in the model of K rauss [32], where the
+model is formulated in terms of a time-discretizised update scheme (iterated map), where
+the velocity at timestep ( t + 1) is limited to a “safe velocity” which is calculated on the basis
+of the kinematic braking distance at a given “comfortable” d eceleration.
+d. Braking in response to small gaps: The forth driving mode is active when the gap is
+much smaller than s∗ but there are no large velocity diﬀerences. Then, the equili brium part
+s0 + vT of s∗ dominates over the dynamic contribution proportional to ∆ v. Neglecting the
+free-road acceleration, Eq. (6) reduces to ˙ v ≈ − (s0 + vT )2/s2, corresponding to a Coulomb-
+like repulsion. Such braking interactions are also impleme nted in other models, e.g., in the
+model of Edie [51], the GKT model [27], or in certain regimes o f the Wiedemann model [30].
+The dynamics in this driving regime is not qualitatively diﬀ erent, if one replaces −a(s∗/s)2
+by −a(s∗/s)δ′
+with δ′> 0. This is in contrast to the approaching regime, where colli sions
+would be provoked for δ′≤ 1. Figure 3 shows the car-following dynamics in this regime. For
+the standard parameters, one clearly sees an non-oscillato ry relaxation to the equilibrium
+distance (solid curve), while for very high values of b, the approach to the equilibrium
+distance would occur with damped oscillations (dashed curv e). Notice that, for the latter
+parameter set, the collective traﬃc dynamics would already be extremely unstable.
+D. Collective Behavior and Stability Diagram
+Although we are interested in realistic open traﬃc systems, it turned out that many
+features can be explained in terms of the stability behavior in a closed system. Figure
+4(a) shows the stability diagram of homogeneous traﬃc on a ci rcular road. The control
+parameter is the homogeneous density ρh. We applied both a very small and a large localized
+perturbation to check for linear and nonlinear stability, a nd plotted the resulting minimum
+(ρout) and maximum ( ρjam) densities after a stationary situation was reached. The re sulting
+diagram is very similar to that of the macroscopic KKKL and GK T models [26,27]. In
+particular, it displays the following realistic features: (i) Traﬃc is stable for very low and
+high densities, but unstable for intermediate densities. ( ii) There is a density range ρc1 ≤
+ρh ≤ ρc2 of metastability, i.e., only perturbations of suﬃciently l arge amplitudes grow, while
+smaller perturbations disappear. Note that, for most IDM pa rameter sets, there is no second
+metastable range at higher densities, in contrast to the GKT and KKKL models. Rather,
+traﬃc ﬂow becomes stable again for densities exceeding the c ritical density ρc3, or congested
+8
+
+===== PAGE 9 =====
+
+ﬂows below Qc3 = Qe(ρc3). (iii) The density ρjam inside of traﬃc jams and the associated ﬂow
+Qjam = Qe(ρjam), cf. Fig. 4(b), do not depend on ρh. For the parameter set chosen here, we
+have ρjam = ρc3 = 140 vehicles/km, and Qjam = 0, i.e., there is no linearly stable congested
+traﬃc with a ﬁnite ﬂow and velocity. For other parameters, es pecially for a nonzero IDM
+parameter s1, both Qjam and Qc3 can be nonzero and diﬀerent from each other [37].
+As further “traﬃc constants”, at least in the density range 2 0 veh./km ≤ ρh ≤ 50
+veh./km, we observe a constant outﬂow Qout = Qe(ρout) and propagation velocity vg =
+(Qout − Qjam)/(ρout − ρjam) ≈ − 15 km/h of traﬃc jams. Figure 4(b) shows the stability
+diagram for the ﬂows. In particular, we have Qc1 < Q out ≈ Qc2, where Qci = Qe(ρci),
+i.e., the outﬂow from congested traﬃc is at the margin of line ar stability, which is also the
+case in the GKT for most parameter sets [27,14]. For other IDM parameters, the outﬂow
+Qout ∈ [Qc1, Qc2] is metastable [37], or even at the margin of nonlinear stabi lity [36].
+In open systems, a third type of stability becomes relevant. Traﬃc i s convectively stable,
+if, after a suﬃciently long time, all perturbations are conv ected out of the system. Both, in
+the macroscopic models and in the IDM, there is a considerabl e density region ρcv ≤ ρh ≤ ρc3,
+where traﬃc is linearly unstable but convectively stable. F or the parameters chosen in this
+paper, congested traﬃc is always linearly unstable, but convectively stable for ﬂows below
+Qcv = Qe(ρcv) = 1050 vehicles/h. A nonzero jam distance s1 is required for linearly stable
+congested traﬃc with nonzero ﬂows [37], at least, if the mode l should simultaneously show
+traﬃc instabilities.
+E. Calibration
+Besides the vehicle length l, the IDM has seven parameters, cf. Table I. The fundamental
+relations of homogeneous traﬃc are calibrated with the desired veloci ty v0 (low density), safe
+time headway T (high density), and the jam distances s0 and s1 (jammed traﬃc). In the low-
+density limit ρ ≪ (v0T )−1, the equilibrium ﬂow can be approximated by Qe ≈ V0ρ. In the
+high density regime and for s1 = 0, one has a linear decrease of the ﬂow Qe ≈ [1− ρ(l+s0)]/T
+which can be used to determine ( l + s0) and T . Only for nonzero s1, one obtains an
+inﬂection point in the equilibrium ﬂow-density relation Qe(ρ). The acceleration coeﬃcient
+δ inﬂuences the transition region between the free and conges ted regimes. For δ → ∞ and
+s1 = 0, the fundamental diagram (equilibrium ﬂow-density rela tion) becomes triangular-
+shaped: Qe(ρ) = min( v0ρ, [1 − ρ(l + s0)]/T ). For decreasing δ, it becomes smoother and
+smoother, cf. Fig. 1(a).
+The stability behavior of traﬃc in the IDM model is determined mainly by the maximum
+acceleration a, desired deceleration b, and by T . Since the accelerations a and b do not
+inﬂuence the fundamental diagram, the model can be calibrat ed essentially independently
+with respect to traﬃc ﬂows and stability. As in the GKT model, traﬃc becomes more
+unstable for decreasing a (which corresponds to an increased acceleration time τ = v0/a),
+and with decreasing T (corresponding to reduced safe time headways). Furthermor e, the
+instability increases with increasing b. This is also plausible, because an increased desired
+deceleration b corresponds to a less anticipative or less defensive brakin g behavior. The
+density and ﬂow in jammed traﬃc and the outﬂow from traﬃc jams is also inﬂuenced by
+s0 and s1. In particular, for s1 = 0, the traﬃc ﬂow Qjam inside of traﬃc jams is typically
+zero after a suﬃciently long time [Fig. 4(b)], but nonzero ot herwise. The stability of the
+9
+
+===== PAGE 10 =====
+
+self-organized outﬂow Qout depends strongly on the minimum jam distance s0. It can be
+unstable (small s0), metastable, or stable (large s0). In the latter case, traﬃc instabilities
+can only lead to single localized clusters, not to stop-and g o traﬃc.
+III. MICROSCOPIC SIMULA TION OF OPEN SYSTEMS WITH AN
+INHOMOGENEITY
+We simulated identical vehicles of length l = 5 m with the typical IDM model parameters
+listed in Table I. Moreover, although the various congested states discussed in the following
+were observed on diﬀerent freeways, all of them were qualita tively reproduced with very
+restrictive variations of one single parameter (the safe ti me headway T ), while we always
+used the same values for the other parameters (see Table I). T his indicates that the model
+is quite realistic and robust. Notice that all parameters ha ve plausible values. The value
+T = 1.6 s for the safe time headway is slightly lower than suggested by German authorities
+(1.8 s). The acceleration parameter a = 0 .73 m/s 2 corresponds to a free-road acceleration
+from v = 0 to v = 100 km/h within 45 s, cf. Fig. 2(b). This value is obtained by
+integrating the IDM acceleration ˙ v = a[1 − (v/v0)δ] with v0 = 120 km/h, δ = 4, and the
+initial value v(0) = 0. While this is considerably above minimum accelerati on times (10
+s - 20 s for average-powered cars), it should be characterist ic for everyday accelerations.
+The comfortable deceleration b = 1 .67 m/s 2 is also consistent with empirical investigations
+[52,33], and with parameters used in more complex models [34 ].
+With eﬃcient numerical integration schemes, we obtained a n umerical performance of
+about 10 5 vehicles in realtime on a usual workstation [55].
+A. Modelling of Inhomogeneities
+Road inhomogeneities can be classiﬁed into ﬂow-conserving local defects like narrow road
+sections or gradients, and those that do not conserve the ave rage ﬂow per lane, like on-ramps,
+oﬀ-ramps, or lane closings.
+Non-conserving inhomogeneities can be incorporated into macroscopic mode ls in a natu-
+ral way by adding a source term to the continuity equation for the vehicle density [56,8,10].
+An explicit microscopic modelling of on-ramps or lane closi ngs, however, would require a
+multi-lane model with an explicit simulation of lane change s. Another possibility opened by
+the recently formulated micro-macro link [46] is to simulat e the ramp section macroscopi-
+cally with a source term in the continuity equation [8], and t o simulate the remaining stretch
+microscopically.
+In contrast, ﬂow conserving inhomogeneities can be implemented easily in both micro-
+scopic and macroscopic single-lane models by locally chang ing the values of one or more
+model parameters or by imposing external decelerations [5] . Suitable parameters for the
+IDM and the GKT model are the desired velocity v0, or the safe time headway T . Regions
+with locally decreased desired velocity can be interpreted either as sections with speed lim-
+its, or as sections with uphill gradients (limiting the maxi mum velocity of some vehicles)
+[57]. Increased safe time headways can be attributed to more careful driving behavior along
+curves, on narrow, dangerous road sections, or a reduced ran ge of visibility.
+10
+
+===== PAGE 11 =====
+
+Local parameter variations act as a bottleneck, if the outﬂo w Q′
+out from congested traﬃc
+(dynamic capacity) in the downstream section is reduced wit h respect to the outﬂow Qout
+in the upstream section. This outﬂow can be determined from f ully developed stop-and
+go waves in a closed system, whose outﬂow is constant in a rather large range of av erage
+densities ρh ∈ [20 veh./km, 60 veh./km], cf. Fig. 4(b). It will turn out that the outﬂow Q′
+out
+is the relevant capacity for understanding congested traﬃc , and not the maximum ﬂow Qmax
+(static capacity), which can be reached in (spatially homog eneous) equilibrium traﬃc only.
+The capacities are decreased, e.g., for a reduced desired ve locity v′
+0 < v 0 or an increased safe
+time headway T ′> T , or both. Figure 5 shows Qout and Qmax as a function of T . For T ′> 4
+s, traﬃc ﬂow is always stable, and the outﬂow from jams is equa l to the static capacity.
+For extended congested states, all types of ﬂow-conserving bottlenecks result in a similar
+traﬃc dynamics, if δQ = (Qout − Q′
+out) is identical, where Q′
+out is the outﬂow for the changed
+model parameters v′
+0, T ′, etc. Qualitatively the same dynamics is also observed in macro-
+scopic models including on-ramps, if the ramp ﬂow satisﬁes Qrmp ≈ δQ [37]. This suggests
+to introduce the following general deﬁnition of the “bottle neck strength” δQ:
+δQ := Qrmp + Qout − Q′
+out, (15)
+In particular, we have δQ = Qrmp for on-ramp bottlenecks, and δQ = ( Qout − Q′
+out) for
+ﬂow-conserving bottlenecks, but formula (15) is also appli cable for a combination of both.
+B. Phase Diagram of T raﬃc States in Open Systems
+In contrast to closed systems, in which the long-term behavior and stability is es sentially
+determined by the average traﬃc density ρh, the dynamics of open systems is controlled by
+the inﬂow Qin to the main road (i.e., the ﬂow at the upstream boundary). Fur thermore,
+traﬃc congestions depend on road inhomogeneities and, beca use of hysteresis eﬀects, on the
+history of previous perturbations.
+In this paper, we will implement ﬂow-conserving inhomogene ities by a variable safe time
+headway T (x). We chose T as variable model parameter because it inﬂuences the ﬂows mo re
+eﬀectively than v0, which has been varied in Ref. [37]. Speciﬁcally, we increas e the local safe
+time headway according to
+T (x) =
+
+
+
+
+
+
+
+T x ≤ − L/2
+T ′ x ≥ L/2
+T + (T ′− T )
+(
+x
+L + 1
+2
+)
+|x|< L/2,
+(16)
+where the transition region of length L = 600 is analogous to the ramp length for inho-
+mogeneities that do not conserve the ﬂow. The bottleneck str ength δQ(T ′) = [ Qout(T ) −
+Qout(T ′)] is an increasing function of T ′, cf. Fig. 5(a). We investigated the traﬃc dynamics
+for various points ( Qin, δQ) or, alternatively, ( Qin, T ′− T ) in the control-parameter space.
+Due to hysteresis eﬀects and multistability, the phase diag ram, i.e., the asymptotic traﬃc
+state as a function of the control parameters Qin and ∆ T , depends also on the history,
+i.e., on initial conditions and on past boundary conditions and perturbations. Since we
+cannot explore the whole functional space of initial condit ions, boundary conditions, and
+past perturbations, we used the following three representa tive “standard” histories.
+11
+
+===== PAGE 12 =====
+
+A. Assuming very low values for the initial density and ﬂow, w e slowly increased the
+inﬂow to the prescribed value Qin.
+B. We started the simulation with a stable pinned localized c luster (PLC) state and a
+consistent value for the inﬂow Qin. Then, we adiabatically changed the inﬂow to the
+values prescribed by the point in the phase diagram.
+C. After running history A, we applied a large perturbation a t the downstream boundary.
+If traﬃc at the given phase point is metastable, this initiat es an upstream propagating
+localized cluster which ﬁnally crosses the inhomogeneity, see Fig. 7(a)-(c). If traﬃc
+is unstable, the breakdown already occurs during time perio d A, and the additional
+perturbation has no dynamic inﬂuence.
+For a given history, the resulting phase diagram is unique. T he solid lines of Fig. 6 show
+the IDM phase diagram for History C. Spatio-temporal densit y plots of the congested traﬃc
+states themselfes are displayed in Fig. 7. To obtain the spat iotemporal density ρ(x, t) from
+the microscopic quantities, we generalize the micro-macro relation (12) to deﬁne the density
+at discrete positions xα + l+sα
+2 centered between vehicle α and its predecessor,
+ρ(xα + l + sα
+2 ) = 1
+l + sα
+, (17)
+and interpolate linearly between these positions. Dependi ng on Qin and δT := (T ′− T ), the
+downstream perturbation (i) dissipates, resulting in free traﬃc (FT), (ii) travels through the
+inhomogeneity as a moving localized cluster (MLC) and neith er dissipates nor triggers new
+breakdowns, (iii) triggers a traﬃc breakdown to a pinned loc alized cluster (PLC), which
+remains localized near the inhomogeneity for all times and e ither is stationary (SPLC),
+cf. Fig. 8(a) for t < 0.2 h, or oscillatory (OPLC). (iv) Finally, the initial pertur bation
+can induce extended congested traﬃc (CT), whose downstream boundaries are ﬁxed at
+the inhomogeneity, while the upstream front propagates fur ther upstream in the course of
+time. Extended congested traﬃc can be homogeneous (HCT), os cillatory (OCT), or consist
+of triggered stop-and-go waves (TSG). We also include in the HCT region a complex state
+(HCT/OCT) where traﬃc is homogeneous only near the bottlene ck, but growing oscillations
+develop further upstream. In contrast to OCT, where there is permanently congested traﬃc
+at the inhomogeneity (“pinch region” [7,36]), the TSG state is characterized by a series of
+isolated density clusters, each of which triggers a new clus ter as it passes the inhomogeneity.
+The maximum perturbation of History C, used also in Ref. [14] , seems to select always the
+stable extended congested phase. We also scanned the contro l-parameter space ( Qin, δQ)
+with Histories A and B exploring the maximum phase space of th e (meta)stable FT and
+PLC states, respectively, cf. Fig. 6. In multistable region s of the control-parameter space,
+the three histories can be used to select the diﬀerent traﬃc s tates, see below.
+C. Multistability
+In general, the phase transitions between free traﬃc, pinne d localized states, and ex-
+tended congested states are hysteretic. In particular, in a ll four examples of Fig. 7, free
+12
+
+===== PAGE 13 =====
+
+traﬃc is possible as a second, metastable state. In the regio ns between the two dotted lines
+of the phase diagram Fig. 6, both, free and congested traﬃc is possible, depending on the
+previous history. In particular, for all ﬁve indicated phas e points, free traﬃc would persist
+without the downstream perturbation. In contrast, the tran sitions PLC-OPLC, and HCT-
+OCT-TSG seem to be non-hysteretic, i.e., the type of pinned l ocalized cluster or of extended
+congested traﬃc, is uniquely determined by Qin and δQ.
+In a small subset of the metastable region, labelled “TRI” in Fig. 6, we even found
+tristability with the possible states FT, PLC, and OCT. Figure 8(a) shows t hat a single
+moving localized cluster passing the inhomogeneity trigge rs a transition from PLC to OCT.
+Starting with free traﬃc, the same perturbation would trigg er OCT as well [Fig. 8(b)], while
+we never found reverse transitions OCT → PLC or OCT → FT (without a reduction of the
+inﬂow). That is, FT and PLC are metastable in the tristable re gion, while OCT is stable.
+We obtained qualitatively the same also for the macroscopic GKT model with an on-ramp
+as inhomogeneity [Fig. 8(c)]. Furthermore, tristability b etween FT, OPLC, and OCT has
+been found for the IDM model with variable v0 [37], and for the KKKL model [11].
+Such a tristability can only exist if the (self-organized) o utﬂow QOCT
+out = ˜Qout from the
+OCT state is lower than the maximum outﬂow QPLC
+out from the PLC state. A phenomenologi-
+cal explanation of this condition can be inferred from the po sitions of the downstream fronts
+of the OCT and PLC states shown in Fig. 8(a). The downstream fr ont of the OCT state
+(t > 1 h) is at x ≈ 300 m, i.e., at the downstream boundary of the L = 600 m wide transition
+region, in which the safe time headway Eq. (16) increases fro m T to T ′ > T . Therefore,
+the local safe time headway at the downstream front of OCT is T ′, or QOCT
+out ≈ Q′
+out, which
+was also used to derive Eq. (18). In contrast, the PLC state is centered at about x = 0, so
+that an estimate for the upper boundary QPLC
+out of the outﬂow is given by the self-organized
+outﬂow Qout corresponding to the local value T (x) = ( T + T ′)/2 of the safe time headway
+at x = 0. Since ( T + T ′)/2 < T ′ this outﬂow is higher than QOCT
+out (cf. Fig. 5). It is an
+open question, however, why the downstream front of the OCT s tate is further downstream
+compared to the PLC state. Possibly, it can be explained by th e close relationship of OCT
+with the TSG state, for which the newly triggered density clu sters even enter the region
+downstream of the bottleneck [cf. Fig. 7(c)]. In accordance with its relative location in
+the phase diagram, it is plausible that the OCT state has a “pe netration depth” into the
+downstream area that is in between the one of the PLC and the TS G states.
+D. Boundaries between and Coexistence of T raﬃc States
+Simulations show that the outﬂow ˜Qout from the nearly stationary downstream fronts of
+OCT and HCT satisﬁes ˜Qout ≤ Q′
+out, where Q′
+out is the outﬂow from fully developed density
+clusters in homogeneous systems for the downstream model pa rameters. If the bottleneck
+is not too strong (in the phase diagram Fig. 6, it must satisfy δQ < 350 vehicles/h), we
+have ˜Qout ≈ Q′
+out. Then, for all types of bottlenecks, the congested traﬃc ﬂow is given by
+Qcong = ˜Qout − Qrmp ≈ Q′
+out − Qrmp, or
+Qcong ≈ Qout − δQ. (18)
+Extended congested traﬃc (CT) only persists, if the inﬂow Qin exceeds the congested traﬃc
+ﬂow Qcong. Otherwise, it dissolves to PLC. This gives the boundary
+13
+
+===== PAGE 14 =====
+
+CT → PLC : δQ ≈ Qout − Qin. (19)
+If the traﬃc ﬂow of CT states is linearly stable (i.e., Qcong < Q c3), we have HCT. If,
+for higher ﬂows, it is linearly unstable but convectively stable, Qcong ∈ [Qc3, Qcv], one has
+a spatial coexistence HCT/OCT of states with HCT near the bottleneck and OCT furthe r
+upstream. If, for yet higher ﬂows, congested traﬃc is also co nvectively unstable, the resulting
+oscillations lead to TSG or OCT. In summary, the boundaries o f the nonhysteretic transitions
+are given by
+HCT ↔ HCT/OCT : δQ ≈ Qout − Qc3,
+OCT ↔ HCT/OCT : δQ ≈ Qout − Qcv. (20)
+Congested traﬃc of the HCT/OCT type is frequently found in em pirical data [7]. In the
+IDM, this frequent occurrence is reﬂected by the wide range o f ﬂows falling into this regime.
+For the IDM parameters chosen here, we have Qc3 = 0, and Qcv = 1050 vehicles/h, i.e., all
+congested states are linearly unstable and oscillations wi ll develop further upstream, while
+Qc3 is nonzero for the parameters of Ref. [37].
+Free traﬃc is (meta)stable in the overall system if it is (met a)stable in the bottleneck
+region. This means, a breakdown necessarily takes place if t he inﬂow Qin exceeds the critical
+ﬂow [Q′
+c2(δQ)− Qrmp], where the linear stability threshold Q′
+c2(δQ) in the downstream region
+is some function of the bottleneck strength. For the IDM with the parameters chosen here,
+we have Q′
+c2 ≈ Q′
+out, see Fig. 4(b). Then, the condition for the maximum inﬂow all owing
+for free traﬃc simpliﬁes to
+FT → PLC or FT → CT : Qin ≈ Qout − δQ, (21)
+i.e., it is equivalent to relation (19). In the phase diagram of Fig. 6, this boundary is given
+by the dotted line. For bottleneck strengths δQ ≤ 350 vehicles/h, this line coincides with
+that of the transition CT → PLC, in agrement with Eqs (21) and (19). For larger bottlenec k
+strengths, the approximation ˜Qout ≈ Q′
+out used to derive relation (19) is not fulﬁlled.
+IV. EMPIRICAL DA T A OF CONGESTED TRAFFIC ST A TES AND THEIR
+MICROSCOPIC SIMULA TION
+We analyzed one-minute averages of detector data from the Ge rman freeways A5-South
+and A5-North near Frankfurt, A9-South near Munich, and A8-East from Munich to Salzburg.
+Traﬃc breakdowns occurred frequently on all four freeway se ctions. The data suggest that
+the congested states depend not only on the traﬃc situation b ut also on the speciﬁc infra-
+structure.
+On the A5-North, we mostly found pinned localized clusters ( ten times during the ob-
+servation period). Besides, we observed moving localized c lusters (two times), triggered
+stop-and-go traﬃc (three times), and oscillating congeste d traﬃc (four times).
+All eight recorded traﬃc breakdowns on the A9-South were to o scillatory congested
+traﬃc, and all emerged upstream of intersections. The data o f the A8 East showed OCT
+with a more heavily congested HCT/OCT state propagating thr ough it. Besides this, we
+found breakdowns to HCT/OCT on the A5-South (two times), one of them caused by
+14
+
+===== PAGE 15 =====
+
+lane closing due to an external incident. In contrast, HCT st ates are often found on the
+Dutch freeway A9 from Haarlem to Amsterdam behind an on-ramp with a very high inﬂow
+[18,37,20–22]. Before we present representative data for e ach traﬃc state, some remarks
+about the presentation of the data are in order.
+A. Presentation of the Empirical Data
+In all cases, the traﬃc data were obtained from several sets o f double-induction-loop
+detectors recording, separately for each lane, the passage times and velocities of all vehicles.
+Only aggregate information was stored. On the freeways A8 an d A9, the numbers of cars
+and trucks that crossed a given detector on a given lane in eac h one-minute interval, and the
+corresponding average velocities was recorded. On the free ways A5-South and A5-North,
+the data are available in form of a histogram for the velocity distribution. Speciﬁcally, the
+measured velocities are divided into nr ranges ( nr = 15 for cars and 12 for trucks), and the
+number of cars and trucks driving in each range are recorded f or every minute. This has the
+advantage that more “microscopic” information is given com pared to one-minute averages
+of the velocity. In particular, the local traﬃc density ρ∗(x, t) = Q/V ∗ could be estimated
+using the “harmonic” mean V ∗ = ⟨1/vα⟩−1 of the velocity, instead of the arithmetic mean
+ρ = Q/V with V = ⟨vα⟩. Here, Q is the traﬃc ﬂow (number of vehicles per time iterval),
+and ⟨· · ·⟩denotes the temporal average over all vehicles α passing the detector within the
+given time interval.
+The harmonic mean value V ∗ corrects for the fact that the spatial velocity distribution
+diﬀers from the locally measured one [18]. However, for better comparison with those freeway
+data, where this information is not available, we will use al ways the arithmetic velocity
+average V in this paper. Unfortunately, the velocity intervals of the A5 data are coarse. In
+particular, the lowest interval ranges from 0 to 20 km/h. Bec ause we used the centers of the
+intervals as estimates for the velocity, there is an artiﬁci al cutoﬀ in the corrsponding ﬂow-
+density diagrams 10(b), and 15(c). Below the line Qmin(ρ) = Vminρ with Vmin = 10 km/h.
+Besides time series of ﬂow and velocity and ﬂow-density diag rams, we present the data also
+in form of three-dimensional plots of the locally averaged v elocity and traﬃc density as a
+function of position and time. This representation is parti cularly useful to distinguish the
+diﬀerent congested states by their qualitative spatio-tem poral dynamics. Two points are
+relevant, here. First, the smallest time scale of the collec tive eﬀects (i.e., the smallest period
+of density oscillations) is of the order of 3 minutes. Second , the spatial resolution of the data
+is restricted to typical distances between two neighboring detectors which are of the order
+of 1 kilometer. To smooth out the small-timescale ﬂuctuatio ns, and to obtain a continuous
+function Yemp(x, t) from the one-minute values Y (xi, tj) of detector i at time tj with Y = ρ,
+V , or Q, we applied for all three-dimensional plots of an empirical quantity Y the following
+smoothing and interpolation procedure:
+Yemp(x, t) = 1
+N
+∑
+xi
+∑
+tj
+Y (xi, tj) exp
+{
+− (x − xi)2
+2σ2
+x
+− (t − tj)2
+2σ2
+t
+}
+. (22)
+The quantity
+15
+
+===== PAGE 16 =====
+
+N =
+∑
+xi
+∑
+tj
+exp
+{
+− (x − xi)2
+2σ2x
+− (t − tj)2
+2σ2
+t
+}
+, (23)
+is a normalization factor. We used smoothing times and lengt h scales of σt = 1 .0 min and
+σx = 0.2 km, respectively. For consistency, we applied this smooth ing operation also to the
+simulation results. Unless explicitely stated otherwise, we will understand all empirical data
+as lane averages.
+B. Homogeneous Congested T raﬃc
+Figure 9 shows data of a traﬃc breakdown on the A5-South on Aug ust 6, 1998. Sketch
+9(a) shows the considered section. The ﬂow data at cross sect ion D11 in Fig. 9(b) illustrate
+that, between 16:20 h and 17:30 h, the traﬃc ﬂow on the right la ne dropped to nearly zero.
+For a short time interval between 17:15 h and 17:25 h also the ﬂ ow on the middle lane
+dropped to nearly zero. Simultaneously, there is a sharp dro p of the velocity at this cross
+section on all lanes, cf. Fig. 10(d). In contast, the velocit ies at the downstram cross section
+D12 remained relatively high during the same time. This sugg ests a closing of the right lane
+at a location somewhere between the detectors D11 and D12.
+Figures 10(d) and (f) show that, in most parts of the congeste d region, there were little
+variations of the velocity. The traﬃc ﬂow remained relative ly high, which is a signature of
+synchronized traﬃc [4]. In the immediate upstream (D11) and downstream (D12) neigh-
+bourhood of the bottleneck, the amplitude of the ﬂuctuation s of traﬃc ﬂow was low as well,
+in particular, it was lower than in free traﬃc (time series at D11 and D12 for t < 16:20 h,
+or t > 18:00 h). Further upstream in the congested region (D10), ho wever, the ﬂuctuation
+amplitude increases. After the bottleneck was removed at ab out 17:35 h, the previously
+ﬁxed downstream front started moving in the upstream direction at a characteristic velocity
+of about 15 km/h [16]. Simultaneously, the ﬂow increased to a bout 1600 vehicles/h, see
+plots 10(e) and 10(g). After the congestion dissolved at abo ut 17:50 h, the ﬂow dropped to
+about 900 vehicles/h/lane, which was the inﬂow at that time.
+Figure 10(a) shows the ﬂow-density diagram of the lane-aver aged one-minute data. In
+agreement with the absence of large oscillations (like stop -and-go traﬃc), the regions of data
+points of free and congested traﬃc were clearly separated. F urthermore, the transition from
+the free to the congested state and the reverse transition sh owed a clear hysteresis.
+The spatio-temporal plot of the local velocity in Fig. 11(a) shows that the incident
+induced a breakdown to an extended state of essentially homo geneous congested traﬃc.
+Only near the upstream boundary, there were small oscillati ons. While the upstream front
+(where vehicles entered the congested region) propagated u pstream, the downstream front
+(where vehicles could accelerate into free traﬃc) remained ﬁxed at the bottleneck at x ≈ 478
+km. In the spatio-temporal plot of the traﬃc ﬂow Fig. 11(b), o ne clearly can see the ﬂow
+peak in the region x > 476 km after the bottleneck was removed.
+We estimate now the point in the phase diagram to which this si tuation belongs. The
+average inﬂow Qin ranging from 1100 vehicles/h at t = 16:00 h to about 900 vehicles/h ( t =
+18:00 h) can be determined from an upstream cross section whi ch is not reached by the
+congestion, in our case D6. Because the congestion emits no s top-and go waves, we conclude
+that the free traﬃc in the inﬂow region is stable, Qin(t) < Q c1. We estimate the bottleneck
+16
+
+===== PAGE 17 =====
+
+strength δQ = Qout − ˜Qout ≈ 700 vehicles/h by identifying the time- and lane-averaged ﬂ ow
+at D11 during the time of the incident (about 900 vehicles/h) with the outﬂow ˜Qout from the
+bottleneck, and the average ﬂow of 1600 vehicles/h during the ﬂow peak (when the congestion
+dissolved) with the (universal) dynamical capacity Qout on the homogeneous freeway (in the
+absence of a bottleneck-producing incident). For the short time interval where two lanes
+were closed, we even have ˜Qout ≈ 500 vehicles/h corresponding to δQ ≈ 1100 vehicles/h.
+(Notice, that the lane averages were always carried out over all three lanes, also if lanes
+were closed.) Finally, we conclude from the oscillations ne ar the upstream boundary of the
+congestion, that the congested traﬃc ﬂow Qcong = ( Qout − δQ) is linearly unstable, but
+convectively stable. Thus, the breakdown corresponds to th e HCT/OCT regime.
+We simulated the situation with the IDM parameters from Tabl e I, with upstream bound-
+ary conditions taken from the data of cross section D6 [cf. Fi g. 10 (h) and (i)] and homo-
+geneous von Neumann downstream boundary conditions. We imp lemented the temporary
+bottleneck by locally increasing the model parameter T to some value T ′> T in an 1 km
+long section centered around the location of the incident. T his section represents the actu-
+ally closed road section and the merging regions upstream an d downstream from it. During
+the incident, we chose T ′ such that the outﬂow ˜Q′
+out from the bottleneck agrees roughly
+with the data of cross-section D11. At the beginning of the si mulated incident, we increased
+T ′abruptly from T = 1 .6 s to T ′= 5 s, and decreased it linearly to 2.8 s during the time
+interval (70 minutes) of the incident. Afterwards, we assum ed again T ′= T = 1.6 s.
+The grey lines of Figs. 10 (c) to 10 (j) show time series of the s imulated velocity and
+ﬂow at some detector positions. Figures 11(c) and (d) show pl ots of the smoothed spatio-
+temporal velocity and ﬂow, respectively.
+Although, in the microscopic picture, the modelled increas e of the safe time headway is
+quite diﬀerent from lane changes before a bottleneck, the qu alitative dynamics is essentially
+the same as that of the data. In particular, (i) the breakdown occured immediately after the
+bottleneck has been introduced. (ii) As long as the bottlene ck was active, the downstream
+front of the congested state remained stationary and ﬁxed at the bottleneck, while the
+upstream front propagated further upstream. (iii) Most of t he congested region consisted of
+HCT, but oscillations appeared near the upstream front. The typical period of the simulated
+oscillations (≈ 3 min), however, was shorter than that of the measured data ( ≈ 8 min). (iv)
+As soon as the bottleneck was removed, the downstream front p ropagated upstream with
+the well-known characteristic velocity vg = 15 km/h, and there was a ﬂow peak in the
+downstream regions until the congestion had dissolved, cf. Figs. 10(c), 10(e), and 11(d).
+During this time interval, the velocity increased gradually to the value for free traﬃc.
+Some remarks on the apparently non-identical upstram bound ary conditions in the em-
+pirical and simulated plots 11(a) and 11(c) are in order. In t he simulation, the velocity
+relaxes quickly from its prescribed value at the upstream bo undary to a value corresponding
+to free equilibrium traﬃc at the given inﬂow. This is a rather generi c eﬀect which also
+occurs in macroscopic models [17]. The relaxation takes pla ces within the boundary region
+3σx = 0 .6 km needed for the smoothing procedure (22) and is, therefor e, not visible in the
+ﬁgures. Consequently, the boundary conditions for the velo city look diﬀerent, although they
+have been taken from the data. In contrast, the traﬃc ﬂow cannot relax because of the con-
+servation of the number of vehicles [17], and the boundary co nditions in the corresponding
+empirical and simulated plots look, therefore, consistent [see. Figs. 11 (b) and (d)]. These
+17
+
+===== PAGE 18 =====
+
+remarks apply also to all other simulations below.
+C. Oscillating Congested T raﬃc
+We now present data from a section of the A9-South near Munich . There are two major
+intersections I1 and I2 with other freeways, cf. Fig. 12(a). In addition, the number of lanes
+is reduced from three to two downstream of I2. There are three further small junctions
+between I1 and I2 which did not appear to be dynamically relev ant. The intersections,
+however, were major bottleneck inhomogeneities. Virtuall y on each weekday, traﬃc broke
+down to oscillatory congested traﬃc upstream of intersecti on I2. In addition, we recorded
+two breakdowns to OCT upstream of I1 during the observation p eriod of 14 days.
+Figure 12(b) shows a spatio-temporal plot of the smoothed ve locity of the OCT state
+occurring upstream of I2 during the morning rush hour of Octo ber 29, 1998. The oscillations
+with a period of about 12 min are clearly visible in both the ti me series of the velocity data,
+plots 12(d)-(f), and the ﬂow, 12(g)-(i). In contrast to the o bservations of Ref. [7], the
+density waves apparently did not merge. Furthermore, the ve locity in the OCT state rarely
+exceeded 50 km/h, i.e., there was no free traﬃc between the cl usters, a signature of OCT
+in comparison with triggered stop-and go waves. The cluster s propagated upstream at a
+remarkably constant velocity of 15 km/h, which is nearly the same propagation velocity as
+that of the detached downstream front of the HCT state descri bed above.
+Figure 12(c) shows the ﬂow-density diagram of this congeste d state. In contrast to the
+diagram 10(b) for the HCT state, there is no separation betwe en the regions of free and
+congested traﬃc. Investigating ﬂow-density diagrams of ma ny other occurrences of HCT
+and OCT, it turned out that this diﬀerence can also be used to e mpirically distinguish HCT
+from OCT states.
+Now we show that this breakdown to OCT can be qualitatively re produced by a mi-
+crosimulation with the IDM. As in the previous simulation, w e used empirical data for the
+upstream boundary conditions. (Again, the velocity relaxe s quickly to a local equilibrium,
+and only for this reason it looks diﬀerent from the data.) We i mplemented the bottleneck
+by locally increasing the safe time headway in the downstrea m region. In contrast to the
+previous simulations, the local defect causing the breakdo wn was a permanent inhomogene-
+ity of the infrastructure (namely an intersection and a redu ction from three to two lanes)
+rather than a temporary incident. Therefore, we did not assu me any time dependence of
+the bottleneck. As upstream boundary conditions, we chose t he data of D20, the only
+cross section where there was free traﬃc during the whole tim e interval considered here.
+Furthermore, we used homogeneous von Neumann boundary cond itions at the downstream
+boundary. Without assuming a higher-than-observed level o f inﬂow, the simulations showed
+no traﬃc breakdowns at all. Obviously, on the freeway A9 the c apacity per lane is lower
+than on the freeway A5 (which is several hundret kilometers a part). This lower capacity
+has been taken into account by a site-speciﬁc, increased val ue of T = 2.2 s in the upstream
+region x < −0.2 km. An even higher value of T ′= 2 .5 s was used in the bottleneck region
+x > 0.2 km, with a linear increase in the 400 m long transition zone. The corresponding
+microsimulation is shown in Fig. 13.
+In this way, we obtained a qualitative agreement with the A9 d ata. In particular, (i)
+traﬃc broke down at the bottleneck spontaneously, in contra st to the situation on the A5.
+18
+
+===== PAGE 19 =====
+
+(ii) Similar to the situation on the A5, the downstream front of the resulting OCT state
+was ﬁxed at the bottleneck while the upstream front propagat ed further upstream. (iii) The
+oscillations showed no mergers and propagated with about 15 km/h in upstream direction.
+Furthermore, their period (8-10 min) is comparable with tha t of the data, and the velocity in
+the OCT region was always much lower than that of free traﬃc. ( iv) After about 1.5 h, the
+upstream front reversed its propagation direction and even tually dissolved. The downstream
+front remained always ﬁxed at the permanent inhomogeneity. Since, at no time, there is a
+clear transition from congested to free traﬃc in the region u pstream of the bottleneck (from
+which one could determine Qout and compare it with the outﬂow ˜Qout ≈ Q′
+out from the
+bottleneck), an estimate of the empirical bottleneck stren gth ( Qout − Q′
+out) is diﬃcult. Only
+at D26, for times around 10:00 h, there is a region where the ve hicles accelerate. Using the
+corresponding traﬃc ﬂow as coarse estimate for Qout, and the minimum smoothed ﬂow at
+D26 (occurring between t ≈ 8:00 h and 8:30 h) as an estimate for Q′
+out, leads to an empirical
+bottleneck strength δQ of 400 vehicles/h. This is consistent with the OCT regime in t he
+phase diagram Fig. 6. However, estimating the theoretical b ottleneck strength directly
+from the diﬀerence ( T − T ′), using Fig. 5, would lead to a smaller value. To obtain a full
+quantitative agreement, it would probably be necessary to c alibrate more than just one IDM
+parameter to the site-speciﬁc driver-vehicle behavior, or to explicitely model the bottleneck
+by on- and oﬀ-ramps.
+D. Oscillating Congested T raﬃc Coexisting with Jammed T raﬃ c
+Figure 14 shows an example of a more complex traﬃc breakdown t hat occurred on the
+freeway A8 East from Munich to Salzburg during the evening ru sh hour on November 2,
+1998. Two diﬀerent kinds of bottlenecks were involved, (i) a relatively steep uphill gradient
+from x = 38 km to x = 40 km (“Irschenberg”), and (ii) an incident leading to the c losing of
+one of the three lanes between the cross sections D23 and D24 f rom t = 17:40 h until t = 18:10
+h. The incident was deduced from the velocity and ﬂow data of t he cross sections D23 and
+D24 as described in Section IV B. As further inhomogeneity, t here is a small junction at
+about x = 41 .0 km. However, since the involved ramp ﬂows were very small, w e assumed
+that the junction had no dynamical eﬀect.
+The OCT state caused by the uphill gradient had the same quali tative properties as that
+on the A9 South. In particular, the breakdown was triggered b y a short ﬂow peak corre-
+sponding to a velocity dip in Plot 14(b), the downstream fron t was stationary, while the
+upstream front moved, and all oscillations propagated upst ream with a constant velocity.
+The combined HCT/OCT state caused by the incident had simila r properties as that on
+the A5 South. In particular, there was HCT near the location o f the incident, correspond-
+ing to the downstream boundary of the velocity plot 14(b), wh ile oscillations developped
+further upstream. Furthermore, similarly to the incident o n the A5, the downstream front
+propagated upstream as soon as the incident was cleared. The plot clearly shows, that the
+HCT/OCT state propagated seemingly unperturbed through th e OCT state upstream of
+the permanent uphill bottleneck. The upstream propagation velocity vg = 15 km/h of all
+perturbations in the complex state was remarkably constant , in particular that of (i) the up-
+stream and downstream fronts separating the HCT/OCT state f rom free traﬃc (for x > 40
+km at t ≈ 17:40 h and 18:10 h, respectively), (ii) the fronts separati ng the HCT/OCT from
+19
+
+===== PAGE 20 =====
+
+the OCT state (35 km ≤ x ≤ 40 km), and (iii) the oscillations within both the HCT and
+HCT/OCT states. In contrast, the propagation velocity and d irection of the front separating
+the OCT from free traﬃc varied with the inﬂow.
+We simulated this scenario using empirical (lane averaged) data both for the upstream
+and downstream boundaries. For the downstream boundary, we used only the velocity
+information. Speciﬁcally, when, at some time t, a simulated vehicle α crosses the downstream
+boundary of the simulated section x ∈ [0, L], we set its velocity to that of the data, vα =
+VD15(t), if xα ≥ L, and use the velocity and positional information of this veh icle to determine
+the acceleration of the vehicle α + 1 behind. Vehicle α is taken out of the simulation as soon
+as vehicle α + 1 has crossed the boundary. Then, the velocity of vehicle ( α + 1) is set to the
+actual boundary value, and so on. The downstream boundary co nditions are only relevant
+for the time interval around t = 18 : 00 h where traﬃc near this boundary is congested. For
+other time periods, the simulation result is equivalent to u sing homogeneous Von-Neumann
+downstream boundary conditions.
+We modelled the stationary uphill bottleneck in the usual wa y by increasing the param-
+eter T to a constant value T ′ > T in the downstream region. The incident was already
+reﬂected by the downstream boundary conditions. Figure 14( c) shows the simulation re-
+sult in form of a spatio-temporal plot of the smoothed veloci ty. Notice that, by using only
+the boundary conditions and a stationary bottleneck as spec iﬁc information, we obtained a
+qualitative agreement of nearly all dynamical collective a spects of the whole complex sce-
+nario described above. In particular, for all times t < 17:50 h, there was free traﬃc at both
+upstream and downstream detector positions. Therefore, th e boundary conditions (the de-
+tector data) did not contain any explicit information about the breakdown to OCT inside
+the road section, which nevertheless was reproduced correc tly as an emergent phenomenon.
+E. Pinned and Moving Localized Clusters
+Finally, we consider a 30 km long section of the A5-North depi cted in Fig. 15(a). On this
+section, we found one or more traﬃc breakdowns on six out of 21 days, all of them Thursdays
+or Fridays. On three out of 20 days, we observed one or more sto p-and-go waves separated
+by free traﬃc. The stop-and go waves were triggered near an in tersection and agreed quali-
+tatively with the TSG state of the phase diagram. On one day, t wo isolated density clusters
+propagated through the considered region and did not trigge r any secondary clusters, which
+is consistent with moving localized clusters (MLC) and will be discussed below. Moving
+localized clusters were observed quite frequently on this f reeway section [23]. Again, they
+have a constant upstream propagation speed of about 15 km/h, and a characteristic outﬂow
+[26]. In addition, we found four breakdowns to OCT, and ten oc currences of pinned local-
+ized clusters (PLC). The PLC states emerged either at the int ersection I1 (Nordwestkreuz
+Frankfurt), or 1.5 km downstream of intersection I2 (Bad Hom burg) at cross section D13.
+Furthermore, the downstream fronts of all four OCT states we re ﬁxed at the latter location.
+On August 6, 1998, we found an interesting transition from an OCT state whose down-
+steam front was at D13, to a TSG state with a downstram front at intersection I2 (D15).
+Consequently, we conclude that, around detector D13, there is a stationary ﬂow-conserving
+bottleneck with a stronger eﬀect than the intersection itse lf. Indeed, there is an uphill sec-
+tion and a relatively sharp curve at this location of the A5-N orth, which may be the reason
+20
+
+===== PAGE 21 =====
+
+for the bottleneck. The sudden change of the active bottlene ck on August 6 can be explained
+by perturbations and the hysteresis associated with breakd owns.
+The diﬀerent types of traﬃc breakdowns are consistent with t he relative locations of
+the traﬃc states in the ( Qin, δQ) space of the phase diagram in Fig. 6. Three of the
+four occurrences of OCT and two of the three TSG states were on Fridays (August 14
+and August 21, 1998), on which traﬃc ﬂows were about 5% higher than on our reference
+day (Friday, August 7, 1998), which will be discussed in deta il below. Apart from the
+coexistent PLCs and MLCs observed on the reference day, all P LC states occurred on
+Thursdays, where average traﬃc ﬂows were about 5% lower than on the reference day. No
+traﬃc breakdowns were observed on Saturdays to Wednesdays, where the traﬃc ﬂows were
+at least 10% lower compared to the reference day. As will be sh own below, for complex
+bottlenecks like intersections, the coexistence of MLCs an d PLCs is only possible for ﬂows
+just above those triggering pure PLCs, but below those trigg ering OCT states. So, we
+have, with increasing ﬂows, the sequence FT, PLC, MLC-PLC, a nd OCT or TSG states, in
+agreement with the theory.
+Now, we discuss the traﬃc breakdowns in August 7, 1998 in deta il. Figure 15(b) shows
+the situation from t = 13:20 h until 17:00 h in form of a spatio-temporal plot of the smoothed
+density. During the whole time interval, there was a pinned l ocalized cluster at cross section
+D13. Before t = 14:00 h, the PLC state showed distinct oscillations (OPLC) , while it
+was essentially stationary (HPLC) afterwards. Furthermor e, two moving localized clusters
+(MLC) of unknown origin propagated through nearly the whole displayed section and also
+through a 10 km long downstream section (not shown here) givi ng a total of at least 30
+km. Remarkably, as they crossed the PLC at D13, neither of the congested states seemed
+to be aﬀected. This complements the observations of Ref. [23 ], desribing MLC states that
+propagated unaﬀected through intersections in the absence of PLCs. As soon as the ﬁrst
+MLC state reached the location of the on-ramp of intersectio n I1 ( x = 488.8 km, t ≈ 15:10
+h), it triggered an additional pinned localized cluster, wh ich dissolved at t ≈ 16:00 h. The
+second MLC dissolved as soon as it reached the on-ramp of I1 at t ≈ 16 : 40 h.
+Figure 15(c) demonstrates that the MLC and PLC states have ch aracteristic signatures
+also in the empirical ﬂow-density diagram. As is the case for HCT and OCT, the PLC state
+is characterized by a two-dimensional ﬂow-density regime ( grey squares). In contrast to the
+former states, however, there is no ﬂow reduction (capacity drop) with respect to free traﬃc
+(black bullets). As is the case for ﬂow-density diagrams of H CT compared to OCT, it is
+expected that HPLCs are characterized by an isolated region , while the points of OPLC lie
+in a region which is connected to the region for free traﬃc. Du ring the periods were the
+MLCs crossed the PLC at D13, the high traﬃc ﬂow of the PLC state dropped drastically,
+and the traﬃc ﬂow had essentially the property of the MLC, see also the velocity plot 15(e).
+Therefore, we omitted in the PLC data the points correspondi ng to these intervals.
+The black bullets for densities ρ > 30 vehicles/km indicate the region of the MLC (or
+TSG) states. Due to the aforementioned diﬃculties in determ ining the traﬃc density for very
+low velocities, the theoretical line J given by QJ(ρ) = Qout − (Qout − Qjam)(ρ − ρout)/(ρjam −
+ρout) (see Ref. [7] and Fig. 15(b)) is hard to ﬁnd empirically. In any case, the data suggest
+that the line J would lie below the PLC region.
+To simulate this scenario it is important that the PLC states occurred in or near the
+freeway intersections. Because at both intersections, the oﬀ-ramp is upstream of the on-ramp
+21
+
+===== PAGE 22 =====
+
+[Fig. 15(a)], the local ﬂow at these locations is lower. In th e following, we will investigate the
+region around I2. During the considered time interval, the a verage traﬃc ﬂow of both, the
+on-ramp and the oﬀ-ramp was about 300 vehicles per hour and la ne. With the exception of
+the time intervals, during which the two MLCs pass by, we have about 1200 vehicles per hour
+and lane at I2 (D15), and 1500 vehicles per hour and lane upstr am (D16) and downstream
+(D13) of I2. This corresponds to an increase of the eﬀective capacity by δQ ≈ − 300 vehicles
+per hour and lane in the region between the oﬀ-ramp and the sub sequent on-ramp.
+In the simulation, we captured this qualitatively by decreasing the parameter T in a
+section x ∈ [x1, x2] upstream of the empirically observed PLC state. The hypoth etical bot-
+tleneck located at D13, i.e., about 1 km upstream of the on-ra mp, was neglected. Using real
+traﬃc ﬂows as upstream and downstram boundary conditions an d varying only the model
+parameter T within and outside of the intersection, we could not obtain s atisfactory sim-
+ulation results. This is probably because of the relatively high and ﬂuctuating traﬃc ﬂow
+on this highway. It remains to be shown if simulations with ot her model parameters can
+successfully reproduce the empirical data when applying re al boundary conditions. Now, we
+show that the main qualitative feature on this highway, namely, the coexistence of pinned
+and moving localized clusters can, nevertheless, be captur ed by our model. For this pur-
+pose, we assume a constant inﬂow Qin = 1390 vehicles per hour and lane to the freeway,
+with the corresponding equilibrium velocity. We initializ e the PLC by a triangular-shaped
+density peak in the initial conditions, and initialize the M LCs by reducing the velocity at
+the downstream boundary to V = 12 km/h during two ﬁve-minute intervals (see caption of
+Fig. 16).
+Again, we obtained a qualitative agreement with the observe d dynamics. In particular,
+the simulation showed that also an increase of the local capacity in a bounded region can
+lead to pinned localized clusters. Furthermore, the region s of the MLC and PLC states
+in the ﬂow-density diagram were reproduced qualitatively, in particular, the coexistence of
+pinned and moving localized clusters. We did not observe suc h a coexistence in the simpler
+system underlying the phase diagram in Fig. 6, which did not i nclude a second low-capacity
+stretch upstream of the high-capacity stretch.
+To explain the coexistence of PLC and MLC in the more complex s ystem consisting of
+one high-capacity stretch in the middle of two low-capacity stretches, it is useful to interpret
+the inhomogeneity not in terms of a local capacity increase in the region x ∈ [x1, x2], but as
+a capacity decrease for x < x 1 and x > x 2. (For simplicity, we will not explicitely include the
+400 m long transition regions of capacity increase at x1 and decrease at x2 in the following
+discussion.) Then, the location x = x2 can be considered as the beginning of a bottleneck, as
+in the system underlying the phase diagram. If the width ( x2 − x1) of the region with locally
+increased capacity is larger than the width of PLCs , such clusters are possible under the same
+conditions as in the standard phase diagram. In particular, traﬃc in the standard system is
+stable in regions upstream of a PLC, which is the reason why an y additional MLC, triggered
+somewhere in the downstream region x > x 2 and propagating upstream, will vanish as soon
+as it crosses the PLC at x = x2. However, this disappearance is not instantaneous, but
+the MLC will continue to propagate upstream for an additiona l ﬂow-dependent “dissipation
+distance” or “penetration depths”. If the width ( x2 − x1) is smaller than the dissipation
+distance for MLCs , crossing MLCs will not fully disappear before they reach th e upstream
+region x < x 1. There, traﬃc is metastable again, so that the MLCs can persi st. Since, in
+22
+
+===== PAGE 23 =====
+
+the metastable regime, the outﬂow of MLCs is equal to their in ﬂow (in this regime, MLCs
+are equivalent to “narrow” clusters, cf. Ref. [26]), the pas sage of the MLC does not change
+the traﬃc ﬂow at the position of the PLC, which can, therefore , persist as well.
+We performed several simulations varying the inﬂow within t he range where PLCs are
+possible. For smaller inﬂows, the dissipation distance bec ame smaller than ( x2 − x1), and
+the moving localized cluster was absorbed within the inhomo geneity. An example for this
+can be seen in Fig. 15(b) at t ≈ 16:40 h and x ≈ 489 km. Larger inﬂows lead to an extended
+OCT state upstream of the capacity-increasing defect, whic h is also in accordance with the
+observations.
+V. CONCLUSION
+In this paper, we investigated, to what extent the phase diag ram Fig, 6 can serve as
+a general description of collective traﬃc dynamics in open, inhomogeneous systems. The
+original phase diagram was formulated for on-ramps and resu lted from simulations with
+macroscopic models [14,10]. By simulations with a new car-f ollowing model we showed
+that one can obtain the same phase diagram from microsimulat ions. This includes even
+such subtle details as the small region of tristability. The proposed intelligent-driver model
+(IDM) is simple, has only a few intuitive parameters with rea listic values, reproduces a
+realistic collective dynamics, and also leads to a plausibl e “microscopic” acceleration and
+deceleration behaviour of single drivers. An interesting o pen question is whether the phase
+diagram can be reproduced also with cellular automata.
+We generalized the phase diagram from on-ramps to other kind s of inhomogeneities.
+Microsimulations of a ﬂow-conserving bottleneck realized by a locally increased safe time
+headway suggest that, with respect to collective eﬀects out side of the immediate neigh-
+bourhood of the inhomogeneity, all types of bottlenecks can be characterized by a single
+parameter, the bottleneck strength. This means, that the ty pe of traﬃc breakdown depends
+essentially on the two control parameters of the phase diagr am only, namely the traﬃc ﬂow,
+and the bottleneck strength. However, in some multistable r egions, the history (i.e., the
+previous traﬃc dynamics) matters as well. We checked this al so by macroscopic simulations
+with the same type of ﬂow-conserving inhomogeneity and with microsimulations using a
+locally decreased desired velocity as bottleneck [37]. In a ll cases, we obtained qualitatively
+the same phase diagram. What remains to be done is to conﬁrm th e phase diagram also for
+microsimulations of on-ramps. These can be implemented eit her by explicit multi-lane car-
+following models [35,60], or, in the framework of single-la ne models, by placing additional
+vehicles in suitable gaps between vehicles in the “ramp” reg ion.
+By presenting empirical data of congested traﬃc, we showed t hat all congested states
+proposed by the phase diagram were observed in reality, amon g them localized and extended
+states which can be stationary as well as oscillatory, furth ermore, moving or pinned localized
+clusters (MLCs or PLCs, respectively). The data suggest tha t the typical kind of traﬃc
+congestion depends on the speciﬁc freeway. This is in accord ance with other observations,
+for example, moving localized clusters on the A5 North [23], or homogeneous congested
+traﬃc (HCT) on the A5-South [4]. In contrast to another empir ical study [7], the frequent
+oscillating states (OCT) in our empirical data did not show m ergings of density clusters,
+although these can be reproduced with our model with other pa rameter values [36].
+23
+
+===== PAGE 24 =====
+
+The relative positions of the various observed congested st ates in the phase diagram
+were consistent with the theoretical predictions. In parti cular, when increasing the traﬃc
+ﬂow on the freeway, the phase diagram predicts (hysteretic) tra nsitions from free traﬃc to
+PLCs, and then to extended congested states. By ordering the various forms of congestion
+on the A5-North with respect to the average traﬃc ﬂow, the obs ervations agree with these
+predictions. Moreover, given an extended congested state a nd increasing the bottleneck
+strength, the phase diagram predicts (non-hysteretic) transitions from triggered stop-and-go
+waves (TSG) to OCT, and then to HCT. To show the qualitative ag reement with the data,
+we had to estimate the bottleneck strength δQ. This was done directly by identifying the
+bottleneck strength with ramp ﬂows, e.g., on the A5-North, o r indirectly, by comparing the
+outﬂows from congested traﬃc with and without a bottleneck, e.g., for the incident on the
+A5-South. With OCT and TSG on the A5-North, but HCT on the A5-S outh, where the
+bottleneck strength was much higher, we obtained again the r ight behavior. However, one
+needs a larger base of data to determine an empirical phase di agram, in particular with its
+boundaries between the diﬀerent traﬃc states. Such a phase d iagram has been proposed
+for a Japanese highway [12]. Besides PLC states, many breakd owns on this freeway lead to
+extended congestions with ﬁxed downstream and upstream fronts. We did not observe such
+states on German freeways and believe that the ﬁxed upstream fronts were the result of a
+further inhomogeneity, but this remains to be investigated .
+Our traﬃc data indicate that the majority of traﬃc breakdown s is triggered by some kind
+of stationary inhomogeneity, so that the phase diagram is applicable. Suc h inhomogeneities
+can be of a very general nature. They include not only ramps, g radients, lane narrowings
+or -closings, but also incidents in the oppositely ﬂowing traﬃc. In the latter case, the
+bottleneck is constituted by a temporary loss of concentrat ion and by braking maneuvers
+of curious drivers at a ﬁxed location . From the more than 100 breakdowns on various
+German and Dutch freeways investigated by us, there were onl y four cases (among them
+the two moving localized clusters in Fig. 15), where we could not explain the breakdowns
+by some sort of stationary bottleneck within the road sectio ns for which data were available
+to us. Possible explanations for the breakdowns in the four r emaining cases are not only
+spontaneous breakdowns [8], but also breakdowns triggered by a nonstationary perturbation,
+e.g., moving “phantom bottlenecks” caused by two trucks ove rtaking each other [58], or
+inhomogeneities outside the considered sections. Our simu lations showed that stationary
+downstream fronts are a signature of non-moving bottleneck s.
+Finally, we could qualitatively reproduce the collective d ynamics of several rather com-
+plex traﬃc breakdowns by microsimulations with the IDM, usi ng empirical data for the
+boundary conditions. We varied only a single model parameter, the safe time headway, to
+adapt the model to the individual capacities of the diﬀerent roads, and to implement the
+bottlenecks. We also performed separate macrosimulations with the GKT model and could
+reproduce the observations as well. Because both models are eﬀective-single lane models,
+this suggests that lane changes are not relevant to reproduc e the collective dynamics caus-
+ing the diﬀerent types of congested traﬃc. Furthermore, we a ssumed identical vehicles and
+therefore conclude that also the heterogeneity of real traﬃ c is not necessary for the basic
+mechanism of traﬃc instability. We expect, however, that ot her yet unexplained aspects
+of congested traﬃc require a microscopic treatment of both, multi-lane traﬃc and hetero-
+geneous traﬃc. These aspects include the wide scattering of ﬂow-density data [7,20] (see
+24
+
+===== PAGE 25 =====
+
+Fig. 17), the description of platoon formation [59], and the realistic simulation of speed
+limits [57], for which a multi-lane generalization of the ID M seems to be promising [60].
+Acknowledgments: The authors want to thank for ﬁnancial support by the BMBF (re -
+search project SANDY, grant No. 13N7092) and by the DFG (gran t No. He 2789). We are
+also grateful to the Autobahndirektion S¨ udbayernand the Hessisches Landesamt f¨ ur Straßen
+und Verkehrswesen for providing the freeway data.
+25
+
+===== PAGE 26 =====
+
+REFERENCES
+[1] F. L. Hall and K. Agyemang-Duah, Transp. Res. Rec. 1320, 91 (1991).
+[2] C. F. Daganzo, in Proceedings of the 13rd International Symbosium on Transpo rtation
+and Traﬃc theory , edited by J. B. Lesort (Pergamon, Tarrytown, 1996), p. 629.
+[3] B. S. Kerner and H. Rehborn, Phys. Rev. E 53, R4275 (1996).
+[4] B. S. Kerner and H. Rehborn, Phys. Rev. Lett. 79, 4030 (1997).
+[5] T. Nagatani, J. Phys. Soc. Japan 66, L1928 (1997).
+[6] B. Persaud, S. Yagar, and R. Brownlee, Transportation Re search Record 1634, 64
+(1998).
+[7] B. S. Kerner, Phys. Rev. Lett. 81, 3797 (1998).
+[8] D. Helbing and M. Treiber, Phys. Rev. Lett. 81, 3042 (1998).
+[9] D. Helbing and M. Treiber, Science 282, 2001 (1998).
+[10] H. Y. Lee, H. W. Lee, and D. Kim, Phys. Rev. Lett. 81, 1130 (1998).
+[11] H. Y. Lee, H. W. Lee, and D. Kim, Phys. Rev. E 59, 5101 (1999).
+[12] H. Y. Lee and H. W. Lee and D. Kim, Empirical Phase Diagram of Congested Traﬃc
+Flow, Preprint cond-mat/9905292.
+[13] C. F. Daganzo, M. J. Cassidy, and R. L. Bertini, Transpor tation Research B 33, 25
+(1999).
+[14] D. Helbing, A. Hennecke, and M. Treiber, Phys. Rev. Lett . 82, 4360 (1999).
+[15] B. S. Kerner, Congested traﬃc ﬂow: Observations and the ory, Transportation Research
+Record 1999, in print.
+[16] B. S. Kerner and H. Rehborn, Internationales Verkehrsw esen 5, 196 (1998).
+[17] D. Helbing and M. Treiber, Computing in Science and Engi neering (CiSE) 5, 89 (1999).
+[18] D. Helbing, Verkehrsdynamik (Springer, Berlin, 1997).
+[19] D. Helbing, Phys. Rev. E 55, R25 (1997).
+[20] M. Treiber and D. Helbing, J. Phys. A 32, L17 (1999).
+[21] S. Smulders, 7th International Conference on Road Traﬃc Monitoring and C ontrol (IEE,
+London, 1994), pp. 145–149.
+[22] V. Shvetsov and D. Helbing, Phys. Rev. E 59, 6328 (1999).
+[23] B. S. Kerner and H. Rehborn, Phys. Rev. E 53, R1297 (1996).
+[24] M. J. Lighthill and G. B. Whitham, Proc. Roy. Soc. of Lond on A 229, 317 (1955).
+[25] M. Cremer and F. Meißner, Traﬃc Prediction and Optimization Using an Eﬃcient
+Macroscopic Simulation Tool . In: A. Pave, ed. Modelling and Simulation 1993 , pp.
+513-519. Society for Computer Simulation International, G hent, Belgium.
+[26] B. S. Kerner and P. Konh¨ auser, Phys. Rev. E 50, 54 (1994).
+[27] M. Treiber, A. Hennecke, and D. Helbing, Phys. Rev. E 59, 239 (1999).
+[28] G. F. Newell, Operations Research 9, 209 (1961).
+[29] P. G. Gipps, Transportation Research B 15, 105 (1981).
+[30] R. Wiedemann, Simulation des Straßenverkehrsﬂusses . Schriftenreihe des IfV, Vol. 8
+(Institut f¨ ur Verkehrswesen, University of Karlsruhe, Germany, 1974).
+[31] M. Bando et al. , Phys. Rev. E 51, 1035 (1995).
+[32] S. Krauß, in Traﬃc and Granular Flow ’97 , edited by M. Schreckenberg and D. E. Wolf
+(Springer, Singapore, 1998), pp. 269–283.
+[33] B. Tilch and D. Helbing, Phys. Rev. E 58, 133 (1998).
+26
+
+===== PAGE 27 =====
+
+[34] For an overview, see the internet page
+http://hippo.mit.edu/products/mitsim/main.html.
+[35] L. D. Howe, Physica A 246, 157 (1997).
+[36] M. Treiber and D. Helbing, “Explanation of observed fea tures of self-organization in
+traﬃc ﬂow”. Preprint cond-mat/9901239.
+[37] M. Treiber, A. Hennecke, and D. Helbing, in Traﬃc and Granular Flow ’99 , edited by
+D. Helbing, H. J. Herrmann, M. Schreckenberg, and D. E. Wolf ( Springer, Berlin, 2000),
+in print.
+[38] O. Biham, A. A. Middleton, and D. Levine, Phys. Rev. A 46, R6124 (1992).
+[39] M. Cremer and J. Ludwig, Math. Comput. Simulation 28, 297 (1986).
+[40] K. Nagel and M. Schreckenberg, J. Phys. I France 2, 2221 (1992).
+[41] R. Barlovic, L. Santen, A. Schadschneider, and M. Schre ckenberg, Traﬃc and Granular
+Flow ’97 (Springer, Singapore, 1998), p. 335.
+[42] D. Helbing and B. A. Huberman, Nature 396, 738 (1998).
+[43] D. E. Wolf, Physica A 263, 438 (1999).
+[44] R. D. K¨ uhne, inProceedings of the 9th International Symposium on Transpor tation and
+Traﬃc Theory, edited by I. Volmuller and R. Hamerslag (VNU Science Press, Utrecht,
+1984), p. 21
+[45] J. Treiterer and J. A. Myers, in Proc. 6th Int. Symp. on Transportation and Traﬃc
+Theory, edited by D. J. Buckley (Elsevier, New York, 1974), p. 13, em pirical observation
+of trajectories.
+[46] A. Hennecke, M. Treiber, and D. Helbing, in Traﬃc and Granular Flow ’99 , edited by
+D. Helbing, H. J. Herrmann, M. Schreckenberg, and D. E. Wolf ( Springer, Berlin, 2000),
+p. to be published.
+[47] A. Reuschel, ¨Osterreichisches Ingenieur-Archiv 4, 193 (1950).
+[48] R. E. Chandler, R. Herman, and E. W. Montroll, Operation s Research 6, 165 (1958).
+[49] R. Herman, E. W. Montroll, R. B. Potts, and R. W. Rothery, Operations Research 7,
+86 (1959).
+[50] D. C. Gazis, R. Herman, and R. W. Rothery, Operations Res earch 9, 545 (1961).
+[51] L. C. Edie, Transp. Res. B 28, 66 (1961).
+[52] T. Bleile, Modellierung des Fahrzeugfolgeverhaltens im innerst¨ adtischen PKW-Verkehr,
+(Phd thesis, University of Stuttgart, Germany, 1999).
+[53] P. G. Gipps, Transp. Res. 20 B , 403 (1986).
+[54] M. Muramatsu and T. Nagatani, Phys. Rev. E 60, 180 (1999).
+[55] The simulations were performed on a personal workstati on with a 433 Mhz Alpha pro-
+cessor.
+[56] B. S. Kerner, P. Konh¨ auser, and M. Schilke, Phys. Rev. E 51, 6243 (1995).
+[57] Since speed limits lead to reduced desired velocities f or many drivers as well, one might
+conclude that speed limits also cause undesirable local bot tlenecks. The main eﬀect of
+speed limits is, however, to reduce the velocity variance wh ich leads to less braking
+maneuvers and de facto to a higher capacity. In contrast, gradients mainly inﬂuenc e
+slow vehicles (trucks), leading to higher values for the vel ocity variance.
+[58] D. C. Gazis and R. Herman, Transportation Science 26(3),223–229 (1992).
+[59] E. Ben-Naim and P. L. Krapivsky, Phys. Rev. E 56, 6680 (1997).
+[60] Interactive simulations of the multi-lane IDM are avai lable at
+27
+
+===== PAGE 28 =====
+
+www.theo2.physik.uni-stuttgart.de/treiber/MicroApplet/.
+28
+
+===== PAGE 29 =====
+
+TABLES
+Parameter Typical
+value
+Desired velocity v0 120 km/h
+Safe time headway T 1.6 s
+Maximum acceleration a 0.73 m/s 2
+Desired deceleration b 1.67 m/s 2
+Acceleration exponent δ 4
+Jam distance s0 2 m
+Jam Distance s1 0 m
+Vehicle length l = 1/ρmax 5 m
+TABLE I. Model parameters of the IDM model used throughout th is paper. Changes of the
+freeway capacity were described by a variation of the safe ti me headway T .
+29
+
+===== PAGE 30 =====
+
+FIGURES
+0
+500
+1000
+1500
+2000
+2500
+3000
+0 50 100 150
+Traffic Flow Q (vehicles/h)
+ρ (vehicles/km)
+(a)
+[1-ρ(s0+L)]/T 
+v0 ρ
+δ = 4
+δ = 1
+δ → ∞
+0 50 100 150
+ρ (vehicles/km)
+(b)
+Standard set
+T = 3 s
+v0 = 72 km/h
+FIG. 1. Equilibrium ﬂow-density relation of identical IDM v ehicles with (a) variable accelera-
+tion exponent δ, and (b) variable safe time headway T and desired velocity v0. Only one parameter
+is varied at a time; the others correspond to the ones in Table I.
+0
+20
+40
+60
+80
+100
+120
+0 50 100
+v (km/h)
+(a)
+-4
+-2
+0
+2
+0 50 100
+dv/dt (m/s2)
+t (s)
+(b)
+FIG. 2. Temporal evolution of velocity and acceleration of a single driver-vehicle unit which
+accelerates on a 2.5 km long stretch of free road before it dec elerates when approaching a standing
+obstacle at x = 2.5 km. The dynamics for the IDM parameters of Table I (solid) is compared with
+the result for an increased acceleration a0 = 2 m/s (dotted), or an increased braking deceleration
+b = 5 m/s 2 (dashed).
+30
+
+===== PAGE 31 =====
+
+10
+15
+20
+25
+0 10 20 30 40
+Net Distance s (m)
+t (s)
+(a)
+32
+34
+36
+38
+40
+42
+0 10 20 30 40
+Velocity v (km/h)
+t (s)
+(b)
+FIG. 3. Adaptation of a single vehicle to the equilibrium dis tance in the car-following regime.
+Shown is (a) the net distance s, and (b) the velocity of a vehicle following a queue of vehicl es
+which all drive at v∗ = 40 .5 km/h corresponding to an equilibrium distance se = 20 m. The
+initial conditions are v(0) = v∗ and s(0) = se/2 = 10 m. The solid line is for the IDM standard
+parameters, and the dashed line for the deceleration parame ter b increased from 1.67 m/s 2 to 10
+m/s2.
+31
+
+===== PAGE 32 =====
+
+0
+20
+40
+60
+80
+100
+120
+140
+160
+180
+50 100 150
+ρjam (veh./km), ρout (veh./km)
+ρh (vehicles/km)
+(a)
+ρjam
+ρout
+ρc1 ρc2
+Small Perturbation
+Large Perturbation
+0
+500
+1000
+1500
+2000
+50 100 150
+Qjam (veh./km), Qout (veh./km)
+ρh (vehicles/km)
+(b)
+Qjam
+Qc1
+Qout,Qc2Qmax
+FIG. 4. Stability diagram of homogeneous traﬃc on a circular road as a function of the homo-
+geneous density ρh for small (grey) and large (black) initial perturbations of the density. In plot
+(a), the upper two lines display the density inside of densit y clusters after a stationary state has
+been reached. The lower two lines represent the density betw een the clusters. Plot (b) shows the
+corresponding ﬂows and the equilibrium ﬂow-density relati on (thin curve). The critical densities
+ρci and ﬂows Qci are discussed in the main text. For ρc2 ≤ ρh ≤ 45 vehicles/km, the outﬂow
+Qout ≈ Qc2 and the corresponding density ρout are constant. Here, we have Qmax ≈ Qout for the
+maximum equilibrium ﬂow, but there are other parameter sets (especially if s1 > 0) where Qmax
+is clearly larger than Qout [37].
+32
+
+===== PAGE 33 =====
+
+800
+1000
+1200
+1400
+1600
+1800
+2000
+1.5 2 2.5 3 3.5 4
+Q (veh./h)
+T (s)
+Qout
+Qc1
+Qmax
+FIG. 5. Outﬂow Qout from congested traﬃc (solid curve), minimum ﬂow Qc1 for nonlinear
+instabilities (dashed), and maximum equilibrium ﬂow Qmax (dotted) as a function of the safe time
+headway. An approximation for the bottleneck strength δQ of the phase diagram is given by the
+diﬀerence between the value Qout = 1689 vehicles/h for T = 1 .6 s (horizontal thin line), and
+Qout(T ). For decerasing values of T traﬃc becomes more unstable which is indicated by increasin g
+diﬀerences ( Qmax − Qout) or ( Qmax − Qc1). For T ≤ 1.5 s this even leads to ∂Qout(T )/∂T > 0.
+Furthermore, Qout ≈ Qc1 for T ≤ 1.4 s.
+33
+
+===== PAGE 34 =====
+
+1000
+1100
+1200
+1300
+1400
+1500
+1600
+1700
+0 100 200 300 400 500 600 700
+Qin (vehicles/h)
+δQ (vehicles/h)
+HCT/
+OCT
+OCT TSG
+MLC
+PLC
+FT
+TRI
+FIG. 6. Phase diagram resulting from IDM simulations of an op en system with a
+ﬂow-conserving bottleneck. The bottleneck is realized by a n increased IDM parameter T in the
+downstream region, cf. Eq. (16). The control parameters are the traﬃc ﬂow Qin and the bottleneck
+strength δQ, see Eq. (15). The solid thick lines separate the congested t raﬃc states TSG, OCT,
+HCT, PLC, and MLC (cf. the main text and Fig. 7) and free traﬃc ( FT) as they appear after
+adiabatically increasing the inﬂow to the value Qin and applying a large perturbation afterwards
+(history “C” in the main text). Also shown is the critical dow nstream ﬂow Q′
+c2(δQ) (thin solid
+line), below which free traﬃc (FT) is (meta-)stable, and the maximum downstream ﬂow Q′
+max(δQ)
+(thin dotted) below which (possibly unstable) equilibrium traﬃc exists. Traﬃc is bistable for in-
+ﬂows above the lines FT-PLC or FT-MLC (whichever is lower), a nd below Q′
+c2(δQ). In the smaller
+shaded region, traﬃc is tristable and the possible states FT , PLC, or OCT depend on the previous
+history (see the main text). For history “C” we obtain OCT in t his region.
+34
+
+===== PAGE 35 =====
+
+35
+
+===== PAGE 36 =====
+
+FIG. 7. Spatio-temporal density plots of the traﬃc states ap pearing in the phase diagram
+of Fig. 6. (a) Homogeneous congested traﬃc (HCT), (b) oscill ating congested traﬃc (OCT),
+(c) triggered stop-and-go waves (TSG), (d) (stationary) pi nned localized cluster (SPLC), and
+(e) oscillatory pinned localized cluster (OPLC). The latte r two states are summarized as pinned
+localized clusters (PLC). After a stationary state of free t raﬃc has developed, a density wave is
+introduced through the downstream boundary (or initial con ditions) which eventually triggers the
+breakdown (History “C”, cf. the main text).
+36
+
+===== PAGE 37 =====
+
+FIG. 8. Spatio-temporal density plots for the same phase poi nt in the tristable traﬃc regime,
+but diﬀerent histories. (a) Metastable PLC and stable OCT. T he system is the same as in Fig.
+7 with Qin = 1440 vehicles/h and T ′ = 1 .95 s ( δQ = 270 vehicles/h). The metastable PLC
+is triggered by a triangular-shaped density peak in the init ial conditions (of total width 600 m,
+centered at x = 0), in which the density rises from 14 vehicles/km to 45 vehi cles km. The OCT is
+triggered by a density wave introduced by the downstream bou ndary conditions. (b) Same system
+as in (a), but starting with metastable free traﬃc. Here, the transition to OCT is triggered by a
+density wave coming from the downstream boundary. (c) Simil ar behavior as in (a), but for the
+GKT model (with model parameters v0 = 120 km/h, T = 1.8 s, τ = 50 s, ρmax = 130 vehicles/km,
+γ = 1.2, A0 = 0.008, and ∆ A = 0.008, cf. Ref. [27]).
+37
+
+===== PAGE 38 =====
+
+/0/0/0
+/0/0/0
+/1/1/1
+/1/1/1
+480.7
+470.7
+471.5
+Temporary
+D12
+D13
+D14
+D11
+D10
+D9
+D8
+D7
+D6
+D5
+Kreuz
+lane closing
+(a)
+473.0 km
+474.0 km
+475.0 km
+476.3 km
+477.4 km
+478.7 km
+479.9 km
+Friedberg Bad Homburger
+0
+1000
+2000
+16 16.5 17 17.5 18
+Q (veh./h)
+t (h) 
+ D11 (477.4 km) (b)
+FIG. 9. Traﬃc breakdown to nearly homogeneous congested tra ﬃc on the freeway A5-South
+near Frankfurt triggered by a temporary incident between 16 :20 and 17:30 on Aug. 6, 1998 between
+the cross sections D11 and D12. (a) Sketch of the freeway. (b) Flows at cross section D11 on the
+right lane (solid black), middle lane (grey), and left lane ( dotted).
+38
+
+===== PAGE 39 =====
+
+FIG. 10. [Please display in two columns as indicated] Details of the traﬃc breakdown
+depicted in Fig. 9. (a) Flow-density diagram of the traﬃc bre akdown on the A5 South, (b)-(g)
+temporal evolution of velocity and ﬂow at three locations ne ar the perturbation, and (h), (i) inﬂow
+boundary conditions taken from cross section D6. Besides th e data (black lines), the results of the
+microsimulation are shown (grey). All empirical quantitie s are averages over one minute and over
+all three lanes.
+39
+
+===== PAGE 40 =====
+
+FIG. 11. [Please display in two columns as indicated] (a), (b) Smoothed spatio-temporal
+velocity and ﬂow from the data of the traﬃc breakdown depicte d in Figs. 9 and 10. (c), (d)
+Corresponding IDM microsimulation with the parameter set f rom Table I. The upstream boundary
+conditions for velocity and traﬃc ﬂow were taken from cross s ection D6. Because of the fast
+relaxation of the velocity to the model’s equilibrium value , the upstream boundary conditions
+for the empirical velocity plots (a) seem to be diﬀerent from the simulation (c) (see main text).
+Homogeneous von Neumann boundary conditions were assumed d ownstream. The temporary lane
+closing is modelled by locally increasing the IDM parameter T in a 1000 m long section centered
+at x = 478 km during the time interval 16:20 h ≤ t ≤ 17:30 h of the incident.
+40
+
+===== PAGE 41 =====
+
+FIG. 12. [Please display in two columns as indicated] Traﬃc breakdown to oscillating
+congested traﬃc in the evening rush hour of October 29, 1998 o n the freeway A9-South near
+Munich. (a) Sketch of the considered section with the cross s ections D16 to D30 and their positions
+in kilometers. The small on- and oﬀ-ramps between I1 and I2, w hich have been neglected in our
+simulation, are indicated by diagonal lines. (b) Spatio-te mporal plot of the smoothed lane-averaged
+velocity. (c) Flow-density diagram obtained from two detec tors in the congested region. (d)-(i)
+Lane-averaged 1-minute data of velocities and ﬂows.
+41
+
+===== PAGE 42 =====
+
+FIG. 13. Smoothed spatio-temporal velocity plot from a qual itative IDM microsimulation
+of the situation depicted in Fig. 12. As inﬂow boundary condi tions, we used the traﬃc ﬂow
+data of cross section D20. Homogeneous von Neumann boundary conditions were assumed at the
+downstream boundary. The inhomogeneity was implemented by a local, but time-independent
+increase of T in the region x ≥ 0 km from T = 2.2 s to T ′= 2.5 s.
+42
+
+===== PAGE 43 =====
+
+D24 43.6 km
+D15 31.5 km
+33.4 km D16
+D17 35.7 km 
+D18 36.8 km
+D19 38.2 km
+D20 39.1 km
+39.9 km D21
+D22 41.7 km
+D23 42.8 km
+uphill downhill
+/0/0
+/0/0
+/1/1
+/1/1
+(a)
+Irschenberg
+FIG. 14. Oscillating congested traﬃc (OCT) on an uphill sect ion of the freeway A8 East
+(near Munich). (a) Sketch of the section with the cross secti ons D15 to D24 and their positions
+in kilometers. (b) Smoothed lane-averaged empirical veloc ity. An incident leading to a temporary
+lane closing between D23 and D24 (near the downstream bounda ries of the plots) induces even
+denser congested traﬃc that propagates through the OCT regi on. (c) Microsimulation using the
+data of cross sections D15 and D23 as upstream and downstream boundary conditions, respectively.
+The uphill section is modelled by linearly increasing the sa fe time headway from T = 1 .6 s (for
+x < 39.3 km) to T ′= 1.9 s (for x > 40.0 km). As in the previous microsimulations, the velocity near
+the upstram boundary relaxes quickly and, therefore, seems to be inconsistent with the empirical
+values (see main text).
+43
+
+===== PAGE 44 =====
+
+488.8
+488.0
+486.9
+486.0
+485.0
+484.1
+482.9
+480.7
+476.4
+478.9
+477.8
+475.1
+473.8
+472.7
+472.1
+471.4
+470.1
+480.1
+482.2
+481.7
+490.5
+490.0
+D22
+D26
+D24
+D20
+D18
+D16
+D14
+D12
+D10
+D6
+D8
+D25
+D23
+D21
+D19
+D17
+D15
+D13
+D11
+D9
+D7
+D5
+I 1
+Nordwestkreuz
+Frankfurt
+I 2
+Friedberg
+Junction
+Bad Homburger
+Kreuz
+(a)
+0
+500
+1000
+1500
+2000
+2500
+0 10 20 30 40 50 60 70 80
+Q (vehicles/h)
+ρ (vehicles/km)
+(c)
+PLC
+MLC
+0
+50
+100
+150
+14 15 16
+V (km/h)
+D6 (471.4 km)
+(d)
+0
+50
+100
+150
+14 15 16
+V (km/h)
+D13 (478.9 km) (e)
+0
+50
+100
+150
+14 15 16
+V (km/h)
+t (h)
+D18 (482.9 km)
+(f)
+44
+
+===== PAGE 45 =====
+
+FIG. 15. Data of two moving localized clusters (MLCs), and pi nned localized clusters (PLC)
+on the freeway A5-North near Frankfurt. (a) Sketch of the inf rastructure with the positions of the
+cross sections D5 - D16 in kilometers. (b) Spatio-temporal p lot of the density. (c) Flow-density
+diagram for detector D6, where there are only stop-and-go wa ves ( ✷ ), and for detector D13 ( •),
+where we have omitted data points during the time intervals w hen the MLCs passed by. (d)-(f)
+Temporal evolution of the velocity (one-minute data) at the location of the PLC at D13, and
+upstream (D18) and downstream (D6) of it.
+45
+
+===== PAGE 46 =====
+
+0
+500
+1000
+1500
+2000
+0 20 40 60 80 100 120
+Q (vehicles/h)
+ρ (vehicles/km)
+(b)
+Equilibrium
+PLC
+MLC
+Jam line J
+FIG. 16. Smoothed spatio-temporal plot of the traﬃc density showing the coexistence of a
+pinned localized cluster (PLC) with moving localized clust ers (MLCs) in an IDM simulation. The
+PLC is positioned at a road section with locally increased capacity corresponding to a bottleneck
+strength δQ = − 300 vehicles/h, which can be identiﬁed with the region betwe en the oﬀ- and
+on-ramps of intersection I2 in Fig. 15(a). It was produced by locally decreasing the IDM parameter
+T from 1.9 s to T ′= 1.6 s in a 400 m wide section centered at x = 480.8 km, and increasing it again
+from T ′to T in a 400 m wide section centered at x = 480.2 km. The initial conditions correspond
+to equilibrium traﬃc of ﬂow Qin = 1390 vehicles/h, to which a triangular-shaped density pea k
+(with maximum density 60 vehicles/km at x = 480 .5 km and total width 1 km) was superposed
+to initialize the PLC. As upstram boundary conditions, we as sumed free equilibrium traﬃc with
+a constant inﬂow Qin of 1390 vehicles/h. As downstream boundary conditions for t he velocity, we
+used the value for equilibrium free traﬃc most of the time. Ho wever, for two ﬁve-minute intervals
+at 14:20 h and 15:40 h, we reduced the velocity to v = 12 km/h to initialize the MLCs. (b)
+Flow-density diagram of virtual detectors located at the po sition x = 480 .2 km (PLC), and 2.2
+km downstream of it (MLC). Again, the time intervals, where d ensity waves passed through the
+PLC, were omitted in the (“virtual”) data points belonging t o PLC. The thin solid curve indicates
+the equilibrium ﬂow density relation and the thick solid lin e J characterizes the outﬂow from fully
+developed density clusters to free traﬃc, cf. Ref. [7], both for T = 1.9 s.
+46
+
+===== PAGE 47 =====
+
+0
+500
+1000
+1500
+0 20 40 60 80 100 120
+Flow (vehicles/h)
+ρ (vehicles/km)
+45 s avg. (x=-3 km)
+Qe (Cars)
+Qe (Trucks)
+FIG. 17. Flow-density diagram of a HCT state of single-lane h eterogeneous traﬃc consisting
+of 70% “cars” and 30% “trucks”. Trucks are characterized by l ower IDM parameters v0 and a,
+and a larger T compared to cars. The solid and dashed curves give the equili brium ﬂow-density
+relations for traﬃc consisting only of cars and trucks, resp ectively. For details, see Ref. [37].
+47

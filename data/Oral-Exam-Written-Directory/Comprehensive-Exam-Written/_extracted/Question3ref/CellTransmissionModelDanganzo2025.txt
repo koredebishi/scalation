@@ -1,0 +1,719 @@
+===== PAGE 1 =====
+
+Transpn. Res.-B. Vol. 298. No. 2. pp. 79-93, 1995
+Coowieht 0 1995 ElsevierS cience Ltd
+Pergamon Printed’& &eat Britain. All rights reserved
+0191-2615195 $9.50 + .OO
+0191-2615(94)00022-O
+THE CELL TRANSMISSION MODEL,
+PART II: NETWORK TRAFFIC
+CARLOS F. DAGANZO
+Department of Civil Engineering and Institute of Transportation Studies,
+University of California, Berkeley, CA 94720, U.S.A.
+(Received 24 November 1993)
+Abstract-This article shows how the evolution of multi-commodity traffic flows over complex
+networks can be predicted over time, based on a simple macroscopic computer representation of
+traffic flow that is consistent with the kinematic wave theory under all traffic conditions. The
+method does not use ad hoc procedures to treat special situations. After a brief review of the basic
+model for one link, the article describes how three-legged junctions can be modeled. It then
+introduces a numerical procedure for networks, assuming that a time-varying origin-destination
+(O-D) table is given and that the proportion of turns at every junction is known. These assump-
+tions are reasonable for numerical analysis of disaster evacuation plans. The results are then
+extended to the case where, instead of the turning proportions, the best routes to each destination
+from every junction are known at all times. For technical reasons explained in the text, the
+procedure is more complicated in this case, requiring more computer memory and more time for
+execution. The effort is estimated to be about an order of magnitude greater than for the static
+traffic assignment problem on a network of the same size. The procedure is ideally suited for
+parallel computing. It is hoped that the results in the article will lead to more realistic models of
+freeway flow, disaster evacuations and dynamic traffic assignment for the evening commute.
+1. INTRODUCTION
+Despite all the attention that dynamic assignment is receiving today in the literature
+(Transportation Research, 1991), most of the research efforts in that field seem to be
+directed at improving the route choice mechanisms of drivers with various levels of
+information and/or at refining the algorithms. Little work is aimed at enhancing the
+realism of the basic building blocks of the predictions- the underlying traffic perfor-
+mance models. A recent overview of this literature is given in Ran ( 1993) and Janson and
+Robles (1993).
+Some of the works reviewed in these references attempt to predict some form of
+system equilibrium, assuming that the travel time on an arc of the network can be
+expressed as an increasing function of the flow on the arc at the time. This, however, is a
+futile exercise for a rather obvious reason: If a bottleneck causes a queue spanning a
+whole arc to form, the result would be high travel times and low flow-an outcome that
+cannot be predicted with a simple flow-time relationship.
+In an attempt to correct this deficiency, some of the more advanced models define
+the arc travel time for an entering vehicle as a function of the current arc occupancy as
+well as entering and exiting flows. Unfortunately, such a generalization does not have the
+desired effect: Absurd results are still obtained whenever a vehicle’s travel time on an arc
+is allowed to depend in any way on the arc entry and/or exit flow at the time of entry
+(Daganzo, 1993~). ’
+The preceding comments are not meant to be critical of specific works. 2 Rather, they
+are meant to illustrate that the state of the art in dynamic traffic assignment is not yet
+‘A formulation based on arc occupancy alone can make some physical sense in the special case where it can
+be interpreted as a network of dimensionless (or point) queues, but such a representation could only apply if
+congestion is so mild that queues do not spill over arcs. If this happens, the predictions with a point queue
+model can be diametrically opposed to those of a model with spatial queues (Daganzo and Lin, 1993b).
+*The coarseness of models, in a way, should be expected because transportation networks are more compli-
+cated than those arising in other fields (than, e.g., electrical networks or hydraulic networks), as they involve
+particles that are destined for specific points in the network with little understood interactions.
+79
+
+===== PAGE 2 =====
+
+80 C. F. DAGANZO
+very advanced and to establish the need for improvements. A basic theory of dynamic
+assignment would have to include at the least realistic models of
+1. Traffic behavior when the vehicle paths are known (so that arc travel times can be
+predicted)
+2. Path choice when the time-varying arc times are known
+3. Equilibrium to reconcile the predictions of items 1 and 2.
+Arguably, item 1 is the least understood of these three items and will thus be the focus of
+the following discussion.
+The conventional macroscopic approach to simulate freeway traffic behavior over
+networks keeps track of the number of vehicles in discrete sections of the network as time
+passes. The vehicle occupancy in each section is increased by the number of vehicles
+allowed to enter the section in each time interval, and is decreased by the number of
+vehicles allowed to leave it.
+When simulating the kinematic wave model of Lighthill and Whitham (1955) and
+Richards ( 1956) -the LWR model-the outflow is typically specified to be a function of
+the occupancy of the section emitting the flow and not to be an explicit function of the
+downstream occupancy. Such approaches do not converge to the desired solution and
+cannot produce reasonable results (Newell, 1988)3; obviously, traffic could be sent into a
+section even after it reaches its maximum occupancy. Perhaps in recognition of this
+problem, some researchers have proposed to introduce constraints on the flows to ensure
+that section occupancies remain between zero and the maximum possible (Algadhi &
+Mahmassani, 1990; Chang et al., 1985; Sheffi et al., 1982). Unfortunately, such improve-
+ments do not guarantee convergence; a symptom of nonconvergence is that stopped
+traffic is still predicted not to flow into an empty freeway.
+For higher-order models, alternative formulations which include downstream infor-
+mation have been proposed but they still require heuristic protections against unreason-
+able results (Cremer et al., 1993). Because the dynamics of higher-order models have not
+been properly linked to any model of sensible driver behavior-as has been done for
+the LWR model (Newell, 1961)-and because said models have been shown to exhibit
+undesirable properties (de1 Castillo et al., 1993), this article will focus on the LWR
+model.
+The nonconvergence problem is serious because, as is well known (see Ansorge,
+1990, for example), the LWR model usually has multiple solutions but only one that is
+physically relevant. Numerical methods must not only approximate the partial differential
+equations of the LWR theory but they must also identify automatically the proper solu-
+tion.
+Ways of addressing these difficulties for a single link exist. See the methods of Lax
+(1954)-tested in Michalopoulos et al. (1984)-Luke ( 1972), Newell (1993), and Da-
+ganzo (1994). Lax’s procedure is a finite difference approximation,4 whereas Luke’s and
+Newell’s methods are exact. Lax’s method converges to the physically relevant LWR
+solution but uses a procedure where vehicles do not always move forward; this may limit
+its practical appeal. Luke’s method is computationally demanding but it can be stream-
+lined in an important special case (Newell, 1993); with Newell’s method solutions can be
+obtained easily by hand. Newell ( 1993) also describes a procedure for handling a single
+freeway. The finite difference procedure in Daganzo (1994) applies to the special case
+considered in Newell (1993). It moves vehicles forward and converges rapidly. Indica-
+tions are that the procedure can be extended to the general case (Daganzo, 1993~).
+Although more memory intensive than Newell’s method, the procedure seems easier to
+program and can be generalized readily to complicated networks. Here we show how this
+can be done.
+To limit the number of junction types to be studied, we shall restrict our attention to
+‘This reference also discusses methods intended to approximate higher-order models (e.g. Payne, 1971).
+“Michalopoulos et al. (1993) test and describe other (more complex) finite difference approximations
+which require fitting the shocks.
+
+===== PAGE 3 =====
+
+Cell transmission model 81
+networks with three-legged junctions. In that case, only two junction types are needed:
+merges and diverges. Most freeway networks can be represented in this manner. For the
+most part, it will also be assumed that the best route between every origin and every
+destination is independent of traffic conditions and is therefore known. Route choice
+issues are discussed at the end of this article.
+After a brief description of the cell-transmission results in Daganzo (1994), the next
+section describes how a network with three-legged junctions should be represented. Sec-
+tion 3 then introduces equations for merges and diverges that define boundary conditions
+for every arc of the network. These equations are used in an approximation procedure for
+networks, were it is assumed that the turning percentages at every diverge are given.
+Section 4 shows how the boundary conditions and the network approximation procedure
+should be modified when the turning percentages are determined by the destination mix
+in the traffic stream. The section also describes a procedure for predicting the evolution
+of traffic over a network. Section 5 describes the accuracy and efficiency of the proce-
+dure. Finally, Section 6 briefly discusses route choice and equilibrium issues (items 2 and
+3 in the preceding list).
+2. THE CELL-TRANSMISSION REPRESENTATION OF A NETWORK
+2.1. Background
+In Daganzo ( 1994), it is shown that if the relationship between traffic flow (4) and
+density (k) is of the form depicted in Fig. 1:
+q = min{uk, qmaxM, k, - k)}, for 0 I k I k, (1)
+then the LWR equations for a single highway link can be approximated by a set of
+difference equations where current conditions (the state of the system) are updated with
+the tick of a clock. In the preceding expression, v, q,,,=, w and k, are constants denoting,
+respectively, the free-flow speed, the maximum flow (or capacity), the speed with which
+disturbances propagate backward when traffic is congested (the backward wave speed)
+and the maximum (or jam) density.
+The method assumes that the road has been divided into homogeneous sections
+(cells), i, whose lengths equal the distance traveled by free-flowing traffic in one clock
+interval. (Although a closer approximation to the LWR results is obtained with short cell
+FLOW
+A
+ki ---
+++f
+/Pi,
+/ \
+9
+max
+t
+kj
+DENSITY
+Fig. 1. The equation of state of the cell-transmission model.
+
+===== PAGE 4 =====
+
+82 C. F. DAGANZO
+lengths, e.g. 100 meters, the procedure can be applied with cells of any length.) The state
+of the system at instant t is then given by the number of vehicles contained in each cell,
+n,( t ). The following parameters are defined for each cell:
+N,(t): The maximum number of vehicles that can be present in cell i at time t
+Q,(t): The maximum number of vehicles that can flow into cell i when the clock
+advances from t to t + 1.
+These constants can vary with time (e.g. as per the occurrence of transient traffic inci-
+dents), but this dependence will be ignored in this article for simplicity of notation. The
+first constant is defined to be the product of the cell’s length and its jam density, and the
+second one is the product of the clock interval and the cell’s capacity.
+If cells are numbered consecutively starting with the upstream end of the road from i
+= 1 to Z, the recursive relationship of the cell-transmission model can be expressed as
+n,(t + 1) = n,(t) + y,(t) -r,+,(t)
+where y,( t) is the inflow to cell i in the time interval (t, t + 1 ), given by
+y,(t) = min{n,-,(t), Q,(t), NN,(t) - n,(t)11
+where 6 = w/v. 5 Note the similarity of eqns ( 1) and (2b).
+For finite roads, boundary conditions can be specified by means of input and output
+cells. The output cell, a sink for all exiting traffic, should have infinite size (N,,, = 00 )
+and a suitable, possibly time-varying, capacity. Input flows can be modeled by a cell pair.
+A source cell numbered 00 with an infinite number of vehicles (n, (0) = 00 ) discharges
+into an empty gate cell 0 of infinite size, N,(t) = 00. The inflow capacity Q,,(t) of the
+gate cell should then be set equal to the desired link input flow for the corresponding time
+interval. The gate cell then acts as a metering device that releases traffic at the desired rate
+while holding (as a parking lot would) any flow that is unable to enter the link. (Although
+it may be possible to eliminate gate cells in an efficient computer implementation, the
+program logic should preserve their effects. Gate cells ensure that any time-dependent
+O-D table can be handled; i.e. that the LWR problem is well posed for all O-D tables.)
+2.2. The network representation
+A general transportation network is usually described by a directed graph of nodes
+and arcs, including some physical data for each arc. We take this representation as a
+point of departure for our discussion, assuming that an arc’s physical data include its
+length and the parameters defining a q-k relation of the type shown in Fig. 1.
+It should be clear that each arc of a network can be treated as in Section 2.1, once
+appropriate boundary conditions at both of its ends have been defined. Thus, we assume
+that each arc of the graph has been subdivided into cells, as explained earlier. For general
+graphs, however, it is no longer possible to number the cells consecutively and specify
+that vehicles should always proceed to the cell numbered next.
+Instead, it is convenient to describe the system of cells as the nodes {I} of a more
+detailed graph and the possible vehicle transfers by a set of links {k } . (From now on, we
+use the term link for the components of the detailed graph to avoid confusion with the
+arcs of the original graph. ) Capital letters will be used to denote cells and lowercase letters
+for links.
+The topology of the detailed network is defined by specifying for each link, k, a
+beginning cell and an ending cell. These will be denoted by adding the prefixes B and E to
+the link label, so that the beginning and ending cells of k become Bk and Ek.
+In Section 2.1 Q, denoted the maximum number of vehicles that could enter cell i per
+‘For reasons explained in Daganzo (1994), the accuracy of the approximation is enhanced if 6 is redefined
+as& = l,ifn,_,(t) I Q,(t)andd = w/v,ifn,_,(r) > Q,(r).
+
+===== PAGE 5 =====
+
+Cell transmission model 83
+unit time, assuming that there was room to store them (i.e. it represented the maximum
+possible flow on the link from i - 1 to i). Alternatively, we could have defined Qi to be
+the maximum possible flow through cell i, as an indicator of cell width, and then defined
+the minimum of Qi_] and Q, to be the maximum flow from i - 1 to i. This revised
+definition is more convenient for network modeling and will be adopted here. Thus, each
+cell will be characterized by a maximum occupancy N, and a maximum throughput Q,.
+The foregoing departs from the classical representation of a transportation network
+in that both, the state of the system (i.e. the cell vehicle occupancies at any given time)
+and the network performance characteristics (N, and QI ), are nodal quantities. In our
+formulation, links will play a minor role; they will simply define the connection of the
+cells, ensuring that vehicles are transferred among the proper nodes.
+2.3. Network topologies allowed
+We consider here networks where the maximum number of arcs (links) entering and/
+or leaving a node (cell) is 3. Thus, cells can be classified into three types: diverge if only
+one link enters the cell but two leave it, merge if two links enter and one leaves, and
+ordinary if one enters and one leaves. Origins and destinations can be modeled with
+ordinary cells as explained in Section 2.1.
+The basic modeling block, a three-legged junction, will consist of the merge (diverge)
+cell, the two links entering (leaving) it and the two cells at the other end of these links;
+see Figs. 2a and 2b. To identify all the components of the junction relative to one of its
+links (k), the prefixes c and C will be used: ck will denote the other (complementary) link
+in the modeling block, and Ck the third (complementary) cell (i.e. the cell which is
+neither Bk nor Ek). The flows on links k and ck will then be determined from functions
+similar to eqn (2b), which would have as arguments the characteristics and occupancies
+of nodes Bk, Ek and Ck.
+Before investigating the form of these equations, note that a highway network with
+three-legged junctions might then include some links that belong to more than one junc-
+tion (e.g. as part of both a diverge and a merge; see Fig. 3a). The presence of such links
+would complicate the link flow equations that are about to be presented and will not be
+allowed. No generality is lost because multi-junction links can be eliminated with a faster
+(a) MERGE
+(b) DIVERGE
+Fig. 2. Representation of a merge and diverge.
+
+===== PAGE 6 =====
+
+84 C. F. DAGANZO
+Ze
+k
+(a) INVALID
+(b) VALID
+Fig. 3. Valid and invalid representations.
+ticking clock (and shorter cells), as shown in Fig. 3b. Thus, with our representation, links
+can only belong to one of three classes: merge links, which belong to a merge junction;
+diverge links,” which belong to a diverge junction; and ordinary links, which join ordi-
+nary cells.
+3. THE DIFFERENCE EQUATIONS: PERCENTAGE OF TURNS KNOWN
+The general procedure for networks involves two steps for each tick of the clock:
+1. Determine the flow on each link with the equivalent of eqn (2b).
+2. Update the cell occupancies by transferring the flows of step 1 from the beginning cell
+to the end cell of each link.
+The procedure is now explained for ordinary links, merges and diverges.
+3.1. Ordinary links
+If we let yk( t) denote the flow on link k from clock tick t to clock tick t + 1, and 6,
+the wave speed coefficient of cell 1, the equivalent of eqn (2b) for an ordinary link is
+For simplicity of notation, the time variable t is omitted from the right side of the
+preceding equation and in forthcoming expressions. It should be understood that any
+time-dependent quantities should be valued at t unless explicitly noted otherwise.
+A further simplification is desirable. If we define
+sI(t) = min{Q,, nil and (3a)
+mini
+R,(t) = QI, UN, - el) (3b)
+
+===== PAGE 7 =====
+
+Cell transmission model 85
+as the maximum flows that can be sent and received by cell Z in the interval between t and
+t + 1, then we can write yk( t) in the more compact form:
+yk(f) = min{&,, &I (4)
+That is, the flow on link k should be the maximum that can be sent by its upstream cell
+unless prevented to do so by its end cell. If blocked in this manner, the flow is the
+maximum allowed by the end cell.
+Equation (4) is interesting because it indicates the direction of causality. During time
+periods when S,, < REk, the flow on link k is dictated by upstream traffic conditions-
+as would be predicted from the forward-moving characteristics of the LWR model. Con-
+versely, when S,, > REk, flow is dictated by downstream conditions and backward-
+moving characteristics.
+Step (2) is then completed by taking the link flows away from the beginning cells and
+adding them to the ending cells:
+n’,(t + 1) = n,(t + 1) -Yk(t), for6 all k (5a)
+%k(r + 1) = n’,(t + 1) +Y,(t) for all k (5b)
+We now explain the extensions of eqn (2b) for merge and diverge links. We assume
+that the LWR model holds for each arc of the original network, subject to proper bound-
+ary conditions at each of its ends. In Daganzo (1994), the boundary conditions were
+captured by origin and destination cells with a time-dependent capacity. For an arc ending
+in a merge or diverge, the boundary conditions should relate the flow at its extreme point
+to the flows at the extremes of the other arcs incident on the same junction.
+Note that in the cell-transmission representation the boundary conditions will only
+involve the flows on the two links of a merge or diverge. Such conditions must include a
+flow conservation equation. This, however, is not sufficient to determine future flows
+from current conditions; other side conditions are needed. They should depend on the
+particular characteristics of the junction (e.g. priorities) and will be introduced separately
+for merges and diverges.
+3.2. Merges
+In the real world, a merge can be in one of three possible causality regimes:
+1. Forward: If the flow on both approaches is dictated by conditions upstream (i.e. waves
+move forward)
+2. Backward: If the flow on both approaches is dictated by conditions downstream (i.e.
+waves move backward)
+3. Mixed: If the flow is dictated by conditions upstream for one approach and down-
+stream for the other.
+Case 1 arises if both approaches are flowing freely. Case 2 arises when both approaches
+are congested due to the junction’s lack of capacity or to congestion downstream. Case 3,
+which is less common, arises when an approach with priority crowds out traffic on its
+complementary approach.’ Boundary conditions should be found that properly reflect
+these three possibilities.* We specify conditions directly in cell-transmission form; the
+continuous model equivalences follow trivially.
+Given the maximum flow that can be emitted by the two sending cells (S,, and & ),
+the boundary equations should specify the advancing flows y, and yck as a function of the
+?he occupancies, II; (t + l), are intermediate variables introduced for mathematical notation purposes;
+they can be eliminated during computer implementation.
+‘In this last case, conditions upstream of the intersection on the congested approach are dictated by past
+conditions upstream of the merge on the uncongested approach.
+&rhe conditions should be similar, but not identical, to those one would have for two merging pipes
+carrying a compressible fluid.
+
+===== PAGE 8 =====
+
+86 C. F. DAGANZO
+maximum flow that can be received immediately downstream: REk. (The variables S,, ,
+S,-, and REk, which capture the current state of the system at the junction, are proxies for
+the traffic densities at the junction.)
+Clearly, the flows must satisfy
+Yk(f) 5 &ik;Yck(f) 5 SC, and (6a)
+uk(t) + ~ck(f) 5 REP (6b)
+But this is not enough to identify the flows unless additional relations are introduced. As
+was done for ordinary cells and links, it will be assumed that cells Bk and Ck send the
+maximum traffic possible if cell Ek can receive it-we will see in due course how the final
+result relates to the three possible states of causality.
+Thus,
+yk(f) = Sk and yck(f) = Sck9 if R, > &l/c + &, (W
+If the condition in eqn (7a) is not satisfied, we will assume that the maximum number
+possible of vehicles, REk(f), advances into Ek. As long as the supply of vehicles from
+both approaches, S,(t) and S,(t), is not exhausted, we will assume that a fraction (Pk )
+of the vehicles comes from Bk and the remainder (pck ) from Ck, where Pk + p& = 1.
+The constants p are characteristics of the intersection that capture any priorities.
+(Absolute priority to approach k, for example, would imply that pk = 1 and p& = 0.)
+If the supply of vehicles on one of the approaches is exhausted before the end of the time
+interval between clock ticks, then the remaining vehicles to advance will come from its
+complementary approach.
+A simple formula for the advancing flows can be identified with the help of Fig. 4.
+The rectangle in the figure represents the set of flows satisfying eqns (6a) and the (im-
+plicit) nonnegativity restrictions. Three cases of eqn (6b) are depicted; points below
+/I
+yk = SBk
+Fig. 4. Diagram of feasible flows for a merge junction.
+
+===== PAGE 9 =====
+
+Cell transmission model 87
+downsloping line i (or ii, or iii) satisfy eqn (6b). The figure also displays the line y,/y,
+= pck/pk , representing the flows that advance before the supply is exhausted.
+Equation (7a) arises when the downsloping line does not intersect the rectangle (case
+3) and the flows are the coordinates of point P. This corresponds to forward causality
+regime 1. When the upward- and downward-sloping lines intersect inside the rectangle
+(case l), a supply of vehicles will remain on both approaches when time expires and the
+solution flows are at the intersecting point (Q). This corresponds to backward causality
+regime 2. If the sloping lines intersect outside the rectangle but the downsloping line
+intersects the rectangle (case 2), then the solution must be on the downsloping line (since
+there is more demand than available room). Moreover, since the supply on one of the
+approaches is exhausted before time expires, the solution must also be on the side of the
+rectangle intersected by the upward sloping line; the point of intersection (R) is the
+solution. This corresponds to mixed causality regime 3.
+We note that for both cases 1 and 2, the solution point is the middle point of the
+three points intersected by the downsloping line (R, R’ and R” ) or (Q, Q’ and Q” ).
+Thus we can write
+yk(f) = midjSBk,R Ek - Sk, pkREk) and (7a)
+&k
+Yck ( t ) = mid 1 &k, &k - , pckREk > (7b)
+if R, < &I, + (7c)
+&‘k
+Equations (7a) and (7b)- the generalization of eqn (4) to merges-uniquely define the
+flows through a merge during time interval (t, t + 1). These flows are then used with eqn
+(5) to update the cell occupancies of the diverge.
+A simulation for two highways that merge into one is easy to build using a computer
+spreadsheet consisting of two separate ranges-similar to the ones described in the appen-
+dix of Daganzo ( 1993a)-linked to a third range that contains the merge cell and eqns
+(7). As in that reference, experiments with such a simulation confirm that the simulated
+behavior of the merge approximates the LWR model.
+For causality regime 1, this can also be verified manually by inspecting the steady-
+state solution to the difference equations (with very small clock ticks) for a network
+such as in Fig. 2a (consisting of two equilibrium link flows and three equilibrium cell
+occupancies), when the input flows to cells Bk and Ck are constant. The predictions also
+match if the combined input flows exceed the capacity of Ek so that a queue exists on one
+or both of the approaches (i.e. under causality regimes 2 and 3).
+Nothing in our formulation prevents the p values, like the other cell characteristics
+(N, Q and a), to depend on time. (Conceivably, p could also depend on the state of
+the end cell.) A time-dependent Q could be used to model ramp metering strategies, a
+time-dependent N to model temporary lane closures and a time-dependent p to simulate
+traffic signals. For the latter, the priority constant, pk, would alternate between 0 and 1
+after a suitable number of clock ticks. Equations (7), however, need to be modified
+because a merge controlled by a traffic signal may not allow traffic from the blocked
+approach to enter the merge, even when the other approach is idle. If this is true, the
+equations are even simpler:
+Yk(t) = 0, if pk(t) = 0 (8a)
+= min{ &k , hk 1, if pk(t) = 1 (8b)
+A variation on eqn (8) would apply if the secondary flow is not totally interrupted when
+the high-priority flow is low (e.g. as when right turns are allowed on red). Since eqns (7)
+and (8) capture a broad set of conditions, we will not give here an extensive set of recipes
+for many forms of control; this may be attempted in the future.
+Finally, note that if the p’s are allowed to depend on the cell occupancies upstream
+of the merge, traffic-actuated control strategies could also be simulated.
+
+===== PAGE 10 =====
+
+88 C. F. DAGANZO
+3.3. Model of a diverge
+In deriving boundary conditions for diverges, it should be recognized that the left/
+right turn percentages will in general depend on the mix of car destinations present in the
+element of flow currently upstream of the junction. This will be examined in Section 4.
+Here we assume that the turning proportions are exogenously determined, as would
+occur for applications involving emergency evacuations (e.g. due to an imminent nuclear
+meltdown or natural disaster). In this case, the logic is very simple.
+In Fig. 2b, cell Bk can send a maximum of S,,(t) vehicles during time interval (t, t
++ 1) and cells Ek and Ck can receive a maximum of REk(f) and R&f), respectively.
+These three quantities are still given by eqns (3). Because part of S,,(t) is destined for Ek
+and part for Ck, it will be assumed (as in Newell, 1993) that all the flow is restricted if
+either one of the diverging branches is unable to accommodate its allocation of flow. This
+assumes that vehicles unable to exit prevent all those behind, regardless of destination, to
+continue. This assumption, which should be suitable for the level of accuracy required of
+large-scale models, implies that vehicles at the diverge (and indeed through the network)
+are served in a first-in-first-out (FIFO) sequence. ’
+We assume here that the proportions of &(t) going each way P&f) and P&t)
+t&(t) + p&t) = 1 ] are exogenously determined and that traffic flows in these pro-
+portions continuously between clock ticks. Then, the (as yet unknown) number of vehi-
+cles emitted by Bk, yBk(t ), determines the turning flows:
+Yk ( t ) = &khk and Yck ( t ) = &khk Pa)
+As in other cases, the amount of traffic emitted by Bk, yak(t), should be as large as
+possible without exceeding the amount that can be received by any of the exiting
+branches. This implies that yk I’nUSt not exceed REk and that y,k mUSt IIOt exceed Rck.
+These conditions can be expressed mathematically as
+The solution to this simple linear program is
+hk ( t ) = min { %k , &k/&k, &k/&k 1 (9b)
+which together with eqn (9a) defines the flows on a diverge.
+As for ordinary and merge links, eqns (5) complete the set of equations needed to
+update the state of the system.
+4. THE MODEL WITH KNOWN ROUTES: TURNING PERCENTAGES NOT SPECIFIED
+It is assumed in this section that the turning percentages at time t are not specified.
+Instead, they are derived from the destinations of the vehicles ready to advance into each
+diverge at time t and information on the best paths available at the time to reach these
+destinations.
+A FIFO discipline (consistent with the analysis in prior sections) will be used to
+identify the advancing vehicles. The best-path information is assumed to take the form of
+route choice constants defined for the two end cells of each diverge, &kd( t) and &kd( t).
+They give the proportion of vehicles with destination d that would advance from Bk to
+each of the two end cells in the time interval from t to t + 1. As before, these constants
+91n actuality, especially when the exit percentage is low, the blockage does not occur instantaneously.
+Furthermore, even after the conditions have settled into a stable pattern, freeway traffic is never at jam density
+next to the ramp. Observation of real systems reveals that the freeway traffic density upstream of a blocked
+diverge increases gradually toward the jam density in the upstream direction and that the density on the through
+lane(s) is less than on the exit lane(s). This allows through vehicles to negotiate the diverge more rapidly than
+exiting vehicles. A more detailed analysis of this phenomenon would require an extension of the LWR theory,
+involving two vehicle types. Such a theory could be useful for traffic engineering studies of freeway interchanges
+and weaving sections, but it is beyond the scope of this article.
+
+===== PAGE 11 =====
+
+Cell transmission model 89
+must be between 0 and 1, and must satisfy p&t) + /3ckd(t ) = 1. We will discuss later
+how these constants can be calculated.
+To use such route choice information within the model, it is necessary to record cell
+occupancies, disaggregated by destination. In addition, to ensure the FIFO discipline
+when cells cannot emit all their contents, it will also be necessary to keep track of the time
+waited by the cell occupants. Thus, we characterize the state of the system by a variable,
+nldr( t), representing the number of vehicles in cell Z at time t bound for destination d that
+entered the cell in the time interval immediately after clock tick (t - 7). The parameter 7
+is a measure of time waited. Keeping track of r is important because on arrival to a
+congested cell, vehicles with high r must advance before those with a low 7.
+Like cell occupancies, link flows must also be disaggregated by destination and wait.
+We use y&f) to represent the number of vehicles flowing on link k during (t, t + 1)
+that ( 1) are bound for d, and (2) had entered cell Bk in the 7th interval before t.
+4. I. The procedure with disaggregated occupancies and flo ws
+As before, the overall algorithm will consist of a flow calculation step 1 and an
+occupancy revision step 2.
+With disaggregated variables, the expressions for the second step-previously eqn
+(5)-should ensure that advancing vehicles have their 7 reset to 1 while the rest have it
+increased by 1. The new formulas are
+hkdl ( t + 1 ) = & Ykdr for all k,d (loa)
+and
+nBkdr+ I ( t + 1 ) = nBkdr - Ykdr for all k,d,r (lob)
+In these equations, r ranges from 1 to the number of time periods present in cell Bk at
+time t, rk( t).
+Since the occupancies are disaggregated by destination and wait, the first step can be
+reduced to the identification of (real) variables aI( t) for every cell, denoting the minimum
+wait of the vehicles leaving each cell in interval (t, t + 1). Under FIFO, the a,‘s readily
+indicate which vehicles are allowed to flow.
+Accordingly, we assume that the disaggregated flows on a diverge link k are given by
+the following function of aBk:
+if T> la&l+ (lla)
+Ykd? ( tyaBk ) = nBkdr&kd9
+= (r - if 7= l&k(+ (llb)
+aBk ) nBkdr &kd ?
+= 0, if r < 1a Bk1 + (llc)
+where laBk I + denotes the SIUglleSt integer equal to or greater than &k. For ordinary or
+merge links, eqn ( 11) applies with flEkd = 1.
+Logically, eqn ( 11) indicates that all the occupants of Bk that have entered cell Bk in
+a time interval prior to t - aBk (i.e. with 7 > I a, 1 +) advance. Conversely, none of
+those with r < Ia,, I + advance. Of those vehicles having entered cell Bk in the time
+interval containing time t - aBk, only a fraction equal to the proportion of the interval
+that precedes aBk (i.e. r - ask) is advanced. This preserves the FIFO order to the accu-
+racy allowed by the simulation clock tick. lo
+The next subsection explains how the a, are calculated.
+“Although eqn ( 11) ensures that vehicles entering a cell in time interval r cannot leave the cell before those
+having entered in earlier intervals (r + 1, z + 2, r + 3 . . . ), it does not differentiate among the vehicles
+entering in the same clock interval. This departure from FIFO should not pose a serious problem because only a
+very small proportion of the total network flow is affected by this approximation. In any case, its effects can be
+minimized by choosing faster clocks.
+
+===== PAGE 12 =====
+
+90 C. F. DAGANZO
+4.2. Minimum link waits
+To determine the minimum link waits, it is convenient to define two functions relat-
+ing aggregated link flows to a,. If indexed by destination only, the link flow is
+Ykd ( haBk) = ? Ykdr ( h@Bk) (12)
+The total aggregate flow is
+(13)
+The inverse relationship between &,k and yk will help us identify the a,. As is illus-
+trated in Fig. 5, eqns (11) to (13) define nonincreasing, piecewise-linear functions with
+changes in slope at the integers. Because these functions are nonincreasing, it is possible
+to define a nonincreasing inverse function of eqn ( 13 ), A,, which gives the minimum wait
+at the link’s source Cell,a Bk, for a given aggregate flOW,y,":
+(14)
+aBk = Ak ( t,yk)
+Equations (13) and (14) can be constructed concurrently in tabular form.
+Equations (13) and (14) are only meaningful for a range of flows between zero and
+the maximum that can be sent, &. [For diverges, flows satisfy 0 5 yk(t,aBk) + yc
+k( t,aBk) s &k .] Accordingly, aBk ranges from the smallest value not violating the
+maximum flow constraint, which is denoted by &k(t) and may be zero, to the maximum
+wait present in the upstream cell, which is denoted by rBk( t). Note that for diverges
+&k(f) = ABk*
+We are now in a position to identify a,(t) for the three basic types of cells.
+Ordinary and merge cells. Since only one link (k) leaves any such cell (Bk), these
+cells emit vehicles without a route choice. As a result, vehicle destinations do not influence
+A
+Y
+c
+1 2 3 4 5 aBk
+Fig. 5. Graphical representation of y,,,ft,uBk) and JJ~(f ,aac).
+“Equation (14) will have a jump discontinuity whenever eqn (13) is constant. In what follows, it does not
+matter how a,, is valued at any such jump; we can assume, for example, that a,, is right continuous, taking on
+the smallest possible value at each jump.
+
+===== PAGE 13 =====
+
+Cell transmission model 91
+the advancing flows and the emitted flow yk can be obtained from the total cell occupanc-
+ies as in Section 3; that is, using eqn (3), and either eqn (4) for ordinary links or eqns
+(7a) and (7b) for merge links. Then, eqn (14) yields a,,.
+Diverges. Although the aggregate flows at a diverge cannot be obtained directly from
+eqn (Sb), it is not difficult to generalize this result. As in Section 3.3, a diverge cell, Bk,
+will send as much flow as possible on both its branches, k and ck, provided that the flows
+sent satisfy the capacity constraints for the sending cell and the two receiving cells. Thus,
+a&t) should be the smallest value satisfying
+and
+Yk ( tpaBk ) 5 &k, yck ( t&k ) 5 &k
+Yk(&aBk) + yck(tyaBk) s SBk
+Because the left sides of these inequalities are nonincreasing and the last inequality is
+satisfied if and only if a,& z A,, the solution is
+(15)
+aBk = max{Ak(f,REk),Ack(f,RCk),ABkJ
+With the a, known, an iteration of the procedure can now be completed. ‘*
+5. COMPUTATIONAL ISSUES
+A computer program which carries out the procedure described in Sections 3 and 4
+for general networks has been written (Lin and Daganzo, 1993). Its results match satis-
+factorily the predictions of the LWR theory for special cases that can be solved by hand.
+Two such examples are reported in Daganzo and Lin (1993a); one of the examples
+illustrates the evolution of the traffic states when an incident in one of the branches of a
+diverge blocks traffic temporarily; the resulting queue spills onto the upstream freeway
+section and eventually dissipates.
+As a point of reference for an evaluation of the computational complexity of our
+procedure, we use the static traffic assignment problem. With careful definition of the
+data structures, the RAM memory needed to implement the procedure is a couple of times
+smaller than the product of the number of links L, the number of destinations D and the
+average of 7&(t), T: LDT. This can be compared with the requirements for the static
+traffic assignment problem, which are comparable to AD, where A is the number of arcs.
+Because A is perhaps an order of magnitude smaller than L, we see that the memory
+required by the cell-transmission model should be about 5T times larger than that of the
+static traffic assignment. The factor T can be roughly viewed as the ratio of the average
+free-flow speed for the network (e.g. 40 mph) and the actual average at the most con-
+gested instant during the study period (e.g. 20 mph). For large networks Tis not likely to
+be large, at most being comparable with 2 or 3. Thus, it appears that the memory
+requirements are about an order of magnitude larger than for an equivalent static traffic
+assignment problem.
+The speed of execution with a single processor can also be estimated. Each clock tick
+requires a simple set of calculations to be done for every cell and every link. Because each
+link requires each destination and each 7 to be considered, the number of calculations per
+tick should be on the order of LDT. For large networks, this compares well with the
+number of calculations for an iteration of the static equilibrium traffic assignment model,
+which is proportional to the number of the destinations but grows supralinearly with the
+number of nodes in network. On the other hand, we may need to perform more iterations
+than are normally done for static equilibrium models in order to simulate a rush-hour
+period. All things considered, thus, the execution time may also be an order of magnitude
+greater than for static equilibrium models.
+“In addition to the cell occupancies, we should also update the maximum wait for each cell. Since by time
+t + 1 all the vehicles having entered Bk before t - uBkt() will have advanced, the maximum wait at that time
+by a remaining vehicle is 1 + ask(t). Clearly then, rsk( t + 1) = 11 + ask 1+ .
+
+===== PAGE 14 =====
+
+92 C. F. DAGANZO
+If this performance seems too cumbersome for application to large networks, the
+reader should recognize that the equations we have proposed are ideally suited for mas-
+sively parallel computing. (Today these machines are approaching computation speeds of
+1 teraflop, or lOI floating point calculations per second, which could be used to simulate
+very large networks in the blink of an eye.) A large regional network can be decomposed
+into small subnetworks corresponding to different subareas of the study region; then,
+thanks to the order-free property of the cell transmission model, the algorithm can oper-
+ate simultaneously and independently on the data for these subnetworks.
+6. APPLICATIONS AND COMMENTS
+The previous section assumed that the desired route between each origin and destina-
+tion was known for all times. Thus, we were able to define turn constants /3,,,(t) for every
+downstream cell of a diverge. This is reasonable if we assume (as in Horowitz, 1984) that
+drivers respond to some weighted average of their past driving experiences and that such
+experiences determine the turn constants. The network model described in this article
+could then be used to simulate a sequence of days to see if an equilibrium is reached. The
+model could also be used to determine the type of real-time information that is likely to
+be of most value to drivers. (Preliminary analyses with the model indicate, not to great
+surprise, that driver advisories should anticipate the projected evolution of the system;
+Daganzo and Lin, 1993b.)
+Dynamic network models can also be applied to evaluate the performance of emer-
+gency evacuation plans developed in response to the possibility of a disaster such as a
+nuclear meltdown (Sheffi, et al., 1982). Because in such an instance time is of the essence,
+a realistic model of network performance under a dynamic load is necessary. Evacuations
+are easier to study than the general dynamic traffic assignment model because traffic can
+be modeled as a single commodity flowing to a unique hypothetical destination, safety. I3
+An evacuation plan, consisting of a set of /3,( r)‘s not differentiated by destination, could
+then be easily evaluated with the proposed approach.
+Recent theoretical results (Daganzo, 1993b) indicate that the model discussed in this
+article can be extended to general equations of state with minor modifications. These new
+results might also allow larger cells (e.g., 1 Km long) to be used on long homogeneous
+freeway segments and shorter cells (e.g., 100 m long) on ramps and interchanges. The
+memory requirements of the models could then be reduced at the cost of some accuracy.
+Efforts toward the development of more refined models of diverge behavior (see
+footnote 9) also seem worthwhile and are currently under way.
+REFERENCES
+Algadhi, S. A. H., & Mahmassani, H. (1990). Modelling crowd behavior and movement: Application to
+Makkah pilgrimage. In M. Koshi (Ed.), Transportation cmd traffic theory, Proceedings of the 1 lth Interna-
+tional Symposium on Transportation and Traffic Theory, Yokohama, Japan (pp. 59-78). New York:
+Elsevier.
+Ansorge, R. (1990). What does the entropy condition mean in traffic flow theory? Trans. Res., Z&?(2), 133-
+143.
+de1 Castillo, J. M., Pintado, P., & Benitez, F. G. (1993). A formulation for the reaction time of traffic flow
+models. In C. Daganzo (Ed.), Trunsportution and traffic theory, Proceedings of the 12th International
+Symposium on Transportation and Traffic Theory, Berkeley, CA (pp. 387405). New York: Elsevier.
+Chang, Cl. L., Mahmassani, H., and Herman, R. (1985). Macroparticle traffic simulation model to investigate
+peak-period commuter decision dynamics. Trans. Res. Rec., 1005, 107-121.
+Cremer, M., Meissner, F., & Schrieber, S. (1993). On predictive control schemes in dynamic rerouting strate-
+gies. In C. Daganzo (Ed.), Transportation und truffic theory, Proceedings of the 12th International Sympo-
+sium on Transportation and Traffic Theory, Berkeley, CA (pp. 407-426). New York: Elsevier.
+Daganzo, C. F. (1993a). The cell-transmission model. Purt I: A simple dynumic representation of highway
+trqffic. Research report, UCB-ITS-PRR-93-7, Institute of Transportation Studies, University of California,
+Berkeley.
+Daganzo, C. F. (1993b). A finite difference approximation for the kinematic wave model. Trans. Res. (submit-
+ted for publication).
+“The network would be represented as usual, stopping a sufficient distance from the location of the
+disaster. The nodes on the edge of the represented network would then be connected to the imaginary destina-
+tion - the safety node-which all traffic would try to reach.
+
+===== PAGE 15 =====
+
+Cell transmission model 93
+Daganzo, C. F. (1993c). Properties of link travel time functions under dynamic loads. Working paper, UCB-
+ITS-PWP-93-5, Institute of Transportation Studies, University of California, Berkeley.
+Daganzo, C. F. (1994). The cell-transmission model: A simple dynamic representation of highway traffic.
+Trans. Res., 288(4), 269-281.
+Daganzo, C. F., & Lin, W. H. (1993a). Moving queues in traffic networks. In S. Yager & A. Santiago (eds.),
+Proceedings of the Engineering Foundation Conference on Issues and Techniques in Traffic Management,
+St Petersburg, FL (pp. 121-136). Washington, DC: FHWA.
+Daganzo, C. F., & Lin, W. H. (1993b). The spatial evolution of queues during the morning commute in a
+sing/e corridor. Working paper, UCB-ITS-PWP-93-7, Institute of Transportation Studies, University of
+California, Berkeley (presented at the 1994 meeting of the Transportation Research Board).
+Horowitz, J. L. (1984). The stability of stochastic equilibrium in a two-link transportation network. Trans.
+Res.. ISB( l), 13-28.
+Janson, B. N., & Robles, J. (1993). Dynamic traffic assignment with arrival time costs. In C. Daganzo (Ed.),
+Transportation and traffic theory, Proceedings of the 12th International Symposium on Transportation and
+Traffic Theory, Berkeley, CA (pp. 127-146). New York: Elsevier.
+Lax, P. D. (1954). Weak solutions of non-linear hyperbolic equations and their numerical computation. Comm.
+Pure App. Math., 7, 159-193.
+Lighthill, M. J., & Whitham, J. B. (1955). On kinematic waves. I. Flow movement in long rivers. II. A Theory
+of traffic flow on long crowded roads. Proc. Royal Sot., A229,281-345.
+Lin, W. H., & Daganzo, C. F. (1993). Technical description of NETCELL: General framework and data
+structure. Institute of Transportation Studies, University of California, Berkeley (mimeo).
+Luke, J. C. (1972). Mathematical models for landform evolution. J. Geoph. Res., 77,2460-2464.
+Michalopoulos, P. Ci., Beskos, D. E., & Yamauchi, Y. (1984). Multilane traffic flow dynamics: Some macro-
+scopic considerations. Trans. Res., 18B(4/5), 377-395.
+Michalopoulos, P. G., Yi, P., & Lyrintzis, A. S. ( 1993). Continuum modelling of traffic dynamics for congested
+freeways. Trans. Res.. 27B(4), 315-332.
+Newell, G. F. (1961). Non-linear effects in the dynamics of car following. Opns. Res., 9(2), 209-229.
+Newell, G. F. (1988). Comments on traffic dynamics. Trans. Res., 23B(5), 386-389.
+Newell, G. F. (1993). A simplified theory of kinematic waves in highway traffic, Part I: General theory; Part
+II; Queuing at freeway bottlenecks; Part III: Multi-destination flows. Trans. Res., 27B(4), 281-314.
+Payne, H. J. (1971). Models of freeway traffic and control. Math. Models Pub/. Sys., Simul. Council Proc.,
+28(l), 51-61.
+Ran, B. ( 1993). Dynamic transportation network models for advanced traveler information systems. PhD
+thesis, University of Illinois, Chicago, IL.
+Richards, P. I. (1956). Shockwaves on the highway. Opns. Res., 4,42-51.
+Sheffi, Y., Mahmassani, H., &Powell, W. B. (1982). A transportation network evacuation model. Trans. Res.,
+16A(3), 209-218.
+Transportation Research. (1991). Special issue on dynamic control of urban traffic networks (Part II; N. H.
+Gartner & G. Improta, Eds.). Elmsford, NY: Pergamon Press.

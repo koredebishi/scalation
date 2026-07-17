@@ -1,0 +1,291 @@
+===== PAGE 1 =====
+
+Proceedings of the 2013 Winter Simulation Conference
+R. Pasupathy, S.-H. Kim, A. Tolk, R. Hill, and M. E. Kuhl, eds
+AN INTRODUCTION TO VERIFICATION AND VALIDATION OF SIMULATION MODELS
+Robert G. Sargent
+Department of Electrical Engineering and Computer Science
+L.C. Smith College of Engineering and Computer Science
+Syracuse University
+Syracuse, NY 13244, USA
+ABSTRACT
+Model verification and validation are defined, and why model verification and validation are important is
+discussed. The three approaches to deciding model validity are described. A graphical paradigm that
+shows how verification and validation are related to the model development process and a flowchart that
+shows how verification and validation is part of the model development process are presented and dis-
+cussed. A recommended procedure for verification and validation is given.
+1 INTRODUCTION
+An introduction to verification and validation of simulation models is given in this paper. Verification and
+validation are concerned with determining whether a model and its results are “correct” for a specific use
+or purpose. Formally, model verification is defined as “ensuring that the computer program of the com-
+puterized model and its implementation are correct” and model validation is defined as the “substantiation
+that a computerized model within its domain of applicability possesses a satisfactory range of accuracy
+consistent with the intended application of the model.” Our discussion of verification and validation of
+simulation models will be primarily concerned with simulation models that are used to predict system be-
+haviors such as systems outputs. Two related topics are model credibility and model usability. Model
+credibility is concerned with developing in (potential) users the confidence they require in order to use a
+model and in the information derived from that model. Model usability is determining that the model and
+its user instructions are easy to use.
+It is important that verification and validation of a simulation model be performed for each use or
+purpose of a model. If the purpose of a simulation model is to answer a variety of questions, the validity
+of the model needs to be determined with respect to each question. The developers and users of simula-
+tion models, the decision makers using information obtained from the results of these models, and the in-
+dividuals affected by decisions based on such models are all rightly concerned with whether a model and
+its results are “correct” for each question being addressed.
+Numerous sets of experimental conditions are usually required to define the domain of a model’s in-
+tended applicability. (A set of experimental conditions contain a set of values for the set of variables that
+define the domain of applicability.) A model may be valid for one set of experimental conditions and in-
+valid in another. A model is considered valid for a set of experimental conditions if the model’s accuracy
+is within its acceptable range of accuracy, which is the accuracy required of the model for its intended
+purpose. This usually requires that the model’s output variables of interest (i.e., the model variables used
+in answering the questions that the model is being developed to answer) be identified and then their ac-
+ceptable range of accuracy specified. A model’s acceptable range of accuracy should be specified prior to
+starting the development of the model or very early in the model development process. If the variables of
+978-1-4799-3950-3/13/$31.00 ©2013 IEEE 321
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:28:13 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 2 =====
+
+Sargent
+interest are random variables, then properties and functions of the random variables such as means and
+variances are usually what is of primary interest and are what is used in determining model validity. Sev-
+eral versions of a model are usually developed prior to obtaining a satisfactory valid model. The substan-
+tiation that a model is valid, i.e., performing model verification and validation, is generally considered to
+be a process and is usually part of the (total) model development process.
+The remainder of the paper is organized as follows: Section 2 presents the three decision-making ap-
+proaches to deciding model validity, Section 3 describes how verification and validation relate to the
+model development process, Section 4 gives a recommended validation procedure, and Section 5 contains
+the summary.
+2 DECISION-MAKING APPROACHES
+There are three basic decision-making approaches for deciding whether a simulation model is valid. Each
+of these three approaches uses a different decision-maker. All of the approaches require the model devel-
+opment team to conduct verification and validation as part of the model development process, which is
+discussed in Section 3. One decision-making approach, and a frequently used one, is for the model devel-
+opment team itself to make the decision as to whether a simulation model is valid. The decision is based
+on the results of the various tests and evaluations conducted as part of the model development process. It
+is usually better, however, to use one of the next two decision-making approaches, depending on which
+situation applies.
+A better decision-making approach is to have the user(s) of a simulation model decide the validity of
+the model. In this approach the users of the simulation model are heavily involved with the model devel-
+opment team when the team is conducting verification and validation of the model and the users deter-
+mine if the model is satisfactory in each phase of verification and validation. This approach is generally
+used with a model development team whose size is not large. Also, this approach aids in model credibility.
+Another decision-making approach, usually called “independent verification and validation” (IV&V),
+uses a third party to decide whether the simulation model is valid. The third party (the IV&V team) is in-
+dependent of both the simulation development team(s) and the model sponsor/user(s). The IV&V ap-
+proach is generally used with the development of large-scale simulation models, whose development usu-
+ally involves several teams. The IV&V team needs to have a thorough understanding of the intended
+purpose(s) of the simulation model in order to conduct IV&V. There are two common ways that the
+IV&V team conducts IV&V: (a) IV&V is conducted concurrently with the development of the simulation
+model and (b) IV&V is conducted after the simulation model has been developed.
+In the concurrent way of conducting IV&V, the model development team(s) gives their model verifi-
+cation and validation test results to the IV&V team as the simulation model is being developed. The
+IV&V team evaluates these results and provides feedback to the model development team regarding
+whether the model verification and validation is satisfying the model requirements and when not, what the
+difficulties are. When conducting IV&V this way, the development of a simulation model should not pro-
+gress to the next stage of development until the model has satisfied the verification and validation re-
+quirements in its current stage. It is the author’s opinion that this is the better of the two ways to conduct
+IV&V.
+When IV&V is conducted after the simulation model has been completely developed, the evaluation
+performed by the IV&V team can range from simply evaluating the verification and validation conducted
+by the model development team to performing a separate thorough verification and validation effort
+themselves. Performing a complete IV&V effort after the model has been completely developed is usually
+both extremely costly and time consuming. This author’s view is that if IV&V is going to be conducted
+on a completed simulation model then it is usually best to only evaluate the verification and validation
+that has already been performed.
+The IV&V approach is also useful for model credibility. When verification and validation is conduct-
+ed by an independent (third) party and they conclude the simulation model is valid, there is a much great-
+322
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:28:13 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 3 =====
+
+Sargent
+er likelihood that others will accept the model as valid and results from the model as being “correct”.
+Cases where this decision-making approach is helpful are (i) when the problem associated with the model
+has a high cost or involves a high risk situation and (ii) when public acceptance of results based on the
+model is desired.
+3 MODEL DEVELOPMENT PROCESS WITH VERIFICATION AND VALIDATION
+In this section a graphical paradigm is presented in subsection 3.1 that relates model verification and vali-
+dation to the model development process. Then in subsection 3.2 the model development process is de-
+scribed that includes verification and validation.
+3.1 A Simple Graphical Paradigm
+There are two common ways to view how verification and validation relate to the model development
+process. One way uses a simple view and the other uses a complex view. A simple graphical paradigm is
+presented in Figure 1 that was developed by this author called the Simplified View of the Model Devel-
+opment Process (Sargent 1981, 1982, 1983, 2001, 2011, 2013). A more complex paradigm developed by
+this author that includes both the “Simulation World” and the “Real World” is contained in Sargent (2001,
+2013).
+Figure 1: Simplified version of the model development process.
+Consider the simplified version of the model development process in Figure 1. The problem entity is
+the system (real or proposed), idea, situation, policy, or phenomena to be modeled; the conceptual model
+is the mathematical/logical/graphical representation (mimic) of the problem entity developed for a partic-
+ular study; and the computerized model is the conceptual model implemented on a computer. The concep-
+tual model is developed through an analysis and modeling phase, the computerized model is developed
+through a computer programming and implementation phase, and inferences about the problem entity are
+obtained by conducting computer experiments on the computerized model in the experimentation phase.
+We now relate model verification and validation to this simplified version of the model development
+process. (See Figure 1.) Conceptual model validation is defined as determining that the theories and as-
+323
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:28:13 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 4 =====
+
+Sargent
+sumptions underlying the conceptual model are correct and that the model representation of the problem
+entity is “reasonable” for the intended purpose of the model. Computerized model verification is defined
+as assuring that the computer programming and implementation of the conceptual model are correct. Op-
+erational validation is defined as determining that the model’s output behavior has a satisfactory range of
+accuracy for the model’s intended purpose over the domain of the model’s intended applicability. Data
+validity is defined as ensuring that the data necessary for model building, model evaluation and testing,
+and conducting the model experiments to solve the problem are adequate and correct.
+3.2 Model Development Process
+A model should be developed for a specific purpose or use. Furthermore, a model should be developed
+such that it is a parsimonious model meaning that it is as simple as possible yet meets its purpose. A
+simulation model is a structural model meaning that the model contains logical and causal relationships
+that occur in the systems. (Note: Empirical models are developed purely from data with an example being
+a regression model. Empirical and structural models are two different types of models.) Developing a val-
+id simulation model is an iterative process where several versions of a model are developed prior to ob-
+taining a valid model.
+Figure 2: The model development iterative process.
+324
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:28:13 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 5 =====
+
+Sargent
+The model development process should include model verification and validation. Following the par-
+adigm given in Figure 1, the iterative process shown in Figure 2 can be used to develop a valid simulation
+model (Sargent 1984). We first develop a conceptual model through analyzing the problem entity and
+then developing a model of the problem entity, remembering that a parsimonious model is desired. Then
+conceptual model validation is performed. This process is repeated until the conceptual model is satisfac-
+tory. Next a computerized model is developed of the (validated) conceptual model by developing a simu-
+lation model of the conceptual model and implementing it on a computer. Then computerized model veri-
+fication is performed. This process is repeated until the computerized model is satisfactory. Lastly,
+operational validation is performed on the computerized model. Model changes required by conducting
+operational validity can be in either the conceptual model or in the computerized model. Verification and
+validation must be performed again when any model change is made. This process is repeated until a val-
+id simulation model is obtained. As stated above, several versions of a model are usually developed prior
+to obtaining a valid simulation model. (The specifics for conducting conceptual model validation, com-
+puterized model verification, and operational validity are discussed in, e.g., Sargent (1984, 2011, 2013).)
+It is often too costly and time consuming to determine that a model is absolutely valid over the com-
+plete domain of its intended applicability. Instead, tests and evaluations are conducted until sufficient con-
+fidence is obtained that a model can be considered valid for its intended purpose or use (Sargent 1982,
+1984). If a test determines that a model does not have sufficient accuracy for any one of the sets of exper-
+imental conditions, then the model is invalid. However, determining that a model has sufficient accuracy
+for numerous sets of experimental conditions does not guarantee that a model is valid everywhere in its
+applicable domain. Figure 3 contains two relationship curves regarding confidence that a model is valid
+(Confidence in Model) over the range of 0-100 percent as they would occur in most cases. (Note that the-
+se curves are qualitative conceptual curves and that they cannot be quantitatively calculated.) The cost
+curve (and a similar relationship holds for the amount of time) of performing model validation shows cost
+increases at an increasing rate as the confidence in the model increases. The value curve shows that the
+value of a model to a user increases as the confidence in a model increases but at a decreasing rate. (In
+some cases these curves may have a different shape for the lower confidence range but would usually be
+similar to what is shown in Figure 3 for the upper confidence range.) The cost of model validation is usu-
+ally quite significant, especially when extremely high model confidence is required.
+Figure 3: Confidence that model is valid.
+4 RECOMMENDED PROCEDURE
+This author recommends that the following eight steps be performed in model verification and validation:
+325
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:28:13 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 6 =====
+
+Sargent
+1. An agreement be made prior to developing the model between (a) the model development team and (b)
+the model sponsors and (if possible) the users that specifies the decision-making approach and a mini-
+mum set of specific validation techniques to be used in determining model validity.
+2. Specify the acceptable range of accuracy required of the simulation model’s output variables of interest
+for the model’s intended application prior to starting the development of the model or very early in the
+model development process.
+3. Test, wherever possible, the assumptions and theories underlying the simulation model.
+4. In each model iteration, perform at least face validity on the conceptual model.
+5. In each model iteration, at least explore the simulation model’s behavior using the computerized model.
+6. In at least the last model iteration, make comparisons, if possible, between the simulation model and
+system behavior (output) data for at least a few sets of experimental conditions, and preferably for several
+sets.
+7. Prepare the verification and validation documentation for inclusion in the simulation model documenta-
+tion.
+8. If the simulation model is to be used over a period of time, develop a schedule for periodic review of
+the model’s validity.
+Note: Discussions of the various validation techniques and model documentation can be found in, e.g.,
+Sargent (1984, 2011, 2013).
+Some simulation models are developed for repeated use. A procedure for reviewing the validity of these
+models over their life cycles needs to be developed, as specified in Step 8. No general procedure can be
+given because each situation is different. For example, if no data were available on the system when a
+simulation model was initially developed and validated, then revalidation of the model should take place
+prior to each usage of the model if new data or system understanding has occurred since the last valida-
+tion.
+5 SUMMARY
+Model verification and validation are critical in the development of a simulation model because a model
+and its results need to be “correct.” Every simulation project presents a new and unique challenge regard-
+ing model verification and validation. This introduction to verification and validation presented what it is,
+why it is important, who the decision-maker is, how it relates to the model development process through
+the use of a graphical paradigm and a flow chart, and a procedure for performing it. The specifics on how
+to do the verification and validation tests and evaluations can be found in, e.g., Sargent (2011, 2013).
+There is considerable literature on model verification and validation. There are conference tutorials
+and papers (e.g., Sargent (2011)), journal articles (e.g., Gass (1983), Landry, Malouin, and Oral (1983),
+Sargent (2013)), discussions in textbooks (e.g., Banks et al. (2010), Law (2007), Robinson (2004), Zeigler,
+B. P., H. Praehofer, and T. G. Kim (2000)), U.S.A. Government Reports (e.g., DoDI 5000.61 (2009) and
+U. S. General Accounting Office (1987)), and books (Knepell and Arangno 1993, Oberkampf and Roy
+2010) that can be used to further your knowledge on model verification and validation.
+REFERENCES
+Banks, J., J. S. Carson II, B. L. Nelson, and D. Nicol. 2010. Discrete-Event System Simulation. 5th ed.
+Englewood Cliffs, NJ: Prentice-Hall.
+DoDI. 2009. DoDI 5000.61: DoD Modeling And Simulation Verification, Validation, and Accreditation.
+U.S. Department of Defense. December 9, 2009.
+326
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:28:13 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 7 =====
+
+Sargent
+Gass, S. I. 1983. “Decision-aiding models: validation, assessment, and related issues for policy analysis.”
+Operations Research 31 (4): 601-663.
+Knepell, P. L., and D. C. Arangno. 1993. Simulation Validation: A Confidence Assessment Methodology.
+IEEE Computer Society Press.
+Landry, M., J. L. Malouin, and M. Oral. 1983. “Model Validation in Operations Research.” European
+Journal of Operational Research 14: 207-220.
+Law, A. M. 2007. Simulation Modeling And Analysis. 4th ed. New York: McGraw-Hill.
+Oberkampf, W. L. and J. Roy. 2010. Verification and Validation in Scientific Computing. Cambridge:
+Cambridge University Press.
+Robinson, S. 2004. Simulation: The Practice of Model Development and Use. Chichester, West Sussex,
+England: John Wiley.
+Sargent, R. G. 1981. “An Assessment Procedure and a Set of Criteria for Use in the Evaluation of Com-
+puterized Models and Computer-Based Modeling Tools.” Final Technical Report RADC-TR-80-409,
+U.S. Air Force.
+Sargent, R. G. 1982. “Verification and Validation of Simulation Models.” Chapter IX in Progress in
+Modelling and Simulation, edited by F. E. Cellier, 159-169. London: Academic Press.
+Sargent, R. G. 1983. “Validating Simulation Models.” In Proc. 1983 Winter Simulation Conf., edited by S.
+Roberts, J. Banks, and B. Schmeiser, 333-337. Piscataway, New Jersey: Institute of Electrical and
+Electronic Engineers Inc.
+Sargent, R. G. 1984. “Simulation Model Validation.” Chapter 19 in Simulation and Model-Based Meth-
+odologies: An Integrative View, edited by T. I. Oren, B. P. Zeigler, and M. S. Elzas, 537-555. Heidel-
+berg, Germany: Springer-Verlag.
+Sargent, R. G. 2001. “Some Approaches and Paradigms for Verifying and Validating Simulation Models.”
+In Proc. 2001 Winter Simulation Conf., edited by B. A. Peters, J. S. Smith, D. J. Medeiros, and M. W.
+Rohrer,106-114. Piscataway, New Jersey: Institute of Electrical and Electronic Engineers Inc.
+Sargent, R. G. 2011. “Verification and Validation of Simulation Models.” In Proc. 2011 Winter Simula-
+tion Conf., edited by S. Jain, R. R. Ceasey, J. Himmelspach, K. P. White, and M. Fu,183-198. Pisca-
+taway, New Jersey: Institute of Electrical and Electronic Engineers Inc.
+Sargent, R. G. 2013. “Verification and Validation of Simulation Models.” Journal of Simulation 7:12-24.
+U. S. General Accounting Office. 1987. “DOD Simulations: Improved Assessment Procedures Would In-
+crease the Credibility of Results.” Report ID: PEMD-88-3.
+Zeigler, B. P., H. Praehofer, and T. G. Kim. 2000. Theory of Modelling and Simulation. 2nd ed. Academ-
+ic Press.
+AUTHOR BIOGRAPHY
+ROBERT G. SARGENT is a Professor Emeritus of Syracuse University. He received his education at
+The University of Michigan. Dr. Sargent has served his profession in numerous ways including being the
+General Chair of the 1977 Winter Simulation Conference (WSC), serving on the WSC Board of Directors
+for ten years and chairing the Board for two years, being a Department Editor for the Communications of
+the ACM, holding the Presidency and other offices of what is now the INFORMS Simulation Society,
+serving as Founding President of the WSC Foundation, and initiating the founding of the Simulation Ar-
+chive. He has received several awards and honors for his professional contributions including the
+INFORMS Simulation Society’s Lifetime Professional Achievement Award and their Distinguished Ser-
+vice Award, a WSC 40th anniversary landmark paper award, the WSC Wilson Award,
+ACM SIGSIM Distinguished Contributions Award, service awards from ACM and IIE, and a Fellow of
+INFORMS and of AAAS. His current research interests include the methodology areas of modeling and
+of simulation, model validation, and performance evaluation. Professor Sargent has published extensively
+and is listed in Who’s Who in America and in Who’s Who in the World. His e-mail is rsargent@syr.edu.
+327
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:28:13 UTC from IEEE Xplore. Restrictions apply.

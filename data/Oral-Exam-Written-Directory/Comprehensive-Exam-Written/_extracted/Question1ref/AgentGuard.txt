@@ -1,0 +1,348 @@
+===== PAGE 1 =====
+
+AgentGuard: Runtime Verification of AI Agents
+Roham Koohestani
+JetBrains Research, The Netherlands
+roham.koohestani@jetbrains.com
+Abstract—The rapid evolution to autonomous, agentic AI from mathematics and formal methods with the existing theory
+systems introduces significant risks due to their inherent unpre- of these agentic systems [6].
+dictability and emergent behaviors; this also renders traditional
+In this work, we present AgentGuard, a framework for
+verification methods inadequate and necessitates a shift towards
+runtime verfication of Agentic AI systems. We provide a proof-
+probabilisticguaranteeswherethequestionisnolongerifasystem
+will fail, but the probability of its failure within given constraints. of-concept for the verification process and demonstrate how it
+This paper presents AgentGuard, a framework for runtime can easily be integrated into existing systems by integrating it
+verification of Agentic AI systems that provides continuous, into an existing agentic system, RepairAgent [7]. We conclude
+quantitative assurance through a new paradigm called Dynamic
+by providing a roadmap for future work building on this
+Probabilistic Assurance. AgentGuard operates as an inspection
+framework. In the sections to follow we begin by further
+layerthatobservesanagent’srawI/Oandabstractsitintoformal
+events corresponding to transitions in a state model. It then expanding on the problem (section II), followed by a section
+uses online learning to dynamically build and update a Markov outliningtheexistingworkandtheoryonformalverificationof
+DecisionProcess(MDP)thatformallymodelstheagent’semergent AI Agents (section III). In section IV we present our approach
+behavior.Usingprobabilisticmodelchecking,theframeworkthen
+followed by its application to RapairAgent in . We conclude by
+verifies quantitative properties in real-time.
+presenting a discussion of the proposed framework (section V).
+Index Terms—Agentic AI, Formal Verification, Probabilistic
+Model-Checking, Runtime Verification
+II. TheProblem
+The problem and risk associated with these models are, at
+I. Introduction
+the same time, the characteristics that make them powerful.
+The rapid evolution from generative artificial intelligence Here we discuss these further in detail. At the core of modern
+(GenAI) to agentic AI marks a measurable leap in AI; agentic systems, you will most likely find a Large Language
+Where previously, AI systems were confined to gathering Model(LLM)basedon(amodifiedversionof)thetransformer
+and generating content within a well-defined scope, agentic architecture proposed by Vaswani et al. [8]. These models
+systems are designed for autonomy. They are implemented to are tied to a stochastic process that makes their outputs, and
+perceive,reason,plan,andactindynamicenvironmentthrough thus the behaviors of the agents, nondeterministic [9]. When
+tool invocation, memory storage and recall, and feedback multiple actions of these agents, or even multiple agents, are
+mechanisms [1], [2]. chained together in a multi-step workflow, this randomness
+Althoughthisparadigmshifthasempoweredmultiplesectors, can lead to an exponential divergence from expected behavior,
+such as automated hardware verification and [3] complex finan- which influences traceability and verification [10]. These are
+cialanalysis[2],theimprovedcapabilitiesofthesesystemsalso attributed to stochasticity and unpredictability.
+introduce higher risks. The design that enables the emergent LLMs are known to "hallucinate;" While the exact defi-
+behaviorsofagenticsystemsmakesitunpredictableandunsafe. nition of a hallucination is still a matter of debate, we refer
+Factors such as (1) stochasticity and unpredictability, (2) to a hallucination when the model generates outputs that are
+Hallucinations, (3) Emergent unintended behaviors and (4) factually incorrect or logically flawed. In an agent acting on its
+susceptibility to new vulnerabilities, all contribute to this generated beliefs, hallucinations can quickly go from being an
+increased risk. annoyance to a failure [9]. Furthermore, interactions between
+TheissuesimposedbyagenticAIrendertraditionalsoftware agentsinmulti-agentsystems(MAS)canproduce(unintended)
+verification techniques inadequate, given that these methods emergent behaviors; these emergent behaviors can be both
+assume deterministic logic and manageable state spaces [4]. beneficialandharmful.AsthesebehaviorsonlyintheseMAS’s,
+Until recently, the focus of the field of AI has often been on theseareimpossibletopredictfromanalyzingindividualagents
+the capabilities of models in isolation; while valuable, this alone [5]. Recent experiments have even shown emergent
+view underestimates the systemic risks that emerge as a result behaviors such as deception and goal subversion [1].
+of complexity and scale [5]. With the limitations of these The natural language interface of LLM agents creates new
+agentic systems in mind, it becomes imperative that the critical attack surfaces. New security attacks such as prompt injection
+questionisnolongerWillthesystemfail?,butratherquestions and red-teaming, where malicious instructions manipulate
+of probabilistic determinism, e.g., What is the probability of agent behavior and its propagation between agents ("prompt
+failure/success within a given time interval / budget? These infection"), pose significant risks. In multiagent systems built
+typesofguaranteescanonlybeprovidedbycombininginsights on inter-agent trust, an adversary could use spoofing or
+5202
+peS
+82
+]IA.sc[
+1v46832.9052:viXra
+
+===== PAGE 2 =====
+
+impersonation to issue malicious commands or exfiltrate planning constraints as a Context-Free Grammar (CFG), which
+data [10]. These are threats pointing towards susceptibility to is translated into a Pushdown Automaton (PDA). The agent is
+new vulnerabilities. then supervised by this PDA during plan generation; this then
+Although all of these issues are important and require verifiesthestructuralvalidityofitsoutput[20].Otherworkuses
+attention, it would be impossible to simultaneously tackle Finite-State Machines (FSMs) to enforce a specific reasoning
+all of them. Therefore, our emphasis is on managing the loop (e.g., Thought → Action → Observation) through a
+unpredictabilityoftheseagenticsystemsandofferingaroadmap decoding monitor that corrects deviations from the prescribed
+to address the emergent behaviors of MASs based on our behavior [21].
+approach. For highly complex tasks like hardware verification, re-
+searchers are building systems where the verification process
+III. Background
+itself is distributed among a crew of specialized AI agents.
+The field of trustworthy AI has led to a growing body Systems such as Saarthi employ agents with roles like Formal
+of research that can be viewed as a "verification stack" Verification Lead, Engineer, and Critic to collaboratively
+of increasing abstraction. Here, we discuss each of these generateandproveformalproperties.Thesesystemsusedesign
+approaches and their limitations. patterns such as reflection (coder-critic loops) and planning
+At the lowest level, researchers focus on the formal ver- (Chain-of-Thought) to improve reliability [3], [9].
+ification of the neural networks themselves. This is an NP- Thisevolutionarypathrevealsacriticalgap.Currentprocess-
+hard problem, and the immense scale of modern LLMs makes level verification focuses on conformance, that is, making sure
+exhaustiveverificationcomputationallyinfeasible.Researchhas that an agent follows a predefined set of rules. The problem
+madeprogressinprovingspecificproperties,suchasrobustness is that it does not analyze the emergent probabilistic behavior
+to adversarial perturbations, using techniques such as SMT that arises from executing that process. It cannot provide a
+solvers,abstractinterpretation,andnetworkreduction,butthese map to predict where the agent is likely to go. To achieve true
+methods struggle to scale [11]–[14]. assurance, we must move from verifying process conformance
+A more practical approach treats the LLM as a generator of to analyzing emergent behavior.
+artifacts, such as code, mathematical proofs, or plans, which
+IV. TheAgentGuardFramework
+are then verified by external tools; this approach is commonly
+called black-box testing. This approach uses the full generative In this paper, we propose a new paradigm called Dynamic
+powers of the LLMs while relying on the rigor of established Probabilistic Assurance, which shifts the verification process
+formal methods for assurance. The approaches in this category from a static and offline setting to a dynamic and ongoing
+can be categorized primarily as frameworks performing Post- process. We have implemented a Proof-Of-Concept (POC)
+Hoc Verifications and those that embrace LLM-Assisted framework called AgentGuard. Any type of static analysis
+Formalization. provides only a snapshot of the system under a fixed set of
+Frameworks such as MATH-VF and Safe use LLMs to assumptions.Agenticsystems,however,aredesignedtooperate
+translatenaturallanguagesolutionsintoaformalcontext,which in non-stationary environments and adapt based on experience.
+is then checked by external tools like SMT solvers or theorem A proof that holds before deployment may be invalidated once
+provers (e.g., Lean 4) to identify hallucinations [15], [16]. Sim- theagentinteractswiththerealworld[22].RuntimeVerification
+ilarly, VeriPlan applies the probabilistic model checker PRISM (RV)offersacompellingalternative.RVisalightweightformal
+toverifythatanLLM-generatedplanforanendusersatisfiesa method that analyzes the actual execution trace of a running
+setofuser-definedconstraints[17].Amajorbarriertoadopting system; using this, we can also avoid the state-space explosion
+formalmethodsisthedifficultyintranslatingambiguousnatural thatisaprobleminexhaustiveofflinemodelchecking.Although
+language requirements into precise specifications. LLMs are itcannotprovepropertiesaboutunobservedpaths,itcanprovide
+proving to be quite good at doing this task. Tools such as strongguaranteesabouttheexecutionthatactuallyoccurredand
+SpecVerify and Req2Spec use LLMs to automatically generate canbeextendedtomakepredictionsaboutfuturebehavior[23]–
+formal assertions from natural language requirements [18], [25].
+[19].
+A. From Traces to Models
+The most recent evolution has moved from verifying static
+outputs to verifying the dynamic processes of agentic AI. This Fundamentally, our model is built on top of three key
+acknowledges that reliability in agentic systems often stems technologies,namely(1)MarkovDecisionProcesses,(2)Online
+fromarobust,iterativeprocessofreasoningandself-correction Learning, and (3) Probabilistic Model Checking.
+which is frequently implemented via multiagent collaboration. 1) Formalizing Agents as Markov Decision Processes: The
+This type of verification is predominantly categorizable into behavior of an agent making decisions in an uncertain world
+Automata-based Control and Verfication via Multi-Agent can be formally modeled using Markovian formalisms. Markov
+Collaboration. Decision Processes (MDPs) are the framework of choice
+A promising direction uses formal automata to describe for modeling sequential decision making, as they separate
+and constrain the high-level behavior of agents. The Formal- an agent’s non-deterministic choices from the environment’s
+LLM framework, for instance, allows developers to specify probabilistic outcomes. An MDP is formally defined as a tuple
+
+===== PAGE 3 =====
+
+(𝑆,𝐴,𝑃,𝑅,𝛾) where 𝑆 is a finite set of states, 𝐴 is a finite set policy. The architecture comprises four primary components,
+of actions, 𝑃(𝑠′|𝑠,𝑎) is a probability of transitioning to state as depicted in Figure 1.
+𝑠′ after taking action a in state a, 𝑅(𝑠,𝑎,𝑠′) is the immediate The Trace Monitor & Event Abstrator is the component
+reward received after transitioning from 𝑠 to 𝑠′ via action a, that instruments the agent framework. Its responsibilities are to
+and 𝛾 is a discount factor that determines the importance of capturerawI/O(e.g.,LLMcalls,toolinvocations,observations)
+future reward [9], [10], [26]. To be able to apply this to an andtoabstractitintoastreamofformaleventscorrespondingto
+agentic system, we need to have a mapping from this MDP to transitioninastatemodel(e.g.,𝑆𝑡𝑎𝑡𝑒 𝐴→ 𝐴𝑐𝑡𝑖𝑜𝑛
+1
+→𝑆𝑡𝑎𝑡𝑒 𝐵).
+the components in an agent’s workflow. The States (𝑆) in an Using the stream from the previous step, the Online Model
+Agentic MDP (AMDP) are essentially snapshots of the agent’s Learner continuously updates an MDP of the agent’s behavior
+progress and context. States are not only defined as a series of and maintains transition probabilities based on observed
+previous tool invocations but also contain relevant information frequencies. After each incremental update to the model by
+to the next decision of the model. This information can vary the previous stage, the Probabilistic Model Checker performs
+by design to be anything from artifacts (e.g., whether an agent quantitativeverificationonthelearnedMDPagainstasetofpre-
+has already written tests or not, or whether the agent’s tests definedproperties(asprovidedintheconfigurationfile).Finally,
+passed), to the content of the agent’s memory/scratchpad and using the insights from the model checker, the Dashboard
+conversation history. presents the quantitative guarantees (e.g. probabilities) to a
+Actions (𝐴) can be seen as discrete high-level operations human observer and can be configured to triger alerts or
+that the agent chooses to perform. These have direct cor- automated responses if a safety threshold is breached using the
+respondence with the invocations of tools in the agent’s actuator.
+utility box, such as run_compiler(), execute_test_suite(), and
+C. Proof-Of-Concept Implementation
+query_static_analyzer()
+The transition probability function (𝑃) essentially captures AgentGuard is a Python-based POC framework that demon-
+strates the feasibility of our approach. Designed to be
+the inherent uncertainty of the agentic workflow. After the
+framework-agnostic, it allows developers to define semantic
+agent chooses a deterministic action (i.e., performs a tool
+states and actions via a logging-style API inspired by RV
+invocation), the outcome is probabilistic. When calling the
+frameworks, and simplifies code instrumentation with a single
+execute_test_suite tool for example, the test suite might pass
+function call. The model structure and properties are defined
+(which would bring the agent in a tests_passed state), fail, or
+outside the agent’s code in a yaml configuration file, meant
+timeout.
+Finally, the reward function (𝑅) makes the agent’s goal to decouple verification logic and to allow for easy analysis
+modifications without affecting the agent. Key components,
+explicit. Using this function, we can give positive rewards for
+AgentGuardLogger and AnalyzerThread, manage concurrent
+making progress (for example, + 3 for passing a new test case),
+analysis in AgentGuard. The user-facing class AgentGuard-
+negative rewards for setbacks (for example, -5 for a regression)
+Logger is initialized with the configuration file path and
+and a large reward for successfully completing the entire task.
+calls the log_transition method to manage an event queue.
+2) Online Learning and Probabilistic Model Checking: A
+AnalyzerThread is a background thread that monitors agent
+limiting factor in attempting to validate agentic behavior is the
+actions, processes transition events, updates the MDP model,
+absence of a formal model of the agent a priori. Previous work
+and periodically invokes the PMC. We used Storm1 as the
+in predictive RV and online learning shows that a probabilistic
+model checker via stormpy bindings. A conversion layer in
+model (like an MDP, or in our case an AMDP) can be
+AnalyzerThread creates a PRISM language model from the
+learned dynamically from execution traces. This, combined
+MDP for Storm verification against PCTL properties. The
+with algorithms designed for non-stationary environments,
+results are printed in the console and can trigger user-defined
+where model drift may occur, can be used to effectively
+callbacks if user-set thresholds are met.
+check the behavior of the agent. One the system is modeled
+as an MDP, probabilistic model checking (PMC) provides D. Motivating Example: Assurance for an Autonomous Repair
+automatedtechniquestoverifyitsquantitativeproperties.Using Agent
+probabilistic temporal logic (like PCTL), one can then start
+AI for Software Engineering, especially Automated Program
+to ask questions of the probabilistic nature, i.e. "What is the
+Repair (APR), is an effective showcase for AgentGuard. Con-
+maximum probability of reaching a success state within an
+siderRepairAgent,anautonomousLLM-basedagentforbugfix-
+expected time interval?"
+ing[7].RepairAgentemploysactionslikeinformationgathering,
+hypothesis formulation, and patching, managed by a finite state
+B. The AgentGuard Architecture
+machine(FSM)and14tools,includingsearch_code_base
+AgentGuardisdesignedtoactasaninspectionlayer thatsits
+and write_fix. Despite FSM guidance, the agent can be
+atop an existing agentic framework (e.g., AutoGen, LangGraph
+inefficient, potentially causing loops, aimless exploration, or
+); this is similar to the function of a middleware in the context
+high resource use on unlikely fixes. To address these, Agent-
+of a web application. It nonintrusively observes the agent’s I/O
+GuardcanbeconfiguredwithFSMstates(e.g.,Understandthe
+and provides continuous probabilistic assurance by creating a
+dynamic, formal digital twin of the agent’s decision-making 1https://www.stormchecker.org/
+
+===== PAGE 4 =====
+
+config.yaml
+States/Actions/Props
+AutoResponse
+Goals
+AgenticSystem TraceMonitor Prob. AssuranceDashboard
+OnlineModelLearner
+(AutoGen/LangGraph) &EventAbstraction ModelChecker &Actuator
+RawTrace Events(𝑠→𝑎→𝑠′) LearnedMDP Guarantees(𝑃 max ,𝐸 min)
+Alerts
+HumanOverseer
+HumanIntervention
+Fig.1. TheAgentGuardArchitectureWorkflow.ThesystemobservesrawagentI/O,abstractsitintoformalevents,learnsaprobabilisticmodel(MDP),and
+usesamodelcheckertoprovidecontinuousassuranceandfeedback.
+bug, Collect information, Try to fix the bug, and terminal states improved by introducing notions of stochastic games into the
+like Fix_Success or Fix_Failed) and corresponding actions framework and integrating frameworks such as PRISM-games
+(relatedtotheagent’stoolssuchas,express_hypothesis, to support analysis of MAS’.
+read_range, discard_hypothesis). Middleware-level
+VI. Conclusion
+instrumentation ensures every tool use triggers a call to
+guard.log_transition(...) to record state transi- The rise of agentic AI demands a corresponding evolution
+tions. in our assurance methods. Static, offline verification, and
+Over time, as RepairAgent addresses bugs, AgentGuard process conformance checks, while valuable, are insufficient
+learns its repair strategy’s AMDP, which reveals execu- for guaranteeing the safety and reliability of autonomous
+tion patterns. For instance, after hypothesizing, the agent systems operating in dynamic worlds. This paper has presented
+uses search_code_base with 75% probability and Dynamic Probabilistic Assurance, a new paradigm for AI
+find_similar_api_calls with 25% probability. This safety, and introduced AgentGuard, a tangible framework that
+modelenablesreal-timeverificationwithpracticalmanagement demonstrates its feasibility. By integrating runtime verification,
+implications. Success probability (𝑃 =?) predicts fix likeli- online model learning, and probabilistic model checking,
+max
+hood and guides resource allocation and interventions when AgentGuard provides continuous, quantitative guarantees about
+low.Theexpectedcyclestocompletion(𝐸 =?)estimatetime an agent’s emergent behavior. It transforms verification from a
+min
+and cost, with very high values pointing towards loops and one-off, pre-deployment activity into a live, adaptive process.
+suggesting automatic termination when over budget. Properties Our vision is for AI systems that are not only increasingly
+like 𝑃 =?[𝐺!"write_fix"] show the probability of no fix capable and autonomous, but also transparent, predictable, and
+max
+and can help with interventions to improve problem-solving. bounded by rigorous, mathematical guarantees of their safety
+Applying AgentGuard can improve RepairAgent’s assurance and reliability.
+from conformance to continuous monitoring, aiding trust,
+VII. Acknowledgements
+cost management, and alignment with task complexity. An
+application of AgentGuard to RepairAgent can be found in the ThisresearchwascarriedoutandfundedthroughtheAI4SE
+study’s replication package [27]. partnership between the Delft University of Technology and
+JetBrains Research. You can find more information about the
+V. Discussion collaboration on the website of the collaboration here.
+The implementation of the POC demonstrates the feasibility References
+oftheDPAparadigm.Italsohighlightsseveralimportantareas
+[1] H.Du,S.Thudumu,R.Vasa,andK.Mouzakis,“Asurveyoncontext-
+for future research and development. The current approach awaremulti-agentsystems:Techniques,challengesandfuturedirections,”
+relies on developers to manually define a discrete state space. 2025.
+[2] N.Krishnan,“Aiagents:Evolution,architecture,andreal-worldapplica-
+Future work should explore techniques for semi-automated or
+tions,”2025.
+fully automated state abstraction, possibly my incorporating [3] D.N.Gadde,K.K.Radhakrishna,V.N.Viswambharan,A.Kumar,and
+ideas from Partially Observable Markov Decision Processes. D.L.et.al.,“Heyai,generatemeahardwarecode!agenticai-based
+hardwaredesign&verification,”2025.
+The periodic re-verification of the entire model for complex
+[4] G. Schwalbe and M. Schels, “A Survey on Methods for the Safety
+agents can introduce a substantial overhead with increased Assurance of Machine Learning Based Systems,” in 10th European
+complexity. Future work should re-investigate how the current CongressonEmbeddedRealTimeSoftwareandSystems(ERTS2020),
+Toulouse,France,2020.
+implementation can be improved to incorporate incremental
+[5] E.Miehling,K.N.Ramamurthy,K.R.Varshney,M.Riemer,D.Boun-
+verification algorithms. Additionally, this system should be effouf,andJ.T.R.et.al.,“Agenticaineedsasystemstheory,”2025.
+
+===== PAGE 5 =====
+
+[6] Y.Zhang,Y.Cai,X.Zuo,X.Luan,K.Wang,andZ.H.et.al.,“The
+fusionoflargelanguagemodelsandformalmethodsfortrustworthyai
+agents:Aroadmap,”2024.
+[7] I.Bouzenia,P.Devanbu,andM.Pradel,“Repairagent:Anautonomous,
+llm-basedagentforprogramrepair,”2024.
+[8] A.Vaswani,N.Shazeer,N.Parmar,J.Uszkoreit,L.Jones,andA.N.G.
+et.al.,“Attentionisallyouneed,”2023.
+[9] A.Kumar,D.N.Gadde,K.K.Radhakrishna,andD.Lettnin,“Saarthi:
+Thefirstaiformalverificationengineer,”2025.
+[10] S. Raza, R. Sapkota, M. Karkee, and C. Emmanouilidis, “Trism for
+agenticai:Areviewoftrust,risk,andsecuritymanagementinllm-based
+agenticmulti-agentsystems,”2025.
+[11] H.Liu,S.Liu,G.Xu,A.Liu,andD.Fang,“Nntbfv:simplifyingand
+verifyingneuralnetworksusingtesting-basedformalverification,”Inter-
+nationalJournalofSoftwareEngineeringandKnowledgeEngineering,
+vol.34,no.02,pp.273–300,2024.
+[12] S. Gokulanathan, A. Feldsher, A. Malca, C. Barrett, and G. Katz,
+“Simplifyingneuralnetworksusingformalverification,”inNASAformal
+methodssymposium. Springer,2020,pp.85–93.
+[13] C.UrbanandA.Miné,“Areviewofformalmethodsappliedtomachine
+learning,”arXivpreprintarXiv:2104.02466,2021.
+[14] T.LadnerandM.Althoff,“Fullyautomaticneuralnetworkreductionfor
+formalverification,”2025.
+[15] K. Zhou and L. Zhang, “Step-wise formal verification for llm-based
+mathematicalproblemsolving,”2025.
+[16] C.Liu,Y.Yuan,Y.Yin,Y.Xu,X.Xu,andZ.C.et.al.,“Safe:Enhancing
+mathematicalreasoninginlargelanguagemodelsviaretrospectivestep-
+awareformalverification,”2025.
+[17] C.P.Lee,D.Porfirio,X.J.Wang,K.C.Zhao,andB.Mutlu,“Veriplan:
+Integrating formal verification and llms into end-user planning,” in
+Proceedingsofthe2025CHIConferenceonHumanFactorsinComputing
+Systems,ser.CHI’25. ACM,2025.
+[18] A.Beg,D.O’Donoghue,andR.Monahan,“Ashortsurveyonformalising
+softwarerequirementsusinglargelanguagemodels,”2025.
+[19] W.Wang,M.Farrell,L.C.Cordeiro,andL.Zhao,“Supportingsoftware
+formalverificationwithlargelanguagemodels:Anexperimentalstudy,”
+2025.
+[20] Z.Li,W.Hua,H.Wang,H.Zhu,andY.Zhang,“Formal-llm:Integrating
+formallanguageandnaturallanguageforcontrollablellm-basedagents,”
+2024.
+[21] M. Crouse, I. Abdelaziz, R. Astudillo, K. Basu, S. Dan, and S. e. a.
+Kumaravel,“Formallyspecifyingthehigh-levelbehaviorofllm-based
+agents,”arXivpreprintarXiv:2310.08535,2023.
+[22] D. B. Acharya, K. Kuppan, and B. Divya, “Agentic ai: Autonomous
+intelligenceforcomplexgoals—acomprehensivesurvey,”IEEEAccess,
+vol.13,2025.
+[23] E.BartocciandY.Falcone,Lecturesonruntimeverification. Springer,
+2018.
+[24] S. D. Stoller, E. Bartocci, J. Seyster, R. Grosu, K. Havelund, S. A.
+Smolka,andE.Zadok,“Runtimeverificationwithstateestimation,”in
+Internationalconferenceonruntimeverification. Springer,2011,pp.
+193–207.
+[25] G. Zhou, W. Liu, and W. Dong, “Runtime verification in uncertain
+environmentbasedonprobabilisticmodellearning,”2019.
+[26] M. Kwiatkowska, G. Norman, and D. Parker, “Probabilistic model
+checkingandautonomy,”2021.
+[27] R. Koohestani, “Agentguard replication package,” 2025. [Online].
+Available:https://anonymous.4open.science/r/AgentGuard

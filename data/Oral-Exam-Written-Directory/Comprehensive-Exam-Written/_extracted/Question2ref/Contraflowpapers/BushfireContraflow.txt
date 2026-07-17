@@ -1,0 +1,1806 @@
+===== PAGE 1 =====
+
+Transportation Research Part A 189 (2024) 104197
+ContentslistsavailableatScienceDirect
+TransportationResearchPartA
+journalhomepage:www.elsevier.com/locate/tra
+Howcontraflowenhancesclearancetimeduringassistedmass
+evacuation–AcasestudyexploringtheAustralian2013–14
+Gippslandbushfires
+ShahroozShahparvaria,∗,MahsaMohammadib,KonradPeszynskia,LaurenRickardsc
+aSchoolofAccounting,InformationSystems&SupplyChain,CollegeofBusiness&Law,RMITUniversity,Melbourne,Australia
+bSchoolofEngineering,UniversityofBritishColumbia,OkanaganCampus,Kelowna,BC,V1V1V7,Canada
+cSchoolofHumanitiesandSocialSciences,LaTrobeUniversity,Australia
+A R T I C L E I N F O A B S T R A C T
+Keywords: Evacuationduringacatastrophicdisasterisacrucialoperationthatneedstobeappropriately
+Massevacuation managed and is of more importance when considering the elderly and people with disabili-
+Trafficcongestion ties. The uncertain and unpredictable nature of disasters can cause long-term repercussions,
+Evacuationrouting-scheduling especiallyintrafficcongestion.Thisstudypresentsamathematicalmodeltoformulatetraffic
+Crisismanagement
+balanceforregularandassistedevacuation(thatis,disabledandtheelderly)whilstconsidering
+Acceleratedbranch&pricealgorithm
+traffic congestion in evacuation clearance time by applying contraflow. A Branch and Price
+(B&P)relatedapproachisdevelopedtohelpsolvetheproposedmodelinlarge-sizeproblems.
+ThepresentedalgorithmisappliedtoacasestudyofAustralia’s2013–14bushfiresinGippsland,
+locatedintheeasternpartofVictoria.Avariationtestisperformedtoevaluatetherobustness
+ofresultsgeneratedbythedevelopedmodel.Resultsindicatethattheparticipationpercentage
+of edges is different based on their location, capacity, and sustainability of blockage. The
+edges’ capacity influences the evacuated population most compared to route capacity and
+time window. The output of this approach enables authorities to improve the resilience of
+communitiesbymakingoptimalstrategicandoperationaldecisionsforenhancinganevacuation
+responseaswellasinfluencingappropriatepolicies.
+1. Introduction
+Critical infrastructure services refer to the systems or networks that provide for the circulation of people, services, and
+information,uponwhichhealth,safety,comfort,andeconomicactivitydepend(Johnstonetal.,2006).Theseservicesarecrucial
+forregionalandremotecommunitiestomaintainlifeandsustaincommunitiesduringtimesofcrisis.Criticalinfrastructure,suchas
+transportation networks, is often viewed as a national and regional issue, depending on the crisis. These are also a significant
+focus for the United Nations Office for disaster risk reduction providing our most basic needs to support our well-being and
+development(WannousandVelasquez,2017).Infrastructuresystemsareunderincreasingpressuretodeliverresilientandreliable
+servicesinthistimeofrapidclimatechangeandintensifyingnaturalhazards.Moreover,unforeseenconsequencescanresultfrom
+increasinginterconnectionsbetweensystemsandnetworks,leadingtogreaterpotentialforcascadingdisastersinwhichthelossof
+onesystemcantriggerfailuresinothers(MatterandStrength,2018;Gissingetal.,2022).
+Evacuationisthe‘‘movementofpeoplethreatenedbyahazardtoasaferlocationandtypically,theireventualsafeandtimely
+return’’(TasmanianGovernment,2018,pp.6)andiswidelyacceptedasaprotectiveactioninemergenciessuchasbushfires,floods,
+∗ Correspondingauthor.
+E-mailaddress: shahrooz.shahparvari@rmit.edu.au(S.Shahparvari).
+https://doi.org/10.1016/j.tra.2024.104197
+Received15December2022;Receivedinrevisedform15July2024;Accepted4August2024
+Available online 26 August 2024
+0965-8564/© 2024 The Author(s). Published by Elsevier Ltd. This is an open access article under the CC BY license
+(h ttp://creativecommons.org/licenses/by/4.0/ ).
+
+===== PAGE 2 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+blizzards,etc.,regardlessofthehazardforimprovingtheresilienceofcommunities(Sorensenetal.,2004).Theefficientscheduling
+ofevacueesinemergencyconditionshasbeenalongdebatablechallenge(Heetal.,2015).Forexample,whenHurricaneRitastruck
+theGulfofMexico,alargenumberofpeopleevacuatedatthesametime,whichledtoalongtrafficjam(100miles)onRoute45
+exiting Texas (Kim et al., 2008) and left many stranded and out of petrol. Evacuation missions can be alleviated if an effective
+plan has been prepared. Such plans allow for efficient evacuation and reduced losses experienced (He et al., 2015). Reliance on
+criticalinfrastructure,networksegments,andessentialservicesarekeyvulnerabilitiesglobally(Afkhametal.,2022).Identifyingand
+prioritisingaccessibleroutesofthetransportationnetworkaidsinminimisingconflictsthatmayoccuratintersections(Bretschneider
+andKimms,2011).However,identifyingandminimisingcongestionisachallengeforanyevacuationplan,thusincreasingtherisk
+andlimitingthevacatingoftheaffectedregion/s(U.S.House,2006).Evacuationistypicallyknownasthesafestoption.However,
+somepeopleintheaffectedregion/sprefertostayathomesincetheyarenotawareofthemagnitudeoftheriskorfailtotakethe
+riskseriouslyuntilitislate(Shahparvarietal.,2015a,2016,2017;ShahparvariandAbbasi,2017).Notonlyisthisapracticalissue
+thatneedsattention,butonethatneedsactionthroughpolicy,influencingarangeofstakeholders,suchasemergencyauthorities,
+police,andvariouslevelsofgovernment.
+In Australia, the context of this study, the impact of bushfires between 1967 and 1999 has been estimated to be worth
+approximatelyAUD2.5billionwith233fatalities(Shahparvarietal.,2021).Theestimatesof2009BlackSaturdaybushfireswere
+estimated to cause AUD 4.4 billion in damages and 173 fatalities (Shahparvari et al., 2019; Shahparvari and Bodaghi, 2018).
+More recently, ‘‘Black Summer bushfires’’ in Australia (September 2019–March 2020) burnt an estimated 18.6 million hectares,
+destroyedover5,900buildings(including2,779homes),andkilledatleast34people(TiernanandO’Mallon,2020).Anestimated
+onebillionanimalswerekilled,andsomeendangeredspeciesweredriventothevergeofextinction(Green,2020).Atitspeak,the
+airqualitydroppedtohazardouslevels,whichmadeevacuationevenmoredangerous(Longman,2020).Thesmokehadextended
+approximately11,000kilometresacrosstheSouthPacificOceantoChileandArgentina(Lee,2020).Tenthousandoccupantshad
+beenurgedtofleefollowingthedeclarationofastateofemergencybythegovernment,whilefourthousandwerestrandedinthe
+Mallacoota coastal township as the arterial road had been blocked by the fire on New Year’s Eve (Martin, 2019). Black summer
+bushfiresareestimatedtocostmorethanBlackSaturdayfiresin2009($4.4billion)(Butler,2020).TheAustraliantourismindustry
+hasexperiencedadramaticfallofmorethan$1billionaswell(HufandMclean,2020).Inthisvein,theRoyalCommissioninto
+National Natural Disaster Arrangements, and its associated recommendations, focus on understanding and reducing the risks to
+essentialservicesarisingfromemergenciesanddisasterscausedbynaturalhazardsinAustralia(Binskinetal.,2020).
+In a broader context, catastrophic events such as heatwaves, volcanic eruptions, wildfires, hurricanes, tornadoes, tsunamis,
+and earthquakes, as well as human-made disasters such as fires, deforestation, nuclear activities, and industrial accidents, have
+accentuated the importance of one of the most significant problems in transportation, evacuation (Moshtagh et al., 2018). This
+problem is not isolated to just one location and usually has a domino effect, impacting the environment, people’s livelihood,
+economies,andcommunities(Kamiyamaetal.,2009).Therationaleofthisstudyoriginatesfromrecommendationsofthe‘‘Victorian
+bushfires royal commission’’ (Teague et al., 2010). The ‘‘royal commission into national natural disaster arrangements’’ (Binskin
+et al., 2020) reports which both emphasis ‘‘the necessity of urgent development and improvement of emergency evacuation
+componentssuchasidentificationofneighbourhoodsaferplacesandpotentialshelters’’(Teagueetal.,2010,pp.20–21)toimprove
+theentireprocesstoleveragetheloss/deathtoll.Thus,thereisaneedforappropriateplanningforefficientlyschedulingevacuations
+fromimpactedareaswithminimalinterruptionordelay.Thiscrisismanagementismadeevenmoredifficultforpeoplewhomay
+bedisabled,theelderly,orpeoplewholivealone.
+Thisisaglobalissuethatcommunityleadersandauthoritieshavetoresolvebyidentifyinganddevelopingevacuationplansto
+safelocationspromptlywhenconfrontedbynaturalorhuman-madedisasters(Nakanishietal.,2019). Bydevelopingappropriate
+evacuationplans,wearealsoabletolessentheimpactoncommunityresiliencebyminimising‘‘stressandcrisis-inducedtransient
+periodsofdysfunction’’(Norrisetal.,2008)(p.144)thatdisastersbringabout.However,thisismorecomplicatedforolderpeople
+andpeoplewithdisabilities,whorequirespecialattentioninsupportingandevacuatingdisaster-hitareas.(Tanaka,2013)presented
+acaseregardingone17-year-oldmale,identifyingthatdespitelivinginasingle-storiedbuildingabout500mfromthecoast,to
+evacuatehimwouldhave‘‘requiredatleasttwopeopletocarryhimandonetocarryhismedicalequipment:atotalofthreepeople’’
+(p.210).Further,inthiscontext,(Tanaka,2013)estimatedthattwiceasmanydisabledindividualswerecasualtiesintheJapanese
+earthquake in 2011. The disabled individuals in this study were casualties of a catastrophic earthquake that triggered powerful
+tsunami waves. The impact of the event and the short warning time, combined with evacuation issues, led to their inability to
+evacuate.Thisstudyhighlightsthedifficultyofevacuatingdisabledindividuals,requiringmultiplepeopletocarrythemandtheir
+medicalequipment.Therefore,designingatacticalandefficientschedulingsystemtotransporttheaffectedpopulation(particularly
+the elderly and people with disabilities) to safe shelters in the least amount of time and with little congestion is paramount to
+minimisetheimpactofthesedisastersonpeople’slivelihood,economies,andcommunities.Thisschedulingsystemalsoneedsto
+be enacted through policy and the inclusion of all associated stakeholders. In addition, Fountain et al. (2019) investigated the
+stakeholder consultation to define research priorities about the elderly (i.e., older adults) and natural disasters in Australia and
+comparedtheirstudyandcurrentresearchliteratureinthisarea.Similarly,Shahparvarietal.(2015b)foundthroughmulti-objective
+analyticsfromthreebushfirescenariosthatolderadultsposechallengesforemergencyauthoritiesinthelateevacuationstage,which
+involvestimelyevacuation,shelterassignment,androuting.
+Free-flow models have typically been used in evacuation planning research. However, the model developed and presented in
+thispaperdoesnotfollowtraditionalevacuationmethodologiesfocusingonevacuationtracksallocatedtoregionsthatshouldbe
+evacuated(Pillacetal.,2016).Instead,thisstudyfocusesonhowresidentsevacuateduringemergencieswithtimeconstraintsand
+traffic congestion. Furthermore, little research focuses on people with disabilities and the elderly and their evacuation patterns.
+2
+
+===== PAGE 3 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Therefore,thisresearchaimstodesignapractical,tacticalandefficientschedulingsystemtotransportpeoplefromareasaffected
+bydisastertoasafeshelterwithminimaldelaysinbothtimeandcongestion,supportingallemergencyauthoritiesappropriately.
+Inthecontextofbushfireevacuations,improvingresilienceandinformingoperationaldecisionscaninvolvearangeofstrategies
+andactions.Somepotentialwaysthattheresearchoutputofthepapercouldcontributetothesegoalsinclude:
+– Optimising evacuation routes: The modelling approach presented in the paper can help emergency management officials
+identifyoptimalevacuationroutesthatminimisecongestionandmaximisethenumberofevacueesthatcansafelyandquickly
+exit the affected area. This information can be used to develop evacuation plans and improve the efficiency of evacuation
+operations.
+– Enhancing communication and information dissemination: The paper highlights the importance of providing accurate
+andup-to-dateinformationtoevacueesduringbushfireevents.Emergencymanagementofficialscanusetheinsightsfromthe
+researchtodevelopcommunicationstrategiesthateffectivelyinformthepublicaboutthestatusofthefire,evacuationorders,
+andavailableresources.
+– Assessingtheimpactofdifferentevacuationscenarios:Themodellingapproachpresentedinthepapercanhelpemergency
+management officials evaluate the potential impact of different evacuation scenarios, such as evacuating high-risk areas or
+using contraflow lanes. This information can inform decision-making and help officials make more informed and effective
+operationaldecisions.
+– Assisting vulnerable populations: The research can be used to assist people at higher risk during bushfire evacuations,
+such as individuals with limited mobility or those living in remote areas. This information can be used to develop targeted
+evacuation plans and ensure these populations can access the necessary resources and support. The research output of the
+paper,hence,cancontributetoimprovingtheresilienceofcommunitiesduringbushfireevacuationsbyprovidingemergency
+managementofficialswiththetoolsandinsightsnecessarytomakeinformedandeffectiveoperationaldecisions.
+Themaincontributionsofthisstudyareasfollows:
+– Anovelintegratedassistedmassevacuationmodelisdeveloped.
+– Evacuationofelderlypeopleandpeoplewithdisabilitiesareinvestigatedinthisstudy.
+– AnAcceleratedBranch&Pricealgorithmisproposedtodealwithlarge-scaleevacuationproblems.
+– Contraflow is incorporated in the developed evacuation model to enhance the network’s capacity and minimise the total
+clearancetime.
+The rest of the paper is organised as follows: the problem background is further discussed in Section 2. Section 4 presents
+themodelformulation.Section5asthesolutionapproachdevelopsaB&Palgorithmfortheproposedmodel. Section7provides
+numerical experiments. Section 8 describes the case study, results, and analysis. Section 9 provides managerial insights for the
+decision-makers.Finally,Section10concludesthepaper.
+2. Problembackground
+Commonly, evacuation has been used to describe a move from at-risk areas to safer areas (Southworth, 1991). Depending on
+itsscaleandthelevelofauthoritycontrol,evacuationmaydifferintermsofitsproperties(StepanovandSmith,2009).Whilstthe
+existingliteratureonemergencyevacuationiscomprehensive,wearestillexperiencingsignificantchallengesthatrequireresolution.
+Time-relatednetworkshavebeendevelopedinmostevacuationschedulingstudiestoexamineevacuationscheduling(Pillacetal.,
+2016). For example, He et al. (2015) proposed an earliest arrival flow formulation for determining the allocation of dynamic
+resources in the evacuation schedule. The contraflow scheme has also been adopted to alleviate congestion (Pillac et al., 2016).
+Kimetal.(2008)setacontraflownetworkconfigurationtominimiseevacuationtimeforeachedge.Inaddition,Kamiyama(2019)
+designedadynamicgraphwithasinglesinkvertex,suppliedwithallvertexesexceptthesinkvertex.Theself-evacuationandbus
+evacuationhavebothbeenexaminedwithinthisstream.Similarly,DikasandMinis(2016)investigatedtheevacuationofresidents
+andthetransportofcasualtiesafterwards.
+Research indicates that many intersecting social factors affect people’s evacuation decisions, including engagement with and
+observationsofothers(Duetal.,2017),whichleadstocomplexfeedbacks.Intermsofindividuals’thoughtprocesses,riskperception
+andmotivationaretwoimportantcomponentsofevacuationdecision-making(Kinseyetal.,2019),thoughhigh-riskperceptiondoes
+not automatically increase preparedness (Wachinger et al., 2013). Individuals’ subjective assessments of the severity, likelihood,
+and potential consequences of a hazard – that is, their perception of risk – are influenced by the proximity of the hazard, past
+experiences, trust in information sources, social networks, and cognitive biases (Dash and Gladwin, 2007; Lechner and Rouleau,
+2019).Individual’smotivationtoevacuateisshapednotonlybyadesiretoprotectthemselvesandlovedonesbuttheperceived
+effectivenessofagivenevacuationoptionincludingtheperceivedsafety,orlackthereof,ofshelteroptions.Peopledrawonvarious
+sources of information – such as official announcements, media, and observation of and messages from their social networks –
+to assess a given threat situation and determine the desirability and feasibility of evacuation options. Effective communication
+strategies,clearwarnings,andinstructionsfromauthoritiescanpositivelyinfluencedecision-making(Kinseyetal.,2019).Whether
+people respond to evacuation orders depends in part on their trust in authorities (Dash, 2002; Kinsey et al., 2019), underlining
+theimportanceofsustainedcommunityengagementbyauthoritiespriortodisasters(Satizabaletal.,2022).Socialencouragement
+3
+
+===== PAGE 4 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+andsupportcanstronglyinfluenceevacuationdecision-making,especiallyforgroupsrequiringassistance(Duetal.,2017;Naand
+Grace,2022).
+Thedecision-makingprocessduringevacuationsisoftencomplex,dynamicandhighlyiterative(Kinseyetal.,2019).Itinvolves
+weighing potential costs and benefits, evaluating multiple options, and adapting decisions based on changing circumstances.
+Researchers have used decision-making models, such as the Protection Motivation Theory (PMT) and the Theory of Planned
+Behaviour (TPB) to try to understand evacuation decision-making processes (Marzouk and Mohamed, 2019). Three main groups
+canbedistinguishedonthebasisoftheirevacuationdecisions(Covaetal.,2011):1.Voluntaryearlyevacuators(whocontributeto
+whattheycall‘backgroundtraffic’);2.Compliantevacuatorswhofollowwarningsanddetailedevacuationplans,includingassisted
+evacuation (participating in ‘mass evacuation’); and (3) Non-evacuators who choose to shelter in place, either in contravention
+of a mandatory evacuation order or in accordance with policies such as Australia’s ‘Prepare, Stay and Defend or Leave Early’
+policy.Subsequentresearch,however,underlinesthatevacuationisnotasimple,zerosumgame:peopleoscillateintheirdecisions
+andactions,withsomeattempting,reversingandreattemptingevacuationmultipletimesasdisastersituationsunfold(Kuligowski,
+2021).
+Evacuation behaviours vary among social groups for multiple reasons (Kinsey et al., 2019). Some of these relate to decision-
+making, with demographic factors such as gender shaping social norms and amplifying tendencies to trust or distrust official
+evacuationmessages(Wachingeretal.,2013).Moresignificantly,characteristicssuchasincome,gender,age,andmobilityenable
+orconstrainwhatevacuationoptionspeopleareawareof,haveavailableandcanimplementsuccessfully(Dengetal.,2021;Hong
+et al., 2021). Culturally and linguistically diverse (CALD) populations are less likely to receive or interpret evacuation warnings
+as intended (Shepherd and van Vuuren, 2014). Groups such as the elderly, individuals with disabilities, and those with limited
+resources are often unable to evacuate successfully on their own (Kusenbach et al., 2010), and those disadvantaged in multiple
+ways–e.g.membersofCALDcommunitieslivingwithdisabilities(Crawfordetal.,2021)–areespeciallyimpacted(Hongetal.,
+2021).Availabilityoftransportandtransportroutes(whichcanvarysignificantlythroughoutadisaster)oftenstronglyinfluences
+people’sdecisionsaboutwhetherandhowtotrytoevacuate(LechnerandRouleau,2019).
+‘Socialcapital’(strongsocialrelationships)istheprimarydeterminantofpositivedisasteroutcomes(Aldrich,2023;Klinenberg,
+2015; Melo Zurita et al., 2018), in part because it encourages disaster volunteerism (e.g. Choo and Yoon, 2022). Yet how they
+influenceevacuationactionsiscomplex.Ontheonehand,communityassistancecanencourageandenableevacuation,especially
+amongvulnerablegroups(e.g.ShojiandMurata,2021).Ontheotherhand,strongcommunityconnectionscanencourageandenable
+peopletostayinplace,especiallyduringthedisasterrecoveryandrebuildphase(e.g.Fraseretal.,2022).Socialrelationshipsalso
+shapewherepeopleevacuatetoandhowlongtheystayaway,includingwhethertheyreturnatall(Dengetal.,2021;Fraseretal.,
+2022).Theseinsightsunderlinehowriskisexperiencedandmanagedcollectively(Kamstraetal.,2021).
+Followedbyevacuees’behaviourclassificationintroducedbyCovaetal.(2011),Shahparvarietal.(2015a),developedadecision
+supportsystemtoidentifythenumberofrequiredvehiclesandtheoptimalevacuationscheduleandroutesinapredefinedperiod
+forpeoplewhoinitiallydecidetoshelterinplace,however,laterdecidetoleavewhenisitlate.
+HsuandPeeta(2014)discussedaself-evacuationversionofthisproblem,inwhichamixed-integerlinearprogrammingmodel
+wasdevelopedtodeterminetheoptimalscheduleandallocateresources(vehicles)tointersections.Anevacuationrouteplanning
+modelconsideringtheuncertaintyofdemandandcapacitywasintroducedtoensurethereliabilityofthedevelopedmodel.Through
+optimising resource allocation, Shahparvari et al. (2015b) developed a mathematical model to maximise the total number of
+evacuees.Thestate-dependentqueueroadwaylinkeffectintheevacuationnetworkwasexaminedbyMoshtaghetal.(2018)using
+theStochasticQueueCore(SQC)model.Tobetterunderstandroadmapsindisaster-hitareas,Amideoetal.(2019)evaluatedshelter
+locationsandevacuationroutes.
+Based on the road network’s capacity and the threat’s evolution, Pillac et al. (2015) presented a mathematical model to
+optimise and mobilise evacuation planning. To advance the prediction of evacuees’ behaviour (Anyidoho et al., 2022) compared
+comprehensively five different models according to their practical utility for future hurricanes. They concluded that the Logistic
+Regression (LR) is easiest for implementation when only an estimate of the total evacuation rate is necessary. While Dynamic
+Discrete Choice (DDC) is recommended in case spatial and/or timing predictions are necessary. Additionally, Jin et al. (2021)
+investigatedpedestrianevacuationplanningandthelocationselectionofundergroundemergencysheltersforurbanregionswhen
+adisasteroccurs.Around-tripbusevacuationmodelisdevelopedbyZhaoetal.(2020)accordingtotheunfixedroutesthatoptimise
+thebusschedulingandroutingplanning,aimingtominimisethetotalevacuationtimeandcost.Twoalgorithms(i.e.,theinsertion
+andedge-exchangealgorithms)areintegratedtoobtainthemodel’ssub-optimalsolution.Lopez-Carmona(2022)modelledcrowd
+dynamicsbyintroducingasystemidentificationusedasamodelpredictivecontrolforbehaviouralmodification.Theaimwasto
+generatedistance-keepinginstructionstocontrolpedestrianflowoptimally.AgeneralframeworkispresentedbyZhangandZhang
+(2022) based on multi-trip Electric Bus (EB) models to examine the feasibility of EBs’ application during evacuation. The EBs’
+chargingbehaviourisalsostudiedalongwithitseconomicbenefits.
+AconceptualframeworkispresentedbyThakuretal.(2022)basedonthesocio-psychologicalapproachtoexamineevacuation
+intentionusinganonlinebehaviouralexpectationsquestionnairesurveyinAuckland,NewZealand.Moreover,Chenetal.(2022)
+collected tsunami evacuation logistics data using a questionnaire survey to analyse the Tsunami arrival time and clearance time
+(preparation and travel) using probabilistic functions. The structural equation modelling is applied to implement the developed
+framework.
+AnemergencyplanningandschedulingstudywasconductedlaterusingCGmethodbyPillacetal.(2016).Thesamemethodis
+usedtoinvestigatethemulti-triplocationroutingproblembyRamosetal.(2018).Capelleetal.(2019)adoptedaCGschemeforthe
+locationandroutingproblemwithpick-upanddelivery.TheLabelSettingAlgorithm(LSA)wasthenappliedfortheshortestpath
+4
+
+===== PAGE 5 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+problemwithpickup&deliveryandtimewindow.Theyconcludedthattheirmodelandtheproposedsolutionapproachcouldsolve
+large-scaleinstancesinamaximumtimeofonehour.Incontrast,themodelwithoutthedevelopedsolutionapproachcanonlysolve
+smallinstances.The𝐵&𝑃 approachisavariantoftheCGmethodthathasbeeninvestigatedbyGharaeiandJolai(2019),Goerigk
+etal.(2013)forthemassevacuationproblemtominimisethetotalclearancetime.Goerigketal.(2014)appliedthe𝐵&𝑃 approach
+to solving location and scheduling problems while achieving a minimum evacuation time. Dayarian et al. (2015) proposed a set
+partitioningmodelthatuses𝐵&𝑃 tosolvethemulti-periodevacuationproblem.TheBranchandPriceandCut(𝐵&𝑃&C)algorithms
+incorporating bucket graph-based label algorithms were used to solve the two-echelon capacitated vehicle routing problem. To
+investigate heterogeneous green vehicle routing with time limitations, Yu et al. (2019) proposed a novel branching strategy that
+cansignificantlyreducethenumberofbranchesandcomputationaltime.
+As disabled and elderly people have limited mobility, they need more supporting items and resources during evacuations
+(i.e.,wheelchairs,walkingframes,andmedications)(Tomeketal.,2014).Anagent-basedmodelcapableofsimulatingevacuation
+behaviour was developed by Nakanishi et al. (2019) to manage elderly and disabled people in a disaster in the Japanese town
+of Mannõ in the Nakatado district of the Kagawa Prefecture. Chakraborty et al. (2019) studied the effect of flood caused by the
+HarveyHurricaneondisabledpeople’sevacuationprocess.Theyfoundthatpeoplewithdisabilitieswithcognitiveandambulatory
+difficultiesweremorevulnerabletonaturalorhuman-madedisastersintheevacuationprocess.
+Luoetal.(2021)analysedtheunbalancedtransportationnetworkproblemregardingfuelconsumption.Amodelbasedonauto-
+mobiletheorywasusedtocalculatefuelconsumption,andexperimentsonrandominstancesproveditsapplicability.Southworth
+(1991)definedtrafficloadingcurves,representingthespreadoftheevacuatedpopulationatagiventime.Ameta-heuristicmethod
+basedontheTabusearchisdevelopedbyMathlouthietal.(2021)fortheroutingschedulingproblemconsideringmultipletime
+windows.Theycomparedthesuggestedapproachwith𝐵&𝑃 algorithmonsmallinstances.Theobtainedresultwasnotcomparable
+with𝐵&𝑃 algorithminlarge-scaleinstances.Areal-worldcasestudyoffloodsandlandslidesinBrazilwasaddressedbyMoreno
+etal.(2020a)bydevelopingthreemathematicalmodelsandvalidinequalitiesoftheheterogeneousmulti-crewroutingscheduling
+problem. Moreno et al. (2020b) developed a hybrid Branch & Benders & Cut (BBC) method that combines Simulated Annealing
+(SA)withtheBBC algorithmsforroutingschedulingproblems.Asaresultoftheirinvestigation,afeasiblesolutionwasobtained
+for390instances,whileanoptimalsolutionwasobtainedfor30instances,whichresultedinan87%reductionincomputational
+time. Purba et al. (2022) applied a new B&P meta-heuristic approach to solving the large-scale evacuation planning problem
+consideringrefuelling.
+This section compares related studies, structurally similar models, and features characterising the evacuation problem. No
+previousresearchhasprovidedanysolutionsforoptimisingtheintegrationofmassandself-evacuationproblems.Whilestructurally
+similarproblems,self-evacuation(Afkhametal.,2022)andmassevacuation(Lietal.,2022),arehelpfulasabaselineforformulating
+andsolvingtheevacuationproblems,nootherpublishedresearchhasfocusedonthemassevacuation(i.e.,evacuationoftheelderly
+anddisabledresidents)andself-evacuation,simultaneously.Thisstudyaddressestheevacuationproblem,especiallyforlarge-scale
+transportation networks, in two aspects. First, from a modelling standpoint, the earliest arrival time considering the evacuation
+trafficflowpatternisadopted.Second,toimprovethecomputationalefficiency,thenovelalgorithmDBNSAisintegratedintothe
+CGalgorithmasapartofB&Palgorithmtosolvelarge-scaleMINLP.Asimpleformulationisproposedtoestimatetrafficcongestion
+considering various measures. This leads to the Strategic Evacuation Route Scheduling Problem (SERSP), which deals with the
+above-mentionedchallenges.
+3. Researchaimsandcontributions
+Thisresearchaimstoanswerthefollowingresearchquestion:Whatistheoptimalplantoevacuatethemaximumnumberofresidents
+intheleastamountoftimeaspartofadisasterresponse?Thisstudymodelsapracticableandexecutablelogisticsschedulingsystem
+forevacuationsindisaster-hitareas.Thepresentedmathematicalmodelprovidesapracticalandeffectiveschedulingapproachto
+maximise the total number of people evacuated, focusing on people with a disability during a rigid time frame whilst tackling
+congestionalongtheevacuationpaths.
+In this study, a novel approach is proposed to address the challenge of evacuating elderly and disabled people during a
+catastrophicdisaster.ThepaperintroducesaDSSthatformulatestrafficbalanceforregularandassistedevacuationandconsiders
+trafficcongestionintheevacuationclearancetimebyapplyingcontraflow.ABranchandPricealgorithmisdevelopedtosolvethe
+proposedmodelinlarge-sizeproblems.Thepapercontributestotransportationknowledgebyprovidinganewmethodformanaging
+evacuationduringdisasterswhileimprovingtheresilienceofcommunitiesthroughoptimalstrategicandoperationaldecisions.The
+traditionalmethodslackconsiderationofthespecificneedsoftheelderlyanddisabledindividualsduringevacuation.
+Thisstudydevelopsanovelmodeltoplantoevacuateresidents,includingtheelderlyanddisabledpeople,optimally.Anovel
+heuristic algorithm, the Dominance-Based Neighbourhood Search Algorithm (DBNSA), is integrated into the Column Generation
+(CG)algorithmtosolvethemixed-integerproblem.
+4. Modeldevelopment
+AccordingtotheargumentspresentedinSection2,thispaperformulatestheSERSP tosolveacomplexMINLP,whichincludes
+a large number of integer variables and rigid constraints. In an evacuation network, the affected points need to be evacuated by
+apredefinedtime,whichcanlimitthenumberofroutesavailable.Thestrategicevacuationnetworkcanbeillustratedbyagraph
+𝑁 =(ℰ, 𝒮, 𝒟′, 𝒢, 𝒢′) where ℰ, 𝒮, 𝒟′, 𝒢 and 𝒢′ are a set of affected nodes, transit nodes, safe nodes (shelter), a set of edges
+5
+
+===== PAGE 6 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Fig.1. Fig.1(a)showsthetime-expandedgraphfortheevacuationscenario;whileFig.1(b)demonstratesmodellingofacontraflowevacuationplanningproblem
+scenario.
+withcurrentdirections,andasetofedgesintheoppositedirections,respectively.Eachevacuatednodehasseveralevacueesand
+apredefinedtime.Eachedgecanbecharacterisedby𝑏̄ ,𝑢 and𝑏 thetraveltimeoftheedge,thecapacityoftheedge,andthe
+𝑔𝑝 𝑔 𝑔
+timeatwhichedge𝑔becomesunavailable.Fig.1providesaschematicoftheexaminedevacuationprobleminthisstudy.
+Fig. 1(a) demonstrates the progress direction of fire and evacuation flow of affected points over a time window. A plan is
+scheduledtocoverallaffectedpointsineachtimestep.Additionally,1(b)depictstheimplementationofcontraflowinthoseroutes
+thatseverelyaffecttrafficcongestion.Forexample,routes𝑐 and𝑐 ,two-wayroads,areutilisedinonedirectiontousecontraflow.
+1 2
+Thecapacityoftheserouteswoulddouble,andtrafficcongestionwouldbereducedsignificantly.
+This model aims at getting everyone (e.g., the elderly and disabled people) to a shelter by a specified deadline. However, the
+natureofadisasterlimitsthetimeoftheevacuationprocess(Zhangetal.,2015).Thus,thesizeoftheevacuationproblem,network
+topology,andtravelconditionsdeterminethetotalclearancetime(Zhangetal.,2019).Theproposedmodelcandeterminewhether
+edge𝑔isutilisedincontraflow,thedeparturetimeofvehicle𝑣totransittheelderlyanddisabledresidentsfromaffectedpointsto
+shelters,andwhetherpath𝑝isappliedintheevacuationprocess.
+4.1. Mathematicalformulation
+TheSERSP addressedinthisstudyhasthefollowingassumptions:
+– Shelters’locationandcapacitiesarepredetermined.
+– Theevacuationofelderlyanddisabledpeoplestartsfromasinknode(dummynode)andendsinshelters.
+– Everyaffectedpointhasaknownnumberofevacuees.
+According to the assumptions as mentioned earlier, the SERSP is formulated as the MINLP model using a list of sets, indices,
+parameters,anddecisionvariablesthatareshowninTable1.
+𝑀𝑎𝑥 𝑧= ∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡 +𝑋 𝑝 ′ 𝑜′𝑑′𝑡 ] (1)
+𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′
+Subjectto:
+∑
+𝑍 =1 ∀𝑘∈𝒜 (2)
+𝑝
+𝑝∈𝒪′(𝒦)
+∑ ∑
+𝑍 − 𝑍 =0 ∀𝑖∈𝒮,𝒮 ∈ℐ (3)
+𝑝 𝑝
+𝑝∈𝒢 ℐ − 𝑝∈𝒢 ℐ +
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡 +𝑋 𝑝 ′ 𝑜′𝑑′𝑡 ] +𝑋̄ 𝑖 =𝑗 𝑖 ∀𝑖∈𝒜 (4)
+𝑝∈𝒪′(𝒦)𝑡∈ℬ′(𝒫)𝑜′∈𝒪′𝑑′∈𝒟′
+∑ ∑
+𝑋 𝑝𝑜′𝑑′𝑡−𝑏̄ 𝑔𝑝 ≤𝑢 𝑔 ∀𝑔∈𝒞,𝑡∈𝒯,𝑜′∈𝒪′,𝑑′∈𝒟′ (5)
+𝑝∈𝒲𝑡−𝑏̄ 𝑔𝑝∈ℬ
+𝒫
+′
+∑ ∑
+𝑋 𝑝𝑜′𝑑′𝑡−𝑏̄ 𝑔𝑝 ≤𝑌 𝑔 𝑢 𝑔 +(1−𝑌′)𝑢′ 𝑔′ ∀𝑔∈𝒞,𝑡∈𝒯,𝑜′∈𝒪′,𝑑′∈𝒟′,𝑔′∈𝒞′ (6)
+𝑝∈𝒲𝑡−𝑏̄ 𝑔𝑝∈ℬ
+𝒫
+′
+∑ ∑ ∑
+𝑋 𝑝𝑜′𝑑′𝑡 ≤𝑏′ 𝑝 𝑍 𝑝 𝑢′ 𝑝 ′ ∀𝑝∈ℳ (7)
+𝑡∈𝒯𝑑′∈𝒟′𝑜′∈𝒪′
+𝑌 +𝑌′ ≤1 ∀𝑔∈𝒞,𝑔′∈𝒞′ (8)
+𝑔 𝑔′
+∑ ∑ 𝑌̄ 𝑣𝑑𝑜′ ≥1 ∀𝑣∈𝒱 (9)
+𝑜′∈𝒪′𝑑∈𝒩
+6
+
+===== PAGE 7 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Table1
+Nomenclature;listofsets,indices,parameters,anddecisionvariables.
+Sets
+𝒜 Setofevacuationnodes;𝒜={1,2,…,𝐴} ℬ′ Setoftimestepswhichpath𝑝isusable;ℬ′={1,2,…,𝐵′}
+𝑝 𝑝 𝑝
+𝒞 Setofedgesthatcanbeusedincontraflow;𝒞={1,2,…,𝐶} 𝒞′ Setofedgesthatcannotbeusedincontraflow;𝒞′={1,2,…,𝐶′}
+𝒟 Setofvehiclesdepots;𝒟={1,2,…,𝐷} 𝒟′ Setofdestination(shelters)nodes;𝒟′={1,2,…,𝐷′}
+ℰ Setofaffectedpoints;ℰ={1,2,…,𝐸} 𝒢 Setofedges;𝒢={1,2,…,𝐺}
+𝒢′ Setofedgesgoingintheoppositedirectionofedge𝐺; 𝒢+ Setofincomingedgesofnode𝑖;𝒢+={1,2,…,𝐺}
+𝑖 𝑖
+𝒢′={1,2,…,𝐺′}
+𝒢− Setofoutgoingedgesofnode𝑖;𝒢−={1,2,…,𝐺} ℐ Setofallnodes;ℐ ={1,2,…,𝐼}
+𝑖 𝑖
+𝒦 Setofallevacuatednodes;𝐾={1,2,…,𝐾} ℳ Setofallfeasiblepathsbetweenevacuatednode𝑘andshelters𝑑′;
+ℳ={1,2,…,𝑀}
+𝒩 Setofpointswithpassableroad;𝒩 ={1,2,…,𝑁} 𝒪′ Setoforiginnodes;𝑂′={1,2,…,∞′}
+𝒫 Setofpaths;𝒫 ={1,2,…,𝑃} 𝒮 Setoftransitnodes;𝒮={1,2,…,𝑆}
+𝒯 Setoftimesteps;𝒯 ={1,2,…,𝑇} 𝒱 Setofvehicles;𝒱 ={1,2,…,𝑉}
+𝒲 Subsetofpathsthatcontainedge𝑔;𝒲 ={1,2,…,𝑊}
+Indices
+𝑎 Indexofevacuationnodes;𝑎∈𝒜 𝑏′ Indexoftimestepinwhichpath𝑝isaccessible;𝑏′∈ℬ′
+𝑝
+𝑐 Indexofedgesthatcanbeusedincontraflow;𝑐∈𝒞 𝑐′ Indexofedgesthatcannotbeusedincontraflow;𝑐′∈𝒞′
+𝑑 Indexofvehicledepots;𝑑∈𝒟 𝑑′ Indexofdestinationnodes(shelters);𝑑′∈𝒟′
+𝑒 Indexofaffectedpoints;𝑒∈ℰ 𝑔 Indexofedges;𝑔∈𝒢
+𝑔′ Indexofedgesgoingintheoppositedirectionofedge𝑔;𝑔′∈𝒢′ 𝑔+ Indexofincomingedgesofnode𝑖;𝑔+∈𝒢
+𝑖 𝑖
+𝑔− Indexofoutgoingedgesofnode𝑖;𝑔−∈𝒢 𝑖 Indexofallnodes;𝑖∈ℐ
+𝑖 𝑖
+𝑘 Indexofevacuatednodes;𝑘∈𝒦 𝑚 Indexofallfeasiblepathsbetweenevacuatednode𝑘andshelters
+𝑑′;𝑚∈𝒫
+𝑛 Indexofpointwithpassableroads;𝑛∈𝒩 𝑜′ Indexoforiginnodes;𝑜′∈ℐ
+𝑝 Indexofpaths;𝑝∈𝒫 𝑠 Indexoftransitnodes;𝑠∈ℐ
+𝑡 Indexoftimestep;𝑡∈𝒯 𝑣 Indexofvehicles;𝑣∈𝒱
+𝑤 Indexofpathsthatcontainedge𝑔;𝑤∈𝒫
+Parameters
+𝑏
+𝑔
+Timestepatwhichedge𝑔becomesunavailable 𝑏̄
+𝑔𝑝
+Numberoftimestepsrequiredtoreachedge𝑔whenfollowingpath
+𝑝
+𝑏𝑖𝑔𝑀 Bigamount 𝑗 𝑖 Numberofevacueesofnode𝑖
+𝑗
+𝑜
+′ Numberofdisabledevacueesoforiginnode𝑜 𝑙
+𝑣
+Capacityofvehicle𝑣
+𝑛′
+𝑔
+Numberofpointswithpassableedge𝑔 𝑢
+𝑔
+Capacityofedge𝑔
+𝑢′ Capacityofedge𝑔′ 𝑢′′ Capacityofpath𝑝
+𝑔′ 𝑝
+Decisionvariables
+𝑋
+𝑝𝑜′𝑑′𝑡
+Numberofevacueesthatstartsevacuationonpath𝑝attime𝑡from 𝑋
+𝑝
+′
+𝑜′𝑑′𝑡
+Numberofevacueeswithdisabilitythatstartsevacuationonpath𝑝
+originnode𝑜′ todestinationnode𝑑′ attime𝑡fromoriginnode𝑜′ todestinationnode𝑑′
+𝑋̄
+𝑖
+Numberofnon-evacuatedevacueesofnode𝑖 𝑌
+𝑔
+Binaryvariable;equals1ifedge𝑔isusedinit’snormaldirection
+otherwise,0
+𝑌 𝑔 ′ ′ Binaryvariable;equals1ifedge𝑔isnotusedinitsnormal 𝑌̄ 𝑣𝑑𝑜′ Binaryvariable;equals1ifvehicle𝑣departsnode𝑑 toaffected
+directionotherwise,0 point𝑜′,otherwise0
+𝑍 𝑝 Binaryvariable;equals1ifpath𝑝isselected,otherwise,0 𝑍 𝑣 ′ 𝑜′ Auxiliaryandsequentialvariable;thenumberofnodesbeing
+visitedbyvehicle𝑣inthesub-toureliminationconstraints
+𝑍′′ Auxiliaryandsequentialvariable;thenumberofnodesbeing
+𝑣𝑑
+visitedbyvehicle𝑣insub-toureliminationconstraints
+∑ ∑ 𝑌̄ 𝑣𝑑𝑜′ ≥1 ∀𝑣∈𝒱 (10)
+𝑜′∈𝒩𝑑∈𝒩
+∑ ∑ 𝑌̄ 𝑣𝑜′𝑑 𝑗 𝑖 ≤𝑙 𝑣 ∀𝑣∈𝒱,𝑖∈ℐ (11)
+𝑜′∈𝒪′𝑑∈𝒩
+𝑍 𝑣 ′ 𝑜′ −𝑍 𝑣 ′′ 𝑑 +𝑛′ 𝑔 𝑌̄ 𝑣𝑜′𝑑 ≤𝑛′ 𝑔 −1 ∀𝑣∈𝒱,𝑜′∈𝒪′,𝑑∈𝒩,𝑔∈𝒢 (12)
+𝑍′ ≤𝑛′ ∀𝑣∈𝒱,𝑜′∈𝒪′,𝑔∈𝒢 (13)
+𝑣𝑜′ 𝑔
+𝑍 𝑏̄ ≥𝑏 𝑏𝑖𝑔𝑀 ∀𝑔∈𝒢,𝑝∈𝒫 (14)
+𝑝 𝑔𝑝 𝑔
+7
+
+===== PAGE 8 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+∑ ∑ ∑ (𝑋 𝑝𝑜′𝑑′𝑡 +𝑋 𝑝 ′ 𝑜′𝑑′𝑡 𝑌̄ 𝑣𝑜′𝑑 )+ ∑ 𝑋̄ 𝑖 = ∑ 𝑍 𝑝 𝑢′ 𝑝 ′+ ∑ 𝑌 𝑔 𝑢 𝑔 + ∑ (1−𝑌 𝑔 ′ ′ )𝑢′ 𝑔′ ∀𝑡∈𝒯 (15)
+𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′ 𝑖∈ℐ 𝑝∈𝒫 𝑔∈𝒢 𝑔′∈𝒢′
+𝑋 𝑝𝑜′𝑑′𝑡 ,𝑋 𝑝 ′ 𝑜′𝑑′𝑡 ∈Z ∀𝑝∈𝒫,𝑜′∈𝒪′,𝑑′∈𝒟′,𝑡∈𝒯 (16)
+𝑍 ∈Z ∀𝑝∈𝒫 (17)
+𝑝 2
+𝑌 ∈Z ∀𝑔∈𝒢 (18)
+𝑔 2
+𝑌′ ∈Z ∀𝑔′∈𝒢′ (19)
+𝑔′ 2
+𝑌̄ 𝑣𝑜′𝑑 ∈Z 2 ∀𝑣∈𝒱,𝑜′∈𝒪′,𝑑∈𝒩 (20)
+𝑍′ ∈Z ∀𝑣∈𝒱,𝑜′∈𝒪′ (21)
+𝑣𝑜′
+𝑍′′ ∀𝑣∈𝒱,𝑑∈𝒩 (22)
+𝑣𝑑∈Z
+𝑋̄ ∈Z ∀𝑖∈ℐ (23)
+𝑖
+Theobjectivefunction(1)maximisesthetotalnumberofevacueestoreachsafenodes(shelters)𝑑′ aswellastheelderlyand
+disabledresidents.Constraint(2)ensuresthatpreciselyonepath𝑝isusedbyresidentsofanevacuatednode𝑘toreachsafenodes𝑑′
+(shelters).Constraint(3)ensurescontinuityofevacueesusepath𝑝toevacuatefromaffectedpoints𝑒tosafenodes𝑑′.Constraint(4)
+describesthatthetotalnumberofevacuatedandnon-evacuatedpeople(𝑋 𝑝𝑜′𝑑′𝑡 ,𝑋 𝑝 ′ 𝑜′𝑑′𝑡 )shouldequalthetotalnumberofresidents
+(demand)𝑗 ofaffectedpoint𝑒.Constraint(5)explainsthattheevacuee’sflowshouldmeetthecapacityofeachedge𝑢 .Constraint
+𝑖 𝑔
+(6)ensuresthatthecapacityofedges𝑢 thatcanbeusedincontraflowshouldbemet.Constraint(7)indicatesthattherewouldnot
+𝑔
+beaflowofevacueescomingfromanaffectednode𝑒aslongaspath𝑝isselected.Constraint(8)describesthatifedge𝑔isselected
+incontraflow,edge𝑔′ cannotbeusedincontraflowandwouldnotbeutilised.Constraint(9)denotesthatthestartpoint𝑑 ofeach
+vehicle(massevacuation)𝑣isknown.Constraint(10)ensuresthateachvehicle𝑣shouldreturntostarttopoint𝑑afterservingthe
+affectedpoints(i.e.,deliveringtheelderlyanddisabledresidents𝑋′ tosafenodes𝑑′).Constraint(11)assuresthatthecapacity
+𝑝𝑜′𝑑′𝑡
+of vehicle 𝑙 should be met. Constraint (12)–(14) are related to sub-tour elimination. These constraints are related to the tour of
+𝑣
+vehicles𝑣whichtransitdisabledandtheelderlyevacuees𝑋 𝑝𝑜′𝑑′𝑡 fromaffectedpoints𝑒toshelters𝑑′.Ifvehicle𝑣servicesapoint𝑒,
+itwillnotreturntotheservicednode.Constraint(15)preventsatimewindowviolation.Path𝑝wouldnotbeselectedattimesteps
+thatarenotavailable.Constraint(16)denotesthebalancedflowofevacuees(𝑋 𝑝𝑜′𝑑′𝑡 ,𝑋 𝑝 ′ 𝑜′𝑑′𝑡 )andnon-evacuatedevacuees(𝑋̄ 𝑖 )in
+eachtimestep𝑡.Constraints(17),(18)and(23)showdomainsofintegervariables.Constraints(19)–(22)arebinaryvariables.
+Astheconstraint(15)isnon-linear(i.e.,multiplicationofabinaryandanintegervariable),accordingtotheEqs.(24)–(27),this
+constraintisconvertedtoalinearcounterpart.
+𝜆= ∑ ∑ ∑ ∑ ∑ ∑ 𝑋 𝑝 ′ 𝑜′𝑑′𝑡 𝑌̄ 𝑣𝑜′𝑑 (24)
+𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′𝑡∈𝒯𝑣∈𝒱𝑑∈𝒩
+∑ ∑ ∑ ∑
+𝜆≤ 𝑋′ (25)
+𝑝𝑜′𝑑′𝑡
+𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′𝑡∈𝒯
+𝜆≤𝐵𝑖𝑔𝑀 ∑ ∑ ∑ 𝑌̄ 𝑣𝑜′𝑑 (26)
+𝑣∈𝒱𝑜′∈𝒪′𝑑∈𝒩
+𝜆≥( ∑ ∑ ∑ 𝑌̄ 𝑣𝑜′𝑑 −1)𝐵𝑖𝑔𝑀+ ∑ ∑ ∑ ∑ 𝑋 𝑝 ′ 𝑜′𝑑′𝑡 (27)
+𝑣∈𝒱𝑜′∈𝒪′𝑑∈𝒩 𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′𝑡∈𝒯
+4.2. Trafficcongestionprojection
+Investigationoftrafficcongestionduringanevacuationmissionhasbeenidentifiedasavitalcomponentofstrategicevacuation
+planning, which includes a projection of clearance time (Jha et al., 2004). Due to the lack of congestion anticipation tools and
+approaches,trafficjamsareoftendisregardedinstrategicevacuationscheduling.Inaddition,thetransportationnetworkstructure
+isunsuitableformassevacuation(AlamandHabib,2019).Consequently,trafficvolumeduringmanyincidentshasbeenproblematic
+anduncontrollable.AformulationbasedonShahparvarietal.(2016)isdevelopedheretoconsidertrafficcongestionandrunthrough
+itsimpactontheevacuationprocesstomakebetterschedulingdecisions.Let𝒦′ bethesetofroutes,ℒ thesetofroadsections,
+and𝒱 thesetofvehicle’stype.Byaroughapproximationoftrafficjams,therewillbeadramaticdecreaseinclearancetimein
+evacuationusingefficienttraffic-calmingapproaches.
+𝜆 𝑖𝑗𝑘′𝑣= ∑ 𝑙 ∑ ∈ℒ 𝑙∈ℒ 𝛽 𝑘′ 𝑑 𝑙𝑣 𝑙𝑘 𝑑 ′ 𝑙𝑘′ ∀𝑖∈ℐ,𝑗∈𝒥,𝑘′∈𝒦′,𝑣∈𝒱 (28)
+𝜆′=𝛾 𝑖𝑗𝑘′𝑠
+𝑣
+(1+𝛼)+𝑡 ∀𝑖∈ℐ,𝑗∈𝒥,𝑘′∈𝒦′,𝑣∈𝒱 (29)
+∑ 𝑛 𝜆′
+𝐶̄ = ∑ 𝑣 ∑ ∈𝒱 𝑣 𝜆 ∀𝑖∈ℐ,𝑗∈𝒥 (30)
+𝑣∈𝒱 𝑘′∈𝒦′ 𝑖𝑗𝑘𝑣
+𝜆 𝑖𝑗𝑘′𝑣∈Z+ ∀𝑖∈ℐ,𝑗∈𝒥,𝑘′∈𝒦′,𝑣∈𝒱 (31)
+𝜆′∈R+ (32)
+𝐶̄ ∈Z (33)
+2
+8
+
+===== PAGE 9 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Where𝜆𝑣 𝑖𝑗𝑘′ depictstheaveragecapacityofroute𝑘′forvehicletype𝑣,𝛽 𝑘′𝑙𝑣 previouslypredictedthecapacityofsection𝑙ofroute
+𝑘 for vehicle 𝑣, 𝑑 𝑙𝑘′ geometric distance of section 𝑙 of route 𝑘′, 𝜆′ route resistance function, 𝛾 𝑖𝑗𝑘′ travel time of route 𝑘′ between
+affected point 𝑖 and safe node 𝑗, 𝑠 speed of vehicle 𝑣, 𝛼 time inflation per cent of the trip due to road congestion (i.e., inflation
+𝑣
+factor)(CairoTrafficCongestion,2006),𝑡dwelltime(dwelltime=2.5minJordan(2019)),𝑛 numberofvehicletype𝑣,𝐶̄ traffic
+𝑣
+flowpercentage.Eq.(28)calculatesthecapacityofroute𝑘′forvehicle𝑣betweentwopoints𝑖and𝑗.Routeresistanceisformulated
+inEq.(29).Eq.(30)estimatestrafficvolumebasedonroutecapacity,whichmeansthatitcalculatesthetrafficpercentagebetween
+twonodes𝑖and𝑗basedonfactorssuchasroutecapacity,routeresistance,distance,vehicletype,andvehiclespeed.Itisconsidered
+intraveltimeandusedinthemathematicalmodeltoevaluateitsimpactsonscheduling.
+TableA.1providesdetaileddataaboutthetraveltimebetweenaffectedpointsandsheltersconsideringnon-trafficandtraffic
+situations.
+5. Solutionapproach-branch&pricedecomposition
+Asthepresentedformulationissophisticatedduetoalargenumberofintegerandbinaryvariables,itisnotefficienttosolveit
+throughacommercialoptimisationsolverduetotheneedforhighdemandoncomputermemoryandtime.Moreefficientalgorithms
+havebeendevelopedtocopewiththiscomplexitymoreefficiently(GharaeiandJolai,2019).Asaresult,anexactdecomposition
+algorithm𝐵&𝑃 isintroduced,whichisappliedinthisstudy.The𝐵&𝑃 algorithmstartswiththeDantzigWolfe(𝐷𝑊)decomposition
+algorithmandformstheRestrictedMasterProblem(RMP).Afterwards,relaxesthemodelLp-relaxationRestrictedMasterProblem
+(LRMP)andsolveitbythesimplexmethod(Algorithm2-Line2)(i.e.,relaxestheassumptionthatthevariablesareinteger).Then,
+thepricingproblemsshouldbesolvedtofindcolumnswithnegativereducedcost(i.e.,minimisationproblem)(Algorithm3-Line4).
+Ifacolumnisfound,itshouldbeaddedtothe𝐿RMP;otherwise,theintegralityofthesolutionsshouldbechecked(Algorithm1-Line
+12).Supposetheobtainedsolutionsareintegers;the𝐵&𝑃 algorithmwillterminate;otherwise,basedonthebranchingstrategies.
+In thatcase, it willbe branchedout on thevariable that isnot an integerand creates twobranches (Algorithm 1-Line15). Each
+branchissolvedusingtheabove-mentionedprocesstoobtaintheoptimalsolution.Thesestepswillrepeatuntiltheobtainedvalues
+forvariablesareintegers.
+Algorithm1:TheBranch&Price(B&P)Algorithm
+// STAGEI:DantzigWolfeDecompositionAlgorithm(SectionAppendixB.1)
+1 GeneratetheRestrictedMasterProblem(𝑅𝑀𝑃)(SectionAppendixB.1.1);// STAGEII:LPRelaxation(SectionAppendixB.2)
+2 Relaxthe𝑅𝑀𝑃;
+3 𝑅𝑀𝑃←𝐿𝑅𝑅𝑀𝑃;
+4 GenerateDualRelaxedRestrictedMasterProblem(DRRMP)(SectionAppendixB.2.1);
+// STAGEIII:ColumnGenerationAlgorithm(PricingProblems)(SectionAppendixB.3);
+5 Generatesub-problems(Sections(AppendixB.3.1–AppendixB.3.2));
+6 Generateinitialcolumn(Algorithm3);// STAGEIV:DominanceBasedNeighborhoodSearchAlgorithm(SectionAppendixB.3.3)
+7 whileNegativeReducedCostMatrix={∅}do
+8 Findcolumnswithnegativereducedcoststoaddto𝐿𝑅𝑅𝑀𝑃 (Algorithm4);
+9 Solvethepricingproblems(Algorithm3)(SectionsAppendixB.3.1,AppendixB.3.2);
+10 ifthereisanycolumnwithnegativereducescost then
+11 Addtheassociatedcolumnstothe𝐿𝑅𝑀𝑃;
+12 elseifallthevariablesareinteger then
+13 Report𝑋 𝑝𝑜′𝑑′𝑡 ,𝑋 𝑝 ′ 𝑜′𝑑′𝑡 ,𝑋̄ 𝑖;
+14 else
+15 BranchingStrategies(SectionAppendixB.3.4);
+AccordingtotheAlgorithm1,inStageIAppendixB,theDW decompositionalgorithm2isadoptedasoneofthemostcommon
+approachesindecomposingintegerprogrammingmodelstosolvelarge-scaleproblems(Puchingeretal.,2011;TonbariandAhmed,
+2019)bypertainingatighterbound(Vanderbeck,2000).TheproblemisthenformulatedastheRMP(Algorithm1-Line1).Inthe
+RMP,eachpossiblepointisgeneratedasaconvexcombinationofsomeextremepoints.InStageII(AppendixB.1.1),someinteger
+constraintscouldformpolytope(RaidlandPuchinger,2008),whichmakesthesolutionspacenon-convex.TheLp-relaxationmethod
+isthenutilisedasacommonwaytomakethefeasiblespaceconvex(Algorithm2-Line2).ThedualformulationoftheLRMPproblem
+isthenformulatedB.2.1.Inthisform,theoptimalsolutionisfoundattheextremepointoftheconvexhullofallfeasibleinteger
+points(Deyetal.,2013).
+StageIII(AppendixB.3)isincorporatedwiththeCGalgorithm3(sub-problemformulation).Thisapproachsolvesndecomposed
+sub-problems,iteratively(Algorithm3-Line4).Variablesassociatedwiththemostnegativereducedcost(i.e.,inminimisation)are
+addedtotheLRPM (Algorithm3-Line6).Theoptimalsolutionisfoundifthereisnocolumnwithnegativereducedcosttoaddto
+theRPM.
+9
+
+===== PAGE 10 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Table2
+Nomenclature;listofsets,indices,parameters,anddecisionvariablesforrobustmodel.
+Sets
+𝑆′ Setofscenarios
+Parameters
+𝑐1 Costofaccommodationinshelter𝑑′ underscenario𝑠′ (establishmentofshelter𝑑′) 𝑝′ Probabilityofrealisationofscenario𝑠′
+𝑑′𝑠′ 𝑠′
+𝑟′ Weightplacedonsolutionvariance 𝑟1 Capacityofshelter𝑑′ underscenario𝑠′
+𝑑′𝑠′
+𝑢′ Weightassignedtomodelinfeasibilitypenalty 𝑗 𝑖𝑠′ Numberofevacueesofnode𝑖underscenario𝑠′
+Decisionvariables
+𝑌1 Binaryvariabletakes1ifshelter𝑑′ isselectedunderscenario𝑠′,otherwise0 𝜆′ Infeasibilityofthemodelunderscenario𝑠′
+𝑑′𝑠′ 𝑠′
+𝜃′ Variabletolinearisethefunction
+𝑠′
+StageIV(AppendixB.3.3)isassociatedwiththedevelopedDBNSA4tointegrateintotheCGalgorithmtoimprovetheefficacy
+offindingcolumnswithnegativereducedcosts(i.e.,mostpositivecostsinmaximisationproblem).Thisalgorithmstartsbycreating
+a lower bound. In each iteration, the DBNSA finds neighbours of the initial solution by swap fabrication operator (Algorithm
+AppendixB.3.3-Line2)andcomparesthesepossiblesolutionstofindthecolumnwiththemostnegativereducedcost(Algorithm
+AppendixB.3.3-Lines3–8).Thesolutionisdiscardedwhentheobjectivefunctionvalueofeachcandidatesolutiongeneratedbythe
+swapoperatorisnotbetterthanthebound(AlgorithmAppendixB.3.3-Lines3,4).
+IntheBranchingStrategies’Stage(AppendixB.3.4),iftheobtainedsolutionsofStageVIareinteger,thealgorithmfinishesby
+returning them as the optimal solution (Algorithm 1-Lines 12,13). The algorithm applies the branching strategies to find integer
+solutions;otherwise,(Algorithm1-Line15)terminates.Moredetailedexplanationsoftheproposedaccelerated𝐵&𝑃 areprovided
+inAppendixB.
+6. Robustnesschecking
+In this study, the model variation test as the most frequently used test in the literature, (Chen et al., 2007; Neumayer and
+Plümper,2017;Choietal.,2019;Jacksonetal.,2019)isappliedtoevaluatetherobustnessoftheproposedmodel.Themainsteps
+ofthismethodareasfollows(NeumayerandPlümper,2017):
+– Step1:Baselinemodelgeneration
+ThebaselinemodelisgeneratedinSection4
+– Step2:Baselinemodelassumptionidentification,relaxingorreplacing
+The main assumptions of the proposed model are given in the section mathematical formulation (Section 4.1). This study’s
+firstandthirdassumptionsarerelaxedandinvestigatedindetailwiththebaselinemodelinthistest.Therelaxationofthe
+secondassumptionwillcausethesub-toureliminationconstraintsofthemodeltobeviolated.
+– Step3:Developingbaselinemodelaccordingtothenew/replacedassumption:
+Therobustmathematicalmodelbasedontherelaxationofassumptionscanbereformulatedasfollows:Thelistofsets,indices,
+parameters,anddecisionvariablesisshowninTable2.
+6.1. Modelreformulationwithrelationofthefirstassumptionrelaxation:
+[ ]
+𝑀𝑖𝑛 ∑ 𝑝′
+𝑠′
+∑ 𝑌
+𝑑
+1
+′𝑠′
+𝑐
+𝑑
+1
+′𝑠′
++ ∑ 𝑝′
+𝑠′
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+] +
+𝑠′∈𝒮′ 𝑑′∈𝒟′ 𝑠′∈𝒮′ 𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′
+[
+𝑟′ ∑ 𝑝′ 𝑠′ ∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋 𝑝 ′ 𝑜′𝑑′𝑡𝑠′ ] − (34)
+𝑠′∈𝒮′ 𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′
+]
+∑ 𝑝′
+𝑠′
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+] +2𝜃
+𝑠
+′
+′
++𝑢′ ∑ 𝑝′
+𝑠′
+𝜆′
+𝑠′
+𝑠′∈𝒮′ 𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′ 𝑠′∈𝒮′
+Subjectto:
+[ ]
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+] −𝑝′
+𝑠′
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+] +𝜃
+𝑠
+′
+′
+≥0 ∀𝑠′∈𝒮′ (35)
+𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′ 𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋 𝑝 ′ 𝑜′𝑑′𝑡𝑠′ ] +𝑋̄ 𝑖 +𝜆′ 𝑠′ =𝑗 𝑖𝑠′ ∀𝑖∈𝒜,𝑠′∈𝒮′ (36)
+𝑝∈𝒪′(𝒦)𝑡∈ℬ′(𝒫)𝑜′∈𝒪′𝑑′∈𝒟′
+∑ ∑
+𝑋 𝑝𝑜′𝑑′𝑡−𝑏̄ 𝑔𝑝𝑠′+𝜆′ 𝑠′ =𝑢 𝑔 ∀𝑔∈𝒞,𝑡∈𝒯,𝑜′∈𝒪′,𝑑′∈𝒟′,𝑠′∈𝒮′ (37)
+𝑝∈𝒲𝑡−𝑏̄ 𝑔𝑝∈ℬ
+𝒫
+′
+10
+
+===== PAGE 11 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+∑ ∑
+𝑋 𝑝𝑜′𝑑′𝑡−𝑏̄ 𝑔𝑝𝑠′+𝜆′ 𝑠′ =𝑌 𝑔 𝑢 𝑔 +(1−𝑌′)𝑢′ 𝑔′ ∀𝑔∈𝒞,𝑡∈𝒯,𝑜′∈𝒪′,𝑑′∈𝒟′,𝑔′∈𝒞′,𝑠′∈𝒮′ (38)
+𝑝∈𝒲𝑡−𝑏̄ 𝑔𝑝∈ℬ
+𝒫
+′
+∑ ∑ ∑
+𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝜆′
+𝑠′
+=𝑏′
+𝑝
+𝑍
+𝑝
+𝑢′
+𝑝
+′ ∀𝑝∈ℳ,𝑠′∈𝒮′ (39)
+𝑡∈𝒯𝑑′∈𝒟′𝑜′∈𝒪′
+∑ ∑ ∑ (𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋 𝑝 ′ 𝑜′𝑑′𝑡𝑠′ 𝑌̄ 𝑣𝑜′𝑑 )+ ∑ 𝑋̄ 𝑖 +𝜆′ 𝑠′ = ∑ 𝑍 𝑝 𝑢′ 𝑝 ′+ ∑ 𝑌 𝑔 𝑢 𝑔 + ∑ (1−𝑌 𝑔 ′ ′ )𝑢′ 𝑔′
+𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′ 𝑖∈ℐ 𝑝∈𝒫 𝑔∈𝒢 𝑔′∈𝒢′ (40)
+∀𝑡∈𝒯,𝑠′∈𝒮′
+∑ ∑ (𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋 𝑝 ′ 𝑜′𝑑′𝑡𝑠′ 𝑌̄ 𝑣𝑜′𝑑 )+𝜆′ 𝑠′ =𝑟1 𝑑′𝑠′ ∀𝑑′∈𝒟′,𝑠′∈𝒮′ (41)
+𝑝∈𝒫𝑜′∈𝒪′
+𝑋 𝑝𝑜′𝑑′𝑡𝑠′,𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+∈Z ∀𝑝∈𝒫,𝑜′∈𝒪′,𝑑′∈𝒟′,𝑡∈𝒯,𝑠′∈𝒮′ (42)
+Eqs.(2)–(3),(8)–(14),(17)–(23).
+The robust objective function (34) includes three main parts. The first part minimises expected cost (i.e., maximises the total
+numberofevacueesplusthetotalnumberofevacueesthat,includeelderlypeopleanddisabledpeople).Thesecondtermminimises
+thevarianceofthetotalnumberofevacuees,representingtherobustnessofthemodelregardingoptimality.Finally,thethirdterm
+showstherobustnessfromafeasibilityperspective,whichmeansitmeasuresmodelfeasibilitybyconsideringaweightedpenalty.
+Concerningequations,(2)–(3),(8)–(14),(17)–(23),nochangeinthemathematicalexpressionismadecomparedtothedeterministic
+model.Constraint(35)isaddedtothemodeltoconvertthenon-linearobjectivefunctiontoalinearmodel.Toensurethatthepenalty
+isappliedincaseofunmetdemand(i.e.,thenumberofevacueesofeachaffectedpoint),Eq.(36)isaddedtothemodel.Constraint
+(37) and (38) explain that the evacuation flow should meet the capacity of edges where the contraflow is employed; otherwise,
+penaltycostwillbeaddedtothemodel.Eq.(39)showsthedependencyofevacueesflowtoselectingpath𝑝.Otherwise,thepenalty
+termwillbeconsideredforthemodel.Furthermore,constraint(40)expressestimewindowlimitationsthatthemodelwillconsider
+penaltycostifthetimewindowisviolated.Finally,thelimitationsofshelters’capacityaredefinedbyEq.(41)that𝜆′ willtake
+𝑠′
+avalueifthemodelviolatesthisconstraint.Constraint(42)demonstratesintegervariables.Itshouldbenotedthatthedifference
+betweenEqs.(34)and(43)isthetermrelatedtolocatingsheltersinthefirstrobustmodel.
+6.2. Modelformulationwiththerelationofthethirdassumptionrelaxation:
+[ ]
+𝑀𝑖𝑛 𝑧= ∑ 𝑝′
+𝑠′
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+]
+𝑠′∈𝒮′ 𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′
+[
++𝑟′ ∑ 𝑝′
+𝑠′
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+] − (43)
+𝑠′∈𝒮′ 𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′
+[ ] ]
+∑
+𝑠′∈𝒮′
+𝑝′
+𝑠′
+∑
+𝑡∈𝒯
+∑
+𝑝∈𝒫
+∑
+𝑜′∈𝒪′
+∑
+𝑑′∈𝒟′
+[ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+] +2𝜃
+𝑠
+′
+′
++𝑢′∑
+𝑠′∈𝒮′
+𝑝′
+𝑠′
+𝜆′
+𝑠′
+Subjectto:
+[ ]
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+] −𝑝′
+𝑠′
+∑ ∑ ∑ ∑ [ 𝑋 𝑝𝑜′𝑑′𝑡𝑠′+𝑋
+𝑝
+′
+𝑜′𝑑′𝑡𝑠′
+] +𝜃
+𝑠
+′
+′
+≥0 ∀𝑠′∈𝒮′ (44)
+𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′ 𝑡∈𝒯𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′
+Eqs.(2)–(3),(8)–(14),(17)–(23),(36)–(40),(42).
+TheexplanationfortheEqs.(2)–(3),(8)–(14),(17)–(23),(36)–(40),(42)arethesameasthefirstrobustmodel.Similartothe
+firstrobustmodel,theobjectivefunctionoftherobustmodel(43)minimisesthetotalexpectedcost,variance,andthetotalpenalty
+regarding the feasibility of the model. Furthermore, Eq. (44) is added to the model to convert the non-linear part of the robust
+modeltothelinearone.
+– Step4:Comparingtheestimatedeffectsofgeneratedmodels:
+Inthecomparison,ithasbeenassumedthattheoptimalsolutioncanberobustifitremainsclosetooptimumandalmostfeasible
+inallscenarios(Mulveyetal.,1995;YuandLi,2000).Forthispurpose,threegroupsofinstances,small,medium,andlarge,are
+generated(Table3).Fourpossibilitiesforevacueesofaffectedpointsasthedemandofeachaffectedpoint(i.e.,relaxationofthefirst
+assumption)andlocationofsheltersandtheircapacities(i.e.,relaxationofthethirdassumption)areconsideredbasedonthestudy
+performedbyPanandNagi(2010).Theuncertainparametersandtheircorrespondingprobabilitiesofrealisationoftheirscenarios
+aregenerateduniformly.Briefly,robustmodels’parametersettingisasfollows:𝑝′ =0.2, 𝑝′ =0.3, 𝑝′ =0.3, 𝑝′ =0.2, 𝑟′ =(0-
+1 2 3 4
+800), 𝑢′ =500(PanandNagi,2010). Leveragingrobustmodelparametersfromadifferentstudycanexpeditethedevelopment
+ofrobustmodels,especiallywhendataorresourcesareunavailable.Theapproachhasbeenwidelyusedintheliterature,provided
+thattheunderlyingsystembeingmodelledisstructurallysimilartotheoneinthepreviousstudy(Ben-TalandNemirovski,1998;
+11
+
+===== PAGE 12 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Table3
+Robustnesschecking.
+No. Instancesize Baseline(Deterministic) Assumption1 Assumption3
+ℰ ×𝒮 ×𝒟′ 𝒯 𝒫 𝒞 𝒞′ O.F.V C.T(s) O.F.V C.T(s) O.F.V C.T(s)
+1 8×16×4 20 20 12 12 3218.4339 13 16242.2976 97 15168.9846 77
+2 16×32×8 18 18 10 10 3812.4469 18 16725.1606 389 16363.7014 89
+3 32×32×10 20 20 12 12 6350.8337 78 18118.9024 168 14889.1479 745
+4 160×8×8 10 10 10 10 25644.4761 106 20335.6652 528 19015.7892 531
+5 200×8×8 10 10 10 10 31591.4267 144 20867.5619 1448 19662.7689 1294
+6 300×8×8 8 8 10 10 46474.2130 179 24130.7978 1284 22849.0351 1336
+7 400×8×8 8 8 9 9 61842.2646 495 24290.9352 1230 23103.4666 1154
+8 450×8×8 8 8 8 8 69598.4413 1004 23220.8694 1742 22032.9739 1457
+Table4
+Randomvariablesandtheirdistribution.
+Parameters Distribution Parameters Distribution
+𝑢
+𝑔
+∼(100,200) 𝑢′
+𝑔′
+∼(100,200)
+𝑢′
+𝑝
+′ ∼(200,300) 𝑙
+𝑣
+∼(3,6)
+𝑏
+𝑔
+∼(1,40) 𝑏̄
+𝑔𝑝
+∼(1,4)
+𝑗
+𝑖
+∼(100,200) 𝑗
+𝑜
+∼(1,15)
+𝑛′
+𝑣
+∼(1,4) 𝑛
+𝑔
+∼(1,280)
+DelageandYe,2010).Previousstudieshaveshownthatthisapproachcanleadtomoreaccurateandreliableresults,andconducting
+sensitivityanalysiscanprovidemoreinsightintotheappropriatenessofusingsuchparameters(DelageandYe,2010).
+Thecomparisonresultsofthreedevelopedmodelsregardingobjectivefunctionvalueandcomputationaltimearesummarisedin
+Table3.Theobjectivefunctionoftherobustmodelsrepresentstheworst-casescenariounderuncertainty.Incontrast,thebaseline
+objectivefunction(deterministic)doesnotconsideruncertaintyanddisturbanceindifferentparametersofthemodel.Accordingto
+Table3,byincreasingthesample’ssize,therobustmodelsresultinmorerobustsolutionsthanthebaselinemodel.Thecomputational
+timeofthebaselinemodelismuchlowerthantherobustmodelsasitisnotincorporatedwiththeadditionalindexof𝑠′asscenarios,
+meaning that it has less complexity than the robust models. By setting 𝑢′ to a large amount, the model must meet the uncertain
+parameters (i.e., all evacuees of all affected points should be evacuated under all scenarios). Otherwise, the model considers a
+considerablepenaltycost.
+Generally, the 𝑟′ provides a trade-off between the model’s robustness and the solution’s robustness. Moreover, the 𝑟′ controls
+thesolutionvariance.Forexample,setting𝑟′ indicatesthedecision-makersfocusontheexpectednumberofevacueesandignore
+theevacuees’variability.Therefore,theexpectednumberofevacueeswillproliferatebyincreasing𝑟′ willproliferatetheexpected
+numberofevacuees.
+The application of robust optimisation on the evacuation problem underlines the potential of both strategies to optimise
+evacuation scheduling processes. The robust strategy explicitly considers noise variables and optimises probability distributions
+ofobjectivefunctionsandconstraintstoachievearobustandreliablesolution.Generally,forallinstances,themodelscanproduce
+robustsolutionsconfirmingeffectivenessindifferentuncertainsituationsandperturbations.
+Therobustnessevaluationiscrucialbecausedecision-makersrelyonaccurateandreliablemodelstoinformtheirpoliciesand
+actions during disasters. Inaccurate or biased model results can lead to sub-optimal decisions and actions that severely affect the
+affected population. By conducting a robustness evaluation, decision-makers can have confidence in the model’s results and use
+themtodevelopeffectiveandefficientevacuationplans.Therobustnessevaluationcanhelpdecision-makersidentifytheproposed
+model’slimitationsandareasthatrequirefurtherimprovement.Thisinformationcanguidedecision-makersinrefiningthemodel
+anddevelopingmorerobustevacuationplanstowithstandvariousdisasterscenarios.
+7. Numericalexperiments
+Inthissection,threesetsofsamples,large,medium,andtrim,aregeneratedbasedonrandomdatatoprovethecapabilityof
+themodelandsolutionapproachinsolvingvarioussampleswithdifferentsizes.Realdataisincorporatedwiththecasestudyto
+evaluatetheefficiencyandeffectivenessoftheproposedmodelandsolutionapproachindealingwithreal-worldemergencies.The
+number of affected points ℰ for the three sizes are considered 4–40, 40–160, and 250–280, respectively. Three, five, seven, and
+tenshelters𝒟′ arefacilitatedforresidents.Missiontimesareprojectedat6,10,20,30,and40-timesteps,respectively.Eight,16,
+20, and 40 transit nodes 𝒮 are utilised between affected points and shelters. Five, 10, and 15 vehicles 𝑣 are prepared to transit
+theelderlyandpeoplewithdisabilitiesbyacapacityofthree,five,andsevenpersons,respectively.Parametersettingisbriefedin
+Table4.
+Table5verifieshowthepresentedmodelprovidesastrategicandoptimalschedulefortheevacuationprocessinavaryingrange
+ofregions.Overall,theproposedmodelsolvessmallsamplesquicklyandincreasesthenetwork’ssize;thecomputationaltimegrows
+steadily.
+12
+
+===== PAGE 13 =====
+
+S.Shahparvarietal.
+Table5
+Numericalexperimentsresults.
+No. Instancesize Non-traffic Traffic
+ℰ ×𝒮 ×𝒟′ 𝒯 𝒫 𝒞 𝒞′ O.F.V C.T(s) % O.F.V C.T(s) %
+1
+llamS
+4×8×3 6 6 3 3 1119 10 100% 1000 10 89%
+2 7×8×3 6 6 3 3 1869 12 100% 1750 12 93%
+3 7×16×3 6 6 3 3 1869 12 100% 1750 13 93%
+4 6 6 3 3 1869 14 100% 1750 17 93%
+5 10 6 3 3 1869 15 100% 1869 19 100%
+6 7×16×5 10 10 3 3 1869 26 100% 1869 31 100%
+7 10 10 6 3 1869 31 100% 1869 37 100%
+8 10 10 6 6 1869 38 100% 1869 42 100%
+9
+muideM
+20×16×5 10 10 6 3 5099 252 98% 5000 260 98%
+10 10 10 6 6 9428 607 90% 9275 623 88% 40×20×7
+11 20 20 12 6 9428 1022 90% 9275 1029 88%
+12 30 30 15 6 101664 2280 93% 99813 2301 89%
+160×40×10
+13 40 30 15 6 102688 3009 100% 101429 3067 98%
+14
+egraL
+Transportation Research Part A 189 (2024) 104197
+200×40×10 40 30 15 6 112688 3900 100% 100216 3936 97%
+15 40 30 15 6 98620 7134 76% 97019 7186 74%
+250×40×10
+16 50 30 15 6 129560 9116 100% 127791 9159 98%
+17 280×40×10 40 30 15 6 136090 14412 94% 133740 14702 92%
+Table6
+ExperimentalresultsonthecomparisonbetweenCPLEX,B&P,AcceleratedB&P andthetwostateoftheartB&P intheliterature.
+The more the affected points increase, the more evacuees should be evacuated based on the available routes, the capacity of
+routes,availabletimesteps,andthenumberofedgesthatcanbeusedincontraflowandtheircapacities.Byincreasingthenumber
+oftransitnodes(intermediatepoints)andsafenodes(shelters),thereisnochangeinthenumberofevacuatedpeople.Atthesame
+time,thereisonlyaslightriseincomputationaltime.Forinstance,insamples3and4,itcanbeseenthatthereisnochangein
+the number of evacuees by doubling transit nodes and increasing shelters. At the same time, any change in transit or safe nodes
+affectstheevacuationschedulesignificantly,whichmeansthatbyincreasingthesheltersandtransitnodes,thedevelopedmodel
+triestoprovideamorebalancedscheduleforevacuees.Thereisasubstantialincreaseinevacueeswherethetimestepincreases.
+Forinstance,thefirst-timestep’sspikeisaccompaniedbya35%growthintheevacuatedpopulation.
+Also, paths play the same role as time steps, meaning that traffic congestion will be controlled by increasing the number of
+available paths. It will reduce, resulting in a proliferation in the number of evacuees. Turning to other factors, such as edges in
+normaloroppositedirections,itcanbeseenthatincreasingthenumberofaffectedpointsincreasesthenumberofevacuees,and
+dropping the number of edges that cannot be used in contraflow curbs the number of evacuees. Thereby, contraflow provides a
+significantriseinthecapacityoftherespectiveroute;hence,whenthenumberofsuchedgesgrows,therewillbemorecapacity
+formoreevacueestoreachshelterssoonerwithoutbeingstuckamidtraffic.Amoresignificantriseispredictedwhentime,routes,
+andcapacitiesincreasesufficientlybasedonthepopulation.Althoughthecomputationaltimedependsmoreonthetimestepand
+paths,thegrowthofcomputationaltimebymultiplicationofedgesthatcanbeusedincontraflowisnotnegligible.
+Various instances are generated to investigate and compare the performance of CPLEX, base 𝐵&𝑃, the accelerated 𝐵&𝑃
+algorithm, 𝐵&𝑃 algorithms adopted by Ahmadi-Javid et al. (2018), Reihaneh and Ghoniem (2019) and Václavík et al. (2018)
+(Table6).Theacceleratedversionof𝐵&𝑃 algorithminthisstudyandthe𝐵&𝑃 algorithmadoptedbyVáclavíketal.(2018)are
+exact-based algorithms that ensure the optimality of the outputs. However, the 𝐵&𝑃 algorithm adopted by Ahmadi-Javid et al.
+(2018),ReihanehandGhoniem(2019)maynotguaranteeoptimalityasitscorealgorithmforthepricingproblemisheuristic-based.
+AccordingtoTable6,itcanbeconcludedthattheCPLEXsolverfailstosolvethelarge-scaleinstances.Theaccelerated𝐵&𝑃
+algorithm outperforms the base version of 𝐵&𝑃 algorithm in terms of computational time by solving on average 14.26% faster,
+obtainingthesameobjectivefunctionvalues.Onaverage,thedeveloped𝐵&𝑃 algorithmprovides3.53%bettersolutionsand12.03%
+lesscomputationaltimethanthedeveloped𝐵&𝑃 algorithmbyReihanehandGhoniem(2019).
+13
+
+===== PAGE 14 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Fig.2. Alternationofevacuatedpopulationbasedonthreekeyparameters(timesteps,thecapacityofedgesandroutes).
+Fig.3. Analysisoftrafficandnon-trafficevacuationflow.
+Thequalityofsolutionsprovidedbythedeveloped𝐵&𝑃 byVáclavíketal.(2018)isthesameastheobtainedsolutionbythe
+accelerated𝐵&𝑃 algorithminthisstudy.While,intermsofcomputationaltime,whichiscrucialinemergency-relatedsituations,the
+accelerated𝐵&𝑃 algorithminthisstudyrequiresapproximately11%lessofthecomputationaltimeonaveragethanthedeveloped
+𝐵&𝑃 by Václavík et al. (2018) to obtain the same optimal objective function value (O.F.V). As it can be seen in Table 6, the
+accelerated𝐵&𝑃 algorithminthisstudyrequireslesscomputationaltimeinfiveinstancesoutofalleightinstances(e.g.,instances
+1,3,4,6,8)thatprovestheoutstandingperformanceofthedevelopedalgorithminthisstudy.
+Fig.2illustratesthetotalnumberofevacueesaccordingtothevariouscombinationsofthetimestep,routecapacity,andedge
+capacity.
+Thetotalnumberofevacuees’downwardandupwardtrendshavethehighestfluctuationwhenthecapacityofedge𝑢 increases
+𝑔
+ordecreases.Themorecapacityoftheedges,themorepeopleareevacuated.Forinstance,when𝑢 declinesby20%,thenumber
+𝑔
+ofevacuatedevacueesdecreasesbyapproximately7%.Incontrast,reducingthenumberoftimestepsby20%leadstoanegligible
+decreaseinthenumberofevacuees(approximately1%).Althoughthecapacityofroutesandtimestepsplayasignificantrolein
+theevacuationprocess,thecrisismanagementteamshoulddevotemostoftheirattentiontoincreasingthecapacityofedges,which
+hasthevitalroleofreducingcongestionandtotalclearancetime,potentiallyleadingtoasmallernumberoffatalities.
+Moreover, edge’s capacity facilitates transportation for evacuees and relief forces to evacuate quickly with the least fatalities.
+Routecapacityisanothersignificantfactorinthisproblem.Thenumberofevacueesexceeds4,755from4,560whenthecapacity
+oftheroutesincreasesby6%.Atypicalpatternforevacuatingthepopulationforallthreefactorsisthatthenumberofevacuees
+risessubstantiallytoapeak,followedbyaslightgrowthbeforeplateauing.
+Fig.3comparestheevacuationflowintwoconditions(trafficandnon-traffic)for17samples.
+Fig. 3 indicates that the capacity of routes and time steps have less influence, whereas the capacity of edges considerably
+influences the evacuation network’s performance. Consequently, the evacuated population will not drop as long as there is a
+continuous rise in the capacity of edges (i.e., contraflow). When two-way edges are employed in contraflow, the capacity of this
+edgewilldouble,andtrafficcongestionwilldecrease,meaningtherewillbeasharpriseinevacuees(Fig.3).Thisisalsovalidfor
+one-wayedgesthatcanbeusedincontraflow,whichbalancestrafficjamsandensurestrafficcongestionwillsplitmoreevenly.
+Table7belowsummarisestherelationshipsandimplicationsfordecision-makersinemergencyevacuationplanningbasedon
+thegivenfindings.Increasingtransitnodesandshelterswillnotaffectthenumberofevacueessignificantly,butitwillleadtoa
+14
+
+===== PAGE 15 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Table7
+Implicationsfordecisionmakers.
+Findings Implicationsfordecisionmakers
+Increasingthenumberoftransitnodesandsheltersdonotimpact Decision-makersshouldtakeintoaccountthatincreasingthenumberof
+evacueenumbers. transitnodesandshelterscanprovideamorebalancedschedulefor
+evacuees.However,itisimportanttonotethatsimplyincreasingthe
+numberoftransitnodesandsheltersisnotlikelytosignificantlyincrease
+thenumberofevacuees.Otherfactors,suchastheavailabilityof
+transportationandthedecision-makingprocessofindividuals,playamore
+significantroleindeterminingthenumberofevacuees.
+Pathsandtimestepsplayacrucialroleintheevacuationprocess, Decision-makersshouldconsidertheimpactofpathsandtimestepsonthe
+andincreasingthenumberofpathsandtimestepscansignificantly evacuationprocess.Increasingthenumberofpathsandtimestepscanhelp
+increasethenumberofevacuees. controltrafficcongestionandultimatelyincreasethenumberofevacuees.
+Byprovidingmoreoptionsforindividualstofollowduringevacuation,
+decision-makerscanensuresmoothertrafficflowandaccommodatea
+largernumberofevacuees.However,itisimportanttobemindfulofthe
+potentialtrade-offbetweenincreasedpathsandtimestepsandlonger
+computationaltimesrequiredfortheevacuationplanningprocess.
+Contraflowcansignificantlyincreasethecapacityofaroute, Decision-makersshouldconsiderimplementingcontraflowandincreasing
+allowingmoreevacueestoreachshelterssoonerwithoutbeing thenumberofedgesthatcanbeusedincontraflow,asitcanincreasethe
+stuckintraffic.Increasingthenumberofedgesthatcanbeusedin capacityofaroute,helpreducecongestion,andpotentiallyleadtofewer
+contraflowcanincreasethecapacityofaroute,whichcanhelp fatalities.
+reducecongestionandtotalclearancetime,potentiallyleadingto
+fewerfatalities.
+Increasingthecapacityofedgescansignificantlyincreasethe Decision-makersshouldconsiderincreasingthecapacityofedgestoreduce
+numberofevacuees,whereasreducingthenumberoftimesteps congestionandtotalclearancetime,whichcanleadtofewerfatalities.
+hasanegligibleeffectonthenumberofevacuees.Increasingthe
+capacityofedgesiscriticalforreducingcongestionandtotal
+clearancetimeandcanleadtofewerfatalities.
+ThedevelopedB&P algorithmoutperformsotheralgorithmsin Decision-makersshouldconsiderusingthedevelopedB&P algorithmasit
+termsofcomputationaltime,andsolutionquality providesbettersolutionsandtakeslesscomputationaltimecomparedto
+otheralgorithms.
+morebalancedscheduleforevacuees.Changesintimestepssignificantlyimpacttheevacuationprocess,witha35%growthinthe
+evacuatedpopulationobservedforthefirsttime.Increasingthenumberofavailablepathswillreducetrafficcongestion,leadingto
+anincreaseinevacuees.Thenumberofevacueeswillincreasewhenmoreedgescanbeusedincontraflow.TheCPLEXsolverfails
+tosolvelarge-scaleinstances,sodecision-makersshouldnotrelysolelyonit.TheacceleratedB&Palgorithmoutperformsthebase
+B&Palgorithmincomputationaltimewhileprovidingthesameobjectivefunctionvalues.ThedevelopedB&Palgorithmprovides
+bettersolutionsinlesscomputationaltimethanotherB&Palgorithms.Thecrisismanagementteamshouldfocusonincreasingthe
+capacityofedgestoreducecongestionandtotalclearancetime,potentiallyleadingtofewerfatalities.
+8. Resultsandanalysis
+8.1. Casestudy
+The2013–14Australia’sbushfireseasoncommencedattheendofwinter2013andfinishedbytheautumnof2014(Triggetal.,
+2015).VariousregionsofthestateofVictoriawereaffectedincludingJeeralangJunction(𝑖 ),JeeralangNorth(𝑖 ),Jeeralang(𝑖 ),
+1 2 3
+LeRoy(𝑖 ),Koornalla(𝑖 ),Callingneenorth(𝑖 ),Balook(𝑖 ),Callingnee(𝑖 ),Callegneesouth(𝑖 )Gormandale(𝑖 )intheGippsland
+4 5 6 7 8 9 10
+beingheavilyburnt.AllcomputationsweretestedusingCPLEXsolver12.8onaPCwithaQuad-Core(2GHZ)CPUand8GRAM.
+Thecasestudycontainstenaffectedpoints,threeshelters,namelyChurchill,Traralgon,andRosedale,andapproximately2,708
+residents(ABS,2011).Theevacuationnetworksettingandparametersettingforthecasestudyareasfollows:
+Ten transit nodes, 11 routes, 47 edges, a horizon of three hours with a time step of 15 min (i.e., 12-time steps) (Pillac et al.,
+2016),thecapacityofpath𝑝isestimatedat200vehicles,thenumberofvehiclesandtheircapacitytotransitelderlyanddisabled
+isconsideredaseightandthree,respectively(NSWRFS,2020),thetimestepatwhichpath𝑝becomesunavailableisconsidered
+basedonVicRoads(2020).Fig.4providesabetterunderstandingofthecasestudy,includingthelocationoftheaffectedandsafe
+places4(a),potentiallinksbetweenaffected,intermediateandsafepoints4(b).
+8.2. Analysis
+Theevacuationprocessstartswithajourneywhere100peopleevacuatedinthefirsttimestepfromLeRoy(𝑖 ),passingthrough
+4
+TraralgonCreekRoadtoreachtheChurchillshelter(𝑑 ).Thistriptakesapproximately(∼52min),aboutthreetimesteps.Although
+1
+the Traralgon shelter (𝑑 ) is closer to Le Roy (𝑖 ) (∼43 min) when compared with Churchill (𝑑 ), considering traffic congestion
+2 4 1
+the model assigned this affected point to Churchill shelter (𝑑 ). At the same time, 100 persons evacuated from Callignee (𝑖 ) to
+1 8
+15
+
+===== PAGE 16 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Fig.4. Casestudyarea;theorangepolygonsshowtheareaofbushfirepropagationandthespreaddirections(whitearrows),thebrownpolygonsshowthe
+residentialarea,theorangefiresymbolindicatestheoriginpointofthebushfire,theblackfiresymboldepictsthelocationoffireatdifferenttimesteps.Fig.4(a)
+Locationofaffectedandsafepoints;Fig.4(b)Potentiallinksbetweenaffected,intermediateandsafepoints.(Forinterpretationofthereferencestocolourin
+thisfigurelegend,thereaderisreferredtothewebversionofthisarticle.)
+Churchill(𝑑 )byMonashWay(∼22min,almosttwo-timesteps)and280personsfromGormandale(𝑖 )toRosedale(𝑑 )through
+1 10 3
+Gormandale-Stradbroke Road (∼19 min, one-time step) (Fig. 5(a)). Approximately 65% of the total population evacuated in the
+firstsix-timesteps(1:6)andnearly35%evacuatedinthesecondsixtimesteps(6:12).Thetraveltimefor300residentsofBalook
+(𝑖 )inthethirdtimesteptotheChurchillshelter(𝑑 )isapproximately(∼39min,three-timesteps),whereas,theevacuationofthe
+7 1
+populationofJeeralangNorth(𝑖 )(approximately100people)totheTraralgonsafenode(𝑑 )takesapproximately(∼15min,one
+3 3
+timestep)(Fig.5(b)).ItseemsthattheBalook’sresidents(𝑖 )traveltotheTraralgonshelter(𝑑 )sinceitiscloserthantheChurchill
+7 2
+shelter(𝑑 ).Duetotheunavailabilityofthisrouteatthistimestep,theevacueesareassignedtoChurchill(𝑑 )asasafenode.In
+1 1
+generatingtheevacuationplan,theevacueeshavebeensplitintodifferenttimestepstominimisecongestion.Forexample,17%,
+18%,and14%ofthetotalevacueepopulationreachthesafenodesinthefirst,secondandthirdtimesteps,respectively.Bytime
+step𝑡 ,thefouraffectedpoints’evacuees(i.e.,𝑖 ,𝑖 ,𝑖 ,𝑖 )reachsafenodescompletely(Fig.5(g)).
+7 2 6 9 10
+As traffic is a substantial factor in emergencies, minimising congestion is essential to investigate the case study thoroughly.
+Contraflow is employed as an efficient solution to maximise the paths’ potential capacity. Fig. 6 provides a better understanding
+of contraflow and traffic congestion implementation. According to Fig. 6(a) in time step three, as the traffic has congested main
+evacuationroutes,edges𝑔 ,𝑔 ,𝑔 ,𝑔 ∶𝑔 ,𝑔 ∶𝑔 ,𝑔 ,𝑔 and𝑔 areemployedincontraflowtodispersethecongestion.Almost
+0 1 2 6 11 19 21 38 39 45
+all of the population at points 𝑖 , 𝑖 , and 𝑖 evacuated at this time step, increasing the traffic in route 𝑝 (Fig. 6). Furthermore,
+1 2 3 4
+thetraffic atpoints𝑖 ,𝑖 ,and 𝑖 arehighly congested.There islighttrafficat points𝑖 ,𝑖 ,𝑖 ,and 𝑖 . Atthenexttimestep,the
+4 5 7 6 8 9 10
+traffic flow is moved towards points 𝑖 , 𝑖 , 𝑖 . Traffic congestion in 𝑝 has experienced no changes between time steps 𝑡 and 𝑡 .
+6 8 9 4 3 6
+Semi-heavytrafficatpoints𝑖 ,𝑖 and𝑖 attimestep𝑡 haschangedtolighttrafficattimestepsix(Figs.6(a)and6(b)).Iftheelderly
+1 2 3 3
+anddisabledresidentscannotleavetheaffectedpoints,itpotentiallyleadstocasualtiesand/orfatalities.Themodelconsidersthe
+evacuationofthosepeopletobemorecompatiblewithreal-worldemergencies.Almost14disabledpeopleatpoint𝑖 areevacuated
+2
+inthefirsttimesteptoshelter𝑑 (Fig.5(a)),evacuating13peopleinthenextstep.Themodelisscheduledtotransferfive,two,
+1
+andsixpeoplewithdisabilitiesfrom𝑖 ,𝑖 and𝑖 toshelters𝑑 and𝑑 ,respectively(Fig.5(b)).
+4 8 10 1 3
+8.3. Heavytrafficcongestionscenario
+Congestionincreasesevacuationtime,andcontraflowisoneofthemoreappropriatesolutionstominimisecongestion.Tofurther
+investigatetheimpactoftrafficcongestionwithoutusingcontraflow,ascenarioisconsideredwherecontraflowisignoredtoexamine
+the clearance time and availability of routes. To scrutinise the impacts of congestion precisely, the number of edges that can be
+usedincontraflowisconsideredzeroforthefollowingscenario.Assuch,therewillbeanincreaseintraffic,leadingtoanincrease
+inclearancetime(SeeTableA.1).Thedevelopedmodelprovidesanoptimalstrategicplanunderheavytrafficconditionswithout
+usingcontraflow.
+Accordingtothisplan,thetotalclearancetimepeaksaround60%toevacuate2,708evacuees.Thisplancanevacuate66%ofthe
+populationin12-timesteps.Withoutanyefficientapproachtodealwithcongestion,thenumberofevacueesdecreasessignificantly
+to approximately 1,787 people. Residential evacuation is more evenly split between Churchill (𝑑 ) and Traralgon (𝑑 ) (i.e., 45%
+1 2
+and36%,respectively),whileonly18%ofevacueesarematchedbytheRosedalesafenode(𝑑 ).Theresultsconfirmacorrelation
+3
+betweendecreasingthenumberofevacueesandincreasingthetotalclearancetimebyincreasingthetrafficvolume.Generally,the
+resultsshowthatmostaffectedpointswereevacuatedalmostcompletely,wherethosepointsareestablishedinregionswithalight
+16
+
+===== PAGE 17 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Fig.5. Totalmaximumflowforthearterialroad;Fig.5(a):Evacuationoftheaffectedpoints(𝑖,𝑖,𝑖,𝑖 ),5(b):Evacuationoftheaffectedpoints(𝑖,𝑖,𝑖,
+2 4 8 10 2 3 5
+𝑖,𝑖 ),5(c):Evacuationoftheaffectedpoints(𝑖 and𝑖)(populationofpoint𝑖 areevacuatedcompletely),Fig.5(d):Evacuationoftheaffectedpoints(𝑖),
+8 10 3 7 7 7
+Fig.5(e):Evacuationoftheaffectedpoints(𝑖,𝑖,𝑖,𝑖)(populationofpoint𝑖 areevacuatedcompletely),Fig.5(f):Evacuationoftheaffectedpoints(𝑖,𝑖,𝑖)
+1 2 3 4 2 5 6 9
+(populationofpoints𝑖 and𝑖 areevacuatedcompletely),Fig.5(g):Evacuationoftheaffectedpoints(𝑖 and𝑖),Fig.5(h):Evacuationofaffectedpoints(𝑖 and
+6 9 5 7 3
+𝑖)(populationofpoints𝑖 and𝑖 areevacuatedcompletely),Fig.5(i):Evacuationoftheaffectedpoints(𝑖)(populationofpoint𝑖 areevacuatedcompletely),
+4 3 4 7 7
+Fig.5(j):Evacuationoftheaffectedpoints(𝑖),Fig.5(k):Evacuationoftheaffectedpoints(𝑖 and𝑖)(populationofpoints𝑖 and𝑖 areevacuatedcompletely),
+1 1 5 1 5
+Fig.5(l):Evacuationoftheaffectedpoints(𝑖)
+8
+trafficflow.Forinstance,points𝑖 and𝑖 areevacuatedcompletelysincethetrafficsignislight(green).Incontrast,only4%of
+9 10
+point𝑖 areevacuatedviaroute𝑝 ,whichsufferedheavytrafficcongestion.Fig.5illustratestheevacuationflowatvarioustime
+4 5
+steps.
+8.4. Sensitivelyanalysis
+Tofurtherexaminetheeffectsofparameters(i.e.,availabilityofroutesateachtimestep,thenumberoftimesteps,thecapacity
+ofedgesandroutes)accurately,asetofscenariosisruntoidentifytheoptimalscheduleoverthepredefinedperiod(seeTable8for
+scenarios).AllparametersaresetbasedondatainTable4,exceptforthenumberofroutes(e.g.,fivemainroutesareconsidered).
+Fig.7comparesthevariousoptimalschedulesoftheevacuationnetworkregardingthenumberofavailableroutesatdifferent
+timesteps.RegardingFig.7,mostevacueesareclearedthroughroutes𝑝 and𝑝 ,whileroutes𝑝 and𝑝 arebarelyactiveduring
+4 5 1 2
+theevacuationprocess.Whentheaccessibilityofroute𝑝 becomeslimitedinall12-timesteps(Fig.7(b)),themodeltriestocover
+4
+theevacuationofthepopulationbyrelyingon𝑝 androute𝑝 .Thecapacityofroute𝑝 appearstobeoneofthevitalroutesthat
+1 2 5
+evacuatethehighestproportion,almost60%ofthepopulation(Fig.7(b)).Theevacueespassingthroughthethirdrouteincrease
+slightlyby6%andamoderateriseinroute𝑝 ,almost23%.Whenroute𝑝 isinaccessiblein12consideredtimesteps,theevacuation
+1 5
+missioncommenceswith109evacueesinthefirsttimestepbeingevacuatedthroughroutes𝑝 and𝑝 .Theevacuationcontinues
+3 4
+viaroute𝑝 untiltimestepfive,wherethenumberofevacueesincreasesduetoevacuationstartingatroute𝑝 .Thisprocesswill
+3 3
+continuebytheendofthetimestep𝑡 ,whichroute𝑝 willagainbecomeunavailablebytheendofthetimestep𝑡 andwillbe
+5 2 9
+availableagaininthelasttimestep𝑡 .
+12
+17
+
+===== PAGE 18 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Fig.6. Trafficflowandimplementationofcontraflowstructure,Heavytraffic:Redlines,Semi-heavytraffic:orangelines,Lighttraffic:Greenlines;Fig.6(a):
+Trafficflowandtheimpactofcontraflowinthethirdtimestep(Theflowofevacueesroutes5(c));Fig.6(b):Trafficcurrentandtheimpactofcontraflowat
+timestep6(theflowofevacueesroutes5(f));.(Forinterpretationofthereferencestocolourinthisfigurelegend,thereaderisreferredtothewebversionof
+thisarticle.)
+Table8
+Sensitivelyanalysis.
+Scenario 𝒫 𝒯 Description
+𝑆 1:5 1:12 Nodisruptioninall12timesteps
+1
+𝑆 1:3,5 1:12 Mainroute𝑝 disruptedinall12timesteps
+2 4
+𝑆 1:4 1:12 Mainroute𝑝 disruptedinall12timesteps
+3 5
+𝑆 1:4 1:6 Mainroute𝑝 disruptedinall6timesteps
+4 4
+𝑆 1:5 1:6 Nodisruptioninall6timesteps
+5
+𝑆 2:5 1:6 Mainroute𝑝 disruptedinall6timesteps
+6 1
+𝑆 1,3:5 1:6 Mainroute𝑝 disruptedinall6timesteps
+7 2
+𝑆 1:2,4:5 1:6 Mainroute𝑝 disruptedinall6timesteps
+8 3
+𝑆 1:4 1:6 Mainroute𝑝 disruptedinall6timesteps
+9 5
+Since response time plays a significant role in emergencies, time steps are decreased from 12 to six to explore the model’s
+capabilitytogenerateanevacuationplanwithinashorterperiod.Theinitialassumptionisthatallroutesareavailable.Althoughthe
+firstroutewasnotevaluatedinpreviousscenarios,themodelprovidesabalancedplaninroute𝑝 thatcanevacuateapproximately
+1
+663peopleduringashortertimeframe7(d).Inthissituation,themodelutilisesallresourcesattotalcapacity.Forinstance,route
+𝑝 ,whichwasnotactiveinseveraltimesteps,transports730evacuees.Thisshowstheflexibilityofthepresentedmodelinhigh-risk
+2
+situationswhereresidentsneedtobeevacuatedimmediately.Thetotalnumberofevacuees,inthiscase,is2,807people.Thereis
+nofallinthetotalnumberofevacuatedpeoplethroughthisscenario.
+Runningthroughthescenariowherethetimeframeistighter,routesarenowconsideredblockedduetotheseverityofthefire.
+Thenumberofevacueespartiallyfallsbyapproximately1%whenroute𝑝 isunavailable.Atthesametime,theunavailabilityofthe
+1
+secondandthirdroutesaffectsthenetworkbyonly1%.Notably,thefirstroute’scapabilitygrowsbyalmosthalfinthissituation.
+Despitetheobtainedresultsforroutes𝑝 ,𝑝 ,and𝑝 ,whenthetimeframeincludes12-timesteps,theserouteshavemoreavailability
+1 2 3
+forevacuees.Bydroppingthetimestepstoapproximatelyhalf,thepercentageofevacueesthroughallroutesisapproximately99%.
+Using the developed model, planners can evaluate different shelter placement scenarios to determine which locations have more
+researchrolesinsupportingandmaintainingabalanceddistributionofevacuees.Thiscanhelpensurethatemergencysheltersare
+strategicallylocatedtoservetheaffectedpopulationeffectively.
+9. Managerialinsights
+Aswellasthepracticalbenefitsofthisresearchaspresentedabove,thisresearchalsoprovidesstrongimplicationsforstrategy
+and policy development, particularly across a range of stakeholders such as police, emergency authorities, relief forces, traffic
+managementaswellasGovernment-Federal,State/TerritoryandLocal.Specifically,thisresearchprovidesanevacuationmodel
+thatwillaidstakeholders,primarilypolice,emergencyauthorities,reliefforces,andtrafficmanagement,indevelopingevacuation
+strategiesthatwillresultintheefficientschedulingofevacuationsfromimpactedareaswithminimalinterruptionsordelays.This
+18
+
+===== PAGE 19 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Fig.7. Evacuationpatternschangebasedontheavailabilityofroutesatvarioustimesteps.Fivemainroutesoftheevacuationnetworkandtheirassociated
+edgesareconsideredtoexaminetheirimpacts;Fig.7(a):Allroutesareavailableinall12-timesteps;7(b):Route𝑝 isunavailablein12-timesteps;7(c):Route
+4
+𝑝 isunavailablein5-timesteps;7(d):Allroutesareavailablein5-timesteps;7(e):Route𝑝 isunavailablein5-timesteps;7(f):Route𝑝 isunavailablein
+5 4 5
+5-timesteps;7(g):Route𝑝 isunavailablein5timesteps;7(h):Route𝑝 isunavailablein5-timesteps;7(i):Route𝑝 isunavailablein5-timesteps;.
+1 2 3
+willassistintherapidschedulingoftheevacuationsofresidentsandalsofactorsinroadnetworkavailability,shelteravailability,
+andspeed.
+This research will also help with the strategic placement of shelters that will broadly consider the network topology size
+andresponsetotheevacuationproblem,networktopology,incorporatingthetravelconditionsandevacuationtime-framewhilst
+considering multiple paths, their availability, and capacity to that shelter. Using the developed model, planners can evaluate
+differentshelterplacementscenariostodeterminewhichlocationsminimiseoverallevacuationtimewhilemaintainingabalanced
+distributionofevacuees.Thiscanhelpensurethatemergencysheltersareplacedstrategicallytoservetheaffectedpopulationmost
+effectively.IncorporatingthismodelintoagenciessuchasEmergencyManagementAustralia,theAustralianInstituteforDisaster
+Resilience,andotherrelatedgovernmentdepartments,federal,state/territory,andlocalwouldenableauthoritiestoeffectivelyand
+efficientlyguidethewithdrawalofresidentssafelyfromanemergingthreatfollowingadecisionandawarningtoevacuate.
+Section 12.1 of the Australian Royal Commission into National Natural Disaster Arrangements (Binskin et al., 2020, p. 264)
+highlightsthatproperplanning‘‘forevacuationsisanintegralpartofkeepingcommunitiessafefromtheharmcausedbynatural
+disasters.Planningforevacuationsshouldoccurearlyandinvolvelocalgovernmentsandcommunities.Evacuationplanningshould
+factor in key issues such as seasonal populations, evacuation routes, shelter facilities, jurisdictional boundaries, messaging to
+communities,andriskstosafeevacuation’’.Sections12.20–12.40ofthefullroyalcommissionreport.Asindicatedthroughoutthe
+justificationandrationaleforthisresearch,thedevelopedmodelandalgorithmaddressmanyoftheseconsiderations,particularly
+aroundtheevacuationroutesandshelterfacilities.
+19
+
+===== PAGE 20 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+One of the key findings from the Australian Royal Commission into National Natural Disaster Arrangements, and its interim
+report highlights the difficulties in coordinating and sharing resources between local governments, which sometimes relies on
+informalunderstandings(Binskinetal.,2020).Thefindingsfromthisstudysupporttheneedforbettercoordinationandresource
+sharing,andthedevelopedalgorithmandmodelenablesuchcoordinationacrossmultiplestakeholders.Thedevelopedmodelalso
+addressestheidentifiedconcernfortheneedforconsistentandcomparabledataandinformationtobemademorewidelyavailable,
+as this can deliver efficiencies, avoid duplication, improve understanding, and facilitate decision-making. Whilst the inclusion of
+many stakeholders may seem appropriate, it is worth noting the Royal Commission’s view that ‘‘care is also required to ensure
+that emergency planning processes remain focused on core objectives, and involve participants who will provide necessary and
+complementarycapabilities,skillsandexpertise’’(Binskinetal.,2020,pp.256).
+InrunningmultiplescenariosacrossAustralia,EmergencyManagementAustralia(EMA)submittedaguidancenotetotheRoyal
+Commissionindicatingthattheyhave‘‘undertakenapreliminaryscanofjurisdictionalemergencydisastermanagementlegislation
+andpolicyandfoundconsistentthemesthatestablishimpliedprioritisationcriteria’’(DepartmentofHomeAffairsDHA-Australian
+Government,2020,pp.3).Theseprioritiesinclude‘‘protectionofhumanlifeisparamount’’and‘‘minimisingharmandinjuryto
+peopleincludingthosewithspecialneedsandauthorities’’.
+Thereisstillaneedtostrengthentherangeofoptionsavailableinthefaceoffire,includingcommunityrefuges,bushfireshelters,
+and evacuation (Teague et al., 2010); ensure that local solutions are tailored and known to communities through local bushfire
+planning;helpmunicipalcouncilsurgentlydevelopforcommunitiesatriskofbushfirelocalplansthatcontaincontingencyoptions
+such as evacuation and shelter; document in municipal emergency management plans and other relevant plans facilities where
+vulnerablepeoplearelikelytobesituated;andthattheState/Territoryintroducesacomprehensiveapproachtoevacuationssothat
+thisoptionisplanned, consideredandimplemented whenit islikelyto offerahigher levelof protectionthanothercontingency
+options.
+This research will also inform policy, investment, and expectations again at the Federal, state/territory, and local levels. For
+example,withinthestateofVictoria,Australia,wheretheBlackSaturdaybushfireoccurred,the2009RoyalCommissionsummary
+report indicated that the Commission viewed the protection of human life, safety and resilience of communities as the highest
+priorityforbushfirepolicyanddirecteditseffortsaccordingly(Teagueetal.,2010).
+Finally,togainthemostoutofthedevelopedmodelandalgorithm,andassupportedbythe2020RoyalCommission(Binskin
+etal.,2020,pp.298)finding,thereisaneedtoprovideappropriateeducationby‘‘StateandTerritoryGovernmentstoensurethat
+the public understands thenew system, symbols, terminology and recommended action. The educationprogram must also target
+people with disabilities, the Indigenous community, and culturally and linguistically diverse Australians’’. Whilst this is the only
+referencetopeoplewithdisabilities,itisstillasignificantpriorityinensuringtheirsafety.Notonlydoesthepublicunderstandthe
+newsystems,butallstakeholdersareawareoftheproposedmodelandalgorithmtomaintainthepriorityofprotectingallhuman
+life.
+10. Conclusion
+The developed algorithm and model provide an attributable source that enables authorities to identify the most appropriate
+modeltoevacuateinresponsetoadisaster.Adoptingthedevelopedmodelwouldleadtoquickerresponseandreducethenumber
+ofcasualtiesand,mostimportantly,fatalities.Thedevelopedmodelbringstogethervariousstakeholders,suchaspolice,emergency
+authorities,reliefforces,trafficmanagement,andaffectedresidents.Additionally,evacuatingtheelderlyanddisabledisoneofthe
+mainconcernsforauthorities.Assuch,thepresentedmodelenablesstakeholderssuchasemergencyauthoritiesandtrafficmanagers
+torapidlydevelopanoptimalplantoassignvehiclestotransitthemtosheltersbasedonroutecapacityandtime.
+Thisstudypresentsanovelmodelforevacuationplanningofregularandassistedevacueeswhilsttryingtominimisecongestion.
+Thedevelopmentofthismodelanswerstheinitialresearchquestionaroundtheoptimalmodeltoevacuatethemaximumnumber
+of residents in the least amount of time as part of disaster response. Specifically, by evaluating the developed model using data
+fromthe2009BlackSaturdaybushfire,wehavecreatedapracticableandexecutablelogisticsschedulingsystemforevacuationsin
+disaster-hitareas.Thepresentedmodelprovidesapracticalschedulingapproachtomaximisethetotalnumberofpeopleevacuated,
+focusingontheelderlyanddisabledresidentsduringatighttimeframewhilstminimisingcongestionalongtheavailableevacuation
+paths.
+Theproposedmodeladoptsthe𝐵&𝑃 approachwhosekeyhallmarkistoprovideanoptimalevacuationplanbasedonavailable
+resources (i.e., available paths, time window, and the capacity of paths and edges) for affected areas using contraflow to tackle
+congestion. Furthermore, this model focuses on evacuating people with disabilities and the elderly, which has not been explored
+elsewhere.Estimatingtrafficcongestionenabledthedevelopedmodeltoplanaccuratelyforreal-worldemergencies.
+Findings indicate that the developed model can plan an effective and efficient evacuation schedule for a large sample under
+various scenarios. Additional simulations indicate that the models’ baseline is highly accurate (e.g., particularly in terms of time,
+which affects the number of evacuees) with a noticeable improvement of 84% of the evacuated population making it to shelters
+anda60%improvementinclearancetimeprovidedthatthelocaltransportationstructurehasthecapabilityandflexibilityofusing
+contraflowandotherefficientsolutionstoreducetrafficcongestion.Furthermore,theresultsshowtherouteswithahighpercentage
+ofparticipationintheevacuationprocess,whichhasthemostimpactonanyevacuationplan.Thecongestionontheserouteswill
+increasethetotalclearancetimedramatically.Incontrast,trafficjamsonrouteswithaminorroleintheevacuationcanleadtoa
+negligibleriseinthetotalevacuationtime.
+20
+
+===== PAGE 21 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+TableA.1
+Timestepsrequiredtoreachshelters.
+ℰ ×𝒮 𝒫 𝒯 (Non-Traffic) mins C 𝒯(Traffic) mins
+Jeeralang→Churchill LindersRoad 1 20 0.35 2 27
+Jeeralang→Traralgon C476 1 20 0.31 2 26.2
+Jeeralang→Traralgon C475Road 1 23 0.35 2 31.05
+Jeeralang→Traralgon Monashway 1 20 0.57 2 36
+Jeeralang→Rosedale FlynnsCreekRoad 2 36 0.25 3 45
+Jeeralang→Rosedale Princesshighway 2 37 0.61 4 59.57
+Jeeralang→Rosedale C476 2 37 0.67 4 61.79
+LeRoy→Churchill TraralgonCreekRoad 3 49 0.41 4 69
+LeRoy→Churchill M1 4 57 0.71 6 97.47
+LeRoy→Churchill JumbakRoad 4 56 0.27 3 42.12
+LeRoy→Traralgon TraralgonCreekRoad 3 41 0.85 5 75.85
+LeRoy→Rosedale TraralgonCreekRoad 4 56 0.3 5 72
+Koornalla→Churchill TraralgonCreekRoad 1 21 0.74 2 36.54
+Koornalla→Churchill Monashway 1 23 0.7 3 39.1
+Koornalla→Churchill M1 2 28 0.66 3 46.48
+Koornalla→Traralgon TraralgonCreekRoad 1 14 0.9 2 26.6
+Koornalla→Rosedale TraralgonCreekRoad 2 28 0.43 3 40.04
+Koornalla→Rosedale HylandHighway 2 30 0.31 2 40.3
+Callignee→Churchill C476 1 23 1.1 3 48.3
+Callignee→Churchill Monashway 2 30 0.98 4 59.4
+Callignee→Churchill M1 2 30 0.77 4 53.1
+Callignee→Traralgon CalligneeSRoad 1 16 0.19 1 21.04
+Callignee→Rosedale FlynnsCreekRoad 2 29 0.28 2 35.84
+Callignee→Rosedale Hylandway 2 31 0.19 2 24.89
+CalligneeNorth→Churchill CalligneeSRoad 1 24 0.23 2 29.52
+CalligneeNorth→Churchill Monashway 2 26 0.56 3 40.56
+CalligneeNorth→Churchill M1 2 31 0.81 4 56.11
+CalligneeNorth→Traralgon CalligneeSRoad 1 16 0.98 2 31.68
+CalligneeNorth→Rosedale Hylandway 2 32 0.37 3 43.84
+CalligneeNorth→Rosedale FlynnsRoad 2 30 0.22 2 36.6
+CalligneeSouth→Churchill ColligneeSRoad 3 38 0.97 5 73.86
+CalligneeSouth→Churchill M1 3 45 1.3 7 103.5
+CalligneeSouth→Traralgon ColligneeSRoad 2 31 0.53 3 47.43
+CalligneeSouth→Rosedale ColligneeSRoad 3 44 0.21 4 52.8
+CalligneeSouth→Rosedale FlynnsRoad 3 46 0.26 4 57.96
+CalligneeSouth→Rosedale GrandRidgeRoad 4 59 0.23 5 72.57
+Intermsoffutureresearch,thelimitationsofthisresearchincludefurtherexploringandincorporatingadditionalfactorsfrom
+the literature that influence the decision-making process during evacuations. Further considerations for animals, livestock, and
+endangeredspeciesandtheirevacuationcouldalsobeincludedinthenextiterationoftheproposedmodel.Further,investigating
+othertypesofdisastersanddisruptions,suchasincidentsandroadclosures,wouldbenefitfromanadaptedversionofthedeveloped
+model.Thepotentialtoco-optimisepaths,schedules,shelterlocations,andotherintermediatelocationsforelderlyanddisability
+aggregators, allowing for concurrent planning or simulation, can be further investigated (Siam et al., 2022; Purba et al., 2022).
+Finally,otherdisasters,suchasfloods,whichhavereceivedlittleattentionthusfar,couldalsobesimulated.
+CRediTauthorshipcontributionstatement
+Shahrooz Shahparvari: Conceptualization, Data curation, Investigation, Project administration, Resources, Software, Super-
+vision, Validation, Visualization, Writing – original draft, Writing – review & editing. Mahsa Mohammadi: Formal analysis,
+Methodology.KonradPeszynski:Writing–review&editing.LaurenRickards:Writing–review&editing.
+Dataavailability
+Datawillbemadeavailableonrequest.
+AppendixA. Data
+SeeTableA.1.
+21
+
+===== PAGE 22 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+AppendixB. Solutionapproach-supplementarymaterials
+B.1. STAGEI:DantzigWolfedecompositionalgorithm
+TheDantzigWolfeDecomposition(DWD)algorithmiscapableofsolvinglarge-scaleproblems(TonbariandAhmed,2019).In
+ordertosolveanintegerprogrammingmodel,theDWDisanidealwaythatdecomposeanintegermodelintoamasterproblemand
+severalsub-problems(Puchingeretal.,2011).Theassociatedmasterandsub-problemsrelatetooptimisingtheflowofevacueesand
+providingasetoffeasiblepathsrespectivelytoprovideoptimalscheduling.SinceDWDisimplementedonanintegerprogramming
+model,itisaspecificreformulationoftheproblemtoimproveatighterbound(Vanderbeck,2000).
+B.1.1. RestrictedMasterProblem(RMP)
+The DWD formulation of the problem is generated by the RMP. It should be noted that, since, in DWD each feasible point is
+formulatedasaconvexcombinationofextremepoints𝜂 andforeachconstraint𝐴𝑋 ≤𝑑,then ∑𝑘𝑖 𝜂 =1.Theformulationof
+𝑖 𝑖 𝑖 𝑗1=1 𝑖𝑗
+DWDisgivenasfollow:
+∑
+𝑘1
+∑
+𝑘2
+𝑀𝑖𝑛 RMP= 𝜂1 + 𝜂2 (B.1)
+𝑗1 𝑗2
+𝑗1=1 𝑗2=1
+Subjectto:
+∑
+𝑘𝑚
+𝜂𝑚 ≤1 ∀𝑚∈ℳ;(ℳ={1,…,8}) (B.2)
+𝑗𝑚
+𝑗𝑚=1
+∑
+𝑘1
+∑
+𝑘4
+∑
+𝑘8
+∑ ∑
+𝑘3
+∑ ∑
+𝑘5
+∑ ∑
+𝑘6
+𝜂1 + 𝜂4 ≤ 𝜂8 + 𝑢′′′ 𝜂3 + 𝑢 𝜂5 + 𝑢′ 𝜂6 (B.3)
+𝑗1 𝑗4 𝑗8 𝑝∈𝒫 𝑗3 𝑔 𝑗5 𝑔′ 𝑗6
+𝑗1=1 𝑗4=1 𝑗8=1 𝑝 𝑗3=1 𝑔∈𝒢 𝑗5=1 𝑔′∈𝒢′ 𝑗6=1
+𝜂𝑚 ∈Z 𝑚∈ℳ;(ℳ={1,…,8}),𝑗∈{1,…,𝑁} (B.4)
+𝑗𝑚
+Algorithm2:DantzigWolfeDecompositionAlgorithm
+Inputs : 𝒞 Initialsetofcolumns;
+ℐ Counterofdualvariables;
+𝒟 Setofoptimaldualvariables;
+𝒾
+Outputs :𝐷 𝑖 ,𝐹 1 ,𝐹 2
+1 Initialization
+2 SolveLp-Relaxationof𝑅𝑀𝑃 toobtain𝒟 𝒾 ;
+3 if𝐹 1 ≤𝐹 2 then
+4 Addassociatedcolumn𝐹 2 ;
+5 GotoStep2;
+6 else
+7 Addassociatedcolumn𝐹 1 ;
+8 GotoStep2;
+B.2. STAGEII:LPrelaxation
+Inintegerprogrammingmodels,integerconstraintsmayformapolytope(RaidlandPuchinger,2008).Indeed,feasiblespaceis
+notconvexandtheoptimalsolutionisfoundattheextremepointoftheconvexhullofallfeasibleintegerpoints(Deyetal.,2013).
+Therefore,theLP-Relaxationmethod(DesrosiersandLübbecke,2010)isappliedtomakefeasiblespaceconvextofindanoptimal
+solution.TheLP-Relaxation(𝐿𝑃𝑅)oftheRMP canbegivenas:
+∑
+𝑘1
+∑
+𝑘2
+Min𝐿𝑅𝑅𝑀𝑃 𝜂1 + 𝜂2 (B.5)
+𝑗1 𝑗2
+𝑗1=1 𝑗2=1
+Subjectto:
+Constraints (B.2)–(B.3) &
+𝜂𝑚 ∈Z+ ∀𝑚∈ℳ;(ℳ={1,…,8}),𝑗∈{1,…,𝑁} (B.6)
+𝑗𝑚
+B.2.1. DualrelaxedRestrictedMasterProblem
+Thedualformulationof𝐿𝑅𝑅𝑀𝑃 isgivenasfollows:
+∑
+𝑀𝑖𝑛 𝐷𝑅RMP= 𝜇 (B.7)
+𝑖
+𝑖∈ℐ
+Subjectto:
+22
+
+===== PAGE 23 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+∑
+𝜇 ≤1 (B.8)
+𝑖
+𝑖=1,9
+∑
+𝜇 ≤1 (B.9)
+𝑖
+𝑖=2,9
+∑
+𝜇 =0 (B.10)
+𝑖
+𝑖=3,9
+∑
+𝜇 =0 (B.11)
+𝑖
+𝑖=4,9
+∑
+𝜇 =0 (B.12)
+𝑖
+𝑖=5,9
+∑
+𝜇 =0 (B.13)
+𝑖
+𝑖=7,9
+∑
+𝜇 ≤1 (B.14)
+𝑖
+𝑖∈ℐ
+𝜇 ∈Z+ ∀𝑖={1,…,5,7,8,9} (B.15)
+𝑖
+Where𝜇 representsdualvariables.
+𝑖
+B.3. STAGEIII:Columngeneration(pricingproblems)
+TheCGapproachhasbeenverifiedtobeadesiredandsuccessfulmethodindealingwithlarge-scaleintegerprogramsinrecent
+decades(Wilhelm,2001).TheCGalgorithmhasbeensuccessfullyimplementedforvariouswell-knownproblems,suchasvehicle
+routingproblems,crewscheduling,cuttingstockproblems,etc(Barnhartetal.,1998).OneofthekeyadvantagesoftheCGalgorithm
+isthatthereisnoneedtoenumeratepossibilities(FordandFulkerson,1958).Inthismethod,𝑛sub-problemsshouldbesolvedin
+eachiteration,andthenvariablesassociatedwiththemostnegativereducedcost(inmaximisation,negativereducedcostandin
+minimisation,positivereducedcost)(𝑍 −𝐶 )areselectedtoaddtotheinitialcolumns(heresinceourproblemismaximisation,
+𝑗 𝑗
+sothemostnegativecolumnshouldbeselected).Ifthereisnocolumntoaddtotheinitialcolumns,thenthenegativereducedcost
+matrixisempty,(𝑍 −𝐶 )=0or(𝑍 −𝐶 )≥0,andtheoptimalsolutionoftheoriginalproblemisfound.
+𝑗 𝑗 𝑗 𝑗
+B.3.1. Firstsub-problem
+Thefirstsub-problem(pricing)canbeformulatedas:
+∑ ∑ ∑ ∑
+𝑀𝑖𝑛 𝑆𝑃 1 =[𝛾 9 𝛼 1 −𝜓 1 ] 𝑋 𝑝𝑜′𝑑′𝑡
+𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′𝑡∈𝒯
+∑ ∑ ∑ ∑
++[𝛾 𝛼 −𝜓 ] 𝑋′
+9 2 2 𝑝𝑜′𝑑′𝑡
+𝑝∈𝒫𝑜′∈𝒪′𝑑′∈𝒟′𝑡∈𝒯
++[𝛾 𝛼 −𝜓 ] ∑ 𝑋̄
+9 3 3 𝑖 (B.16)
+𝑖∈ℐ
+∑ ∑
++[𝛾 𝛼 −𝜓 ] 𝑍 +[𝛾 𝛼 −𝜓 ] 𝑌
+9 4 4 𝑝 9 5 5 𝑔
+𝑝∈𝒫 𝑔∈𝒢
+∑ ∑
++[𝛾 𝛼 −𝜓 ] 𝑌′ + 𝜇
+9 6 6 𝑔′ 𝑖
+𝑔′∈𝒢′ 𝑖={1,…,6}
+Subjectto:
+Constraints (2)–(9),(15),(17)–(20) &
+𝜇 ∈Z+ ∀𝑖={1,…,6} (B.17)
+𝑖
+Where𝜇 aredualvariables,[𝛾 𝛼 −𝜓 ]calculatesthecoefficientofvariables(𝑍 −𝐶 )where𝐶 representsthenegativereduced
+𝑖 9 1 1 𝑗 𝑗 𝑗
+cost.
+B.3.2. Secondsub-problem
+Thesecondsub-problem(pricing)canbewrittenas:
+𝑀𝑖𝑛 𝑆𝑃 2 =(𝛾 9 𝛼 7 −𝜓 7 ) ∑ ∑ ∑ 𝑌̄ 𝑣𝑜′𝑑 + ∑ 𝜇 𝑖 (B.18)
+𝑣∈𝒱𝑜′∈𝒪′𝑑∈𝒩 𝑖={7,8}
+Subjectto:
+Constraints (10)–(14) &
+𝜇 ∈Z+ ∀𝑖=7,8 (B.19)
+𝑖
+23
+
+===== PAGE 24 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Where 𝜇 are dual variables, (𝛾 𝛼 − 𝜓 ) calculates the coefficient of the variable as objective function (𝑍 − 𝐶
+𝑖 9 7 7 𝑗 𝑗
+(Negativereducedcost)).Thepseudo-codeofCGalgorithmisbriefedasfollows:
+Algorithm3:ColumnGenerationAlgorithm
+Inputs :𝒜 Setoffeasiblecolumns;
+𝒟 Setofoptimaldualvariables;
+𝒾
+ℐ Setofinitialcolumns;
+Parameters: 𝑁 𝑐 Negativereducedcostsmatrix;
+𝑐𝑐 Columnwiththemostnegativereducedcost;
+Outputs :𝐷 𝑖,𝑜𝑏𝑗
+1
+,𝑜𝑏𝑗
+2
+1 while𝑁 𝑐={⊘}do
+2 Solve𝑅𝑀𝑃 ;
+3 Define𝑜𝑏𝑗 1 and𝑜𝑏𝑗 2 usingdualvaluesof𝐿𝑅𝑀𝑃;
+4 Solve𝑆𝑃 1 ,𝑆𝑃 2 tofind𝑁 𝑐;
+5 if𝑁 𝑐 ≠{⊘}then
+6 ℐ ←𝑐𝑐;
+7 else
+8 GotoStep2;
+B.3.3. STAGEIV:Dominancebasedneighborhoodsearchalgorithm(𝐷𝐵𝑁𝑆𝐴)
+Inthissection,analgorithmnamedDBNSAisdesignedtoaddcolumnswithnegativereducedcoststothe𝐿𝑅𝑅𝑀𝑃.Inother
+words, this algorithm is designed to integrate into the CG algorithm (Developed CG) in order to find columns with negatively
+reducedcostbysolvingpricingproblemsandaddingthosecolumnstotheRestrictedMasterProblem.First,theLP-Relaxationof
+theRestrictedMasterProblemshouldbesolvedtofindagoodbound.Then,thepricingproblemsshouldbesolved.Afterthat,the
+swapfabricationoperatorproducesitsneighbours,iftheobjectivefunctionvalueisworsethanobtainedbound,thissolutionwill
+bediscarded,otherwise,thealgorithmwillcontinuewiththebest-foundsolutionintheneighbours,andwillcontinueuntilthere
+isnocolumntoaddtotheRestrictedMasterProblem.Inordertopreventtrappinginthelocaloptimum,thealgorithmfindsthe
+feasiblesolution’sneighbours,whichleadstodiversificationinthealgorithmtofindthebestoptimalsolution.Finally,thecolumn
+associatedwiththebest-foundsolutionisgiventothemasterproblem.
+Algorithm4:DominanceBasedNeighborhoodSearchAlgorithm
+Inputs : 𝒜 Setoffeasiblecolumns
+𝒟 Setofoptimaldualvariables
+𝒾
+Parameters: 𝑆 𝑎 Setofallneighborsoffeasiblesolution𝑎;
+𝐹𝑂 𝑎 Objectivevalueofeachfeasiblesolution;
+𝐿𝐵 Lowerbound;
+𝐵 Bestsolution;
+𝑁 𝑐 Negativereducedcostsmatrix;
+Outputs :𝑁 𝑐,𝐵
+1 Solve𝐿𝑅𝑀𝑃 (LPRelaxedMasterProblem)
+2 Find𝑆 𝑎 byswapoperator;
+3 if𝐹𝑂 𝑎 ≤𝐿𝐵then
+4 #Abort;
+5 elseif𝐹𝑂 𝑎 ≥𝐹𝑂 𝑎+1 then
+6 𝐵=𝐹𝑂 𝑎+1 ;
+7 elseif𝐹𝑂 𝑎 ≤𝐹𝑂 𝑎+1 then
+8 𝐵=𝐹𝑂 𝑎;
+B.3.4. Branchingstrategy
+Inthissection,thebranchingstrategyisutilisedtoextendthe𝐵&𝑃 tree.Iftheobtainedsolutions(variables𝑋 𝑝𝑜′𝑑′𝑡 ,𝑋 𝑝 ′ 𝑜′𝑑′𝑡 𝑎𝑛𝑑𝑥̄ 𝑖 )
+arenotintegers,twobrancheswillbeexpandedandtheproblemshouldbesolvedwithnewbranchesindividually.Thealgorithm
+doesnotstopaslongasfindsintegervaluesforthesevariables.Thebrancheswillbegeneratedasfollows:
+𝑋 𝑝𝑜′𝑑′𝑡 ≥ ⌊𝑋 𝑝𝑜′𝑑′𝑡⌋ ∀𝑝∈𝒫,𝑜′∈𝒪′,𝑑′∈𝒟′,𝑡∈𝒯 (B.20)
+𝑋 𝑝𝑜′𝑑′𝑡 ≤ ⌈𝑋 𝑝𝑜′𝑑′𝑡⌉ ∀𝑝∈𝒫,𝑜′∈𝒪′,𝑑′∈𝒟′,𝑡∈𝒯 (B.21)
+𝑋 𝑝 ′ 𝑜′𝑑′𝑡 ≥ ⌊𝑋 𝑝 ′ 𝑜′𝑑′𝑡⌋ ∀𝑝∈𝒫,𝑜′∈𝒪′,𝑑′∈𝒟′,𝑡∈𝒯 (B.22)
+𝑋 𝑝 ′ 𝑜′𝑑′𝑡 ≤ ⌈𝑋 𝑝 ′ 𝑜′𝑑′𝑡⌉ ∀𝑝∈𝒫,𝑜′∈𝒪′,𝑑′∈𝒟′,𝑡∈𝒯 (B.23)
+𝑋̄ 𝑖 ≥ ⌊𝑋̄ 𝑖⌋ ∀𝑖∈ℐ (B.24)
+𝑋̄ 𝑖 ≤ ⌈𝑋̄ 𝑖⌉ ∀𝑖∈ℐ (B.25)
+As mentioned above, the 𝐿𝑅𝑅𝑀𝑃 provides a proper bound, therefore, this can be used to construct a branching rule. If the
+branches’valueexceedstheobtainedboundfromthe𝐿𝑅𝑅𝑀𝑃,thebranchesthatexceedtheboundcanbecut.Consequently,the
+convergencespeedwillbeimprovedbyusingtheabove-mentionedbranchingrules.
+24
+
+===== PAGE 25 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+References
+ABS,2011.LabourforceAustralia.CanberraAust.BureauStat..
+Afkham,M.,Ramezanian,R.,Shahparvari,S.,2022.Balancingtrafficflowinthecongestedmassself-evacuationdynamicnetworkundertightpreparationbudget:
+AnAustralianbushfirepractice.Omega111,102658.
+Ahmadi-Javid,A.,Amiri,E.,Meskar,M.,2018.Aprofit-maximizationlocation-routing-pricingproblem:Abranch-and-pricealgorithm.EuropeanJ.Oper.Res.
+271(3),866–881.
+Alam,M.J.,Habib,M.A.,2019.Massevacuationofhalifax,Canada:Adynamictrafficmicrosimulationmodelingapproach.ProcediaComput.Sci.151,535–542.
+Aldrich,D.P.,2023.Howsocialinfrastructuresaveslives:aquantitativeanalysisofJapan’s3/11disasters.Jpn.J.PoliticalSci.1–11.
+Amideo,A.E.,Scaparra,M.,Kotiadis,K.,2019.Optimisingshelterlocationandevacuationroutingoperations:Thecriticalissues.EuropeanJ.Oper.Res.279
+(2),279–295.
+Anyidoho,P.K.,Davidson,R.A.,Rambha,T.,Nozick,L.K.,2022.Predictionofpopulationbehaviorinhurricaneevacuations.Transp.Res.PartAPolicyPractice
+159,200–221.
+Barnhart,C.,Johnson,E.L.,Nemhauser,G.L.,Savelsbergh,M.W.,Vance,P.H.,1998.Branch-and-price:Columngenerationforsolvinghugeintegerprograms.
+Oper.Res.46(3),316–329.
+Ben-Tal,A.,Nemirovski,A.,1998.Robustconvexoptimization.Math.Oper.Res.23(4),769–805.
+Binskin,M.,Bennett,A.,Macintosh,A.,2020.Royalcommissionintonationalnaturaldisasterarrangementsreport.CanberraCommonw.Aust..
+Bretschneider,S.,Kimms,A.,2011.Abasicmathematicalmodelforevacuationproblemsinurbanareas.Transp.Res.PartAPolicyandPractice45(6),523–539.
+Butler,B.,2020.EconomicimpactofAustralia’sbushfiressettoexceed$4.4bncostofBlackSaturday.URL:https://www.Thegurdian.com/.
+CairoTrafficCongestion,2006.EstimationofdirecteconomiccostsoftrafficcongestioninCairo.URL:https://www.documents.worldbank.org/.
+Capelle,T.,Cortés,C.E.,Gendreau,M.,Rey,P.A.,Rousseau,L.M.,2019.Acolumngenerationapproachforlocation-routingproblemswithpickupanddelivery.
+EuropeanJ.Oper.Res.272(1),121–131.
+Chakraborty,J.,Grineski,S.E.,Collins,T.W.,2019.Hurricaneharveyandpeoplewithdisabilities:DisproportionateexposuretofloodinginHouston,Texas.Soc.
+Sci.Med.226,176–181.
+Chen,X.,Sim,M.,Sun,P.,2007.Arobustoptimizationperspectiveonstochasticprogramming.Oper.Res.55(6),1058–1071.
+Chen,C.,Wang,H.,Lindell,M.K.,Jung,M.C.,Siam,M.,2022.Tsunamipreparednessandresilience:Evacuationlogisticsandtimeestimations.Transp.Res.Part
+DTransp.Environ.109,103324.
+Choi,M.,Rabinovich,E.,Richards,T.J.,2019.Supplychaincontractsandinventoryshrinkage:Anempiricalanalysisinthegroceryretailingindustry.Decis.
+Sci.50(4),694–725.
+Choo,M.,Yoon,D.,2022.Examiningtheeffectsofthelocalcommunities’socialcapitalondisasterresponsecapacityinSeoul,SouthKorea.Int.J.Disaster
+RiskReduct.75,102973.
+Cova,T.J.,Dennison,P.E.,Drews,F.A.,2011.Modelingevacuateversusshelter-in-placedecisionsinwildfires.Sustainability3(10),1662–1687.
+Crawford,T.,Villeneuve,M.,Yen,I.,Hinitt,J.,Millington,M.,Dignam,M.,Gardiner,E.,2021.Disabilityinclusivedisasterriskreductionwithculturallyand
+linguisticallydiverse(CALD)communitiesintheHawkesbury–Nepeanregion:Aco-productionapproach.Int.J.DisasterRiskReduct.63,102430.
+Dash,N.,2002.Decision-MakingUnderExtreme*Uncertainty:RethinkingHazard-RelatedPerceptionsandAction(Ph.D.thesis).FloridaInternationalUniversity.
+Dash,N.,Gladwin,H.,2007.Evacuationdecisionmakingandbehavioralresponses:Individualandhousehold.Nat.HazardsRev.8(3),69–77.
+Dayarian, I., Crainic, T.G., Gendreau, M., Rei, W., 2015. A branch-and-price approach for a multi-period vehicle routing problem. Comput. Oper. Res. 55,
+167–184.
+Delage,E.,Ye,Y.,2010.Distributionallyrobustoptimizationundermomentuncertaintywithapplicationtodata-drivenproblems.Oper.Res.58(3),595–612.
+Deng,H.,Aldrich,D.P.,Danziger,M.M.,Gao,J.,Phillips,N.E.,Cornelius,S.P.,Wang,Q.R.,2021.High-resolutionhumanmobilitydatarevealraceandwealth
+disparitiesindisasterevacuationpatterns.Humanit.Soc.Sci.Commun.8(1),1–8.
+Department of Home Affairs DHA-Australian Government, 2020. Australia. Guidance note – national resource prioritisation. AFC.502.001.0971. URL: https:
+//naturaldisaster.royalcommission.gov.au/system/files/exhibit/AFC.502.001.0971.pdf.
+Desrosiers,J.,Lübbecke,M.E.,2010.Branch-price-and-cutalgorithms.WileyEncycl.Oper.Res.Manag.Sci..
+Dey,S.S.,etal.,2013.Somepropertiesofconvexhullsofintegerpointscontainedingeneralconvexsets.Math.Program.141(1–2),507–526.
+Dikas,G.,Minis,I.,2016.Solvingthebusevacuationproblemanditsvariants.Comput.Oper.Res.70,75–86.
+Du,E.,Cai,X.,Sun,Z.,Minsker,B.,2017.Exploringtheroleofsocialmediaandindividualbehaviorsinfloodevacuationprocesses:Anagent-basedmodeling
+approach.WaterResour.Res.53(11),9164–9180.
+Ford,Jr.,L.R.,Fulkerson,D.R.,1958.Asuggestedcomputationformaximalmulti-commoditynetworkflows.Manage.Sci.5(1),97–101.
+Fountain,L.,Tofa,M.,Haynes,K.,Taylor,M.R.,Ferguson,S.J.,2019.Olderadultsindisasterandemergencymanagement:Whatarethepriorityresearchareas
+inAustralia?Int.J.DisasterRiskReduct.39,101248.
+Fraser,T.,Aldrich,D.,Morikawa,L.,2022.DoallroadsleadtoSapporo?Theroleoflinkingandbridgingtiesinevacuationdecisions.Ecol.Soc.27(2).
+Gharaei,A.,Jolai,F.,2019.Abranchandpriceapproachtothetwo-agentintegratedproductionanddistributionscheduling.Comput.Ind.Eng.136,504–515.
+Gissing, A., Eburn, M., McAneney, J., 2022. Planning and capability requirements for catastrophic and cascading events. In: Disaster Risk Reduction in Asia
+Pacific.Springer,pp.175–186.
+Goerigk,M.,Grün,B.,Heßler,P.,2013.Branchandboundalgorithmsforthebusevacuationproblem.Comput.Oper.Res.40(12),3010–3020.
+Goerigk,M.,Grün,B.,Heßler,P.,2014.Combiningbusevacuationwithlocationdecisions:Abranch-and-priceapproach.Transp.Res.Procedia2,783–791.
+Green,M.,2020.Australia’smassivefirescouldbecomeroutine,climatescientistswarn.CanberraTimes.
+He,X.,Zheng,H.,Peeta,S.,2015.Modelandasolutionalgorithmforthedynamicresourceallocationproblemforlarge-scaletransportationnetworkevacuation.
+Transp.Res.C59,233–247.
+Hong,B.,Bonczak,B.J.,Gupta,A.,Kontokosta,C.E.,2021.Measuring inequalityincommunityresiliencetonaturaldisastersusing large-scalemobilitydata.
+NatureCommun.12(1),1870.
+Hsu,Y.T.,Peeta,S.,2014.Behavior-consistentinformation-basednetworktrafficcontrolforevacuationoperations.Transp.Res.C48,339–359.
+Huf,B.,Mclean,H.,2020.2019–2020Bushfire.URL:www.parliament.vic.gov.au.
+Jackson,P.L.,Muckstadt,J.A.,Li,Y.,2019.Multiperiodstockallocationviarobustoptimization.Manage.Sci.65(2),794–818.
+Jha,M.,Moore,K.,Pashaie,B.,2004.Emergencyevacuationplanningwithmicroscopictrafficsimulation.Transp.Res.Rec.1886(1),40–48.
+Jin,J.G.,Shen,Y.,Hu,H.,Fan,Y.,Yu,M.,2021.Optimizingundergroundshelterlocationandmasspedestrianevacuationinurbancommunityareas:Acase
+studyofshanghai.Transp.Res.PartAPolicyandPractice149,124–138.
+Johnston,D.,Becker,J.,Cousins,J.,2006.Lifelinesandurbanresilience.DisasterResilience.CharlesCThomas,Springfield40–65.
+Jordan,E.W.,2019.Transportationterms:Dwelltime.URL:https://www.medium.com/.
+Kamiyama,N.,2019.DiscreteNewtonmethodsfortheevacuationproblem.Theoret.Comput.Sci.795,510–519.
+Kamiyama,N.,Katoh,N.,Takizawa,A.,2009.Anefficientalgorithmfortheevacuationprobleminacertainclassofnetworkswithuniformpath-lengths.Discrete
+Appl.Math.157(17),3665–3677.
+Kamstra,P.,Cook,B.,Edensor,T.,Kennedy,D.,Kearnes,M.,2021.Relationalriskandcollectivemanagement:apathwaytotransformationalriskmanagement.
+RiskAnal.41(10),1782–1794.
+25
+
+===== PAGE 26 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+Kim, S., Shekhar, S., Min, M., 2008. Contraflow transportation network reconfiguration for evacuation route planning. IEEE Trans. Knowl. Data Eng. 20 (8),
+1115–1129.
+Kinsey,M.,Gwynne,S.,Kuligowski,E.D.,Kinateder,M.,2019.Cognitivebiaseswithindecisionmakingduringfireevacuations.FireTechnol.55,465–485.
+Klinenberg,E.,2015.HeatWave:aSocialAutopsyofDisasterinChicago.UniversityofChicagoPress.
+Kuligowski,E.,2021.Evacuationdecision-makingandbehaviorinwildfires:Pastresearch,currentchallengesandafutureresearchagenda.FireSaf.J.120,
+103129.
+Kusenbach, M., Simms, J.L., Tobin, G.A., 2010. Disaster vulnerability and evacuation readiness: Coastal mobile home residents in Florida. Nat. Hazards 52,
+79–95.
+Lechner,H.N.,Rouleau,M.D.,2019.Shouldwestayorshouldwegonow?FactorsaffectingevacuationdecisionsatPacayavolcano,Guatemala.Int.J.Disaster
+RiskReduct.40,101160.
+Lee,H.,2020.BushfiresreleaseoverhalfAustralia’sannualcarbonemissions.URL:https://www.time.com.
+Li,Q.,Soleimaniamiri,S.,Li,X.,2022.Optimalmassevacuationplanningforelectricvehiclesbeforenaturaldisasters.Transp.Res.PartDTransp.Environ.107,
+103292.
+Longman,M.,2020.HowtheAustralianbushfireswillimpacthealth.URL:https://www.msn.com.
+Lopez-Carmona,M.A.,2022.Systemidentificationforthedesignofbehavioralcontrollersincrowdevacuations.Transp.Res.C144,103913.
+Luo,R.,Ji,S.,Ji,T.,2021.Aneffectivechaos-drivendifferentialevolutionformulti-objectiveunbalancedtransportationproblemconsideringfuelconsumption.
+Appl.SoftComput.101,107058.
+Martin,L.,2019.Australiafires:Thousandsfleetobeachtoescape.URL:https://www.bbc.com/.
+Marzouk,M.,Mohamed,B.,2019.Integratedagent-basedsimulationandmulti-criteriadecisionmakingapproachforbuildingsevacuationevaluation.Saf.Sci.
+112,57–65.
+Mathlouthi,I.,Gendreau,M.,Potvin,J.Y.,2021.Ametaheuristicbasedontabusearchforsolvingatechnicianroutingandschedulingproblem.Comput.Oper.
+Res.125,105079.
+Matter,O.,Strength,T.,2018.ProfilingAustralia’svulnerability.
+MeloZurita,M.d.,Cook,B.,Thomsen,D.C.,Munro,P.G.,Smith,T.F.,Gallina,J.,2018.Livingwithdisasters:socialcapitalfordisastergovernance.Disasters42
+(3),571–589.
+Moreno,A.,Alem,D.,Gendreau,M.,Munari,P.,2020a.Theheterogeneousmulticrewschedulingandroutingprobleminroadrestoration.Transp.Res.B141,
+24–58.
+Moreno,A.,Munari,P.,Alem,D.,2020b.Decomposition-basedalgorithmsforthecrewschedulingandroutingprobleminroadrestoration.Comput.Oper.Res.
+119,104935.
+Moshtagh,M.,Fathali,J.,Smith,J.M.,2018.TheStochasticQueueCoreproblem,evacuationnetworks,andstate-dependentqueues.EuropeanJ.Oper.Res.269
+(2),730–748.
+Mulvey,J.M.,Vanderbei,R.J.,Zenios,S.A.,1995.Robustoptimizationoflarge-scalesystems.Oper.Res.43(2),264–281.
+Na,H.S.,Grace,R.,2022.Influenceofsocialnetworksandopportunitiesforsocialsupportonevacuationdestinationdecision-making.Saf.Sci.147,105564.
+Nakanishi,H.,Black,J.,Suenaga,Y.,2019.Investigatingthefloodevacuationbehaviourofolderpeople:AcasestudyofaruraltowninJapan.Res.Transp.
+Bus.Manag.30,100376.
+Neumayer,E.,Plümper,T.,2017.RobustnessTestsforQuantitativeResearch.CambridgeUniversityPress.
+Norris,F.H.,Stevens,S.P.,Pfefferbaum,B.,Wyche,K.F.,Pfefferbaum,R.L.,2008.Communityresilienceasametaphor,theory,setofcapacities,andstrategyfor
+disasterreadiness.Am.J.CommunityPsychol.41,127–150.
+NSWRFS,2020.NewSouthWalesruralfireserviceresources.URL:https://www.rfs.nsw.gov.au/resources.
+Pan,F.,Nagi,R.,2010.Robustsupplychaindesignunderuncertaindemandinagilemanufacturing.Comput.Oper.Res.37(4),668–683.
+Pillac,V.,Cebrian,M.,VanHentenryck,P.,2015.Acolumn-generationapproachforjointmobilizationandevacuationplanning.Constraints20(3),285–303.
+Pillac,V.,VanHentenryck,P.,Even,C.,2016.Aconflict-basedpath-generationheuristicforevacuationplanning.Transp.Res.B83,136–150.
+Puchinger,J.,Stuckey,P.J.,Wallace,M.G.,Brand,S.,2011.Dantzig-Wolfedecompositionandbranch-and-pricesolvinginG12.Constraints16(1),77–99.
+Purba,D.S.D.,Kontou,E.,Vogiatzis,C.,2022.Evacuationrouteplanningforalternativefuelvehicles.Transp.Res.C143,103837.
+Raidl,G.R.,Puchinger,J.,2008.Combining(integer)linearprogrammingtechniquesandmetaheuristicsforcombinatorialoptimization.In:HybridMetaheuristics.
+Springer,pp.31–62.
+Ramos,B.,Alves,C.,deCarvalho,J.V.,2018.Columngenerationbasedapproachesforcombinedroutingandscheduling.Electron.NotesDiscreteMath.64,
+155–164.
+Reihaneh,M.,Ghoniem,A.,2019.Abranch-and-pricealgorithmforavehicleroutingwithdemandallocationproblem.EuropeanJ.Oper.Res.272(2),523–538.
+Satizabal, P., Cornes, I., Zurita, M.d.M., Cook, B.R., 2022. The power of connection: Navigating the constraints of community engagement for disaster risk
+reduction.Int.J.DisasterRiskReduct.68,102699.
+Shahparvari,S.,Abbasi,B.,2017.Robuststochasticvehicleroutingandschedulingforbushfireemergencyevacuation:AnAustraliancasestudy.Transp.Res.
+PartAPolicyandPractice104,32–49.
+Shahparvari,S.,Abbasi,B.,Chhetri,P.,2017.Possibilisticschedulingroutingforshort-noticebushfireemergencyevacuationunderuncertainties:AnAustralian
+casestudy.Omega72,96–117.
+Shahparvari, S., Abbasi, B., Chhetri, P., Abareshi, A., 2015a. Vehicle routing and scheduling for bushfire emergency evacuation. In: 2015 IEEE International
+ConferenceonIndustrialEngineeringandEngineeringManagement.IEEM,IEEE,pp.696–700.
+Shahparvari,S.,Abbasi,B.,Chhetri,P.,Abareshi,A.,2019.Fleetroutingandschedulinginbushfireemergencyevacuation:AregionalcasestudyoftheBlack
+SaturdaybushfiresinAustralia.Transp.Res.PartDTransp.Environ.67,703–722.
+Shahparvari, S., Bodaghi, B., 2018. Risk reduction for distribution of the perishable rescue items; a possibilistic programming approach. Int. J. Disaster Risk
+Reduct.31,886–901.
+Shahparvari,S.,Bodaghi,B.,Roozbeh,I.,Mohammadi,M.,Soleimani,H.,Chhetri,P.,2021.Acooperative(orcoordinated)multi-agencyresponsetoenhance
+theeffectivenessofaerialbushfiresuppressionoperations.Int.J.DisasterRiskReduct.102352.
+Shahparvari,S.,Chhetri,P.,Abareshi,A.,Abbasi,B.,2015b.Multi-objectivedecisionanalyticsforshort-noticebushfireevacuation:AnAustraliancasestudy.
+Australas.J.Inf.Syst.19.
+Shahparvari,S.,Chhetri,P.,Abbasi,B.,Abareshi,A.,2016.Enhancingemergencyevacuationresponseoflateevacuees:RevisitingthecaseofAustralianBlack
+Saturdaybushfire.Transp.Res.PartELogist.Transp.Rev.93,148–176.
+Shepherd,J.,vanVuuren,K.,2014.TheBrisbaneflood:CALDgatekeepers’riskcommunicationrole.DisasterPrev.Manag..
+Shoji,M.,Murata,A.,2021.Socialcapitalencouragesdisasterevacuation:EvidencefromacycloneinBangladesh.J.Dev.Stud.57(5),790–806.
+Siam,M.R.,Wang,H.,Lindell,M.K.,Chen,C.,Vlahogianni,E.I.,Axhausen,K.,2022.Aninterdisciplinaryagent-basedmultimodalwildfireevacuationmodel:
+Criticaldecisionsandlifesafety.Transp.Res.PartDTransp.Environ.103,103147.
+Sorensen,J.H.,Shumpert,B.L.,Vogt,B.M.,2004.Planningforprotectiveactiondecisionmaking:evacuateorshelter-in-place.J.Hazard.Mater.109(1–3),1–11.
+Southworth,F.,1991.Regionalevacuationmodeling:Astate-of-the-artreview.
+Stepanov,A.,Smith,J.M.,2009.Multi-objectiveevacuationroutingintransportationnetworks.EuropeanJ.Oper.Res.198(2),435–446.
+Tanaka,S.,2013.Issuesinthesupportanddisasterpreparednessofseverelydisabledchildreninaffectedareas.BrainDev.35(3),209–213.
+26
+
+===== PAGE 27 =====
+
+S.Shahparvarietal. Transportation Research Part A 189 (2024) 104197
+TasmanianGovernment,2018.Emergencyevacuationframework.URL:https://www.aidr.org.au.
+Teague,B.,Pascoe,S.,McLeod,R.,2010.The2009VictorianBushfiresRoyalCommissionFinalReport:Summary.VictorianBushfiresRoyalCommission.
+Thakur,S.,Ranjitkar,P.,Rashidi,S.,2022.ModellingevacuationdecisionsunderathreatofvolcaniceruptioninAuckland.Transp.Res.PartDTransp.Environ.
+109,103374.
+Tiernan,F.,O’Mallon,E.,2020.Australia’s2019–20bushfireseason.CanberraTimes.
+Tomek,M.,Seidl,M.,Bucová,G.,2014.Transportsafetyatevacuationforpeoplewithdisabilities.Kontakt16(3),e195–e202.
+Tonbari,M.E.,Ahmed,S.,2019.DistributedDantzig-Wolfedecomposition.arXivpreprintarXiv:1905.03309.
+Trigg,J.,Rainbird,S.,Thompson,K.,Bearman,C.,Wright,L.,McLennan,J.,etal.,2015.CapturingCommunityExperiencesSouthAustralianBushfiresJanuary
+2014.BushfireandNaturalHazardsCRC,MelbourneAustralia.BushfireandNaturalHazardsCRC,Australia.
+U.S.House,2006.TheFederalResponsetoHurricaneKatrina:LessonsLearned.GovernmentPrintingOffice.
+Václavík, R., Novák, A., vScha, P., Hanzálek, Z., 2018. Accelerating the branch-and-price algorithm using machine learning. European J. Oper. Res. 271 (3),
+1055–1069.
+Vanderbeck,F.,2000.OnDantzig-Wolfedecompositioninintegerprogrammingandwaystoperformbranchinginabranch-and-pricealgorithm.Oper.Res.48
+(1),111–128.
+VicRoads,2020.Traffic.URL:https://traffic.vicroads.vic.gov.au/.
+Wachinger,G.,Renn,O.,Begg,C.,Kuhlicke,C.,2013.Theriskperceptionparadox—implicationsforgovernanceandcommunicationofnaturalhazards.Risk
+Anal.33(6),1049–1065.
+Wannous, C., Velasquez, G., 2017. United nations office for disaster risk reduction (unisdr)—unisdr’s contribution to science and technology for disaster risk
+reductionandtheroleoftheinternationalconsortiumonlandslides(icl).In:WorkshoponWorldLandslideForum.Springer,pp.109–115.
+Wilhelm,W.E.,2001.Atechnicalreviewofcolumngenerationinintegerprogramming.Optim.Eng.2(2),159–200.
+Yu,C.S.,Li,H.L.,2000.Arobustoptimizationmodelforstochasticlogisticproblems.Int.J.Prod.Econ.64(1–3),385–397.
+Yu,Y.,Wang,S.,Wang,J.,Huang,M.,2019.Abranch-and-pricealgorithmfortheheterogeneousfleetgreenvehicleroutingproblemwithtimewindows.Transp.
+Res.B122,511–527.
+Zhang,Z.,Parr,S.A.,Jiang,H.,Wolshon,B.,2015.Optimizationmodelforregionalevacuationtransportationsystemusingmacroscopicproductivityfunction.
+Transp.Res.B81,616–630.
+Zhang,Z.,Wolshon,B.,Murray-Tuite,P.,2019.Aconceptualframeworkforillustratingandassessingrisk,resilience,andinvestmentinevacuationtransportation
+systems.Transp.Res.PartDTransp.Environ.77,525–534.
+Zhang,J.,Zhang,X.,2022.Amulti-tripelectricbusroutingmodelconsideringequityduringshort-noticeevacuations.Transp.Res.PartDTransp.Environ.110,
+103397.
+Zhao,X.,Ji,K.,Xu,P.,Qian,W.w.,Ren,G.,Shan,X.n.,2020.Around-tripbusevacuationmodelwithschedulingandroutingplanning.Transp.Res.PartA
+PolicyandPractice137,285–300.
+27

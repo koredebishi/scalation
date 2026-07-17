@@ -37,6 +37,8 @@ This ensures zero loss of continuity between chat sessions.
 | Ramp physics + density lane assignment | `context/ramp-physics-and-density-lane-assignment.md` |
 | Model template (standard) | `context/model-template.md` |
 | OSM road geometry plan | `context/osm-road-geometry-plan.md` |
+| **Graph network paradigm (takeover spec — ACTIVE)** | `context/graph-network-architecture.md` |
+| PhD publication pipeline (7 papers) | `docs/phd-papers/README.md` |
 
 ## Papers
 
@@ -171,7 +173,7 @@ Model.loadOsmBackground(jsonPath, gpsAnchors, dims)
 
 | Issue | Status |
 |-------|--------|
-| No gap acceptance at merge |  Major — both models unconditionally insert (no safe-gap wait). If you yield to director while waiting, follower ramp vehicles are blind and drive over the waiting vehicle. |
+| No gap acceptance at merge |  Major — both models unconditionally insert (no safe-gap wait). NOTE: the "P2: gap acceptance" comment in CalRoute101_3.scala:206 is ASPIRATIONAL — the code below it calls `mergeFromRamp` unconditionally (blind insert, Route.scala:232-238). Fix in progress: `[GRAPH-P1]` gated merge (`tryMergeFromRamp`) on branch `feature/graph-network-paradigm` — see `context/graph-network-architecture.md`. Hazard: if you yield to director while waiting, follower ramp vehicles are blind and drive over the waiting vehicle — design answer: waiter stays as ramp-DLL head (spec §10). |
 | Animation teleportation at merge |  Cosmetic — car jumps from ramp endpoint to mainline segment (no smooth visual transition). Fix: interpolate screen position over ~0.5s or use a short auxiliary VTransport bridging ramp end → mainline lane. ~30 lines. |
 | Ramp `gap = -4` from VTransport coroutine yield |  Benign — multiple ramp vehicles at `disp=0` on same ramp DLL. IDM clamp holds at `v=0` until leader clears. Root cause: VSource spawns while prior car is still inside `move()` yield. Not a physics error — just queuing. |
 | Outer lane crowding after ramp merge |  Minor — ramp vehicles merge into outermost lane, MOBIL moves them inward but throughput limited by 3s cooldown. Multiple lane changes needed (4→3→2) take 6+ seconds. Realistic behavior — real highways show same pattern near on-ramps. |
@@ -198,11 +200,9 @@ Model.loadOsmBackground(jsonPath, gpsAnchors, dims)
 
 ## What Is In Progress — ACTIVE NEXT TASKS
 
-1. ✅ **Exam template setup** — exam repo/workspace initialized and synchronized with Overleaf/GitHub workflow.
-2. 🔄 **Q1 drafting** — build argument structure and add references directly into `refQ1.bib` while writing.
-3. 🔄 **Q2 drafting prep** — queue behavior-model citations and evidence claims in `refQ2.bib`.
-4. 🔄 **Q3 grounding (priority risk)** — literature-first pass and equation scaffolding in `refQ3.bib` before full drafting.
-5. ⏸ **Simulation engine development tasks** — paused until comprehensive exam submission is complete.
+1. 🔄 **Graph network paradigm transition (ACTIVE, 2026-07-16)** — branch `feature/graph-network-paradigm`, spec = `context/graph-network-architecture.md`. Approved sequence: Step 0 save-state → Step 1 reference run → Step 2 `RoadGraph.scala` (+ `runRoadGraphTest`) → Step 3 `CalRoute101_3_NewParadigm` (graph wiring, behavior identical) → Step 4 `Route.tryMergeFromRamp` (additive, `[GRAPH-P1]`) → Step 5 gated merge wired + merge-hazard scenario test. Original CalRoute101_3 is FROZEN (regression baseline). Engine changes additive-only. ScalaTion naming, never SUMO's.
+2. 🔄 **PhD publication pipeline** — 7 minimal publishable units documented in `docs/phd-papers/` (recommended order 1→2→4→3→5→6→7). Written comp exam answers (q1–q3) are the source material; oral exam done.
+3. ⏸ **Eaton fire model (Study 2)** — resumes after graph paradigm lands (needs OD, behavioral mapping, contraflow — all blocked on RoadGraph; see spec §2 Finding 4).
 
 ## Session State — 2026-04-15
 

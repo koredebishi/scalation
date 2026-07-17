@@ -1,0 +1,1466 @@
+===== PAGE 1 =====
+
+12
+FireTechnology,50,1545–1571,2014
+(cid:2)2013SpringerScience+BusinessMediaNewYork.ManufacturedinTheUnitedStates
+DOI:10.1007/s10694-013-0352-7
+A Method for the Analysis of Behavioural
+Uncertainty in Evacuation Modelling
+Enrico Ronchi*, Department of Fire Safety Engineering and Systems Safety,
+Lund University, P.O. Box 118, 22100 Lund, Sweden
+Paul A. Reneke and Richard D. Peacock, National Institute of Standards and
+Technology, Gaithersburg, MD 20899, USA
+Received:4April2013/Accepted:22June2013
+Abstract. Evacuation models generally include the use of distributions or probabilis-
+tic variables to simulate the variability of possible human behaviours. A single model
+setup of the same evacuation scenario may therefore produce a distribution of differ-
+ent occupant-evacuation time curves in the case of the use of a random sampling
+method. This creates an additional component of uncertainty caused by the impact of
+the number of simulated runs of the same scenario on evacuation model predictions,
+here named behavioural uncertainty. To date there is no universally accepted quanti-
+tative method to evaluate behavioural uncertainty and the selection of the number of
+runs is left to a qualitative judgement of the model user. A simple quantitative
+method using convergence criteria based on functional analysis is presented to
+address this issue. The method permits (1) the analysis of the variability of model
+predictions in relation to the number of runs of the same evacuation scenario, i.e. the
+study of behavioural uncertainty and (2) the identification of the optimal number of
+runsof the same scenarioin relation topre-defined acceptance criteria.
+Keywords: Evacuationmodelling,Behaviouraluncertainty,Humanbehaviourinfire,
+Functionalanalysis,Convergencecriteria
+1. Introduction
+Uncertainty is divided into different components in the context of fire safety engi-
+neering and modelling [1]: model input uncertainty, measurement uncertainty, and
+intrinsic uncertainty.
+(1) Model input uncertainty is associated with the parameters obtained from
+experimental measurements that are used as model input, i.e. the assumptions
+employed to derive model input from the experiments.
+(2) Measurement uncertainty is associated with the experimental measurement
+itself, i.e., the data collection techniques employed.
+(3) Intrinsic uncertainty is the uncertainty associated with the physical and mathe-
+matical assumptions and methods that are intrinsic to the model formulation.
+* Correspondenceshouldbeaddressedto:EnricoRonchi,E-mail:enrico.ronchi@brand.lth.se
+
+===== PAGE 2 =====
+
+1546 Fire Technology 2014
+In the case of evacuation data, uncertainty includes an additional component,
+here named behavioural uncertainty. Behavioural uncertainty is uncertainty asso-
+ciated with the stochastic nature of human behaviour, i.e. human behaviour is sto-
+chastic per se [2], and a single experiment or model run may not be representative
+of a full range of the behaviours of the occupants. In fact, ‘‘evacuate the same
+building with the same people starting in the same places on consecutive days and
+the answers could vary significantly’’ [2]. There is a subsequent need for multiple
+experimental data-sets to understand the possible variability of occupant behav-
+iours in each individual evacuation scenario [3]. Unfortunately, experimental data-
+sets on human behaviour in fire are scarce and single data-sets are often the only
+available reference for the study of an individual scenario. Behavioural uncer-
+tainty needs to be analysed in both experimental and modelling studies. In this
+context, the assessment of the variability of simulation results in relation to
+behavioural uncertainty is a key issue to be discussed. This is reflected in the esti-
+mation of the convergence of an individual evacuation simulation scenario
+towards an ‘‘average’’ predicted occupant evacuation time-curve. It should be
+noted that the term behavioural uncertainty is here introduced in the context of
+fire safety science, i.e. the term may have different meanings in other research
+fields.
+Fire modellers and evacuation modellers treat uncertainty in different ways.
+Uncertainty is generally treated in fire models as a deterministic problem, i.e., it is
+studied by analysing the sensitivity of the model output in relation to the variabil-
+ity of the model input. This is driven by the fact that fire models are generally
+based on deterministic equations (e.g. [4, 5]). On the other hand, evacuation mod-
+els treat uncertainty as a stochastic problem. In fact, to address the stochastic nat-
+ure of human behaviour, evacuation models often employ distributions or
+stochastic variables to simulate people movement and behaviours [6–10] (e.g. dis-
+tribution of walking speeds, distribution of pre-evacuation times, exit choice, etc.).
+In fact, random numbers/seeds may be employed to solve space conflict resolu-
+tion, simulate exit choice, familiarity with the exit, queuing behaviour, etc. When
+distributions are created adopting a random sampling method, multiple occupant-
+evacuation time curves for the same scenario using the same model inputs are
+produced. Random variables may be intrinsic of the model algorithms, and model
+users may not have control/access to them (especially in closed-source models).
+This leads to the need for a study of the variability of the results associated with
+the random variables embedded in the models.
+Therefore, evacuation modellers face the problem of selecting the appropriate
+number of runs to be simulated in order to be representative of the average
+model outcome. This problem arises both during the use of evacuation models
+for a fire safety design as well as during validation studies. In fact, two main
+questions can be asked during the simulation of evacuation scenarios that
+include distributions or stochastic variables: (1) Which occupant-evacuation time
+curve is representative of model predictions in a fire safety design? (2) Which
+occupant-evacuation time curve should be used as reference during the compari-
+son with experimental data in a validation study? To date, the answers to these
+questions are left to a qualitative judgment by the evacuation model user. For
+
+===== PAGE 3 =====
+
+Analysis of Behavioural Uncertainty 1547
+instance, in the context of evacuation model validation, model users may select
+the best model prediction during the comparison with experimental data [11] or
+employ the model’s average total evacuation time (TET) [possibly including
+information on the standard deviation (SD)] as representative of model predic-
+tions. The study of the average TETs and their corresponding SDs provides
+insights only on the required safe escape time, rather than the whole evacuation
+process. There is instead a need for a method which investigates the size of the
+variation for the whole occupant-evacuation time curve. Nevertheless, to date,
+there is no universally accepted quantitative method to estimate how these aver-
+age predictions may vary over the number of runs.
+In addition, complex evacuation scenarios may be computationally expensive
+to simulate. For instance, previous research on the use of distribution curves for
+Monte Carlo simulations for uncertainty analysis in evacuation model predic-
+tions have demonstrated the need for a large computational effort [7]. Therefore
+there is a need to optimize the selection of the number of runs of the same sce-
+nario in order to be representative of occupants’ ‘‘average behaviour’’, and pro-
+vide a quantitative and computationally inexpensive measurement of the
+variability associated with the simulated runs (and a subsequent estimation of
+the behavioural uncertainty associated with an individual evacuation model
+setup).
+A useful method for the analysis of model predictions is functional analysis.
+This branch of mathematics represents curves as vectors, and uses geometrical
+operations on the curves. Functional analysis operations are currently employed
+during the comparison of fire model evaluations and experimental data [12, 13]
+and the comparison between evacuation model results and experimental data [14].
+Nevertheless, functional analysis has not been employed so far to compare evacu-
+ation model predictions against each other to analyse the uncertainty associated
+with the number of runs of the same evacuation scenario, i.e. behavioural uncer-
+tainty.
+This paper proposes a set of convergence criteria for the analysis of the vari-
+ability of evacuation model predictions of the same evacuation scenario (i.e. the
+same model input which includes distributions or stochastic variables) in relation
+to the number of runs. A procedure for the definition of the optimal number of
+runs—in relation to the evacuation scenario, the model in use, and the scope of
+the simulations—is presented. The scope of the present work is therefore to pro-
+vide a quantitative method to assess the variability associated with the number of
+runs of the same evacuation scenario. The proposed method allows the analysis of
+behavioural uncertainty and the prediction of the average occupant-evacuation
+time curve in relation to pre-defined acceptance criteria.
+A case study about the application of the method is presented. The case study
+is an explanatory example in which a fictitious data-set (i.e. a data-set created
+using a pseudo-random generator) is employed to show the convergence criteria
+and the evaluation procedure.
+The last part of the paper discusses the benefits associated with the use of the
+convergence criteria and future work regarding their possible uses.
+
+===== PAGE 4 =====
+
+1548 Fire Technology 2014
+2. Method
+This section presents a proposed methodology for the analysis of behavioural
+uncertainty. It includes the definition of five convergence criteria for the analysis
+of the occupant-evacuation time curves produced by evacuation models and a
+procedure for the assessment of the optimal number of runs in relation to pre-
+defined acceptance criteria.
+The proposed methodology is based on the definition of a set of convergence
+measures that sufficiently describe the distribution of occupant-evacuation time
+curves. This is addressed by constructing a series for each measure and demon-
+strating that the measure is sufficiently close to the expected value, i.e. the series
+converge to the average occupant-evacuation time curve.
+A series S = {s,…, s } converges to S if for any positive real value e there is
+i n c
+an n such that jS (cid:2)s j<e.
+c n
+The series represents the evacuation time predictions of evacuation models and
+they are based on sample data. This will imply that the series will likely not
+smoothly converge, meaning that it might happen that jS (cid:2)s j>jS (cid:2)s j. In
+c nþ1 c n
+order to increase the confidence that our series have sufficiently converged, a
+requirement that the last b values of the series (the convergence measures) are
+within S is added. For some series we might not know the expected value S , i.e.,
+c c
+the value to which the series is convergent. In those cases the last current value of
+the series is used as the best estimate of the value the series converges to.
+2.1. Functional Analysis Concepts
+Beforediscussionofconvergencecriteria,thereisaneedtointroducethreeconcepts
+offunctionalanalysis,namelytheEuclideanRelativeDifference(ERD),theEuclid-
+ean Projection Coefficient (EPC) and the Secant Cosine (SC). Initial applications of
+these concepts have been used in different research fields (e.g., mechanics [15], engi-
+neering[16],etc.),includingfirescience(seePeacocketal.[12]andGaleaetal.[14]).
+The single comparison of two individual points in a curve can be made by find-
+ing the norm of the difference between the two vectors representing the data. A
+norm represents the length of a vector. The distance between two vectors corre-
+sponds to the length of the vector resulting from the difference of the two vectors.
+* *
+For a generic vector x; the norm is represented using the symbol jjxjj: This con-
+cept can be extended to multiple dimensions. The distance between two generic
+* *
+multi-dimensional vectors x and y is therefore the norm of the difference of the
+* *
+vectors jjx(cid:2)yjj. The ERD between two vectors can be normalized as a relative
+*
+difference to the vector y (see Equation 1).
+jj * x(cid:2) * yjj sffi P ffiffiffiffiffi n ffiffiffiffiffi ð ffiffi x ffiffiffiffi (cid:2) ffiffiffiffiffi y ffiffiffi Þ ffiffi 2 ffiffi
+ERD¼ ¼ i¼1 i i ð1Þ
+jj * yjj Pn i¼1 ðy i Þ2
+The ERD represents, therefore, the overall agreement between two curves.
+Two components can be considered during the comparison of two vectors,
+namely the distance between two vectors and the angle between the vectors.
+
+===== PAGE 5 =====
+
+Analysis of Behavioural Uncertainty 1549
+Figure1. The projection coefficient fortwo vectors.
+The concept of projection coefficient a is introduced. From a geometric point of
+* * *
+view,thevectorax istheprojectionofthevector y ontothevector x (seeFigure 1).
+a defines a factor which reduces the distance between two vectors to its mini-
+mum (see Figure 1). The solution of the minimum problem is found and corre-
+sponds to Equation 2.
+*
+jjyjj
+a¼ cosb ð2Þ
+*
+jjxjj
+* *
+hx;yi is the inner product of two vectors, i.e., the product of the length of the
+two vectors and the cosine of the angle between them. The inner product can be
+interpreted as the standard dot product; producing Equation 3.
+n
+* * X
+hx;yi¼ ðxyÞ ð3Þ
+i i
+i¼1
+The EPC is found by studying the minimum problem, i.e., studying when the
+derivative of the function is zero (see Peacock et al. [12] for the full solution of
+the minimum) and it corresponds to:
+h
+*
+x;
+*
+yi
+Pn
+ðxyÞ
+a¼EPC ¼ ¼ i¼1 i i ð4Þ
+jj * yjj2 Pn i¼1 y i 2
+*
+EPC defines a factor which when multiplied by each data point of the vector y
+* *
+reduces the distance between the vectors y and x to its minimum, i.e. the best
+possible fit of the two curves.
+The concept of SC is also introduced. It represents a measure of the differences
+of the shapes of two curves. This is investigated by analysing the first derivative of
+both curves.
+For n data points, a multi-dimensional set of n - 1 vectors can be defined to
+approximate the derivative. This produces Equation 5 [12]:
+SC ¼(cid:3) (cid:3) (cid:3) (cid:3) (cid:3) (cid:3) * h x * x (cid:3) (cid:3) (cid:3) (cid:3) (cid:3) (cid:3) ; (cid:3) (cid:3) (cid:3) * y (cid:3) (cid:3) (cid:3) * y i (cid:3) (cid:3) (cid:3) (cid:3) (cid:3) (cid:3) ¼ qffi P ffiffiffiffiffi n i ffi ¼ ffiffi P s ffi þ ffiffiffi 1 ffi n i ffi ¼ ffi s ð ffi 2 s ffi D ð þ ffiffi x D ffi 1 i ffi (cid:2) t ffi i ffi (cid:2) s ð ffi Þ D 1 ffi 2 ffi Þ x ffi s ffi i 2 P (cid:2) ffi ð ffi s ffi D ffi Þ ffi t ð n i ffi i ¼ D (cid:2) ffiffi 1 y ffi s ffi Þ i þ (cid:2) ffiffi s 1 ffi Þ ffiffi s ffi ð 2 ffi D ffi ð ffi D y ffiffi i(cid:2) t ffi i ffi (cid:2) s ffi Þ ffi 1 ffi 2 Þ ffiffi ð5Þ
+
+===== PAGE 6 =====
+
+Where:
+t is the measure of the spacing of the data, i.e. t = 1 if there is a data point for
+each occupant;
+s represents the number of data points in the interval;
+n is the number of data points in the data-set;
+Dx ¼x (cid:2)x ;
+i(cid:2)s i i(cid:2)s
+Dy ¼y (cid:2)y ;
+i(cid:2)s i i(cid:2)s
+Dt ¼t (cid:2)t :
+i(cid:2)1 i i(cid:2)1
+When the SC is equal to unity, the shapes of the two curves are identical.
+Depending on the value for s, the noise of the data is smoothed out. An example
+of the impact of different values of s on the SC is shown in Figures 2 and 3. Fig-
+ure 2 shows two hypothetical curves (obtained by 120 values for x and y corre-
+sponding to 120 arbitrary data-points) which include noise or no noise. The
+comparison between the shapes of the two curves is made using different s values
+(from s = 1 to s = 60 in this example), i.e., Figure 3 shows that the use of higher
+values for s reduces the impact of the noise in the comparison.
+Nevertheless, s should not be too large, so that the natural variations in the data
+arekept.AnexampleofthisissueisprovidedinFigure 4,where,consideringahypo-
+thetical set of 4 data-points, different values for s generate either SC = 1 for s = 4
+(theshapeofthecurvesappearidentical)orSC „ 1inthecaseofs = 1ands = 2.
+2.2. Convergence Measures
+A set of variables are introduced in order to present the method of analysis of
+evacuation model predictions based on functional analysis and convergence
+criteria.
+1800
+1600
+1400
+1200
+1000
+800
+600
+400
+200
+0
+0 20 40 60 80 100 120
+tinu
+yrartibrA
+1550 Fire Technology 2014
+Curve 1 (no noise) Curve 2 (including noise)
+Arbitrary unit
+Figure2. Hypothetical curves including noise (grey curve) andnot
+including noise (black curve).
+
+===== PAGE 7 =====
+
+1.0
+0.9
+0.8
+0.7
+0.6
+0.5
+0.4
+0 10 20 30 40 50 60
+*
+The measured experimental data are represented using vector E (see Equa-
+tion 6), where E represents the measured evacuation time for the ith occupant.
+i
+*
+E¼ðE ;...;E Þ ð6Þ
+1 n
+*
+For example, in the case of i = 3 occupants, i.e., E¼ðE ;E ;E Þ; E is the mea-
+1 2 3 1
+sured evacuation time corresponding to occupant 1, E is the measured evacuation
+2
+time corresponding to occupant 2 and E is the measured evacuation time corre-
+3
+sponding to occupant 3.
+*
+The simulated predicted times are represented by the vector m (see Equation 7),
+where m is the simulated evacuation time for the ith occupant. m represents the
+i n
+evacuation time corresponding to the last occupant out of the building
+*
+m¼ðm ;...;m Þ ð7Þ
+1 n
+*
+Therefore, m¼ðm ;m ;m Þ, where m is the simulated evacuation time corre-
+1 2 3 1
+sponding to occupant 1, m is the simulated evacuation time corresponding to
+2
+occupant 2 and m is the simulated evacuation time corresponding to occupant 3.
+3
+CS
+Analysis of Behavioural Uncertainty 1551
+SC
+s
+Figure3. SC in relation todifferent svalues.
+Figure4. Schematic representation of the useof different values for
+s duringthe calculation of theSC.
+
+===== PAGE 8 =====
+
+1552 Fire Technology 2014
+Several runs of the same scenarios are simulated. The simulated evacuation
+*
+times of each occupant i in each jth run are represented using n vectors m (see
+ij
+Equation 8). Here, q is the total number of occupants and n is the total number
+of runs. One assumption is that occupants are ranked in accordance to their evac-
+uation time, i.e. occupants may evacuate the building in a different order in differ-
+ent runs.
+* (cid:4) (cid:5)
+m ¼ m ;...;m ;...;m ð8Þ
+ij 11 ij qn
+Considering nine runs of the same evacuation scenario including the same three
+* *
+occupants, 9 vectors m are obtained where i = 3 and j = 9, i.e., m ¼ðm ;
+ij i1 11
+* *
+m ;m Þ; m ¼ðm ;m ;m Þ; ...;m ¼ðm ;m ;m Þ.
+21 31 i2 12 22 32 i9 19 29 39
+The next variable that is presented is associated with the calculation of the
+arithmetic mean of the values of the runs. The jth average curve of evacuation
+times produced by the model considering the arithmetic mean of the values of all
+*
+runs is represented using an n dimensional vector M (see Equation 9), where
+j
+M
+¼1Pn
+m ;M
+¼1Pn
+m ;...;M
+¼1Pn
+m .
+1 n j¼1 1j 2 n j¼1 2j n n j¼1 qj
+* (cid:4) (cid:5)
+M ¼ M ; ...;M ;...;M ð9Þ
+j 1 j n
+Considering the previous example, i.e. 3 occupants and 9 runs (i = 3 and j = 9),
+*
+the average curve M corresponds to the values of the first run. The average curve
+1
+*
+for a sub-set of 4 runs will generate M which corresponds to the arithmetic
+4
+*
+means of the values up to the fourth run. In the case of all 9 runs, M corre-
+9
+sponds to the arithmetic means of the values of all runs.
+*
+Figure 5 presents vector M in relation to the number of runs under consider-
+j
+ation.
+*
+Hence if j¼1;M ¼ðM Þ, i.e. the average curve corresponds to the curve of
+j 1
+* *
+the first run. If 1<j<n, M becomes M ¼ðM ; ...;M Þ where
+j j 1 j
+*
+M
+¼1P1<j<nm
+;M
+¼1P1<j<nm
+;...;M
+¼1P1<j<nm
+:M represents
+1 j j¼1 1j 2 j j¼1 2j j j j¼1 qj j
+*
+then the average curve corresponding to 1<j<n runs. Considering 4 vectors m
+ij
+corresponding to the predicted evacuation times for three occupants in j = 4 runs
+* (cid:6)
+out of n = 9 runs, M ¼ M
+¼1P1<4<9m
+; M
+¼1P1<4<9m
+;M ¼
+4 1 4 j¼1 1j 2 j j¼1 2j 3
+* *
+1P1<4<9m
+Þ: If j = n, M becomes M ¼ðM ; ...;M Þ where M
+¼1Pn
+m ;
+4 j¼1 3j j n 1 n 1 n j¼1 1j
+*
+M
+¼1Pn
+m ;...; M
+¼1Pn
+m : Thus, M represents the average curve cor-
+2 n j¼1 2j j n j¼1 qj j
+*
+responding to all j = n runs. For instance, if n = 9 runs, M ¼ðM ¼
+9 1
+1P9
+m ; M
+¼1P9
+m M
+¼1P9
+m Þ.
+9 j¼1 1j 2 9 j¼1 2j 3 9 j¼1 3j
+2.2.1. Convergence Measure 1: TET. The vector m can also be called TET, TET
+n j
+(also called Required Safe Egress Time in the context of performance based
+
+===== PAGE 9 =====
+
+Analysis of Behavioural Uncertainty 1553
+*
+Figure5. Vector M in relationto the considered number of runs.
+j
+design [17]), corresponding to the jth run. Therefore, there are several simulated
+TET, each one corresponding to the jth run for a total of n runs.
+j
+The jth TETs TET for n runs of the same scenario simulated with an evacua-
+i
+(cid:2)(cid:2)(cid:2)*
+tion model can be represented using the vector TET¼ðTET ;...;TET Þ.
+1 n
+The arithmetic mean of the TETs for j runs can be expressed using TET (see
+avj
+Equation 10):
+1X j
+TET ¼ TET ð10Þ
+avj j i
+i¼1
+The set of all n consecutive mean TETs TET of the same scenario simulated
+avj
+with an evacuation model is TET = (TET ,…, TET ). TET is assumed to
+av av1 avn av1
+correspond to the value in run 1, TET is the average for j = 2,…, TET the
+av2 avn
+average for j = n.
+Applying the law of large numbers, the consecutive mean TETs TET can be
+avi
+interpreted as a series converging to an expected value (the mean TET). Hence, a
+measure of the convergence of the series can be performed.
+AmeasureoftheconvergenceoftwoconsecutivemeanTETsTET (e.g.TET
+avj av1
+and TET ) is obtained calculating TET (see Equation 11). It is expressed
+av2 convj
+(in %) as the difference of two consecutive mean TETs divided by the last mean
+evacuation time. This convergence measure assumes that the best approximation of
+theexpectedvalue(themeanTET)isthelastmeanevacuationtime.
+This produces a total of p = n-1 TET .
+convj
+TET (cid:2)TET
+TET ¼j avj avj(cid:2)1 j ð11Þ
+convj TET
+avj
+
+===== PAGE 10 =====
+
+1554 Fire Technology 2014
+The last TET value, corresponding to all n runs is TET (see Equa-
+convj convFIN
+tion 12).
+TET (cid:2)TET
+TET ¼j avp avp(cid:2)1 j ð12Þ
+convFIN TET
+avp
+2.2.2. Convergence Measure 2: SD of TETs. Convergence variables can also be
+presented in terms of the SD of TETs.
+The jth SD SD for n runs of the TET of the same scenario simulated with an
+j *
+evacuation model can be represented by the vector SD¼ðSD ;...;SD Þ.
+1 n
+Also in this case, the application of the law of large numbers permits the inter-
+pretation of the consecutive SDs of TETs SD as a series convergent to an expec-
+j
+ted value (the mean SDs of TETs). Therefore, a measure of the convergence of
+the series is possible.
+A measure of the convergence of two consecutive SDs SD (e.g. SD and SD )
+j 1 2
+is obtained by calculating SD . It is expressed (in %) as the difference of two
+convj
+consecutive SDs divided by the last SD (see Equation 13). This produces a total
+of p = n-1 SD . This convergence measure assumes that the best approxima-
+convj
+tion of the expected value (the mean SD of TETs) is the last SD of TETs.
+SD (cid:2)SD
+SD ¼j j avj(cid:2)1 j ð13Þ
+convj SD
+j
+The last SD value, corresponding to all n runs, is SD (see Equation 14).
+convj convFIN
+SD (cid:2)SD
+SD ¼j avp avp(cid:2)1 j ð14Þ
+convFIN SD
+avp
+2.2.3. Convergence Measure 3: ERD. A set of ERD can be calculated, each one
+*
+corresponding to two consecutive pairs of vectors M representing the progressive
+j
+average occupant-evacuation time curves.
+(cid:2)(cid:2)(cid:2)* (cid:4) (cid:5)
+A vector ERD¼ ERD ;...;ERD is made of p consecutive ERD where
+1 p j
+p = j - 1, corresponding to average j runs of the same scenario simulated with
+an evacuation model. For instance, in the case of j = 4 runs,
+(cid:2)(cid:2)(cid:2)*
+ERD¼ðERD ;ERD ;ERD Þ where ERD is calculated from the comparison
+1 2 3 1
+between M and M , ERD is calculated from the comparison between M and
+1 2 2 2
+M and ERD is calculated from the comparison between M and M . M repre-
+3 3 3 4 1
+sents the curve from run 1, M represents the average curve generated by the
+2
+arithmetic means of the individual occupant evacuation times for run 1 and run 2,
+M represents the average curve generated by the arithmetic means of the individ-
+3
+ual occupant evacuation times for run 1, run 2 and run 3. M represents the
+4
+
+===== PAGE 11 =====
+
+Analysis of Behavioural Uncertainty 1555
+average curve generated by the arithmetic means of the individual occupant evac-
+uation times for run 1, run 2, run 3 and run 4.
+The consecutive ERD can be interpreted as a series convergent to the expected
+j
+value equal to 0 (the case of two curves identical in magnitude). Hence, a measure
+of the convergence of the series is possible. A measure of the convergence of two
+*
+consecutive ERDs ERD corresponding to two consecutive average curves M can
+j j
+be obtained calculating ERD (see Equation 15). It is expressed as the absolute
+convj
+value of the difference of two consecutive ERDs ERD and ERD .
+j j-1
+ERD ¼jERD (cid:2)ERD j ð15Þ
+convj j j(cid:2)1
+The last ERD value, corresponding to the differences between the latest aver-
+convj
+age curves is ERD (see Equation 16).
+convFIN
+ERD ¼jERD (cid:2)ERD j ð16Þ
+convFIN p p(cid:2)1
+Calculation of ERD permits estimation of the impact of the number of runs
+convj
+on the overall differences between consecutive average curves. ERD repre-
+convFIN
+sents therefore a tool to understand the behavioural uncertainty associated with
+multiple runs of an individual evacuation scenario.
+2.2.4. Convergence Measure 4: EPC. The same type of convergence measures can
+be produced for the EPC.
+The consecutive EPC can be interpreted as a series convergent to the expected
+j
+value equal to 1 (the best possible agreement between two consecutive EPC).
+j
+Hence, a measure of the convergence of the series can be performed. This results
+in Equations 17 and 18.
+EPC ¼jEPC (cid:2)EPC j ð17Þ
+convj j j(cid:2)1
+EPC ¼jEPC (cid:2)EPC j ð18Þ
+convFIN p p(cid:2)1
+ERD permits the estimation of the impact of the number of runs on the possi-
+convj
+ble agreement between two consecutive average curves. ERD is therefore
+convFIN
+another indicator of the behavioural uncertainty associated with multiple runs of
+an individual evacuation scenario.
+2.2.5. Convergence Measure 5: SC. Convergence measures can be developed for
+the SC. The consecutive SC can be interpreted as a series convergent to the
+j
+expected value equal to 1 (the case of two identical shapes of consecutive curves).
+Hence, a measure of the convergence of the series can be performed and it is pre-
+sented in Equations 19 and 20.
+SC ¼jSC (cid:2)SC j ð19Þ
+convj j j(cid:2)1
+
+===== PAGE 12 =====
+
+1556 Fire Technology 2014
+SC ¼jSC (cid:2)SC j ð20Þ
+convFIN p p(cid:2)1
+SC allows understanding of the impact of the number of runs on the possible
+convj
+differences between the shapes of two consecutive average curves. SC repre-
+convFIN
+sents therefore a variable to understand the behavioural uncertainty associated
+with the average shape of the simulated curves, given a certain number of runs n
+of the same evacuation scenario.
+2.3. The Evaluation Method
+Five variables have been presented in the previous section, namely TET ,
+convFIN
+SD , ERD , EPC , and SC . Those variables represent the
+convFIN convFIN convFIN convFIN
+basis for a novel evaluation method. The proposed method addresses two key
+aspects of evacuation modelling:
+(1) The analysis of behavioural uncertainty of an individual evacuation scenario.
+(2) The identification of the optimal number of runs to produce a stable evacua-
+tion curve of the same scenario in relation to the evacuation scenario and the
+model in use.
+An iterative method is suggested for the evaluation of evacuation model results.
+The method is based on five steps (see Figure 6).
+CONSIDERATIONS
+Depending on the evacuation
+[1] Define the acceptance criteria scenarios, model in use, etc.
+TRTET, TRSD, TRERD, TREPC, TRSC. T
+m
+h
+a
+e
+n
+u
+y
+s
+c
+e
+o
+r
+n
+s
+s
+a
+e
+ls
+c
+o
+u t
+n
+iv
+e
+e
+e
+r
+d
+u
+s
+n
+t
+s
+o
+a
+d
+re
+e fi
+n
+n
+e
+e
+e
+h
+d
+o
+e
+w
+d
+to satisfy the conditions.
+CONSIDERATIONS
+[2] Simulate a finite set of nruns of The initial number of simulations is
+the same evacuation scenario an arbitrary number set by the model
+user
+[5] Simulate a set of additional runs m [3] Calculate the convergence units
+so that the new set of runs for the TETconvj , Sdconvj , ERDconvj ,
+comparison is S=n+m EPCconvj , and SCconvj
+[4] Compare the convergence units
+with the acceptance criteria
+NO [4bis] Are all conditions satisfied?
+TETconvj < TRTETfor b consecutive runs
+SDconvj < TRSDfor b consecutive runs
+ERDconvj < TRERDfor b consecutive runs
+EPCconvj < TREPCfor b consecutive runs
+SCconvj < TRSCfor b consecutive runs
+YES
+END
+Figure6. Schematic flowchart of theproposed evaluation method.
+
+===== PAGE 13 =====
+
+Analysis of Behavioural Uncertainty 1557
+Step 1. Define the acceptance criteria [see (1) in Figure 6].
+The first step of the method consists of the identification of the acceptable
+thresholds to be achieved, i.e. the accepted behavioural uncertainty associated
+with the average curve obtained by multiple runs of the same scenario. The aim
+is to obtain an evacuation curve that is sufficiently stable given the scope of the
+analysis. For example, in the case of the use of evacuation modelling in the con-
+text of performance based design, the identification of these acceptable thresh-
+olds can be based on the estimated uncertainty during the calculation of the
+available safe escape time produced using a fire model. This approach permits a
+joint analysis of the uncertainty associated with both the fire and evacuation sim-
+ulations. Five thresholds (corresponding to the five convergence measures) are
+identified, namely TR , TR , TR , TR , TR . It should be noted that
+TET SD ERD EPC SC
+there is an additional acceptance criteria that needs to be assessed, i.e., a finite
+number of consecutive runs b for which the acceptable thresholds must not be
+crossed. This needs to be assessed in order to verify that the convergence mea-
+sures are stable under certain thresholds over a pre-defined number of runs. This
+requirement is based on the assumptions described in Section 2. The larger is b,
+the higher is the confidence that can be put on the fulfilment of the acceptance
+criteria.
+The identification of the acceptance criteria may depend on several factors
+such as the evacuation scenario, the model in use, etc. The selection of the accep-
+tance criteria—which may or may not include all convergence measures—may be
+identified by the evacuation modeller itself or from a third party.
+Step 2. Simulate a finite set of n runs of the same evacuation scenario [see (2) in
+Figure 6].
+Evacuation model users select an arbitrary initial number of simulations of an
+individual evacuation scenario, i.e., the same model input is used. n vectors
+* (cid:4) (cid:5)
+m ¼ m ;...;m ;...;m corresponding to the simulated evacuation times of
+ij 11 ij qn
+each occupant ith in each jth run are obtained. The occupant-evacuation time
+curves are produced ranking the occupants in relation to their evacuation time.
+*
+The vector corresponding to the consecutive average curves M¼ðM ;...;M Þ
+1 n
+is also generated.
+In order to optimize the iterative process, the selection of the initial arbitrary
+number of runs may be based on a qualitative evaluation made by the evacua-
+tion modeller of the variability of the predicted outcome given the model input
+of the scenario under consideration. Nevertheless, this judgment—which is the
+current qualitative method adopted by evacuation modellers to estimate the opti-
+mal number of runs—is not mandatory, since the proposed method permits a
+quantitative study of the impact of the number of runs on the occupant-evacua-
+tion time curve produced by the model.
+Step 3. Calculate the convergence measures [see (3) in Figure 6].
+The convergence measures presented in the previous sections are calculated for
+all runs, i.e., TET , SD , ERD , EPC , and SC .
+convj convj convj convj convj
+In order to perform the calculation of the SCs for all runs, model users need
+
+===== PAGE 14 =====
+
+1558 Fire Technology 2014
+also to identify a finite set of values for s, needed for the calculation of SC .
+convj
+As described in Section 2.1, the choice of the values for s relies on the dataset
+under consideration. SC are calculated for all runs for as many s values as
+convj
+chosen by the model user.
+Step 4-4bis. Compare the convergence measures with the acceptance criteria [see
+(4-4bis) in Figure 6].
+The model user compares the calculated convergence measures against the
+acceptable thresholds defined during Step 1. This produces five tests that need to
+be accomplished:
+Test 1:
+TET <TR forbconsecutivenumberofruns ð21Þ
+convj TET
+Test 2:
+SD <TR forbconsecutivenumberofruns ð22Þ
+convj SD
+Test 3:
+ERD <TR forbconsecutivenumberofruns ð23Þ
+convj ERD
+Test 4:
+EPC <TR forbconsecutivenumberofruns ð24Þ
+convj EPC
+Test 5:
+SC <TR forbconsecutivenumberofruns ð25Þ
+convj SC
+It should be noted that the criteria need to be satisfied for a pre-defined finite
+number of consecutive b runs (as defined during Step 1). The values correspond-
+ing to the jth run where the conditions are verified for b consecutive runs repre-
+sent TET , SD , ERD , EPC , and SC . If the five
+convFIN convFIN convFIN convFIN convFIN
+conditions are all satisfied for a pre-defined number of consecutive runs, the
+curves generated by n number of runs meet the acceptance criteria, i.e. the average
+curve is estimated given an accepted behavioural uncertainty associated with the
+number of runs (based on the acceptance criteria). If one or more of the condi-
+tions are not satisfied, the model user needs to proceed with Step 5.
+Step 5. Simulate a set of additional simulations m so that the new set of runs for
+the comparison is S = n + m [see (5) in Figure 6].
+
+===== PAGE 15 =====
+
+Analysis of Behavioural Uncertainty 1559
+The model user sets an arbitrary number of additional simulations to be run.
+The definition of the additional runs can be set in accordance with a qualitative
+* *
+analysis of the failed tests. A new set of S ¼nþmS vectors S ¼
+ij ij
+(cid:4) (cid:5)
+S ;...;S ;...;S corresponding to the average simulated evacuation times of
+11 ij qS
+each occupant ith in each jth run are obtained. The same methodology of Step 2
+is adopted to produce the occupant-evacuation time curves, i.e., the occupants
+are ranked in relation to their evacuation time. The model user can now re-start
+the procedure starting from Step 3.
+3. Case Study
+An application of the method presented in Section 2 is described to provide an
+example of the concepts. Given the explanatory scope of the example, data used in
+this section are fictitious, i.e., they do not correspond to real data. This choice has
+been driven by the current lack of repeated experimental data, i.e. the method has
+beenappliedtostudysimulationresults.Dataarecreatedinordertoberepresenta-
+tive of the results obtained with an evacuation model for a hypothetical evacuation
+scenario. A fictitious set of numbers is produced using Wichman and Hill’s [18]
+pseudo-random generator. The pseudo-random numbers are used as input to pro-
+duce lognormal-distributed values. This choice was made in order to be representa-
+tive of a hypothetical evacuation scenario which is influenced by pre-evacuation
+times (which generally followa log-normal distribution [17]). The fictitious data are
+thenusedtocreatefictitious individualevacuationtimescalculatedbyprogressively
+summing the values obtained (in order to be representative of a hypothetical real
+case study where total evacuation times range approximately between 1100 s and
+1900 s). For example,if the first pseudo-random generated numberis 12.41 and the
+secondpseudo-random generatednumberis18.18 s,theevacuationtimeofthefirst
+occupant out would correspond to 12.41 s and the evacuation time of the second
+occupant out would be 12.41 s + 18.18 s = 30.59 s. The procedure is repeated for
+all120occupants(seeTable 1).AnexampleofonepossiblecurveisprovidedinFig-
+ure 7. The assumed population consists of 120 occupants. The evaluation of the
+numberofrunstobesimulatedistheunknownvariableofthisexample.
+The steps of the evaluation method are applied as follows.
+Step 1. Define the acceptance criteria.
+This step deals with the definition of the five acceptable thresholds TR ,
+TET
+TR , TR , TR , TR about the impact of the number of runs on the
+SD ERD EPC SC
+predicted outcome of the evacuation model for the same evacuation scenario (see
+Eqs. 26–30). The number of consecutive runs b = 10 for which the acceptance
+thresholds needs to be accomplished is also defined.
+TR ¼0:5% ð26Þ
+TET
+TR ¼5% ð27Þ
+SD
+
+===== PAGE 16 =====
+
+1600
+1400
+1200
+1000
+800
+600
+400
+200
+0
+0 20 40 60 80 100 120
+TR ¼1% ð28Þ
+ERD
+TR ¼1% ð29Þ
+EPC
+TR ¼1% ð30Þ
+SC
+For instance, this means that the acceptance criteria are satisfied if
+TET <TR for 10 consecutive runs, SD <TR for 10 consecutive
+convj TET convj SD
+runs, etc.
+It should be noted that the acceptance criteria have been selected with the only
+purpose of showing the procedure, i.e., they do not represent recommended values
+for use in real engineering analyses. Nevertheless, those criteria represent possible
+values in the context of fire safety engineering in relation to all types of uncer-
+tainty associated with modelling results. In fact, the authors argue that thresholds
+below 5% would permit the assessment of the required safe egress time with a
+reasonable degree of accuracy. The definition of the criteria would be dependent
+)s(
+emit
+noitaucavE
+1560 Fire Technology 2014
+Table1
+Exampleof Fictitious DataRepresenting One Possible Occupant-
+Evacuation Curve
+Occupantsout Pseudo-randomgeneratednumber Evacuationtime(s)
+1 12.41 12.41
+2 18.18 30.59
+3 20.22 50.81
+4 8.43 59.24
+… … …
+120 … 1401.09
+Occupants out (n)
+Figure7. Fictitious datarepresenting one possible curve of evacua-
+tiontimes.
+
+===== PAGE 17 =====
+
+on several factors, such as the type of evacuation scenario, data under consider-
+ation, the scope of the analysis, etc.
+Step 2. Run a finite set of n runs of the same evacuation scenario.
+An arbitrary initial number of simulations of the same scenario is set to 35.
+* (cid:4) (cid:5)
+n = 35 vectors of 120 dimensions m ¼ m ;...;m ;...;m corresponding
+ij 11 ij 12035
+to the simulated evacuation times of each occupant ith (for a total of 120 occu-
+pants) in each jth run are obtained (for a total of 35 runs).
+In the present example, the 35 fictitious curves have been generated using the
+method described at the beginning of Section 3. They result in the 35 curves
+showed in Figure 8. The curves presented in Figure 7 are representative of a set
+of repeated results of an evacuation model in the case of a hypothetical evacua-
+tion scenario for lognormal distribution of evacuation times [19]. It should be
+noted that the shape of the evacuation curves may be different than the example
+provided here (e.g. s-shaped occupant-evacuation curves). The method is based
+on convergence measures which are independent on the shape of the curves, thus
+it may be applicable for any type of curve.
+The vector corresponding to the consecutive average curves
+*
+M¼ðM ;...;M Þ is also generated.
+1 35
+Step 3. Calculate the convergence measures.
+The convergence measures presented in the previous sections are calculated for
+all 35 runs, i.e., TET , SD , ERD , EPC , and SC in accordance
+convj convj convj convj convj
+to Equations 11, 13, 15, 17, and 19, respectively. In this example a single value
+for s in Equation 19 has been used, namely s = 4. Results are presented in
+Table 2.
+Step 4-4bis. Compare the convergence measures with the acceptance criteria.
+Results for 35 runs are compared with the acceptance criteria defined in Step 1
+(see also Equations 21–25). Table 3 shows the results of the tests in relation to
+the number of runs. When the box shows ‘‘FAILED’’, it means that the test is
+2000
+1800
+1600
+1400
+1200
+1000
+800
+600
+400
+200
+0
+0 20 40 60 80 100 120
+)s(
+emiT
+noitaucavE
+Analysis of Behavioural Uncertainty 1561
+Occupants out (n)
+Figure8. Fictitious datarepresenting 35runs of thesame hypotheti-
+calevacuation scenario.
+
+===== PAGE 18 =====
+
+1562 Fire Technology 2014
+Table2
+RESULTSCorresponding to35Runs of the SameEvacuation Scenario
+(Expressed in %)
+Run(n) TET (%) SD (%) ERD (%) EPC (%) SC (%)
+convj convj jconv jconv jconv
+1 / / / / /
+2 12.163 / / / /
+3 3.852 8.294 10.800 18.674 10.337
+4 3.369 0.886 1.555 5.446 0.439
+5 4.691 16.110 1.059 4.962 1.238
+6 2.024 3.639 2.399 3.022 0.176
+7 0.405 7.698 0.368 0.052 0.045
+8 2.054 2.709 1.321 2.658 0.115
+9 1.323 1.400 1.403 1.086 0.365
+10 1.238 0.875 0.055 1.900 0.165
+11 0.582 3.723 0.158 0.088 0.024
+12 1.139 0.358 0.169 0.187 0.011
+13 0.626 2.473 0.122 0.138 0.008
+14 0.820 0.772 0.081 0.068 0.004
+15 1.901 11.480 1.761 2.673 0.392
+16 0.140 3.194 1.883 2.505 0.396
+17 0.758 0.312 0.235 0.969 0.042
+18 0.861 0.779 0.134 1.393 0.064
+19 0.403 1.859 0.166 1.248 0.062
+20 0.453 1.400 0.254 1.355 0.062
+21 0.234 2.124 0.578 0.696 0.003
+22 0.420 1.159 0.028 0.092 0.010
+23 0.569 0.080 0.443 0.980 0.032
+24 0.298 1.473 0.514 0.893 0.029
+25 0.393 0.819 0.170 0.206 0.012
+26 0.663 1.576 0.206 0.210 0.002
+27 0.267 1.297 0.138 1.033 0.016
+28 0.198 1.480 0.084 0.955 0.006
+29 0.666 2.348 0.666 1.631 0.095
+30 0.166 1.442 0.958 1.043 0.079
+31 0.129 1.481 0.031 0.231 0.020
+32 0.652 2.721 0.323 0.359 0.012
+33 0.184 1.193 0.382 0.646 0.013
+34 0.075 1.441 0.044 0.075 0.001
+35 0.207 0.956 0.181 0.424 0.012
+failed. When the test is passed, the box is left blank. After 10 consecutive runs
+(given the acceptance criteria defined in Step 1), when the test is passed, the box
+shows ‘‘OK’’, which means that the acceptance criteria have been met.
+In this example, Test 1 failed, Test 2 is passed after 25 runs, Test 3 is accom-
+plished after 26 runs, Test 4 is failed, and Test 5 is accomplished after 15 runs.
+This means that our predicted curve meet the acceptance criteria with regards of
+the SD of the TET, the ERD and the SC. Nevertheless, there are two criteria
+that have not been met (TET and EPC). It is therefore necessary to proceed with
+Step 5 by conducting additional runs.
+
+===== PAGE 19 =====
+
+Analysis of Behavioural Uncertainty 1563
+Table3
+Summaryof the Results of the TestsinStep 4
+Run Test1 Test2 Test3 Test4 Test5
+1 / / / / /
+2 Failed Failed / / /
+3 Failed Failed Failed Failed Failed
+4 Failed Failed Failed
+5 Failed Failed Failed Failed Failed
+6 Failed Failed Failed
+7 Failed
+8 Failed Failed Failed
+9 Failed Failed Failed
+10 Failed Failed
+11 Failed
+12 Failed
+13 Failed
+14 Failed
+15 Failed Failed Failed Failed Ok
+16 Failed Failed
+17 Failed
+18 Failed Failed
+19 Failed
+20 Failed
+21
+22
+23 Failed
+24
+25 Ok
+26 Failed Ok
+27 Failed
+28
+29 Failed Failed
+30 Failed
+31
+32 Failed
+33
+34
+35
+Step 5. Simulate a set of additional simulations m so that the new set of runs for
+the comparison is S = n + m.
+Another set of runs m = 35 of the same scenario—corresponding to addi-
+tional 35 occupant-evacuation time curves—are considered for a total of
+S = n + m = 35 + 35 = 70 runs. In this example, additional fictitious data
+are produced using the same method as the first 35 curves. A new set of
+* * (cid:4) (cid:5)
+S = n + m S vectors S ¼ S ;...;S ;...;S corresponding to the average
+ij ij 11 ij qS
+simulated evacuation times of each of the 120 occupant ith in each of the 70 jth
+run S are produced.
+
+===== PAGE 20 =====
+
+1564 Fire Technology 2014
+Table4
+Results of Test1 andTest4 for70 Runs
+Run Test1 Test4 Run Test1 Test4 Run Test1 Test4
+1 24 47
+2 Failed 25 48
+3 Failed Failed 26 Failed 49
+4 Failed Failed 27 Failed 50
+5 Failed Failed 28 51 Failed
+6 Failed Failed 29 Failed Failed 52
+7 30 Failed 53
+8 Failed Failed 31 54
+9 Failed Failed 32 Failed 55
+10 Failed Failed 33 56
+11 Failed 34 57
+12 Failed 35 58
+13 Failed 36 59
+14 Failed 37 60
+15 Failed Failed 38 61 OK
+16 Failed 39 62
+17 Failed 40 Failed OK 63
+18 Failed Failed 41 64
+19 Failed 42 Failed 65
+20 Failed 43 66
+21 44 67
+22 45 68
+23 Failed 46 69
+70
+The evaluation method is now repeated for S = 70 runs, starting from Step 3,
+called here Step 3.2.
+Step 3.2. Calculate the convergence measures.
+The failing convergence measures are calculated for S = 70 runs, i.e.,
+TET , and EPC for our case study.
+convFIN convFIN
+Step 4.2-4.2bis. Compare the convergence measures with the acceptance criteria.
+Results for S = 70 runs are compared again with the acceptance criteria
+defined in Step 1. Table 4 shows the results of the tests that were previously fail-
+ing in relation to the number of runs.
+Table 4 shows that Test 4 is accomplished after 40 runs. An example of the
+number of runs required to accomplish different criteria for TR (where
+TET
+TET <TR for 10 consecutive runs) for the fictitious data-set under consid-
+convj TET
+eration is shown in Figure 9. The grey dashed vertical line refers to the acceptance
+criteria TR = 0.5% which has been selected for the analysis of the TET in
+TET
+Step 1. Test 1 is passed after 61 runs if the convergence criteria are TET <
+convj
+0.5% for 10 consecutive runs. This means that our predicted curve now meet all
+acceptance criteria.
+
+===== PAGE 21 =====
+
+70
+60
+50
+40
+30
+20
+10
+0
+0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0
+4. Discussion
+The analysis of the trend of the convergence measures is useful to obtain general
+information on the type of data-set under consideration. For example, it is possi-
+ble to assess behavioural uncertainty and therefore estimate the impact of the use
+of stochastic variables/distributions on evacuation model results.
+An example from the data of the case study in Section 3.1 is presented in Fig-
+ure 10 where TET and SD are shown as well as Figure 11 where ERD ,
+convj convj convj
+EPC , and SC are shown (convergence measures are calculated for a total
+convj convj
+of 140 consecutive average number of runs, i.e., 70 additional runs have been ana-
+lysed).
+rebmuN
+)n(
+snur
+fo
+Analysis of Behavioural Uncertainty 1565
+Criteria for TRTET (%)
+Figure9. Number of requiredruns in relationto different criteria for
+TRTET.
+TETconvj SDconvj TRtet TRsd
+18
+16
+14
+12
+10
+%
+8
+6
+4
+2
+0
+0 20 40 60 80 100 120 140
+Number of runs (n)
+Figure10. TET ,SD in relation tothe consecutive average
+convj convj
+number of runs (expressedin %).
+
+===== PAGE 22 =====
+
+1566 Fire Technology 2014
+ERDjconv EPCjconv
+SCjconv TRerd = TRepc = TRsc
+18
+16
+14
+12
+10
+%
+8
+6
+4
+2
+0
+0 20 40 60 80 100 120 140
+Number of runs (n)
+Figure11. ERD , EPC , andSC in relationto the consecu-
+convj convj convj
+tiveaverage number of runs(expressed in %).
+Figures 10 and 11 show that the SD of the evacuation time SC of the last
+convj
+occupant is the slowest converging variable. Together with TET , those vari-
+convj
+ables are useful to understand the variability of the TET in relation to the number
+of runs. An estimation of uncertainty (including behavioural uncertainty) associ-
+ated with the TET is a key aspect of fire safety engineering analysis since it repre-
+sents the required safe egress time (RSET) [19], the time needed by all occupants
+to perform a safe evacuation.
+The analysis of the convergence of ERD , EPC , and SC is also a sig-
+convj convj convj
+nificant contribution to the understanding of behavioural uncertainty, since it per-
+mits the analysis of the variability of the predicted occupant-evacuation time
+curves in relation to the number of runs. In the example provided here, the con-
+vergence measures are below 2.5% after 17 runs, thus permitting the estimation of
+the average occupant-evacuation time curve with an admitted 2.5% variability in
+a relatively small number of runs.
+The simulation of additional 70 runs (for a total of 140 runs in Figures 10
+and 11) shows that, as expected, results continue to converge and the effect of
+behavioural uncertainty on average occupant evacuation time is progressively
+reduced. Nevertheless, if the acceptance criteria include the requirement of being
+below the thresholds for a sufficient number of consecutive runs (i.e. a critical
+number that the model user should select in relation to the scenario under consid-
+eration in order to verify the stability of the convergence), the simulation of addi-
+tional runs does not provide any additional benefits to the modeller. The selection
+of the number of runs is optimised in relation to the pre-defined acceptance crite-
+ria and there is no need to simulate additional runs.
+A statistical estimation of the uncertainty associated with the use of the conver-
+gence measures can be performed in relation to the number of runs. This includes
+the study of the uncertainty of the sample average TETs and the sample SDs.
+
+===== PAGE 23 =====
+
+Analysis of Behavioural Uncertainty 1567
+*
+Assume that each TET in the vector TET is a sum of random variables corre-
+sponding to the inter-temporal times between each occupant. Applying the central
+*
+limit theorem, the series corresponding to the vector TET consists of normally dis-
+tributed values TET (cid:3) N(l, r2), where l is the true mean value and r2 is the true
+j
+variance. The sample variance is:
+Pn (cid:4)
+TET (cid:2)TET
+(cid:5)2
+s2 ¼ j¼1 j avj ð31Þ
+n(cid:2)1
+where n is the number of runs. Applying Cochran’s theorem, s2 (cid:3) r2 v2 , a Chi
+n(cid:2)1 n(cid:2)1
+squared distribution with n - 1 degrees of freedom. Then, the variance of the
+sample variance, Var(s2), corresponds to:
+Varðs2Þ¼Var
+(cid:7) r2
+v2
+(cid:8)
+¼
+(cid:7) r2 (cid:8)2
+Var (cid:4) v2 (cid:5)
+n(cid:2)1 n(cid:2)1 n(cid:2)1 n(cid:2)1
+ð32Þ
+(cid:7) r2 (cid:8)2 2r4
+¼ 2ðn(cid:2)1Þ¼
+n(cid:2)1 n(cid:2)1
+The sample SD s is distributed as a chi distribution with n - 1 degrees of free-
+dom, i.e., s(cid:3)pffi n r ffi (cid:2)1 v n(cid:2)1 . Hence the variance of the SDs of the sample data corre-
+sponds to:
+(cid:7) r (cid:8) r2
+VarðsÞ¼Var p v ¼ Varðv Þ
+ffinffiffi (cid:2)1 n(cid:2)1 n(cid:2)1 n(cid:2)1
+r2
+2 (
+C
+(cid:4)n(cid:5) )2 3 ð33Þ
+¼
+n(cid:2)1
+4n(cid:2)1(cid:2)2
+C
+(cid:4)n(cid:2) 2 1(cid:5) 5
+2
+where C(n) is a gamma function. Hence, it is possible to estimate the relative SD
+(the relative difference between the use of sample SDs and the SDs corresponding
+to the true distribution):
+vffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+u"
+(cid:9) (cid:10)2
+#
+u CðnÞ
+u n(cid:2)1(cid:2)2 2
+u Cðn(cid:2)1Þ
+t 2
+relativeStdðsÞ¼ ð34Þ
+n(cid:2)1
+This information permits an estimation of the uncertainty associated with the use
+of the estimate SDs SD employed in the evaluation method in relation to the
+j
+number of runs under consideration.
+It is also possible to perform an estimation of the uncertainty associated with
+the use of the estimate variance of the sample data s2 when calculating the aver-
+age sample TET TET . In fact, the average of the TET TET is distributed as
+avj avj
+
+===== PAGE 24 =====
+
+1568 Fire Technology 2014
+ps ffi n ffit n(cid:2)1 þl, where t n-1 is a Student t random variable with n-1 degrees of free-
+dom.
+Therefore the variance of the sample average TET corresponds to:
+avj
+(cid:4) (cid:5)
+s2n(cid:2)1
+Var TET ¼ ð35Þ
+avj n n(cid:2)3
+And the uncertainty of the TET is:
+avj
+sffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+(cid:4) (cid:5) n(cid:2)1
+SD TET ¼s ð36Þ
+avj nðn(cid:2)3Þ
+It is therefore possible to estimate the uncertainty associated with the number of
+runs given the use of the sample TET .
+avj
+To date, behavioural uncertainty is generally treated only in a qualitative man-
+ner (performing a qualitative evaluation of the number of runs to be simulated). It
+is argued that the present work would encourage evacuation model users to per-
+form a quantitative treatment of this type of uncertainty given the simplicity of
+the method proposed.
+The benefits obtained from the use of the method apply to design studies as
+well as model validation. The proposed method permits an estimation of the con-
+vergence of the simulated occupant-evacuation curve towards the average curve,
+thus increasing the understanding of the model predictions. This is reflected in a
+better understanding of the variability of RSET and the possible estimation of the
+margin of safety of a specific design in relation to behavioural uncertainty.
+From a model validation perspective, to date, two antithetical approaches may
+be used to present model comparison with experimental data, namely (1) the use
+of the best model estimation for the occupant-evacuation time curve, or (2) the
+average occupant-evacuation time curve. The method presented in this section
+increases the usability of the second approach, since it allows a thorough quanti-
+tative understanding of the average curves produced by evacuation models. Future
+work based on the presented method is therefore a definition of an evacuation
+model validation protocol which uses the convergence measures to assess the dif-
+ferences between model predictions and experimental data by taking into account
+behavioural uncertainty.
+A possible application of the method presented in this paper may be its use for
+the comparison of model predictions produced by different evacuation models. It
+would be in fact possible to quantify the impact of the stochastic variables and
+assumptions used by different evacuation models given the same evacuation sce-
+nario.
+5. Limitations
+A set of limitations of the proposed method can be identified both in terms of its
+assumptions as well as its applicability.
+
+===== PAGE 25 =====
+
+Analysis of Behavioural Uncertainty 1569
+The first limitation of the method is that it uses the concepts of convergence in
+mean and the central limit theorem rather than a statistical estimation of the
+expected values. Hence, the choice of the requirement for the finite number of
+consecutive runs b for which the acceptable thresholds must not be crossed should
+be carefully evaluated by the modeller in relation to the data under consideration.
+This limitation is tempered by the simplicity of the proposed method, i.e., it can
+be applied by evacuation modellers to analyse behavioural uncertainty without a
+complex inferential statistical treatment of the data, which may require time and
+user expertise.
+Another limitation of the method is associated with the assumptions that evacu-
+ation curves can be identical between model runs even in the case of different
+behaviours occurring, i.e., the arrival rates to the exits are the same but they refer
+to different occupants or different exits.
+With regards of the method applicability, multiple data-sets of a single evacua-
+tion scenario are rarely available in the literature. This makes it difficult to study
+the impact of behavioural uncertainty on experimental data. Given the current
+stage of experimental evacuation research, the proposed method is mainly applica-
+ble to the analysis of behavioural uncertainty in simulation results. Once addi-
+tional experimental data on individual scenarios will be available, researchers will
+be able to use the same concepts introduced in this paper for the analysis of
+behavioural uncertainty in experimental data.
+Without multiple experimental data, a single experiment often represents the
+only reference on that specific evacuation scenario, but it is not clear whether it
+represents average behaviour or it is a tail of the curve. In fact, the assessment of
+experimental and evacuation model results may also include the analysis of the
+tails of the distribution rather than the analysis of the peaks (i.e. average values).
+Nevertheless, the authors argue that the study of the average model predictions
+together with the variability of results around the average is deemed to be a useful
+method to analyse behavioural uncertainty. The research community of human
+behaviour in fire is aware of the lack of experimental data and the need to fill this
+gap with data collection efforts [2]. In recent years, significant data collection
+efforts have been carried out (e.g. several projects were performed for different
+aspects/conditions of the evacuation process using several tool to aid the collec-
+tion and quality of data [20, 21]). Therefore, it can be argued that considering a
+long-term perspective, it will be possible to assess behavioural uncertainty also for
+experimental data (thus making the method proposed in the paper applicable also
+for that issue).
+The method is presented using a case study based on pseudo-random generated
+numbers. Future work can be based on the analysis of the results of an evacua-
+tion model from a real world case study.
+6. Conclusions
+This paper introduces a simple methodology to analyse the variability of evacua-
+tion model predictions of an individual evacuation scenario in relation to the
+
+===== PAGE 26 =====
+
+1570 Fire Technology 2014
+number of test cases. The method allows increasing the understanding of the
+uncertainty in evacuation model results, which depend on the stochastic nature of
+human behaviour, here called behavioural uncertainty.
+This paper presents a step forward towards a more accurate interpretation of
+evacuation model results, because it introduces a novel method to perform quanti-
+tative estimation of the convergence of evacuation model predictions. In fact, the
+use of functional analysis operators permitted the analysis of the entire occupant-
+evacuation time curves, rather than a study focused on the average and SDs of
+evacuation times only.
+This paper represents the starting point for a better quantitative interpretation
+of evacuation behaviour. In fact, future applications are associated with the inter-
+pretation of behavioural experimental data as well as the development of a stan-
+dard model validation protocol.
+Acknowledgments
+The authors wish to acknowledge Erica Kuligowski, Craig Weinschenk, Thomas
+Cleary, Anthony Hamins, and Rita Fahy for a comprehensive review of the paper
+before publication. Enrico Ronchi thanks Daniel Nilsson for the fruitful discus-
+sions which have led to the idea of this paper. Finally, the authors wish to thank
+Blaza Toman for her valuable suggestions for the assessment of the uncertainty
+associated with the proposed criteria.
+References
+1. Hamins A, McGrattan K (2007) Verification and validation of selected fire models for
+nuclear power plant applications. Final Report NUREG-1824. U.S. Nuclear Regula-
+tory Commission
+2. Averill JD (2011) Five grand challenges in pedestrian and evacuation dynamics. In:
+Proceedings of the 5th international pedestrian and evacuation dynamics conference,
+pp1–11
+3. Kuligowski E(2011)Predicting human behaviorduring fires. Fire Technol49:101–120
+4. McGrattan K, Hostikka S, Floyd J, Baum H, Rehm R, Mell W, McDermott R (2007)
+Fire dynamics simulator (version 5) technical reference guide. NIST special publication
+1018-5
+5. Jones WW, Peacock RD, Forney G, Reneke PA (2009) CFAST—consolidated model
+of fire growth and smoke transport (version 6). Technical reference guide. NIST special
+publication 1026
+6. Kuligowski ED, Peacock RD, Hoskins BL (2010) A review of building evacuation
+models, 2nd edn. Fire Research Division, National Institute of Standards and Technol-
+ogy,Technical Note 1680
+7. Lord J, Meacham B, Moore A, Fahy R, Proulx G (2005) Guide for evaluating the pre-
+dictive capabilities of computer egress models. National Institute of Standards and
+Technology.NIST GCR06-886
+
+===== PAGE 27 =====
+
+Analysis of Behavioural Uncertainty 1571
+8. Ronchi E, Kinsey M (2011) Evacuation models of the future. Insights from an online
+survey on user‘s experiences and needs. In: Proceedings of the advanced research work-
+shop:evacuation andhuman behaviour in emergency situations,pp 145–155
+9. Capote JA, Alvear D, Abreu O, Cuesta A, Alonso V (2012) A stochastic approach for
+simulating human behaviour during evacuation process in passenger trains. Fire Tech-
+nol48:911–925
+10. Ronchi E, Nilsson D, Gwynne SMV (2012) Modelling the impact of emergency exit
+signs in tunnels. Fire Technol48:961–988
+11. Galea ER, Filippidis L, Deere S, Brown R, Nicholls, Hifi Y, Besnard B (2012) IMO
+information paper—the SAFEGUARD validation data-set and recommendations to
+IMO to update MSC/Circ. 1238. Safeguard passenger evacuation seminar, 30 Nov
+2012, London
+12. Peacock RD, Reneke PA, Davis WD, Jones WW (1999) Quantifying fire model evalua-
+tionusingfunctionalanalysis.FireSafJ33:167–184.doi:10.1016/S0379-7112(99)00029-6
+13. International Standards Organization (2008) ISO/FDIS 16730. Fire safety engineer-
+ing—assessment, verificationand validation of calculation methods.ISO/TC92/SC4
+14. Galea ER, Deere S, Brown R, Filippidis L (2013) An Evacuation validation data set
+for large passenger ships. In: Proceedings of the pedestrian and evacuation dynamics
+2012conference
+15. Prugovecki E (1981) Quantum mechanics in Hilbert space, 2nd ed. Pure and applied
+mathematics, aseries of monographsand textbooks.AcademicPress, NewYork
+16. Bains R (1992) Applied functional analysis and variational methods in engineering. Eng
+Anal BoundElem9:365–366
+17. Purser DA,Bensilum M(2001) Quantificationof behaviour for engineering designstan-
+dardsand escapetime calculations. SafSci 38(2):157–182
+18. Wichmann BA, Hill ID (1982) Algorithm AS 183: an efficient and portable pseudo-ran-
+domnumber generator.Appl Stat 31:188–190
+19. Ronchi E, Nilsson D (2013) Modelling total evacuation strategies for high-rise build-
+ings. BuildSimul. doi:10.1007/s12273-013-0132-9
+20. Gwynne SMV, Kuligowski ED, Nilsson D (2012) Representing evacuation behavior in
+engineering terms.JFire ProtEng 22(2):133–150
+21. Gwynne SMV (2013) Improving the collection and use of human egress data. Fire
+Technol41(1):83–99

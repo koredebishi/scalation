@@ -1,0 +1,2845 @@
+===== PAGE 1 =====
+
+FoundComputMath(2017)17:527–566
+DOI10.1007/s10208-015-9296-2
+Random Gradient-Free Minimization of Convex
+Functions
+YuriiNesterov1 · VladimirSpokoiny2
+Received:15July2013/Revised:4May2015/Accepted:24September2015/
+Publishedonline:30November2015
+©SFoCM2015
+Abstract In this paper, we prove new complexity bounds for methods of convex
+optimizationbasedonlyoncomputationofthefunctionvalue.Thesearchdirections
+of our schemes are normally distributed random Gaussian vectors. It appears that
+suchmethodsusuallyneedatmostntimesmoreiterationsthanthestandardgradient
+methods,wheren isthedimensionofthespaceofvariables.Thisconclusionistrue
+for both nonsmooth and smooth problems. For the latter class(cid:2), w(cid:3)e present also an
+accelerated scheme with the expected rate of convergence O
+n2
+, where k is the
+k2
+iteration counter. For stochastic optimiz(cid:2)ation,(cid:3)we propose a zero-order scheme and
+justifyitsexpectedrateofconvergenceO n .Wegivealsosomeboundsfortherate
+k1/2
+ofconvergenceoftherandomgradient-freemethodstostationarypointsofnonconvex
+functions,forbothsmoothandnonsmoothcases.Ourtheoreticalresultsaresupported
+bypreliminarycomputationalexperiments.
+Keywords Convexoptimization·Stochasticoptimization·Derivative-freemethods·
+Randommethods·Complexitybounds
+Communicatedby MichaelOverton.
+Y.Nesterov:ThisworkwasdoneinaffiliationwithHigherSchoolofEconomics,Moscow.
+B
+YuriiNesterov
+yurii.nesterov@uclouvain.be
+1 CenterforOperationsResearchandEconometrics(CORE),CatholicUniversityofLouvain
+(UCL),Leuven,Belgium
+2 WeierstrassInstituteforAppliedAnalysisandStochastics(WIAS),HumboldtUniversityofBerlin,
+Berlin,Germany
+123
+
+===== PAGE 2 =====
+
+528 FoundComputMath(2017)17:527–566
+MathematicsSubjectClassification 90C25·0C47·68Q25
+1 Introduction
+1.1 Motivation
+Derivative-freeoptimizationmethodswereamongthefirstschemessuggestedinthe
+early days of the development of optimization theory [12]. These methods have an
+evidentadvantageofasimplepreparatorystage(theprogramofcomputationofthe
+functionvalueisalwaysmuchsimplerthantheprogramforcomputingthevectorof
+thegradient).However,verysoonitwasrealizedthatthesemethodsaremuchmore
+difficultfortheoreticalinvestigation.Forexample,evenformoderatedimension,the
+famous method by Nelder and Mead [13] has only an empirical justification up to
+now (justification for low-dimensional problems were given in [10,11]). Moreover,
+the possible rate of convergence of the derivative-free methods (established usually
+onanempiricallevel)isfarbelowtheefficiencyoftheusualoptimizationschemes.
+Ontheotherhand,asitwasestablishedinthebeginning of1980s,anyfunction,
+representedbyanexplicitsequenceofdifferentiableoperations,canbeautomatically
+equipped with a program for computing the whole vector of its partial derivatives.
+Moreover,thecomplexityofthisprogramisatmostfourtimesbiggerthanthecom-
+plexityofcomputationoftheinitialfunction(thistechniqueiscalledFastDifferentia-
+tion,orabackwardmodeofAutomaticDifferentiation).Itseemsthatthisobservation
+destroyedthelastargumentsforsupportingtheideaofderivative-freeoptimization.
+Duringseveraldecades,thesemethodswerealmostoutofcomputationalpractice.
+However, in the last years, we can see a restoration of the interest to this topic.
+The current state of the art in this field was recently updated by a comprehensive
+monograph[5].Itappearsthat,despiteserioustheoreticalobjections,thederivative-
+freemethodscanprobablyfindtheirplaceonthesoftwaremarket.Forthat,thereexist
+atleastseveralreasons.
+• Inmanyappliedfields,thereexistsomemodels,whicharerepresentedbyanold
+black-boxsoftwareforcomputingonlythevaluesofthefunctionalcharacteristics
+oftheproblem.Modificationofthissoftwareiseithertoocostlyorimpossible.
+• There exist some restrictions for applying the Fast Differentiation technique. In
+particular, it is necessary to store the results of all intermediate computations.
+Clearly,forsomeapplications,thisisimpracticalbymemorylimitations.
+• Inanycase,creationofaprogramforcomputingpartialderivativesrequiressome
+(substantial) efforts of a qualified programmer. Very often his/her working time
+is much more expensive than the computational time. Therefore, in some situa-
+tionsitisreasonabletobuyacheapersoftwareandacceptsignificantlyincreased
+computationaltime.
+• Finally,theextensionofthenotionofthegradientontononsmoothcaseisanon-
+trivialoperation.Thegeneralizedgradientcannotbeformedbypartialderivatives.
+Themostpopularframeworkfordefiningthesetoflocaldifferentialcharacteristics
+(Clarkesubdifferential[4])suffersfromanincompletechainrule.Theonlyknown
+techniqueforautomaticcomputationsofsuchcharacteristics(lexicographicdiffer-
+123
+
+===== PAGE 3 =====
+
+FoundComputMath(2017)17:527–566 529
+entiation[17])requiresanincreaseincomplexityoffunctionevaluationin O(n)
+times,wherenisthenumberofvariables.
+Thus,itisinterestingtodevelopthederivative-freeoptimizationmethodsandobtain
+the theoretical bounds for their performance. It is interesting that such bounds are
+almost absent in this field (see, for example, [5]). One of the few exceptions is a
+derivative-freeversionofcuttingplanemethodpresentedinSection9.2of[15]and
+improvedby[21].
+Inthispaper,wepresentseveralrandomderivative-freemethodsandprovidethem
+withsomecomplexityboundsfordifferentclassesofconvexoptimizationproblems.
+Aswewillsee,thecomplexityanalysisiscrucialforfindingthereasonablevaluesof
+theirparameters.
+Our approach can be seen as a combination of several popular ideas. Firstof all,
+wementiontherandomoptimizationapproach[12],asappliedtotheproblem
+min f(x), (1)
+x∈Rn
+where f isadifferentiablefunction.Itwassuggestedtosampleapoint y randomly
+aroundthecurrentpositionx (inaccordancewithGaussiandistribution)andmoveto
+y if f(y) < f(x). The performance of this technique for nonconvex functions was
+estimatedin[6]andcriticizedby[22]fromthenumericalpointofview.
+DifferentimprovementsoftherandomsearchideawerediscussedinSection3.4
+[20].Inparticular,itwasmentionedthatthescheme
+x k+1 = x k −h k f(xk +μ μ ku)−f(xk ) u, (2)
+k
+whereu isarandomvectordistributeduniformlyovertheunitsphereandconverges
+under assumption μ → 0. However, no explicit rules for choosing the parameters
+k
+weregiven,andnoparticularrateofconvergencewasestablished.
+The main goal of this paper is the complexity analysis of different variants of
+method(2)anditsacceleratedversions.Westudythesemethodsforbothsmoothand
+nonsmooth optimization problems. It appears that the most powerful version of the
+scheme(2)correspondstoμ →0.Thenwegetthefollowingprocess:
+k
+x k+1 = x k −h k f (cid:4)(x k ,u)u, (3)
+where f (cid:4)(x,u)isadirectionalderivativeoffunction f(x)alongu ∈ Rn.Ascompared
+withthegradient,directionalderivativeisamuchsimplerobject.Itsvaluecanbeeasily
+computedevenfornonconvexnonsmoothfunctionsbyaforwarddifferentiation.Orit
+canbeapproximatedverywellbyfinitedifferences.Notethatinthegradientschemes,
+the target accuracy (cid:2) for problem (1) is not very high. Hence, as we will see, the
+accuracyofthefinitedifferencescanbekeptonareasonablelevel.
+For our technique, it is convenient to work with a normally distributed Gaussian
+vectoru ∈ Rn.Thenwecandefine
+g
+(x)d=ef
+f
+(cid:4)(x,u)u.
+0
+123
+
+===== PAGE 4 =====
+
+530 FoundComputMath(2017)17:527–566
+Itappearsthatforconvex f,vector E (g (x))isalwaysasubgradientof f atx.
+u 0
+Thus,wecantreattheprocess(3)asamethodwithrandomoracle.Usually,these
+methodsareanalyzedintheframeworkofstochasticapproximation(see[14]forthe
+state of art of the field). However, our random oracle is very special. The standard
+assumption in stochastic approximation is the boundedness of the second moment
+oftherandomestimate∇ F(x,u)ofthegradientfortheobjectivefunction f(x) =
+x
+E (F(x,u)):
+u
+E ((cid:6)∇ F(x,u)(cid:6)2)≤ M2, x ∈ Rn. (4)
+u x 2
+(see,forexample,condition(2.5)in[14]).However,inourcase,if f isdifferentiable
+atx,then
+E ((cid:6)g (x)(cid:6)2)≤(n+4)(cid:6)∇f(x)(cid:6)2.
+u 0 2 2
+Thisrelationmakestheanalysisofourmethodsmuchsimplerandleadstothefaster
+schemes.Inparticular,forthemethod(3)asappliedtoLipschitz-continuousfunctions,
+we can prove(cid:4)that the expected rate of convergence of the objective function is of
+the order O( n). If a function has Lipschitz-continuous gradient, then the rate is
+k
+increasedupto O(n).Ifinaddition,ourfunctionisstronglyconvex,thenwehavea
+k
+globallinearrateofconvergence. Notethatinthesmoothcase,usingthetechnique
+ofestimatesequences(e.g.,Section2.2in[16]),wecanacceleratemethod(3)upto
+convergencerate
+O(n2).
+k2
+For justifying the versions of random search methods with μ > 0, we use a
+k
+smoothedversionoftheobjectivefunction
+fμ (x)= E
+u
+(f(x +μu)). (5)
+This object is classical in optimization theory. For the complexity analysis of the
+random search methods, it was used, for example, in Section 9.3 [15]1 However, in
+theiranalysistheauthorsusedthefirstpartoftherepresentation
+(!)
+∇fμ (x)=
+μ
+1E
+u
+(f(x +μu)u) ≡
+μ
+1E
+u
+([f(x +μu)− f(x)]u).
+Inouranalysis,weusethesecondpart,whichisboundedinμ.Hence,ourconclusions
+aremoreoptimistic.
+Ourresultscomplementaseriesofdevelopmentsinthemachinelearningcommu-
+nity,relatedtorandomized algorithmsbasedonzero-orderoracles.Firstalgorithms
+ofthistypewereproposedin[8]underthenameofbanditconvexoptimizationfora
+noisyoracle.Theobtainedcomplexityresultswereoftheorder(cid:2)−1/4
+forLipschitz-
+continuousconvexfunctions.Anotherimportantcontributionis[1],wheretheauthors
+consideranoisyzero-orderoracleandobtaincomplexityresultsfordifferentclasses
+1 In[15],uwasuniformlydistributedoveraunitball.Inourcomparison,weuseadirecttranslationofthe
+constructionsin[15]intothelanguageofthenormalGaussiandistribution.
+123
+
+===== PAGE 5 =====
+
+FoundComputMath(2017)17:527–566 531
+ofconvexfunctions(e.g.,O(n4)forLipschitz-continuousfunctions).In[2],themodel
+(cid:2)2
+oftheoracleadmitsevenmorenoise.Itseemsthatthemethodswiththeabsenceof
+noisewerenotinthemainfocusofthislineofresearch.
+Randomized optimization algorithms were intensively studied in the theoretical
+computer science literature in the framework of random walks in convex sets (e.g.,
+[3]).Forglobaloptimization,manyauthorswereapplyingrandomizationideas(e.g.,
+[9];seealso[7]forrelevantlowerbounds).Inourapproach,wesignificantlysimplify
+the analysis allowing random displacements in the full neighborhood of the current
+testpoint.
+Thispaperisanextendedversionofpreprint[18].
+1.2 Contents
+InSect.2,weintroducetheGaussiansmoothing(5)andstudyitsproperties.Inpar-
+ticular,fordifferentfunctionalclasses,weestimatetheerrorofapproximationofthe
+objective function and the gradient with respect to the smoothing parameter μ. The
+proofsofallstatementsofthissectioncanbefoundin“Appendix”.
+InSect.3,weintroducetherandomgradient-freeoracles,whicharebasedeitheron
+finitedifferencesorondirectionalderivatives.Themainresultsofthissectionarethe
+upperboundsfortheexpectedvaluesofsquarednormsoftheseoracles.InSect.4,we
+applythesimplerandomsearchmethodtoanonsmoothconvexoptimizationproblem
+withsimpleconvexconstraints.Weshowthatthescheme(3)worksatmostin O(n)
+timesslowerthantheusualsubgradientmethod.Forthefinite-differenceversion(2),
+this factor is increased up to O(n2). Both methods can be naturally modified to be
+usedforstochasticprogrammingproblems.
+In Sect. 5, we estimate the performance of method (2) on smooth optimization
+problems.Weshowthat,underproperchoiceofparameters,itworksatmostntimes
+slowerthantheusualgradientmethod.InSect.6,weconsideranacceleratedversion
+ofthisschemewiththeconvergencerateO(n2).Forallmethods,wederivetheupper
+k2
+bounds forthevalue ofthesmoothing parameter μ.Itappears thatinallsituations,
+theirdependencein(cid:2)andnisquitemoderate.Forexample,forthefastrandomsearch
+presentedinSect.6,theaveragesizeofthetrialstepμuisoftheorderO(n −1/2(cid:2)3/4),
+where (cid:2) is the target accuracy for solving (1). For the simple random search, this
+averagesizeisevenbetter: O(n −1/2(cid:2)1/2).
+In Sect. 7, we estimate a rate of convergence for the random search methods to
+a stationary point of a nonconvex function (in terms of the norm of the gradient).
+We consider both smooth and nonsmooth cases. Finally, in Sect. 8, we present the
+preliminarycomputationalresults.Inthetestedmethods,wewerecheckingthevalidity
+ofourtheoreticalconclusionsonstabilityandtherateofconvergenceofthescheme,
+ascomparedwiththeprototypegradientmethods.
+1.3 Notation
+∗
+Forafinite-dimensionalspaceE,wedenotebyE itsdualspace.Thevalueofalinear
+functions ∈ E ∗ atpointx ∈ E isdenotedby(cid:10)s,x(cid:11).Weendowthespaces E and E ∗
+withEuclideannorms
+123
+
+===== PAGE 6 =====
+
+532 FoundComputMath(2017)17:527–566
+(cid:6)x(cid:6)=(cid:10)Bx,x(cid:11)1/2, x ∈ E, (cid:6)s(cid:6) ∗ = (cid:10)s,B −1s(cid:11)1/2, s ∈ E ∗,
+where B = B ∗ (cid:12) 0isalinearoperatorfrom E to E ∗ .Foranyu ∈ E,wedenoteby
+∗ ∗
+uu alinearoperatorfrom E to E,whichactsasfollows:
+uu ∗(s)=u·(cid:10)s,u(cid:11), s ∈ E ∗.
+Inthispaper,weconsiderfunctionswithdifferentlevelsofsmoothness.Itisindi-
+catedbythefollowingnotation.
+• f ∈C0,0(E)if|f(x)− f(y)|≤ L (f)(cid:6)x −y(cid:6),x,y ∈ E.
+0
+• f ∈C1,1(E)if(cid:6)∇f(x)−∇f(y)(cid:6) ∗ ≤ L 1 (f)(cid:6)x −y(cid:6),x,y ∈ E.Thiscondition
+isequivalenttothefollowinginequality:
+|f(y)− f(x)−(cid:10)∇f(x),y−x(cid:11)| ≤ 1L (f)(cid:6)x −y(cid:6)2, x,y ∈ E. (6)
+2 1
+• f ∈C2,2(E)if(cid:6)∇2f(x)−∇2f(y)(cid:6)≤ L (f)(cid:6)x−y(cid:6),x,y ∈ E.Thiscondition
+2
+isequivalenttotheinequality
+|f(y)− f(x)−(cid:10)∇f(x),y−x(cid:11)− 1(cid:10)∇2f(x)(y−x),y−x(cid:11)|
+2
+(7)
+≤ 1L (f)(cid:6)x −y(cid:6)3, x,y ∈ E.
+6 2
+Wesaythat f ∈C1,1(E)isstronglyconvex,ifforanyx and y ∈ E wehave
+f(y)≥ f(x)+(cid:10)∇f(x),y−x(cid:11)+ τ(f)(cid:6)y−x(cid:6)2, (8)
+2
+whereτ(f)≥0istheconvexityparameter.
+Let (cid:2) ≥ 0. For convex function f, we denote by ∂f(cid:2) (x) its (cid:2)-subdifferential at
+x ∈ E:
+f(y)≥ f(x)−(cid:2)+(cid:10)g,y−x(cid:11), g ∈∂f(cid:2) (x), y ∈ E.
+If(cid:2) =0,wesimplifythisnotationto∂f(x).
+2 GaussianSmoothing
+Considerafunction f : E → R.Weassumethatateachpointx ∈ E,itisdifferen-
+tiablealonganydirection.LetusformitsGaussianapproximation
+(cid:5)
+fμ (x)= κ 1 f(x +μu)e −1 2 (cid:6)u(cid:6)2 du, (9)
+E
+where
+(cid:5)
+κ d=ef e − 2 1(cid:6)u(cid:6)2 du = [d (2 et π B )n ] / 1 2 /2 . (10)
+E
+123
+
+===== PAGE 7 =====
+
+FoundComputMath(2017)17:527–566 533
+Allresultsofthissection,relatedtothepropertiesofthisfunction,arerathergeneral.
+Therefore,weputtheirproofsin“Appendix”.
+As we will see later, for μ > 0 function fμ(cid:5) is always differentiable, and μ ≥ 0
+playsaroleofsmoothingparameter.Clearly, κ 1 ue −1 2 (cid:6)u(cid:6)2 du =0.Therefore,if f is
+E
+convexandg ∈∂f(x),then
+(cid:5)
+fμ (x)≥ κ 1 [f(x)+μ(cid:10)g,u(cid:11)]e −1 2 (cid:6)u(cid:6)2 du = f(x). (11)
+E
+Notethatingeneral, fμ hasbetterpropertiesthan f.Atleast,allinitialcharacter-
+isticsof f arepreservedbyany fμwithμ≥0.
+• If f isconvex,then fμisalsoconvex.
+• If f ∈ C0,0,then fμ ∈ C0,0 and L
+0
+(fμ ) ≤ L
+0
+(f).Indeed,forall x,y ∈ E we
+have
+(cid:5)
+|fμ (x)− fμ (y)|≤ κ 1 |f(x +μu)− f(y+μu)|e −1 2 (cid:6)u(cid:6)2 du ≤ L 0 (f)(cid:6)x −y(cid:6).
+E
+• If f ∈C1,1,then fμ ∈C1,1and L
+1
+(fμ )≤ L
+1
+(f):
+(cid:5)
+(cid:6)∇fμ (x)−∇fμ (y)(cid:6) ∗ ≤ κ 1 (cid:6)∇f(x +μu)−∇f(y+μu)(cid:6) ∗e −1 2 (cid:6)u(cid:6)2 du
+E (12)
+≤ L (f)(cid:6)x −y(cid:6), x,y ∈ E.
+1
+Fromdefinition(10),wegetalsotheidentity
+(cid:5)
+ln e − 2 1(cid:10)Bu,u(cid:11) du ≡ n ln(2π)− 1lndetB.
+2 2
+E
+Differentiatingthisidentityin B,wegetthefollowingrepresentation:
+(cid:5)
+κ 1 uu ∗ e − 2 1(cid:6)u(cid:6)2 du = B −1. (13)
+E
+Takingascalarproductofthisequalitywith B,weobtain
+(cid:5)
+κ 1 (cid:6)u(cid:6)2e −1 2 (cid:6)u(cid:6)2 du =n. (14)
+E
+(cid:5)
+In what follows, we often need upper bounds for the moments M d=ef 1 (cid:6)u(cid:6)p
+p κ
+E
+e
+−
+2
+1(cid:6)u(cid:6)2
+du.Wehaveexactsimplevaluesfortwocases:
+M
+( =10)
+1, M
+( =14)
+n. (15)
+0 2
+123
+
+===== PAGE 8 =====
+
+534 FoundComputMath(2017)17:527–566
+Forothercases,wewillusethefollowingsimplebounds.
+Lemma1 For p ∈[0,2],wehave
+M
+≤np/2.
+(16)
+p
+If p ≥2,thenwehavetwo-sidebounds
+np/2 ≤ M ≤(p+n)p/2. (17)
+p
+Nowwecanprovethefollowingusefulresult.
+Theorem1 Let f
+∈C0,0(E),then
+|fμ (x)− f(x)|≤μL
+0
+(f)n1/2, x ∈ E. (18)
+If f
+∈C1,1(E),then
+|fμ (x)− f(x)|≤ μ
+2
+2 L
+1
+(f)n, x ∈ E. (19)
+Finally,if f
+∈C2,2(E),then
+|fμ (x)− f(x)− μ
+2
+2(cid:10)∇2f(x),B −1(cid:11)|≤ μ
+3
+3 L
+2
+(f)(n+3)3/2, x ∈ E. (20)
+Inequality(20)showsthatincreasingthelevelofsmoothnessoffunction f beyond
+C1,1(E)cannotimprovethequalityofapproximationof
+f by fμ.If,forexample, f
+isquadraticand∇2f(x)≡G,then
+fμ (x) ( =20) f(x)+ μ2(cid:10)G,B −1(cid:11).
+2
+Theconstantterminthisidentitycanreachtheright-handsideofinequality(19).
+Foranypositiveμ,function fμisdifferentiable.Letusobtainaconvenientexpres-
+sionforitsgradient.Forthat,werewritedefinition(9)inanotherformbyintroducing
+anewintegrationvariable y = x +μu:
+(cid:5)
+fμ (x)=
+μ
+1
+nκ
+f(y)e
+−
+2μ
+1
+2
+(cid:6)y−x(cid:6)2
+dy.
+E
+Since the value and the partial derivative in x of the argument of this integral are
+continuous in (x,y), we can apply the standard differentiation rule for finding the
+gradient:
+123
+
+===== PAGE 9 =====
+
+FoundComputMath(2017)17:527–566 535
+(cid:5)
+∇fμ (x)=
+μn+
+1
+2κ
+f(y)e
+−
+2μ
+1
+2
+(cid:6)y−x(cid:6)2
+B(y−x)dy
+E
+(cid:5)
+= μ 1 κ f(x +μu)e −1 2 (cid:6)u(cid:6)2 Bu du (21)
+E
+(cid:5)
+= κ 1 f(x+μ μ u)−f(x) e − 2 1(cid:6)u(cid:6)2 Bu du.
+E
+ItappearsthatthisgradientisLipschitz-continuousevenifthegradientof f isnot.
+Lemma2 Let f
+∈C0,0(E)andμ>0.Then
+fμ
+∈C1,1(E)with
+L
+1
+(fμ )= n1
+μ
+/2 L
+0
+(f). (22)
+Denoteby f
+(cid:4)(x,u)thedirectionalderivativeof
+f atpointx alongdirectionu:
+f (cid:4)(x,u)=lim α 1[f(x +αu)− f(x)]. (23)
+α↓0
+Thenwecandefinethelimitingvectorofthegradients(21):
+(cid:5)
+∇f 0 (x)= κ 1 f (cid:4)(x,u)e −1 2 (cid:6)u(cid:6)2 Bu du. (24)
+E
+Notethatateach x ∈ E,thevector(24)isuniquelydefined.If f isdifferentiableat
+x,then
+(cid:5)
+∇f 0 (x)= κ 1 (cid:10)∇f(x),u(cid:11)e −1 2 (cid:6)u(cid:6)2 Bu du ( =13) ∇f(x). (25)
+E
+Letusprovethatinconvexcase,∇fμ (x)alwaysbelongstosome(cid:2)-subdifferential
+offunction f.
+Theorem2 Let f be convex and Lipschitz continuous. Then, for any x ∈ E and
+μ≥0,wehave
+∇fμ (x)∈∂
+(cid:2)
+f(x), (cid:2) =μL
+0
+(f)n1/2.
+Notethatexpression(21)canberewritteninthefollowingform:
+(cid:5)
+∇fμ (x) = κ 1 f(x)−f μ (x−μu) e −1 2 (cid:6)u(cid:6)2 Bu du
+E
+(26)
+(cid:5)
+( =21) κ 1 f(x+μu) 2 − μ f(x−μu) e − 2 1(cid:6)u(cid:6)2 Bu du.
+E
+123
+
+===== PAGE 10 =====
+
+536 FoundComputMath(2017)17:527–566
+Lemma3 If f
+∈C1,1(E),then
+(cid:6)∇fμ (x)−∇f(x)(cid:6) ∗ ≤ μ 2 L 1 (f)(n+3)3/2. (27)
+For f
+∈C2,2(E),wecanguaranteethat
+(cid:6)∇fμ (x)−∇f(x)(cid:6) ∗ ≤ μ 6 2 L 2 (f)(n+4)2. (28)
+Finally,weproveonemorerelationbetweenthegradientsof f and fμ.
+Lemma4 Let f ∈C1,1(E).Then,foranyx ∈ E,wehave
+(cid:6)∇f(x)(cid:6)2
+∗
+≤2(cid:6)∇fμ (x)(cid:6)2
+∗
++ μ
+2
+2 L2
+1
+(f)(n+6)3. (29)
+3 RandomGradient-FreeOracles
+Letrandomvectoru ∈ E haveGaussiandistributionwithcorrelationoperator B −1.
+Denoteby E (ψ(u))theexpectationofcorrespondingrandomvariable.Forμ ≥ 0,
+u
+usingexpressions(21),(26),and(24),wecandefinethefollowingrandomgradient-
+freeoracles:
+1.Generate randomu ∈ E andreturngμ (x)= f(x+μ
+μ
+u)−f(x) ·Bu.
+2.Generate randomu ∈ E andreturngˆ μ (x)= f(x+μu) 2 − μ f(x−μu) ·Bu. (30)
+3.Generate randomu ∈ E andreturng (x)= f (cid:4)(x,u)·Bu.
+0
+As we will see later, oracles gμ and gˆ μ are more suitable for minimizing smooth
+functions.Oracleg ismoreuniversal.Itcanbealsousedforminimizingnonsmooth
+0
+convexfunctions.Recallthatinviewof(24)andTheorem2,wehave2
+E (g (x))=∇f (x) ∈ ∂f(x). (31)
+u 0 0
+Wecanestablishnowseveralusefulupperbounds.Firstofall,notethatforfunction
+f differentiableatpointx,wehave
+(cid:6)g (x)(cid:6)2 =(cid:10)∇f(x),u(cid:11)2·(cid:6)u(cid:6)2 ≤ (cid:6)∇f(x)(cid:6)2·(cid:6)u(cid:6)4.
+0 ∗ ∗
+2 Presenceofthisoracleisthemainreasonwhywecallourmethodsgradientfree(notderivativefree!).
+Indeed,directionalderivativeisamuchsimplerobjectascomparedwiththegradient.Itcanbeeasily
+definedforaverylargeclassoffunctions.Atthesametime,definitionofthegradient(orsubgradient)
+ismuchmoreinvolved.Itiswellknownthatinnonsmoothcase,collectionofpartialderivativesisnota
+subgradientofconvexfunction.Fornonsmoothnonconvexfunctions,thepossibilityofcomputingasingle
+subgradientneedsaseriousmathematicaljustification[17].Ontheotherhand,ifwehaveanaccesstoa
+programforcomputingthevalueofourfunction,thentheprogramforcomputingdirectionalderivatives
+canbeobtainedbyatrivialautomaticforwarddifferentiation.
+123
+
+===== PAGE 11 =====
+
+FoundComputMath(2017)17:527–566 537
+(17)
+Hence, E u ((cid:6)g 0 (x)(cid:6)2 ∗ ) ≤ (n+4)2(cid:6)∇f(x)(cid:6)2 ∗.Itappearsthatthisboundcanbesig-
+nificantlystrengthened.
+Theorem3 1.If f isdifferentiableatx,then
+E u ((cid:6)g 0 (x)(cid:6)2 ∗ )≤(n+4)(cid:6)∇f(x)(cid:6)2 ∗ . (32)
+2.Let f beconvex.Denote D(x)=diam∂f(x).Then,foranyx ∈ E wehave
+(cid:6) (cid:7)
+E u ((cid:6)g 0 (x)(cid:6)2 ∗ )≤(n+4) (cid:6)∇f 0 (x)(cid:6)2 ∗ +nD2(x) . (33)
+Proof Indeed,letusfixτ ∈(0,1).Then,
+(cid:5)
+E u ((cid:6)g 0 (x)(cid:6)2 ∗ ) ( =30) κ 1 (cid:6)u(cid:6)2e −1 2 (cid:6)u(cid:6)2 f (cid:4)(x,u)2du
+E
+(cid:5)
+= κ 1 (cid:6)u(cid:6)2e −τ 2 (cid:6)u(cid:6)2 f (cid:4)(x,u)2e −1− 2 τ(cid:6)u(cid:6)2 du
+E
+(8 ≤ 0) κ 2 τe (cid:5) f (cid:4)(x,u)2e −1− 2 τ(cid:6)u(cid:6)2 du
+E
+(cid:5)
+= κτ(1−τ 2 )1+n/2e f (cid:4)(x,u)2e − 2 1(cid:6)u(cid:6)2 du.
+E
+Theminimumoftheright-handsideinτ isattainedforτ ∗ = n+ 2 4 .Inthiscase,
+(cid:2) (cid:3)
+n+2
+τ
+∗
+(1−τ
+∗
+)n+
+2
+2 =
+n+
+2
+4
+n
+n
++
++
+2
+4
+2 >
+(n+
+2
+4)e
+.
+Therefore,
+(cid:5)
+E u ((cid:6)g 0 (x)(cid:6)2 ∗ )≤ n+ κ 4 f (cid:4)(x,u)2e −1 2 (cid:6)u(cid:6)2 du.
+E
+If f isdifferentiableatx,then f
+(cid:4)(x,u)=(cid:10)∇f(x),u(cid:11),andweget(32)from(13).
+Supposethat f isconvexandnotdifferentiableat x.Denotebyg(u)anarbitrary
+pointfromthesetArgmax{(cid:10)g,u(cid:11): g ∈∂f(x)}.Then
+g
+f (cid:4)(x,u)2 =((cid:10)∇f (x),u(cid:11)+(cid:10)g(u)−∇f (x),u(cid:11))2.
+0 0
+123
+
+===== PAGE 12 =====
+
+538 FoundComputMath(2017)17:527–566
+Notethat
+E ((cid:10)∇f (x),u(cid:11)·(cid:10)g(u)−∇f (x),u(cid:11)) ( =13) E ((cid:10)∇f (x),u(cid:11)· f (cid:4)(x,u))−(cid:6)∇f (x)(cid:6)2
+u 0 0 u 0 0 ∗
+= (cid:10)∇f (x),E (u· f (cid:4)(x,u))(cid:11)−(cid:6)∇f (x)(cid:6)2
+0 u 0 ∗
+( =24)
+0.
+Therefore,
+(cid:5) (cid:6) (cid:7)
+E u ((cid:6)g 0 (x)(cid:6)2 ∗ ) ≤ n+ κ 4 (cid:10)∇f 0 (x),u(cid:11)2+D2(x)(cid:6)u(cid:6)2 e − 2 1(cid:6)u(cid:6)2 du
+E
+(cid:8) (cid:9)
+(cid:5)
+( =13) (n+4) (cid:6)∇f 0 (x)(cid:6)2 ∗ + D2 κ (x) (cid:6)u(cid:6)2e − 2 1(cid:6)u(cid:6)2 du
+E
+(cid:6) (cid:7)
+( =14)
+(n+4) (cid:6)∇f
+0
+(x)(cid:6)2
+∗
++nD2(x) .
+(cid:15)(cid:16)
+Letusprovenowthesimilarboundsfororaclesgμandgˆ μ.
+Theorem4 Letfunction f beconvex.
+1.If f
+∈C0,0(E),then
+E u ((cid:6)gμ (x)(cid:6)2 ∗ )≤ L2 0 (f)(n+4)2. (34)
+2.If f
+∈C1,1(E),then
+E
+u
+((cid:6)gμ (x)(cid:6)2
+∗
+)≤ μ
+2
+2 L2
+1
+(f)(n+6)3+2(n+4)(cid:6)∇f(x)(cid:6)2
+∗
+,
+(35)
+E u ((cid:6)gˆ μ (x)(cid:6)2 ∗ )≤ μ 8 2 L2 1 (f)(n+6)3+2(n+4)(cid:6)∇f(x)(cid:6)2 ∗ .
+3.If f
+∈C2,2(E),then
+E u ((cid:6)gˆ μ (x)(cid:6)2 ∗ )≤ μ 18 4 L2 2 (f)(n+8)4+2(n+4)(cid:6)∇f(x)(cid:6)2 ∗ . (36)
+(cid:6) (cid:7)
+Proof Note that E u ((cid:6)gμ (x)(cid:6)2 ∗ ) = μ 1 2 E u [f(x +μu)− f(x)]2](cid:6)u(cid:6)2 . If f ∈
+C0,0(E),thenweobtain(34)directlyfromthedefinitionofthefunctionalclassand
+(17).
+Let f
+∈C1,1(E).Since
+[f(x +μu)− f(x)]2 = [f(x +μu)− f(x)−μ(cid:10)∇f(x),u(cid:11)+μ(cid:10)∇f(x),u(cid:11)]2
+(cid:2) (cid:3)
+( ≤ 6) 2 μ2 L (f)(cid:6)u(cid:6)2 2 +2μ2(cid:10)∇f(x),u(cid:11)2,
+2 1
+123
+
+===== PAGE 13 =====
+
+FoundComputMath(2017)17:527–566 539
+weget
+E
+u
+((cid:6)gμ (x)(cid:6)2
+∗
+) ≤ μ
+2
+2 L2
+1
+(f)E
+u
+((cid:6)u(cid:6)6)+2E
+u
+((cid:6)g
+0
+(x)(cid:6)2
+∗
+)
+(17)
+≤
+,(32)
+μ
+2
+2 L2
+1
+(f)(n+6)3+2(n+4)(cid:6)∇f(x)(cid:6)2
+∗
+.
+Forthesymmetricoraclegˆ μ,since f isconvex,wehave
+f(x +μu)− f(x −μu) = [f(x +μu)− f(x)]+[f(x)− f(x −μu)]
+(cid:10) (cid:11)
+(
+≤
+6)
+μ(cid:10)∇f(x),u(cid:11)+ μ2 L (f)(cid:6)u(cid:6)2 +μ(cid:10)∇f(x),u(cid:11).
+2 1
+Similarly, we have f(x + μu) − f(x − μu) ≥ 2μ(cid:10)∇f(x),u(cid:11) − μ2 L (f)(cid:6)u(cid:6)2.
+2 1
+Therefore,
+(cid:6) (cid:7)
+E u ((cid:6)gˆ μ (x)(cid:6)2 ∗ ) = 4μ 1 2 E u [f(x +μu)− f(x −μu)]2(cid:6)u(cid:6)2
+(cid:10) (cid:2) (cid:3) (cid:6) (cid:7)(cid:11)
+≤ 1 E μ4 L2(f)(cid:6)u(cid:6)6 +E 4μ2(cid:10)∇f(x),u(cid:11)2(cid:6)u(cid:6)2
+2μ2 u 4 1 u
+(17)
+≤
+,(32)
+μ
+8
+2 L2
+1
+(f)(n+6)3+2(n+4)(cid:6)∇f(x)(cid:6)2
+∗
+.
+Let f
+∈C2,2(E).WewillusenotationofLemma3.Since
+[f(x +μu)− f(x −μu)]2 =[f(x +μu)− f(x −μu)−2μ(cid:10)∇f(x),u(cid:11)
++2μ(cid:10)∇f(x),u(cid:11)]2 ≤2[a (μ)−a (−μ)]2
+u u
++8μ2(cid:10)∇f(x),u(cid:11)2
+(
+≤
+7)
+2μ6 L2(f)(cid:6)u(cid:6)6+8μ2(cid:10)∇f(x),u(cid:11)2,
+9 2
+weget
+E u ((cid:6)gˆ μ (x)(cid:6)2 ∗ ) ≤ μ 18 4 L2 2 (f)E u ((cid:6)u(cid:6)8)+2E u ((cid:6)g 0 (x)(cid:6)2 ∗ )
+(17)
+≤
+,(32)
+μ
+18
+4 L2
+2
+(f)(n+8)4+2(n+4)(cid:6)∇f(x)(cid:6)2
+∗
+.
+(cid:15)(cid:16)
+Sometimesitismoreconvenienttohaveintheright-handsideofinequality(35)
+thegradientofGaussianapproximation.
+Lemma5 Let f ∈C1,1(E).Then,foranyx ∈ E wehave
+E u ((cid:6)gμ (x)(cid:6)2 ∗ )≤4(n+4)(cid:6)∇fμ (x)(cid:6)2 ∗ +3μ2L2 1 (f)(n+4)3. (37)
+123
+
+===== PAGE 14 =====
+
+540 FoundComputMath(2017)17:527–566
+Proof Indeed,
+(f(x +μu)− f(x))2 =(f(x +μu)− fμ (x +μu)− f(x)+ fμ (x)+fμ (x +μu)
+−fμ (x))2≤2(f(x+μu)− fμ (x +μu)− f(x)+fμ (x))2
++2(fμ (x +μu)− fμ (x))2.
+(19)
+Notethat|f(x +μu)− fμ (x +μu)− f(x)+ fμ (x)| ≤ μ2L
+1
+(f)n,and
+(fμ (x +μu)− fμ (x))2 ≤2(fμ (x +μu)− fμ (x)−μ(cid:10)∇fμ (x),u(cid:11))2
++2μ2(cid:10)∇fμ (x),u(cid:11)2≤μ4 L2(f)(cid:6)u(cid:6)4+2μ2(cid:10)∇fμ (x),u(cid:11)2.
+2 1
+Applying(32)tofunction fμ,weget E
+u
+((cid:10)∇fμ (x),u(cid:11)2(cid:6)u(cid:6)2) ≤ (n+4)(cid:6)∇fμ (x)(cid:6)2 ∗.
+Hence,
+E
+u
+((cid:6)gμ (x)(cid:6)2
+∗
+)≤
+μ
+1
+2
+E
+u
+((f(x +μu)− f(x))2(cid:6)u(cid:6)2)
+≤2μ2L2
+1
+(f)n2M
+2
++μ2L2
+1
+(f)M
+6
++4(n+4)(cid:6)∇fμ (x)(cid:6)2
+∗
+≤μ2L2
+1
+(f)(2n3+(n+6)3)+4(n+4)(cid:6)∇fμ (x)(cid:6)2
+∗
+.
+Itremainstonotethat2n3+(n+6)3 ≤3(n+4)3. (cid:15)(cid:16)
+Example f(x) = (cid:6)x(cid:6), x = 0, shows that the pessimistic bound (34) cannot be
+significantlyimproved.
+4 RandomSearchforNonsmoothandStochasticOptimization
+Unless otherwise noted, we assume that f is convex. Let us show how to use the
+oracles(30)forsolvingthefollowingnonsmoothoptimizationproblem:
+f ∗ d=ef min f(x), (38)
+x∈Q
+where Q ⊆ E is a closed convex set and f is a nonsmooth convex function on E.
+Denote by x ∗ ∈ Q one of its optimal solutions. Recall that we measure distances
+in E by the primal Euclidean norm (cid:6)u(cid:6) = (cid:10)Bu,u(cid:11)1/2, u ∈ E. Distances in E ∗ are
+measuredbytheconjugatenorm:(cid:6)g(cid:6) ∗ =(cid:10)g,B −1g(cid:11)1/2,g ∈ E ∗ .
+123
+
+===== PAGE 15 =====
+
+FoundComputMath(2017)17:527–566 541
+Letuschooseasequenceofpositivesteps{h k } k≥0 .Considerthefollowingmethod.
+MethodRS
+μ
+:Choosex
+0
+∈ Q.Ifμ=0,weneedD(x
+0
+)=0.
+Iterationk ≥0.
+(39)
+a).Generateu
+k
+andcorrespondinggμ (x
+k
+).
+(cid:6) (cid:7)
+b).Computex k+1 =π Q x k −h k B −1gμ (x k ) .
+Weusenotationπ (x)forEuclideanprojectionontotheclosedconvexset Q.Thus,
+Q
+(cid:6)π (x)−y(cid:6)≤(cid:6)x −y(cid:6)forall y ∈ Q.
+Q
+Method (39) generates random vectors {x k } k≥0 . Denote by U k = (u 0 ,...,u k )
+a random vector composed by independent and identically distributed variables
+{u k } k≥0 (i.i.d.) attached to each iteration of the scheme. Let φ 0 = f(x 0 ), and
+φ
+k
+d=ef EU
+k−1
+(f(x
+k
+)),k ≥1.
+Theorem5 Let sequence {x k } k≥0 be generated by RS 0 . Then, for any N ≥ 0 we
+have
+(cid:12)N (cid:12)N
+h (φ − f ∗)≤ 1(cid:6)x −x ∗(cid:6)2+ n+4L2(f) h2. (40)
+k k 2 0 2 0 k
+k=0 k=0
+Proof Let point x with k ≥ 1 be generated after k iterations of the scheme (39).
+k
+Denoter =(cid:6)x −x ∗(cid:6).Then
+k k
+r
+k
+2
++1
+≤(cid:6)x
+k
+−h
+k
+g
+0
+(x
+k
+)−x ∗(cid:6)2 = r
+k
+2−2h
+k
+(cid:10)g
+0
+(x
+k
+),x
+k
+−x ∗(cid:11)+h2
+k
+(cid:6)g
+0
+(x
+k
+)(cid:6)2
+∗
+.
+Note that function f is differentiable at x with probability one. Therefore, using
+k
+representation(25)andtheestimate(32),weget
+(cid:6) (cid:7)
+E r2 ≤r2−2h (cid:10)∇f(x ),x −x ∗(cid:11)+h2(n+4)L2(f)
+uk k+1 k k k k k 0
+≤r2−2h (f(x )− f ∗)+h2(n+4)L2(f).
+k k k k 0
+TakingnowtheexpectationinU k−1 ,weobtain
+(cid:6) (cid:7) (cid:6) (cid:7)
+EU
+k
+r
+k
+2
++1
+≤ EU
+k−1
+r
+k
+2 −2h
+k
+(φ
+k
+− f ∗)+h2
+k
+(n+4)L2
+0
+(f).
+Usingthesamereasoning,weget
+(cid:6) (cid:7)
+EU
+0
+r
+1
+2 ≤r
+0
+2−2h
+0
+(f(x
+0
+)− f ∗)+h2
+0
+(n+4)L2
+0
+(f).
+Summinguptheseinequalities,wecometo(40). (cid:15)(cid:16)
+123
+
+===== PAGE 16 =====
+
+542 FoundComputMath(2017)17:527–566
+(cid:12)
+Denote S = N h , and define xˆ = argmin[f(x) : x ∈ {x ,...,x }].
+N k=0 k N 0 N
+x
+Then
+(cid:13) (cid:14)
+(cid:6) (cid:7) (cid:12)N
+EU
+N−1
+f(xˆ
+N
+) − f ∗ ≤ EU
+N−1 S
+1
+N k=0
+h
+k
+(f(x
+k
+)− f ∗)
+(cid:15) (cid:16)
+(4
+≤
+0)
+1 1(cid:6)x −x ∗(cid:6)2+ n+4L2(f)
+(cid:12)N
+h2 .
+SN 2 0 2 0
+k=0
+k
+Inparticular,ifthenumberofsteps N isfixed,and(cid:6)x −x ∗(cid:6)≤ R,wecanchoose
+0
+h k = (n+4)1/2(N R +1)1/2L0 (f) , k =0,...,N. (41)
+Thenweobtainthefollowingbound:
+EU
+N−1
+(cid:6)
+f(xˆ
+N
+)
+(cid:7)
+− f ∗ ≤ L
+0
+(f)R
+(cid:10)
+N
+n+
++
+4
+1
+(cid:11) 1/2
+. (42)
+(cid:6) (cid:7)
+Hence,inequality EU
+N−1
+f(xˆ
+N
+) − f ∗ ≤(cid:2) canbeensuredbyRS
+0
+in
+n+4L2(f)R2
+(43)
+(cid:2)2 0
+iterations.
+Sameasinthestandardnonsmoothminimization,insteadoffixingthenumberof
+stepsapriori,wecandefine
+h k = (n+4)1/2(k+ R 1)1/2L0 (f) , k ≥0. (44)
+Thismodificationresultsinamultiplicationoftheright-handsideoftheestimate(42)
+byafactor O(lnN)(e.g.,Section3.2in[16]).
+Letusconsidernowtherandomsearchmethod(39)withμ>0.
+Theorem6 Letsequence{x k } k≥0 begeneratedbyRS μ withμ > 0.Then,forany
+N ≥0wehave
+(cid:18) (cid:19)
+1 (cid:17)N 1 1 (n+4)2 (cid:17)N
+h (φ −f ∗)≤μL (f)n1/2+ (cid:6)x −x ∗(cid:6)2+ L2(f) h2 .
+S k k 0 S 2 0 2 0 k
+N k=0 N k=0
+(45)
+Proof Let point x with k ≥ 1 be generated after k iterations of the scheme (39).
+k
+Denoter =(cid:6)x −x ∗(cid:6).Then
+k k
+r
+k
+2
++1
+≤(cid:6)x
+k
+−h
+k
+gμ (x
+k
+)−x ∗(cid:6)2 = r
+k
+2−2h
+k
+(cid:10)gμ (x
+k
+),x
+k
+−x ∗(cid:11)+h2
+k
+(cid:6)gμ (x
+k
+)(cid:6)2
+∗
+.
+123
+
+===== PAGE 17 =====
+
+FoundComputMath(2017)17:527–566 543
+Usingrepresentation(21)andtheestimate(34),weget
+(cid:6) (cid:7)
+E
+uk
+r
+k
+2
++1
+≤ r
+k
+2−2h
+k
+(cid:10)∇fμ (x
+k
+),x
+k
+−x ∗(cid:11)+h2
+k
+(n+4)2L2
+0
+(f)
+(1
+≤
+1)
+r
+k
+2−2h
+k
+(f(x
+k
+)− fμ (x ∗))+h2
+k
+(n+4)2L2
+0
+(f).
+TakingnowtheexpectationinU k−1 ,weobtain
+(cid:6) (cid:7) (cid:6) (cid:7)
+EU
+k
+r
+k
+2
++1
+≤ EU
+k−1
+r
+k
+2 −2h
+k
+(φ
+k
+− fμ (x ∗))+h2
+k
+(n+4)2L2
+0
+(f).
+Itremainstonotethat fμ (x ∗)
+(1
+≤
+8)
+f ∗+μL
+0
+(f)n1/2. (cid:15)(cid:16)
+(cid:6) (cid:7)
+Thus,inordertoguaranteeinequality EU
+N−1
+f(xˆ
+N
+) − f ∗ ≤(cid:2)bymethodRS μ,
+wecanchoose
+μ ≤ (cid:2) , h = R , k =0,...,N,
+2L0 (f)n1/2 k (n+4)(N+1)1/2L0 (f)
+(46)
+N = 4(n+4)2 L2(f)R2.
+(cid:2)2 0
+NotethatthiscomplexityboundisinO(n)timesworsethanthecomplexitybound(43)
+ofthemethodRS .Thiscanbeexplainedbythedifferentupperboundsprovidedby
+0
+inequalities(32)and(34).Itisinterestingthatthesmoothingparameterμisnotused
+inthedefinition(46)ofthestepsizesandinthetotallengthoftheprocessgenerated
+bymethodRS μ.
+Finally,letuscompareourresultswiththefollowingRandomCoordinateMethod:
+1.Generateauniformly(cid:6)distributednumberi
+k (cid:7)
+∈{1,...,n}.
+(47)
+2.Updatex k+1 =π Q x k −he ik (cid:10)g(x k ),e ik (cid:11) ,
+wheree isacoordinatevectorin Rn andg(x ) ∈ ∂f(x ).Bythesamereasoningas
+i k k
+inTheorem5,wecanshowthat(comparewith[19])
+(cid:12)N
+1 (φ − f ∗)≤ nR2 + hL2(f).
+N+1 k 2(N+1)h 2 0
+k=0
+Thus, under an appropriate choice of h, method (47) has the same complexity
+bound (43) as RS . However, note that (47) requires computation of the coordi-
+0
+natesofthesubgradientg(x ).Thiscomputationcannotbearrangedwithdirectional
+k
+derivatives,orwithfunctionvalues.Therefore,forgeneralconvexfunctionsmethod
+(47)cannotbetransformedinagradient-freeform.
+Anaturalmodificationofmethod(39)canbeappliedtotheproblemsofstochastic
+optimization. Indeed, assume that the objective function in (38) has the following
+form:
+(cid:5)
+f(x)= Eξ[F(x,ξ)] d=ef F(x,ξ)dP(ξ), x ∈ Q, (48)
+(cid:11)
+123
+
+===== PAGE 18 =====
+
+544 FoundComputMath(2017)17:527–566
+whereξ isarandomvectorwithprobabilitydistributionP(ξ),ξ ∈(cid:11).Weassumethat
+f ∈ C0,0(E)isconvex(thisisarelaxationofthestandardassumptionthat F(x,ξ)
+is convex in x for any ξ ∈ (cid:11)). Similarly to (30), we can define random stochastic
+gradient-freeoracles:
+1.Generaterandomu ∈ E,ξ ∈(cid:11).Returnsμ (x)= F(x+μu,
+μ
+ξ)−F(x,ξ) ·Bu.
+2.Generaterandomu ∈ E,ξ ∈(cid:11).Returnsˆ
+μ
+(x)= F(x+μu,ξ)
+2
+−
+μ
+F(x−μu,ξ) ·Bu.(49)
+3.Generaterandomu ∈ E,ξ ∈(cid:11).Returns (x)= D F(x,ξ)[u]·Bu.
+0 x
+Notethatthefirstandthesecondoraclesrequirecomputationoftwovaluesofrandom
+functionF(·,ξ)definedbythesamevalueofstochasticparameterξ.Insomeapplica-
+tion,thisisimpossible.Forexample,therandomfunction F(·,ξ)canbeobservable
+duringaveryshortperiodoftime,whichissufficientonlyformeasuringsomeofits
+instantaneouscharacteristics.Then,thethirdoraclemustbeused.
+Considerthefollowingmethodwithsmoothingparameterμ>0.
+MethodSS μ : Choosex 0 ∈ Q.
+Iterationk ≥0.
+(50)
+a).Forx ∈ Q,generateindependentrandomvectorsξ ∈(cid:11)andu .
+k k k
+(cid:6) (cid:7)
+b).Computesμ (x k ), andx k+1 =π Q x k −h k B −1sμ (x k ) .
+ItsjustificationisverysimilartotheproofofTheorem6.
+Theorem7 Let L 0 (F(·,ξ)) ≤ L for all ξ ∈ (cid:11). Assume the sequence {x k } k≥0 be
+generatedbySS μwithμ>0.Then,forany N ≥0wehave
+(cid:15) (cid:16)
+(cid:12)N (cid:12)N
+1 h (φ − f ∗)≤μLn1/2+ 1 1(cid:6)x −x ∗(cid:6)2+ (n+4)2 L2 h2 , (51)
+SN
+k=0
+k k SN 2 0 2
+k=0
+k
+whereφ k = EU k−1 ,P k−1 (f(x k )),andP k ={ξ 0 ,...,ξ k }.
+Proof InthenotationofTheorem6,wehave
+r
+k
+2
++1
+≤r
+k
+2−2h
+k
+(cid:10)sμ (x
+k
+),x
+k
+−x ∗(cid:11)+h2
+k
+(cid:6)sμ (x
+k
+)(cid:6)2
+∗
+.
+123
+
+===== PAGE 19 =====
+
+FoundComputMath(2017)17:527–566 545
+(cid:6) (cid:7)
+In view of our assumptions, (cid:6)sμ (x k )(cid:6) ∗ ≤ L(cid:6)u k (cid:6)2. Since Eξ sμ (x) = gμ (x), we
+have
+(cid:6) (cid:7)
+E uk ,ξ k (r k 2 +1 ) ≤ r k 2+E uk −2h k (cid:10)gμ (x k ),x k −x ∗(cid:11)+h2 k L2(cid:6)u k (cid:6)4
+(21)
+≤
+,(17)
+r
+k
+2−2h
+k
+(cid:10)∇fμ (x
+k
+),x
+k
+−x ∗(cid:11)+h2
+k
+(n+4)2L2
+≤ r
+k
+2−2h
+k
+(fμ (x
+k
+)− fμ (x ∗))+h2
+k
+(n+4)2L2.
+TakingnowtheexpectationinU k−1 andP k−1 ,weget
+EU k ,P k (r k 2 +1 )
+(1
+≤
+1)
+EU k−1 ,P k−1 (r k 2)−2h k (φ k − fμ (x ∗))+h2 k (n+4)2L2.
+Itremainstonotethat fμ (x ∗)
+(1
+≤
+8)
+f ∗+μLn1/2. (cid:15)(cid:16)
+Thus, choosing the parameters of method SS μ in accordance with (46), we can
+solvetheminimizationproblem(38)withstochasticobjective(48)inO(n2)iterations.
+(cid:2)2
+AsimilarjustificationcanbedonealsoformethodSS .
+0
+Someminimizationschemescanbeusedforjustifyingadjustmentprocessesina
+stochasticenvironment,whereeventhedatatransmissionissubjecttorandomerrors.
+Consider,forexample,thefollowingoptimizationprocedure,whichtakesintoaccount
+therandomimplementationerrors.
+MethodSD
+μ
+.Fork ≥0do:
+a).Atx ∈ Q,generaterandomindependentvectorsξ ∈(cid:11),u (cid:4) andu (cid:4)(cid:4).
+k k k k
+(52)
+b).Formy (cid:4) = x +μu (cid:4) andy (cid:4)(cid:4) = x +μu (cid:4)(cid:4).Computeδ = F(y k (cid:4),ξ k )−F(y k (cid:4)(cid:4),ξ k ) .
+k k k k k k k 2μ
+(cid:6) (cid:7)
+c).Updatex k+1 =π Q x k −h k δ k (y k (cid:4) −y k (cid:4)(cid:4)) .
+Usingthesameargumentsasformethod(50),wecanprovethecomplexityboundfor
+thisschemeoftheorder
+O(n2).
+(cid:2)2
+5 SimpleRandomSearchforSmoothOptimization
+Considerthefollowingsmoothunconstrainedoptimizationproblem:
+f ∗ d=ef min f(x), (53)
+x∈E
+123
+
+===== PAGE 20 =====
+
+546 FoundComputMath(2017)17:527–566
+where f isasmoothconvexfunctionon E.Assumethatthisproblemissolvableand
+∗
+denote by x one of its optimal solutions. For the sake of notation, we assume that
+dimE ≥2.
+Considerthefollowingmethod.
+MethodRG μ : Choosex 0 ∈ E.
+Iterationk ≥0.
+(54)
+a).Generateu
+k
+andcorrespondinggμ (x
+k
+).
+b).Computex k+1 = x k −hB −1gμ (x k ).
+This is a random version of the standard primal gradient method. A version of
+method(54)withoraclegˆ μwillbecalledR(cid:20)G μ.
+Sincethebounds(35)and(36)arecontinuousinμ,wecanjustifyallvariantsof
+methodRG μ,μ≥0,byasinglestatement.
+Theorem8 Let f ∈C1,1(E),andsequence{x k } k≥0 begeneratedbyRG μwith
+h = 1 . (55)
+4(n+4)L1 (f)
+Then,forany N ≥0,wehave
+1
+(cid:12)N
+(φ − f ∗)≤ 4(n+4)L1 (f)(cid:6)x0 −x∗(cid:6)2 + 9μ2(n+4)2L1 (f). (56)
+N+1 k N+1 25
+k=0
+Letfunction f bestronglyconvex.Denoteδ μ = 18μ 25 2 τ (n ( + f) 4)2 L 1 (f).Then
+(cid:15) (cid:2) (cid:3) (cid:6) (cid:7) (cid:16)
+φ N − f ∗ ≤ 2 1L 1 (f) δ μ + 1− 8(n+ τ 4 ( ) f L ) 1 (f) N (cid:6)x 0 −x ∗(cid:6)2−δ μ . (57)
+Proof Let point x with k ≥ 0 be generated after k iterations of the scheme (54).
+k
+Denoter =(cid:6)x −x ∗(cid:6).Then
+k k
+r
+k
+2
++1
+=r
+k
+2−2h(cid:10)gμ (x
+k
+),x
+k
+−x ∗(cid:11)+h2(cid:6)gμ (x
+k
+)(cid:6)2
+∗
+.
+123
+
+===== PAGE 21 =====
+
+FoundComputMath(2017)17:527–566 547
+Usingrepresentation(26)andtheestimate(35),weget
+(cid:6) (cid:7) (cid:10) (cid:11)
+E uk r k 2 +1 ≤ r k 2−2h(cid:10)∇fμ (x k ),x k −x ∗(cid:11)+h2 μ2(n 2 +6)3 L2 1 (f)+2(n+4)(cid:6)∇f(x)(cid:6)2 ∗
+(cid:10) (cid:11)
+(1
+≤
+1)
+r
+k
+2−2h(f(x
+k
+)− fμ (x ∗))+h2 μ2(n
+2
++6)3 L2
+1
+(f)+4(n+4)L
+1
+(f)(f(x
+k
+)− f ∗)
+(1
+≤
+9)
+r2−2h(1−2h(n+4)L (f))(f(x )− f ∗)+μ2nhL (f)+ μ2(n+6)3 h2L2(f)
+k 1 k 1 2 1
+(cid:10) (cid:11)
+( =55) r2− f(xk )−f∗ + μ2 n + (n+6)3 ≤ r2− f(xk )−f∗ + 9μ2(n+4).
+k 4(n+4)L1 (f) 4 n+4 8(n+4)2 k 4(n+4)L1 (f) 100
+TakingnowtheexpectationinU k−1 ,weobtain
+(cid:6) (cid:7)
+ρ k+1 d=ef EU k r k 2 +1 ≤ρ k − 4(n φ + k 4 − )L f 1 ∗ (f) + 9μ2 1 ( 0 n 0 +4).
+Summinguptheseinequalitiesfork = 0,...,N,anddividingtheresultby N +1,
+weget(56).
+Assumenowthat f isstronglyconvex.Aswehaveseen,
+E (cid:6) r2 (cid:7) ≤r2− f(xk )−f∗ + 9μ2(n+4) ( ≤ 8) (cid:2) 1− τ(f) (cid:3) r2+ 9μ2(n+4).
+uk k+1 k 4(n+4)L1 (f) 100 8(n+4)L1 (f) k 100
+TakingtheexpectationinU k−1 ,weget
+(cid:2) (cid:3)
+ρ
+k+1
+≤ 1−
+8(n+
+τ
+4
+(
+)
+f
+L
+)
+1 (f)
+ρ
+k
++ 9μ2
+1
+(
+0
+n
+0
++4).
+Thisinequalityisequivalenttothefollowingone:
+(cid:2) (cid:3) (cid:2) (cid:3)
+ρ
+k+1
+−δ
+μ
+≤ 1−
+8(n+
+τ
+4
+(
+)
+f
+L
+)
+1 (f)
+(ρ
+k
+−δ
+μ
+) ≤ 1−
+8(n+
+τ
+4
+(
+)
+f
+L
+)
+1 (f)
+k+1
+(ρ
+0
+−δ
+μ
+).
+Itremainstonotethatφ − f ∗
+(
+≤
+6)
+1L (f)ρ . (cid:15)(cid:16)
+k 2 1 k
+LetusdiscussthechoiceofparameterμinmethodRG μ.Considerfirstthemin-
+imization of functions from
+C1,1(E).
+Clearly, the estimate (56) is valid also for
+φˆ
+N
+d=ef EU
+k−1
+(f(xˆ
+N
+)), where xˆ
+N
+= argm
+x
+in[f(x) : x ∈ {x
+0
+,...,x
+N
+}]. In order
+togetthefinalaccuracy(cid:2)fortheobjectivefunction,weneedtochooseμsufficiently
+small:
+(cid:4)
+μ≤ 5 (cid:2) . (58)
+3(n+4) 2L1 (f)
+Takingintoaccountthat E
+u
+((cid:6)u(cid:6)) = O(n1/2),wecanseethattheaverag(cid:2)e(cid:4)lengtho(cid:3)f
+(cid:2)
+thefinite-differencestepincomputationoftheoraclegμisoftheorderO
+nL1 (f)
+.
+123
+
+===== PAGE 22 =====
+
+548 FoundComputMath(2017)17:527–566
+Itisinterestingthatthisboundismuchmorerelaxedwithrespectto(cid:2)thanthebound
+(46) for nonsmooth version of the random search. However, it depends now on the
+dimension of the space of variables. At the same time, inequality φˆ − f ∗ ≤ (cid:2) is
+N
+satisfiedatmostin O(nL (f)R2)iterations.
+(cid:2) 1
+Considernowthestronglyconvexcase.Then,wechooseμsatisfyingtheequation
+2 1L 1 (f)δ μ ≤ 2 (cid:2) .Thisis
+(cid:4)
+μ≤ 5 (cid:2) · τ(f) . (59)
+3(n+4) 2L1 (f) L1 (f)
+(cid:2) (cid:3)
+ThenumberiterationsofthismethodisoftheorderO nL1 (f) ln L1 (f)R2 .Itisnatural
+τ(f) (cid:2)
+thatafasterschemeneedsahigheraccuracyofthefinite-differenceoracle(orasmaller
+valueofμ).
+The complexity analysis of the method
+R(cid:20)G
+μ can be done in a similar way. In
+accordancewiththeestimate(35),thecorrespondingresultswillhaveslightlybetter
+dependenceinμ.Notethatourcomplexityresultsarealsovalidforthelimitingversion
+RG ≡R(cid:20)G .
+0 0
+6 AcceleratedRandomSearch
+Letusapplytoproblem(53)arandomvariantofthefastgradientmethod.Weassume
+that function f ∈ C1,1(E) is strongly convex with convexity parameter τ(f) ≥ 0.
+Denote by κ(f) d=ef τ(f) its condition number. And let θ = 1 , h =
+L1 (f) n 16(n+1)2L1 (f) n
+1 .
+4(n+4)L1 (f)
+MethodFG μ :Choosex 0 ∈ E,v 0 = x 0 ,andapositiveγ 0 ≥τ(f).
+Iterationk ≥0:
+a)Computeα
+k
+>0satisfyingθ
+n
+−1α
+k
+2 =(1−α
+k
+)γ
+k
++α
+k
+τ(f)≡γ
+k+1
+.
+b)Setλ = α k τ(f),β = α k γ k ,andy =(1−β )x +β v .
+k γ k+1 k γ k +α k τ(f) k k k k k
+c).Generaterandomu
+k
+andcomputecorrespondinggμ (y
+k
+).
+d).Setx k+1 = y k −h n B −1gμ (y k ),v k+1 =(1−λ k )v k +λ k y k − α θ n B −1gμ (y k ).
+k
+(60)
+Notethattheparametersofthismethodsatisfythefollowingrelations:
+1−λ =(1−α ) γ k , 1−β = γ k+1 , (1−λ )1−β k = 1−α k. (61)
+k k γ k+1 k γ k +α k τ(f) k β k α k
+123
+
+===== PAGE 23 =====
+
+FoundComputMath(2017)17:527–566 549
+Theorem9 Forallk ≥0,wehave
+(cid:2) (cid:3)
+φ − f ∗ ≤ψ ·[f(x )− f(x ∗)+ γ 0(cid:6)x −x ∗(cid:6)2]+μ2L (f) n+ 3(n+8) C ,
+k k 0 2 0 1 16 k
+(62)
+(cid:21)(cid:2) (cid:3) (cid:2) (cid:4) (cid:3) (cid:22) (cid:23) (cid:24)
+whereψ ≤min 1−κ1/2(f) k , 1+ k γ 0 −2 ,andC ≤min k, 4(n+4) .
+k 4(n+4) 8(n+4) L1 (f) k κ1/2(f)
+Proof Assume that after k iterations, we have generated points x and v . Then we
+k k
+cancompute y
+k
+andgenerategμ (y
+k
+).Takingarandomstepfromthispoint,weget
+fμ (x k+1 ) (1 ≤ 2) fμ (y k )−h n (cid:10)∇fμ (y k ),B −1gμ (x k )(cid:11)+ h 2 2 nL 1 (f)(cid:6)gμ (y k )(cid:6)2 ∗ .
+Therefore,
+E uk (cid:6) fμ (x k+1 (cid:7) ) (2 ≤ 6) fμ (y k )−h n (cid:6)∇fμ (y k )(cid:6)2 ∗ + h 2 2 nL 1 (f)E uk (cid:6) (cid:6)gμ (y k )(cid:6)2 ∗ (cid:7)
+(37) (cid:6) (cid:6) (cid:7) (cid:7)
+≤ fμ (y
+k
+)−
+4(n
+h
++
+n
+4)
+E
+uk
+(cid:6)gμ (y
+k
+)(cid:6)2
+∗
+−3μ2L2
+1
+(f)(n+5)3
+(cid:6) (cid:7)
++h
+2
+2 nL
+1
+(f)E
+uk
+(cid:6)gμ (y
+k
+)(cid:6)2
+∗
+(cid:6) (cid:7)
+= fμ (y k )− 2 1θ n E uk (cid:6)gμ (y k )(cid:6)2 ∗ +ξ μ ,
+whereξ μ d=ef 3 1 ( 6 n ( + n 5 + ) 4 3 ) μ 2 2 L 1 (f).Notethat ( ( n n + + 4 5) ) 3 2 ≤n+8forn ≥2.
+Letusfixanarbitraryx ∈ E.Notethat
+δ k+1 (x) d=ef γ k
+2
++1(cid:6)v k+1 −x(cid:6)2+ fμ (x k+1 )− fμ (x)
+= γ k
+2
++1(cid:6)(1−λ
+k
+)v
+k
++λ
+k
+y
+k
+−x(cid:6)2− θ n γ
+α
+k
+k
++1(cid:10)gμ (y
+k
+),(1−λ
+k
+)v
+k
++λ
+k
+y
+k
+−x(cid:11)
++θ n 2 2 γ α k 2 +1(cid:6)gμ (y k )(cid:6)2 ∗ + fμ (x k+1 )− fμ (x).
+k
+Takingtheexpectationinu ,andusingtheequationofStepa)in(60),weget
+k
+E uk (δ k+1 (x))
+(2
+≤
+1)
+γ k 2 +1(cid:6)(1−λ k )v k +λ k y k −x(cid:6)2−α k (cid:10)∇fμ (y k ),(1−λ k )v k +λ k y k −x(cid:11)
+(cid:6) (cid:7) (cid:6) (cid:7)
++ 2 1θ n E uk (cid:6)gμ (y k )(cid:6)2 ∗ +E uk fμ (x k+1 ) − fμ (x)
+≤ γ k
+2
++1(cid:6)(1−λ
+k
+)v
+k
++λ
+k
+y
+k
+−x(cid:6)2+α
+k
+(cid:10)∇fμ (y
+k
+),x −(1−λ
+k
+)v
+k
+−λ k y k (cid:11)+ fμ (y k )− fμ (x)+ξ μ .
+123
+
+===== PAGE 24 =====
+
+550 FoundComputMath(2017)17:527–566
+Notethatv = y + 1−β k(y −x ).Therefore,
+k k β k k
+k
+(1−λ )v +λ y = y +(1−λ )1−β k(y −x ) ( =61) y + 1−α k(y −x ).
+k k k k k k β k k k α k k
+k k
+Hence,
+fμ (y
+k
+)+α
+k
+(cid:10)∇fμ (y
+k
+),x −(1−λ
+k
+)v
+k
+−λ
+k
+y
+k
+(cid:11)− fμ (x)
+= fμ (y
+k
+)+(cid:10)∇fμ (y
+k
+),α
+k
+x +(1−α
+k
+)x
+k
+−y
+k
+(cid:11)− fμ (x)
+(8)
+≤ (1−α
+k
+)(f(x
+k
+)− fμ (x))−
+2
+1α
+k
+τ(f)(cid:6)x −y
+k
+(cid:6)2,
+andwecancontinue:
+E uk (δ k+1 (x))≤ γ k 2 +1(cid:6)(1−λ k )v k +λ k y k −x(cid:6)2+ξ μ
++ (1−α
+k
+)(f(x
+k
+)− fμ (x))−
+2
+1α
+k
+τ(f)(cid:6)x −y
+k
+(cid:6)2
+≤ γ k 2 +1(1−λ k )(cid:6)v k −x(cid:6)2+ γ k 2 +1λ k (cid:6)y k −x(cid:6)2+ξ μ
++ (1−α
+k
+)(f(x
+k
+)− fμ (x))−
+2
+1α
+k
+τ(f)(cid:6)x −y
+k
+(cid:6)2
+( =61)
+(1−α
+k
+)δ
+k
+(x)+ξ
+μ
+.
+Denote φ
+k
+(μ) = EU
+k−1
+(fμ (x
+k
+)), ρ
+k
+= γ
+2
+kEU
+k−1
+((cid:6)v
+k
+− x ∗(cid:6)2). Then, taking the
+expectationofthelatterinequalityinU k−1 ,weget
+φ k+1 (μ)− fμ (x)+ρ k+1 ≤(1−α k )(φ k (μ)− fμ (x ∗)+ρ k )+ξ μ
+(cid:6) (cid:7)
+≤... ≤ ψ k+1 · fμ (x 0 )− fμ (x)+ γ 2 0(cid:6)x 0 −x(cid:6)2
++ ξ
+μ
+·C
+k+1
+,
+k(cid:25)−1 k(cid:12)−1 k(cid:25)−1
+whereψ = (1−α ),andC =1+ (1−α ),k ≥1.Definingψ =1
+k i k j 0
+i=0 i=1 j=k−i
+andC = 0,wegetC ≤ k,k ≥ 0.Ontheotherhand,byinductionitiseasytosee
+0 k
+thatγ ≥τ(f)forallk ≥0.Therefore,
+k
+α ≥[τ(f)θ ]1/2 = κ1/2(f) d=ef ω , k ≥0.
+k n 4(n+4) n
+k(cid:12)−1 k(cid:25)−1
+Then,C ≤1+ (1−ω )i =1+(1−ω )(1−(1−ω n )k) ≤ω−1.Thus,
+k n n ω n
+i=1 j=(cid:23)k−i (cid:24) (cid:2) (cid:3) n
+C ≤min k, 4(n+4) , ψ ≤ 1− κ1/2(f) k , k ≥0.
+k κ1/2(f) k 4(n+4)
+123
+
+===== PAGE 25 =====
+
+FoundComputMath(2017)17:527–566 551
+Further,3 let us prove that γ ≥ γ ψ . For k = 0, this is true. Assume it is true for
+k 0 k
+somek ≥0.Then
+γ
+k+1
+≥(1−α
+k
+)γ
+k
+≥ γ
+0
+ψ
+k+1
+.
+Denotea = 1 .Then,inviewoftheestablishedinequalitywehave:
+k ψ1/2
+k
+a k+1 −a k = ψ ψ k 1
+k
+1 /2 /2 − ψ ψ
+k
+1 k
++
+1 / + 2 /
+1
+2 1 = ψ
+k
+1/2ψ
+k
+1 ψ
++
+/2 k
+1
+− (ψ ψ
+k
+1 k / + 2 1 +ψ
+k
+1
++
+/2
+1
+) ≥ ψ 2ψ k −
+k
+ψ ψ
+k
+1 k
++
+/ + 2
+1
+1
+(cid:4)
+= ψ k −(1−α k )ψ k = α k = γ k 1 + /2 1 θ n 1/2 ≥ 1 γ 0 .
+2ψ
+k
+ψ
+k
+1
++
+/2
+1
+2ψ
+k
+1
++
+/2
+1
+2ψ
+k
+1
++
+/2
+1
+8(n+4) L1 (f)
+(cid:4)
+Hence, 1 ≥1+ k γ 0 forallk ≥0.Itremainstonotethat
+ψ k1/2 8(n+4) L1 (f)
+EU
+k−1
+(f(x
+k
+))− f(x ∗)
+(1
+≤
+1)
+φ
+k
+(μ)− f(x ∗)
+(1
+≤
+9)
+φ
+k
+(μ)− fμ (x ∗)+ μ
+2
+2 L
+1
+(f)n
+(cid:6) (cid:7)
+≤ ψ k · fμ (x 0 )− fμ (x ∗)+ γ 2 0(cid:6)x 0 −x ∗(cid:6)2 +ξ μ ·C k + μ 2 2 L 1 (f)n
+(1
+≤
+9)
+ψ
+k
+·
+(cid:6)
+f(x
+0
+)− f(x ∗)+ γ
+2
+0(cid:6)x
+0
+−x ∗(cid:6)2
+(cid:7)
++ξ
+μ
+·C
+k
++μ2L
+1
+(f)n.
+Itremainstoapplytheupperboundsforψ . (cid:15)(cid:16)
+k
+Letusdiscussthecomplexityestimatesofthemethod(60)forτ(f)=0.Inorder
+togetaccuracy(cid:2)fortheobjectivefunction,itsufficesthatbothtermsintheright-hand
+(cid:2)
+sideofinequality(62)besmallerthan .Thus,weneed
+2
+(cid:13) (cid:14)
+N((cid:2))= O
+nL1
+1
+/2(f)R
+(63)
+(cid:2)1/2
+iterations.Similarlytothesimplerandomsearchmethod(39),thisestimateisntimes
+larger than the estimate of the corresponding scheme with full computation of the
+gradient.Theparameteroftheoracleμmustbechosenas
+(cid:13) (cid:14) (cid:13) (cid:14)
+μ ≤ O (cid:2)1/2 = O (cid:2)3/4
+L1/2(f)(n·N((cid:2)))1/2 nL3/4(f)R1/2
+1 1
+= O
+(cid:8)
+1
+(cid:15)
+(cid:2) ·
+(cid:10)
+(cid:2)
+(cid:11) 1/2 (cid:16) 1/2 (cid:9)
+.
+(64)
+n L1 (f) L1 (f)R2
+Ascomparedwith(58),theaveragesizeofthetrialstepμuisatighterfunctionof(cid:2).
+Thisisnatural,sincethemethod(54)ismuchfaster.Ontheotherhand,thissizeis
+stillquitemoderate(thisisgoodfornumericalstabilityofthescheme).
+3 TherestoftheproofisverysimilartotheproofofLemma2.2.4in[16].Wepresentitherejustforthe
+readerconvenience.
+123
+
+===== PAGE 26 =====
+
+552 FoundComputMath(2017)17:527–566
+Remark1 1. Method(60)canbeseenasavariantoftheconstantstepscheme(2.2.8)
+in[16].Therefore,thesequence{v }canbeexpressedintermsof{x }and{y }
+k k k
+(seeSection2.2.1in[16]fordetails).
+2. Linearconvergenceofmethod(60)forstronglyconvexfunctionsallowsaneffi-
+cientgenerationofrandomapproximationstothesolutionofproblem(53)with
+arbitrary high confidence level. This can be achieved by an appropriate regular-
+izationoftheinitialproblem,assuggestedinSection3of[19].
+7 NonconvexProblems
+Considernowtheproblem
+min f(x), (65)
+x∈E
+wheretheobjectivefunction f isnonconvex.Letusapplytoitmethod(39).Nowit
+hasthefollowingform:
+MethodR(cid:20)S
+μ
+:Choosex
+0
+∈ E.
+Iterationk ≥0.
+(66)
+a).Generateu
+k
+andcorrespondinggμ (x
+k
+).
+b).Computex k+1 = x k −h k B −1gμ (x k ).
+Letusestimatetheevolutionofthevalueoffunction fμafteronestepofthisscheme.
+Since fμhasLipschitz-continuousgradient,wehave
+fμ (x k+1 )
+(
+≤
+6)
+fμ (x k )−h k (cid:10)∇fμ (x k ),B −1gμ (x k )(cid:11)+ 2 1h2 k L 1 (fμ )(cid:6)gμ (x k )(cid:6)2 ∗ .
+Takingnowtheexpectationinu ,weobtain
+k
+(21) (cid:6) (cid:7)
+E uk (fμ (x k+1 )) ≤ fμ (x k )−h k (cid:6)∇fμ (x k )(cid:6)2 ∗ + 2 1h2 k L 1 (fμ )E uk (cid:6)gμ (x k )(cid:6)2 ∗ .(67)
+Considernowtwocases.
+1. f
+∈C1,1(E).Then
+(37)
+E uk (fμ (x k+1 )) ≤ fμ (x k )−h k (cid:6)∇fμ (x k )(cid:6)2 ∗
+(cid:6) (cid:7)
++
+2
+1h2
+k
+L
+1
+(f) 4(n+4)(cid:6)∇fμ (x
+k
+)(cid:6)2
+∗
++3μ2L2
+1
+(f)(n+4)3
+123
+
+===== PAGE 27 =====
+
+FoundComputMath(2017)17:527–566 553
+Choosingnowh =h ˆ d=ef 1 ,weobtain
+k 4(n+4)L1 (f)
+E uk (fμ (x k+1 ))≤ fμ (x k )− 2 1h ˆ(cid:6)∇fμ (x k )(cid:6)2 ∗ + 3 3 μ 2 2 L 1 (f)(n+4).
+TakingtheexpectationofthisinequalityinU ,weget
+k
+φ k+1 ≤φ k − 2 1h ˆη k 2+ 3μ2 3 (n 2 +4) L 1 (f),
+(cid:6) (cid:7)
+whereη k 2 d=ef EU k (cid:6)∇fμ (x k )(cid:6)2 ∗ .Assumingnowthat f(x) ≥ f ∗ forall x ∈ E,we
+get
+(cid:10) (cid:11)
+1
+(cid:12)N
+η2 ≤8(n+4)L (f) f(x0 )−f∗ + 3μ2(n+4) L (f) . (68)
+N+1 k 1 N+1 32 1
+k=0
+Sinceθ
+k
+2 d=ef EU
+k
+(cid:6)
+(cid:6)∇f(x
+k
+)(cid:6)2
+∗
+(cid:7)(2
+≤
+9)
+2η
+k
+2+μ2(n
+2
++6)3 L
+(cid:12)
+2
+1
+(f),theexpectedrateofdecrease
+inθ isofthesameorderas(68).Inordertoget 1 N θ2 ≤(cid:2)2,weneedtochoose
+k N+1 k=0 k
+(cid:2) (cid:3)
+μ≤ O (cid:2) .
+n3/2L1 (f)
+Then,theupperboundfortheexpectednumberofstepsis O(n ).
+(cid:2)2
+2. f
+∈C0,0(E).Then,
+(34)
+E uk (fμ (x k+1 )) ≤ fμ (x k )−h k (cid:6)∇fμ (x k )(cid:6)2 ∗ + 2 1h2 k L 1 (fμ )·L2 0 (f)(n+4)2
+( =22) fμ (x
+k
+)−h
+k
+(cid:6)∇fμ (x
+k
+)(cid:6)2
+∗
++
+μ
+1h2
+k
+n1/2(n+4)2·L3
+0
+(f).
+(cid:12)
+Assume f(x) ≥ f ∗ , x ∈ E,anddenote S d=ef n h .Takingtheexpectationof
+N k=0 k
+thelatterinequalityinU ,andsummingthemup,weget
+k
+(cid:15) (cid:16)
+(cid:12)N (cid:12)N
+S
+1
+N k=0
+h
+k
+η
+k
+2 ≤
+S
+1
+N
+(fμ (x
+0
+)− f ∗)+C(μ)
+k=0
+h2
+k
+,
+(69)
+C(μ)d=ef 1n1/2(n+4)2·L3(f).
+μ 0
+Thus, we can guarantee a convergence of the process (66) to a stationary point of
+the function fμ, which is a smooth approximation of f. In order to bound the gap
+inthisapproximationby(cid:2),weneedtochooseμ ≤ μ¯ ( =18) (cid:2) .Letusassume
+for simplicity that we are using a constant step scheme: h n1 ≡ /2L h 0 ( , f k ) ≥ 0. Then the
+k
+right-handsideofinequality(69)becomes
+fμ¯(x0 )−f∗ + hn(n+4)2L4(f)≤ L0 (f)R + hN(n+4)2L4(f) d=ef ρ(h).
+(N+1)h (cid:2) 0 (N+1)h (cid:2) 0
+123
+
+===== PAGE 28 =====
+
+554 FoundComputMath(2017)17:527–566
+Minimizingthisupperboundinh,wegetisoptimalvalue:
+(cid:15) (cid:16) (cid:15) (cid:16)
+1/2 1/2
+h ∗ = (cid:2)R , ρ(h ∗) = 2 n(n+4)2L5 0 (f)R .
+n(n+4)2L3(f)(N+1) (cid:2)(N+1)
+0
+Thus,inordertoguaranteetheexpectedsquarednormofthegradientoffunction fμ¯
+oftheorderδ,weneed
+(cid:13) (cid:14)
+n(n+4)2L5(f)R
+O 0
+(cid:2)δ2
+iterationsofthescheme(66).Tothebestofourknowledge,thisisthefirstcomplexity
+bound for the methods for minimizing nonsmooth nonconvex functions. Note that
+allowinginthemethod(66)h → 0andμ → 0,wecanensureconvergenceofthe
+k
+schemetoastationarypointoftheinitialfunction f.Butthisproofisquitelongand
+technical.Therefore,weomitit.
+8 PreliminaryComputationalExperiments
+The main goal of our experiments was the investigation of the impact of the ran-
+dom oracle on the actual convergence of the minimization methods. We compared
+theperformanceoftherandomizedgradient-freemethodswiththeclassicalgradient
+schemes.Assuggestedbyourefficiencyestimates,itisnormaliftheformermethods
+needntimesmoreiterationsascomparedwiththeclassicalones.Letusdescribeour
+results.
+8.1 SmoothMinimization
+We checked the performance of the methods (54) and (60) on the following test
+function:
+n(cid:12)−1(cid:6) (cid:7) (cid:6) (cid:7)
+f (x)= 1(x (1))2+ 1 x (i+1)−x (i) 2+ 1 x (n) 2−x (1), x =0. (70)
+n 2 2 2 0
+i=1
+ThisfunctionwasusedinSection2.1in[16]forprovingthelowercomplexitybound
+forthegradientmethodsasappliedtofunctionsfromC1,1(Rn).Ithasthefollowing
+parameters:
+L (f )≤4, R2 =(cid:6)x −x ∗(cid:6)2 ≤ n+1, n =256.
+1 n 0 3
+These values were used for defining the trial step size μ by (58) and (64). We also
+testedtheversionsofcorrespondingmethodswithμ=0.Finally,wecomparedthese
+resultswiththeusualgradientandfastgradientmethod.
+Ourresultsforthesimplegradientschemesarepresentedinthefollowingtable.The
+firstcolumnofthetableindicatesthecurrentlevelofrelativeaccuracywithrespectto
+123
+
+===== PAGE 29 =====
+
+FoundComputMath(2017)17:527–566 555
+Table1 SimplerandomsearchRGμ
+Accuracy μ=0 μ=8.9×10 −6 GM
+Min Max Mean Min Max Mean
+2.0×10 −3 3 4 4.0 3 4 3.9 1
+9.8×10 −4 20 22 21.3 21 22 21.3 5
+4.9×10 −4 85 89 86.8 85 89 86.8 22
+2.4×10 −4 329 343 335.5 327 342 335.4 83
+1.2×10 −4 1210 1254 1232.8 1204 1246 1231.8 304
+6.1×10 −5 4129 4242 4190.3 4155 4235 4190.4 1034
+3.1×10 −5 12440 12611 12536.7 12463 12645 12538.1 3092
+1.5×10 −5 30883 31178 31054.6 30939 31269 31058.1 7654
+thescaleS d=ef 1L (f )R2.Thekthrowofthetable,k =2,...,9,showsthenumber
+2 1 n
+ofiterationsspentforachievingtheabsoluteaccuracy2
+−(k+7)
+S.Thistableaggregates
+theresultsof20attemptsofthemethodRG
+0
+andRG μtominimizethefunction(70).
+The columns 2–4 of the table represent the minimal, maximal and average number
+ofblocksbyn iterations,executedbyRG inordertoreachcorrespondinglevelof
+0
+accuracy.ThenextthreecolumnsrepresentthisinformationforRG μwithμcomputed
+by(58)with(cid:2) =2 −16.Thelastcolumncontainstheresultsforthestandardgradient
+methodwithconstantsteph = 1 (Table1).
+L1 (fn )
+Wecanseeaverysmallvarianceoftheresultspresentedineachcolumn.Moreover,
+thefinite-differenceversionwithanappropriatevalueofμdemonstratespractically
+the same performance as the version based on the directional derivative. Moreover,
+thenumberofblocksbyniterationsoftherandomschemesispracticallyequaltothe
+numberofiterationsofthestandardgradientmethodmultipliedbyfour.Aplausible
+explanationofthisphenomenaisrelatedtothechoiceofthestepsizeh = 1 .
+4·(n+4)L1 (f)
+However, we prefer to use this value since there is no theoretical justification for a
+largerstep.
+Letuspresenttheresultsof20runsoftheacceleratedschemes.Thestructureof
+Table2issimilartothatofTable1.Sincethesemethodsarefaster,wegivetheresults
+foramoreaccuratesolution,upto(cid:2) =2 −30.
+Aswecansee,theacceleratedschemesareindeedfasterthanthesimplerandom
+search.Ontheotherhand,sameasinTable1,thevarianceoftheresultsineachlineis
+verysmall.Methodwithμ=0demonstratesalmostthesameefficiencyasthemethod
+with μ defined by (64). And again, the number of the blocks by n iterations of the
+randommethodsisproportionaltothenumberofiterationsofthestandardgradient
+methodsmultipliedbyfour.
+8.2 MinimizationofPiecewiseLinearFunctions
+Fornonsmoothproblems,wepresentfirstthecomputationalresultsoftwovariantsof
+method(39)onthefollowingtestfunctions:
+123
+
+===== PAGE 30 =====
+
+556 FoundComputMath(2017)17:527–566
+Table2 FastrandomsearchFGμ
+Accuracy μ=0 μ=3.5×10 −10 FGM
+Min Max Mean Min Max Mean
+2.0×10 −3 7 7 7.0 7 7 7.0 1
+9.8×10 −4 21 22 21.1 21 22 21.1 4
+4.9×10 −4 45 47 45.8 46 47 46.2 10
+2.4×10 −4 93 96 94.1 93 96 94.5 22
+1.2×10 −4 182 187 184.7 180 188 185.4 44
+6.1×10 −5 338 350 345.4 342 349 346.6 84
+3.1×10 −5 597 611 603.2 599 609 604.3 147
+1.5×10 −5 944 967 953.1 948 964 954.9 233
+7.6×10 −6 1328 1355 1339.6 1332 1351 1341.5 328
+3.8×10 −6 1671 1695 1679.4 1671 1688 1680.3 411
+1.9×10 −6 1915 1934 1922.6 1916 1928 1923.1 471
+9.5×10 −7 2070 2083 2075.3 2070 2080 2075.7 508
+4.8×10 −7 2177 2189 2182.1 2177 2187 2182.6 535
+2.4×10 −7 2270 2281 2274.4 2268 2279 2274.4 557
+1.2×10 −7 2360 2375 2366.8 2355 2375 2366.3 580
+6.0×10 −8 4294 4308 4299.9 4291 4308 4300.9 1056
+3.0×10 −8 4396 4410 4402.4 4392 4411 4403.6 1081
+1.5×10 −8 4496 4521 4506.9 4495 4518 4508.0 1107
+7.5×10 −9 6519 6537 6529.0 6517 6540 6529.1 1604
+3.7×10 −9 6624 6669 6646.2 6623 6672 6644.4 1633
+1.9×10 −9 8680 8718 8700.3 8682 8712 8699.1 2139
+9.3×10 −10 10770 10805 10789.9 10779 10808 10791.2 2653
+n(cid:12)−1
+F (x)=|x (1)−1|+ |1+x (i+1)−2x (i)|,
+1
+i=1
+(cid:21) (cid:22) (71)
+F∞ (x)=max |x (1)−1|, max |1+x (i+1)−2x (i)| .
+1≤i≤n−1
+Forbothfunctions,x
+0
+=0,(x ∗)(i) =1,i =1,...,n,and F
+1
+∗ = F
+∞
+∗ =0.Theyhave
+thefollowingparameters:
+L
+0
+(F
+1
+)≤3n1/2, L
+0
+(F∞ ) ≤ 3, R2 =(cid:6)x
+0
+−x ∗(cid:6)2 ≤ n.
+Despite their trivial form, these functions are very badly conditioned. Let us define
+theconditionnumberofthelevelsetoffunction f:
+(cid:23) (cid:24)
+κ (f)d=ef inf (cid:6)x−x∗(cid:6)∞ : f(x)= f(y)= f ∗+t , t ≥0,
+t x,y (cid:6)y−x∗(cid:6)∞
+123
+
+===== PAGE 31 =====
+
+FoundComputMath(2017)17:527–566 557
+SuchaconditionnumbercanbedefinedwithrespecttoanynorminE.Sinceallnorms
+onfinite-dimensionalspacesarecompatible,anyofthesenumbersprovidesuswitha
+usefulestimateofthelevelofdegeneracyofcorrespondingfunctions.
+Lemma6 Foranyt ≥0,wehaveκ
+t
+(F
+1
+)≤
+3(2
+2
+n
+n
+−1)
+,andκ
+t
+(F∞ )≤
+2n
+1
+−1
+.
+Proof Indeed,definex (1) =1+ t,andx (i) =1,i =2,...,n.Then,
+2
+x (1)−1= t, 1+x (2)−2x (1) = −t,
+2
+1+x (i+1)−2x (i) =0, i =2,...,n−1.
+Thus,F
+1
+(x)=
+2
+3t,andF∞ (x)=t.Further,definey (i) =1+γt(2i−1),i =1,...,n.
+Then,
+y
+(1)−1=γt,
+1+y (i+1)−2y (i) =1+γt(2i+1−1)+1−2[γt(2i −1)+1] = γt,
+i =1,...,n−1.
+Hence,F 1 (y)=nγt,andF∞ (y)=γt.Notethat(cid:6)x−x ∗(cid:6) ∞ =t,and(cid:6)y−x ∗(cid:6) ∞ =
+γt(2n−1).Takingnowγ =
+2
+3
+n
+forF
+1
+,andγ =1forF∞,wegetthedesiredresults.
+(cid:15)(cid:16)
+UsingthetechniqueofSection2.1in[16]asappliedtofunctions(71),itispossible
+toprovethelowercomplexitybound O(1)fornonsmoothoptimizationmethods.
+(cid:2)2
+InTable3,wecomparethreemethods:methodRS
+0
+,methodRS μwithμdefined
+by(46),andthestandardsubgradientmethod(e.g.,Section3.2.3in[16]),asappliedto
+thefunctionF .Thefirstcolumnofthetableshowstherequiredaccuracywithrespect
+1
+to the scale L (F )R. The theoretical upper bound for achieving the corresponding
+0 1
+level of accuracy is κ , where κ is an absolute constant. We present the results for
+(cid:2)2
+threedimensionsn = 16,64,256.Forthefirsttwomethods,wedisplaythenumber
+ofblocksofn iterationsthatwererequiredinordertoreachthislevelofaccuracy.If
+thiswasimpossibleafter105iterations,weputinthecellthebestvaluefoundbythe
+scheme.Forthestandardsubgradientscheme,weshowtheusualnumberofiterations.
+Theseresultscorrespondonlytoasinglerunsincethevariabilityintheperformance
+oftherandomschemesisverysmall.
+Ascomparedwiththetheoreticalupperbounds,allmethodsperformmuchbetter.
+WeobserveanunexpectedlygoodperformanceofmethodRS μ.Itisusuallybetter
+thanitsvariantwithexactdirectionalderivative.Moreover,forahigheraccuracy,itis
+oftenbetterthantheusualsubgradientmethod.Letuspresentnowthecomputational
+resultsforfunction F∞(Table4).
+We can see that at this test problem, the finite-difference version RS μ is less
+dominant.Nevertheless,intwocasesfromthreeitisaclearwinner.
+123
+
+===== PAGE 32 =====
+
+558 FoundComputMath(2017)17:527–566
+Table3 DifferentmethodsforfunctionF1 ,Limit=105
+Method RS 0 RSμ SG RS 0 RSμ SG RS 0 RSμ SG
+(cid:2)\n 16 64 256
+2.5E−1 4 1 1 2 9 1 4 33 1
+1.3E−1 7 18 4 7 58 3 11 221 3
+6.3E−2 11 38 12 25 105 4 21 381 4
+3.1E−2 27 60 30 59 137 10 74 482 4
+1.6E−2 104 88 40 187 161 24 263 546 14
+7.8E−3 328 108 94 685 180 48 1045 590 36
+3.9E−3 1086 114 248 2749 199 118 3848 624 94
+2.0E−3 4080 273 3866 10828 221 368 14773 656 202
+9.8E−4 10809 884 17698 41896 698 904 54615 698 392
+4.9E−4 39157 3714 46218 6.0E−4 2213 3570 7.5E−4 981 566
+2.4E−4 3.0E−4 11156 85778 9506 18354 3759 904
+1.2E−4 26608 2.2E−4 37870 1.8E−4 14961 1.7E−4
+Table4 DifferentmethodsforfunctionF∞,Limit=105
+Method: RS 0 RSμ SG RS 0 RSμ SG RS 0 RSμ SG
+(cid:2)\n 16 64 256
+2.5E−1 1 1 1 1 1 1 1 1 1
+1.3E−1 1 1 1 1 1 1 1 1 1
+6.3E−2 43 73 19 1 1 1 1 1 1
+3.1E−2 63 207 79 245 675 77 1 1 1
+1.6E−2 115 321 278 337 3650 343 1301 9123 322
+7.8E−3 201 432 1159 546 6098 1265 1921 56604 1340
+3.9E−3 1101 471 5058 2579 7503 5060 3335 95699 5058
+2.0E−3 1601 504 20228 7637 8322 20233 12328 3.5E−3 20231
+9.8E−4 5972 542 80912 27417 8755 80916 42798 80915
+4.9E−4 29873 1923 8.8E−4 91102 9008 8.8E−4 6.9E−4 8.8E−4
+2.4E−4 93887 5685 4.3E−4 9431
+1.2E−4 1.8E−4 21896 25424
+Let us compare these methods on a more sophisticated test problem. Denote by
+(cid:20) ⊂ Rm thestandardsimplex.Considerthefollowingmatrixgame:
+m
+min max(cid:10)Ax,y(cid:11) = max min(cid:10)Ax,y(cid:11),
+(72)
+x∈(cid:20)
+m
+y∈(cid:20)
+m
+y∈(cid:20)
+m
+x∈(cid:20)
+m
+123
+
+===== PAGE 33 =====
+
+FoundComputMath(2017)17:527–566 559
+Table5 Saddlepointproblem Dim RS 0 RSμ SG
+8 1.3E−5 5.3E−6 1.4E−4
+16 3.3E−5 8.3E−6 1.3E−4
+32 4.80E−5 7.0E−6 1.3E−4
+64 2.3E−4 2.2E−4 2.4E−4
+128 9.3E−5 3.1E−5 1.6E−4
+256 9.3E−5 2.1E−5 1.7E−4
+where Aisanm×m-matrix.Definethefollowingfunction:
+(cid:21) (cid:22)
+(cid:26) (cid:27)
+f(x,y) =max max (cid:10)ATe ,x(cid:11)−(cid:10)Ae ,y(cid:11) , |(cid:10)e¯,x(cid:11)−1|, |(cid:10)e¯,y(cid:11)−1| ,
+i j
+1≤i,j≤m
+wheree ∈ Rm arecoordinatevectorsande¯ ∈ Rm isthevectorofallones.Clearly,
+i
+theproblem(72)isequivalenttothefollowingminimizationproblem:
+min f(x,y). (73)
+x,y≥0
+The optimal value of this problem is zero. We choose the starting points x = e¯ ,
+0 m
+y = e¯ , and generate A with random entries uniformly distributed in the interval
+0 m
+[−1,1].Thentheparametersofproblem(38)areasfollows:
+n = 2m, Q = R+ n, L
+0
+(f)≤n1/2, R ≤ 2.
+InTable5,wepresentthecomputationalresultsfortwovariantsofmethodRS
+μ
+andthesubgradientscheme.Forproblems(73)ofdimensionn = 2p, p = 3...16,
+wereportthebestaccuracyachievedbytheschemesafter105iterations(asusual,for
+random methods, we count the blocks of n iterations). The parameter μ of method
+RS μwascomputedby(46)withtargetaccuracy(cid:2) =9.5E−7.
+Clearly,inthiscompetitionmethodRS μisagainawinner.Thetwoothermethods
+demonstrateverysimilarperformance.
+8.3 TestFunctionsBasedonChebyshevPolynomials
+Chebyshevpolynomialsofthefirstkindaredefinedbytherecurrencerelation
+T (t)=1, T (t) = t,
+0 1
+T n+1 (t)=2tT n (t)−T n−1 (t), n ≥1.
+Inparticular, T (t) = 2t2−1.Theabsolutevalueofsuchapolynomialachievesits
+2
+maximum(equaltoone)exactlyatn+1pointsofthesegment[−1,1].
+123
+
+===== PAGE 34 =====
+
+560 FoundComputMath(2017)17:527–566
+Chebyshevpolynomialssatisfythefollowingnestingproperty
+T (T (t))= T (t),
+n m nm
+which allows to create test functions with very high oscillating behavior. Indeed,
+considerthesystemofequations
+(cid:6) (cid:7)
+x (k+1) = T x (k) , k =1,...,n−1. (74)
+2
+Then the last component of the vector x ∈ Rn depends on the first one in a very
+oscillatingmanner:
+(cid:6) (cid:7)
+x (n) = T 2n−1 x (1) .
+Penalizing the residual in the system of nonlinear equations (74), we can get many
+interestingobjectivefunctions.Ononehand,theydonothavelocalminimums,and
+ontheotherhand,theyexhibitanoscillatorybehaviorofthelevelsets.Thesimplest
+functionofthistypeisasfollows:
+f(x)= 1 (cid:6) x (1)−1 (cid:7) 2+ n(cid:12)−1 (cid:2) x (i+1)+1−2 (cid:6) x (i) (cid:7) 2 (cid:3) 2 ,
+4
+i=1 (75)
+x ∗ =(1,...,1)T, x = (−1,1,...,1)T.
+0
+However,function(75)isnotconvex.InordertoseethatChebyshevpolynomials
+candeliverinterestingtestfunctionsforconvexoptimization,notethatthepolynomial
+T (t)isconvex.
+2
+Considerthefollowingsystemofnonlinearinequalities:
+(cid:6) (cid:7)
+x (k+1) ≥2 x (k) 2−1, k =1,...,n−1,
+(76)
+x (1) ≥1.
+Lemma7 Letpointx ∈ Rn befeasibleforthesystemofconvexinequalities(76).If
+forsomeδ ∈[0,1]wehavex (1) ≥1+ δ2 ,then
+2(1+δ)
+(cid:10) (cid:11)
+x (n) ≥ 1 (1+δ)2n−1 +(1+δ)−2n−1 ≥ 2 −1+ 2 δ 2n. (77)
+2
+(cid:10) (cid:11)
+Proof Indeed, let us prove by induction that x (i) ≥ 1 (1+δ)2i−1 +(1+δ)−2i−1 .
+2
+Fori = 1,thisinequalityisvalidbytheassumption.Letitbevalidforsomei ≥ 1.
+Then,
+123
+
+===== PAGE 35 =====
+
+FoundComputMath(2017)17:527–566 561
+( T 7 a 9 b ) le6 Resultsforproblem Dim SG RS 0 RSμ
+8 833650 415165 11862
+16 532123 34471 16939
+32 454043 441065 34741
+64 428966 15665 130
+128 421854 5636 250
+256 416582 913 2577
+512 416143 707 923
+1024 413209 1419 2001
+(cid:10) (cid:11)
+x (i+1) ≥ 1 (1+δ)2i−1 +(1+δ)−2i−1 2 −1
+2
+(cid:10) (cid:11)
+= 1 (1+δ)2i +(1+δ)−2i .
+2
+Itremainstonotethatforδ ∈[0,1]wehaveln(1+δ)≥δln2. (cid:15)(cid:16)
+Thus,thesystemofinequalities(76)hasverypoorSlatercondition,whichmakes
+itdifficultfortheinterior-pointmethods.Thisill-conditioningisinheritedbyanother
+representationofthisset.Forexample,itcanbedefinedasfollows:
+(cid:4)
+1+x(k+1) ≥ x (k), k =1,...,n−1,
+2
+(78)
+x (1) ≥1.
+Note that the functional components of this representation are Lipschitz continuous
+onthepositiveorthant.Letusdefinenowthefollowingfunction:
+(cid:21) (cid:15) (cid:4) (cid:16)(cid:22)
+ψ(x)=max 1−x (1),x (n)−1,
+1≤
+m
+k≤
+a
+n
+x
+−1
+x (k)− 1+x
+2
+(k+1) , x ∈ Q ≡ R+ n.
+√
+This function is nonnegative on its feasible set and L (ψ) = 3 2. It attains its
+0 4
+minimumatx ∗ =(1,...,1)T.Thus,ournexttestproblemisasfollows:
+min{ψ(x): x ∈ Q}, x 0 =(1,...,1,2)T. (79)
+x
+Thus,wecanchoose R =1.TheresultsofourexperimentsarepresentedinTable6.
+Theproblem(79)wassolvedbyallmethodsuptoaccuracy(cid:2) =10 −4.Aswecan
+see,thestandardsubgradientmethodbehavesonthisproblemratherpoorly.Thismay
+confirmanintuitionthatonhighlydegenerateproblems,therandomsearchdirections
+havemorechancestosucceedascomparedwithregularshort-stepprocedures.Onthe
+otherhand,werecallthereaderthatinthistable,theresultsforrandomsearchmeth-
+odsaregiveninblocksofniterations.Therefore,ifwewouldcomparethenumberof
+123
+
+===== PAGE 36 =====
+
+562 FoundComputMath(2017)17:527–566
+callsoforacle,subgradientmethodwillbealmostthebest,atleastfortheproblems
+ofhighdimension.
+8.4 Conclusion
+Ourexperimentsconfirmthefollowingconclusion.Ifthecomputationofthegradient
+is feasible, then the cost per iteration for random methods and gradient methods is
+approximatelythesame.Inthissituation,thetotaltimespentbytherandommethods
+istypicallyO(n)timesbiggerthanthetimerequiredforthegradientschemestoreach
+thesameaccuracy.Hence,therandomgradient-freemethodsshouldbeusedonlyif
+creationofthecodeforcomputingthegradientistoocostlyorjustimpractical.
+Inthelattercase,forsmoothfunctions,theacceleratedscheme(60)demonstrates
+betterperformance.Thispracticalobservationisconfirmedbythetheoreticalresults.
+Fornonsmoothproblems,thesituationismoredelicate.Inourexperiments,thefinite-
+differenceversionRS μ wasalwaysbetterthanthemethodRS 0 ,basedontheexact
+directionalderivative.Uptonow,wedidnotmanagetofindareasonableexplanation
+forthisphenomenon.Itremainsaninterestingtopicforthefutureresearch.
+Acknowledgements Theauthorswouldliketothanktwoanonymousrefereesforenormouslycarefuland
+helpfulcomments.PavelDvurechenskyproposedabetterproofofinequality(37),whichweuseinthispaper.
+Researchactivityofthefirstauthorforthispaperwaspartiallysupportedbythegrant“Actionderecherche
+concertèARC04/09-315”fromthe“Directiondelarecherchescientifique-Communautèfrançaisede
+Belgique,”andRFBRresearchprojects13-01-12007ofi_m.ThesecondauthorwassupportedbyLaboratory
+of Structural Methods of Data Analysis in Predictive Modeling, MIPT, through RF government grant,
+ag.11.G34.31.0073.
+Appendix:ProofsofStatementsofSect.2
+ProofofLemma1 Denoteψ(p) = lnM .Thisfunctionisconvexin p.Letusrep-
+p
+resent p = (1−α)·0+α ·2 (thus, α = p). For p ∈ [0,2], we have α ∈ [0,1].
+2
+Therefore,
+ψ(p)≤(1−α)ψ(0)+αψ(2) ( =14) p lnn.
+2
+Thisistheupperbound(16).If p ≥2,thenα ≥1,andαψ(2)becomesalowerbound
+forψ(p).Itremainstoprovetheupperboundin(17).
+Letusfixsomeτ ∈(0,1).Notethatforanyt ≥0wehave
+(cid:6) (cid:7)
+tpe −τ 2 t2 ≤ τ p e p/2. (80)
+Therefore,
+(cid:5) (cid:5)
+M p = κ 1 (cid:6)u(cid:6)pe −1 2 (cid:6)u(cid:6)2 du = κ 1 (cid:6)u(cid:6)pe −τ 2 (cid:6)u(cid:6)2 e −1− 2 τ(cid:6)u(cid:6)2 du
+E E
+(8 ≤ 0) κ 1 (cid:6) τ p e (cid:7) p/2 (cid:5) e −1− 2 τ(cid:6)u(cid:6)2 du = (cid:6) τ p e (cid:7) p/2 (1−τ 1 )n/2 .
+E
+123
+
+===== PAGE 37 =====
+
+FoundComputMath(2017)17:527–566 563
+Theminimumoftheright-handsideinτ ∈(0,1)isattainedatτ = p .Thus,
+p+n
+M ≤ (cid:6) p (cid:7) p/2 (cid:2) 1+ n (cid:3) p/2 (cid:6) 1+ p (cid:7) n/2 ≤ (p+n)p/2.
+p e p n
+(cid:15)(cid:16)
+(cid:5)
+ProofofTheorem1 Indeed, for any x ∈ E we have fμ (x)− f(x) =
+κ
+1 [f(x +
+E
+μu)− f(x)]e −1 2 (cid:6)u(cid:6)2 du.Therefore,if f ∈C0,0(E),then
+(cid:5)
+|fμ (x)− f(x)|≤ κ 1 |f(x +μu)− f(x)|e −1 2 (cid:6)u(cid:6)2 du
+E
+≤ μL κ 0 (f)
+(cid:5)
+(cid:6)u(cid:6)e −1 2 (cid:6)u(cid:6)2 du
+(1
+≤
+6)
+μL 0 (f)n1/2.
+E
+Further,if f isdifferentiableatx,then
+(cid:5)
+fμ (x)− f(x)= κ 1 [f(x +μu)− f(x)−μ(cid:10)∇f(x),u(cid:11)]e −1 2 (cid:6)u(cid:6)2 du.
+E
+Therefore,if f
+∈C1,1(E),then
+|fμ (x)− f(x)| ( ≤ 6) μ2L 2 1 κ (f) (cid:5) (cid:6)u(cid:6)2e −1 2 (cid:6)u(cid:6)2 du ( =14) μ2L 2 1 (f) n.
+E
+Finally,if f istwicedifferentiableatx,then
+(cid:5)
+κ 1 [f(x +μu)− f(x)−μ(cid:10)∇f(x),u(cid:11)− μ 2 2(cid:10)∇2f(x)u,u(cid:11)]e −1 2 (cid:6)u(cid:6)2 du
+E
+( =13) fμ (x)− f(x)− μ2(cid:10)∇2f(x),B −1(cid:11).
+2
+Therefore,if f
+∈C2,2(E),then
+(cid:28)
+|fμ (x)− f(x)−
+μ2
+(cid:10)∇2f(x),B −1(cid:11)|
+(
+≤
+7) μ3L
+2
+(f)
+(cid:6)u(cid:6)3e −1 2 (cid:6)u(cid:6)2 du
+2 6κ
+E
+( =17)
+μ3L
+1
+(f)
+(n+3)3/2.
+6
+(cid:15)(cid:16)
+123
+
+===== PAGE 38 =====
+
+564 FoundComputMath(2017)17:527–566
+ProofofLemma2 Indeed,forallx and y in E,wehave
+(cid:6)∇fμ (x)−∇fμ (y)(cid:6) ∗
+(2
+≤
+1)
+κ 1 μ
+(cid:5)
+|f(x +μu)− f(y+μu)|(cid:6)u(cid:6)e −1 2 (cid:6)u(cid:6)2 du
+E
+(cid:5)
+≤ κ 1 μ L 0 (f) (cid:6)u(cid:6)e −1 2 (cid:6)u(cid:6)2 du·(cid:6)x −y(cid:6).
+E
+Itremainstoapply(16). (cid:15)(cid:16)
+ProofofTheorem2 Letμ>0.Since fμisconvex,forallx and y ∈ E wehave
+f(y)+μL
+0
+(f)n1/2
+(1
+≥
+8)
+fμ (y) ≥ fμ (x)+(cid:10)∇fμ (x),y−x(cid:11)
+(11)
+≥ f(x)+(cid:10)∇fμ (x),y−x(cid:11).
+Takingnowthelimitasμ→0,weprovethestatementforμ=0. (cid:15)(cid:16)
+ProofofLemma3 Indeed,forfunction f
+∈C1,1(E),wehave
+(cid:6)∇fμ (x)−∇f(x)(cid:6) ∗ ( =25) (cid:29) (cid:29) (cid:29) κ 1 (cid:5) (cid:2) f(x+μ μ u)−f(x) −(cid:10)∇f(x),u(cid:11) (cid:3) Bue −1 2 (cid:6)u(cid:6)2 du (cid:29) (cid:29) (cid:29)
+∗
+E
+(cid:5)
+≤ κ 1 μ |f(x +μu)− f(x)−μ(cid:10)∇f(x),u(cid:11)|(cid:6)u(cid:6)e −1 2 (cid:6)u(cid:6)2 du
+E
+(
+≤
+6)
+μL 2 1 κ (f)
+(cid:5)
+(cid:6)u(cid:6)3e − 2 1(cid:6)u(cid:6)2 du
+(1
+≤
+7)
+μ 2 L 1 (f)(n+3)3/2.
+E
+Let f ∈ C2,2(E). Denote a (τ) = f(x + τu) − f(x) − τ(cid:10)∇f(x),u(cid:11) −
+u
+τ2(cid:10)∇2f(x)u,u(cid:11).Then,|a (±μ)|
+(
+≤
+7)
+μ3 L (f)(cid:6)u(cid:6)3.Since
+2 u 6 2
+(cid:28)
+∇fμ (x)−∇f(x)
+( =13) 1
+[f(x +μu)− f(x −μu)
+2κμ
+E
+−2μ(cid:10)∇f(x),u(cid:11)]Bue −1
+2
+(cid:6)u(cid:6)2 du,
+wehave
+(cid:28)
+(cid:6)∇fμ (x)−∇f(x)(cid:6) ∗ ≤ 1 |f(x+μu)−f(x−μu)−2μ(cid:10)∇f(x),u(cid:11)|(cid:6)u(cid:6)e − 2 1(cid:6)u(cid:6)2 du
+2κμ
+E
+(cid:28)
+= 2κ 1 μ |a u (μ)−a u (−μ)|(cid:6)u(cid:6)e − 2 1(cid:6)u(cid:6)2 du
+E
+123
+
+===== PAGE 39 =====
+
+FoundComputMath(2017)17:527–566 565
+(cid:28)
+≤
+μ2L
+6 2 κ
+(f)
+(cid:6)u(cid:6)4e − 2 1(cid:6)u(cid:6)2 du
+(1
+≤
+7) μ
+6
+2
+L 2 (f)(n+4)2.
+E
+(cid:15)(cid:16)
+ProofofLemma4 Indeed,
+(cid:5)
+(cid:6)∇f(x)(cid:6)2
+∗
+( =13) (cid:6)
+κ
+1 (cid:10)∇f(x),u(cid:11)Bue −1
+2
+(cid:6)u(cid:6)2 du(cid:6)2
+∗
+E
+(cid:5)
+= (cid:6)
+κ
+1
+μ
+([f(x+μu)−f(x)]−[f(x+μu)−f(x)−μ(cid:10)∇f(x),u(cid:11)])Bue −1
+2
+(cid:6)u(cid:6)2 du(cid:6)2
+∗
+E
+(2
+≤
+6)
+2(cid:6)∇fμ (x)(cid:6)2
+∗
++
+μ
+2
+2
+(cid:6)
+κ
+1
+(cid:5)
+[f(x +μu)− f(x)−μ(cid:10)∇f(x),u(cid:11)]Bue −1
+2
+(cid:6)u(cid:6)2 du(cid:6)2
+∗
+E
+(cid:5)
+≤ 2(cid:6)∇fμ (x)(cid:6)2 ∗ + μ 2 2κ [f(x +μu)− f(x)−μ(cid:10)∇f(x),u(cid:11)]2(cid:6)u(cid:6)2e −1 2 (cid:6)u(cid:6)2 du
+E
+(
+≤
+6)
+2(cid:6)∇fμ (x)(cid:6)2
+∗
++ μ
+2
+2 L2
+1
+(f)M
+6
+.
+Itremainstouseinequality(17). (cid:15)(cid:16)
+References
+1. A. Agarwal, O. Dekel, and L. Xiao,Optimalalgorithmsforonlineconvexoptimizationwith
+multi-pointbanditfeedback,inProceedingsofthe23rdAnnualConferenceonLearning,2010,pp.
+2840.
+2. A. Agarwal, D. Foster, D. Hsu, S. Kakade, and A. Rakhlin,Stochasticconvexoptimization
+withbanditfeedback,.SIAMJ.onOptimization,23(2013),pp.213–240.
+3. D. Bertsimas and S. Vempala,Solvingconvexprogramsbyrandomwalks,J.oftheACM,51
+(2004),pp.540–556.
+4. F. Clarke,Optimizationandnonsmoothanalysis,Wliley,NewYork,1983.
+5. A. Conn, K. Scheinberg, and L. Vicente ,Introductiontoderivative-freeoptimization.MPS-
+SIAMseriesonoptimization,SIAM,Philadelphia,2009.
+6. C. Dorea,Expectednumberofstepsofarandomoptimizationmethod,JOTA,39(1983),pp.165–171.
+7. J. Duchi, M.I. Jordan, M.J. Wainwright, and A. Wibisono,Finitesampleconvergencerate
+ofzero-orderstochasticoptimizationmethods,inNIPS,2012,pp.1448–1456.
+8. A. D. Flaxman, A.T. Kalai, and B.H. Mcmahan,Onlineconvexoptimizationinthebandit
+setting:gradientdescentwithoutagradient,inProceedingsofthe16thannualACM-SIAMsymposium
+onDiscreteAlgorithms,2005,pp.385–394.
+9. R. Kleinberg, A. Slivkins, and E. Upfal,Multi-armedbanditsinmetricspaces,inProceedings
+ofthe40thannualACMsymposiumonTheoryofComputing,2008,pp.681–690.
+10. J. C. Lagarias, J. A. Reeds, M. H. Wright, and P. E. Wright,Convergencepropertiesof
+theNelder-MeadSimplexAlgorithminlowdimensions,SIAMJ.Optimization,9(1998),pp.112–147.
+11. J. C. Lagarias, B. Poonen, and M. H. Wright,ConvergenceoftherestrictedNelder-Mead
+algorithmintwodimensions,SIAMJ.Optimization,22(2012),pp.501–532.
+12. J. Matyas,Randomoptimization.AutomationandRemoteControl,26(1965),pp.246–253.
+13. J. A. Nelder and R. Mead,Asimplexmethodforfunctionminimization,ComputerJournal,7
+(1965),pp.308–3013
+123
+
+===== PAGE 40 =====
+
+566 FoundComputMath(2017)17:527–566
+14. A. Nemirovski, A. Juditsky, G. Lan, and A.Shapiro, Robust Stochastic Approximation
+approachtoStochasticProgramming,SIAMJ.onOptimization,19(2009),pp.1574–1609.
+15. A. Nemirovsky and D.Yudin,Problemcomplexityandmethodefficiencyinoptimization,John
+WileyandSons,NewYork,1983.
+16. Yu. Nesterov,IntroductoryLecturesonConvexOptimization,Kluwer,Boston,2004.
+17. Yu. Nesterov,Lexicographicdifferentiationofnonsmoothfunctions’,MathematicalProgramming,
+104(2005),pp.669–700.
+18. Yu. Nesterov,Randomgradient-freeminimizationofconvexfunctions,COREDiscussionPaper#
+2011/1,(2011).
+19. Yu. Nesterov,Efficiencyofcoordinatedescentmethodsonhuge-scaleoptimizationproblems.SIAM
+J.onOptimization,22(2012),pp.341–362.
+20. B. Polyak,IntroductiontoOptimization.OptimizationSoftware-Inc.,PublicationsDivision,New
+York,1987.
+21. V. Protasov,Algorithmsforapproximatecalculationoftheminimumofaconvexfunctionfromits
+values,MathematicalNotes,59(1996),pp.69–74.
+22. M. Sarma,OntheconvergenceoftheBabaandDorearandomoptimizationmethods,JOTA,66
+(1990),pp.337–343.
+123

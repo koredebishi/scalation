@@ -1,0 +1,1617 @@
+===== PAGE 1 =====
+
+UC Berkeley
+Recent Work
+Title
+Developing Transportation Response Strategies for Wildfire Evacuations via an Empirically
+Supported Traffic Simulation of Berkeley, California
+Permalink
+https://escholarship.org/uc/item/70p6k4rf
+Authors
+Zhao, Bingyu
+Wong, Stephen D
+Publication Date
+2021-08-10
+DOI
+10.1177/03611981211030271
+Peer reviewed
+eScholarship.org Powered by the California Digital Library
+University of California
+
+===== PAGE 2 =====
+
+Developing Transportation Response Strategies for Wildfire
+Evacuations via an Empirically Supported Traffic Simulation of
+Berkeley, California
+Pre-Print
+Transportation Research Record
+August 2021
+https://doi.org/10.1177/03611981211030271
+Bingyu Zhao, Ph.D.
+UC Berkeley
+Stephen D. Wong, Ph.D.
+UC Berkeley
+University of Alberta
+Note: Small differences in language will exist between this version and the final published
+journal article
+
+===== PAGE 3 =====
+
+Zhao and Wong 2
+Developing Transportation Response Strategies for Wildfire Evacuations via
+an Empirically Supported Traffic Simulation of Berkeley, California
+Bingyu Zhao
+Postdoctoral Researcher
+University of California, Berkeley
+Civil and Environmental Engineering
+Berkeley, California 94720
+Email: bz247@berkeley.edu
+Stephen D. Wong
+Incoming Assistant Professor
+University of Alberta
+Civil and Environmental Engineering
+Email: stephenwong@ualberta.ca
+https://orcid.org/0000-0002-3638-3651
+Published Online: August 10, 2021
+Funding Statement: SB 1 grant from the University of California Institute of Transportation
+Studies, the Graduate Research Fellowship Program (National Science Foundation), and the
+Dwight D. Eisenhower Transportation Fellowship Program (Federal Highway Administration).
+Open-source Code: https://github.com/cb-cities/spatial_queue
+
+===== PAGE 4 =====
+
+Zhao and Wong 3
+ABSTRACT
+Government agencies must make rapid and informed decisions in wildfires to safely evacuate
+people. However, current evacuation simulation tools for resource-strapped agencies largely fail
+to compare possible transportation responses or incorporate empirical evidence from past
+wildfires. Consequently, we employ online survey data from evacuees of the 2017 Northern
+California Wildfires (n=37), the 2017 Southern California Wildfires (n=175), and the 2018 Carr
+Wildfire (n=254) to inform a policy-oriented traffic evacuation simulation model. We test our
+simulation for a hypothetical wildfire evacuation in the wildland urban interface (WUI) of
+Berkeley, California. We focus on variables including fire speed, departure time distribution,
+towing of items, transportation mode, GPS-enabled rerouting, phased evacuations (i.e., allowing
+higher-risk residents to leave earlier), and contraflow (i.e., switching all lanes away from danger).
+We found that reducing household vehicles (i.e., to 1 vehicle per household) and increasing GPS-
+enabled rerouting (e.g., 50% participation) lowered exposed vehicles (i.e., total vehicles in the fire
+frontier) by over 50% and evacuation time estimates (ETEs) by about 30% from baseline. Phased
+evacuations with a suitable time interval reduced exposed vehicles most significantly (over 90%)
+but produced a slightly longer ETEs. Both contraflow (on limited links due to resource constraints)
+and slowing fire speed were effective in lowering exposed vehicles (around 50%), but not ETEs.
+Extended contraflow can reduce both exposed vehicles and ETEs. We recommend agencies
+develop a communication and parking plan to reduce the number of evacuating vehicles, create
+and communicate a phased evacuation plan, and build partnerships with GPS-routing services.
+Keywords: Evacuations, Traffic Simulation, California Wildfires, Transportation Policy,
+Behavior, Contraflow, Phased Evacuations
+
+===== PAGE 5 =====
+
+Zhao and Wong 4
+1. INTRODUCTION
+Recent large-scale wildfire evacuations in California have exposed significant challenges for
+governments in increasing evacuation compliance, decreasing congestion, and ensuring equity. In
+many of these events, public agencies (e.g., transportation, transit, emergency management) lacked
+resources to deploy for a transportation response (1). These challenges are likely to extend to other
+wildland-urban interface (WUI) evacuations across North America. Without adequate funding,
+staff, and research ability, governments need practice-ready strategies to successfully evacuate
+residents in wildfires. One positive direction in the field has been the development of wildfire
+evacuation models, including traffic simulation models (2) that have sometimes been coupled with
+fire spread models and trigger buffer models (e.g., (3)). Despite these new integrated models, two
+key limitations remain in the wildfire evacuation simulation field. First, choice-making and
+behavior (e.g., transportation mode choice, destination choice) in wildfire evacuation simulations
+is often assumed or estimated based on expert knowledge, not actual behavior from post-disaster
+surveys or data. Second, traffic simulations for wildfires often fail to compare transportation
+strategies for evacuations. Effective and cost-efficient policies are crucial for ensuring safe
+evacuations.
+To begin addressing these two key limitations, we developed several research questions:
+1. What behavioral assumptions in simulations could be replaced by previously collected
+evacuation data?
+2. What key factors should be integrated into traffic simulations to balance realism,
+computational complexity, and generalizability?
+3. What transportation responses/strategies could be simulated and how might
+responses/strategies differ?
+To answer these questions, we developed a spatial-queue-based traffic simulation that integrates
+post-disaster wildfire survey data from three wildfires - the 2017 Northern California Wildfires,
+the 2017 Southern California Wildfires, and the 2018 Carr Wildfire - for several evacuation
+choices. Using this simulation, we compare and contrast different fire speeds, departure times,
+towing demand, transportation mode splits, rerouting participation rates (i.e., GPS-guided routing
+based on real-time traffic conditions), phased evacuation times (i.e., time-based zone releases of
+evacuees), and contraflow options (e.g., switching all lanes to evacuate away from the fire). These
+fire behavior and policy parameters are tested in hypothetical wildfire incidents in the Berkeley
+Hills. We investigate the results for each scenario and provide recommendations for the different
+responses and strategies.
+2. LITERATURE REVIEW
+2.1 Wildfire and No-Notice Evacuation Behavior
+During wildfire evacuations, individuals must make a number of complex choices including their
+decision to evacuate or stay/defend, departure timing, transportation mode, route choice,
+shelter/accommodation type, destination, and reentry timing. The wildfire evacuation behavior
+literature (see review in (4)) has focused predominantly on the decision to evacuate or stay (5,6).
+In many cases (e.g., (7,8)), this literature employs discrete choice models to isolate influential
+variables in the decision to evacuate or stay including defending behavior of property (see (9) for
+more work on alternatives to evacuations). One important improvement over the years has been
+
+===== PAGE 6 =====
+
+Zhao and Wong 5
+the collection of post-disaster wildfire evacuation survey data to inform these models, e.g., (6–
+8,10,11,1). However, much less work has focused on decisions during the evacuation process (e.g.,
+route, destination) (11,12), as noted in (13). Other work, such as (14), notes that behavior such as
+extra-trip making, mobilization time, and background traffic can also impact evacuations.
+Moreover, alternative transportation strategies such as the sharing economy (e.g. (15–17)) may be
+feasible under certain wildfire evacuation circumstances, changing the potential modal split and
+sometimes increasing social equity. Altogether, the literature lacks in several areas: 1) fully
+understanding evacuee behavior, and 2) having enough survey data for most or all choices in
+wildfire evacuations. In addition, survey data has yet to be fully integrated into evacuation
+simulation models as behavioral variables are currently created via assumptions, expert opinions,
+and/or hypothesized statistical distributions.
+Apart from the wildfire specific studies referenced above, no-notice or short-notice evacuation
+under other types of hazards (e.g., truck attack, flash flood, or general emergency situations) have
+long attracted researchers’ attention (18–21). Research in this area can be categorized into two
+types. The first type focuses on understanding the evacuation demand, such as participation rates,
+origin locations, departure times, and destination locations (22). The second type analyzes
+operational strategies to accomplish the evacuation safely and efficiently (23). On the demand side,
+compared to early, self-organized evacuations, no- or short-notice evacuations are often
+characterized by excess levels of stress and uncertainties associated with dire situations (20,24).
+As a result, evacuees’ behaviors might differ from their response to long-notice evacuations. In
+addition, short-notice evacuations also have distinct phases (e.g., anticipation, warning,
+displacement, notification, and return and recovery) (24). Different evacuation behaviors are
+associated with each phase. Surveys and statistical models have been used to elicit qualitative and
+quantitative insights on the evacuation behavior parameters, such as the reasons and ratios of
+people choosing to stay in shelters, hotels, or with family/friends (22,24). It is also recognized that
+different behavior parameters are interconnected and correlated, and models with correlation
+structures have been used to capture their joint distribution (22). On the operational side,
+challenges for safely evacuating people correspond to traffic assignment tasks, with some
+additional features and constraints. Different algorithms have been used to optimize the evacuation
+process, from bus scheduling, to family trip-chain arrangements, to optimum traffic assignment
+(21,23,25).
+2.2 Wildfire Evacuation Strategies
+Wildfire evacuation strategies have been largely developed following guidance and lessons learned
+from other types of disasters (e.g., hurricanes, tsunamis). The focus of most strategies for wildfire
+evacuations has been on evacuation efficiency (e.g., reducing evacuation time estimates [ETEs] or
+total travel time), given the speed and short notice of wildfires. Generally, these metrics are aimed
+to 1) improve the network capacity through strategies of contraflow (e.g., switching some or all
+lanes of a roadway to flow away from a hazard) or new infrastructure or 2) optimize the utilization
+of the network by evacuees through strategies such as phased evacuation, which reduces peak
+demand on the roadway by spreading out evacuees temporally. Some examples in literature offer
+more details of how the strategies can be implemented in a wildfire evacuation context. Contraflow
+was studied in (14), where locations were determined by iteratively turning the excess road
+capacity in the opposite direction of road links. (26) proposed a phased-evacuation strategy where
+those closer to danger should leave first (Innermost First Out, InFO), while (27) tested all phase
+
+===== PAGE 7 =====
+
+Zhao and Wong 6
+sequences in a road network with four evacuation zones. A lane-based intersection-control plan
+was proposed in (28) to reduce crossing and merging conflicts at intersections for wildfire
+evacuations. However, one key limitation of many of these strategies is the need for a significant
+amount of personnel and coordination to implement (e.g., intersection control in (29)). Moreover,
+some metrics to determine strategy efficiency can be misleading as ETEs are sensitive to the
+departure of the last vehicle from the evacuation zone (30). Despite work on different
+transportation strategies in evacuations (63), a comprehensive study that compares relative gains
+of each type of strategy specifically for wildfire evacuation remains absent from the literature.
+2.3 Wildfire Evacuation Simulations and Strategies
+Traffic modeling and simulations have been widely used to test wildfire evacuation scenarios and
+strategies (Table 1), from simple hypothetical network (27,29), to small communities with tens to
+hundreds of households (31,32) to a large town/city (33). Most studies run off-the-shelf
+microscopic simulation software, such as SUMO (33) and Paramics (29,31). Certain non-
+microsimulation quick calculations are also proven to be useful in estimating the evacuation delays
+and finding bottlenecks, such as the simplified manual calculations in (29) and adjusted four-step
+models used by (14). Model inputs (network and travel demand) are usually sourced from a variety
+of venues, such as the OpenStreetMap (OSM), digitized aerial imagery, planning documents, and
+census data. Vehicles follow either a fixed route to the closest exits or routes that periodically
+update based on evolving traffic conditions during the evacuation. Probably due to the complexity
+of the problem as well as the emerging nature of the evacuation process, most wildfire-evacuation-
+related studies use one-shot assignment rather than optimization-based formulation, with
+exceptions for simplified networks, such as in (28) and (34). Model outputs typically include
+aggregated metrics such as ETEs, fire exposure (e.g., (27)), or spatially or temporally
+disaggregated link-level congestion status (e.g., (14,33)). In many evacuation studies across
+hazards, agent-based models are widely adopted in the evacuation simulations (35–37). These
+types of models are frequently leveraged to investigate the changes in evacuation performance
+metrics in parametric studies by focusing on detailed evacuation choices, such as departure time,
+route, and destination.
+
+===== PAGE 8 =====
+
+Zhao and Wong 7
+1 TABLE 1 Key Models for Wildfire Evacuations
+Traffic Simulation Models for Wildfire Evacuations
+Reference Model Characteristics
+Metrics Strategies or Scenarios
+Demand Generation Departure Time Destination and Simulation Network + Demand
+Routing Choices Type Data Source
+(31)8/11/202 250 homes; vehicles per Household departure Dynamically updated Microscopic Clearance time, Adding new
+1 8:14:00 household follows Poisson time follows Poisson least-cost routes to (Paramics) Digitized aerial mean vehicle travel infrastructure; varying
+AM distribution (mean: 0.5-3 distribution (mean: 5- closest exits image and planning time, evacuation demand rate and
+vehicles/household) 25 minutes) documents time of each departure delay
+(Emigration Oak, household
+UT) (disaggregated)
+(29)* Not required; 30-150 Not required; Various static routing Microscopic Hypothesized (9 to Clearance time, Reducing intersection
+vehicles per zone used for uniformly generated (minimize total travel (Paramics) and 25 intersections); total travel distance, merge/cross delays via
+testing the clearance time within 15 minutes; distance, minimize manual digitized aerial image number of merges turn restrictions (lane-
+on the hypothesized used for testing the merging or balanced); capacity of 20 intersections based routing); varying
+network clearance time on the destinations solved analysis (Salt Lake City, UT) demand rate, signal
+hypothesized network endogenously with timing and numbers of
+routes exits
+(34)* Three levels of evacuation Optimum departure System-optimal Mesoscopic Simplified extracted Network clearance Time-dependent staging
+demand: 1,794, 3,558, and time solved dynamic traffic (DYNASMAR network (Fort Worth, time, total and policy for each origin;
+5,692. Background traffic endogenously with assignment; destinations T-P) for TX) average trip time varying evacuation
+and evacuees are in total routes solved endogenously network demand
+47,300 with routes loading
+(32) 1.5-5 vehicles per node, All departure finish by Fixed “shortest” path or Microscopic Digitized aerial Clearance time, Varying demand rate,
+randomly assigned to 753 30 minutes (urgent), 1 dynamically updated (CORSIM) photograph (Summit fatalities, link level departure time (urgency),
+nodes hour (medium), or 2 “fastest” path to pre- Park, Salt Lake City, max. queue length & incorporating rerouting
+hours (slow) designated exits UT)
+(27)* Grid network: 20-80 Set zonal departure Dynamically updated Microscopic Hypothesized (grid, Clearance time Staggering departure of
+vehicles per block; Ring time interval: fastest route to any exit; (Paramics) ring); digitized aerial zones; varying demand
+network: same vehicle hypothesized network: all exits are linked as image (San Marcos, rate
+density as the grid 1 minute; one destination zone. TX)
+network; real network of real network: 1 or 4
+1-8 vehicles per household minutes
+for 485 households
+
+===== PAGE 9 =====
+
+Zhao and Wong 8
+(14) All households in 8 Not available (static) Shelters (15%), Friends Adjusted four- Planning documents Clearance time, Restricting the egress
+evacuation districts with or families’ home step with static of main roads for link-level routes to evacuees;
+background traffic; auto (60%), hotels (15%), out multiclass fire-prone congestion (volume- blocking the entrance to
+ownership from US of county (10%) assignment neighborhoods to-capacity) evacuation zones;
+Census (2000) (Colorado Spring, conducting
+CO) contraflow
+(38) Total population of about Evacuees react to Static routing to closest Microscopic Open Street Maps Clearance time, fire Conducting phased
+9,000. 85% participate in visual triggers & exits (SUMO) with (OSM); census exposure count evacuation with dynamic
+the evacuation, 1.5 people official warnings, both trigger model population; registered triggering, varying fire
+per vehicle trip related to dynamic fire household addresses ignition locations and
+front; decision and (Dandenong Ranges, weather conditions
+preparation delay Australia)
+(33) Uniformly distributed S-shaped cumulative Fixed “shortest” path or Microscopic Link-level speed, Closing roads; conducting
+along residential/service departure periodically updated (SUMO) 1 OSM (Paradise, CA arrival curve, contraflow, varying
+roads (23,635 vehicles for “fastest” path to any second time and Mill Valley, CA) average trip-time departure time
+Paradise, 12,212 for Mill exit; all exits are linked step is used). concentration; varying
+Valley) as one destination zone. demand rate, and
+rerouting
+* Emergency evacuations, not specific to wildfire evacuations
+Other Key Literature Related to Simulations of Wildfire Evacuations
+Reference Type of Model or Analysis Goal or Aim of Study
+(39) Fire spread modeling (FlamMap), fire-spread network modeling, and Calculate evacuation trigger buffer a small community (Julian, California) and
+shortest path analysis (altogether known as the Wildland-Urban Interface determine trigger zones
+Evacuation model)
+(40) Wildland-Urban Interface Evacuation model (WUIVAC) Apply data from the 2003 Cedar Fire in southern California to develop trigger buffers
+and compare results to the event timeline to find possibly improvements
+(41) Network and spatial data analysis (critical cluster model) Identify fire-prone communities with minimal egress opportunity in western U.S.
+(3) Household-level model for trigger buffers and fire-spread modeling Determine evacuation trigger buffers (ETBs), recommended evacuation departure
+(FlamMap) times (REDTs), and a ranking of households based on lead time
+(42) Review of evacuation models Understand and review the scale, applicability, and interactions of fire, pedestrian, and
+traffic models
+(2) Review of traffic models for wildfire evacuations Understand and review the traffic models based on relation to fire spread, spatial and
+demographic factors, temporal issues, and intended application and identification of 22
+traffic models and applications
+(43) Controlled behavior experiment and regression models Determine the collective evacuation decision of communities under different disaster
+likelihoods and shelter availabilities
+1
+
+===== PAGE 10 =====
+
+Zhao and Wong 9
+2.4 Evacuation issues in other disasters
+Evacuation strategies in wildfire emergencies can sometimes be different compared to other
+disasters, due to characteristics of fire hazards. For example, time for advanced warnings in
+wildfire evacuations (hours) are often shorter than those for hurricanes and flooding (often with at
+least 24 hours in advance), but longer than tsunami evacuations (minutes in advance or no warnings
+at all). The spatial extent of evacuations for each hazard are also different, where the distances of
+evacuation trips include local sheltering (e.g., tsunamis), within-region evacuations (e.g.,
+wildfires), and out-of-state evacuations (e.g., hurricanes). These spatial temporal differences along
+with the difference in risks (63) alters evacuation behavior and the most efficient and effective
+transportation response strategies. For example, compared with wildfire evacuations when cars are
+the predominant mode of transport, tsunami evacuations are usually multi-modal, involving both
+vehicular traffic and pedestrian traffic as people need to rapidly move to safety (35). Tsunami
+evacuation destinations also tend to be closer in distance (to inland location or vertical shelters),
+due to the minimal time to evacuate (36). Hurricane evacuations benefit from a longer period of
+advanced warning (e.g., usually days in advance), but the spatial extents of the evacuation trips
+are also the largest, sometimes requiring evacuations of over 100 miles to another state (44,45).
+This can lead to large-scale transportation responses that span multiple states. While wildfires
+often require more rapid evacuations compared to hurricanes, they also tend to impact a smaller
+land area, threaten less people, and require shorter trips to reach a safe destination. Consequently,
+wildfire evacuation transportation responses must be deployed faster than hurricane responses, but
+they can also be more complex and time-intensive compared to tsunami evacuations.
+Other types of disasters, such as nuclear power plant failures, chemical accidents, and hazardous
+material accidents, also require evacuations. In nuclear power plant failures (e.g., the Three Miles
+Island (TMI) nuclear accident, USA [1979] and the Fukushima nuclear disaster, Japan [2011]),
+individuals evacuated lived in specific distances from the source of the accident. For example,
+residents within several to tens of miles radius of the accident were ordered to evacuate in past
+events (46,47). Since the direction of radioactive material plays a critical role, the strategies
+employed could be parallel to those of wildfires. However, shelter-in-place strategies (e.g., staying
+inside and reducing air flow into a building) are more common for these disasters than wildfires.
+It should also be noted that the temporal length of evacuations from these types of disasters is
+highly variable (46,48), which indicates that different evacuation strategies from a range of natural
+hazards could be used. Altogether, the unique characteristics of hazards influences the most
+effective transportation response strategies to improve evacuation outcomes. However, strategies
+developed for one disaster could be effective for another disaster with similar spatiotemporal
+characteristics. To test this possibility for wildfire evacuations, we considered a number of
+strategies across hazards to begin developing a suite of evacuation strategies that are most effective
+for wildfires.
+3. METHODOLOGY
+To address some gaps presented in the literature review and taking cues from (2), we developed a
+survey-informed dynamic (spatial-queue) traffic simulation to evaluate evacuation performance
+(time efficiency, evacuee safety) under different fire, human behavior, and transportation response
+scenarios. The details of each component are introduced below in Figure 1 and following sections.
+
+===== PAGE 11 =====
+
+Zhao and Wong 10
+Figure 1. Study framework
+3.1 Spatial-Queue-Based Dynamic Traffic Simulation Model
+We use a spatial-queue-based traffic model to simulate the evacuation process. We chose this over
+popular microscopic simulators that implement car-following and lane-changing because the
+spatial-queue-based model is less data intensive and is easier to program from scratch. The
+simulator tracks individual vehicles through a vehicle routing module, a spatial-queue-based link
+model, and an intersection model that prevents cross conflicts. The simulation runs at a time step
+of 1 second, capturing detailed temporal traffic conditions, though not sub-link, sub-node or sub-
+second behavior (e.g., interaction of multiple vehicles inside an intersection). At the beginning of
+the simulation (or when rerouting is required), the routing module computes for the fastest path
+using Dijkstra's Algorithm (49), based on the free flow speed (initial route) or average travel speed
+in the past 20 seconds (subsequent rerouting). Vehicle routes are updated every 10 seconds for
+those following real-time traffic updates similar to location-based direction services (e.g., Google
+Maps, Apple Maps, Waze). Queues and spillbacks are simulated by the link model, which requires
+a vehicle to spend at least the free flow travel time on a link, before joining a queue at the end.
+When the end of the queue, formed by vehicles with some physical length, reaches the upstream
+end of the link, no more vehicles can enter (spillback). Link flow capacity is assumed to be 1,900
+vehicles/(hour×lane). Discretized into one-second time steps, link capacities are imposed in a flip-
+coin probability manner, with the probability of a queuing vehicle leaving the current link or
+entering the next link being 0.53 vehicles/(second×lane). At each 1-second time step, the node
+model moves vehicles at the front of each link to the next link, as long as 1) it satisfies the inflow
+capacity of the next link and the outflow capacity of the current link, and 2) it does not conflict
+with other vehicles moving through the intersection at that time step (e.g., from perpendicular
+direction, left-turns). Vehicles entering an intersection are assumed to have equal priority except
+roundabouts (higher priority). All intersections are modeled as non-signalized (e.g., due to power
+failures).
+
+===== PAGE 12 =====
+
+Zhao and Wong 11
+3.2 Scenario Development
+This research compares the effectiveness of different evacuation response/policy options via
+scenario testing with controlled variables. In this section, the set of fixed inputs and variable
+scenarios will be explained.
+3.2.1 Road Network
+The hypothesized evacuation occurs in the hilly northeast area of Berkeley. Most of the roads in
+the study area are one-way-per-direction residential roads (Figure 2(b)). On-street parking is
+common, creating many narrow choke points that prohibit two-way flow. However, off-street
+parking is often recommended by the city on a red flag warning day (50). Figure 2(b) highlights a
+few main evacuation routes. Among all possible routes leading away from the fire, Marin Avenue
+is the straightest (no curve), but is also the steepest (maximum gradient over 30%). The other two
+roads labeled in Figure 2(b) (i.e., Spruce Avenue and Euclid Avenue), are also frequently used by
+residents. A distinct feature of the road network in the Berkeley Hills compared to other wildfire
+evacuation study is that the road network here is “funnel-shaped.” Apart from the major egress
+roads shown in Figure 2(b), there are many smaller roads that lead to safe areas. These roads can
+serve as the evacuation route for a small number of vehicles that are routed off the main roads,
+while also allowing for emergency access vehicles to go uphill if major roads are used for
+contraflow operations. We also note that nearly all roads in the area are flanked by densely grown
+trees and brush, which pose substantial fire risk and a high chance for toppled trees on roadways.
+The road network for the study area was obtained from the OSM. The study area is defined to be
+the city of Berkeley plus a 6.2-mile (10 km) buffer area, given wildfire evacuation trips are usually
+short (1,14). To reflect slower driving on narrow, hilly roads, a discount factor of 0.8 was applied
+on the speed limit. After processing the OSM data, a directed node-and-link-based road network
+for the study area was obtained (Figure 2). The large and complex network consists of 15,294
+nodes and 37,951 links.
+
+===== PAGE 13 =====
+
+Zhao and Wong 12
+Figure 2. Map of the study area, road network, evacuation zones and fire hazard severity
+zones. (a) The whole study area; (b) terrain map and numbers of lanes per road in the
+evacuation zone; (c) four evacuation zones. (LRA: local responsible area; SRA: state
+responsible area. VHFHSZ: very high fire hazard severity zone)
+3.2.2 Fire Propagation
+The Berkeley Hills area borders Tilden Regional Park and mostly falls within the California
+Department of Forestry and Fire Protection (Cal Fire) Very High Fire Hazard Severity Zones
+(VHFHSZ, Figure 2). A hypothesized fire is ignited at a transmission tower 0.9 miles northeast of
+the Berkeley Hills area (coordinate: 37.910399, -122.249261). Fire spread can be modeled by
+software such as FlamMap or the Wildland-Urban Interface Fire Dynamics Simulator (WFDS)
+(39,51). However, WUI fire spread is difficult to model due to non-uniform buildings, defensible
+space, and vegetation. Consequently, data from a nearby and real fire case (1991 Oakland Hills
+Fire) was borrowed. Both sites are located on the east hillside of the East Bay Hills with similar
+weather patterns, land topology, vegetation, and housing density. An elliptical fire growth model
+was fitted to a georeferenced map of the Oakland Hills Fire (Figure 3) (52). The hypothesized fire
+starts shortly before 11:00 am on a weekend, same as the Oakland Hills Fire. All households are
+assumed to be at home. These two critical assumptions were used to constitute a “worse-case”
+scenario. Evacuation orders are sent out 15 minutes after the onset of the fire (reasonable estimate
+for an urban fire), starting the evacuation. Future work will be necessary to integrate wildfire
+modeling with traffic simulations to produce more realistic evacuation models.
+
+===== PAGE 14 =====
+
+Zhao and Wong 13
+Figure 3. (a) Chronological view of the development of the 1991 Oakland Hills Fire (via
+Oakland Fire Department from georeferenced image by (52)). (b) Fitting elliptical curves
+to the observed fire frontier.
+3.2.3 Evacuation Zone
+Based on fire location, evacuation orders are issued to an assumed area within Berkeley bounded
+by several major streets (Hearst Avenue on the south, the Shattuck-Sutter-Arlington corridor on
+the west and the city boundary on the east and north). To add land development realism, a parcel
+map was obtained for the evacuation area, where each parcel is home to one to five households
+depending on the land use code (53,54). This accounts for 7,438 households. For simplicity, areas
+west of Shattuck Avenue (i.e., downtown Berkeley) and south of Hearst Avenue (i.e., University
+of California, Berkeley campus) are assumed as temporary safe locations. For this study, we
+generated a random list of origin-destination pairs, where 30%, 30%, 30%, and 10% of the vehicles
+evacuate to destinations within 1-2 miles, 2-3 miles, 3-4 miles, and 5 or more miles. Our local
+focus stems from our survey data that found upwards of two-thirds of evacuees remained within
+their county of origin. The treatment of destination choices is simplistic, as evacuees’ destinations
+could be influenced multiple factors (e.g., availability of shelters, proximity to resources, safety of
+the destination). Moreover, we did not ask for exact destinations (by address or traffic analysis
+zone) in our survey and these destinations will require more robust datasets such as mobile phone
+traces. With this limitation in mind, the results of this study focus on the first half of the evacuation
+trip (e.g., the time to reach 1 mile away from the evacuation zone or the distance/time exposed to
+the fire). Time to the destination is not reported, as this does not provide any additional about risk
+to the evacuee.
+3.2.4. Transportation Response Scenarios
+We tested a range of wildfire evacuation scenarios, which can be categorized into three groups:
+hazard (fire speed), evacuation behavior (departure time, towed vehicle demand, transportation
+mode choice, GPS-enabled rerouting), and policies/responses (phased evacuation, contraflow).
+For a set of scenario variables, a base case value was chosen for comparison. Details of each
+scenario are given in Table 2.
+
+===== PAGE 15 =====
+
+Zhao and Wong 14
+Several post-disaster surveys of individuals impacted by California wildfires in 2017 and 2018
+were used to define some scenario variables, as discussed in Table 2 (1). For example, mode choice
+with a focus on vehicles per household was used as a key behavioral parameter. About 41% to
+45% of evacuees depending on wildfire used two vehicles to evacuate. Moreover, an additional
+9% to 17% of evacuees depending on wildfire used three or more vehicles to evacuate. Even small
+increases of vehicles on the roadway could significantly increase congestion during a wildfire. For
+route decision-making, only between 8% and 19% of evacuees depending on fire used GPS
+navigation. This behavior is particularly interesting given that 78% to 87% of respondents overall
+had access to in-vehicle or smartphone navigation. This result may be influenced by shorter
+evacuations during wildfires (about two thirds evacuated within county) and/or evacuees’ greater
+knowledge of route options. Finally, between 6% and 21% of evacuees depending on fire towed
+items while evacuating (e.g., boats, trailers, or towing personal vehicles using recreational
+vehicles). Towed items generally increase congestion, take additional space on narrow mountain
+roads, and reduce traffic throughput. Individuals likely wanted to protect their processions from
+the fire, leading them to tow items during the evacuation. Additional details and a thorough
+discussion of these choices and more are provided in (1).
+TABLE 2 Descriptions of Scenarios
+Options
+Category (Baseline Value Description
+Underlined)
+Hazard Scenario
+• Wildfire speed depends on fuel type, wind
+“Slow”: Basecase ROS × speed, humidity, land topology, etc.
+0.5 • The baseline case uses the fire speed in the
+1991 Oakland Hills Fire (Figure 3(b))
+“Normal”: 1991 Oakland • Alternative cases assume the fire speed to be
+Fire speed
+Hills Fire rate of spread halved (e.g., with proper fuel management
+(ROS) and/or firefighting, favorable weather) or
+doubled (e.g., poor fuel management and/or
+challenged firefighting, unfavorable
+“Fast”: Basecase ROS × 2 weather)
+Evacuee Behavior
+
+===== PAGE 16 =====
+
+Zhao and Wong 15
+• Cal Fire emphasizes the importance
+preparing and taking swift action in a
+wildfire (“Ready, Set, Go!”)
+• The planned departure times assumed as a
+truncated normal distribution (i.e., truncated
+“Fast”: 20 min ± 10 min
+around the mean at ± one standard deviation)
+• Vehicles will leave automatically if fire
+Departure “Medium”: 40 min ± 20
+reaches residents’ location regardless of the
+time min
+planned departure time
+• The baseline case assumes the planned
+“Slow”: 60 min ± 30 min
+departure time to be the medium level
+~N(40min, 20min), truncated at 20 min and
+60 min.
+• The alternative cases assume shorter or
+longer departure times
+• Normal vehicles assumed to take 26 ft. on
+the road, invert of typical jam density (94)
+• Towed vehicles assumed to take 50 ft. of
+space (normal vehicle plus a 24 ft.
+trailer/recreational vehicle)
+0%
+• Survey results indicated that between 6%
+and 21% of households took towed vehicles
+% household 10% (approximated
+during their evacuation
+towing item survey)
+• It is assumed each household tows a
+maximum of one item irrespective of the
+25%
+number of evacuating vehicles
+• The baseline case assumes 10% households
+tow an item
+• The alternative case assumes 0% and 25%
+households tow an item
+• Survey results indicated that approximately
+“Low”: 1 36-45%/41-45%/9-17% of households
+vehicles/household (depending on wildfire case) evacuate with
+1/2/3 vehicles and this is taken as the
+# vehicles 44%/43%/13% households baseline (12,621 vehicles in total for our
+per leave with 1/2/3 vehicles case)
+household (approximated survey) • Alternative scenarios assume the number of
+for vehicles per household to be one (7,438
+evacuation “High”: 3 vehicles in total) or three (22,358 vehicles in
+vehicles/household total)
+• Other forms of transportation (i.e., bus, rail,
+biking, walking) are converted to single
+vehicle households for simplicity
+% vehicles 0% • Survey results indicated that 91% to 93% of
+rerouting the evacuees have smartphones but only
+
+===== PAGE 17 =====
+
+Zhao and Wong 16
+with real 15% (approximated between 8% and 19% of people followed
+time traffic survey) GPS directions during the evacuation
+information (depending on wildfire case study)
+50% • It is assumed updated routing information
+will be available every 10 seconds based on
+100% the average link traversal time in the past 20
+seconds
+15%, but lost connection to • Individuals that may reroute without perfect
+real-time data in 6 minutes information are not considered
+• The baseline scenario assumes 15% people
+15%, but lost connection to follow dynamic updated fastest path while
+real-time data in 30 the rest do not update their route
+minutes
+• Three alternative scenarios assume different
+percentages of vehicles that dynamically
+50%, but lost connection to
+update their path
+real-time data in 6 minutes
+• Four alternative scenarios assume the
+connectivity to the real-time routing
+50%, but lost connection to
+information is interrupted 10 or 30 minutes
+real-time data in 30
+after the start of the evacuation (e.g., cell
+minutes
+tower losing power)
+Policy Scenario
+• Evacuation area is divided into four zones
+based on distance to the fire origin (Figure 2)
+0 min • Zone boundaries are all secondary or tertiary
+roads (i.e., important roads in the residential
+Phased 15 min area)
+evacuation • Baseline case assumes “no phased
+time interval 30 min evacuation”: vehicles in four zones have the
+same mean departure time
+60 min • Alternative scenarios vary the time interval
+in the mean departure time of vehicles in
+each of the four evacuation zones
+• Contraflow roads now switch all lanes in the
+No contraflow evacuation direction
+• Baseline case assumes “no contraflow”
+Short-distance contraflow • Roads were identified based on long traffic
+Contraflow on selected roads (Figure queues from the baseline simulation and
+4) local knowledge of primary routes in the
+area
+Long-distance contraflow • Alternative scenarios assume a short-
+distance or a long-distance contraflow
+3.3. Limitations
+In addition to the assumptions described in the prior section, we note several key limitations here.
+First, the surveys exhibit self-selection bias as they were opt-in. We attempted to reduce this bias
+
+===== PAGE 18 =====
+
+Zhao and Wong 17
+through a wide distribution across multiple agencies and news sources. Participants also skewed
+wealthier with more vehicles, due to the online distribution, and the sample sizes for the surveys
+were small. Additional survey limitations are described in further details in (1). The survey data
+also has measurement error, leading us to choose approximate values for the model. Finally, we
+note that we used survey data from other locations to develop the scenarios for the Berkeley Hills,
+as a major fire has not occurred recently in the Berkeley Hills. Despite this possible mismatch of
+traffic, social, climate, and cultural factors, the surveys and our study area were similar based on
+fire risk (WUI zones), housing type (mostly single-family residences) and income level (high
+income level). Future work is needed to apply modeling across more geographies and collect more
+survey data to increase generalizability.
+There are limitations regarding the network representations. For example, even though the city
+recommends off-street parking on a red flag day, the compliance is not guaranteed. This is a major
+issue hindering evacuation, as the road network in the study area (as well as many other high-risk
+sites beyond this study) is quite windy and narrow. Also, there are critical intersections where left-
+turns block other movements or where two traffic streams merge. Evacuation efficiency could be
+significantly improved if these critical intersections can be correctly managed (e.g., forming
+undisrupted evacuation routes (55)). However, such strategies usually require optimization
+techniques to be formulated and are not included in this study. We also note that our network does
+not consider the impacts of vehicle breakdowns or emergency vehicles (which need to travel uphill
+towards the fire). However, since contraflow is not instituted on all uphill routes, emergency
+vehicles would find alternative roads to access the fire or those in needs. The network analysis also
+assumes that most evacuees will not travel far distances, which is supported by the survey data.
+However, mass evacuations over 100,000 people may require a better understanding of
+destinations and shelter types (along with the suitability of these locations) for the simulation.
+Regarding traffic models, due to data availability and coding efficiency considerations, sub-link
+behaviors in the model (e.g., lane-changing aggressive drivers) were not included. The node model
+is not detailed enough to investigate within-intersection events. We remove signaling for
+simplicity, since so few nodes in the study area are signalized. The “fastest” path assumption is
+limited as evacuees likely do not have full knowledge of congestion, choosing detours to
+circumvent congestion. Research has also shown that other factors impact routing beyond shortest
+path (11,56). Pedestrian-vehicle interactions are not considered, evacuees are assumed to leave via
+a vehicle (overestimating congestion), and individuals rerouting without perfect information are
+not considered.
+For the scenarios, interactions of different strategies are not considered due to the already large
+numbers of studied variables, despite possible correlated effects (57). Incidents such as fallen trees
+blocking the roads are not considered. A shelter-in-place option is not considered. We assume
+100% of residents are home and 100% of evacuees will leave even though research has shown
+compliance of mandatory evacuation orders around 90% (11). This oversimplification is chosen
+to model both a disadvantageous scenario for congestion, but also an ideal outcome (in terms of
+compliance to mandatory evacuation orders) for public safety agencies. We also note that we
+oversimplify the evacuation process (one trip per household, with no trip-chaining). Past research
+has demonstrated that evacuees may take multiple stops before reaching the destination. For
+example, (6) found that people make 1.1 intermediate stops on average based on post-wildfire
+
+===== PAGE 19 =====
+
+Zhao and Wong 18
+surveys in Haifa, Israel. Families with children make more intermediate stops, at 1.5 on average.
+(58) also argued that trip-chaining helped explain certain travel behaviors (e.g., evacuating towards
+the fire area), which avoids overly optimistic travel time predictions. In the simulation case study
+presented in this paper, trip chains are not considered (e.g., child pickup or helping carless
+individuals). However, the considered scenario, namely a weekend morning when all residents are
+at home, is likely to imply an equally disadvantageous demand level. First, additional trips such
+as child pickup or return home from work are usually happening during work hours, which
+coincides with the time that most residents are away from home in the residential neighborhood.
+Second, during wildfire events, there are usually orders in place that prevents people from entering
+the fire zone.
+Apart from excluding trip-chaining, we also simplify the model by not including surrounding
+vehicles (i.e., background traffic), multiple pre-evacuation trips by households, or post-evacuation
+trips. We also did not consider shadow evacuations (i.e., evacuation of individuals who did not
+receive a mandatory evacuation order), which is a limitation. More data is needed to determine the
+extent of shadow evacuations, especially in cases where evacuation orders are delivered effectively
+and on-time. We also note that specific vulnerable population evacuations were not considered.
+For instance, in zip code area 94708, which covers most of the evacuation area, there are 2,850
+Old-Age, Survivors, and Disability Insurance (OASDI) beneficiaries (59). Agencies with local
+knowledge should make these populations a priority. The destination choice in the simulation is
+based on the notion that most wildfire evacuations are short-distance trips. Destinations for each
+simulated vehicle are randomly sampled according to the trip distance distribution obtained from
+the survey. Three random variables are used, and results indicate that stochasticity in destination
+locations only have minor impacts on the results. Future work is necessary to also consider how
+shelter locations could be incorporated into the modeling.
+Most critically, simulations are not perfect representatives of real-life behavior. The number of
+factors, random events, and governmental decisions would be nearly impossible to model. We
+acknowledge that our simulation, while incorporating past behavioral data, could be continuously
+improved with greater realism. This might also include how demographic characteristics impact
+the decision to evacuate or stay/defend (see (6–8,11,13)). Though, most of these studies have found
+that risk perceptions, not demographics, are better predictors of choice. Regardless, integrating
+discrete choice analyses with this simulation framework is a logical next step. Finally, the
+simulation framework is not straightforward for agencies to use directly due to the lack of an
+interactive dashboard. Efforts are being made to make the code and data open-sourced, as
+discussed in Section 3.4. Our aim is to produce a workable simulation model that is a stepping
+stone for more behaviorally driven research.
+3.4 Simulation Reproducibility
+Reproducibility is defined as the ability to confirm the results of a previous experiment by means
+of another similar experiment (60), and it is a crucial criterion in ensuring the credibility of
+scientific results. (60) categorized reproducibility into four levels, from being able to reproduce
+the results using the same data and model, to reproducing the results based on general descriptions
+of the model specifications. The model presented in this paper is based on computer simulations.
+Efforts to ensure reproducibility include:
+
+===== PAGE 20 =====
+
+Zhao and Wong 19
+1. Stating model specifications and key assumptions in detail in the methodology section
+(Section 3). Based on these specifications, the results can be verified and reproduced in
+other simulation software;
+2. Conducting repeated experiments with random seeds as shown in the results section
+(Section 4). Despite the minor differences in each random experiment, the magnitude and
+overall conclusions of the results were largely unchanged;
+3. Providing open-sourced simulation code. To ensure that the results and conclusions are
+reproducible by future researchers, the simulation code is open-sourced, and data inputs
+are available upon request.
+4. RESULTS
+We begin with presenting the baseline case for the wildfire simulation. Figure 4 shows the
+simulated congestion status at two specific time steps for the baseline case. Each road link is
+colored by vehicle density, while each road node is represented by pre-departed vehicles. Figure
+4(a) shows results at 45 minutes since giving out the evacuation order. The traffic is visibly heavier
+than Figure 4(b), which is at 1 hour and 45 minutes after giving out the evacuation order. We note
+that the most congested roads are often branch roads merging into key routes (e.g., the roads
+leading to Marin Avenue).
+For each scenario shown in Table 2, the alternatives are compared against the base scenario, while
+fixing all other strategies to their respective baseline values (underlined values in Table 2). Three
+random repetitions are conducted to reduce the influence of random variabilities on the outcomes.
+Two evacuation related metrics are shown in detail:
+● Safe Vehicles: Total number of vehicles that have reached at least one mile away from the
+evacuation zone;
+○ Designates vehicles reaching safe location;
+○ Can derive evacuation time estimates;
+● Exposed Vehicles: Number of vehicles within in the fire frontier;
+○ Identifies vehicles overtaken by the fire (i.e., potential risk or danger);
+○ Does not necessarily signify fatalities.
+The metrics are plotted over time for the baseline and each comparison scenario. Other summary
+statistics are given in Table 3, including time of exposed vehicles and average distance from the
+fire frontier.
+
+===== PAGE 21 =====
+
+Zhao and Wong 20
+Figure 4. Results from the spatial-queue-based traffic simulation, including the vehicle
+density on each road link and number of pre-depart vehicles (either because of the delay in
+departure or being blocked from the first link). (a) Results at 45 minutes since the evacuation
+order is given out (1 hour since the ignition of the fire); (b) Results at 1 hour and 45 minutes
+since the evacuation order is given out (2 hours since the ignition of the fire);
+4.1 Fire Speed
+We first vary the fire speed to reflect potential changes in weather conditions, firefighting, and/or
+fuel management. In the baseline case, fire overtook the first vehicle at 14 minutes after the
+evacuation order was given (Figure 5(a)). The number of exposed vehicles reached its peak of 782
+vehicles at 2.3 hours. Compared to the baseline, this metric decreases by 56% if the fire speed can
+be reduced to half (e.g., through effective firefighting, fuel management, weather, etc.) or increases
+by 55% if the fire speed doubles. Figure 5(b) shows safe vehicles and the associated ETEs. Fire
+speed only minimally influences ETEs since most vehicles depart before the fire reaches their
+households in all scenarios. Additional work will need to identify how departure time and
+mobilization time is influenced by fire speed, especially given the role of speed in challenging
+evacuations in past wildfires (1).
+
+===== PAGE 22 =====
+
+Zhao and Wong 21
+Figure 5. The impact of fire speed on (a) exposed vehicles; (b) number of safe vehicles.
+4.2. Departure Timing
+The three departure time scenarios (“fast”, “medium” and “slow”, Table 2) represent departure
+times after receiving the evacuation order. Scenarios perform similarly for exposed vehicles
+(Figure 6(a)), possibly due to relatively close means for all three cases (20, 40 and 60 minutes).
+The number of exposed vehicles in the “fast” departure scenario grows ahead of the other two
+cases due to earlier buildup of queues on Marin Avenue (a key local route).
+Figure 6(b) shows both the cumulative number of vehicles that started the evacuation (dashed line)
+and safe vehicles. We note that the dashed line for the cumulative distribution function (CDF) does
+not follow a truncated normal function, since some vehicles cannot enter fully saturated links. The
+“fast” case is the most efficient in ETEs, showing the benefit in early departure. However, the
+magnitude of the time savings of a 20-minute earlier departure is minimal. Compared with Section
+4.4 (phased evacuation), more gradual departure times (without staggering the departure spatially)
+alleviate less congestion.
+Figure 6. The impact of departure delays on (a) exposed vehicles; (b) safe vehicles.
+4.3 Towing
+Normal vehicles are assumed to take 26 ft of space on road, the invert of typical jam density (94)
+with towed items taking an additional 24 ft (approximate trailer length). Assuming the percentage
+of households towing items is 0% or 25%, the simulation results in -5% and 8% changes in the
+total vehicle length compared to the baseline
+
+===== PAGE 23 =====
+
+Zhao and Wong 22
+(10% households take towing items). The maximum number of exposed vehicles changed by -3%
+and 5% compared to the baseline, while the ETEs changed by -7 minutes and +4.2 minutes, a
+rather small change compared to other scenarios.
+Figure 7. The impact of towing items on (a) exposed vehicles; (b) safe vehicles.
+4.4 Transportation Mode Split
+Evacuating households often use multiple vehicles to take belongings, family members, and pets
+or to remove the vehicle from danger (61), leading to more congestion. Our baseline case sets the
+household vehicles for evacuation according to the survey (about 1.7 per household), resulting in
+782 exposed vehicles (about 6% of the total demand) and an ETE of about 3 hours. If all
+households evacuate with only one vehicle, the maximum number of exposed vehicles falls to 245
+(about 3% of the total demand) and the ETE is cut to 1.9 hours. If all households evacuate with
+three vehicles, exposed vehicles reach 2,497 (11% of the total demand). Only 19,953 vehicles can
+reach the safe area in 4 hours (89% of the total demand in this scenario).
+Figure 8. The impact of number of vehicles per household on (a) exposed vehicles; (b) safe
+vehicles. Note the scales are different.
+4.5 Real-Time Traffic Information for Rerouting
+Rerouting can theoretically relieve congestion by distributing the traffic to other roads. The black
+lines in Figure 9(a) presents baseline results with 15% rerouting (similar to the survey). The
+orange, blue and green curves correspond to scenarios where 0% (no information), 50% (strong
+access to rerouting information), and 100% (theoretically equivalent to automated vehicles [AVs])
+of the drivers reroute. Compared to baseline, the exposed vehicles change by +20%, -51% and -
+
+===== PAGE 24 =====
+
+Zhao and Wong 23
+89%, respectively. Figure 9(b) shows that the alternative scenarios can also reduce the ETEs to
+3.2, 2.1 and 1.2 hours compared to 2.9 hours in the baseline case.
+Figure 9. The impact of vehicle rerouting on (a) exposed vehicles; (b) safe vehicles.
+However, rerouting may not be a safe option due to road closures or connectivity challenges, as
+was the case of the Camp Fire (62). We further explored this scenario in the simulation and the
+results are shown Figure 10. In Figure 10, results of two levels of real-time routing participation
+rate (15% and 50%) and three levels of interruption timing (no interruption, interrupt at 30 minutes
+and 6 minutes) are plotted. In the base case (black curves), 15% of vehicles follow real-time routing
+information, and such information is available throughout the evacuation process. Comparatively,
+the orange and red curves show the results when the connection to the real-time information is
+interrupted at 30 minutes or 6 minutes. Unless the connectivity is lost at a very early stage, the
+influence on evacuation efficiency is minimal (orange curve almost coincides with the base curve).
+The reasoning is that the total number of rerouting vehicles (15%) is relatively small. For these
+vehicles, many are routed away from the congested roads at the beginning and are not adjusted
+significantly during the evacuation. This can be seen in Figure 11(a), where the thickness of the
+lines indicates the numbers of vehicles using each link throughout the entire simulation and the
+color indicates the percentages of rerouting vehicles. We note that the percentage of rerouting
+vehicles on the congested roads (thick lines) is lower (less than 5%) than the scenario average of
+15% rerouting. As a result, interrupting rerouting after congestion starts to form will not alleviate
+or worsen congestion significantly. However, if rerouting is interrupted at the beginning of the
+simulation (e.g., the red curve in Figure 10), the vehicles with rerouting capabilities are not able
+to avoid the congestion, since delays have not started to form when they are planning their routes.
+The results of a loss of connectivity early in the evacuation are very similar to results without
+rerouting (orange curve in Figure 9). For higher usage of real-time rerouting (50% of vehicles
+using real-time rerouting, blue/green/purple curves in Figure 10), the impact of losing such
+information is clearer. As shown in Table 3, if the connection to the real-time information is lost
+at 30 minutes while 50% of the evacuees are trying to follow it for routing, the number of exposed
+vehicles increases by almost 100 compared to the no interruption case, while the total exposed
+time (vehicle-hours) increases by over 50%. Figure 11(b) also illustrates this. Since evacuation
+efficiency is dominated by the congestion on a few routes, significant improvements could be
+made if vehicles on these congested routes could have used real-time rerouting to seek an
+alternative route.
+
+===== PAGE 25 =====
+
+Zhao and Wong 24
+Figure 10. The impact of interrupting real-time routing at different stages of the
+evacuation.
+Figure 11. Total numbers of vehicles using each link (thickness) and percentages of vehicles
+with real-time rerouting on each link (color scale). (a) 15% of all evacuees follow real-time
+traffic information; (b) 50% of all evacuees follow real-time traffic information.
+4.6 Phased Evacuation
+Phased evacuations often improve congestion by reducing the maximum instantaneous traffic load
+and increases overall safety by prioritizing residents in greater danger (63). We tested phasing by
+altering time intervals between the mean departure time of different evacuation zones (Figure 12).
+Figure 12(a) shows exposed vehicles for different phased evacuation intervals. By giving a 15-
+minute priority to each of the evacuation zones closer to the fire (blue curve), exposed vehicles
+reduce by 78%. If the phase interval increases to 30 minutes (green curve), exposed vehicles reduce
+by 94%. However, if the phase interval becomes too large (e.g., 60 minutes, orange curve), some
+vehicles may leave too late and be overcome by the fire, increasing exposed vehicles slightly
+compared to the 30-minute case. Figure 12(b) shows safe vehicles differ minimal from baseline
+for phase intervals of 15 minutes and 30 minutes. However, when the phase interval becomes 60
+minutes, the network is underutilized (characterized by flat lines).
+
+===== PAGE 26 =====
+
+Zhao and Wong 25
+Figure 12. The impact of phased evacuation on (a) exposed vehicles; (b) safe vehicles.
+4.7 Contraflow
+In this study, the locations of contraflow were identified based on inspecting the bottlenecks in
+Figure 4, centerline markings, and local knowledge of downhill routes as:
+For short-distance contraflow, resources are assumed to be limited and the strategy could only be
+implemented along the key egress routes to slightly beyond the evacuation boundary:
+● West side downhill routes (3.7 miles long, extending 0.5 mile outside of the evacuation
+zone): Marin Avenue → Spruce Street → Oxford Street; and
+● East side downhill routes (1.9 miles long): Shasta Road → Glendale Avenue → La Loma
+Avenue → Cedar Street → Euclid Avenue → Le Conte Avenue → Hearst Avenue (→
+join the westside contraflow routes at Oxford Street).
+When there are sufficient personnel and time, contraflow roads can be extended to local
+highways. In this scenario, the contraflow strategies are also implemented following roads:
+● Shattuck Avenue and Martin Luther King Junior Way, from University Avenue till CA-
+24 (2.7 miles).
+● University Avenue, from Shattuck Avenue till I-80 (2.2 miles).
+Figure 13(a) shows a reduction of 53% of exposed vehicles after implementing contraflow to the
+evacuation zone boundary. In the extended contraflow scenario, the number of exposed vehicles
+reduced by 73% compared to the baseline. In Figure 13(b), the number of safe vehicles and ETE
+does not change substantially when the evacuation lanes terminate close to the evacuation
+boundary. In fact, this is in accordance with the characteristics of contraflow: it helps absorb more
+vehicles from branch roads to the contraflow lanes, thus making it faster for the vehicles to outrun
+the fire. However, in an urban setting, the downstream (sink) capacity is still limited by the end of
+the contraflow roads, leading to vehicle queues downstream of the contraflow roads. By extending
+the contraflow lanes to a further distance away from the evacuation zone, it is possible to reduce
+the queue spillback into the evacuation zone, making it faster for vehicles to leave the dangerous
+area.
+
+===== PAGE 27 =====
+
+Zhao and Wong 26
+Figure 13. The impact of contraflow on (a) exposed vehicles; (b) safe vehicles.
+4.8 Summary of Findings
+Four summary statistics are given in Table 3 for comparison: 1) exposed vehicles; 2) ETE; 3)
+amount of time exposed vehicles were in the fire frontier; and 4) average distance from fire. The
+time for all vehicles to complete the evacuation is not shown, as the evacuation destinations were
+picked at random and sometimes constitute long trip times.
+Based on summary statistics in Table 3, phased evacuations with 30-minute departure time
+interval, >50% vehicle rerouting, personal vehicle reduction (1 vehicle per household) and
+instituting contraflow beyond the evacuation zone boundaries are the most effective strategies.
+These strategies can greatly reduce the load of the traffic temporally (phased evacuations),
+spatially (rerouting and contraflow), and overall (personal vehicle reduction). Each strategy has
+limitations: phased evacuations require strict adherence to mandatory orders, vehicle rerouting
+requires real-time information from power and cell sources and quick detection of road closures,
+personal vehicle reduction requires significant education and a willingness to give up an expensive
+asset, and contraflow requires planning efforts and is labor-intensive during its execution.
+Some strategies (e.g., slowing fire speed, phased evacuation with less time intervals between
+zones, selective contraflow) have less impact on ETEs but still lead to moderate reductions in
+exposed vehicles. Reducing fire speed provides more time for slower households to leave. We
+found that rapid phasing, compared to more drawn-out phasing, overloads the network too quickly
+and is not as effective as other phasing intervals. Contraflow over a short length also removes
+individuals quickly from the fire area, but downstream congestion still leads to high ETEs. Several
+strategies, such as changing towing behavior and speeding up departure times, lead to minimal
+reductions in both exposed vehicles and ETEs. The worst case among all scenarios studied is to
+evacuate with three vehicles per household. This represents the highest evacuation demand on a
+network with limited capacity and is detrimental in all metrics evaluated.
+The above simulation results are based on the series of scenarios and assumptions as stated in
+Sections 3.2 and 3.3. In reality, situations that deviate from these assumptions might happen and
+lead to changes in the outcomes. For example, depending on the time and day of the incident, there
+may be less people at home compared to the current assumption. This will reduce the evacuation
+
+===== PAGE 28 =====
+
+Zhao and Wong 27
+demand, effectively leading to less challenging evacuation situations similar to the effect of vehicle
+reduction. Also, it has been suggested that people may make multiple trips during the evacuation
+(6,58). This has the potential to increase the overall ETE and conflicts at intersections, for example.
+Other factors that will affect evacuation outcomes include shadow evacuations, the presence of
+pedestrians sharing the road network, vehicle breakdowns, emergency vehicles traveling in the
+opposite direction, transportation of vulnerable populations, and public transit usage. In addition,
+the resilience and operations of the infrastructure may also impact the overall evacuation
+efficiency. For instance, signals that are not optimized may create long queues of traffic backing
+up (64). However, as the signalized intersections in the study area are mostly out of the evacuation
+zone, it may not significantly affect evacuation metrics, such as the fire exposure time.
+Realistically, multiple disadvantageous scenarios may happen at the same time, such as a fast-
+moving fire that damages the communication and navigation infrastructure, causing difficulties in
+coordinating contraflow operations between emergency personnel and/or evacuee challenges in
+accessing real-time routing information.
+TABLE 3. Summary of Evacuation Efficiency Metrics under Different Strategy Scenarios.
+Evacuation Efficiency Metrics
+Total
+Evacuation Time Time of Distance
+Exposed Vehicles
+Estimate (ETE) Exposed from Fire
+Vehicles
+Time (hrs),
+Min.
+Max # veh all
+Total veh- average
+in fire % change vehicles % change
+hours fire distance to
+frontier at from reach from
+frontier the fire
+the same baseline safety, 1 baseline
+(veh-hrs) frontier
+time (veh); ml from
+(miles)
+evac zone;
+Baseline
+Baseline 782 - 2.9 - 954 0.6
+Fire speed
+×0.5
+342 -56% 2.8 -1% 350 0.8
+(slower)
+×2 (faster) 1,209 +55% 2.8 -2% 1,569 0.5
+Departure time
+Less delay 729 -7% 2.7 -5% 910 0.4
+More 747 -4% 3.1 +7% 906 0.6
+delay
+% towed vehicles
+0% 757 -3% 2.8 -4% 885 0.7
+25% 821 +5% 3.1 +2% 906 0.6
+
+===== PAGE 29 =====
+
+Zhao and Wong 28
+# vehicles per household for evacuation
+1 245 -69% 1.8 -36% 129 0.9
+3 2,497 +219% >4 >+40% 5,057 0.4
+% vehicles rerouting with real-time traffic information
+0% 943 +20% 3.2 +11% 1,320 0.6
+50% 381 -51% 2.1 -28% 279 0.8
+100% 86 -89% 1.2 -58% 35 0.7
+15%, stop
+979 +25% 3.1 +7% 1,430 0.6
+at 6 min
+15% stop
+771 -1% 2.8 -3% 974 0.6
+at 30 min
+50%, stop
+979 +25% 3.1 +7% 1,430 0.6
+at 6 min
+50%, stop
+474 -39% 2.1 -28% 411 0.8
+at 30 min
+Phased evacuation time difference between bands
+15 min 173 -78% 2.9 +2% 188 0.8
+30 min 49 -94% 3.2 +10% 35 0.8
+60 min 80 -90% >4 >+40% 40 0.7
+Contraflow
+Short
+367 -53% 2.6 -10% 310 0.8
+contraflow
+Long
+209 -73% 1.7 -41% 84 0.9
+contraflow
+5. POLICY RECOMMENDATIONS
+The modeling results point to clear opportunities for emergency management and transportation
+agencies to reduce wildfire evacuee risk and improve ETEs. In Table 4, we present each of the
+transportation responses, their priority, and possible recommendations for agencies to pursue. We
+note that many strategies will require careful planning and substantive communication with
+residents. Indeed, informational and educational campaigns (not infrastructure or operational
+changes) that attempt to nudge behavior may be the most cost-effective strategy to improve
+evacuation outcomes.
+
+===== PAGE 30 =====
+
+Zhao and Wong 29
+TABLE 4: Policy Recommendations for Transportation and Hazard Responses and
+Strategies
+Transportation/ Hazard Response Priority
+1. Slowing Fire Speed Moderately Recommended
+Description
+Slowing fire speed will reduce the number of vehicles in the fire frontier and allow for longer
+mobilization times, especially for vulnerable populations who might need more time to
+evacuate. However, slowing fire speed requires very quick and rapid response to the hazard or
+longer-term fuel management strategies (e.g., fuel breaks), which may not be feasible for some
+jurisdictions. Moreover, the typology, land development, and weather conditions may make
+fire suppression nearly impossible, placing firefighters or aircrafts at risk.
+Recommendations for Emergency Management and Transportation Agencies
+• Manage fuels and create fire breaks by reducing highly flammable vegetation in high-
+risk areas (e.g., near powerlines) and along roadways
+• Develop rapid detection systems for wildfires (e.g., cameras, sensors, physical
+lookouts, crowdsourced information, drones)
+• Work with homeowners and landowners through education, funding, and enforcement
+to create defensible space, fire resistant structures, and backup water storage systems
+Feasibility
+Fire spread depends on the weather, topology, and fuel. Studies have shown that fuel
+management such as Fuel Reduction Burning (FRB) can effectively slow down the rate of
+head fire spread (65). Also, structures that are separated by sufficient distances or have
+defensible space around them can help stop or slow down fire (66). Smart technologies are
+also maturing and have been adopted in practice, such as using fire cameras combined with
+Artificial Intelligence (AI) to rapidly detect fire and smoke at early stage (67). The benefits of
+slowing fire spread are clear, but actions will require substantial effort by agencies and
+residents. Agencies should work on community preparedness and prescribed burning.
+Residents should conduct actions for the residence (e.g., clean gutters, use fire resistant roofing
+and exterior in high-risk areas). Economically, however, this can be difficult for low-income
+communities (e.g., metal roofing can be 5-10 times more expensive than asphalt roofing
+materials), indicating equity challenges.
+2. Reducing Departure Delays Moderately Recommended
+Description
+Reducing the departure time lag between receiving a mandatory evacuation order and
+evacuating can help remove at-risk people more quickly. However, this strategy alone is not
+enough to sufficiently reduce evacuation risk. Moreover, some individuals, such as individuals
+with a physical disability, may need extra assistance and additional time to evacuate.
+Recommendations for Emergency Management and Transportation Agencies
+
+===== PAGE 31 =====
+
+Zhao and Wong 30
+• Issue mandatory evacuation orders as quickly as possible to ensure enough time for
+individuals to mobilize and leave, especially individuals with access and functional
+needs (AFN)
+• Encourage residents to create go-bags that speed up the mobilization process
+• Include in mandatory evacuation orders an approximate amount of time they should
+spend mobilizing that is long enough to prepare but also short enough to evacuate
+individuals quickly
+Feasibility
+Reduction in departure delay can be achieved through improving pre-event preparedness and
+giving evacuation orders in a timely and clear manner. Cal Fire and local agencies have made
+efforts in improving this preparedness with the public-facing website readyforwildfire.org that
+disseminates “Ready, Set and Go” information (68). For alert systems, most local areas are
+gradually adopting state-of-the-art software, such as Code Red, and/or updating their Wireless
+Emergency Alert (WEA) system. However, issues remain in disseminating information
+quickly, in multiple languages, with adequate direction, and to enough people (1). Reducing
+evacuation delay is attainable, but based on recent experience, a robust communication system
+(along with correct decision-making from officials) is needed.
+3. Reducing the Amount of Towing Minimally Recommended
+Description
+Additional mobile assets (e.g., trailers, boats, motorhomes) create more demand, but this
+increase is minimal to moderate. A reduction in towing leads to some gains across evacuation
+metrics. However, mobile assets tend to be expensive, making them a higher priority for
+protection.
+Recommendations for Emergency Management and Transportation Agencies
+• Encourage residents in high-risk areas with mobile assets to gain wildfire (e.g.,
+disaster) insurance
+• Suggest to residents to hook up and prepare mobile assets ahead of potential fire
+danger to reduce mobilization time
+• Develop plans for parking areas outside of potential evacuation zones for residents to
+take mobile assets during high fire danger weather (i.e., pre-disaster trip-making)
+Feasibility
+There is currently little information on agency regulation or recommendations regarding
+towing vehicles, so its current feasibility is hard to assess. Based on the Federal Highway
+Administration (FHWA) highway statistics of 2019, the ratio of trailers versus automobiles (all
+privately owned) in the fire-prone states California, Nevada, Oregon, and Washington were
+0.16, 0.18, 0.22 and 0.20, respectively (69). The values are within range of the simulation
+inputs (0-25%) in this study. Trailer usage in places with large farm animals may be higher
+and planning for their safe evacuation might be more crucial.
+4. Reducing Number of Evacuating Vehicles Highly Recommended
+
+===== PAGE 32 =====
+
+Zhao and Wong 31
+Description
+The travel demand from multiple vehicle households greatly increases exposed vehicles and
+ETEs. By reducing the number of vehicles taken by households, congestion will be greatly
+diminished and allow evacuees to reach their destinations more quickly. Reducing vehicles is
+highly recommended for all jurisdictions but this strategy will require significant and proactive
+educational campaigns.
+Recommendations for Emergency Management and Transportation Agencies
+• Recommend to residents to take as few vehicles as possible (i.e., enough to transport
+people and key belongings) through an educational and informational campaign
+• Suggest to resident to pre-pack vehicle(s) in advance such that space is used efficiently
+in vehicles
+• Encourage evacuees taking more than one vehicle to provide their extra space to
+carless individuals and other vulnerable populations to improve equitable outcomes
+• Develop an equitable insurance framework for protecting vehicles of residents in high-
+risk fire areas
+• Develop plans for parking areas outside of potential evacuation zones for residents to
+take additional vehicle during high fire danger weather (i.e., pre-disaster trip-making)
+Feasibility
+Based on data from 1990-2010, the WUI is the fastest growing land use type in the contiguous
+United States (70). With mostly single-family houses in the WUI (71), private vehicle are the
+primary mode of transport in such areas. In the Berkeley Hills area (most of which belongs to
+zip code 94708), the average household size is 2.3, but there are nearly 2 vehicles per
+household on average. As a result, carpooling would be considered less attractive given the
+high car-ownership. Israel, for example, having lower car ownership than the United States,
+was reported to use 0.89 vehicles per household for evacuation (6). The benefits of vehicle
+reduction during evacuations are well understood in the literature, and there is already some
+development of education campaign by agencies. For example, Marin County in California
+advocates on its website that “every seat should be filled” and that evacuees should “assist
+elderly or disabled neighbors” and “carpool with neighbors to reduce traffic” (72,73). (57)
+noted the difficulty in vehicle reduction and compared this to the “prisoner’s dilemma”, where
+residents would have to forsake personal properties (vehicles and belongings that could not be
+taken) for the overall benefit of reduction in traffic. One important possibility is that auto
+insurance could help to reduce the financial loss of vehicles if they are left at the residence.
+Some auto insurance policies cover wildfire damage but not all people can afford this
+comprehensive coverage. In terms of parking capacity in the study area, there are nearly 1,400
+off-street parking spots owned and operated by the City of Berkeley, including three garages
+and two surface parking lots in Downtown Berkeley, South Berkeley, and the Elmwood
+district (74). There are also over 1,400 parking spaces at the North Berkeley and Ashby
+stations for Bay Area Rapid Transit (BART) (75). In addition, the above totals do not count for
+parking owned by companies, employers, or private operators. Other parking structures, such
+as those on the nearby University of California, Berkeley campus, can also provide additional
+space for the pre-evacuation of vehicles. For other cities, a similar crude validation can be used
+t o estimate the feasibility of a pre-evacuation parking strategy.
+
+===== PAGE 33 =====
+
+Zhao and Wong 32
+5. Increasing GPS-Based Rerouting Highly Recommended
+Description
+Higher rates of rerouting led to significant reductions in exposed vehicles and ETEs. Even
+smaller percentages of rerouting (15%) were far more effective than other potential
+transportation strategies. Despite these benefits, a rerouting strategy will have to ensure that
+GPS-guided directions are available, accurate, and followed by evacuees.
+Recommendations for Emergency Management and Transportation Agencies
+• Partner with GPS mapping services (e.g., Google Maps, Apple Maps, Waze) and auto
+manufacturers with GPS guidance to ensure that systems with be operational in a
+disaster
+• Update mapping services through official or crowdsourced information of blocked
+routes (i.e., downed powerlines, trees) and current fire location
+• Work with and require utilities to have backup generators for key communication
+services (e.g., high-speed mobile Internet) to ensure GPS directions are available
+• Produce pre-disaster information related to GPS guidance to evacuees and encourage
+usage of services, even for short evacuations
+• Encourage services to default applications to reroute in an evacuation, rather than
+remain on the current route
+• Consider future integration of wildfire evacuation information to automated vehicles
+(AVs)
+• In the long-term, develop vehicle-to-everything (V2X) technologies that can exchange
+information and compute real-time routes without relying on vulnerable
+communication infrastructures (e.g., cell towers)
+Feasibility
+Real-time rerouting is an effective strategy in all scenarios studied in the simulation. However,
+its feasibility is dampened by several challenges. First, real-time rerouting services are mostly
+provided by private companies. While many have shown strong willingness to assist (e.g.,
+Google hazard map showing real-time closures), companies have yet to develop robust
+partnerships with agencies. Second, GPS systems need to be paired with transmission
+infrastructure (e.g., cell towers) to communicate with the central server about current
+positions. However, cell towers and other communication infrastructures have been
+susceptible to power outages, losses of backhaul fibers, and structure damages from wildfires
+(76). In 2020, California Public Utilities Commission issued a new decision for major wireless
+providers to have 72 hours of backup power and build new communication resiliency and
+emergency operations plans (77). Other opportunities for ensuring communication include the
+use of short-range equipment to act as temporary stations (e.g., using drones to relay wireless
+signals in (78)). However, these innovations are still largely conceptual. Finally, people may
+not choose real-time routing guidance during an evacuation, opting instead for routes that are
+shorter, have less fire danger, and high-quality pavement conditions (12). Altogether, real-time
+routing requires improvements to enhance V2G (vehicle to grid) infrastructure and V2V
+(vehicle to vehicle) infrastructure to support more secure and robust communication to make
+rerouting feasible (79–82).
+
+===== PAGE 34 =====
+
+Zhao and Wong 33
+6. Phasing Evacuations Highly Recommended
+Description
+Depending on the phasing time difference (and size of phased zones), a phased evacuation
+strategy can be effective in improving evacuation outcomes on its own. However, phasing
+requires significant pre-planning activity and active communication with residents before and
+during the evacuation, making it difficult to implement. Moreover, the characteristics of the
+wildfire may make a phased evacuation impossible, as the fire may overcome non-evacuated
+zones.
+Recommendations for Emergency Management and Transportation Agencies
+• Research, develop, and widely distribute phased evacuation plans that create
+reasonable time bands (e.g., approximately 30 minutes for a highly urban fire)
+• Use known boundaries and easy to identify landmarks and roads to set evacuation
+zones for phasing
+• Maintain a relatively small number of potential zones to reduce confusion in the
+evacuation process and reduce the number of messages sent to evacuees
+• Convey emergency evacuation orders and warnings by zones
+• Prepare for contingencies (i.e., changes in time bands) if the fire spread is faster or
+slower than expected
+Feasibility
+Dividing the fire-prone area into zones is an effective way to move as few people as needed to
+safe areas (83). In practice, agencies can construct evacuation zones based on both natural (e.g.,
+vegetation type) and human factors (e.g., landmarks, clearly defined roads) (84,85). The initial
+research can be done as a desktop study, as the vegetation coverage map, the road network map,
+and other geospatial information can be readily obtained from sources such as the LANDFIRE
+program and OpenStreetMap. During the development stage, refinement can be made through
+meetings with the emergency responders and the wider community (14). Prior to wildfires,
+residents need to be informed of their zones, potentially through letters sent to homeowners and
+renters or announcements via online neighborhood hubs such as Nextdoor. Interactive zone
+maps for the jurisdiction can also be created easily using tools such as ArcGIS online (e.g.,
+Berkeley Evacuation Zone Map from (86)). During the wildfire, geo-coded alerts can be sent to
+residents in targeted zones. For example, alerts can be sent to the residents in specific areas
+through FEMA’s Integrated Public Alert & Warning System (IPAWS) system through multiple
+pathways using commercial software (87,88). However, reliability of the software could be
+problematic, as previous technical difficulties have been reported (89). Lastly, zone-based
+phased evacuation may not work as planned if the fire spreads too quickly. In such case, public
+agencies may need to use a variety of communication tools (e.g., radios, phone calls, social
+media platforms, person-to-person interactions) to keep evacuees informed (62).
+7. Instituting Contraflow Moderately Recommended
+
+===== PAGE 35 =====
+
+Zhao and Wong 34
+Description
+Contraflow strategies can reduce the exposed vehicles from the fire frontier. Extending the
+contraflow operation beyond the immediate boundary of the evacuation zone can help to
+further improve the ETEs. However, contraflow tends to be an expensive procedure that
+requires significant pre-planning, time to executive, and personnel. For resource-strapped or
+smaller agencies, contraflow may not be a viable option.
+Recommendations for Emergency Management and Transportation Agencies
+• Develop contraflow plans that focus on highly congested roads, arterials, and
+neighborhoods with few exits to maximize effectiveness and minimize resource needs
+• Notify evacuees ahead of time of the plan to switch lanes to flow in the opposite
+direction
+• Consider potential turning or merging conflicts when designing contraflow routes
+• Pre-plan traffic operations (e.g., changing signals to prioritize traffic away from the
+fire) and consider congestion-reducing mechanisms near the end of the contraflow to
+minimize bottlenecks and upstream queuing in the fire frontier
+Feasibility
+The practicality and benefits of contraflow has been demonstrated mainly in hurricane
+evacuations. However, its success is heavily dependent on proper planning and execution.
+Early studies pointed out several factors that might prevent contraflow from achieving its
+optimum outcome. On the planning level, limitations include the cost of planning and
+infrastructure changes, safety implications, confusion caused by evacuees’ unfamiliarity to the
+arrangement, and reduced access for service and emergency vehicles (90). On the operational
+level, especially on urban roads/arterials, challenges remain in identifying contraflow links
+analytically, disseminating contraflow information timely, and maintaining traffic flow
+through reversed lanes and intersections (91). However, it has been shown that simple and
+inexpensive actions, such as providing enough entrance capacity and carrying out merges after
+the evacuation area, can greatly improve contraflow efficiency (92,93).
+6. CONCLUSIONS
+In this study, we developed a spatial-queue-based dynamic traffic simulation model that
+incorporated behavioral data from post-disaster wildfires in California. This simulation model was
+applied to a wildfire evacuation case in the Berkeley Hills Area of Berkeley, California. To
+incorporate realism, we considered a range of variables including fire speed, departure time,
+destination choice, mode choice, number of towed vehicles, queuing, rerouting, and two policy
+strategies (e.g., contraflow, phased evacuation). We aimed to produce a data-driven model that
+could identify possible transportation response strategies for agencies with minimal time, funds,
+resources, or knowledge to respond to a wildfire evacuation. Compared to other evacuation
+models, the incorporation of behavioral data, focus on policies and strategies, and realistic details
+(e.g., dynamic routing, parcel level data, complicated street network) signify an important step for
+the field.
+
+===== PAGE 36 =====
+
+Zhao and Wong 35
+We found strong indications that phased evacuations, vehicle rerouting, and reduction in personal
+vehicles were the most effective strategies for reducing the number of exposed vehicles in the fire
+frontier and/or the evacuation time estimate (ETE). Implementing these strategies, while
+challenging, would not be unrealistic for small and/or poorly resourced emergency management
+and transportation agencies. The strategies would require substantial pre-disaster communication
+and accurate, timely messaging during the wildfire. Contraflow for an extended length beyond the
+evacuation boundary was also found to be effective in reducing ETEs and exposed vehicles.
+However, this strategy would be potentially hard to implement for resource-strapped agencies if
+guidance is required at every intersection. A vehicle rerouting strategy may also require new
+partnerships with GPS-based mapping platforms (e.g., Google Maps, Apple Maps, Waze). In
+addition, the phased evacuation results showed that too small or too large of time intervals would
+be less efficient, suggesting a need for thoughtful planning. We also found moderate improvements
+in evacuation outcomes for implementing contraflow (for short lengths under resource constraints)
+and slowing fire speed for our case study. In combination with other strategies, these responses
+may prove to be highly useful under different conditions (e.g., for a different road network).
+Given the level of details that the simulation can support (e.g., road network, vehicle behavior),
+there are many assumptions involved that have been documented extensively in Section 3 and offer
+broader application. Specifically, the intended application of this simulation is for preparedness
+analysis and reconnaissance of real events, where reasonable assumptions can be made based on
+local knowledge or post-event surveys. For example, for many resource-strapped communities in
+the WUI area, it is imperative to understand the most cost-effective precautionary measures and
+implement corresponding policies. This best-working strategy is likely to be different for each
+community, thus a flexible simulation model framework such as the one presented in this paper
+becomes valuable. The model can be adapted to incorporate local knowledge-based assumptions
+to find the critical policy scenario specific to the local context. For post-event reconnaissance, (64)
+presented the application of a similar framework in Paradise, CA to simulate the Camp Fire
+evacuation. In that study, the assumptions were made according to the field interviews with local
+officials. Consequently, the modeling approach in this paper demonstrates the applicability of the
+simulation framework to analyze alternative scenarios and gain valuable lessons from
+reconstructing past events.
+However, more research is needed on this topic based on the limitations of the paper. For example,
+the model could use additional realism through better post-disaster data (including verification
+with mobile phone data) and integration with a fire spread model. The model also requires
+application across more jurisdictions in California, in North America, and globally for
+generalizability assessments. Most critically, work is needed to link this model to a transit-based
+evacuation model that better incorporates the needs of vulnerable populations and includes data
+on how vulnerable populations make decisions in wildfire evacuations. With increasing frequency
+and size of wildfire evacuations, realistic and practice-oriented models that incorporate behavioral
+realism will become even more critical to ensure that all people are safe.
+7. ACKNOWLEDGEMENTS
+This study was made possible via an SB 1 grant from the University of California Institute of
+Transportation Studies, the Graduate Research Fellowship Program (National Science
+Foundation), and the Dwight D. Eisenhower Transportation Fellowship Program (Federal
+
+===== PAGE 37 =====
+
+Zhao and Wong 36
+Highway Administration). We thank the many agencies and community organizations across
+California for distributing the surveys and Professor Kenichi Soga, Professor Susan Shaheen, and
+Professor Joan Walker from the University of California, Berkeley for their support. We express
+our gratitude to the anonymous reviewers for their time and valuable advice on improving the
+quality of this paper.
+8. AUTHOR CONTRIBUTIONS
+The authors confirm contribution to the paper as follows: study conception and design: B. Zhao,
+S. Wong; data collection: S. Wong; modeling: B. Zhao; analysis and interpretation of results; draft
+manuscript preparation, results review, and final approval: all authors.
+9. REFERENCES
+1. Wong SD, Broader JC, Shaheen SA. Review of California Wildfire Evacuations from 2017
+to 2019 [Internet]. University of California Institute of Transportation Studies; 2020 Mar.
+Available from: https://escholarship.org/uc/item/5w85z07g
+2. Intini P, Ronchi E, Gwynne S, Pel A. Traffic modeling for wildland-urban interface fire
+evacuation. Journal of Transportation Engineering Part A: Systems. 2019;145(3):1–15.
+3. Li D, Cova TJ, Dennison PE. A household-level approach to staging wildfire evacuation
+warnings using trigger modeling. Computers, Environment and Urban Systems. 2015 Nov
+1;54:56–67.
+4. McLennan J, Ryan B, Bearman C, Toh K. Should We Leave Now? Behavioral Factors in
+Evacuation Under Wildfire Threat. Fire Technol [Internet]. 2018 Jul 17 [cited 2018 Oct 3];
+Available from: https://doi.org/10.1007/s10694-018-0753-8
+5. Mozumder P, Raheem N, Talberth J, Berrens RP. Investigating intended evacuation from
+wildfires in the wildland-urban interface: Application of a bivariate probit model. Forest
+Policy and Economics. 2008 Aug;10(6):415–23.
+6. Toledo T, Marom I, Grimberg E, Bekhor S. Analysis of evacuation behavior in a wildfire
+event. International Journal of Disaster Risk Reduction. 2018 Oct;31:1366–73.
+7. Lovreglio R, Kuligowski E, Gwynne S, Strahan K. A modelling framework for householder
+decision-making for wildfire emergencies. International Journal of Disaster Risk Reduction.
+2019 Dec 1;41:101274.
+8. McCaffrey S, Wilson R, Konar A. Should I Stay or Should I Go Now? Or Should I Wait
+and See? Influences on Wildfire Evacuation Decisions. Risk Analysis. 2018 Jul
+1;38(7):1390–404.
+9. Paveglio TB, Boyd AD, Carroll MS. Wildfire evacuation and its alternatives in a post-
+Black Saturday landscape: Catchy slogans and cautionary tales. Environmental Hazards.
+2012 Mar 1;11(1):52–70.
+
+===== PAGE 38 =====
+
+Zhao and Wong 37
+10. Strahan K. Factors influencing householder self-evacuation in two Australian bushfires.
+2017 [cited 2018 Oct 3]; Available from: http://researchbank.rmit.edu.au/view/rmit:162093
+11. Wong SD, Broader JC, Walker JL, Shaheen SA. Understanding California Wildfire
+Evacuee Behavior and Joint Choice-Making. 2020 May 1 [cited 2020 Jun 4]; Available
+from: https://escholarship.org/uc/item/4fm7d34j
+12. Wong SD, Chorus CG, Shaheen SA, Walker JL. A Revealed Preference Methodology to
+Evaluate Regret Minimization with Challenging Choice Sets: A Wildfire Evacuation Case
+Study. Travel Behaviour and Society. 2020 Jul 1;20:331–47.
+13. Kuligowski E. Evacuation decision-making and behavior in wildfires: Past research, current
+challenges and a future research agenda. Fire Safety Journal. 2020 May 3;103129.
+14. de Araujo MP, Lupa MR, Casper CT, Waters B. Wildfire Evacuation Scenario in Colorado.
+Transportation Research Record: Journal of the Transportation Research Board. 2014
+Jan;2430(1):133–44.
+15. Wong S, Shaheen S. Current State of the Sharing Economy and Evacuations: Lessons from
+California. 2019 Jun 1 [cited 2019 Jun 27]; Available from:
+https://escholarship.org/uc/item/16s8d37x
+16. Wong SD, Broader JC, Shaheen SA. Can Sharing Economy Platforms Increase Social
+Equity for Vulnerable Populations in Disaster Response and Relief? A Case Study of the
+2017 and 2018 California Wildfires. Transportation Research Interdisciplinary
+Perspectives. 2020 May 1;5:100131.
+17. Wong SD, Walker JL, Shaheen SA. Role of Trust and Compassion in Willingness to Share
+Mobility and Sheltering Resources in Evacuations: A Case Study of the 2017 and 2018
+California Wildfires. 2020 Feb 1 [cited 2020 Feb 28]; Available from:
+https://escholarship.org/uc/item/1zm0q2qc
+18. Murray-Tuite PM, Mahmassani HS. Transportation Network Evacuation Planning with
+Household Activity Interactions. Transportation Research Record. 2004 Jan;1894(1):150–9.
+19. Noh H, Chiu Y-C, Zheng H, Hickman M, Mirchandani P. Approach to Modeling Demand
+and Supply for a Short-Notice Evacuation. Transportation Research Record. 2009
+Jan;2091(1):91–9.
+20. Vorst HCM. Evacuation models and disaster psychology. Procedia Engineering.
+2010;3:15–21.
+21. Lim GJ, Zangeneh S, Reza Baharnemati M, Assavapokee T. A capacitated network flow
+optimization approach for short notice evacuation planning. European Journal of
+Operational Research. 2012 Nov;223(1):234–45.
+
+===== PAGE 39 =====
+
+Zhao and Wong 38
+22. Golshani N, Shabanpour R, Mohammadian A (Kouros), Auld J, Ley H. Analysis of
+evacuation destination and departure time choices for no-notice emergency events.
+Transportmetrica A: Transport Science. 2019 Nov 29;15(2):896–914.
+23. Shahparvari S. Possibilistic scheduling routing for short-notice bushfire emergency
+evacuation under uncertainties_ An Australian case study. 2016;22.
+24. Cohn PJ, Carroll MS. Evacuation Behavior during Wildfires: Results of Three Case
+Studies. 2006;10.
+25. Murray-Tuite PM, Mahmassani HS. Model of Household Trip-Chain Sequencing in
+Emergency Evacuation. Transportation Research Record. 2003 Jan;1831(1):21–9.
+26. So SK, Daganzo CF. Managing evacuation routes. Transportation Research Part B:
+Methodological. 2009;44(4):514–20.
+27. Chen X, Zhan FB. Agent-based modelling and simulation of urban evacuation: relative
+effectiveness of simultaneous and staged evacuation strategies. Journal of the Operational
+Research Society. 2008 Jan 1;59(1):25–33.
+28. Cova TJ, Johnson JP. A network flow model for lane-based evacuation routing.
+Transportation Research Part A: Policy and Practice. 2003 Aug;37(7):579–604.
+29. Cova TJ, Johnson JP. A network flow model for lane-based evacuation routing.
+Transportation Research Part A: Policy and Practice. 2003 Aug;37(7):579–604.
+30. Cova TJ, Johnson JP. Microsimulation of Neighborhood Evacuations in the Urban–
+Wildland Interface. Environment and Planning A: Economy and Space. 2002
+Dec;34(12):2211–29.
+31. Cova TJ, Johnson JP. Microsimulation of Neighborhood Evacuations in the Urban–
+Wildland Interface. Environment and Planning A: Economy and Space. 2002
+Dec;34(12):2211–29.
+32. Wolshon B, Marchive III E. Emergency Planning in the Urban-Wildland Interface:
+Subdivision-Level Analysis of Wildfire Evacuations. Journal of Urban Planning and
+Development. 2007 Mar 1;133(1):73–81.
+33. Chen Y, Yusef Shafi S, Chen Y. Simulation Pipeline for Traffic Evacuation in Urban Areas
+and Emergency Traffic Management Policy Improvements. 2020 Feb; Available from:
+http://arxiv.org/abs/2002.06198
+34. Sbayti H, Mahmassani HS. Optimal Scheduling of Evacuation Operations. Transportation
+Research Record. 2006 Jan 1;1964(1):238–46.
+35. Wang H, Mostafizi A, Cramer LA, Cox D, Park H. An agent-based model of a multimodal
+near-field tsunami evacuation: Decision-making and life safety. Transportation Research
+Part C: Emerging Technologies. 2016 Mar;64:86–100.
+
+===== PAGE 40 =====
+
+Zhao and Wong 39
+36. Mas E, Suppasri A, Imamura F, Koshimura S. Agent-based Simulation of the 2011 Great
+East Japan Earthquake/Tsunami Evacuation: An Integrated Model of Tsunami Inundation
+and Evacuation. Journal of Natural Disaster Science. 2012;34(1):41–57.
+37. Parikh N, Hayatnagarkar HG, Beckman RJ, Marathe MV, Swarup S. A comparison of
+multiple behavior models in a simulation of the aftermath of an improvised nuclear
+detonation. Auton Agent Multi-Agent Syst. 2016 Nov;30(6):1148–74.
+38. Beloglazov A, Almashor M, Abebe E, Richter J, Steer KCB. Simulation of wildfire
+evacuation with dynamic factors and model composition. Simulation Modelling Practice
+and Theory. 2016 Jan 1;60:144–59.
+39. Dennison PE, Cova TJ, Mortiz MA. WUIVAC: a wildland-urban interface evacuation
+trigger model applied in strategic wildfire scenarios. Natural Hazards. 2007;41:181–99.
+40. Larsen JC, Dennison PE, Cova TJ, Jones C. Evaluating dynamic wildfire evacuation trigger
+buffers using the 2003 Cedar Fire. Applied Geography. 2011 Jan 1;31(1):12–9.
+41. Cova TJ, Theobald DM, Norman JB, Siebeneck LK. Mapping wildfire evacuation
+vulnerability in the western US: the limits of infrastructure. GeoJournal. 2013 Apr
+1;78(2):273–85.
+42. Ronchi E, Rein G, Gwynne SMV, Intini P, Wadhwani R. Framework for an integrated
+simulation system for Wildland-Urban Interface fire evacuation. In 2017 [cited 2020 Jul
+23]. p. 119–34. Available from: http://lup.lub.lu.se/record/1840add0-243c-40b1-a60c-
+e7f7e2be3b51
+43. Nguyen C, Schlesinger KJ, Han F, Gür I, Carlson JM. Modeling Individual and Group
+Evacuation Decisions During Wildfires. Fire Technol [Internet]. 2018 Sep 21 [cited 2018
+Oct 3]; Available from: https://doi.org/10.1007/s10694-018-0770-7
+44. Chen X, Meaker JW, Zhan FB. Agent-Based Modeling and Analysis of Hurricane
+Evacuation Procedures for the Florida Keys. Nat Hazards. 2006 Jul;38(3):321–38.
+45. Stephen Wong SS. Understanding Evacuee Behavior: A Case Study of Hurricane Irma.
+2018 [cited 2021 Mar 31]; Available from: https://escholarship.org/uc/item/9370z127
+46. Cutter S, Barnes K. Evacuation behavior and Three Mile Island. Disasters. 1982;6(2):116–
+24.
+47. Akabayashi A, Hayashi Y. Mandatory evacuation of residents during the Fukushima
+nuclear disaster: an ethical analysis. Journal of Public Health. 2012 Aug;34(3):348–51.
+48. Do XB. Fukushima Nuclear Disaster displacement: How far people moved and
+determinants of evacuation destinations. International Journal of Disaster Risk Reduction.
+2019 Feb;33:235–52.
+
+===== PAGE 41 =====
+
+Zhao and Wong 40
+49. Kumar K. Dijkstra Priority Queue [Internet]. 2020 [cited 2020 Jul 19]. Available from:
+https://github.com/cb-cities/sp
+50. City of Berkeley. Red Flag Warning for the Berkeley Hills [Internet]. 2020 [cited 2021 Mar
+31]. Available from:
+https://www.cityofberkeley.info/City_Manager/Press_Releases/2020/2020-10-
+20_Red_Flag_warning_for_the_Berkeley_hills.aspx
+51. United States Forest Service. Wildland-Urban Interface Fire Dynamics Simulator (WFDS)
+[Internet]. 2013 [cited 2020 Jul 19]. Available from:
+https://www.fs.fed.us/pnw/fera/wfds/simulation_models.shtml
+52. Ryan D. Map of Oakland Hills Fire [Internet]. 2013 [cited 2020 Jul 19]. Available from:
+http://djjr-courses.wikidot.com/soc128:project13-fires
+53. Alameda County Assessor’s Office. The Assessor’s Use Codes [Internet]. 2005 [cited 2020
+Jul 19]. Available from: https://www.acgov.org/MS/prop/useCodeList.aspx
+54. Alameda County Data Sharing Initiative. Parcels [Internet]. 2020 [cited 2020 Jul 19].
+Available from: https://data.acgov.org/
+55. Xie C, Turnquist MA. Lane-based evacuation network optimization: An integrated
+Lagrangian relaxation and tabu search approach. Transportation Research Part C: Emerging
+Technologies. 2011 Feb;19(1):40–63.
+56. Brachman ML, Church R, Adams B, Bassett D. Wayfinding during a wildfire evacuation.
+Disaster Prevention and Management: An International Journal. 2019 Jan 1;29(3):249–65.
+57. Chen YY, Yusef Shafi S, Chen YY, Shafi SY, Chen YY. Simulation Pipeline for Traffic
+Evacuation in Urban Areas and Emergency Traffic Management Policy Improvements
+[Internet]. Feb, 2020. Available from: http://arxiv.org/abs/2002.06198
+58. Pel AJ, Bliemer MCJ, Hoogendoorn SP. A review on travel behaviour modelling in
+dynamic traffic simulation models for evacuations. Transportation. 2012 Jan;39(1):97–123.
+59. Social Security Administration. OASDI Beneficiaries by State and ZIP Code [Internet].
+2019 [cited 2021 Mar 31]. Available from:
+https://www.ssa.gov/policy/docs/statcomps/oasdi_zip/2019/ca.html
+60. Dalle O. On reproducibility and traceability of simulations. In: Proceedings of the 2012
+Winter Simulation Conference (WSC). 2012. p. 1–12.
+61. Lindell M, Murray-Tuite P, Wolshon B, Baker EJ. Large-scale evacuation. New York:
+Routledge; 2019.
+62. Comfort L, Soga K, Stacey M, McElwee M, Ecosse C, Dressler G, et al. Collective Action
+in Communities Exposed to Recurring Hazards [Internet]. Natural Hazards Center; 2019
+[cited 2020 Jul 25]. Report No.: QR300. Available from:
+
+===== PAGE 42 =====
+
+Zhao and Wong 41
+https://hazards.colorado.edu/quick-response-report/collective-action-in-communities-
+exposed-to-recurring-hazards
+63. So SK, Daganzo CF. Managing evacuation routes. Transportation Research Part B:
+Methodological. 2010 May;44(4):514–20.
+64. Soga K, Comfort L, Zhao B, Lorusso P, Soysal S. Integrating Traffic Network Analysis and
+Communication Network Analysis at a Regional Scale to Support More Efficient
+Evacuation in Response to a Wildfire Event [Internet]. Berkeley, USA: University of
+California Institute of Transportation Studies; 2021 Mar [cited 2021 Mar 31]. Available
+from: https://berkeley.app.box.com/s/4y0uozbbtz5zwcct34fh4bvuga46a9t4
+65. McCarthy GJ, Tolhurst KG, Victoria, Fire Management. Effectiveness of broadscale fuel
+reduction burning in assisting with wildfire control in parks and forests in Victoria. East
+Melbourne: Dept. of Natural Resources and Environment; 2001.
+66. Hakes RSP, Caton SE, Gorham DJ, Gollner MJ. A Review of Pathways for Building Fire
+Spread in the Wildland Urban Interface Part II: Response of Components and Systems and
+Mitigation Strategies in the United States. Fire Technol. 2017 Mar;53(2):475–515.
+67. Alchera Inc. Alchera [Internet]. 2020 [cited 2020 Mar 31]. Available from:
+https://alcherainc.com/en/
+68. Cal Fire. Wildfire is coming... Are you ready? [Internet]. 2019 [cited 2020 Mar 31].
+Available from: https://www.readyforwildfire.org/prepare-for-wildfire/ready-set-go/
+69. FHWA. Highway Statistics 2019. Trailer and semi-trailer registrations. [Internet]. 2020
+[cited 2020 Nov 28]. Available from:
+https://www.fhwa.dot.gov/policyinformation/statistics/2019/
+70. Radeloff VC, Helmers DP, Kramer HA, Mockrin MH, Alexandre PM, Bar-Massada A, et
+al. Rapid growth of the US wildland-urban interface raises wildfire risk. Proc Natl Acad Sci
+USA. 2018 Mar 27;115(13):3314–9.
+71. Thomas DS, Butry DT. Areas of the U.S. wildland–urban interface threatened by wildfire
+during the 2001–2010 decade. Nat Hazards. 2014 Apr;71(3):1561–85.
+72. Firesafe Marin. Wildfire Evacuation Checklist. Marin County [Internet]. 2019 [cited 2021
+Nov 28]. Available from:
+https://www.firesafemarin.org/images/documents/resources/evac/FIRESafe_MARIN_Evac
+uation_Checklist.pdf
+73. Firesafe Marin. Wildfire Evacuation Preparedness [Internet]. 2020 [cited 2020 Nov 28].
+Available from: https://www.firesafemarin.org/evacuation
+74. City of Berkeley. Off Street Parking (Garages & Lots [Internet]. 2020 [cited 2021 Mar 31].
+Available from:
+
+===== PAGE 43 =====
+
+Zhao and Wong 42
+https://www.cityofberkeley.info/Public_Works/Transportation/Off_Street_Parking_(Garage
+s_and_Lots).aspx
+75. BART. 2015 BART Station Profile Study [Internet]. Bay Area Rapid Transit; 2015.
+(Station Profiles - Home Origins). Available from:
+https://www.bart.gov/sites/default/files/docs/StationProfile2015_HomeOriginOnePagers_re
+v0629.pdf
+76. Anderson S, Barford C, Barford P. Five Alarms: Assessing the Vulnerability of US Cellular
+Communication Infrastructure to Wildfires. In: Proceedings of the ACM Internet
+Measurement Conference. 2020.
+77. California Public Utilities Commission (CPUC). CPUC Requires Wireless Companies to
+Better Serve Customers in Emergencies [Internet]. 2020 [cited 2021 Mar 31]. Available
+from:
+https://docs.cpuc.ca.gov/PublishedDocs/Published/G000/M343/K979/343979403.PDF
+78. Xie Y, Liu X-Y, Kong L, Wu F, Chen G, Vasilakos AV. Drone-Based Wireless Relay
+Using Online Tensor Update. 2016;8.
+79. Abuelela M, Olariu S. Taking VANET to the clouds. 2010;8.
+80. Flötteröd Y-P, Erdmann J. Dynamic Reroute Modeling for Emergency Evacuation: Case
+Study of Brunswick City, Germany. 2018;11.
+81. Elbery A, Hassanein HS, Zorba N, Rakha HA. VANET-Based Smart Navigation for
+Emergency Evacuation and Special Events. In: 2019 IEEE 24th International Workshop on
+Computer Aided Modeling and Design of Communication Links and Networks (CAMAD)
+[Internet]. Limassol, Cyprus: IEEE; 2019 [cited 2020 Nov 24]. p. 1–6. Available from:
+https://ieeexplore.ieee.org/document/8858502/
+82. Han R, Tolan M, McCloskey R, Cleary F. A NOVEL EMERGENCY EVACUATION
+ALGORITHM FOR VEHICLES BASED ON VEHICLE-TO-VEHICLE (V2V)
+COMMUNICATION. 2019;10.
+83. FEMA. Planning Considerations: Evacuation and Shelter-in-Place Guidance for State,
+Local, Tribal, and Territorial Partner [Internet]. 2019 [cited 2021 Mar 31]. Available from:
+https://www.fema.gov/sites/default/files/2020-07/planning-considerations-evacuation-and-
+shelter-in-place.pdf
+84. Wilmot CG, Meduri N. Methodology to Establish Hurricane Evacuation Zones.
+Transportation Research Record. 1922;9.
+85. Wong S, Martin I, Halpern J. KENSINGTON EVACUATION RESEARCH PROJECT
+FINAL REPORT. 2020;124.
+86. City of Berkeley. Wildfire Evacuation [Internet]. 2020 [cited 2021 Mar 31]. Available
+from: https://www.cityofberkeley.info/WildfireEvacuation/
+
+===== PAGE 44 =====
+
+Zhao and Wong 43
+87. FEMA. Integrated Public Alert & Warning System. Federal Emergency Management
+Agency [Internet]. 2020 [cited 2021 Mar 31]. Available from:
+https://www.fema.gov/emergency-managers/practitioners/integrated-public-alert-warning-
+system
+88. OnSolve. CodeRED for IPAWS [Internet]. 2020 [cited 2021 Mar 31]. Available from:
+https://www.onsolve.com/landing/codered-for-ipaws/
+89. Todd Z, Trattner S, McMullen J. Ahead of Camp Fire Anniversary, New Details Emerge of
+Troubled Evacuation. PBS - Frontline [Internet]. 2019 Oct 25; Available from:
+https://www.pbs.org/wgbh/frontline/article/camp-fire-anniversary-new-details-troubled-
+evacuation/
+90. Wolshon B. “One-Way-Out”: Contraflow Freeway Operation for Hurricane Evacuation.
+Nat Hazards Rev. 2001 Aug;2(3):105–12.
+91. Tuydes H, Ziliaskopoulos A. Tabu-Based Heuristic Approach for Optimization of Network
+Evacuation Contraflow. Transportation Research Record. 2006;12.
+92. Theodoulou G, Wolshon B. Alternative Methods to Increase the Effectiveness of Freeway
+Contraflow Evacuation. Transportation Research Record. 2004 Jan;1865(1):48–56.
+93. Lim E, Wolshon B. Modeling and Performance Assessment of Contraflow Evacuation
+Termination Points. Transportation Research Record. 2005;11. \
+94. May, A.D. (1990), Traffic Flow Fundamentals, Prentice Hall, Englewood Cliffs, NJ.

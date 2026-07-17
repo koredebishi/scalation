@@ -1,0 +1,601 @@
+===== PAGE 1 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 1
+Hybrid Mesoscopic-Microscopic Traffic Simulation
+Wilco Burghout*1, Haris N. Koutsopoulos2, Ingmar Andréasson1
+1 Centre for traffic simulation (CTR), Royal Institute of Technology, SE-10044 Stockholm, Sweden.
+{wilco|ingmar}@infra.kth.se
+2Department of Civil and Environmental Engineering, Northeastern University
+437 Snell Engineering Center, Boston, MA 02115-5000, haris@coe.neu.edu
+* Corresponding author: wilco@infra.kth.se
+Submitted for publication in Transportation Research Record, March 2005
+6092 words (Abstract+Text+References) + 1 table and 4 figures (5 X 250) = 7342 words
+
+===== PAGE 2 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 2
+Hybrid Mesoscopic-Microscopic Traffic Simulation
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson
+Abstract
+Traffic simulation is an important tool for modeling the operations of dynamic traffic systems. While microscopic
+simulation models provide a detailed representation of the traffic process, macroscopic and mesoscopic models
+capture traffic dynamics of large networks, in lesser detail, but without the problems of application and calibration
+of microscopic models. In this paper we present a hybrid mesoscopic-microscopic model that applies microscopic
+simulation to areas of specific interest, while simulating a large surrounding network in lesser detail with a
+mesoscopic model. We identify requirements that are important in order for a hybrid model to be consistent across
+the models at different levels of detail. These requirements vary from network and route-choice consistency to
+consistency of traffic dynamics at the boundaries of the micro and meso submodels. We propose an integration
+framework that satisfies these requirements. A prototype hybrid model is used to demonstrate the application of the
+integration framework and the solution of the various integration issues. The hybrid model integrates MITSIMLab,
+a microscopic traffic simulation model, and Mezzo, a newly developed mesoscopic model. The hybrid model is
+applied in two case studies. The results are very promising and support both the proposed architecture and the
+importance of integrating micro and meso models.
+Keywords: Traffic simulation, Traffic models, Mesoscopic, Microscopic, Hybrid
+
+===== PAGE 3 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 3
+1. INTRODUCTION
+Traffic simulation has become very popular for modeling the operations of dynamic traffic systems. Traffic
+simulation models are macroscopic, mesoscopic or microscopic. Macroscopic (macro) models (e.g. Strada (1),
+Metacor (2)) tend to model traffic as a continuous flow, often using formulations based on hydrodynamic flow
+theories. Mesoscopic (meso) models (e.g. DynaMIT (3), DYNASMART (4)) model individual vehicles, but at an
+aggregate level, usually by speed-density relationships and queuing theory approaches. Microscopic (micro) models
+(e.g. MITSIMLab (5), Vissim (6)) capture the behavior of vehicles and drivers in great detail, including interactions
+among vehicles, lane changing, response to incidents, and behavior at merging points. Because of this level of detail
+in the representation of traffic dynamics, microscopic models are appropriate for evaluation of ITS systems at the
+operational level, since the representation of many dynamic traffic management systems requires such fine-grained
+modeling of the traffic process.
+However, the application of micro simulation is not without problems. Due to the detailed nature of the
+models, the preparation of input data (e.g. network coding and representation) can be very time consuming and
+tedious. In addition, micro models are highly sensitive to errors or variation in input demand data, especially under
+congested conditions. Finally, and due to the complicated structure of the models involved, calibration is not trivial.
+Furthermore, for these reasons and due to their complexity, microscopic models are usually applied to smaller
+networks and may suffer from boundary effects. On the other hand, macro and meso models usually have fewer
+parameters to calibrate and are less sensitive to errors in network coding or demand variations. However, due to
+their more aggregate nature, such models are limited in their ability to capture the detailed behavior needed to study
+traffic networks with dynamic traffic management capabilities.
+The objective of the paper is to present a methodology for the systematic integration of meso and micro
+simulation models into a single hybrid model. Such a hybrid model has the advantages of both types of simulation
+since it combines high fidelity micro simulation in areas of particular interest, with meso simulation of a large
+surrounding area. Another advantage of the integration is that it reduces the computational requirements. Overall,
+integration enables the simulation of large scale networks, incorporating the effects of local micro phenomena, with
+increased accuracy and validity, while reducing the required data collection and calibration effort of the overall
+model.
+The remainder of the paper is organized as follows. Section 2 identifies the main requirements for a
+successful hybrid simulation model. Section 3 introduces the integration framework and proposes solutions for the
+various issues and requirements identified in section 2. Section 4 presents results from two case studies that
+illustrate the consistency issues and the importance of integration. Finally, Section 5 draws conclusions and
+summarizes the paper.
+2. MESO-MICRO INTEGRATION REQUIREMENTS
+An important aspect in developing a hybrid meso-micro traffic simulation model is the identification and
+implementation of conditions for consistent interfaces between the meso and micro simulation components of the
+simulation model. These conditions range from structural compatibility issues in terms of modeling traffic flows in
+the two models, to compatibility of route choice.
+Previous studies of dynamic hybrid models include Micmac (7), Hystra (8), (9), and Micro-Macro link
+(10). These models combine dynamic macro with micro simulation. They focus on compatibility issues that arise
+from combining two models that represent traffic flow at two different resolutions. The macro models represent
+traffic as continuous flows, while the micro models represent individual vehicles. The proposed approaches vary in
+how they address the problem of converting continuous flows into individual vehicles and vice-versa at the macro-
+micro boundaries. In (7) the micro model is adapted to fit a number of conditions regarding the fundamental
+diagrams, produced by the macro model, while in (8), (9) first a micro model is derived from the LWR theory (11)
+(12), in order to fit the macro model which is also based on the LWR theory. This model showed good equivalence,
+but was difficult to extend. The second model presented in (8), (9) is based on Newell’s optimum velocity model
+(13). In (10) the micro model (IDM) and macro model (GFT) are derived from gas-kinetic type differential
+equations.
+However, restricting the micro model to fit the macro model, or deriving the micro model from macro
+equations, may limit the capability of the model since the micro-macro equivalence usually only holds during steady
+state flows. Since only the car-following model is derived or adapted to fit the macro model, important aspects such
+as lane-changing are not part of the equivalence, and neither is gap-acceptance and stochasticity of user behavior. It
+is not clear how these aspects can be introduced (although (9) shows how stochastic desired speeds can be
+introduced) while maintaining equivalency, and in (7),(8) and (9) the use of ‘transition cells’ is reported to be
+
+===== PAGE 4 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 4
+necessary. Furthermore, the approach may constrain the type of car following models that can be used, as the range
+of multi-regime models such as MITSIMLab (5), Aimsun (14) and Paramics (15), as well as psycho-physical
+models such as Vissim (6) cannot be derived from macro models, nor can their steady state properties be
+theoretically derived.
+The approach proposed here for the development of a hybrid model focuses on the integration of meso with
+micro models. Since meso models represent flow as individual vehicles, earlier problems of
+aggregating/disaggregating the flow are easier to deal with. The main requirements for the development of a
+micro/meso hybrid traffic simulation model include:
+Consistency in route choice and network representation
+One of the most basic conditions is general consistency of the two models in their representation of the road
+network, paths, and route choice. The route choice needs to be consistent to ensure that vehicles will make the same
+decision given the same route choice situation (pre-trip or en-route), regardless if they are in the micro or the meso
+model. This means also that the representation of the alternative paths needs to be consistent throughout the hybrid
+model, as well as the travel times (link costs).
+Consistency of traffic dynamics at meso-micro boundaries
+Besides the consistency of network representation, the consistency of traffic dynamics at the boundaries between the
+meso and micro submodels needs to be ensured. This means that traffic dynamics upstream and downstream of the
+boundaries need to be consistent. For instance, when a queue is forming downstream of the boundary point, and
+grows until it reaches the boundary, it should continue in the other submodel, upstream of the boundary, in a similar
+way as it would if the boundary had not been there.
+Consistency in traffic performance for meso and micro submodels
+The two submodels need to be consistent with each other with regard to the results they produce. Ideally, for those
+facilities that can be simulated sufficiently well by both models, the results, in terms of common outputs, such as
+travel times, flows, speeds, densities, etc, should be similar. This implies the need for consistent calibration of the
+two models.
+Transparent communication and data exchanges
+The submodels exchange large amounts of data conveying vehicle characteristics, and downstream traffic
+conditions. This requires an efficient synchronization and communication paradigm, and a design that minimizes the
+amount and frequency of data exchange. Otherwise the communication overhead may become very large. On the
+other hand, aggregation and disaggregation of information at the boundaries may introduce complications, and
+should thus be avoided (see (7),(8), (9), (10)).
+3. INTEGRATION FRAMEWORK
+In this section we propose an implementation architecture that facilitates the consistency between the submodels and
+discusses alternative modeling approaches to meet the requirements identified in Section 2.
+3.1 Architecture
+Simulation models are in general a synthesis of a number of supply and demand models. Meso and micro models
+use different approaches to model traffic dynamics and different levels of aggregation for network representation.
+However, since they both use an individual vehicle-based representation of flow, they usually employ similar travel
+behavior models (e.g. route choice models). Hence, the route choice component should be shared by both models,
+and operate on the complete network graph, including both the micro and meso areas. The paths should be defined
+over this common network graph, and the link travel time database should cover the entire network, and also be
+shared by both models.
+The proposed architecture consists of a module, outside the meso and micro models, that contains the
+common elements: a database with the network graph, the travel time tables, the set of paths and the origin-
+
+===== PAGE 5 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 5
+destination (OD) flows, as well as a travel behavior component with route choice models and path generation
+algorithms.
+<insert figure 1 here>
+Figure 1a presents the proposed integration architecture. The travel behavior component in the common
+module uses the database that contains the complete network graph, link travel times and known paths for the entire
+network. Both the micro and meso models supply descriptions of their subnetworks, from which the network graph
+is constructed. Each time a vehicle makes a route choice (whether in micro or meso), the common module is
+consulted. For the common route choice module to operate properly, the meso and micro models need to update the
+travel time database regularly with the link travel times in their subnetwork.
+The common module also includes the OD matrix for the entire network. To simplify the information
+exchange and facilitate a transparent data input interface, it is assumed that all origin and destination nodes in the
+network belong to the meso subnetwork. This assumption is by no means restrictive, since an origin or destination
+node in the micro area can always be designated as a boundary node in meso connected directly to the micro
+subnetwork.
+The above architecture is applicable in the case where the two simulation models to be integrated have an
+open architecture or are new models, developed with integration in mind. In integrating existing models, that are not
+as flexible, the implementation of the integration framework needs to be adjusted to minimize inter-model
+communication, and use functionalities that are implemented separately in each model in a consistent way. For
+example, the simulation models may have their own route choice models. In this case, consistent route choice
+behavior across submodels requires two conditions: a) route choice models with the same structure and parameters
+in the two submodels, and b) consistent path choice set (defined over the entire network). To maintain the required
+consistency in this case, the micro and meso networks are enhanced with the addition of virtual links that correspond
+to the paths in the remaining network.
+More specifically the meso network includes virtual links for each path connecting boundary nodes in the
+micro network. This representation guarantees that each relevant path through the micro model is represented
+correctly in the meso route choice. The meso model collects travel times for the virtual links, and uses them in the
+route choice like any other link in the network. Similarly the micro network is expanded with the addition of micro
+virtual links to the micro subnetwork. The virtual links allow the micro model to deal with en-route choice in the
+micro subnetwork. Since each path from an exit point in the micro network to a destination in the meso network is
+represented by a virtual link in the micro model, a change of route for a vehicle in the micro sub-network can
+effectively mean a different exit point into the meso network. There are no limitations in the framework regarding
+the number of virtual links, nor the recalculation of the virtual links due to changing traffic conditions.
+The above considerations simplify the initial architecture considerably in the case where integration of
+existing simulation models takes place (Figure 1b). Under this architecture, and based on the OD matrix
+representation discussed earlier, the meso model is solely responsible for all pre-trip decisions, while en-route
+decisions are the responsibility of the respective subnetwork and paths inside the meso model. This architecture has
+a number of practical advantages compared to the initial one. While the initial architecture would be preferable in
+the case of a new meso-micro model, it would require large amounts of communication overhead when combining
+two existing models. With the above modifications this overhead is avoided.
+3.2 Modeling for Consistency
+Assuming a common network graph, the architecture proposed in section 3.1 ensures route choice consistency.
+However, several aspects still need to be addressed at the modeling level, especially at the interface between the
+micro and meso areas.
+Network representation
+Problems may occur if the level of detail in micro and meso subnetworks is not consistent. Networks for micro
+simulation include (almost) all roads in the area of study. On the other hand, meso networks are much larger and
+may include only a subset of the roads. When these networks are combined into a general network there are two
+problems: a) connectivity, and b) capacity at the interfaces.
+The connectivity problem arises when not all links in one model (micro) are present in the other (meso) at
+the boundary of the two models (this may also affect the correct definition of paths over the entire network). For the
+same reason, the micro capacity at the boundary interface may be different than the meso capacity. This can lead to
+
+===== PAGE 6 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 6
+very biased results unless the level of network aggregation across the boundaries is both consistent and appropriate.
+Of course, an easy and practical solution to this problem may be to increase the level of detail in the meso
+subnetwork where it connects to the micro subnetwork, and maybe decrease the level of detail in the micro
+subnetwork, near the boundaries with the meso one.
+Modeling traffic dynamics at meso-micro boundaries
+The limited literature on hybrid simulation models focuses on aggregation/disaggregation issues between the macro
+and micro representations of traffic (see (7),(8), (10), (16)). In our case these issues are avoided by integrating two
+models that have a vehicle-based representation of traffic flows. However, other issues concerning the interfaces
+between the models remain. In principle, the main sources of potential inconsistencies at the interface between the
+meso and micro models are:
+• Location of boundaries
+• Queue formation and representation
+• Vehicle attributes (i.e. determination of speeds and accelerations of vehicles crossing the micro/meso
+boundaries)
+Location of boundaries. Due to the fact that the meso and micro submodels may represent links and intersections
+differently, the positioning of the boundaries between them should be carefully considered. Placing them at nodes in
+the overall network would imply that some of the legs of an intersection would be at meso and some at micro level.
+This creates the problem of having to deal with the intersection behavior (signal controlled or otherwise) at different
+levels of detail. For instance, gap acceptance models in the micro module require vehicles’ positions, speeds and
+gaps in the opposing flows. This information though, is not typically available at the mesoscopic level. It is
+recommended therefore, that the boundaries be located in the middle of links, with exactly one entry and one exit
+segment.
+Queue formation and representation. The placement of boundaries is also dependent on the homogeneity of
+traffic conditions. Typically micro models, due to their level of detail, represent lane-specific queues. Meso models
+on the other hand, usually do not have lanes. If this is the case, a queue on one lane in micro, even if the other lanes
+remain open, will block the boundary node completely, unless the exchange of vehicles at the boundary is taking
+place properly. The virtual links in the meso subnetwork play an important role in solving the problem of
+inconsistent queue representation. Virtual links that represent paths that can only use the blocked lanes will be
+blocked, while virtual links representing paths that use open lanes will have available capacity and allow the proper
+advancement of the corresponding vehicles.
+Crossing vehicle attributes. The attributes of the vehicles as they cross the boundaries need to be properly
+determined in both directions (micro (cid:1) meso) and (meso (cid:1) micro). Attributes such as speeds, accelerations,
+headways, etc should be consistent with the prevailing conditions in the new segment the vehicle is moving to,
+otherwise unnecessary shockwaves may propagate upstream.
+On the boundary from the meso to the micro (meso (cid:1)(cid:1)(cid:1)(cid:1) micro) submodel information is exchanged in both
+directions: from meso to micro information about vehicles (with a certain speed and at certain time intervals) needs
+to be communicated; from micro to meso information about blocking of boundaries and downstream density needs
+to be communicated. If the entry to the micro link (downstream of the boundary point) is blocked, the meso needs to
+stop vehicles from exiting. The micro model informs meso when the blockage is removed, so that vehicles can start
+flowing (over that specific boundary) again. The micro also sends the density in the vicinity of the boundary to
+meso, where it is used to calculate the speed of the shockwave that propagates upstream.
+A more complicated issue is the generation of information that is needed in the micro representation of
+traffic, but missing in the meso. The micro characteristics that need to be generated at the entry to the micro model
+are divided into vehicle/driver attributes and model variables. Attributes such as desired speed are generated
+independently in micro based on the distribution of these characteristics in the general driver population assumed by
+the micro model. Model variables, such as the vehicle’s speed, acceleration and time headway to the vehicle in front
+need to be in accordance with the traffic situation upstream and downstream of the boundary.
+The variables that need to be assigned values at the entry of a vehicle from the meso into the micro models are
+usually: lane, time-headway to the vehicle in front, speed and acceleration. From the meso model the time-headway
+is determined, but not the speed, acceleration or lane. Based on the type of vehicle and the vehicle’s path, a set of
+
+===== PAGE 7 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 7
+feasible lanes is specified. The vehicle is loaded on the lane with the largest available headway (space). The speed
+assigned to the vehicle according to the following algorithm:
+• Regime 1 (bound traffic): t < t <= t
+1 h 2
+V = V
+front
+• Regime 2 (partially bound traffic): t < t <= t
+2 h 3
+a = ( t - t )/( t -t )
+h 2 3 2
+V = a *V + (1-a )*V
+desired front
+• Regime 3 (unbound traffic): t > t
+h 3
+V = V
+desired
+Where,
+t = threshold, to be calibrated
+i
+t = time headway (s)
+h
+V = speed (km/h)
+V = speed of vehicle in front (km/h)
+front
+V = desired speed (km/h)
+desired
+The above approach was tested with actual data in (17). Measurements of speeds and time-headways on an urban
+freeway in Stockholm show high correlation of speeds between consecutive vehicles on the same lane, in the case of
+small headways (t = 0.5 seconds, t = 2.5 seconds). This correlation decreases with increased time headways, and
+1 2
+remains at a constant low level beyond t = 7.5 seconds. In almost all micro models, an initial acceleration rate of 0
+3
+m/s2 is assigned to the vehicles that enter the network. The assignment of zero acceleration to the vehicles crossing
+the micro boundary suffices for the hybrid model as well.
+In the interface from the micro to the meso model (micro (cid:1)(cid:1)(cid:1)(cid:1) meso), similar conditions need to be met as
+mentioned in the meso to micro case. In the first instance the meso needs to inform the micro each time the
+downstream meso link becomes blocked or unblocked, so that the micro model can stop/start sending vehicles at the
+right moments. In addition to the blocking, the vehicles in micro that move towards the exit to meso, need to react to
+the downstream traffic conditions, as they would if the downstream link were micro as well. In that case, the
+vehicles would react to vehicles in front, using their car-following logic, and those vehicles would react to vehicles
+in front of them, etc. In the meso model, however, the position and detailed behavior of vehicles is not usually
+modeled. But it is known when the latest arrival of a vehicle was, and the (average) speed it was assigned. Using this
+information a virtual vehicle is projected in the “imaginary” continuation of the micro link, and vehicles in micro
+that are near the exit react to the virtual vehicle, as if it were a normal vehicle in front of them. This idea can also be
+found (in a slightly different form) in (8) and (7). An obvious refinement is to use lane-specific virtual vehicles.
+3.3 Communication/Synchronization
+The meso and micro models need to communicate with each other to hand over vehicles that cross the boundaries,
+and inform each other of traffic conditions downstream of the boundaries, so that traffic upstream can react to these.
+Hence, in order to facilitate the proper modeling of the traffic dynamics at the interfaces, as outlined above, the
+following information is exchanged between the submodels:
+1. vehicles passing the boundaries between the models and their characteristics
+2. link blocking/unblocking information
+3. density on micro segments
+4. information for virtual vehicles (speed and entry time of vehicle that last crossed the border)
+4. CASE STUDIES
+Two case studies are used to illustrate the points made in this paper. The consistency issues and their resolutions are
+discussed through a case study with a small artificial network. The importance of integration in the quality of the
+results is illustrated in a second case study using an actual network from Stockholm. The hybrid model used in the
+case studies was developed using two simulation models: MITSIMLab and Mezzo.
+MITSIMLab is a high fidelity micro model, which has been applied in a number of studies, and has been
+calibrated and validated in both USA and Sweden (18, 19). Mezzo is a new event-based mesoscopic model that was
+developed in the context of this research (20). A network in Mezzo consists of nodes and links. The links are
+
+===== PAGE 8 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 8
+characterized by the number of lanes and length. Each link has a speed/density function associated with it, that
+determines the traversal speed of vehicles entering the link, given the density at the time of entry. At the nodes, one
+stochastic queue-server for each turning movement regulates the transfer of vehicles from one link to another. The
+queue at the downstream end of the link consists of vehicles that are ready to exit (given their entry time and
+traversal speed), and occupies space. The density on the part of the link not occupied by the queue (running part) is
+used in the calculation of the traversal speeds. Queues blocking upstream of a turning movement can block access
+to other turning movements, if they grow beyond a predetermined length.
+The propagation of queue-fronts is modeled based on the shockwave theory (11), (12). The shockwave
+speed of the queue front is calculated for cases in which a queue dissipates in the downstream segment. When the
+dissipation reaches the current segment, the flow and density in the downstream segment and current segment are
+used to calculate the propagation speed of the start-up shockwave. In addition, the downstream density is used to
+determine the speed of the vehicles once they start moving towards the stopline. Using these two speeds, the delay to
+each vehicle is calculated.
+The two submodels communicate via PVM (21), which makes it possible to run Mezzo and MITSIMLab
+on different computers. Since Mezzo is event-based, and has thus a continuous representation of time, the message
+passing is also used for synchronizing with the micro time-steps. A message with the relevant information for
+Mezzo is sent at each MITSIMLab time-step, and upon receipt, Mezzo sends back a message with the relevant
+information for MITSIMLab. These messages from MITSIMLab are therefore treated as external events, and are
+processed just like any other event.
+4.1 Case Study I
+We will illustrate the behavior of the hybrid model using a simple network operating under incident conditions. In
+the first case the incident takes place in the micro part of the network and in the second in the mezzo part. We focus
+our discussion, specifically on the way queue build-up and dissipation propagates across the boundary, both in the
+meso-to-micro and micro-to-meso direction.
+The network consists of a single two-lane road that is 5 km long, divided into 10 segments of 500 meter
+(Figure 2). The first five segments are within Mezzo, followed by two segments in MITSIMLab, and finally three
+Mezzo segments.
+<insert figure 2 here>
+The free flow speed is 100 km/h. A constant demand of 3000 veh/h is applied for a simulation time of 1 hour (3600
+seconds). The locations of the incidents are indicated in Figure 2. The first scenario has the incident on the
+boundary between segments 5 and 6 in MITSIMLab, and the second on the boundary between segments 8 and 9 in
+Mezzo. The incidents occur 20 minutes into the simulation and completely block the link for 5 minutes. Mezzo was
+calibrated using data obtained from MITSIMLab, run independently on the same network, under a variety of
+demand loads. The parameters in Mezzo that require calibration include the capacity of the servers at the nodes and
+the parameters of the speed-density relationship used to determine the speed of the vehicles. (22).
+<insert figure 3 here>
+Figure 3a shows the cumulative outflow (veh/lane) for segments 0 to 5 under the first scenario. The cumulative flow
+shows that the propagation of changes in flow in both queue build-up and queue-dissipation is smooth and consistent
+across the meso-to-micro and micro-to-meso boundaries. As the queue grows it starts blocking upstream segments
+as shockwaves start traveling upstream. Figure 3b illustrates the evolution of density over time in the five segments
+of interest. The density increases in segment 5 (MITSIMLab) after the incident takes place. The queue reaches the
+boundary with the mezzo segment 4 approximately when the incident is cleared, causing the queue on segment 5 to
+dissipate. However, the end of the queue still exists and that causes the density in segment 4 to remain high for some
+time, also causing upstream segments to get blocked. As in the cumulative flow plot, it can be observed that queue
+formation and dissipation behave properly over the boundaries. There are some differences between the Mitsim and
+Mezzo segments. The queue dissipation shockwave propagates faster in Mezzo than in Mitsim. This is possibly
+due to the simplified representation of acceleration and driver reaction delay time in Mezzo.
+It can also be noted that when the queue front reaches the queue back on the last congested segment
+(segment 1), it causes an increase in the density in segment 2. This may be a result of the simplified traffic dynamics
+representation in the Mezzo model, which does not take into account the vehicles that approach the end of the queue
+
+===== PAGE 9 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 9
+but never come to a complete stop. Because of this simplification, the outflow of this segment is larger, resulting in
+a second ‘bump’ in the density of the downstream segment. In general, the results indicate that the queue
+propagation and dissipation behavior is consistent across the Mezzo-MITSIMLab boundary.
+In the second scenario a similar type incident is introduced at the exit of segment 8 in Mezzo. In this
+scenario queue behavior similar to scenario 1 (Figure 3) occurs. One difference that was observed is the steep
+increase of the outflow from (Mezzo) segment 8 at the end of the incident, whereas the increase in flow on
+(MITSIMLab) segment 5 is smoother and slower. This can be explained by the fact that the shockwave theory which
+is used for modeling the queue dissipation in Mezzo, assumes immediate changes in speed, while the vehicles in
+MITSIMLab are bound to their acceleration limits (and reaction times). Another reason may be the quality of the
+calibration of the Mezzo speed/density function.
+4.2 Case Study II
+The objective of the second case study is to compare the accuracy of the results of the hybrid model against actual
+measurements (for more details about this case study see (22)). The hybrid model (MiMe) is used to simulate the
+operations on a mixed freeway/urban network in the north of Stockholm (Brunnsviken). MITSIMLab has been
+calibrated and validated independently for the same network (see (18)).
+<insert figure 4 here>
+The network (Figure 4) is divided into the meso part in the north, which consists mainly of freeways, and micro part
+in the south, which consists of a number of complex intersections with coordinated signal control and a large
+roundabout. The area is highly congested during the studied period, which is the morning peak, 6:45 – 9:00 a.m.
+Sensor count data from 12 locations across the network, averaged over 15 minute intervals, was available from May
+2000. The OD matrix used for this case study was estimated in (18).
+The performance of the hybrid model is compared against MITSIMLab and Mezzo using the RMSNE
+(Root Mean Squared Normalized Error) relative to observed flow values and Theil inequality coefficient U( (23),
+(24) ). The U error proportions UM, US, and UC are also used to measure the systematic (bias), variance, and non-
+systematic (covariance) proportions of the errors. Table 1 summarizes the results. MITSIMLab corresponds to the
+results of the application of MITSIMLab alone, Mezzo to the results of the application of Mezzo alone, and Hybrid
+to the results of the application of the integrated model (MiMe).
+<insert table 1 here>
+The values indicate that, as expected, MITSIMLab performs best. According to the RMSNE values, the hybrid
+model (MiMe) performed better than Mezzo alone, due to the fact that the signal controlled portion of the network is
+now simulated at microscopic detail. The Theil U value indicates that the Mezzo model has a larger systematic error
+than MiMe. To further explore the nature of the differences, Table 1 reports the RMSNE for sensors located in
+different parts of the network (Meso network is the part of the network modeled by Meso in the hybrid model, and
+Micro network is the part of the network modeled by MITSIMLab in the hybrid model). The part of the network
+modeled by MITSIMLab in the hybrid model application is very congested and contains a number of complex
+signalized intersections. The results clearly illustrate the importance of the more detailed representation. Not only
+the accuracy of the simulation improves in the micro network but also in the meso network, presumably due to
+better flow propagation.
+Finally, as expected the computational time for MiMe is far superior compared to the computational time
+required to model the network using MITSIMLab (about 5 times faster). This difference is expected to grow as the
+size of the network increases.
+5. CONCLUSION
+Micro and meso traffic simulation models have different strengths and weaknesses. While micro models provide a
+more detailed representation of the traffic process, meso models are able to capture traffic dynamics of large
+networks, in lesser detail, but without the data requirements and other application problems of micro models. In this
+paper we discussed the requirements for the development of a hybrid meso-micro model which applies micro
+simulations to areas of specific interest, while simulating a large surrounding network in lesser detail with the meso
+model.
+
+===== PAGE 10 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 10
+We proposed an integration framework that satisfies the integration requirements, and discussed a prototype hybrid
+model which integrates MITSIMLab (micro) and a newly developed meso simulation model. In a small case study
+aspects of consistency of traffic dynamics across boundaries of the individual models were demonstrated. The
+importance of hybrid modeling for the quality of the results was illustrated in a second case study using an actual
+network from Stockholm. The results indicate that by modeling specific parts of the network in microscopic detail,
+the quality of the simulation results improve. In addition, the data preparation, calibration efforts, and computing
+time are significantly reduced.
+ACKNOWLEDGMENTS
+The authors would like to thank Professor Ben-Akiva, director of the ITS lab at MIT for making available the
+MITSIMLab program source code, which has been used for creating the implementation of the hybrid model
+presented in this paper.
+REFERENCES
+1. Buisson, C., J.-P. Lebaque, and J.-B. Lesort. A discretized macroscopic model of vehicular traffic flow in
+complex networks based on the Godunov scheme. Presented at CESE'96. Lille, France, 1996.
+2. Elloumi, N., H. Haj-Salem, and M. Papageorgiou. METACOR: A macroscopic Modelling Tool for Urban
+Corridor. Presented at TRIennal Symposium on Transport ANalysis. Capri, 1994.
+3. Ben-Akiva, M.E., et al., eds. Real-time simulation of traffic demand-supply interactions within DynaMIT.
+Transportation and network analysis: current trends. Miscellenea in honor of Michael Florian, ed. M.
+Gendreau and P. Marcotte, Kluwer Academic Publishers: Boston/Dordrecht/London. 19-36, 2002.
+4. Jayakrishnan, R., H.S. Mahmassani, and T.Y. Hu, An Evaluation Tool fo Advanced Traffic Information and
+Management Systems in Urban Networks. Transportation Research C: 2C(3): pp. 129-147, 1994.
+5. Ben-Akiva, M., et al., Simulation Laboratory for Evaluating Dynamic Traffic Management Systems. ASCE
+Journal of Transportation Engineering: 123(4), 1997.
+6. Fellendorf, M. VISSIM for traffic signal optimisation. Presented at Traffic Technology International. Dorking,
+UK, 1996.
+7. Magne, L., S. Rabut, and J.-F. Gabard. Towards an hybrid macro-micro traffic simulation model. Presented at
+INFORMS. Salt Lake City, USA, 2000.
+8. Bourrel, E. and J.-B. Lesort. Mixing Micro and Macro Representations of Traffic Flow: a Hybrid Model Based
+on the LWR Theory. Presented at Transportation Research Board. Washington DC, 2003.
+9. Bourrel, E., Modélisation dynamique de l'ecoulement du traffic routier: du macroscopique au microscopique,
+PhD thesis, L' Institut National des Sciences Appliquées de Lyon, Lyon, 2003,
+10. Helbing, D., et al., Micro- and Macrosimulation of Freeway Traffic. Mathematical and Computer Modelling:
+35(5/6): pp. 517-547, 2002.
+11. Lighthill, M.H. and G.B. Whitham. On kinematic waves II: a theory of traffic flow on long crowded roads.
+Presented at Proceedings of the Royal Society of London, 1955.
+12. Richards, P.I., Shockwaves on the Highway. Operations Research: 4: pp. 42-51, 1956.
+13. Newell, G.F., Non linear effects in the dynamics of car-following. Operations Research: 9, 1961.
+14. Barcelo, J., J. Ferrer, and R. Grau, Microscopic traffic simulation for ATT systems analysis, Universitat
+Politecnica de Catalunya, Barcelona, 1997
+15. Smith, M., et al., Paramics Final Report, University of Edinburgh, Edinburgh, 1994
+16. Kates, R. and A. Poschinger. Investigation of a stochastic disaggregation model. Presented at World Congress
+on Intelligent Transportation Systems. Torino, 2000.
+17. Burghout, W., H. Koutsopoulos, and I. Andreasson, Loading of vehicles in microscopic simulation models.
+International Journal of Transportation Management: Submitted for review, 2004.
+18. Toledo, T., et al., Calibration and validation of microscopic traffic simulation tools: Stockholm Case Study.
+Transportation Research Record: Journal of the Transportation Research Board: (1831): pp. 65-75, 2003.
+19. Yang, Q., A Simulation Laboratory for Evaluation of Dynamic Traffic Management Systems, PhD thesis, ITS
+Program, Massachusetts Institute of Technology, Cambridge, (MA), 1997,
+20. Burghout, W., Mezzo: an event-based mesoscopic simulation model for dynamic traffic assignment, CTR
+working paper, Centre for Traffic Simulation, Royal Institute of Technology, Stockholm, Sweden, 2004
+
+===== PAGE 11 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 11
+21. Alexandrov, V. and J. Dongarra. Recent Advances in Parallel Virtual Machine and Message Passing Interface.
+Presented at 5th European Pvm/Mpi User's Group Meeting. Liverpool, UK: Springer Verlag, 1998.
+22. Burghout, W., Hybrid Microscopic-Mesoscopic Traffic Simulation Modelling, PhD thesis, Dept of
+Infrastracture, Royal Institute of Technology, Stockholm, 2004,
+http://www.infra.kth.se/ctr/publikationer/ctr2004_04.pdf
+23. Pindyck, R. and D. Rubinfeld, Econometric Models and Economic Forecasts: Irwin/McGraw-Hill, 1997.
+24. Theil, H., Economic forecasts and policy, Amsterdam: North Holland, 1961.
+
+===== PAGE 12 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 12
+LIST OF TABLES
+TABLE 1 Results of Case Study II on all three models.
+LIST OF FIGURES
+FIGURE 1 Integration Architecture: (a) Generic architecture, (b) Simplified architecture
+FIGURE 2 Test network
+FIGURE 3 Results Incident scenario 1. (a) Cumulative flow, (b) Density over time
+FIGURE 4 Application of Hybrid model (MiMe) on Brunnsviken / Stockholm network.
+
+===== PAGE 13 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 13
+TABLE 1 Results of Case Study II on all three models.
+MITSIMLab Mezzo Hybrid (MiMe)
+RMSNE
+Entire network 12% 16% 15%
+Meso network 10% 13% 11%
+Micro network 14% 18% 17%
+Theil U 0.051 0.055 0.054
+UM 0.001 0.147 0.075
+US 0.010 0.002 0.017
+UC 0.989 0.852 0.909
+
+===== PAGE 14 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 14
+Vehicles,
+Meso Traffic - Micro
+Common Module
+conditions
+Network graph Subnetwork
+Travel
+Database
+behavior Virtual links Virtual links
+Network graph
+Pre-trip Travel
+Times
+Travel times Link travel Link travel
+En-Route times times
+Paths
+Path Paths Subpaths
+generation OD flows
+OD flows
+Route choice
+Route choices Route choices • En-route
+Travel times Travel times Route choice
+• Pre-trip
+Meso Model Micro Model • En-route
+Vehicles,
+Traffic -
+conditions
+(a) Generic Integration Architecture (b) Simplified Integration Architecture
+FIGURE 1 Integration Architecture
+
+===== PAGE 15 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 15
+Incident 1 Incident 2
+0 1 2 3 4 5 6 7 8 9
+Mezzo MITSIMLab Mezzo
+FIGURE 2 Test network
+
+===== PAGE 16 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 16
+160
+140
+120
+100
+80
+60
+40
+20
+0
+1000 1500 2000 2500
+Time (s)
+(a) Cumulative flow (b) Density
+(a) Cumulative flow (b) Density over time
+FIGURE 3 Case Study I results
+)enal/mk/hev(
+ytisneD
+1200
+Mezzo
+Segment 0
+1100 Mezzo
+Segment 1
+1000 Mezzo
+Segment 2
+900 Mezzo
+Segment 3
+800 Mezzo
+Segment 4
+700 MITSIMLab Segment 5
+600
+500
+400
+300
+1000 1500 2000 2500
+Time (s)
+)enal/hev(
+wolF
+evitalumuC
+
+===== PAGE 17 =====
+
+Wilco Burghout, Haris Koutsopoulos, Ingmar Andréasson 17
+Measurement
+locations, one
+for each
+direction
+Meso
+Micro
+FIGURE 4 Application of Hybrid model (MiMe) on Brunnsviken / Stockholm network.

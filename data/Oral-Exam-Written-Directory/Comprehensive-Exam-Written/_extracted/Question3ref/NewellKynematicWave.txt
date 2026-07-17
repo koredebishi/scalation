@@ -1,0 +1,350 @@
+===== PAGE 1 =====
+
+Tronspn. Res:B. Vol. 27B, No. 4, pp. 281-287, 1993 0191-2615/93 f6.00 + .OO
+Printed in Great Britain. 0 1993 Pergamon Press Ltd.
+A SIMPLIFIED THEORY OF
+KINEMATIC WAVES IN HIGHWAY TRAFFIC,
+PART I: GENERAL THEORY
+G. F. NEWELL
+Institute of Transportation Studies, University of California,
+Berkeley, CA 94720, U.S.A.
+(Received 9 March 1992)
+Abstract - In the theory of “kinematic waves,” as described originally by Lighthill and Whitham
+in 1955, the evaluation of the shock path is typically rather tedious. Instead of using this theory
+to evaluate flows or densities, one can use it to evaluate the cumulative flow A(x, t) past any
+point x by time r. It is shown here how a formal solution for A(x, 1) can be evaluated directly
+from boundary or initial conditions without evaluation at intermediate times and positions. If
+there are shocks, however, this solution will be multiple-valued. The correct solution, which is the
+lower envelope of all such formal solutions, will automatically have discontinuities in slope de-
+scribing the passage of a shock. To evaluate A(x, t) at any particular location x, it is not necessary
+to follow the actual path of the shock. The solution can be evaluated directly in terms of the
+boundary data by either graphical or numerical techniques.
+1. INTRODUCTION
+In a famous paper, “On Kinematic Waves,” Lighthill and Whitham (1955) described a
+theory of one-dimensional wave motion which could be applied to certain types of fluid
+motion or to highway traffic flow. Richards (1956) independently proposed a similar
+theory for traffic flow. The key postulate of the (L-W-R) theory was that there exists
+some functional relation between the flow q and the density (concentration) k. The flow
+is defined for fluids as the rate at which mass passes some point and for traffic as the rate
+at which vehicles pass some point. The density is defined for fluids as the mass per unit
+length of channel and for traffic as the number of vehicles per unit length of road. This
+relation between q and k might vary with location x but not with time t, i.e.,
+k (x, t) = k*(q (x, t), x) (1)
+or
+q (x, t) = q* (k (x, t), xl
+for some given functions k* or q*.
+The conservation equation (equation of continuity) implies that (with no entering or
+exiting traffic)
+6% (x, t) + a4 (x9 t) =
+() (2)
+at ax *
+which with eqn (1) gives a partial differential equation for q(x, t),
+aq
+(x9 t) + a4 (x, 0 =
+w (Q 0, t)J) o (3)
+at ax
+*
+with
+w (4, X) = ak* (4, x)/aq.
+The (l/w) is called the “wave velocity,” but in most applications it is more meaningful to
+describe the time to travel a given distance than the distance traveled in a given time. We
+281
+
+===== PAGE 2 =====
+
+282 t:. F. NEWELL
+refer to w as the “pace” of the wave for lack of any other common word for the reciprocal
+of the velocity.
+The usual method for solving eqn (3) is to note that eqn (3) implies that q(x, I)
+remains constant along a characteristic curve (wave) for which
+dt/dx = w (q, x). (4)
+Thus from any initial or boundary conditions which specify a value of q at some point
+x0,&, the same value of q applies at all points along the characteristic curve passing
+through x,,t,, namely the curve
+5I
+(x) = 1, + w (4 (xo, to), z) dz. (5)
+t
+x0
+We will be concerned here mostly with the special case of a homogeneous channel or
+road section for which k*(q, x) = k*(q) is independent of x. In this case w is also constant
+along the characteristic curve and the characteristic curve is a straight line.
+One of the complications in the theory results from the possibility that characteristic
+curves for different values of q may intersect giving multiples values of q at the same (x,
+t). To complete the theory, it was necessary to introduce shocks (discontinuities in q) and
+write separate equations for the path of the shock so as to guarantee the conservation of
+mass across the shock path; the shock itself is not a source of mass. The characteristic
+curves on either side of the shock path determine the q(x, t) on each side, but each
+characteristic terminates at the shock.
+It was also necessary to eliminate certain formal solutions of the resulting equations
+which are inconsistent with a preferred direction of time. The conservation equations are
+invariant to changing x to -x and t to -I, but a flow pattern with shocks obtained by
+reversing the direction of x and t is not acceptable.
+The numerical solutions of the equations for the shock path are typically rather
+tedious.
+2. CUMULATIVE FLOWS
+In the analysis of problems in highway traffic flow, particularly “queueing” behind a
+bottleneck, it is convenient to deal with the “cumulative flow” (see Makagami, et al.,
+1971). Let
+A (x, I) = cumulative number of vehicles to pass some location x by
+time t starting from the passage of some reference
+vehicle.
+If vehicles do not pass each other, one could imagine that an observer at location x0
+numbered the vehicles consecutively as they passed him and he attached the numbers to
+the vehicles. The A(x, t) then represents the number of the last vehicle to pass an observer
+at x before time 1.
+The reason that this is so useful for the analysis of traffic flow is that if one draws
+the curves of ,4(x,, t) and A(x2, t) for two locations x, and x2 on the same graph as in Fig.
+1, the vertical distance between the curves at time t,A(x,, t) - A(x,, t) represents the
+number of vehicles between xi and x2, and the horizontal distance between the curves at
+height j represents the trip time of the jth vehicle from x1 to x2 if vehicles do not pass
+each other. The area between the two curves describes the total trip time of all vehicles.
+Most quantities of interest to the description of traffic flow have simple geometric inter-
+pretations.
+In Fig. 1, the A-curves should actually be step functions, since the count of vehicles
+is integer valued. To define a flow, however, one must “smooth” the curve and interpret
+q(x,, t) or q(x,, t) as the derivative of the smoothed curve.
+
+===== PAGE 3 =====
+
+Theory of kinematic waves in highway traffic, Part I 283
+t
+Time
+Fig. 1. Cumulative flow at two locations.
+One can similarly define A(x, t) for a fluid as the total mass to have passed x by time
+t, measured relative to the passage of some “streamline,” although the physical observ-
+ables of interest in fluid dynamics are not necessarily analogous to those of interest in
+traffic flow.
+One of the advantages of introducing the function A(x, t) for either traffic or fluids,
+is that the existence of such a function itself guarantees the conservation of mass (or
+vehicle numbers). From the A(x, t) one can evaluate
+-aA (x, t) A4 (x, t)
+k (x, t) = ax 9 4 (x9 t) = at 9
+and the identity
+a2A (x, t) a2A (x, t)
+axat = atax
+is equivalent to eqn (2) provided that the second derivatives exist. A shock would be
+represented by a discontinuity in the first derivatives of ,4(x, t), but the conservation
+equations will still be valid provided only that A(x, t) is continuous across the shock
+path, i.e. the number on a vehicle at the shock is the same as viewed from either side of
+the shock.
+The key hypothesis of the L-W-R theory is that eqn (1) is valid at any point where q
+and k are continuous, i.e.
+aA (x, t) (-a A (x, t)
+at = 4* ax 3 x . (7)
+1
+In the absence of shocks, the formal solution of this equation is obtained in the
+same way as in the L-W-R theory, namely from the conclusion that q is constant along
+the characteristic curves. Knowledge of q also determines k(x, t) at all points along the
+characteristic curve from eqn (l), and together they determine the change in A along the
+curve, since
+dA = (aA/ax)dx + (aA/at)dt = - kdx + qdt = ( -k + qw) dx. (8)
+
+===== PAGE 4 =====
+
+284 G.F. NEWELL
+Thus, if one knows ,4(x&,) and q(x,,,t,) at some boundary point, one can determine A(x,
+t) at all points along the characteristic curve through (x,,, to).
+In the special case of a homogeneous channel, k, q and w are all constant along a
+linear characteristic curve and, as a result of eqn (8), so is dA/dx. If we interpret A(x, t)
+as a surface in a three-dimensional (A, x, t) space, the surface A(x, t) is a “ruled surface,”
+a surface generated by a family of straight lines. The value of A(x,,, t,) and q(x,, to) at any
+boundary point would determine a line in the surface A(x, t). From appropriate boundary
+data one could quite easily construct such a surface and, thereby, determine A(x, t)
+everywhere.
+3. SHOCK CONDITIONS
+The main advantage of evaluating the A(x, t) rather than q(x, t) relates to the shock
+conditions. If characteristic curves intersect, the surface A(x, t) generated in the manner
+described above is still easily constructed but it gives a multiple-valued function of x, t.
+Each of the values of A(x, t) at the same x, t is derived from different initial or boundary
+conditions. To complete the theory, one must specify some recipe which will create from
+this multiple-valued surface a unique and continuous “solution.”
+For highway traffic, a driver is influenced mostly by motion of vehicles downstream
+of him (vehicles of lower number), and the number of vehicles which can pass any
+point by time t should not exceed any “constraint” generated by the motion of vehicles
+downstream at earlier times. If this theory is to make any sense, there will be a natural
+order of cause and effect relations which will create a “well-posed” problem. We claim
+that the “solution” one is looking for is the lower envelope of the multiple-valued solution
+derived from properly set initial or boundary conditions.
+The proposed solution is guaranteed to be continuous and therefore satisfy the
+conservation equations, but the derivatives of q and k need not be continuous. A shock
+path, the path of any discontinuity in q and k, will emerge automatically from the
+geometrical construction of the single-valued A(x, t). To determine the time at which a
+shock passes any location x* or the location of a shock at any time t*, one need not
+follow the actual path of the shock. It suffices to construct the graph of A(x*, t) versus I
+for fixed x* directly from the boundary data and see where it has a discontinuity in the
+slope q(x*, t), or construct a graph of A(x, t*) versus x for fixed t* and see where it has a
+discontinuity in slope k(x, t*).
+We have described the solution procedure above as if one were to construct the
+solution graphically on a continuous space of x and 1. In doing so, however, one would
+draw only a certain finite number of characteristic curves and interpolate graphically. If
+one were to program the procedure for a computer one might prefer to use a discrete
+lattice of points in the x, t space. This presents no problem. If one should calculate more
+than one value of A(x, t) at some lattice point from different boundary data, one simply
+chooses the smallest value. It is not even necessary to specify whether or not a shock
+passed. This can be inferred after one has looked at the resulting solution. In contrast
+with this, people have encountered all sorts of difficulties trying to solve the original
+L-W-R equations for q and/or k on a lattice.
+4. BOUNDARY CONDITIONS
+There is an enormous variety of practical problems for which the above technique
+offers a significant simplification as compared with previous methods for solving the
+L-W-R equations. The present methods were actually devised for the purpose of analyz-
+ing flows on a freeway with entrance and exit ramps. One is given a time-dependent rate
+at which vehicles enter the freeway at entrance i with destination j for all i and j. The
+goal is to determine the resulting flow pattern, trip times, exit flows, etc. The details of
+this will be described in Part III because the present scheme is only a small part of the
+total problem. The above method will be used to determine A(x,+,, t) at the i + lth
+ramp from A(x,, t) at the ith ramp or vice versa depending on whether the waves are
+
+===== PAGE 5 =====
+
+Theory of kinematic waves in highway traffic, Part I 285
+traveling forward or backward. This could be done without necessarily also evaluating
+the ,4(x, t) or following the paths of any shocks for intermediate values of x.
+There are a variety of more traditional problems which can be analyzed very easily.
+For example:
+a) One could specify the trajectory of some “lead” vehicle arbitrarily labeled as vehicle
+number 0 for t > to, or, for a fluid, the trajectory of a piston in a long cylindrical pipe,
+and also the density k(x, to) for locations upstream of the lead vehicle (or piston) at time
+to, x < x,.
+The trajectory of the lead vehicle is the curve of constant car number A(x, t) = 0,
+and the velocity v(x, t) of the vehicle determines values of q and k along the trajectory
+from eqn (1) and the condition q = kv. Thus one knows the value of A and q along the
+trajectory from which one can construct a surface A(x, t) passing through this trajectory.
+The initial conditions k(x, to) for x < x0 determine
+s
+5
+‘4 (X,f,l) = k (x’,rO)dx’, with A (x0,&) = 0
+x
+and the value of q(x, to), and therefore a surface ,4(x, t) satisfying these initial conditions.
+The final solution is, of course, the lower envelope of any such surfaces A(x, t) if there
+are multiple values.
+b) To analyze the flow of vehicles through a traffic signal, one typically specifies the flow
+q(x,, t) at some location x0 well upstream of the signal, from which one can also evaluate
+s
+I
+A (XoJ) = ,” q(xo,t’ )dt’
+relative to some arbitrary vehicle labeled as vehicle 0 passing x0 at time 1,.
+At the traffic signal, one further specifies that any vehicle which arrives at the
+intersection just as the signal turns red will come to a stop and resume its “free speed”
+soon after the signal turns green. In effect, one specifies the trajectory of a vehicle of
+known vehicle number, which in turn determines a corresponding surface A(x, t) as in
+(a). The final ,4(x, t) will be the lower envelope of surfaces determined from the initial
+flow or from the signal. A shock path defining the back of the “queue” will be the locus
+of points where these surfaces meet.
+c) In the freeway problem mentioned above, one might specify the entrance flow on some
+ramp at x,,,, but this flow plus the through flow approaching xi+] might exceed the
+capacity of the freeway downstream of the ramp. If the ramp flow does actually pass the
+“bottleneck,” then one knows the maximum through traffic that can pass xi+,. One will
+thus know the A(x,+,, t) for the through traffic from which one can construct a surface
+A(x, t) for x < x,,,. The shock for the back of the queue will be the intersection of this
+surface with the surface generated from the upstream flows.
+5. HISTORICAL NOTES
+In retrospect, one can’t help wonder why something as simple as this has gone
+unnoticed for more than 35 years or, if it was noticed, that it was not exploited. Almost
+every book dealing with traffic theory which describes the L-W-R theory not only repeats
+the same arguments as in the original papers but even reproduces some of the figures
+from these papers.
+The use of cumulative “input-output” curves itself has an interesting history. Edie
+and Foote (1960, 1961) drew graphs of the cumulative number of vehicles to pass specific
+locations in the Holland Tunnel. This was perhaps more a convenient way of presenting
+their experimental observations than the basis of any “theory,” although they did use
+these graphs as a means of showing the propagation of shocks. Herman and Rothery
+(1965) also used cumulative curves to describe experimental observations and gave geo-
+metric interpretations of various derived quantities.
+
+===== PAGE 6 =====
+
+286 G.F. NEWELL
+In the “transportation science” literature, the first use of cumulative curves as a tool
+for making theoretical prediction seems to have been by Gazis and Potts (1965). These
+curves were described and used with no references, as if they were an obvious tool. In the
+“traffic engineering” literature, cumulative curves are described in a paper by Moskowitz
+and Newman (1963), but it was apparently a “standard procedure” for the analysis of
+freeway traffic among the traffic engineers at the California Division of Highways (now
+Caltrans). Some of the engineers who were with Caltrans at that time say that “everyone
+knew it.” It seems likely that this was an invention of the late Karl Moskowitz.
+For the present generation of transportation engineering students, the use of such
+curves is well-known, but it took a long time (a “generation”) for this to become one of
+the standard tools of traffic engineering. For people working in related fields of queueing,
+inventory, production, etc., which also deal with the flow of objects past various restric-
+tions, there is still considerable reluctance to exploit simple graphical methods of analysis
+based on cumulative flows.
+The three-dimensional representation A@, t) was described by Makigami et al.
+(1971). I first wrote some notes about this for a course on queueing theory to show that
+an observer at any location x could construct a curve of cumulative flow, and that the
+collection of all such curves would describe a surface A(x, t). Y. Makigami, a student in
+this class, decided to do an individual study to explore it further. He even made a plaster
+of Paris model of a hypothetical traffic pattern.
+After we had circulated a draft of a paper, Richard Rothery pointed out that he
+had described a similar three-dimensional construction in his (unpublished) Ph.D. thesis
+(Rothery, 1968). We agreed to submit the paper with three authors and make reference
+to Rothery’s thesis.
+Rothery’s thesis also points out that a stationary flow pattern would give a planar
+surface for A(x, t) and that a “transition” from one constant flow pattern to another
+would propagate with a certain speed. There is no reference in Rothery’s thesis, however,
+to the L-W-R theory or to “waves” or “shocks.” Most of Rothery’s thesis deals with
+car-following theories.
+At that time Karl Moskowitz also called me on the telephone to announce that he
+had, for some time, used such three-dimensional figures to describe freeway traffic pat-
+terns. I asked him if he could give me a reference, but he said that he never published it
+or even wrote any technical reports about it. I had no doubt that he had done it, and I
+should have suggested that he join as another coauthor. I lost an opportunity then to give
+some recognition to one of the great pioneers of traffic engineering. Unfortunately, he
+published very little of what he knew.
+The three-dimensional representation A(x, t) was just one of several illustrations of
+“tandem queues” included in the second edition of my book on queueing theory, (Newell,
+1982). Other illustrations involved “blocking” due to a finite storage between “servers,”
+for which the cumulative departures at any server might be constrained by conditions
+either upstream or downstream. The actual cumulative curve was the smallest of those
+determined by an constraint.
+There was also a simple model of a freeway diamond interchange for which the
+highway section between an off-ramp and an on-ramp could store only a specified num-
+ber of cars. Again, the cumulative flow at the off-ramp was constructed as the minimum
+of an arrival curve determined from upstream conditions and a departure curve deter-
+mined from downstream conditions at a bottleneck. It was not explicitly noted that when
+these two curves crossed, it was the time when the shock wave passed; nor was there any
+mention of the connection with the L-W-R theory, but it was noted that one did not need
+to know the details of the traffic flow pattern at intermediate points.
+More recently I derived some “backward” solutions of the L-W-R equations in terms
+of the A(x, t) but with no shocks (Newell, 1988). I am embarrassed that I did not
+recognize then the simple solution for the shock conditions. The emphasis in this paper
+was on other things (which were less interesting).
+The equations of “kinematic waves” arise in many other applications, particularly in
+fluid dynamics (flood waves, bores, sonic booms, etc.). I made some inquiries among
+
+===== PAGE 7 =====
+
+Theory of kinematic waves in highway traffic, Part I 287
+fluid dynamics specialists if analogous methods of determining shock paths were well-
+known in fluid dynamics, and then sent some notes on this to G. B. Whitham. He replied
+that the shock-fitting is “well-known to us,” which he later explained meant “to me, my
+students, and other hangers-on.”
+Whitham sent me a reprint of a paper by J. C. Luke (1972) on erosion of soil. In this
+paper the analogue of the A(x, t) is the elevation of the ground. Luke starts with equations
+analogous to eqn (7) and solves these equations by, in effect, going back to the kinematic
+wave equations (3) to apply the method of characteristics. The shock conditions, how-
+ever, are determined from the lower envelope of .4(x, t) surfaces as in Section 3.
+It would seem that this trick is obvious to some people working in continuum me-
+chanics but unknown to others, much as the use of cumulative curves for the analysis of
+traffic problems was obvious to some people and unknown to others.
+REFERENCES
+Edie L. C. and Foote R. S. (1960) Effect of shock waves on tunnel traffic flow. Highway Research Board
+Proc., 39,492-505.
+Edie L. C. and Foote R. S. (1961) Experiments on single-lane flow in tunnels. In R. Herman (Ed.), Theory of
+Traffic Flow, pp. 175-192. Elsevier, Amsterdam.
+Gazis D. C. and Potts R. B. (1965) The oversaturated intersection. Proceedings of the Second International
+Symposium on the Theory of Traffic Flow, OECD, Paris, pp. 221-237.
+Herman R. and Rothery R. W. (1965) Car following and steady state flow. Proceedings of the Second Interna-
+tional Symposium on the Theory of Traffic Flow, OECD, Paris, pp. l-l 1.
+Lighthill M. J. and Whitham G. B. (1955) On kinematic waves. I: Flood movement in long rivers. II: A theory
+of traffic flow on long crowded roads. ProceedingsRoyalSociety, (London), A229,281-345.
+Luke J. C. (1972) Mathematical models for landform evolution. J. GeophysicalRes., 77,2460-2464.
+Makigami Y., Newell G. F. and Rothery R. (1971) Three-dimensional representations of traffic flow. Trans.
+Sci., 5, 302-313.
+Moskowitz K. and Newman L. (1963) Notes on freeway capacity. Highway Res. Record, #27, Highway Research
+Board, Washington, D.C.
+Newell G. F. (1982) Applications of Queueing Theory, 2nd ed. Chapman and Hall, London.
+Newell G. F. (1988) Traffic flow in the morning commute. Trans. Sci., 22,47-58.
+Richards P. I. (1956) Shock waves on the highway. Opns. Res., 4,42-51.
+Rothery R. (1986) Car following-A deterministic model for single-lane traffic flow. D. SC. Thesis, Universite
+Libre de Bruxelles, Belgium.

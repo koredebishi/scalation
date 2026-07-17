@@ -1,0 +1,310 @@
+ere are the questions for your Written Comprehensive Exam.
+
+Produce a pdf file with three sections, each giving the question and your answer.
+Each question typically requires a several page answer.  Once completely
+finished, please send me the full document and I will distribute it.
+
+Thanks,
+John Miller
+
+Comprehensive Exam Questions: answer one per week (3 weeks total)
+
+Q1.  When an LLM autonomously generates and refines discrete-event simulation experiments, part of the human researcher's traditional role as guarantor of experimental validity is transferred to the agent.  Discuss the verification and validation challenges this introduces for your proposed AutoTrafficSim architecture.  Specifically:  Explain how your runtime invariant monitor can distinguish between a physically invalid scenario and a valid but unexpected emergent behavior worth scientific investigation.  Describe what formal, empirical, and methodological evidence would be required to establish that an agent-generated experiment is scientifically sound.  Discuss how the adaptive feedback loop can be prevented from overfitting to calibration metrics rather than producing genuine scientific insight.  Explain what fundamentally separates your framework from large-scale automated scenario generation systems, and support your discussion with relevant literature.
+
+Q2.  In your evacuation and contraflow study, how do you model and justify behavioral assumptions (e.g., compliance, rerouting, panic effects) that are rarely observed in standard datasets?  What is the fundamental need for your agentic simulation framework given that existing tools like SUMO with calibration and optimization can already reproduce observed data, and how does your approach go beyond fitting to enable new, generalizable knowledge?
+
+Q3.  Review and critique the research literature on hybrid meso-micro traffic simulation.  Explain in detail how meso-scale models work and how they can be integrated with micro-scale models for effective city-wide traffic simulation.  As meso-scale models are discrete-event and micro-scale models are discrete-time, how can they be synced up.  Your answer should explain the situation all the way down to mathematical equations.
+
+                                                       
+
+Korede,
+
+Here are comments from the committee.
+
+Items to strengthen for the oral exam and dissertation.
+Stopping criterion.*Names Goodhart's Law, but I did not see when the feedback loop decides "good enough." The agent's objective function and termination logic need to be made more explicit.
+Quarantine specification. How many replications distinguish artifact from emergence? What statistical test makes that call?                                                                
+Audit trail at scale. Recording hypothesis lineage is a good idea, but after 1,000 iterations, how does a researcher actually navigate that trail?
+Human vs. agent decision boundary.  Good that the final scientific judgment is with the researcher. The dissertation could make it clearer what the agent decides on its own and what it cannot. State growth. As the feedback loop generates and branches scenarios, do you have a pruning strategy, or is one needed?
+
+Q2 follow up
+To strengthen the answer, I suggest adding a few concrete examples of parameter ranges or distributions for key behaviors and clarifying how the model would be validated or judged credible when direct behavioral observations are limited.
+Since SUMO can already do these tasks, the framework seems to contribute efficiency rather than new functions. This should be validated by benchmarking it against a standard SUMO workflow
+
+
+Q3 follow up
+The proposed meso-micro hybrid needs more details, including diagrams showing how the interfaces work.  Also discuss how this could be implemented say for North Los Angeles
+(the whole city may be too difficult).  Is PDES needed fundamentally or only for speed of simulation (it is challenging by itself)?
+
+Q3 Reading to answer the followup
+1. Virtual Time Machine: Fujimotor paper. 
+----Parallel computation is essentially sequencing. If one can take advantage of 
+sequecencing for parallel computing then the issue of time can be solved at those bother. 
+eg, If LP-A produces result that LP-B needs, then LP-A must happen before LP-B. In my own word, 
+this looks like an happen-before paradign of lamport clock and an antimessaging also sent if ordering is not followed. Again all these can be tide to time warping. 
+
+An specifically for discrete event simulation, LP-A and LP-B example above is subject to event schedule timestamp, Once we know the timestamp for each LP, and suppose both LPs are in different models say LP-A in meso model and LPB in micro model, and both has:
+1. discrete Time stamps
+2. Event time Stamps 
+
+Each task as a notion of virtual time: 
+
+
+Fujimoto Again: Paper name: Parallel and Distributed DES Algo and application. 
+
+Mentioned that the synchonization problem is solved largely by 1. Space parallel approach and 2. Time paralle approach. 
+
+State parallel - LP are communicating via time stamped events or messaging. Each LP is just a path of the model that only concerns itself by compting it's own sample path only and sending messages/events out as needed. 
+He then mention that a key question is to ensure that the events are procssed in a correct order. 
+
+The Time parallel approach shares the work to processors to computing there on assigned sequential time intervals and he mention using paralle prefix (Greenbarg at al 1991).
+Time management algorithms usually assume the simulation consists of a collection of logical processes (LPs) that communicate by exchanging timestamped messages or events.  The goal of the synchronization mechanism is to ensure that each LP processes events in timestamp order; this requirement is referred to as the local causality constraint.  It can be shown that if each LP adheres to the local causality constraint, execution of the simulation program on a parallel computer will produce exactly the same results as an execution on a sequential computer.  
+
+Very important"
+Each link has a clock that is equal to the timestamp of the messages at the front of the link's queue. if the queue contains a message, or the timestamp of the last received message if the queue is empty. The process repeatedly selects the link with the smallest clock and, if there is a message in that link’s queue, processes it. This protocol guarantees that each process will only process events in non-decreasing timestamp order. 
+
+Although the above ensure local causality is never violeted, it is prone to deadlock, due to fractional timing. However, this is also resolvable using null messageing. LP-A can send LP-B null message to ensure following right ordering. 
+
+[Packet of meso vehicle ]   ------------entering the micro model: 
+-- keep sending the time since they are logically sharing almost same packet time stamp but 
+with numbering of packet as car so we can have LP1_car1_time:1.0sec  and 1.2sec for the second etc. once that packet of vehicle is sent, it sends LP1-null message to let the micro model know all vehicles have been sent and .. this null message may then we use to advance the clock. 
+
+
+This is GOLD because"How does a process determine the timestamps of the null messages it sends?  The clock value of each incoming link provides a lower bound on the timestamp of the next event that will be removed from that link’s buffer.  When coupled with knowledge of the simulation performed by the process, this bound can be used to determine a lower bound on the timestamp of the next outgoing message on each output link.  For example, if a queue server has a minimum service time of T, then the timestamp of any future departure event must be at least T units of simulated time larger than any arrival event that will be received in the future. "
+
+At the virtual link level: ie the link interface node that connects every Meso to Micro, 
+there is a notion of time at that level, Meso knows there was an event that Packet_LP1 just entered a micro virtual link and it knows when it entered and event_time stap the packet. 
+the expected time of the packet to reach (or travel inside the micro level is also know) as the link size so the next meso link  meso(layer)----release LP_Packet ------(micro breask them up)----meso layer receive the LP_packer again ... once that LP finish traversing micro virtual link, wait. the meso send a null message along the LP packet, the micro send a notnull same message when they finish sending to the next meso connector... ? wait needs to make this make sense. 
+
+the above is conservative algo and not so good 
+
+
+Optimistic is best as we discussed and it is the time wap paradign. However, one issue i see here is that, rolling back due to excessive optimizing might not work because this is traffic physical car simulation, but maybe the notion of Global virtual time helps solve that too and Fujimoto mention some varient of optimisitc algo with eg using Global virtual time with sliding window. don't know if this works. 
+
+
+
+Can we even use the optimistic (allow error occur ) approach here? conservative approach might be better?? 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Q1 Follow up brainstorming. 
+=============================
+As for every simulation or scientific endevour: there is an objective function that we are either minimizing or maximizing. 
+Here the Agent is running a scientific problem and needs two things. 
+1. An objective function that guides the Agents scientific endeavour 
+2. A Termination logic that tells the Agent that the objective function solution space is now optimal. 
+
+These two MUST be made explicit in the architectural framework else the Agent just keep working without no guide. ( Need to search literature on how this is done and achieved). 
+
+1. You already names Goodheart Law: 
+
+   
+
+Quarantine Specification: What statistical test makes the calls of amount to replicate for an experiment. 
+1. What are u using as a statistical caller for the amount of replication to be done? 
+2. Hypothesis lineage is a good idea, but how do you manage 1,000 iteration trail? Even as a human? what will you (Or the LLM Agent) be looking out for in this log trail? 
+2.1 Needs to explain how a researcher manages large log trail. Need to read (Q1, Hypothesis lineage).
+3. Human vs Agent decision: Good that the final scientific Judgement is with the researcher, NOW answer this
+    3.1: Make it clear what the Agent decides on it's own and what it does not decide on it's own. 
+4. State Growth: Do you need or have a pruning Strategy for the feedback loop branching scenario. 
+What this is saying is, there will be the growth of log, trail and scientific scenario, what is your prunning/discarding strategy to chop off and remove what you do not need. 
+How do you decide what you do not need (I think this is also tied to Objective function and some criterio: How do you manage space, disc and sizes and memory). Because believe me or not this thing will generate large data. The Question is , how does human handle this? 
+
+
+
+                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                        
+
+
+
+
+Fujimotor paper:PDES and why it is hard. 
+He started by saying let us take normal sequaltial DES, it involves, 
+1. A state variable that discrive state of the system
+2. An event list that roll out events as they happens 
+3. A global clock variable that helps monitor how far the simulation has gone. Event Scheduler row out time stamped events sequentially
+All events are timestampt and the smallest time stapped event is selected next for execution. 
+and it is very important to always select this small event so that casuality effect can be monitored as needed. 
+
+Why PDES is hard: Because DES maintain a Seqencing paradigm that follows a cause and effect relationship. on a PDES, this relationship is the hardest to uphold since these LPs are in different processors and are using different Global timers. Again how do we know that Even1 is not depending on event2 since we are now in PDES with different event schedulars, since event scheduling is critically dependent on eventtime stamps. 
+
+Because at runtime, we do not necessarily know how these events will be schedules and the kind of causal event relationship they have because on a single processor DES is simple since the processor timer is been used so the event schedular knows and have a sense of the global time of the processor
+and so it can coodinate causal effect efficiently. But on a PDES where the processsors are different and apart, clock notion is not shared. 
+
+
+SAID PDAS IS DIFFICULT UNLIKE VECTOR MATRIX PARALLELISATION BECAUSE THE The Sequencing of what to be executed after the other is LARGELY DATA DEPENDANT. --- (I don't know if this has even been solved). this is why matrix vectorization and parallelization is much easy because it has an analytic close form or end to end differentiable and one can solve and get the answer even thouhg it involved a lot of comput but it's solvable. 
+
+He then went on to say PDES has two algo, conservative that avoids at all cost any coursality error and the optimistic that allows errors to occur but recovers from it. using rollback. 
+
+Let a simulation have N logical processes , LP0------LPN-1, clock_i represent the simulation up to LP_i has progressed. When an event is processed, the process clock is automatically advanced up to the time stamp of that event. If LP_i sends a message to LP_j during simulation, we say a link exists from LP_i to LP_j. 
+
+THE NOTION OF LP revisted. It is important that LP does not share state variables , so that we can better implement PDES and it maybe make sense since each server should have their own LPs independent of the LPs of other servers. 
+
+I think for our work currently, the solution proposed by fujimoto is that suppose we have PDES with LPs across various processors, if both LPs communicate and will share a link, them both boundy must carry a copy of the registers, although he said this may look messy as another LP is carrying code that does not belong to it that must be updated anytime the link communicate, at least one needs to find a way to abstract this as this is the only way performance may be optimized. 
+
+Conservative algo. 
+1. designed to avoid causality effect by promising to avoid entirely event at will not respect lower bound timing effect, ie decreasing orderly timing 
+of events Event time must be released and processed in decreasing order. 
+2. Sends a null message when the queue is empty to assure the talking to LP that they will respect FIFO (keeps a FIFO of events) processing of events. in the event that the each person same time queue is empty, deadlock will arise. null message is an assurance they use to say they will not violate this contract or I am not going to send message less then the time of this null message, ie they will always get a lower bound of the time with respect to which they are transmitting events. 
+
+Then he mentioned the 
+Optimisitic algo with rollback and error tolerance. mentioning the notion of global virtual time and time warping mechanism. 
+
+
+
+
+
+
+The First Mobiliti Paper: 
+Models PDES using high performing computing, they simulated using San Fransico bay area. 
+1. 2.2 billion events schedules 
+2. Millions of links and nodes processed (from OpenStreetMap)
+3. Reported congestion, enery consumption and production degredation. 
+
+
+They noted that previous or current PDES for transportation uses shared memory parallelism and Global syncronization mechanism. And this works because a single multi-core compute node 
+is usually used and as such, LPs can always see the threads used and written by other LPs and so virtual timing and GVT and time warping mechanism is massively easy since they can see 
+what other LPS have done or that in itself can be made available for LPs to use. 
+
+They also made the disadvantage concrete by using the workers and master note where work has to be somewhat serialized even thos it's parallel. 
+Master node distribute task and workers agreed on where to somewhat wait for the master once they are done so that they do not work too far out of sychonization. So the GVT is still controlled by the master scheduler and it oversee all the events in the specific agreed timeframe. 
+
+PDES is easy with a single node MultiCore computer. with multi-nodes. the notion of GVT from the master node to workers node is discarded and workers are allowed to coodinate with workers in another node. However, this means that the causality effect has to be done in another fashion since there exist no notion of master node any longer. And the idea of a null message can be use to solve this issue. 
+
+My intuition is right, they mention that single node PDES simulator like polaris use the conservative master worker node to do PDES, Master, worker nodes serializing (LP) , GVT by master and null messaging. 
+ACCURACY IS TRADED FOR EXECUTION SPEED BECAUSE, THIS IS SOMEWHAT SERIALIZED because there is a casuality agreement guarantee used by these conservative PDES simulators. 
+
+Mobiliti:
+vehicles are events to be scheduled
+road network links are agents to schedule (move) those events
+if a vehicle (event occur/arrive at t_0) into an agent a_1 with process time S, it will
+schedule (move ) this event(vehicle) out at time: t_0 + S (t_0 + delta_t) to the next agent (link). 
+
+Given a Global delta_Time. 
+All workers are asked to start working by the master on this current global time up to [T_i, T_i+1)... and they all report back once done. (notice that they have to wait for the sloweest worker). then the master advance time accordingly again  and ask they work on [T_i+1, T_i+2]... continue. 
+
+
+""The Mobiliti strucuture basically""
+Composing the process-to-process
+messaging of GASNet along with our intra-process threadto-
+thread messaging allows us to expose a global model of
+parallelism where the threads may send active messages to
+each other seamlessly across thread and process boundaries.
+On top of the global thread-to-thread messaging paradigm
+we built a fairly standard optimistic PDES engine. Each CPU
+core manages a set of owned logical processes (LPs) (also
+known as actors or agents). Each LP manages a time-sorted
+queue of events which are merely state-change functions
+which execute against the LP to achieve three outcomes:
+1) Change the LP’s application state.
+2) Generate future events for this or other LPs.
+3) Return a function closure to unexecute the state change
+performed by this event. This is called if the system
+detects it executed the event out of proper time order.
+Our method for computing global virtual time (GVT) is
+completely asynchronous and concurrent with the processing
+of events. At all times in the simulation, there is a GVT
+reduction in-flight that continuously lower-bounds the minimum
+time stamp seen across all LPs and in-flight messages
+in the system. GVT is necessary for knowing how far back
+the system may have to rollback, thus it is the only means
+for reclaiming the memory dedicated internally to event
+unexecute functions. Once an executed event’s timestamp is
+surpassed by GVT, the event is committed (cannot be rolled
+back) since it would be impossible for an unseen event to
+"""
+
+
+if Agents are connected linkes (roads) that send and schedule vehicles events between each other,
+because these nodes are linked:
+1. The flow rate inside each link (serving time is or can be know)
+Time to travel a single link is = length of the link / free flow speed. 
+Free flow speed is the speed it takes a vehicle event to travel the link.
+2. the connecting downstream rate (congestion signal) can also be sense
+3. One can also mentain a traffic signal (dynamic routing at the lane level)
+
+Link agent state transition. Each link agent state
+consists of two linked lists of vehicle arrival times. When a
+vehicle arrival event is executed (at time t0), it is inserted onto
+the head of L and events older than t0 􀀀W are migrated to
+Lb. The lists maintain the invariant that events are within the
+time ranges specified such that jLj is the number of vehicles
+that arrived within time window W, and no event older than
+GV T 􀀀W is kept in Lb.
+
+
+
+
+"""
+This looks like something I can use to argue and counter Q2 follow up. 
+""
+Software engineering vs AI engineering
+The biggest difference between being a SWE and an AI engineer is that traditional software engineering trains you to think deterministically, while applied AI forces you to think probabilistically.
+In normal software, you write the logic, get it to run, and when something breaks you can usually trace it – a structured input deterministically gives you a structured output.
+Applied AI doesn't work like that. You're building around a non-deterministic API call to intelligence, which means the same input can come back different every time. Because of this, the job stops being just building the software, and instead becomes measuring whether the system actually behaves the way it should.
+The way we do that is through evals, so I’ll break down how to build an evaluation suite that ensures the agent you develop isn’t making mistakes. I’ve come to learn that this is one of the most important skills of an applied AI developer, given the non-deterministic nature of the work that we do.
+The next part of the article covers developing each part of an AI agent (except for the model itself, of course), because you can call an API to a model but you need to build everything else yourself. This is called harness engineering.
+And lastly, I’ll cover how to go from one agent in production to multiple – and why it’s a distributed systems problem. If you can make it to the end of this article, there’s no reason you shouldn’t be able to make the transition to becoming an Applied AI engineer.
+Evals
+An applied AI engineer turns uncertainty into measured confidence using evals. In traditional software development, you trust the system because you wrote the logic and tested the code. In applied AI, you can’t trust the system that way because the model can behave differently across runs. So the AI engineer has to build a measurement layer around the agent.
+An eval is the process of giving an agent a task, letting it run, and grading what it did. The goal is to prove two things: the agent completed the work correctly, and the agent stayed within the boundaries it was given.
+The first step is to grade the outcome. This is the easiest step of the eval process. For an invoice agent, the ones I usually work on, that means ensuring the invoice lands in the right place, or the duplicate is flagged. You are just comparing the final result against what should have happened.
+The second step is to grade the trajectory. This is the path the agent took to get to that result: the tools it called, the fields it touched, the arguments it passed, and the actions it attempted along the way. This matters because an agent can reach the right final answer while still doing something dangerous in the process. It can classify an invoice correctly while also changing bank details or send a payment before approval.
+The trajectory itself is just a log: an ordered list of every tool the agent called and the arguments it passed – to grade it just means writing checks against that log.
+Some checks are deterministic – ensuring that send_payment never appears before an approval call, checking that the only fields written to were the ones the agent was allowed to write to. Others are judgment calls – whether an escalation was appropriate, whether the reasoning justified the action. Those go to a second model with a rubric.
+The general principle to follow is that deterministic checks generally catch the safety violations, whereas the judge model scores the quality.
+The result is two grades per test case: did the agent get the right answer, and did it behave correctly getting there. These need to be reported separately, because an agent that classifies invoices correctly 95% of the time but touches a forbidden field in 4% of runs looks great on a blended score but causes major business complications in production.
+This article serves as an introduction to evals and all other topics covered, so I’ve linked other resources to help you go deeper. Some that have me understand how to build effective evals are –
+Anthropic’s eval course
+Lenny’s complete guide to evals
+Hamel’s FAQ on evals
+I’d recommend going through each one, but starting with Lenny’s and Hamel’s before going through the eval course (which is slightly more hands-on).
+But an eval still needs an agent to test, and everything around the model has to be built by you. That surrounding system is called a harness – the next section covers how to think about each part of the harness engineering process, from tool calling to context window optimization.
+Harness Engineering
+A model on its own is not an agent. A model can reason, classify, write, and decide, but it cannot operate inside a company by itself. It can say what action should happen, but it cannot safely take that action unless you build the system around it – and that system is the harness.
+The harness is everything around the model that turns an API call into a working agent: the tools it can use, the context it sees, the state it remembers, the guardrails that constrain it, and the loop that lets it keep working until the task is done.
+The first part of the harness is tool execution.
+Models only read and write text, so when a model decides to do something, it does not actually execute it. It emits a structured request (a JSON string) to update a record, or send an email, or search a database.
+The harness receives that request, validates it, runs the real operation, and sends the result back to the model as text.
+The second part is context management. Every instruction, tool menu, tool result, and prior message takes up space in the model’s context window. The harness has to decide what the model needs to see right now, what should be summarized, and what should be removed. Without this, agents get lost in irrelevant history.
+I’ll write a more comprehensive article that goes deeper into each part of the harness development process, but for now, I’d recommend listening to this talk by an engineer at Arize, the continual learning platform for agents, that goes deep into their thought process on context management.
+To learn more about applying effective context management to your agents in practice, read through these blogs:
+OpenAI’s context management article
+A practical guide to context management
+Anthropic's context engineering guide
+The third part in harness engineering is state and memory. Models are stateless between calls, so anything the agent needs to remember has to live outside the model (usually in a database, file store, or task record). Context is what the model is looking at right now. State is everything the agent knows but is not currently looking at.
+The fourth part is guardrails. Since the model can request the wrong action with the same confidence as the right one, the harness has to check permissions, validate inputs, block unsafe actions, and route high-risk steps to humans.
+Finally, all of this gets tied together in the agent loop: build the context, call the model, inspect its response, execute the tool if allowed, store the result, update the context, and repeat until the task is done.
+Harness engineering is most of what you’ll be doing as an Applied AI engineer, so take your time with this section. As an applied AI engineer, your whole job is to build the operating environment that lets a probabilistic system do work inside deterministic software.
+But production usually does not stop at one agent.
+As the workflow gets larger, the natural instinct is to split the work. But once you add that second agent, the system design changes.
+With one agent, most of the complexity lives inside one loop. With multiple agents, you now have several loops acting over the same environment. Each agent may read state another agent just changed, write to memory another agent depends on, or call a tool whose result affects the entire workflow.
+At that point, the hard part is no longer just prompting, evals, or harness design. It becomes a distributed systems problem: who owns which state, who can write to memory, which tools are safe to retry, and what happens when two reasonable agents take actions in the wrong order.
+Multi-Agent Deployments are a Distributed Systems Problem
+When the first agent works and the workflow gets bigger, a new applied AI engineer naturally has the instinct to split the work into roles: one agent researches, one plans, one executes, one reviews.
+But the second agent changes the unit of design from the agent to the system. Several loops now act in the same environment – one agent can update the customer status while another is mid-plan writing against the outdated status. Both made reasonable decisions, but the system let those decisions interact in the wrong order.
+This is a distributed systems problem. The good news is that distributed systems engineers solved these failures decades ago. Your job is to apply them to loops that happen to contain an LLM. Below is a list of solutions from distributed systems that apply to AI engineering:
+Single-writer principle. Every important piece of state gets exactly one agent that can write to it – other agents read from it or submit change requests. Enforce this at the tool level: if the execution agent is the only one that can write to the CRM, the research agent cannot corrupt the CRM no matter how poorly it reasons.
+Idempotency keys. Agents retry tool calls when something fails or times out, but retries can be dangerous when the tool changes something in the real world. You do not want an agent to send the same payment twice just because the first request looked like it failed. The fix is to attach a unique key to every mutating tool call — meaning any action that changes data in an external system. If the tool sees the same key again, it should return the original result instead of running the action a second time. Stripe's API works this way – and it carries over to agent development when dealing with payments, emails, etc.
+Preconditions on writes. Agents often act on an old view of the world. Something may have changed between the time the agent made its plan and the time it tries to update an external system. To prevent stale writes, mutating tools should require a condition before making the change. For example: “set the status to Approved only if it is still Pending.” If the status has already changed, the tool should fail clearly instead of silently overwriting the newer state.
+Explicit hand-offs. Pass work as messages with a defined schema, sequenced by an orchestrator. An agent should receive its task, not discover it.
+TLDR
+This article serves as an overview of the most important topics I've learned as an Applied AI engineer: evals, harness engineering, and multi-agent system design.
+If you walk away with anything, make it this – the model provides the intelligence, but everything that makes it reliable (the measurement layer, the operating environment, the coordination rules) is engineered by you. Understand these and the transition from software engineering becomes an extension of skills you already have.
+If you’re interested in this sort of work and want to come and tackle some of the most interesting problems in Applied AI with a very talented engineering team, we’re always hiring. Apply on our website at varickagents.com , and we could have you start as soon as possible. On the other hand, if you refer a successful candidate, we’ll give you a $20K referral bonus.""

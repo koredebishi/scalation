@@ -1,0 +1,923 @@
+===== PAGE 1 =====
+
+Open Traffic Models - A framework for hybrid
+simulation of transportation networks
+Gabriel Gomes
+August 13, 2019
+Abstract
+This paper introduces a new approach to hybrid traffic modeling, along with its
+implementation in software. The software allows modelers to assign traffic models to
+individuallinksinanetwork. Eachmodelimplementsaseriesofmethods, referedtoas
+the modeling interface. These methods are used by the program to exchange informa-
+tion between adjacent models. Traffic controllers are implemented in a similar manner.
+The paper outlines the important components of the method: the network description,
+the description of demands, and the modeling and control interfaces. We include tests
+demonstratingthepropagationofcongestionbetweenpairsofmacroscpoic,mesoscopic,
+andmicroscopicmodels. OpenTrafficModelsisanopensourceimplementationofthese
+concepts, and is available at https://github.com/ggomes/otm-sim.
+1 Introduction
+Simulation tools are an integral part of transportation planning and research. As described
+by Lieberman (2004), the history of traffic simulators stretches back to the 1950s, and has
+proceeded alongside developments in the theory of traffic. This trend has continued to the
+present day: about half of the papers in the Transportation Research Board’s 2018 issue on
+Intelligent Transportation Systems involve a simulation model. Similar numbers apply to
+recent issues of the IEEE Transactions on Intelligent Transportation Systems.
+Transportation models can be classified broadly into macroscopic, mesoscopic, and mi-
+croscopic models. We adopt here the definitions of van Wageningen-Kessels et al. (2015) for
+these terms. Macropscopic models do not distinguish individual vehicles, but instead view
+traffic as a coninuum. This approach originates with the work of Lighthill and Whitham
+(1955) and Richards (1956), who coupled the “fundamental diagram” of Greenshields (1935)
+with the law of conservation of vehicles. In contrast, mesoscopic and microscopic models are
+vehicle-based. Microscopic models compute vehicle trajectories based on car-following rules.
+Most models in this category use ordinary differential equations to represent the accelera-
+tions of a vehicle as a function of the state of its neighbors. The car-following approach is one
+of the oldest in transportation modeling, dating back to the work of Chandler et al. (1958).
+1
+9102
+guA
+21
+]SM.sc[
+1v90040.8091:viXra
+
+===== PAGE 2 =====
+
+It is used today in most micrscopic simulation software, including SUMO (Krajzewicz et al.,
+2006), Aimsun (2019), and CORSIM (2005). Another sub-category of micrscopic models
+are those based on cellular automata. Here space is considered as fundamentally discrete,
+and the neighborhood of a vehicle consists only of its neighboring cells. These models were
+introduced to transportation by Nagel and Schreckenberg (1992). Their compatibility with
+image processing algorithms has lead to extremely fast implementations, such as that of
+Korˇcek et al. (2011). Mesoscopic models also distinguish individual vehicles, however their
+movements depend on aggregate quantities such as capacity and jam density, in addition
+to the states of nearby vehicles. Queueing models fall into this category (Zhou and Taylor,
+2014).
+It has long been recognized that none of these model types is superior to all others, but
+instead each has adomain of application (Bourrel and Lesort (2003); Burghout et al. (2005)).
+For example, models that stem from the kinematic wave theory capture the propagation of
+congestion waves with fewer parameters than microscopic models. They are more parsimo-
+nious for the study of congestion-based interventions, such as ramp metering and variable
+speed limits on freeways. Conversely, the dynamics of arterial roads is strongly influenced
+by traffic signals, with congestion wave speed being of secondary importance. Vehicles form
+queues at intersections, and hence queueing models are a good choice for the study of signal
+control algorithms.
+Figure 1: The boundary between two models: m and m .
+u d
+Observations such as these have motivated the development of hybrid approaches, in
+which different models are applied to different regions of the network. Some early efforts in
+this area include those of Bourrel and Lesort (2003), Burghout et al. (2005), and Leclercq
+(2007). These studies focused primarily on the design of the transition boundary between
+two given models. Figure 1 is used for illustration. Here the upstream and downstream
+regions are managed by models m and m respectively. Vehicles crossing the boundary
+u d
+must be translated from the representation of m into the representation of m . If m is
+u d u
+microscopic, then the approaching vehicle (vehicle a) may require information from a vehicle
+within m (vehicle b), for example to determine its own headway.
+d
+Most authors have approached this problem by creating a “transition zone” between m
+u
+and m , where both representations coexist. The focus of these studies has not been on the
+d
+generic case, but rather on how to preserve consistency in the transition zone between two
+particular models m and m . Burghout et al. (2005) studied the coupling of a mesoscopic
+u d
+model called Mezzo with a microscopic model called MITSIMLab. Bourrel and Lesort (2003)
+proposed the combination of the LWR with a compatible microscopic model, such as Newell
+(2002). This approach is extended by Leclercq (2007), who notes that no transitions zone is
+2
+
+===== PAGE 3 =====
+
+needed if the models are mutually consistent since, in this case, estimates can be made from
+upstream information alone. That paper developed a technique for coupling a macroscopic
+and a microscopic model, both of which were consistent with LWR.
+The goal of the present paper is to develop and demonstrate a more general approach to
+the problem. First, it is recognized that the function of the transition zone is to preserve
+information that is needed by one model and which may not be easily obtained from the
+other. In the example of the figure, if model m is macroscopic, then vehicle b will not
+d
+have an explicit representation, and thus the headway for vehicle a will be undetermined.
+A transition zone would guarantee that there is always a vehicle b from which to compute
+a headway. Here however, we will dispense with the transition zone. Instead it will be
+the “responsibility” of m to provide a reasonable response when queried by m for the
+d u
+position of its upstream-most vehicle. This will not be difficult whenever m is vehicle-
+d
+based (microscopic or mesoscopic). The case of the cell-transmission model is developed in
+Section 5.3 .
+Section3describestheproposedapproachforcoordinatingtheinteractionsoftwomodels
+over a boundary. We will see that the methodology captures a wide range of models, includ-
+ing microscopic, mesoscopic, and macroscopic models of first and second order, discretized
+with a Godunov scheme. The approach allows the arbitrary partitioning of traffic networks
+into sub-networks, each managed by a different traffic model. This type of architecture, in
+which link interactions are mediated by a model-agnostic protocol, lends itself well to imple-
+mentations in distributed memory. A future publication will present the extension to HPC
+(high performance computing).
+The concepts described in this paper have been implemented in the Open Traffic Models
+project. OTM includes three models representing the three major classes: the cell transmis-
+sion model (macro), the two-queue model (meso), and Newell’s car-following model (micro).
+Other models can be added, combined, and distributed as plugins, using the OTM inter-
+face. OTM also provides several options for controlling (or influencing) traffic. These include
+fixed actuators such as traffic signals, ramp meters, variable speed limits, as well as on-board
+devices such as driver information systems and routing apps. The control algorithms that
+drive these devices can be implemented as plugins as well, using OTM’s control algorithm
+interface.
+2 Preliminaries
+Two basic requirements for the design of a hybrid traffic simulation interface can be stated:
+1) it must conserve vehicles, and 2) it must conserve vehicle characteritics. The first require-
+ment means simply that vehicles should not be created or destroyed across the interface.
+The second depends on which characteristics the modeler wishes to track. For example, the
+modeler may assign different performance or emissions characteristics to different popula-
+tions, such as cars and trucks. Or they may wish to follow different populations of vehicles
+for the purpose of computing performance metrics. It is also possible that different vehicles
+have different access to the network infrastructure – e.g. high-occupancy vehicles can use
+3
+
+===== PAGE 4 =====
+
+the HOV lane; connected vehicles and drivers with routing-apps have access to an informa-
+tion service. This is captured with the vehicle type. The concept of vehicle type gathers all
+distinguishing characteristics of the population that we are interested in tracking. Hence the
+population is split according to vehicle type, and each type is assigned a unique id.
+Vehicles enter the network through a source, attached to a link. A source produces a
+stream of vehicles of the given type (multiple sources can be attached to a single link). The
+time-varying intensity of the source is specified by the user as a discrete-time profile. Excess
+demand, that is, demand that exceeds the flow capacity or holding capacity of the link, is
+held in a limitless buffer. The process that produces the vehicles is specified by the user,
+and also depends on the model that operates on the source link. A vehicle-based model, for
+example, may create vehicles according to a Poisson process, while a fluid model may use a
+sequence of independent random variables.
+Each vehicle type is assigned a routing behavior. The routing behavior can be either
+routed or probabilistic. Routed vehicle types are assigned a route (a.k.a. a path), which is a
+sequence of links starting with the given source link. These vehicles travel along the path
+and are removed from the network upon exiting the last link in the sequence. They can be
+diverted to another path only by a routing actuator, such as a routing app. Probabilistic
+vehicles choose their next link at each junction according to turning probabilities, or split
+ratios. These vehicles are removed from the simulation when they exit a terminal link in
+the network. The split ratios are provided as discrete-time sequences for every junction and
+vehicle type. They can be modified during the run by an event (e.g. an accident) or a split
+ratio actuator.
+2.1 Road segments
+The road network consists of an interconnection of road segments, or links. The state of each
+link is managed by its model. Figure 2 shows a generic link. Each link has a positive number
+of full-length lanes. It may also have partial-length lanes, such as turn pockets. The four
+possible partial lane structures are in the “inner-upstream”, “inner-downstream”, “outer-
+upstream”, and“outer-downstream” positions. Each partial lane structure is characterized
+by its position, number of lanes, length, and gates.
+Figure 3(a) shows an intersection approach. The turn pocket is captured as an inner-
+downstreampartiallane. Figure3(b)showsanonrampmerge. Themergelaneisrepresented
+as an outer-upstream partial lane in link 2. In both cases, access to the partial lanes is
+unrestricted. Figure 3(c) depicts a freeway segment with a priority lane with restricted
+access. The priority lane can be represented as an inner-downstream (or upstream) partial
+lane structure with length equal to the full length of the link. Access to the priority lane
+can be restricted to a series of gates, or unrestricted.
+2.2 Road parameters
+The driving characteristics of the road segments are captured by a set of road parameters.
+These parameters are, in general, specific to the model that manages the link. However,
+4
+
+===== PAGE 5 =====
+
+Figure 2: Generic road geometry.
+Figure 3: Example road geometries
+there are basic roadway characteristics that are common to many traffic models. These are
+¯
+the three parameters of the so-called triangular fundamental diagram: the road capacity (f),
+the speed limit (v¯), and the jam-density (ρ¯). See Figure 4.
+It is required that the per-lane values of these three quantities be defined for each road
+segment. These are interpreted by the models and translated into model-specific parameters.
+Thus,abasicdegreeofphysicalconsistencybetweenmodelsisachieved. Themodelsmayalso
+require additional parameters to be defined, and these can be provided separately. Section 5
+describes how these quantities are interpreted by each of the three canonical models included
+with OTM.
+5
+
+===== PAGE 6 =====
+
+Figure 4: Required road parameters
+2.3 Road connections
+Thus far we have focused on the geometry and characteristics of isolated road segments.
+We will now describe how these road segments are connected. The standard approach for
+macroscopic traffic models is to use a graph in which links are identified with edges and
+their interconnections are represented as vertices. This approach ignores the finer-grained
+interconnections between lanes, which are needed by most microscopic models. Here we use
+road connections to specify the relations between links at the lane level.
+Figure 5: A freeway offramp
+A road connection is a tuple with two elements: a set of upstream lanes and a set of
+downstream lanes. r = (lup,ldn). The interpretation of a road connection is that vehicles
+r r
+that depart the upstream link from a lane contained in lup may enter the downstream link
+r
+throughanylaneinldn. Figure5showsarepresentationofafreewayofframp. Thethreelinks
+r
+are the upstream freeway segment (lanes 1 to 4), the downstream freeway segment (lanes
+5 to 8), and the offramp (lane 9). The road connections are r = ({1,2,3,4},{5,6,7,8})
+1
+and r = ({4},{9}). Movements that do not follow road connections are prohibited. For
+2
+example, vehicles are not allowed to exit the freeway from lane 3. The granularity of the
+representation can be controlled by adding or removing road connections. For example,
+vehicles can be made to preserve their lanes when moving from one link to the next by
+assigning road connections to every individual lane. However this level of detail is often not
+needed.
+There may be overlap between the upstream lanes of two road connections (lup∩lup (cid:54)= ∅),
+r r(cid:48)
+and thus a vehicle within the overlap may have turning options (e.g. lane 4 in Figure 5). It
+is required that these options lead to different links, so that split ratios specified at the link
+6
+
+===== PAGE 7 =====
+
+level may be translated into split ratios between road connections.
+2.4 Lane groups
+We use the term lane group to mean a set of adjacent lanes that share the same set of exiting
+road connections. Lanes in a single lane group can be expected to advance with approxi-
+mately equal speed. The model that operates on the link can therefore assign to each lane
+group a single speed-synchonized structure. For a microscopic model this would be a lane;
+for a mesoscopic model, a FIFO queue; for a macropscopic model it would be an instantia-
+tion of the differential equation. The model may choose to create a finer representation (e.g.
+lane-by-lane), but this is not required.
+2.5 Models and state indices
+A model is a program that manages the state of one or more links in the simulation. The
+responsibilities of a model are,
+1. to maintain the internal state of the lane groups in its links,
+2. to emit vehicle packet release requests to the simulator, in order to send vehicles to a
+downstream model,
+3. to ensure that vehicles only leave the link along road connections that are consistent
+with their routing,
+4. to receive incoming vehicle packets sent from upstream links,
+5. to respond to requests for information from the simulator.
+The system requires that models keep track of the type and routing information of all
+of the vehicles in their links. The routing information is captured by the route id, if the
+vehicle is of a routed type, and by the id of the next downstream link, if the vehicle is of
+a probabilistic type. Thus it is assumed that all vehicles (probabilistically routed vehicles
+in particular) select upon entering a link, the link to which they will proceed following that
+link. This assumption is in contrast to many graph-based models, in which the split ratio is
+only applied as vehicles flow through a multi-output node; that is, when they exit the link.
+This selection of a next link, whether deterministic (provided by the route) or probabilistic
+(provided by split ratios) is computed by the OTM system and attached to the vehicle
+packets as they enter the link (see Section 3).
+We use the term state index to refer to a pair of vehicle type id and either route id or next
+link id, depending on whether the type is routed or probabilistic. Table 1 shows an example
+of a lane group with four state indices. The first and second rows correspond to vehicles
+of type 1, the third and fourth are vehicles of type 2. If type 1 is routed, then the third
+column indicates that these vehicles are on routes 7 and 4. If type 2 is probabilistic then the
+third column indicates that these vehicles will proceed to links 23 and 34 after leaving the
+7
+
+===== PAGE 8 =====
+
+present link. The values of the states are listed in column four, and are in units of number
+of vehicles. These values are defined and managed by the model. The model represented in
+the table is a first order fluid model. If it were a second order fluid model, then the values of
+the fourth column would be two-dimensional arrays. If it were a vehicle-based model, then
+they would be a set of vehicle objects.
+Type Route or Next link Vehicles
+1 7 11.2
+1 4 4.7
+2 23 0.3
+2 34 9.1
+Table 1: Typical lane group state for a first order fluid model.
+3 Model interactions
+Each of the individual models engaged in the simulation are responsible for managing their
+internal states. The interactions between these models are coordinated by the simulator
+using the protocol described in this section. This protocol is intended to be compatible with
+the Godunov scheme for partial differential equations, but also capable of handling discrete
+vehicles. The Godunov scheme, as illustrated by the cell-transmission model, determines
+the flow across the boundary between links as the minimum between what the upstream
+link ‘wants’ to send (the demand) and what the downstream link can accommodate (the
+supply). The method can also be used to solve second-order fluid dynamical models by
+generalizing the definitions of demand and supply (Lebacque et al., 2007). Here we use a
+similar approach for passing flux packets from an upstream model to a downstream model.
+The packet may contain any number of vehicles, along with their state, and tagged with a
+state index. For example the contents of Table 1 is a viable flux packet. Packets will contain
+either whole vehicle objects or arrays of real numbers, depending on whether the originating
+model is vehicle-based or fluid-based. OTM provides basic object types for vehicle-based
+and fluid-based state descriptions with translators for converting between them. These can
+be used to build new model plugins.
+Figure 6: Links are drawn with a dotted rectangle, lane groups with a solid rectangle, and
+nodes with a circle.
+8
+
+===== PAGE 9 =====
+
+The protocol is triggered when the upstream model m requests to send a packet p along
+u
+a road connection r. Figure 6 shows the elements involved. The road connection r leads to
+a set of lane groups D in the downstream link d. The set of road connections that leave
+r
+link d are denoted with E. The set of links reached by road connections in E is F.
+Upon receiving the request from the upstream model to release p along r, the system asks
+the downstream model how much space the packet p would occupy in link d, and how much
+space is available. This is done by invoking the following methods in the model interface, as
+implemented by m .
+d
+get packet size : (p,r) → |p| ∈ R+ (1)
+get max packet size : (p,r) → p¯∈ R+ (2)
+These are then used to compute a scaling factor for packet p,
+(cid:18) (cid:19)
+p¯
+α = min 1, (3)
+|p|
+It is assumed that by multiplying the number of vehicles in the packet by α (uniformly over
+all state indices), while keeping fixed all other states and vehicle characteristics, the scaled
+packet (αp) will fit in the downstream link. This is true for first order fluid models, and for
+the class of generic second order models described in Lebacque et al. (2007) (GSOM class).
+If the sending model is vehicle-based, then the packet must be split into two integer-valued
+parts, while complying with the space constraint of Eq. (3). In this case, the calculation is
+more complicated: each state index is scaled separately by the largest amount that preserves
+whole vehicles while not exceeding the value of α from Eq. (3).
+In the particular case of a downstream mesoscopic model with vertical queueing, α al-
+ways evaluates to 1, since all packets can be accepted without restriction. For second-order
+fluid models, such as those in the GSOM class, the maximum packet size depends on the
+composition of the packet, in addition to the state of the downstream link. This is the reason
+for including p as a parameter in Eq. (2).
+It should be noted that it is not necessary that all models share the same ‘norm’; that
+is, they need not agree on the size of a packet. They must however return a value |p| such
+that αp (as defined above) can be accommodated.
+Next, before delivering αp to the downstream model, the system determines the next link
+for probabilistically routed vehicles. This is done by sampling the split ratios assigned to
+links in F in Figure 6. If the upstream model is fluid-based, then αp is divided into as many
+smaller packets as non-zero split ratios exist for the given vehicle type. If it is vehicle-based,
+then the each vehicle is assigned a next link with probabilities correseponding to the split
+ratios. The resulting collection of vehicles packets is then passed to the downstream model
+using the method,
+send packets : (P,r) → void (4)
+Here P is the collection of packets being sent, and r is the road connection along which they
+travel. Upon receiveing the packets, the downstream model must distribute them amongst
+9
+
+===== PAGE 10 =====
+
+the lane groups in D . On possible strategy for doing this is to split each packet in P into
+r
+|D | equal packets. Another is to split them in a way that seeks equilibrium between the
+r
+lane groups. OTM provides implementations of these two strategies that can be used by
+new model plugins.
+After lane group assignment, the final step of the process is to translate all of the packets
+into the native representation of the receiving model, and incorporate them into the state.
+This is done by the downstream model using vehicle classes and translators provided by the
+program.
+4 Simultaneous requests
+Theprevioussectiondescribedtheinteractionbetweenanupstreamandadownstreammodel
+when a single vehicle packet is sent between the two. In general however, packets may be
+sent simultaneously through a multi-input/multi-output connection. This is the case, for
+example, with discrete-time fluid models where all lane groups emit packets at every time
+step. In this section we describe the extension of the model coordinator for this case. This is
+known in the transportation literature as a “node model”. The purpose of the node model is
+to scale the packets that travel through a MIMO node such that they can be acommodated
+by the downstream lane groups, while satisfying some criterion such as maximizing flow. We
+describe here the particular node model that has been implemented in OTM, which is an
+adaptation of the method of Wright et al. (2017) to a network representation consisting of
+lane groups and road connections, instead of nodes and links.
+Figure 7: Node model.
+Figure 7 provides an illustration. A set of packets is requested to be sent from upstream
+lane groups in the set G, through road connections in the set R, to downstream lane groups
+in the set H. The “node” in the figure has three incoming, or upstream, lane groups {1,
+2, 3}, which connect via three road connections {1, 2, 3} to three downstream lane groups
+{4, 5, 6}. The figure also shows a graph representation of the connectivity between these
+elements. This graph is encoded in “upstream” and “downstream” sets for each element.
+The downstream set of lane group 1 is road connection 1, the upstream set of lane group 6
+is road connections 1 and 3, etc. These sets are denoted with D , U , D , and U for the
+g r r h
+upstream and downstream sets of elements in G, R, and H.
+10
+
+===== PAGE 11 =====
+
+while true {
+(NM 0)
+break if (stopping criterion)
+(NM 1) through (NM 6)
+}
+The execution of the node model is shown above. With each iteration, the upstream models
+send a portion of their packets. The portion is limitted either by upstream demand or
+downstream supply, and hence, as with Wright et al. (2017), the algorithm is guaranteed
+to complete within a number of iterations not exceeding the number of lane groups. We
+confine the description to the simpler case, where the total supply in downstream lane
+groups are independent of the composition of the packets being sent to those lanes groups.
+This case covers first-order fluid models and most vehicle-based models. This more general
+case has been developed by Wright and Horowitz (2017) for graph representations, and will
+be developed for OTM in a future publication.
+4.1 Node model steps
+(NM 0) dg ∈ R+ is the size of the packet emitted by lane group g ∈ G along road connection
+r
+r ∈ R. This is obtained, as in the SISO case, by invoking Eq. (1) on the unique
+receiving model. For each lane group g, we construct the set of road connections with
+positive demand:
+D+ = {r ∈ D : dg > 0} ∀g ∈ G (5)
+g g r
+Boolean variables (cid:3)g, (cid:3)r, and (cid:3)h are used to indicate that a lane group or road
+connection is “blocked”. A downstream lane group h is blocked if it has zero supply
+sh.
+(cid:3)h = [sh == 0] ∀h ∈ H (6)
+The supply sh is obtained from Eq. (2). This function is expected to return zero
+whenever lane group h is full, and thus prevent vehicles from entering. A road con-
+nection is blocked only if all of its downstream lane groups are blocked. This reflects
+the assumption that packets traveling along road connection r may be placed in any
+of the lane groups in D .
+r
+(cid:3)r = [(cid:3)h] ∀r ∈ R (7)
+∀h∈Dr
+The variable (cid:3)g is true whenever lane group g is either blocked or empty. An upstream
+lane group is blocked whenever any of its exiting road connections is blocked, provided
+there is demand for that road connection (Eq. 8). This reflects the FIFO assumption
+within the lane group: a single vehicle moving along a blocked road connection will
+block the entire upstream lane group. A lane group is empty if its demand has been
+delivered, and therefore the set D+ is empty.
+g
+(cid:3)g = [(cid:3)r] ∨ (cid:2) D+ = ∅ (cid:3) ∀g ∈ G (8)
+∃r∈Dg + g
+11
+
+===== PAGE 12 =====
+
+(stopping criterion) The computation halts if all upstream lane groups are blocked or empty.
+stop if [(cid:3)g] (9)
+∀g∈G
+(NM 1) For every r ∈ R: Calculate the total demand on each road connection by aggregating
+over incoming lane groups.
+(cid:88)
+dr = dg (10)
+r
+g∈Ur
+Compute the downstream supply available to each road connection, disregarding the
+demandsfromotherroadconnections. Thiscalculationinvolvesλr ∈ (0,1], theportion
+h
+of lane group h that is accessible to road connection r. In Figure 7, λ1 = 0.5 since road
+6
+connection 1 has access to only one of the two lanes in lane group 6.
+(cid:88)
+sr = λrsh (11)
+h
+h∈Dr
+Compute the apportionment of the demand on connector r to each of its downstream
+lane groups h. This is done in proportion to the available supply.
+(cid:26)
+0 if sr == 0
+αr = ∀ h ∈ D (12)
+h λrsh/sr otherwise r
+h
+(NM 2) For every h ∈ H: Compute the total demand on downtream lane group h as the sum of
+demandsonitsincomingroadconnectionsscaledbytheapportionmentfactor(Eq.13).
+γh is the percent excess demand on lane group h (Eq. 14).
+(cid:88)
+dh = αrdr (13)
+h
+r∈U
+h
+(cid:18) sh(cid:19)
+γh = max 0,1− (14)
+dh
+(NM 3) For every r ∈ R: Propagate the excess demand factors to the road connectors. The
+demand on each road connector must be reduced by the worst-case factor. Note that
+this formula will yield γr = 1 for a blocked road connection, since with sh = 0 we have
+γh = 1 for all of its downstream lane groups.
+(cid:88)
+γr = αrγh (15)
+h
+h∈Dr
+(NM 4) For every g ∈ G: Compute the reduction factor for each upstream lane group. Only
+road connections with positive demand (r ∈ D+) are considered in this calculation.
+g
+The (cid:3)g case is included to account for the situation that g is empty, and therefore the
+max is undefined. If g is blocked, then both formulas evaluate to 1.
+(cid:26) 1 (cid:3)g
+γg = (16)
+max (γr) !(cid:3)g
+r∈Dg +
+12
+
+===== PAGE 13 =====
+
+Compute the demand that advances along each road connection exiting lane group g
+(Eq. 17), and update the demand that remains (Eq. 18). ∀ r ∈ D+:
+g
+δg = dg(1−γg) (17)
+r r
+dg ← γgdg (18)
+r r
+(NM 5) For every r ∈ R: Calculate the portion of the advancing flow on each road connection.
+(cid:88)
+δr = δg (19)
+r
+g∈Ur
+(NM 6) For every h ∈ H: Collect the flow entering each downstream lane group and reduce
+the downstream supplies.
+(cid:88) 1−γh
+δh = αrδr (20)
+1−γr h
+r∈U
+h
+sh ← sh −δh (21)
+Once the algorithm converges, the scaling factors that are the output of the node model
+can be computed from the total amount of each packet that has been sent.
+5 Models
+Models are implemented in OTM as plugins, that is, as relatively small pieces of code that
+define the functionality specified by the modeling interface. This interface includes methods
+such as Eqs. (1), (2) and (4), as well as other methods that are needed to track performance
+measures. Additionally, the model must provide methods for advancing its internal state in
+time. That is, it must provide the longitudinal and lateral dynamics. All other functionality
+– routing, traffic control, performance metrics, execution, and process parallelization – are
+managed by OTM. The main requirement placed on the model is that it must only release
+vehicle packets along road connections that are consistent with the routing behavior of the
+vehicles. This implies that vehicles must move laterally within a link (from one lane group
+to another) in order to reach a valid exiting road connection. In short, the model must
+implement a lane-changing strategy.
+This section describes implementations of the three canonical examples for microscopic,
+mesoscopic, and macroscopic modeling; respectively, Newell’s simplified car following model,
+the two-queue model, and the cell-transmission model.
+5.1 Newell’s car-following model
+The model described here is a discrete-time version of Newell (2002). Each lane group
+contains a single first-in-first-out queue of vehicles, numbered starting with the downstream-
+most vehicle. The position of the ith vehicle at time t, x (t), is related to the position of the
+i
+13
+
+===== PAGE 14 =====
+
+(i−1)th vehicle at a previous time,
+x (t+∆t) = x (t)+max (cid:0) 0, min (cid:0) δvi , h (t)−δwi , h (t)δf ¯i (cid:1)(cid:1) (22)
+i i i i
+Here ∆t is model’s simulation time step; δvi, δwi, and δf ¯i are sampled from distributions
+whose means correspond to the left and right slopes of the fundamental diagram, and the
+capacity (see Figure 4).
+δvi ∼ N(v ∆t,σv) (23)
+f
+δwi ∼ N(w∆t,σw) (24)
+δf ¯i ∼ N(f ¯ ∆t,σf) (25)
+σv, σw, and σf are user-defined standard deviations. The first term in Eq. (22) applies
+to lead vehicles that travel with free-flow speed v . The second term involves h (t), the
+F i
+headway of the ith vehicle at time t. This is defined, for all vehicles except the first vehicle
+in the lane group, as the distance to its leader: h (t) = |x (t) − x (t)|. The first vehicle
+i i i−1
+however does not have a leader in its lane group, and hence it is possible that its leader
+belongs to a different model. Computing the headway for the first vehicle may therefore
+involve requesting the position of the upstream-most vehicle in the lead vehicle’s next link.
+This is done by calling a method provided by the modeling interface.
+get distance to last vehicle : (r) → η ∈ R+ (26)
+This measures the distance from the upstream boundary of the link accessed by road con-
+nection r to the nearest vehicle in any of the lane groups accessible from r.
+The third term in Eq. (22) imposes a capacity constraint.
+The lane change model that has been implemented for this model is simple. Vehicles
+that enter a link are placed directly into a lane group that connects to their target road
+connection, irrespective of whether the road connection they enter by actually connects to
+that lane group. In other words they change lanes immediately and without obstruction into
+their target lane group. If the target lane group is already full, then the vehicle is placed in
+a buffer attached to that lane group, and enters as soon as space becomes available.
+5.2 Two-queue model
+This mesoscopic model is similar to the one reported in Varaiya (2013). Each lane group is
+equipped with two queues. The first is a transit queue, which delays every vehicle entering
+the lane group by the free-flow travel time. After leaving the transit queue, the vehicle enters
+the waiting queue, which is a FIFO queue, serviced by a Poisson process. See Figure 8.
+This model makes use of the three supply-side parameters of Figure 4. The speed limit v¯
+¯
+is used to calculate the free-flow travel time. The capacity f is the average discharge rate for
+the waiting queue. The jam density ρ¯ is used to compute the available supply for incoming
+vehicle packets. These packets are rejected whenever the combined number of vehicles in the
+transit and waiting queues reaches the maximum value. The lane changing model for the
+14
+
+===== PAGE 15 =====
+
+Figure 8: Queueing model.
+queuing model is identical to that of the car-following model: an arriving vehicle is placed
+immediately into its target lane group unless it is full, in which case the vehicle is held in a
+buffer until space becomes available.
+5.3 Cell-transmission model
+The macroscopic model included with OTM is an adaptation of the cell transmission model
+(CTM) of Daganzo (1994), with a lane change strategy that is similar to that of Laval and
+Daganzo (2006). Lane groups are divided into cells. Figure 9 shows a single link with three
+lane groups. All of the cells in a link are of equal size, which is computed as the largest that
+yields an integer number of cells, without exceeding a user-defined maximum cell size. The
+simulation time step ∆t must comply with the Courant–Friedrichs–Lewy condition, that no
+cell can be traversed in one time step by a vehicle traveling at maximum speed.
+Figure 9: Lane changing model for the CTM.
+Each cell i has up to two lateral neighbors in adjacent lane groups; the inner and outer
+lane groups (in(i) and out(i)). The state of a cell i consists of the number of vehicles per
+state index s: ni (omitting the time index for convenience).
+s
+S(cid:96) is the set of all states that can use link (cid:96). The link shown in Figure 9 carries two states:
+one represented by a solid blue arrow, which is headed for link 1, and another represented
+by an open green arrow, which is headed for link 2. Each lane group carries a map ρg that
+returns, for each state, the road connection r that it must use to reach its next link.
+ρg : S(cid:96) → R (27)
+In Figure 9 we have that ρ1 evaluated on the blue state returns road connection 1, while ρ2
+and ρ3 evaluated on the green state return road connection 2. It is a requirement on the
+network configuration that this map should return at most one road connection. That is,
+for each lane group g, the road connections that leave g must all lead to different links.
+15
+
+===== PAGE 16 =====
+
+We define the target lane group set for a state s within link (cid:96) as those from which its next
+link can be reached. In the figure, the target lane group set for the blue state is {1}, and for
+the green state it is {2,3}. Each lane group also carries a map φg indicating the direction in
+which a state must change lanes in order to reach its target lane group set.
+φg : S(cid:96)(g) → {in,out,none} (28)
+Here (cid:96)(g) is the link that contains lane group g, and hence S(cid:96)(g) is the set of states that use
+g. φg(s) returns in, out, or none depending on whether the state must change lanes inward,
+outward, or not at all to reach its target road connection. Figure 9 illustrates this map.
+5.4 Dynamics
+Every lane group managed by the fluid-dynamical model emits vehicle packets every ∆t.
+These packets are assessed by the OTM node model, which involves calls to the supply
+calculation function. Following this, every lane group receives a set of vehicle packets from
+its incoming road connections, and proceeds to update its internal state. These three steps
+– vehicle packet generation, supply calculation, and state update – are described below.
+5.4.1 Vehicle packet generation.
+This stage consists of the five internal steps. First, the number of vehicles that change
+lanes during the upcoming time step is computed with Eqs. (29) through (31), and used
+to compute an intermediate state with Eq. (32). The intermediate state is then used to
+evaluate the longitudinal demand, in step Eqs. (33).
+Figure 10: Lane change model.
+[FP 1] Compute, for each cell, the total number of vehicles performing each of the lane change
+maneuvers.
+(cid:88)
+ni = ni µ ∈ {in,out,stay} (29)
+µ s
+{s:φg(i)(s)=µ}
+16
+
+===== PAGE 17 =====
+
+Here, g(i) is the lane group for cell i, and therefore {s : φg(i)(s) = µ} is the set of states
+that perform maneuver µ in cell i.
+[FP 2] Compute for all cells i the total number of vehicles in the cell.
+(cid:88)
+ni = ni +ni +ni = ni ∀ cells i (30)
+in out stay s
+s
+[FP 3] Compute the scaling factor for all cells. ξi ∈ [0,1] is a supply apportionment factor for
+lane change movements, analogous to w for longitudinal movements. Hence the space
+available in cell i for vehicles changing lanes is ξi(n¯i −ni), where n¯i is the maximum
+occupancy. As illustrated in Figure 10, the total number of vehicles entering cell i is
+nout(i) +nin(i), and the scaling factor βi is,
+in out
+(cid:32) (cid:33)
+ξi(n¯i −ni)
+βi = min 1 , (31)
+nout(i) +nin(i)
+in out
+[FP 4] Apply the scaling factors to the lane change demands and execute the maneuvers. This
+results in an intermediate state nˆi which represents the number of vehicles for state s
+s
+after the lane changes have completed, but before vehicles have moved forward.
+ (cid:0) (cid:1) 
+1−βin(i) ni if φi(s) = in
+ s 
+(cid:0) (cid:1)
+nˆi = 1−βout(i) ni if φi(s) = out (32)
+s s
+ ni if φi(s) = none 
+s
+(cid:26) nout(i) if φout(i)(s) = in (cid:27)
++ βi s
+0 otherwise
+(cid:26) nin(i) if φin(i)(s) = out (cid:27)
++ βi s
+0 otherwise
+[FP 5] Compute the demand generated by each lane group on each of its outgoing road con-
+nections. This demand depends on the number of vehicles in its downstream-most cell.
+Denote with θ(g) a map that returns the downstream-most cell for lane group g (see
+Figure 9).
+(cid:26) min(vθ(g) nθ(g),f ¯θ(g)) if ρg(s) = r
+dg = x (33)
+rs 0 otherwise
+Here dg is the demand for state s generated by lane group g on road connection r. dg
+rs rs
+is zero if s does not use r. Otherwise it is as prescribed by the CTM. vθ(g) and f ¯θ(g)
+are the normalized free-flow speed and capacity for the downstream-most cell of lane
+group g. The set of dg values over all states s constitutes the flux packet that lane
+rs
+group g emits on road connection r.
+17
+
+===== PAGE 18 =====
+
+5.4.2 Supply calculation.
+The space available in lane group g to receive packets from upstream road connections is a
+¯
+functionofthestateinitsupstream-mostcell. Denotethiscellwithθ(g)(showninFigure9).
+sg = wθ¯(g)(n¯θ¯(g) −nθ¯(g)) (34)
+Here
+n¯θ¯(g)
+and
+wθ¯(g)
+are parameters of the upstream-most cell representing the jam density
+and congestion wave propagation speed.
+5.4.3 State update.
+Following the completion of the node model, reduced packets are passed between the lane
+groups. These are then translated into the macroscopic representation, and consolidated into
+two packets per lane groups – one entering and one leaving. The content of the upstream and
+downstream packets for lane group g is the total number of vehicles per state s: ng,up and
+s
+ng,dn. The the densities per cell and state can then be updated using the law of conservation
+s
+of vehicles. The incoming flow for the upstream-most cell is ng,up, the outgoing flow for the
+s
+downstream-most cell is ng,dn. The flows across internal cell boundaries are given by the
+s
+standard CTM formulas.
+All models must respond to simulator requests for the position of the upstream-most
+vehicle in a lane group. The CTM does this based on the supply function of the upstream-
+most cell in the lane group. By assuming that density concentrates toward the downstream
+part of the cell, the distance from the upstream edge to the last vehicle is (cid:96)(ρ¯−ρ)/ρ¯, where
+(cid:96) is the length of the cell, ρ¯ is the jam density, and ρ is the current density.
+6 Control elements
+We have thus far described the simulation of the hybrid open-loop traffic dynamics. We
+now describe how this dynamics can be influenced by a feedback algorithm, or a controller.
+Controllers are implemented in OTM as plugins, similarly to models. They do not interact
+directly with the traffic models, but instead through sensors and actuators. A sensor is any
+element that extracts information from the models and provides it to the controller. An
+actuator delivers the control command from the controller to the models. OTM provides a
+number of sensors and actuators that can be used by the modeler to construct the control
+infrastructure. Sensors and actuators are model agnostic: they operate using methods from
+the modeling interface, and are not concerned with the implementation details of those
+methods. Thus, the traffic models used in a scenario can be changed without modifying the
+control structures.
+Each controller can register with one or more sensors and one or more actuators. An
+actuator however can only be assigned to a single controller. Each controller is prescribed a
+time step by the modeler. This time step need not be equal to (or a multiple of) the time
+stepsoftheunderlyingmodels. Ateverytimestep, thecontrollerwillreadthemeasurements
+18
+
+===== PAGE 19 =====
+
+from its sensors, update its commands, and then transmit the commands to its actuators.
+Sensors and actuators have their own time steps, and again these are independent from the
+timestepsofthecontrollersandmodels. Sensorsuseinterfacemethodstoextractinformation
+from the models at each sensor time step. For example, the fixed local sensor method uses
+the get total vehicles in lanegroup(lg). OTM currently provides the following basic
+sensors,
+• Fixed local sensor. This sensor is attached to the pavement, and can be used to extract
+density, flow, and speed information for a particular cross section.
+• Fixed lane group sensor. This sensor is attached to a lane group, and can be used to
+obtain the total number of vehicles and their speeds.
+• Probe. This sensor is attached to a vehicle and can be used to measure its speed and
+local environment.
+The functionality required for the probe sensor is implemented in OTM’s basic vehicle class.
+This class can be extended for use in any vehicle-based model. When a probe vehicle enters
+a fluid-based model, OTM automatically creates a ‘’virtual vehicle’, which it tracks through
+the fluid network using the local speed provided by the model.
+In addition to these, there are also methods for querying static information about the sce-
+nario. This includes information about past and future demands and split ratios, controller
+states, and geometric information of the links and lane groups.
+These are the actuators that are currently available in OTM:
+• Road connection blocking actuator. This actuator can be used to open and close road
+connections, and thus to mimick traffic signals.
+• Variable speed limit. This actuator is used to change the speed limit of the link and
+its lane groups.
+• Router. Used to change the route of a routed vehicle type.
+• Demand modifier. Alter the profile of demand intensity for a source and vehicle type.
+• Split ratio actuator. Alter the profile of split ratios for a given vehicle type at a
+junction.
+In contrast to sensors, the implementation of these actuators does not make use of the mod-
+eling interface, but rather act by modifying the inputs to the models (e.g. road parameters).
+7 Experiments
+Here we apply the OTM framework to a simple linear network with two models m and
+A
+m . This is meant only to demonstrate the translation of vehicle states across a modeling
+B
+19
+
+===== PAGE 20 =====
+
+Figure 11: Experimental setup.
+interface. It does not exercise other features of the program, such as vehicle types, lane
+changing, the node model, and control structures. These are left for a future publication.
+Figure 11 shows the setup. The links are all of length 500 meters. They share per-lane
+characteristics: the capacity is 1,000 veh/hr/lane, jam density is 100 veh/km/lane, and the
+free-flow speed is 100 km/hour. Links 0 through 4 have two lanes, and hence their flow and
+holding capacities are 2,000 veh/hr and 100 vehicles respectively. Link 5 has half of these
+values (1,000 veh/hour and 50 vehicles).
+Links 0, 1, and 2 are managed by m ; links 3, 4, and 5 by m . A source of 1500
+A B
+veh/hr is applied upstream of link 0. This causes congestion to accummulate at link 5. This
+congestionpropagatesupstreamoverthemodelinginterface, anddissipatesafterthedemand
+is removed.
+Figure 12: m =macro, m =meso.
+A B
+Figure 12 shows the result when m is a macroscopic model and m is mesoscopic.
+A B
+Vehicles immediately begin to queue in link 5. The number of vehicles in link 5 reaches
+50 after about 400 seconds, and then the queue spills into link 4. The queue reaches the
+model boundary at around 1,750 seconds and propagates into the macroscopic model. The
+queueing density and speed in the macroscopic portion are 55 vehicles and 9.09 km/hr,
+according to the hydrodynamic theory. Notice that the congested density in the fluid model
+is significantly lower than in the mesoscopic model (55 vehicle versus 100 vehicles). As a
+consequence, the speed of propagation of congestion is higher. After the demand is removed
+20
+
+===== PAGE 21 =====
+
+(at 2,500 second) the congestion dissipates, again at a faster pace in the macroscopic model
+than in the mesoscopic model.
+Figure 13 shows the result when m is macroscopic and m is microscopic. For the
+A B
+microscopic model, the capacity reduction of link 5 is applied throughout its length, and not
+only at the downstream edge of the link, as with the macroscopic and mesoscopic models.
+This can be seen in Figure 13 as vehicles increase their spacing when they enter link 5. This
+causes congestion to form more quickly than in the previous case. The congestion wave
+reaches the model boundary after approximately 540 seconds. Measuring from the plot, the
+speed of propagation of congestion in the microscopic region is approximately 8.4 km/hour,
+which is 8% slower than in the fluid model, and faster than in the mesoscopic model. The
+queueing density in the microscopic model is about 34 vehicles in 500 meters. The congestion
+reaches the upstream boundary of the segment at around 1,400 sec. After that, the demand
+is turned off and congestion dissipates.
+Figures 13, 14, and 15 show other combinations of the three model types.
+Figure 13: m =macro, m =micro.
+A B
+8 Conclusion
+The goal of this work has been to develop a traffic simulation platform that is capable of
+running a variety of models, such as car-following, queueing, and fluid-based models. The
+approach has two main components.
+1. A network description that bridges the single-pipe graphs of macroscopic models and
+the lane-by-lane representations of micropscopic models. Road connections are used to
+construct lane groups. The lanes within a lane group are assumed to be synchronized
+in speed, and hence each lane group is assigned one instantiation of the ‘longitudinal
+dynamics’. This corresponds to a lane of vehicles for a microscopic model, a pair of
+queues for a mesoscopic model, and a differential equation for a macroscopic model.
+21
+
+===== PAGE 22 =====
+
+Figure 14: m =meso, m =micro.
+A B
+Figure 15: m =micro, m =macro.
+A B
+The granularity of the representation can be controlled by adding or removing road
+connections. Single-pipe and lane-by-lane are the two extreme cases.
+2. A protocol for coordinating models that operate on this network description. The
+protocol uses a ‘model interface’ to negotiate the passage of flux packets from one
+link to another. The protocol is similar to the Godunov scheme for partial differential
+equations, with a simple extension to vehicle-based models.
+Apart from the dynamical model, the complete specification of a traffic scenario also includes
+thedemandsandthecontrolalgorithms. Thepaperdescribesademandspecificationthathas
+multiple vehicles types (multi-commodity) and also allows for routed and probabilistic flows.
+The control structure has sensors and actuators, which provide communication between the
+models and the controllers.
+22
+
+===== PAGE 23 =====
+
+Open Traffic Models (OTM) is an implementation of this scheme. The software includes
+the three example models of the paper. The control and modeling interfaces allow for
+algorithms to be implemented as plugins. OTM is an open-source software, and it can be
+found at https://github.com/ggomes/otm-sim.
+References
+Aimsun. https://www.aimsun.com/, 2019. [Online; accessed January 2019].
+E. Bourrel and J.B. Lesort. Mixing micro and macro representations of traffic flow: A hybrid
+model based on the LWR theory. In 82th Annual Meeting of the Transportation Research
+Board, 2003.
+W. Burghout, H. Koutsopoulos, and I. Andr´easson. Hybrid mesoscopic–microscopic traf-
+fic simulation. Transportation Research Record: Journal of the Transportation Research
+Board, 1934:218–225, 2005.
+R. Chandler, R. Herman, and E. Montroll. Traffic dynamics: Studies in car following.
+Operations Research, 6, 1958.
+C. Daganzo. The cell transmission model a dynamic representation of highway traffic con-
+sistent with the hydrodynamic theory. Transportation Research Part B, 28B(4):269–287,
+1994.
+B. Greenshields. A study of highway capacity. Proceedings Highway Research Record, 14,
+1935.
+Systems Division ITT Industries, Inc. CORSIM User’s Guide, CORSIM Reference Manual,
+Version 6.0, May 2005. Prepared for Federal Highway Administration under contract
+number: DTFH61-01-C-00005.
+P. Korˇcek, L. Sekanina, and O. Fuˇcik. Cellular automata based traffic simulation accelerated
+on GPU. page 395–402, 2011.
+D. Krajzewicz, M. Bonert, and P. Wagner. The open source traffic simulation package
+SUMO. In RoboCup 2006, 2006.
+J. Laval and C. Daganzo. Lane-changing in traffic streams. Transportation Research Part
+B, 40:251–264, 2006.
+J.P Lebacque, S. Mammar, and H. Haj-Salem. Generic second order traffic flow modelling.
+17th International Symposium on Transportation and Traffic Theory, 2007.
+L. Leclercq. Hybrid approaches to the solutions of the Lighthill–Whitham–Richards model.
+Transportation Research Part B, 41:701–709, 2007.
+23
+
+===== PAGE 24 =====
+
+E. Lieberman. Brief history of traffic simulation. Traffic and Transportation Simulation -
+Looking Back and Looking Ahead: Celebrating 50 Years of Traffic Flow Theory, a Work-
+shop, pages 17–29, 2004.
+M.J.LighthillandG.B.Whitham. OnkinematicwavesII.Atheoryoftrafficonlongcrowded
+roads. Proceedings of the Royal Society A, 229:317–345, 1955.
+K. Nagel and M. Schreckenberg. A cellular automaton model for freeway traffic. Journal de
+Physique I, 2(12):2221–2229, 1992.
+G. Newell. A simplified car-following theory: A lower order model. Transportation Research
+Part B, 36:195–205, 2002.
+P. Richards. Shock waves on the highway. Operations Research, 4:42–51, 1956.
+F. van Wageningen-Kessels, H. van Lint, K. Vuik, and S. Hoogendoorn. Genealogy of traffic
+flow models. EURO Journal on Transportation and Logistics, 4(4):445–473, 2015.
+P. Varaiya. Max pressure control of a network of signalized intersections. Transportation
+Research Part C, 36:177–195, 2013.
+M. Wright, G. Gomes, R. Horowitz, and A. Kurzhanskiy. On node models for high-
+dimensional road networks. Transportation Research Part B: Methodological, 105:212–234,
+2017.
+M.A. Wright and R. Horowitz. Generic second-order macroscopic traffic node model
+for general multi-input multi-output road junctions via a dynamic system approach.
+arXiv:1707.09346 [cs, math], July 2017. URL http://arxiv.org/abs/1707.09346.
+X. Zhou and J. Taylor. DTALite: A queue-based mesoscopic traffic simulator for fast model
+evaluation and calibration. Cogent Engineering, 1(1), 2014.
+24

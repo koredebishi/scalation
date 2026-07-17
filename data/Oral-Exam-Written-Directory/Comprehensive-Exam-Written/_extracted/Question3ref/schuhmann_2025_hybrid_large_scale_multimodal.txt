@@ -1,0 +1,1332 @@
+===== PAGE 1 =====
+
+smart cities
+Article
+Creating and Validating Hybrid Large-Scale, Multi-Modal Traffic
+Simulations for Efficient Transport Planning
+FabianSchuhmann1,∗ ,NgocAnNguyen2 ,JörgSchweizer2 ,Wei-ChiehHuang3 andMarkusLienkamp1
+1 InstituteofAutomotiveTechnology,DepartmentofMobilitySystemsEngineering,TUMSchoolof
+EngineeringandDesign,TechnicalUniversityofMunich,85748Garching,Germany
+2 DepartmentofCivil,EnvironmentalandMaterialEngineering(DICAM),UniversityofBologna,
+40126Bologna,Italy
+3 ProfessorshipofTravelBehavior,DepartmentofMobilitySystemsEngineering,TUMSchoolofEngineering
+andDesign,TechnicalUniversityofMunich,80333Munich,Germany
+* Correspondence:fabian.schuhmann@tum.de
+Highlights:
+Whatarethemainfindings?
+• Withtheproposedhybridtoolchain,aseamlesstransferfromthegloballyassignedmeso-
+demandtoasmaller,locallysimulatedmicro-networkhasbeensuccessfullyappliedtoatest
+caseofthelargerMunchmetropolitanarea.
+• The approach allows link-by-link validation between real measurements, as well as the
+meso-andthemicro-simulations;forthetestcase,bothmodelsshowedagoodfitbetween
+simulatedandmeasuredtrafficflows,butthemicro-modelshowedmorerealisticresults
+with respect to the meso-model when average link speeds from floating car data were
+compared.
+Whatistheimplicationofthemainfinding?
+• Withthepresentedhybridapproach,itwillbecomefeasibletoefficientlymodelandsimulate
+large-scale transport scenarios with individual users while enabling a consistent micro-
+simulationondedicatedareas,whicharesensitivetotheimplementationofawiderangeof
+complextransportservicesandpolicymeasures.
+• It is possible to quantify and directly compare the closeness to reality of the meso- and
+AcademicEditor:PierluigiSiano
+micro-model,whichisusefultodemonstratewhetheramicro-simulationdoesofferadded
+Received:23October2024
+valueandwhetheritisworththeadditionaleffortswithrespecttothemeso-onlyapproach.
+Revised:8December2024
+Accepted:9December2024
+Published: 24December2024 Abstract:Mobilitydigitaltwins(MDTs),whichutilizemulti-modalmicroscopic(micro)traffic
+Citation: Schuhmann,F.;Nguyen, simulationsandanactivity-baseddemandgeneration,areenvisionedasflexibleandreliable
+N.A.;Schweizer,J.;Huang,W.-C.; planningtoolsforaddressingtoday’sincreasinglycomplexanddiversetransportscenarios.
+Lienkamp,M.CreatingandValidating
+Hybridmodelsmaybecomearesource-efficientsolutionforbuildingMDTsbycreatinglarge-
+HybridLarge-Scale,Multi-Modal
+scale,mesoscopic(meso)trafficsimulations,usingsimplified,queue-basednetwork-linkmodels,
+TrafficSimulationsforEfficient
+incombinationwithmoredetailedlocalmicro-trafficsimulationsfocusedonareasofinterest.
+TransportPlanning.SmartCities2025,
+8,2. https://doi.org/10.3390/ Theoverallobjectiveofthispaperistodevelopanefficienttoolchaincapableofautomatically
+smartcities8010002 generating,calibrating,andvalidatinghybridscenarios,withthefollowingspecificgoals:(i)an
+automatedandseamlessmergeofthemeso-andmicro-networksanddemand;(ii)avalidation
+Copyright:©2024bytheauthors.
+LicenseeMDPI,Basel,Switzerland. procedurethatincorporatesreal-worlddataintothehybridmodel,enablingthemeso-and
+Thisarticleisanopenaccessarticle micro-sub-modelstobevalidatedseparatelyandcomparedtodeterminewhichsimulation,
+distributedunderthetermsand micro-ormeso-,moreaccuratelyreflectsreality.Thedevelopedtoolchainisimplementedand
+conditionsoftheCreativeCommons
+appliedtoacasestudyofMunich,Germany,withthemicro-simulationfocusingonthecity
+Attribution(CCBY)license
+quarterofSchwabing,usingreal-wordtrafficflowandfloatingcardataforvalidation.When
+(https://creativecommons.org/
+validatingthesimulatedflowswiththedetectedflows,theregressioncurveshowsacceptable
+licenses/by/4.0/).
+SmartCities2025,8,2 https://doi.org/10.3390/smartcities8010002
+
+===== PAGE 2 =====
+
+SmartCities2025,8,2 2of23
+values.Thespeedvalidationwithfloatingcardatarevealssignificantdifferences;however,it
+demonstratesthatthemicro-simulationachievesconsiderablybetteragreementwithrealspeeds
+comparedtothemeso-model,asexpected.
+Keywords: agent-basedmodel;activity-basedmodel;hybridsimulation;MATSim;SUMO;
+hybridPY
+1. Introduction
+In the quest for ever-more-realistic mobility models for planning, transport policy
+drafting,ortransporttechnologydevelopment,thereisatrendtowardmorefine-grained,
+individual methods, such as activity-based demand models (ABMs), as well as meso-
+andmicro-trafficsimulationmodels. ABMsarecapableofreplicatingthedailyorweekly
+activity–travel schedule of individuals by considering their socio-demographic status,
+residentiallocation,mobilityresources,theaccessibilityoftransportinfrastructuresand
+amenities,householdinteractions,andsoon [1]. Thisadvancedapproachcangenerate
+moretemporallyandspatiallyconsistentmobilitypatternscomparedtotraditionalfour-
+stepmodels(FTMs),whichjustmodeltripsandallowtripsmadebythesameindividuals
+to overlap in time and space. The consistency of travel patterns in space and time can
+contributetoamorerealistictrafficsimulationwithmoregranularity.
+Using meso- or micro-simulators, the travel demand, calculated using ABMs, can
+beassignedtothestreetnetworktodeterminetheroutes takenbyagents, forexample
+in a user equilibrium condition [2]. Finally, during the micro-simulation, the agent’s
+triptimesandmanyotherimportantkeyindicatorscanbequantified—whichmeans,in
+general,thatthemobilitysystem’sreactiontoanychangesonthedemandorsupplyside
+canbedetermined.
+Mesoscopicsimulatorsusedynamicqueuesasanetworkedgemodel,withtheedge
+capacitypredefinedaccordingtonetworkattributes [3]. Oncethesimulatedflowratesinto
+anedgeexceedthiscapacitylimits,queuesformandmayspilloverintoprecedingedges.
+MATSim(Multi-Agent-TransportSimulation)[4],apopular,open-sourcemeso-trafficsimu-
+lation,isfrequentlyusedinoptimizationloopstodetermineuserequilibrium,thankstoits
+efficiencyinsimulatinglargeregions. Intheoptimizationloop,agentsegoisticallyoptimize
+theirdailyactivityschedulesusingaco-evolutionaryalgorithm,adjustingfactorssuchas
+departuretime,transportmode,orroute. Theoptimizationisrununtilanequilibriumstate
+isreached. MATSimincludesitsdemandsub-modelsandhasbeenintegratedwithother
+ABMstobuildlarge-scalescenarios,includingTASHA[5],CEMDAP[6],mobiTopp[7],
+BEAM[8],andFEATHERS[9].
+Microscopicsimulators,inessence,solvevehicle-motionequationsandgeneratevehicle
+trajectories and speed profiles. Through car-following models, vehicles interact based
+onspeedsanddistancesbetweenleaderandfollower,implicitlydefiningnetworkedge
+capacities. Furtherdetails,suchaslane-changemodels,lane-to-laneturningrestrictions,
+andtrafficlightsystemscanalsobesimulated. Micro-simulatorsaremuchclosertowhatis
+understoodasamobilitydigitaltwin(MDT).Practically,anypoliciesorplansthataimto
+changethemobilitysystem,physicallyorlogistically,couldbeimplementedandevaluated
+withsuchanMDT.SUMO(SimulationofUrbanMObility),awidelyused,open-source
+micro-simulationframework,developedandmaintainedbytheGermanAerospaceCenter
+inBerlin,Germany,employscar-followingmodelstoaccuratelyreplicatevehicledynamics,
+including position, speed, and acceleration in both longitudinal and lateral directions.
+
+===== PAGE 3 =====
+
+SmartCities2025,8,2 3of23
+However,itrequiresaprecisedescriptionofthetransportinfrastructuresuchaslanes,lane
+properties,turningrestrictions,andtrafficsignalprograms[10].
+Whilemicro-trafficmodelsareregardedasMDTplatformsandareapplicabletoawide
+rangeofproblems,theydofacetwomajorlimitations,whichcomplicatethecalibrationand
+validationofthemodel,particularlyinmulti-modal,large-scaleMDTscenarios,including
+thefollowing:
+• Micro-traffic models are sensitive to infrastructure details; inaccurately modeled
+detailscanresultinunexpectedbehavior,suchasartificialgridlocks. Topreventthese
+issues,accuratenetworkpreparationandtestingareessential,requiringsignificantly
+moremodelingeffortcomparedwithmeso-simulators.
+• Micro-simulationsfaceahighcomputationalburdenandexcessivelylongsimulation
+timescomparedtomeso-simulations. Thedynamicqueuemodelinmeso-simulations
+ismuchfasterthanthecar-followingmodelsusedforeachvehicleoneachedge[11].
+Furthermore, meso-models can simulate scenarios with down-scaled demand by
+adjustingedgecapacitiesaccordingly[12].
+However, meso- and micro-simulation models have complementary strengths in
+modelingeffort,speed,andaccuracy,makingahybridapproachadvantageous. Hybrid
+modelsutilizeamulti-levelframeworktocomprehensivelyrepresentmobilitydynamicsby
+integratinglarge-scalemeso-simulationswiththedetailedprecisionofmicro-simulations
+in areas of particular interest. This combination enhances the understanding of traffic
+behaviorbyleveragingtheuniquestrengthsofeachsimulationenvironment[13].
+Even if the advantages of hybrid traffic models, such as the shorter computation
+time [14] or reduced modeling complexity and effort while maintaining the ability to
+efficientlyestimatetheuserequilibrium,areknownandrecognized,currentapproaches
+areoftenlimitedtosmallandoftenpuretheoreticalproblems. However,noframework
+currentlysupportsthedevelopmentandexecutionofhybridtrafficmodelsinpractical
+applications. Additionally, no large-scale, multi-modal hybrid traffic model has been
+validatedthroughhourlyordailylink-to-linkanalysis.
+This paper contributes to the state of the art by presenting a toolchain, named hy-
+bridPY,toefficientlygeneratehybridtrafficmodelsbycombiningtheopen-sourcetraffic
+simulationframeworksSUMO andMATSim. Themethodpresentedmakesitpossible
+to bridge the differences between MATSim and SUMO by synchronizing the networks
+and,basedonthis,totransferthepredicteduserequilibriumfromthemeso-leveltothe
+micro-level. Theproposedtool-chainisappliedtoacasestudy,inMunich,Schwabing. The
+resultsarevalidatedusingflowmeasurementsandspeedprofilesobtainedfromfloating
+cardata. Theremainderofthissectiondescribesthestateoftheartanddefinesthegoalsof
+thispaper.
+2. StateoftheArt
+The development of hybrid models has led researchers to address several critical
+challenges: ensuringconsistenttrafficdynamicsatmodelboundaries,maintaininguniform
+networkandroutechoicerepresentations,aligningtrafficperformanceacrossdifferentsub-
+models,andenablingeffectivedataexchangebetweensimulationmodes[15]. State-of-the-
+artapproachestomulti-leveltrafficmodelscanbecategorizedintermsofappliedmodels,
+thetypeofcoupling,andtheapplicationarea. Inliterature,macroscopic(macro)-micro
+andmeso-microhybridtrafficmodelscanbefound. Thehybridizationmethoditselfcan
+becategorizedintosequential(orstatic)andparallel(ordynamic)approaches.Sequential
+couplingmeansthemodelsareexecutedafteranother,whatinvolvesfixedinteractions
+establishedattheinitializationofeachsimulation,whereasparallelcouplingallowsfora
+
+===== PAGE 4 =====
+
+SmartCities2025,8,2 4of23
+real-timedataexchangebetweenbothsimulationsexecutedinparallelduringtherun-time
+throughoutthesimulation,enablingmoreflexibleandresponsivemodelinteractions[16].
+Several studies have investigated the coupling of flow-based macro models with
+vehicle-based micro-models by proposing theoretical hybrid approaches to effectively
+manage transitions, particularly at the boundaries [17–20], routing integration [21] be-
+tween scales. In the recent literature, different strategies have been proposed using
+multi-resolutionagentscombiningthedifferentresolutionsinoneentity[14,22],construct-
+ingamodel-switchingcriteriondesignedtoreducethecomputationalloadwhileaccu-
+ratelycapturingtrafficjamdynamics,especiallyaroundhighwaymergingsections[23,24],
+middleware-basedsolutions[25],andclusterprinciples[26]formanagingdataexchange,
+synchronization,andrepresentationbetweensimulations.
+Toachieveahigherresolutionandaccuracyinmeso-simulations,severalmeso–micro-
+hybridizationtechniqueshavebeenproposed. Burghoutetal.[13]introducedanintegra-
+tionarchitecturewithacommonmodulethatmanagesthenetworkbyadjustingmodel
+detaillevelsandaddingvirtualedgestoensureconsistentroutechoicesandvehiclecom-
+munication across boundaries. The framework was then utilized to develop a hybrid
+Mezzo–VisSimmodel,enablinganinterfacewithanadaptivesignalcontrollersimulator
+atintersections [15]. AsimilarapproachwasproposedbyBarcelóetal.[27],aso-called
+dynamictrafficassignmentserver. Burghoutetal.[28]furtherproposedaloadingmech-
+anismatthemeso–micro-boundariesforaconsistentrepresentationoftrafficdynamics.
+Claesetal.[29]proposedanadaptivestrategycalledtheschedule–pullprotocol,which
+enablesswitchingbetweendifferentsimulationmodelsatruntimetooptimizeperformance.
+Joueiaietal.[30]focusedontwomainclassesofconsistencyproblemsinhybridmodes,
+including local and global consistency, both aimed at ensuring the coherence of traffic
+featuresbetweenmodelinterfaces. Nevertheless, thesehybridmodelapproacheshave
+beenappliedtohypotheticaltestingscenariosonly.
+Inrecentyears,hybridtrafficmodelshavebeendevelopedandappliedtoreal-world
+problems. Casasetal.[31]enhancedAimsun’smeso–micro-capabilitiestomodelacoarse
+freeway network of 1160 km in Madrid, Spain, focusing on network consistency, route
+choice,communication,anddataexchange. Themodelemployedatrip-basedapproachto
+simulatemorningcartraveldemandandcomparedtheresultswithrealdata. Thehybrid
+modelofAimsunwasalsocoupledwithanFTMnamedCUBEtomodel24-hmulti-modal
+traveldemandforMinneapolis–SaintPaul,Minnesota,USAin2015[32]. Thestudyused
+loopdetectorflowandturningmovementdataformodelcalibrationatmayorroadsat
+peakhour. However,differentvalidationmethodsandvalidateddata(e.g.,hourlyand
+dailylink-by-linkvolumesandspeeddata)havenotbeencomprehensivelyconsidered.
+Nevertheless,Aimsuniscommercialsoftware,anditisnotavailableasanopensource.
+Efforts to couple the open-source frameworks MATSim and SUMO into a hybrid,
+small-scalenetworktrafficmodelaredetailedinthestudybyGütleinetal.[33,34]. The
+authors proposed a co-simulation framework running MATSim and SUMO in parallel.
+Nevertheless,theirmodelfocusesonoperationalefficiencyandtechnicalsynchronization
+betweensub-modulesinsteadofvalidatingwithreal-worlddata. Totackletheoverestima-
+tionofjunctioncapacitiesinmeso-models,Rakowetal.[35]combinedSUMOandMATSim
+tosimulateautonomousvehicles(AVs)byfirstusingfirstusingSUMOmicro-simulation
+environmenttoassesstraffic-flowcapacitiesatsignalizedintersectionsandthenfeedingthe
+resultsintoMATSimtoexploresystem-wideandlong-termimpacts. Therefore,thetraffic
+dynamicsinmicro-simulation(e.g.,vehicleinteractionsbeyondthejunctionarea)have
+notbeencomprehensivelyaccountedforinthehybridmodel. Moreover,themodelwas
+validatedsolelybasedonthecar-modelshareandtotaltripnumbers. Triebkeetal.[36,37]
+sequentiallycoupledMATSimandSUMOtomodelfleetstrategiesforsharedautonomous
+
+===== PAGE 5 =====
+
+SmartCities2025,8,2 5of23
+vehicles(SAVs),initiallyemployingMATSimforpreliminarymodelingandsubsequently
+refiningtheresultswithSUMO,utilizinguncleanedmicro-networksfromOpenStreetMap
+(OSM).TheseeffortsfocuspurelyonsimulatingSAVperformance,ratherthanmodeling
+mobilityaspects.
+Furthermore,averyrecentdaily,large-scale,mono-modal,co-simulationapproach
+hasbeendevelopedfortheCityofBerlin,Germany[38]. Car-basedtrafficdemandwas
+extractedfromacalibratedMATSimscenarioandtransferredtoamanuallycleanedSUMO
+network in a scaled and randomized manner for micro-simulation. This study demon-
+stratedthefeasibilityofthemethodbycomparinglink-by-linkhourlysimulationresultsto
+actualtrafficcounts,provingitsapplicabilitytoanalyzingnewmobilitysolutions. How-
+ever, the model considers exclusively car traffic, neglecting other modes such as buses,
+trams, commercial vehicles, bicycles, and pedestrians. Notably, the approach relies on
+re-estimatinguserequilibriumthroughiterativeSUMOsimulationsandroute-choicead-
+justments,whichmaysignificantlyextendsimulationtimes.
+Table1summarizesthepublishedhybridmodelsappliedtolarge-scalescenariosfrom
+theliterature. Thestateoftheartshowsthatrecentadvancementsinhybrid,multi-level
+macro–micro-andmeso–micro-modelingtechniquesareincreasinglybeingexploredto
+constructmorecomprehensiveandrealisticMDTscenarios.
+But despite recent advancements, significant research gaps remain in developing
+hybridmodels: (i)Currentapproacheslackaframeworkforcreatinghybridtrafficsimulations
+usingopen-sourcesimulators. Thesemodelslackaseamlessworkflowthatallowsforthe
+insertionandconnectionofasmallermicro-networkintoalargermeso-networkwhilethe
+routesarereconfigured,inparticularthenetworkboundariesbetweenthemeso-modeland
+themicro-model. Thisleadstodifficultiesinmaintainingscenarioconsistencyacrossall
+phases,fromnetworkandtraveldemandgenerationtomeso-andmicro-simulations,and
+inenablingseamlesscomparisonswithreal-worldtrafficvolumes,aswellasGPS-based
+speeddata. Themanualapproachusingthemicro-networkfortheentirecityreported
+in[32]isverytime-consuming. Thisisamajorlimitation,anditimpedesthewidespread
+adoption of the hybrid approach for large-scale scenarios. (ii) Multi-modal, large-scale
+hybrid models have not been thoroughly validated with daily and hourly link-by-link
+comparisons. Whilesomeeffortshavebeenmadetoaddresscertainaspects,theyarenot
+comprehensive.
+Tofilltheseresearchgaps,aneffectivetoolchainforgeneratingaconsistent,large-scale,
+multi-modalhybridscenarioisdevelopedwiththefollowingaims: (i)achievingseamless
+integrationbetweenmeso-andmicro-networksanddemandmodels;(ii)validatingboth
+meso-andmicro-sub-modelswithrealdata,suchasdailyandhourlycountsfromtraffic
+detectorsandfloatingcardata,whilealsoenablingacomparisonoftheclosenesstoreality
+between meso- and micro-models. The latter is not only important for qualifying the
+modelsasMDTsbutalsoquantifyingtheusefulnessofthehybridapproachassuch,e.g.,
+whetheritisworththeefforttocreateanadditionalmicro-layerinameso-model.
+The remaining parts of this paper are structured as follows: Section 3 describes
+the methodology behind the hybrid traffic simulation approach, detailing the overall
+framework and developed methods for hybrid network synchronization and demand
+transfer. Section4explainstheprocessofbuildingthehybridscenarioforthecasestudy,
+focusing on the methods and data used for model validation. Section 5 describes, and
+Section6discusses,thehybridtrafficsimulationresults,comparingthemtoreal-world
+trafficcountsandobservedspeeds. Section7concludesthecurrentHybridPYdevelopment
+andoutlinespotentialfutureadvancements.
+
+===== PAGE 6 =====
+
+SmartCities2025,8,2 6of23
+Table1.Comparisonofpublishedhybridmodelsinlarge-scalescenarios.
+Approach/
+Network
+Publication Simulator DemandModel Information Validation
+Coverage
+Exchange
+GEHindexof
+Trip-basedmodel, 1160kmroad Parallel/Network
+Casasetal., hourlyobserved
+AIMSUN morningcar networkin consistency,route
+2011[31] versussimulated
+demand Madrid,Spain choice
+volumes
+Parallel/meso-to- Usinghourlyloop
+Trip-basedmodel, 26,196kmroad micro-traveltime detectorflowsfor
+Zitzowetal.,
+AIMSUM dailymulti-modal networkin transferformode modelcalibration,
+2015[32]
+demand Minnesota,USA choiceandroute notvalidated
+assignment purely
+Sequential/micro-
+Activity-based 739,098roadlinks to-meso-
+MATSim Carmodelshare,
+Rakowetal., model,14% intheGreater intersection
+and absolutetrip
+2021[35] multi-modal Düsseldorfarea, capacitytransfer
+SUMO numbers
+demand Germany for
+meso-simulation
+Simulatingfleet
+MATSim strategiesofSAVs Sequential/meso-
+Triebkeetal.,
+and with80%citywide Berlin,Germany to-micro-travel Notyetvalidated
+2023[36]
+SUMO activity-based demandtransfer
+demand
+Scaled-updaily
+Sequential/O-D Distributionof
+MATSim activity-based Roadnetwork
+Schrabetal., locationmatching, hourlysimulated
+and model, covering800km2
+2023[38] meso-to-micro- versusobserved
+SUMO mono-modalcar inBerlin,Germany
+routingtransfer volumes
+demand
+Timeandspatial
+distributionof
+trafficvolumes,
+linearregression,
+Daily Sequential/ andscalable
+MATSim activity-based 88,133kmofroad Synchronizationof qualityvalue
+Thispaper and model, lengthinthe network,travel (SQV)fordaily
+SUMO multi-modal Munich,Germany demand,and andhourly
+demand routing link-by-link
+comparisonsof
+simulatedversus
+observedvolumes
+andspeeds
+3. HybridModelingFramework
+ThemesoscopicsimulationMATSimmodelsthetrafficdynamicsinasimplifiedway
+using a queueing model [4]. In contrast, the microscopic traffic simulation models the
+underlyingtrafficdynamicsbasedonvehicle-followingmodelsforlongitudinaldynamics,
+suchasKrauss[39]orIDM[40],andlane-changingmodelsforlateraldynamics,suchas
+LC2013[41]. Acomparisonofbothsimulationsrevealsthedifferentlevelsofcomplexity.
+Usingsimplified,queue-basedmodelsandcombiningthemwithmicroscopicmodelsin
+theareaofinterestallowsustosavecomputingresources. Althoughtheoreticaladvances,
+e.g.,forcombiningMATsimandSUMOby[36],havebeenstudied,buildinghybridtraffic
+modelsforreal-worldproblemsisstillchallenging.
+
+===== PAGE 7 =====
+
+SmartCities2025,8,2 7of23
+Afirstconceptofdevelopingatool-based,sequentialcouplingofmeso-andmicro-
+trafficsimulationsispresentedinapreviouspublication[11],wheremeso-trips,overlap-
+pingwiththesmallermicro-area,wereregeneratedandreroutedonthemicro-network,
+whichclearlyleadstoalternationsinlinkflows.Tofullyleveragethepotentialofthehybrid
+trafficsimulation,thecurrentworkpresentstwomethodsforsolvingbothproblems,laying
+thefoundationforanefficientmodelingprocessforreal-worldtransportscenarios. The
+overallprocedureisshowninFigure1,whichcomprisessixsteps,asfollows:
+Step1—microscopicnetworkimportandcleaning: Themicro-networkneedstobe
+importedintothehybridPYframework(e.g.,fromOpenstreetmap—OSM[42])andafter-
+wardsmanuallycheckedandcleaned. Themicro-networkdefinesthereferencecoordinate
+system.
+Step 2—mesoscopic network import and projection: The meso-network is im-
+ported and projected onto the micro-network. Now, both networks are in the same
+coordinatesystem.
+Step3—hybridnetworkintegration: Thenetworksarealignedusingtheproposed
+novelhybridnetworkintegrationmethod(detailedinSection3.1),ensuringequivalence
+betweenthetwosimulationlevelsintermsofpropertiesandidentifiers.
+Step 4—mesoscopic simulation and user equilibrium estimation: The meso-
+simulationisexecutedtoperformthemeso-trafficassignmentandachieveuserequilibrium.
+Step 5—meso–micro-demand transfer: The user equilibrium is transferred to the
+micro-levelinthefifthstep,whichisfurtherpresentedinSection3.2
+Step6—microscopicsimulation: Themicro-modelinareasofparticularinterestis
+executed;additionaltrafficdemand(e.g.,commercialvehicles)canalsobeaddedtoachieve
+amorerealisticmicro-trafficsimulation.
+cipocsoseM
+cipocsorciM
+20 %
+car-only
+2 Import MATSim 4 RunMATSim
+NetworkfromOSM Simulation
+3
+3 Syncronisationof 5 Demand transfer
+thenetworks
+100%
+multi-modal
+1 Import SUMO 6 Run SUMO
+Network and clean Simulation
+Figure1.ProposedhybridPYsimulationpipeline:sequentialorderofmodels.
+HavingalookatthesequentialprocessinFigure1revealsthatthehybridnetwork
+integration (Step 3) and the meso-micro-demand transfer (Step 5) are the two main in-
+novations needed to efficiently couple MATSim and SUMO. These innovations will be
+discussedinmoredetailinSections3.1and3.2,respectively. Theprocedurepresentedhere
+isexemplaryforMATSimbutcanbetransferredtoBEAM[43]andothermeso-simulations
+aswell.
+3.1. HybridNetworkIntegration
+Thecoreideaofmergingthesmallermicro-networkwiththeglobalmeso-networkis
+asfollows: (i)toconvertthemoredetailed,manuallyreviewedmicro-networkintoameso-
+networkpatch;(ii) tocutaholeintotheglobalmeso-networkwherethemicro-networkis
+located;and(iii)topatchthemeso-networkpatchintotheholeoftheglobalmeso-network
+byconnectingallfringenodes.
+
+===== PAGE 8 =====
+
+SmartCities2025,8,2 8of23
+Theconversionandtheassociatedmergingofthesimulationnetworksenabledataand
+informationtobeexchangedeasilybetweenthetwosimulationenvironments. Changes,
+such as road closures or structural changes, can be applied to the micro-network and
+projectedontothemeso-network. Additionally,thetrafficdemandcanbetransferredto
+themicrosimulation.
+A SUMO network with lane accuracy as the standard enables precise intersection
+modelstobestored.Incontrast,MATSimgenerallyreliesonasimpleandquicklycalculable
+nodeandedgemodel,wherenodesallowallpossibleturnsandedgestohaveapredefined
+capacity function. As the MATSim network is mono-modal in our setup and contains
+onlythecarmodeoftransport,onlythecar-accessibleSUMOnetworkisconsideredfor
+conversion. TheintegrationprocedureisvisualizedinFigure2:
+Step3.1—networkconversion: TheunderlyingSUMOnetworkisconvertedintoa
+MATSimnetworkbasedonthenodesandedges. Herein,theconceptofexpandednodes,
+whichisknownintheMATSimcommunity,isusedtointegratetheturningrelationships
+fromtheSUMOnetworkintotheMATSimnetworkfornodesthatdonotallowcertain
+turnsinsidethemicro-area. Theconceptofexpandednodesexpandsanintersectionnode
+intomultiplesub-nodesandafterwardexplicitlyconnectsallincomingandoutgoinglanes
+viasmalledgestoreflectturningrestrictions. Thecharacteristicsoftheinsertededges(e.g.,
+capacityandfree-flowspeed),arederivedfromSUMO’sinternaledges. Theseedgesare
+additionallyflaggedtoensuretraceabilitythroughoutthesimulationprocess. Forallother
+edges,capacitiesareestimatedbasedontheMATSimcommunitystandard[4];forexample,
+motorwaysandtrunkroadshaveacapacityof2000vehiclesperlane.
+Step3.2—connectionanalysis:TheconnectionsbetweentheMATSimandSUMOnet-
+worksareanalyzed. First,thefringenodesofthemicro-areaneedtobeidentified. Fringe
+nodesinSUMOaredefinedasnodeswherethenumberofincomingoroutgoingedgesis
+equaltozero. Edgesconnectingthesametwonodestoreflectbothdirectionsareignored
+withinthenumberofincomingandoutgoingedges. OncethefringenodesoftheSUMO
+networkareidentified,thecorrespondingMATSimnodesarelocated. Thealgorithmfirst
+searchesforcorrespondingnodeswithinaradiusof3m, (|node,node | < 3m). Ifa
+MATSim
+MATSimnodeisfound,itisdesignatedasacorrespondingnode.Otherwise,asuitableedge
+withanorthogonaldistancelowerthan10mandwithinthesamedirectionischosenasthe
+correspondingedge,(|node,edge |<10m)AND(|∠ edge −∠ edge |<20◦.
+MATSim sumo MATSim
+Step3.3—cuttingtheMATSimnetwork: Afterwards,theoriginalMATSimedges
+withintheSUMOareaaredeleted. Thealgorithmchecks,foreachMATSimedge,whether
+acorrespondingSUMOedgeexists,andifso,theMATSimedgeisremoved. Thedetec-
+tionisbasedongeometricconstraints,namelytheorthogonaldistanceandthedirection
+(|edge ,edge | <10m)AND(|∠ edge −∠ edge | <20◦.
+sumo MATSim sumo MATSim
+Step3.4—patchingthenetworks:Thenewlycreatedmeso-networkpatchisintegrated
+into the existing MATSim network. The nodes identified as corresponding within the
+MATSimnetworkarerenamedtoalignwiththeSUMOnodeIDs.
+Step3.5—ensuringthereachabilityoftheMATSimnetwork: MATSimrequiresa
+fullyreachablenetworkforasimulationtowork.Forthispurpose,thealgorithmguarantees
+reachabilitybyselectingthebiggestfullyconnectednetworkwithintheresultingnetwork.
+ThisalgorithmisinaccordancewiththeMATSimcommunitystandard.
+
+===== PAGE 9 =====
+
+SmartCities2025,8,2 9of23
+Step3.1: Network Step3.2: Step3.3:Cuttingthe Step3.4:Patching Step3.5:Ensuring
+Initial State
+conversion Connectionanalysis MATSim network thenetworks reachability
+SUMOnode connectionnode MATSimnode SUMOlane
+SUMOedge connectionedge MATSimedge
+Figure2.Workflowforthehybridnetworkintegration.
+3.2. Meso–Micro-DemandTransfer
+TheMATSimdemandisacollectionofdailymobilityplansforeachsyntheticindi-
+vidualinthestudyareageneratedviaanABMdevelopedby [1]. Theplanfilecontains
+therouteinformationandtriptimesofallvehicletypesandpersons,anditconstitutesthe
+demandinputforthepresenthybridframework. AsthepatchedMATSimnetwork,as
+describedinSection3.1andvisualizedinFigure2,Step3.5,isusedtogeneratetheplans,
+allroutesintheplanfilewillbevalidonthemeso-andthemicro-networkalike. Also,after
+theuser-equilibriumassignmentwiththemeso-simulatorMATSim,theresultingroutes
+fromtheplanfileandthetimingfromtheeventsfilearevalidforthemicro-network.
+TheMATSimdemandisonlyasample(e.g., 20%)ofthetotaltraveldemand. The
+demandis,therefore,scaledupwithadistributionwithinadefinedtemporalperiod(e.g.,
+plusandminus20min)relativetothetripstarttimewithinthemicro-simulationarea,as
+indicatedinthemeso-eventsfile. Inapost-processingstep,itisnecessarytocutofunnec-
+essaryU-turnsattheendofthetrips,which,insomecases,createscirculationproblems.
+Furthermore,routesthatconsistofonlyasingleedgeduetotruncationareexcluded.
+Inthecurrentsetup,MATSimutilizesacar-onlynetwork,meaningthatmodeslike
+bikingandwalkingareteleportedwithinthemeso-simulation. Nevertheless,thesemodes
+needtobeintegratedintothemicro-simulationaswell. Totransferthetripsofteleported
+modes,theprocessbeginsbycheckingwhethertheairlinebetweenthetrip’sstartandend
+pointsintersectstheSUMOarea. Ifitdoes,thenextstepistoidentifythefirstedgewhere
+thetripenterstheSUMOareaandrouteitthroughalledgesthatallowthecorresponding
+modeuntilitreachesthedestination.
+4. HybridTrafficSimulationCaseStudy: Munich–Schwabing
+Thissectionpresentsalarge-scalehybridtrafficsimulationcasestudyforthemetropoli-
+tanareaofMunich,Germany,focusingonthemicro-areaofSchwabing.Thefirstsub-section
+outlinestheexperimentalset-up,followedbyanintroductiontothedatasourcesandhow
+tointegratethesedataintothehybridmodelforvalidation.
+For this case study SUMO [10] in version 1.20.0 and MATSim [4] in version 15.0
+areused.
+4.1. Munich–SchwabingRoadNetworkModel
+Thelarge-scalehybridmodelwasdeployedinacasestudyofMunich,amajorcity
+insouthernGermany. Themeso-simulationencompassesthecitiesofMunich,Ingolstadt,
+Augsburg,Regensburg,andRosenheim,whilethemicro-simulationfocusesonthecity
+quarterofSchwabing. Figure3displaysthehybridroadnetworks,withthemeso-MATSim
+networkrepresentedinblackandthemicro-SUMOnetworkdepictedinblue.
+
+===== PAGE 10 =====
+
+SmartCities2025,8,2 10of23
+BothnetworkswereexportedfromOSMusingSUMO’sOSMWebWizard[44]. To
+createtheMATSimnetwork,theOSMdatawasinitiallysavedascar-onlyscenarioinSUMO
+format. Thenode-edgestructureoftheSUMOnetworkwasthenreducedtoitslargest
+fully connected network, ensuring that every node is reachable from every other node
+andviceversa. Thisprocessgeneratedthemeso-MATSimnetworkwith559,796edges
+and 232,632 nodes, covering a total length of 88,133 km. The network is mono-modal,
+containingonlyedgesaccessiblebycar.
+TheSUMOnetworkwasinitiallydesignedtoaccommodateonlycarsaswell. Sub-
+sequently, sidewalks and cycle lanes were incorporated using the netconvert tool [45].
+Theresultingnetworkwasmanuallyverifiedandadjustedbasedonaerialimagesand
+on-siteinspections. Alltrafficlightcontrolswereconfiguredto“actuated”. Asaresult,the
+micro-SUMOnetworkconsistsof3248edgesand1505nodes,covering316kmofstreets.
+Figure3.Roadnetworkofthecasestudy:micro-area(blue)andmeso-area(black).
+4.2. MunichActivity-BasedTravelDemandModel
+Inthispaper,travelplansweregeneratedviatheactivity-basedincrementaltravel
+demandmodel(ABIT)[46].TheABITmodelgeneratesaweek-longactivity–travelschedule
+forthesetofasyntheticpopulationthatstatisticallyrepresentsthepopulationintheMunich
+MetropolitanAreabyMorenoetal.[47]. Theyusedthemicro-censusdataofGermany
+in the year of 2011 and applied the Iterative Proportional Updating (IPU) approach to
+generatethesyntheticpopulationforthesameyear. Thesyntheticpopulationcontains
+social-economicanddemographicinformationatthepersonal,household,anddwelling
+levels,suchasage,gender,householdcomposition,carownership,andsoon,whichplay
+roles in people’s traveling demand and behavior. For this paper, we further expanded
+thesyntheticpopulationgeneratedfortheyearof2011to2022toachievethenumberof
+populationandhouseholdsintheregistryinordertomeettheincreasedtravelingdemand
+inrecentyears.
+Afterthesyntheticpopulationisupdated,itisusedintheABITmodeltogenerate
+travelplans. Theplangenerationcombinesrule-basedandrandomutility-maximization
+models. The rule-based approach structures the decision-making hierarchy in activity
+generation,scheduling,andtravel-relatedbehaviorinABIT.Forexample,ABITassumes
+
+===== PAGE 11 =====
+
+SmartCities2025,8,2 11of23
+that individuals prioritize their mandatory activities (e.g., work and education) before
+theirdiscretionaryactivities(e.g.,shoppingandsocializing). Althoughsucharule-based
+assumptionmightnotbevalidforeveryagent,itisareasonablecompromisebasedonthe
+complexityofhumanbehavioranddataavailability. Randomutilitymaximizationmodels
+(RUMs)areappliedinmultipledecisionmodels,suchasthemodechoicemodel,where
+theutilityfunctionoftransportmodesbetweenoriginanddestinationiscalculated,and
+individualschoosebasedonprobability. AlloftheseRUMmodelswereestimatedusinga
+householdtravelsurveyavailableinGermany,as[46]describedintheirpaper.
+Thetravelplan,alsocalledtraveldemand,generatedviaABITiscalibratedusingthe
+mostrecentGermanNationalHouseholdTravelSurveycollectedin2017,withallerrors
+controlledwithinareasonablerange.ThefinalproductofABITisalistoflegsandactivities
+filesthatcanbefurtherusedandconvertedtocorrespondingformatsfordifferenttraffic
+assignmentmodels. Theactivitiesfiledescribestheactivityparticipationofeachindividual
+across a week, including the starting time, ending time, activity type/purpose, spatial
+location,andsoon. Thelegsfiledescribesthepreviousactivityanditslocation,thenext
+activityanditslocation,thetravelmodeconnectingthetwolocations,thedeparturetime
+ofthetrip,andsoon. Arandom20%ofthetotaltraveldemandfromMonday,thefirst
+dayoftheweeklydemand,wasselectedforthemeso-simulation. Themeso-simulation
+wasthenexecutedfor50iterationstoachieveuserequilibrium. Allparameters,apartfrom
+thestuck-timeparameter,werechosentomeetthecommunitystandard. Thestuck-time
+parameterwaschosentobe60s.
+Aftertheuserequilibriumwasdetermined,thedemandwastransferredtothemicro-
+environment,followingthemethodproposedinSection3.2. Nevertheless,thegenerated
+travelplansonlydescribetheindividual’straveldemand. Tomoreaccuratelyreflectreal-
+worldconditions,commercialtrafficandheavygoodstrips(>3.5tons)wereincorporated
+usingacount-basedsamplingmethod. Randomroutesforthisadditionaldemandwere
+generatedinthemicro-areausingSUMO’srouteSampler[48]. Theserouteswereselected
+toensurethatthegeneratedtrafficvolumesforheavy-goodsvehiclesalignedwithactual
+trafficflows.Theabsolutetrafficvolumewasbasedonthe2022heavy-goodstraffic-volume
+map[49]. Inordertoincorporatecommercialtrafficbelow3.5tons,thesameamountof
+trafficasabove,3.5tons,wasaddedtothesimulationusingacar-basedvehicleclass.
+Themicro-simulationwasexecuted,allowing30%ofalltrafficparticipantstochangetheir
+routeduringmicro-simulation.Stuckvehicleswereremovedfromthesimulationafter60s.
+4.3. ValidationwithSpeedData
+To derive the floating car data, we used the data collected with the smartphone
+applicationcalled“Mobilität.Leben”. Thesmartphoneappautomaticallycollectsusers’
+GPScoordinatesinafrequencyof1to5sandreportsthemtoabackendserver. Theuser’s
+modeoftransportisdetectedautomatically[50].
+This study used the raw data from the smartphone-based survey to validate the
+observedtravelspeedsinsidethesimulationenvironmentsSUMOandMATSim. Theraw
+pointscontainthefollowinginformation:location,time,speed,andaccuracyinmeters.The
+tripsfromthetravelsurveywerefilteredbasedonthefollowingcriteria: (i)occurringon
+weekdaysfromMondaytoThursday;(ii)GPSaccuracyoflessthan15m;(iii)speedreaching
+over40km/hatleastonceduringthetrip;(iv)theautomaticallydetectedmodeis“car”;and
+(v)thetrajectorylengthisgreaterthan3km.
+Thefilteredrawdataisfirstmap-matchedtothecorrespondingedges. TheSUMO
+networkservesastheunderlyingnetwork,especiallythegeometryoftheedgesandthe
+geometry of the intersections. For map-matching, first, the most probable trajectory is
+createdbasedontheunderlyingSUMOnetworkusingthepgMapMatchapproach[51]. All
+
+===== PAGE 12 =====
+
+SmartCities2025,8,2 12of23
+turnrelationshipsareignoredherein.Routegenerationensuresthatallindividualsegments
+represent a valid route according to network properties. The GPS point is, afterwards,
+geometricallyassignedtotherespectiveroadvector. Allpointsthatdonotfallwithinthe
+startorendareaofthetrajectory(20m)areusedtocalculatetheaveragespeed.Weconsider
+onlyedgeswithmorethan30differenttripsdeliveringmeasurementpoints. Thesedatais
+thenaggregatedtocalculatetheaveragespeedofeachedge.
+Theedge-basedspace-centervelocityfromtheedge-basedSUMOstandardoutput
+servesasthereferencevelocitywithinSUMO.ForMATSim,thespeedcalculatedfromthe
+averagelinktraveltimeandedgelengthservesasthereferencespeed. Theaveragelink
+traveltimeisderivedfromtheeventsfile.
+4.4. ValidationwithFlowDetectors
+InthecitydistrictofMunich,manytrafficlight-controlledintersections,aswellas
+primaryroads,areequippedwithtrafficdetectors. Thevaluesarereportedautomatically
+viaawebinterface[52]ona15minbasis. Thedetectorsarelane-based,andtheymeasure
+the absolute vehicle traffic volume per lane. To compare the edge flows of the meso-
+and micro-environments to reality, the detectors are matched to the road network and
+aggregated to an edge-based count. The advantage of the hybrid model is that we can
+again use the more detailed, micro-model to match the detectors and then transfer the
+informationdirectlytothemeso-network. Formostdetectors,weknowthecoordinates,
+thetypeofdetector(trafficlightorprimaryroad),thename,andthegroupofthedetectors
+(whichreflectsthedirection),aswellas,fordetectorsonprimaryroads,thedirection.
+Toassignthetrafficlightdetectors,first,thetrafficlightpositioniscalculatedasthe
+centerofgravityofthepositionsofalldetectorsofatrafficlight. Inthesecondstep,all
+groupsofdetectorsarethenassignedtotherespectivebest-ratededgeoftheindividual
+group. Theratingisbasedonthedistanceofthegroupcentertotheedgeandtheedge
+directionrelativetothetrafficlight. Inaddition,theevaluationconsiderswhethertheedge
+leadstoatrafficlightandcarsarepermittedontheedge. Fordetectorsonprimaryroads,
+thegivendirectionisusedinsteadoftherelativepositiontowardsthetrafficlight.
+As a stringent safety criterion, we ensure that the number of assigned detectors
+precisely matches the number of lanes of the respective edge. This check guarantees
+thatthesumofalldetectorsassignedtoanedgeaccuratelyreflectstheabsoluteflowof
+thatedge.
+ForvalidationinSection5,thisstudyusedtheaveragedtrafficcountsofMondaysin
+April,May,andJune2022.
+5. Results
+Thissectionpresentstheresultsofthehybridtrafficsimulationwithaprimaryfocus
+ontrafficvolumesandedgespeeds. Firstly,thedistributionsofaccumulateddailytraffic
+volumesbyhour,aswellastrafficvolumesbystationofobserveddata,arecomparedwith
+simulatedflowsfromMATSimandSUMO.Thiscomparisonisfollowedbyadescriptive
+analysisofaKolmogorov–Smirnovtest(K-S),Pearson’scorrelationcoefficients(r),andthe
+meanabsoluteerrors(MAE).Subsequently,furthervalidationmethodologies,consisting
+of a linear regression analysis and a scalable quality value (SQV) indicator, are used to
+comparethesimulatedandobservedtrafficvolumes. Lastly,thesimulatededge-based
+travelspeedsfromthemeso-andmicro-simulationareanalyzedcomparedtoactualdata.
+
+===== PAGE 13 =====
+
+SmartCities2025,8,2 13of23
+5.1. DistributionofDailyTrafficVolumes
+Two hundred detectors distributed across the micro-simulation area were used to
+comparetheresultsandvalidatethehybridmodel. Thelocationsoftheseobservedstations
+areillustratedinFigure4a.Thesedetectorsmeasuredtrafficvolumesformotorizedvehicles,
+withanabsolutedailytotalof1.44millionvehicles/day. TheMATSimsimulationresults
+predicted a volume of 1.40 million vehicles/day, while SUMO simulated 1.50 million
+vehicles/day.
+Figure4bpresentsthehourlydistributionsofaccumulateddailytrafficvolumesby
+hour across observed stations. Overall, the accumulated traffic volumes in the hybrid
+simulations closely align with the actual daily traffic volume profiles with most traffic
+concentratedduringthepeakhourinthemorning(6:00a.m. to9:00a.m.) andafternoon
+(3:00p.m. to6:00p.m.),followedbylowervolumesduringmiddayandnighttime.
+TheresultsalsodemonstratedthatbothMATSimandSUMOmodeledsignificantly
+higher-than-observedtrafficvolumesduringthemorningpeak, between7:00a.m. and
+8:00 a.m., with deviations of 45.2% and 39.7%, respectively. Furthermore, during peak
+hour,especiallyintheafternoonpeak,theMATSimtrafficvolumeswereapproximately8%
+higherthanSUMOvolumes. Incontrast,duringoff-peakhour,theMATSimthroughput
+wascomparedtothatofSUMO,withdiscrepanciesrangingfrom10%to17%.
+140
+120
+100
+80
+60
+40
+20
+-
+1h 3h 5h 7h 9h 11h 13h 15h 17h 19h 21h 23h
+)ruoh/selcihev
+0001(
+emulov
+ylruoH
+Accumulated daily traffic volume distribution across
+measured stations
+Observation MATSim SUMO
+Time of day
+(a) (b)
+Figure4.Locationof200flowmeasurementdetectors(bluedots)inthemicrosimulationarea(a),
+anddistributionofMATSimandSUMOdailysimulatedvolumescomparedtoobserveddata(b).
+Figure 5 presents the probability density function, illustrating and comparing the
+distributionoftrafficvolumesatallmonitoringstations. Thedifferencesindistribution
+densities are assessed using the Kolmogorov–Smirnov test, as detailed in Table 2. The
+analysisrevealsthat,overall,trafficvolumesaresimilarlydistributedwhentheobserved
+dataarecomparedwithsimulations. However,duringpeakhour,therearedifferencesin
+theprobabilitydensitydistribution,withtheactualdatashowingmorelocationshaving
+trafficvolumesbelow1000vehicles/hour,followedbySUMOandMATSim. Despitethese
+variations,thedifferencesindistributionarenotstatisticallysignificant(p-value>0.05).
+
+===== PAGE 14 =====
+
+SmartCities2025,8,2 14of23
+0.10
+0.08
+0.06
+0.04
+0.02
+0.00
+0 10 20 30 40
+(a) (b) (c)
+ytisned
+ytilibaborP
+Daily volume (0:00am–24:00pm)
+0.10
+Observation
+SUMO
+0.08
+MATSim
+0.06
+0.04
+0.02
+0.00
+0 10 20 30 40
+Traffic volume (1000 vehicles/24h)
+ytisned
+ytilibaborP
+Daytime volume (7:00am–7:00pm)
+1.00
+Observation
+SUMO
+0.80
+MATSim
+0.60
+0.40
+0.20
+0.00
+0 1 2 3 4
+Traffic volume (1000 vehicles/12h)
+ytisned
+ytilibaborP
+Peak hour volume (5:00pm–6:00pm)
+Observation
+SUMO
+MATSim
+Traffic volume (1000 vehicles/h)
+Figure5.Theprobabilitydensityfunctiondepictsthedistributionoftrafficvolumesatmonitoring
+stations,comparingactualmeasuredvolumeswiththosesimulatedviaMATSimandSUMOover
+differenttimeperiods:theentireday(a),daytime(b),andpeakhour(c).
+Table 2. The Kolmogorov–Smirnov test (K-S) to compare the distribution of traffic volumes at
+monitoringstationsoverdifferenttimeperiodsbetweenobservations, MATSimsimulation, and
+SUMOsimulation.
+Observedvs. MATSim Observedvs. SUMO MATSimvs. SUMO
+Time K-STest K-STest K-STest
+p-Value p-Value p-Value
+Statistic Statistic Statistic
+Daily 1.34 0.06* 1.04 0.23* 0.79 0.56*
+Daytime 1.34 0.05* 0.95 0.33* 0.70 0.72*
+Peakhour 1.10 0.18* 0.95 0.32* 0.75 0.62*
+Note:*Nosignificantdifferencebetweenthedistributionoftwosamples(p-value>0.05).
+ComplexityanalysisoutputsaredepictedinTable3,whichillustratesthevariationsin
+Pearson’scorrelationcoefficients(r)andmeanabsoluteerrors(MAEs)amongtheobserved,
+MATSim,andSUMOvolumesatmeasuredstationsoveraone-hourintervalwithinthe24-h
+simulation.Theresultsdemonstratedsignificantcorrelations(p<0.05)amonghourlyobserved,
+MATSim,andSUMOvolumesacrossallstations,withtheexceptionofsimulatedMATSimand
+SUMOvolumesduringtheperiodsof1:00a.m.–2:00a.m.and9:00p.m.–10:00p.m.
+Furthermore,thecorrelationcoefficients(r)indicatedpositivecorrelations(0<r<1)
+andstrongcorrelations(r>0.8)[53]betweentheobserved,MATSim,andSUMOvolumes
+from6:00a.m. to9:00p.m. withhighercorrelationvaluesbetweenMATSimandSUMO
+comparedtotheothercomparisons. Notably,thehighercorrelationcoefficientsbetween
+theMATSimandSUMOresultsaresupportedbylowermeanabsoluteerror(MAE)values
+forthetrafficvolumesperhour.
+
+===== PAGE 15 =====
+
+SmartCities2025,8,2 15of23
+Table3.Pearson’scorrelationcoefficients(r)andMAEsbetweenobservation,MATSim,andSUMO
+simulationinhourlyvolumesatmeasuredstationsbytime.
+Observedvs. MATSim Observedvs. SUMO MATSimvs. SUMO
+Time r MAE r MAE r MAE
+0:00–1:00 0.55*** 56.12 0.23* 42.28 0.52*** 17.32
+1:00–2:00 0.62*** 26.70 0.42*** 21.86 −0.06ns 20.10
+2:00–3:00 0.60*** 23.59 0.39*** 25.43 0.79*** 17.78
+3:00–4:00 0.65*** 29.34 0.48*** 32.15 0.87*** 18.92
+4:00–5:00 0.64*** 65.05 0.54*** 60.80 0.95*** 19.90
+5:00–6:00 0.71*** 123.11 0.70*** 119.81 0.27*** 21.93
+6:00–7:00 0.84*** 166.08 0.82*** 155.45 0.99*** 41.21
+7:00–8:00 0.88*** 230.56 0.89*** 202.65 0.98*** 77.19
+8:00–9:00 0.86*** 151.48 0.88*** 163.48 0.98*** 67.17
+9:00–10:00 0.85*** 137.16 0.82*** 153.16 0.97*** 101.47
+10:00–11:00 0.85*** 151.76 0.81*** 138.01 0.97*** 66.20
+11:00–12:00 0.87*** 146.26 0.85*** 134.15 0.98*** 60.23
+12:00–13:00 0.87*** 152.30 0.84*** 141.05 0.98*** 60.18
+13:00–14:00 0.87*** 165.67 0.84*** 147.98 0.98*** 62.02
+14:00–15:00 0.87*** 165.50 0.84*** 151.96 0.99*** 50.15
+15:00–16:00 0.88*** 164.42 0.88*** 153.99 0.99*** 53.97
+16:00–17:00 0.89*** 171.38 0.89*** 152.58 0.97*** 82.08
+17:00–18:00 0.89*** 165.41 0.89*** 148.75 0.98*** 72.32
+18:00–19:00 0.84*** 132.49 0.86*** 147.92 0.97*** 63.30
+19:00–20:00 0.83*** 111.79 0.82*** 130.54 0.96*** 75.96
+20:00–21:00 0.83*** 95.74 0.80*** 87.53 0.97*** 42.64
+21:00–22:00 0.75*** 118.05 0.71*** 98.95 0.14ns 42.09
+22:00–23:00 0.71*** 41.28 0.68*** 43.39 0.91*** 32.99
+23:00–24:00 0.72*** 67.37 0.43*** 48.72 0.79*** 25.66
+Note:Statisticallysignificantlevelsinhourlytrafficvolumesatmeasuredstationsbetweenobservation,MATSim,
+andSUMOsimulation:ns=notsignificant(p>0.05),*p<0.05,**p<0.01,***p<0.001.
+5.2. ValidationwithTrafficVolumes
+Theaccuracyofthehybridmodelisfurtheranalyzedusinglinearregressionanalysis
+andtheSQVindicatorstocomparesimulatedversusobservedtrafficvolumes.
+Figure6presentstheregressionanalysisbetweensimulatedandobservedtrafficflows
+withtheslopesandR²valuesindicatingtheperformanceofthehybridmodel.Itisevidentthat
+thehybridmodel’sperformanceduringthedaytime(7:00a.m.–7:00p.m.)andthepeakhour
+(5:00p.m.–6:00p.m.)closelymatchedtheactualtrafficvolumes,demonstratingslightlybetter
+accuracycomparedtodailyresultsduetotheexclusionofnighttimesimulations.Specifically,
+theregressionslopesduringdaytime(SUMO:0.92;MATSim:0.90)andpeakhour(SUMO:
+0.95;MATSim:1.10)predominantlymatchedtheacceptablethresholdof0.9<m<1.1,and
+theirR2fordaytime(SUMO:0.82;MATSim:0.80)andpeakhour(SUMO:0.81;MATSim:0.82)
+attheacceptablecriterionofR2>0.8,accordingto[54].
+Inaddition,theSQV,anenhancedqualitymeasurebasedontheGEHstatisticmethod
+wasfurtheremployedtovalidatethehybridmodel. ThismethodisavariantoftheChi-
+squaredstatisticthataccountsforbothrelativeandabsoluteerrors[55]. TheSQVisdefined
+inEquation(1):
+1
+SQV = (cid:114) (1)
+1+
+(m−c)2
+f·c
+wherein m represents the simulated values, c represents the observed values, and f is
+a scaling factor that depends on the type of compared traffic volumes, with a value of
+1000forhourlytrafficvolumeand10,000fordailytrafficvolume.
+
+===== PAGE 16 =====
+
+SmartCities2025,8,2 16of23
+40
+y = 0.88x + 1.10
+30 R² = 0.80
+20
+10
+y = 0.83x + 0.97
+R² = 0.77
+-
+- 10 20 30 40
+(a) (b) (c)
+)h42/selcihev
+0001(
+emulov
+detalumiS
+Daily volume (0:00am–24:00pm)
+40 MATSim SUMO
+y = 0.92x + 0.66
+30
+R² = 0.82
+20
+10
+y = 0.90x + 0.55
+R² = 0.80
+-
+- 10 20 30 40
+Observed volume (1000 vehicles/24h)
+)h21/selcihev
+0001(
+emulov
+detalumiS
+Daytime volume (7:00am–7:00pm)
+4 MATSim SUMO
+y = 1.10x + 0.01
+3 R² = 0.82
+2
+1 y = 0.95x + 0.03
+R² = 0.81
+-
+- 1 2 3 4
+Observed volume (1000 vehicles/12h)
+)h/selcihev
+0001(
+emulov
+detalumiS
+Peak hour volume (5:00pm–6:00pm)
+MATSim SUMO
+Observed volume (1000 vehicles/h)
+Figure6.Theregressiondiagramsdisplaythecomparisonbetweensimulatedandobservedtraffic
+volumesoverdifferenttimeperiods:theentireday(a),daytime(b),andpeakhour(c).
+Figure 7 illustrates the interquartile ranges (IQRs) of SQV values, comparing the
+hourlysimulatedvaluesofSUMOandMATSimtotheactualhourlytrafficvolumes. The
+analysisindicatedthatthehybridmodelgenerallyperformedatanacceptablelevel,with
+meanSQVs>0.8[56]formostoftheday,exceptduringthemorningpeak(7:00a.m.–8:00
+a.m.),whenthemeso-SQVsshowedaslightlylowervalueof0.77.
+1h 2h 3h 4h 5h 6h
+VQS
+1.0
+0.8
+0.6
+0.4
+0.2
+0.0
+7h 8h 9h 10h 11h 12h
+VQS
+1.0
+0.8
+0.6
+0.4
+0.2
+0.0
+13h 14h 15h 16h 17h 18h
+VQS
+1.0
+0.8
+0.6
+0.4
+0.2
+0.0
+19h 20h 21h 22h 23h 24h
+VQS
+MATSim SUMO MATSim SUMO
+Time of day Time of day
+(a) (b)
+1.0
+0.8
+0.6
+0.4
+0.2
+MATSim SUMO MATSim SUMO
+0.0
+Time of day Time of day
+(c) (d)
+Figure7. TheSQVsindicatedeviationsbetweenobservedandsimulatedtrafficvolumesacross
+differenttimesofday:earlymorning(a),morning(b),afternoon(c),andevening(d).
+
+===== PAGE 17 =====
+
+SmartCities2025,8,2 17of23
+5.3. Travel-SpeedComparison
+Thetravelspeedsobtainedfromthesmartphone-basedsurveyforcarswereanalyzed
+andcomparedwiththeaverageedgetravelspeedswithintheMATSimandSUMOsimula-
+tionenvironments,asdescribedinSection4.3. Theresultsindicatethatthesimulatedtravel
+speedsinthehybridmodelareconsistentlyhigherthantheobservedspeeds. MATSim
+modeledhighertravelspeedsthanbothSUMOandobserveddataacrossallperiodsof
+theday. Specifically,MATSimrecordedaveragesimulatedspeedsof45.49km/hatnight,
+decreasing to 41.58 km/h in non-peak hour and 39.82 km/h during peak hour. These
+speedssurpassedthoseofSUMOandtheobserveddataby17.45%and36.65%atnight,
+24.12%and40.00%innon-peakhour,25.54%and47.37%duringpeakhour,respectively.
+Thesefindingsfurtherrevealconsistentvariationsintravelspeedswithsimilarpat-
+ternsbetweendifferenttimesoftheday,regardlessoftheobservedandsimulatedspeeds.
+The nighttime average travel speeds of MATSim are significantly higher, depicted in
+Figure8,followedbyoff-peakandpeakhourspeeds. Duringnighttimehours,MATSim
+vehiclesmostlyoperateatanarrowerspeedrange(mean: 45.49km/h;IQR:44.73–48.60
+km/h)comparedtoSUMOspeeds(mean: 38.73km/h;IQR:28.34–47.24km/h).
+Observation MATSim SUMO
+)h/mk(
+deeps
+levarT
+Nighttime travel speed
+70
+60
+50
+40
+30
+20
+10
+0
+Observation MATSim SUMO
+)h/mk(
+deeps
+levarT
+Peak hour travel speed
+70
+60
+50
+40
+30
+20
+10
+0
+Observation MATSim SUMO
+(a) (b) (c)
+)h/mk(
+deeps
+levarT
+Off-peakhour travel speed
+70
+60
+50
+40
+30
+20
+10
+0
+Figure8.Thedistributionoftheobservedvehicletravelspeeds(green)comparedtotheaverageedge
+speedsfromMATSim(blue)andSUMO(red):nighttime(a),off-peakhour(b),andpeakhour(c).
+Figure 9 presents the linear regression analysis of observed and hybrid simulated
+speeds. Theindicatorsintheregressionfunctionshowthatsimulatedtravelspeedsdur-
+ingpeakhourmostcloselyalignedwithobservedreal-worldspeeds,followedbythose
+simulatedduringoff-peakhourandnighttime,asevidencedbyhigherslopevalues(m)
+andahighercoefficientofdetermination(R2). TheSUMOregressionmodelsdemonstrated
+generallyhighermandR2values(m =0.62to0.68andR2 =0.36to0.44)comparedtothe
+MATSimmodels(m = 0.35to0.52and R2 = 0.28to0.41),indicatingacloseralignment
+withreal-worlddata. SimulatedspeedsinMATSimwereexcessivelycompliantwiththe
+free-flow speed limits set for different road hierarchies within the network model (i.e.,
+30km/h,50km/h,and60km/h). Incontrast,SUMOsimulatedspeedsexhibitedawider
+rangeofvalues,reflectinggreatersensibilitytotheactualtrafficflowspeeds.
+
+===== PAGE 18 =====
+
+SmartCities2025,8,2 18of23
+80
+y = 0.49x + 26.89
+R² = 0.41
+60
+40
+20
+y = 0.65x + 14.19
+R² = 0.44
+0
+0 20 40 60 80
+)h/mk(
+deeps
+detalumiS
+Off-peak hour travel speed
+MATSim SUMO 80
+y = 0.52x + 25.91
+R² = 0.28
+60
+40
+20
+y = 0.68x + 13.26
+R² = 0.36
+0
+0 20 40 60 80
+Observed speed (km/h)
+)h/mk(
+deeps
+detalumiS
+Peak hour travel speed
+80 MATSim SUMO
+y = 0.35x + 33.67
+R² = 0.35
+60
+40
+20
+y = 0.62x + 18.03
+R² = 0.40
+0
+0 20 40 60 80
+Observed speed (km/h)
+)h/mk(
+deeps
+detalumiS
+Nighttime travel speed
+MATSim SUMO
+Observed speed (km/h)
+(a) (b) (c)
+Figure9.Theregressiondiagramsillustratethecomparisonbetweensimulatedandobservedspeeds
+acrossdifferenttimeperiods:nighttime(a),off-peakhour(b),andpeakhour(c).
+6. Discussion
+Thissectiondiscussestheproposedmethodforcreatingthehybridtrafficsimulation,
+supportedbythefindingsfromthesimulationresultsofthecasestudyinMunich,Germany.
+Theestablishedtoolchain,thehighlightofthestudy,wasabletosuccessfullytransfer
+theroadnetworkinformation,traveldemand,androutechoicebetweenmeso-andmicro-
+modelswithahighdegreeofconsistency. Theseresultsalsodemonstratethesuccessofthe
+map-matchingalgorithmdevelopedtointegratetrafficvolumesfromactualdetectorsto
+thecorrespondingedgesinthehybridmodel. Thisfacilitatesareductionincomplexityin
+developinglarge-scale,multi-modaltransportscenarios.
+Variousvalidationmethodswereemployedtoevaluatemodelaccuracy,whichmutu-
+allyreinforceoneanother. TheK-Stestevaluatesthestatisticalsimilarityoftemporaland
+spatialdistributionsbetweenobservedandsimulateddata. Pearson’scorrelationanalysis
+examinesthelinearassociationoflink-by-linktrafficvolumes. Regressionmodelsvalidate
+resultsacrossmultipletimescales,providingdetailedparameters(e.g.,slopesandR2)for
+the model evaluation of both volume and speed data. Meanwhile, the SQV method is
+scalableandinterpretablefordailyvolumes,overcomingthelimitationsofthetraditional
+GEHstatisticmethod,whichonlyallowsforcomparisonsofhourlyindicators.
+Theproposedvalidationmethodsfacilitatedtheevaluationofmodeloutcomesbyas-
+sessingtheconsistencyoftrafficdistributionatmonitoringstations,asdemonstratedbythe
+K-Stestwitha p-value>0.05andstrongcorrelationsbetweenthedetected,MATSim,and
+SUMOtrafficvolumeswithPearson’scorrelationcoefficients(r),whichliespredominantly
+over0.8atallobservationlocationsthroughouttheday. Thisconsistencyunderscoresthe
+robustnessoftheapproachacrossdifferentsimulationscales.
+AlthoughthevalidationresultsgenerallyindicateanotableoverestimationofMAT-
+SimandSUMOvolumescomparedtotheobservedvolumesduringthemorningpeak,
+this discrepancy could be attributed to deficiencies in the demand-generation models,
+for example, a behavioral change in society after the COVID-19 pandemic, such as the
+possibilityofremoteworking. Recentchangesintravelpatternsarenotcapturedinthe
+traveledsurveycollectedin2017. Thismeansthecomparisonagainstthetrafficcountdata
+fromtheyear2022mightexplainacertainlevelofdiscrepancy. Furthermore,itisimportant
+toacknowledgethattheloweroff-peakvolumesintheMATSimmodelcomparedtoSUMO
+
+===== PAGE 19 =====
+
+SmartCities2025,8,2 19of23
+arelikelyduetotheexclusionofcommercialvehicledemandinthemeso-simulation,which
+predominantlyoccursduringoff-peakhourinMunich,asreflectedintheSUMOresults.
+Thelink-by-linktraffic-volumevalidationresultsfromthelinearregressionmodels,as
+wellasbeingsupportedbytheSQVindicators,investigatedthatthesimulatedvolumes
+closelyreflecttheactualvolumesduringdaytimeandafternoonpeakhourperiods. How-
+ever,theperformanceslightlyfellbelowacceptablethresholdswhennighttimeresultswere
+incorporated,duetolowertraveldemandandfewerobservationsamples. Theupdateof
+theABITdemandmodeltoreflecttheup-to-datetraveldemandinthestudyarea,while
+ensuringcompatibilitywiththetrafficsupplycapacity,couldfurtherpotentiallyimprove
+theaccuracyoftheflowcalibrationresults.
+Theregressionvaluesbetweentheobservedspeedsandthosesimulatedviathehybrid
+modelfallbelowthethresholdforaccuracycommonlyusedfortrafficvolumevalidation.
+However, this discrepancy is justifiable due to the inherent sensitivity of velocity data
+to specific time points and factors such as the length of the observed data, as well as
+instantaneousaccelerationanddecelerationpatternsduetolocaltrafficsituations. Both
+MATSimandSUMOassumeperfectconditionsatalltimesandsimulatedtravelspeeds
+viaMATSim,followedbySUMO,consistentlyexceededobservedspeeds. Themajority
+ofsimulatedtrafficspeedsintheMATSimmodelexhibitedasymptoticbehaviorrelative
+tothefree-flowspeedlimitsestablishedhomogeneouslywithintheroadnetworkmodel
+(i.e.,30km/h,50km/h,and60km/h).
+TheobservedspeedresultscanbeexplainedbythefactthatMATSimdoesnotsim-
+ulate speeds explicitly but estimates speeds indirectly by means of the traffic flow and
+aheuristicallydeterminedflow-speedfunction, whichreflectstheroadpropertiesona
+specificlink. Lane-changebehavior,vehiclefollowing,spontaneoustrafficbreakdowns,
+orthepresenceofbicyclesinthesamelanearenotpartofthismeso-model. Thisiswhy
+speedstendtostayatfree-flowvelocity. Bycontrast, SUMOdoesmodelcar-following,
+lane-change,andevensub-lanebehavior,anditoverestimatesspeedstoalesserextent.
+ForthedifferencesbetweenSUMOandmeasuredspeeds,manyfactorscanberesponsible:
+impreciseinstantaneoustrafficdensities,aninexactmodelingofvehiclefollowingbehav-
+ior,orimperfecttrafficconditions(e.g.,spontaneousbreakingorlane-changemaneuvers
+toavoidobstacleslikecarsenteringparking,etc.). Theseresultswereconfirmedbythe
+findingsfromTriebkeetal.,2022[37],throughaninvestigationofanin-depthanalysisof
+trafficspeedsthroughouttheday,insteadofone-hourtracking.
+One primary limitation of the current approach is that the improved link-speed
+estimatedviathemicro-modelonlyhasaneffectontheroutesofthesimulatedvehiclesin
+themicro-area. Thechangesinlinktraveltimesdonotaffecttheoveralluser-equilibrium
+assignmentonthemeso-level,wheretheroutesaredeterminedglobally. Thismeansthat
+particularlycongestedlinksinthemicro-areawillnotbeavoidedbyreroutingvehicles
+alsooutsidethemicro-area. Inthefuture,thisshortcomingcanbeavoidedbyfeedingthe
+updatedlinktraveltimesbacktothemeso-modelinordertorepeattheuser-equilibrium
+assignmentand,successively,themicro-simulationwiththenewroutes. Suchaniterative
+processhasbeenappliedinpreviousworks[32].
+However, this approach involves a drawback, as only the link travel times in the
+micro-areaareupdated,whichmeanstheyaregenerallyincreased,asdemonstratedabove.
+Theconsequencemaybethat,withaglobalassignment,thevehicleswillgenerallyavoid
+themicro-areaasspeedtimesare, onaverage, lowerthanthoseoutsidethemicro-area.
+Thiseffectcouldbemitigatedbyalsoincreasingthelinktraveltimesonthemeso-network
+outside the micro-network, based on similarities in road type and volumes from links
+withinthemicro-area. Buttheriskofsuchadaptationisthatunrealisticadaptationcan
+distorttheoverallresults.
+
+===== PAGE 20 =====
+
+SmartCities2025,8,2 20of23
+Another shortcoming is that public transport was not explicitly modeled. Instead,
+busesweresimulatedaspartofcommercialtrafficdemandwithoutactuallytransporting
+passengers. Nevertheless, there is the potential to model public transport explicitly in
+SUMO,aswellasMATSim,bycreatingbusandtramlinesusingtheopenaccessGeneral
+TransitFeedSpecification(GTFS)availableforMunich. HybridPyprovidesalgorithmsto
+matchtheGTFSdataontotheSUMOnetworkcreatetherequiredbusstopsandgenerate
+bus/tram/trainrouteswiththespecifiedrunsofaparticularday. Thisinformationcanbe
+manuallyrefinedand,afterward,projectedintothepublictransportmodelofMATSim.
+7. Conclusions
+Thispaperhascontributedtothestateoftheartbyproposinganovelhybridapproach
+withaneffectivetoolchain. Withthisapproach,ithasbeenpossibletocoupleMATSim,a
+meso-trafficsimulatorabletosimulatelarge-scalenetworks,withSUMO,amicro-traffic
+simulatorabletosimulateadetailednetworkonasmallerscale.
+We have proposed a novel solution to merging both modeling environments by
+blending the typically smaller yet more refined micro-network into the meso-network,
+which ensures that the network edges of both models are identical within the micro-
+area. Thisintegrationhasenabledaseamlesstraveldemandandrouteexchangebetween
+the meso- and micro-models. But the true advantage of the present approach is the
+possibility for validation, link by link, compared to real data for both the meso-model
+and the micro-model. This means that, for the first time, it is possible to compare the
+closenesstorealityofthemeso-andmicro-modelsand, hence, tojustifytheadditional
+effortsforcreatingahybridmodelwithrespecttoapuremeso-model. Inparticular,the
+developedmap-matchingalgorithmsallowtheintegrationofreal-worlddataobtained
+from traffic detectors and floating car data into the hybrid model, facilitating seamless
+comparisonandvalidation. Thelarge-scalehybridmodelwassuccessfullydeployedin
+a case study of Munich, Germany, with the micro-simulation concentrating on the city
+quarterofSchwabing.
+Variousvalidationtechniqueswereapplied,andtheymutuallyreinforcedoneanother
+toensurethemodel’saccuracy,includingtheK-Stest,Pearson’scorrelationanalysis,regres-
+sionmodels,andSQVs. Theproposedvalidationmethodsenabledtheassessmentofthe
+successfulsynchronizationbetweentheroadnetwork,traveldemand,androutechoicebe-
+tweenmeso-andmicro-simulations,showingahighdegreeofconsistency.Thisisindicated
+bystrongPearson’scorrelationcoefficients(r > 0.8)andcloseK-Sstatisticdistributions
+(p-value>0.05)whencomparingtheobserved,MATSim,andSUMOtrafficvolumesatthe
+monitoredstations. ThelinearregressionmodelandSQVanalysisdemonstratedastrong
+representationofsimulatedtrafficvolumescomparedtoreal-worlddata. Keyvalidation
+indicatorswereatacceptablevalues(0.9< m <1.1,R2 >0.8,andSQV >0.8),particularly
+during daytime and afternoon peak hour. Maintaining temporal consistency between
+observedtrafficvolumesandmobilitydatausedindevelopingABMmayimprovemodel
+accuracy,especiallyduringmorningpeakhour.
+Inaddition,themodelenabledalink-by-linkcomparisonofsimulatedaverageedge
+speedswithreal-worlddataforboththemeso-andthemicro-models. Whilethespeed
+regressionvaluesfellbelowcommonlyacceptedthresholds,thismaybejustifiedbythe
+inherentsensitivityofspeeddatatomanyinternalsimulationparameters,suchasvehicle
+followingmodels.Animportantfindinghasbeenthatthemicro-SUMOmodeloutperforms
+MATSimintermsofthesimulationspeedrelativetoreal-worlddata. Themodel’sspeed
+resultshaveallowedproofthatthelimitedvehicleinteractionrepresentationinthemeso-
+modelenablesvehiclestotravelathigherspeedsthaninthemicro-simulationmodel. This
+differenceexplainedthehigherpeakhourtrafficvolumesinMATSimcomparedtoSUMO.
+
+===== PAGE 21 =====
+
+SmartCities2025,8,2 21of23
+Additionally,theincreaseinoff-peaksimulatedvolumesinSUMOmaybeattributedto
+the contribution of commercial vehicle demand in this micro-simulation. Furthermore,
+theresultsalsoallowedforademonstrationthatsimulatedspeedsintheMATSimmodel
+tendtoasymptoticallyapproachfree-flowlimits,whereastheSUMOmodelshowsawider
+speeddistribution,reflectingactualtrafficdynamicsinthemicro-simulation.
+Theseanalysesclearlyindicatedthat,inthepresentcasestudy,thehybridapproach
+offersadvantagesoverapuremeso-approach,asobservedspeedfromfloatingcardatais
+betterreproduced.
+Theproposedhybridapproachofferstransportresearchersandpractitionersrealistic
+andflexiblemethodsfortheplanningprocessthatcanbevalidatedandthatrequirefewer
+resourcescomparedtopuremicro-approaches. Itisfurtherpossibletoquantifyhowmuch
+closerthehybridapproachistorealdatawithrespecttoapuremeso-model, basedon
+the same network. However, the proposed model involved limitations, and it calls for
+future works to automatically feed simulation results back from the micro-level to the
+meso-level,ensuringthatthemicro-areaisnotartificiallycompromisedbyoverestimating
+traveldemandinthemeso-model. Additionally,integratingpublictransportservicesand
+couplingsyntheticpopulationsbetweenthemeso-andmicro-levels,ratherthanonatrip
+basis,couldfurtherstrengthentheproposedframework.
+AuthorContributions: Theauthorscontributedtothisworkinthefollowingways: conceptual-
+ization,F.S.;methodology,F.S.;software,F.S.;validation,F.S.andN.A.N.;formalanalysis,F.S.and
+N.A.N.;investigation,F.S.;resources,F.S.;datacuration,F.S.,W.-C.H.,andN.A.N.;writing—original
+draftpreparation,F.S.,N.A.N.,W.-C.H.,andJ.S.;writing—reviewandediting,F.S.,J.S.,andM.L.;
+visualization,F.S.andN.A.N.;supervision,M.L.andJ.S.;projectadministration,F.S.;andfunding
+acquisition,M.L.Allauthorshavereadandagreedtothepublishedversionofthemanuscript.
+Funding: This project was partially funded by the Federal Ministry of Education and Research
+(BMBF)aspartoftheM-CubeCluster4FuturewithintheprojectDatSim,grantno.03ZU1105LA,as
+wellastheItalianPNRRprogram.
+DataAvailabilityStatement:TheunderlyingSUMOnetworksoriginatefromfreelyaccessibleand
+usableOpenStreetMapdataextracts.Thehistoricaltrafficflowdatausedinthisstudywereobtained
+fromtheCityofMunichandarecurrentlyaccessiblevia[52].
+ConflictsofInterest:Theauthorsdeclarenoconflictsofinterest.
+References
+1. Moeckel, R.; Kuehnel, N.; Llorca, C.; Moreno, A.T.; Rayaprolu, H.; Galante, F. Agent-Based Simulation to Improve Policy
+SensitivityofTrip-BasedModels. J.Adv.Transp.2020,2020,1902162.[CrossRef]
+2. Lin,D.Y.;Eluru,N.;Waller,S.;Bhat,C. IntegrationofActivity-BasedModelingandDynamicTrafficAssignment. Transp.Res.Rec.
+2008,2076.[CrossRef]
+3. Maciejewski,M.;Nagel,K. TowardsMulti-AgentSimulationoftheDynamicVehicleRoutingProbleminMATSim. InParallel
+ProcessingandAppliedMathematics;Springer:Berlin/Heidelberg,Germany,2012;pp.551–560.
+4. Horni,A.;Nagel,K.;Axhausen,K.(Eds.) Multi-AgentTransportSimulationMATSim;UbiquityPress:London,UK,2016.[CrossRef]
+5. Hao,J.Y.;Hatzopoulou,M.;Miller,E.J. IntegratinganActivity-BasedTravelDemandModelwithDynamicTrafficAssignment
+andEmissionModels. Transp.Res.Rec.2010,2176,1–13.[CrossRef]
+6. Ziemke,D.;Nagel,K.;Bhat,C. IntegratingCEMDAPandMATSimtoincreasethetransferabilityoftransportdemandmodels.
+Transp.Res.Rec.2015,2493,117–125.[CrossRef]
+7. Briem,L.;Mallig,N.;Vortisch,P.Creatinganintegratedagent-basedtraveldemandmodelbycombiningmobiToppandMATSim.
+ProcediaComput.Sci.2019,151,776–781.[CrossRef]
+8. Zhang,H.;Sheppard,C.J.;Lipman,T.E.;Zeng,T.;Moura,S.J. Charginginfrastructuredemandsofshared-useautonomous
+electricvehiclesinurbanareas. Transp.Res.PartDTransp.Environ.2020,78,102210.[CrossRef]
+9. Ziemke,D.;Knapen,L.;Nagel,K. ExpandingtheanalysisscopeofaMATSimtransportsimulationbyintegratingtheFEATHERS
+activity-baseddemandmodel. ProcediaComput.Sci.2021,184,753–760.[CrossRef]
+
+===== PAGE 22 =====
+
+SmartCities2025,8,2 22of23
+10. Krajzewicz,D.;Erdmann,J.;Behrisch,M.;Bieker,L. RecentDevelopmentandApplicationsofSUMO—SimulationofUrban
+MObility. Int.J.Adv.Syst.Meas.2012,5,128–138.
+11. Schweizer,J.;Schuhmann,F.;Poliziani,C. hybridPy:TheSimulationSuiteforMesoscopicandMicroscopicTrafficSimulations.
+SUMOConf.Proc.2024,5,39–55.[CrossRef]
+12. Llorca,C.;Moeckel,R. Effectsofscalingdownthepopulationforagent-basedtrafficsimulations. ProcediaComput. Sci. 2019,
+151,782–787.[CrossRef]
+13. Burghout,W.;Koutsopoulos,H.N.;Andreasson,I. Hybridmesoscopic–microscopictrafficsimulation. Transp.Res.Rec.2005,
+1934,218–225.[CrossRef]
+14. Zehe,D.;Grotzky,D.;Aydt,H.;Cai,W.;Knoll,A.Trafficsimulationperformanceoptimizationthroughmulti-resolutionmodeling
+ofroadsegments. InProceedingsofthe3rdACMSIGSIMConferenceonPrinciplesofAdvancedDiscreteSimulation,London,
+UK,10–12June2015;pp.281–288.
+15. Burghout, W.; Wahlstedt, J. Hybridtrafficsimulationwithadaptivesignalcontrol. Transp. Res. Rec. 2007, 1999,191–197.
+[CrossRef]
+16. Haman,I.T.;Kamla,V.C.;Galland,S.;Kamgang,J.C. Towardsanmultilevelagent-basedmodelfortrafficsimulation. Procedia
+Comput.Sci.2017,109,887–892.[CrossRef]
+17. Bourrel,E.;Lesort,J.B. Mixingmicroscopicandmacroscopicrepresentationsoftrafficflow:HybridmodelbasedonLighthill–
+Whitham–Richardstheory. Transp.Res.Rec.2003,1852,193–200.[CrossRef]
+18. ElHmam,M.S.;Abouaissa,H.;Jolly,D.;Benasser,A. Towardsanhybridsimulationapproachoftransportationsystems. IFAC
+Proc.Vol.2004,37,75–80.[CrossRef]
+19. Abouaissa,H.;Jolly,D.;Benasser,A. Macro-microsimulationoftrafficflow. IFACProc.Vol.2006,39,351–356.
+20. Chiou,Y.C.;Sun,C.A.;Hsieh,C.W. Amacro-micromodelundermixedtrafficflowconditions. J.East. AsiaSoc. Transp. Stud.
+2015,11,1931–1944.
+21. Sahraoui,A.E.K.;Jayakrishnan,R. Microscopic-macroscopicmodelssystemsintegration:AsimulationcasestudyforATMIS.
+Simulation2005,81,353–363.[CrossRef]
+22. Sewall,J.;Wilkie,D.;Lin,M.C. Interactivehybridsimulationoflarge-scaletraffic. InProceedingsofthe2011SIGGRAPHAsia
+Conference,HongKong,China,12–15December2011;pp.1–12.
+23. Takahashi,T.;Abe,K.;Fujii,H.;Ikada,S.;Matsudaira,M. DevelopmentofDynamicHybridTrafficSimulationModelandIts
+ValidationUsingRealHighwayDataset. Trans.Jpn.Soc.Simul.Technol.2021,13,37–47.[CrossRef]
+24. Imai,Y.;Fujii,H.;Okano,K.;Matsudaira,M.;Suzuki,T. DevelopmentofDynamicMicro-andMacroscopicHybridModelfor
+EfficientHighwayTrafficSimulation:ModelExtensiontoMergingSectionsandValidationwithProbeData. Int.J.Intell.Transp.
+Syst.Res.2024,22,159–170.[CrossRef]
+25. Boulet,X.;Zargayouna,M.;Scemama,G.;Leurent,F. Couplingmulti-agentandmacroscopicsimulatorsoftraffic. InAgentsand
+Multi-AgentSystems:TechnologiesandApplications2019:13thKESInternationalConference,KES-AMSTA-2019,St.Julians,Malta,June
+2019Proceedings;Springer:Berlin/Heidelberg,Germany,2020;pp.323–332.
+26. Bouha, N.; Morvan, G.; Abouaissa, H.; Kubera, Y. A First Step Towards Dynamic Hybrid Traffic Modeling. arXiv 2015,
+arXiv:1505.07257.
+27. Barceló,J.;Casas,J.;García,D.;Perarnau,J. Ahybridsimulationframeworkforadvancedtransportationanalysis. IFACProc.Vol.
+2006,39,497–502.[CrossRef]
+28. Burghout,W.;Koutsopoulos,H.N. HybridTrafficSimulationModels:VehicleLoadingatMeso-MicroBoundaries. InTransport
+Simulation;EPFLPress:Lausanne,Switzerland,2019.
+29. Claes,R.;Holvoet,T. Multi-modeltrafficmicrosimulations. InProceedingsofthe2009WinterSimulationConference(WSC),
+Austin,TX,USA,13–16December2009;IEEE:Piscataway,NJ,USA,2009;pp.1113–1123.
+30. Joueiai,M.;vanLint,H.;Hoogendoorn,S. Genericsolutionsforconsistencyproblemsinmulti-scaletrafficflowmodels-analysis
+andpreliminaryresults. InProceedingsofthe16thInternationalIEEEConferenceonIntelligentTransportationSystems(ITSC
+2013),TheHague,TheNetherlands,6–9October2013;IEEE:Piscataway,NJ,USA,2013;pp.310–315.
+31. Casas,J.;Perarnau,J.;Torday,A. Theneedtocombinedifferenttrafficmodellinglevelsforeffectivelytacklinglarge-scaleprojects
+addingahybridmeso/microapproach. Procedia-Soc.Behav.Sci.2011,20,251–262.[CrossRef]
+32. Zitzow,S.;Lehrke,D.;Hourdos,J. DevelopingaLarge-ScaleHybridSimulationModel:LessonsLearned. Transp.Res.Rec.2015,
+2491,107–116.[CrossRef]
+33. Gütlein,M.;German,R.;Djanatliev,A. Towardsahybridco-simulationframework:HLA-basedcouplingofMATSimandSUMO.
+InProceedingsofthe2018IEEE/ACM22ndInternationalSymposiumonDistributedSimulationandRealTimeApplications
+(ds-rt),Madrid,Spain,15–17October2018;IEEE:Piscataway,NJ,USA,2018;pp.1–9.
+34. Gütlein,M.;Djanatliev,A.Coupledtrafficsimulationbydetachedtranslationfederates:AnHLA-basedapproach. InProceedings
+ofthe2019WinterSimulationConference(WSC),NationalHarbor,MD,USA,8–11December2019;IEEE:Piscataway,NJ,USA,
+2009;pp.1378–1389.
+
+===== PAGE 23 =====
+
+SmartCities2025,8,2 23of23
+35. Rakow,C.;Kaddoura,I.;Nippold,R.;Wagner,P. Investigationofthesystem-wideeffectsofintelligentinfrastructureconcepts
+withmicroscopicandmesoscopictrafficsimulation. InProceedingsofthe27thITSWorldCongress,Hamburg,Germany,11–15
+October2021.
+36. Triebke,H.;Kromer,M.;Vortisch,P. Bridgingthegapbetweenmesoscopictransportplanningandmicroscopictrafficsimulation:
+Ananalyticalandnumericalanalysisoftrafficdynamics. Transp.Res.Rec.2022,2677,62–76.[CrossRef]
+37. Triebke,H.;Kromer,M.;Vortisch,P. Pre-studyandinsightstoasequentialMATSim-SUMOtool-couplingtodeduce24hdriving
+profilesforSAEVs. SUMOConf.Proc.2022,1,93–112.[CrossRef]
+38. Schrab, K.; Protzmann, R.; Radusch, I. A large-scale traffic scenario of berlin for evaluating smart mobility applications.
+InProceedingsoftheConferenceonSustainableUrbanMobility, Skiathos, Greece, 31August–2September2022; Springer:
+Berlin/Heidelberg,Germany,2022;pp.276–287.
+39. Krauß,S.;Wagner,P.;Gawron,C. Metastablestatesinamicroscopicmodeloftrafficflow. Phys. Rev. E1997,5,5597–5602.
+[CrossRef]
+40. Treiber,M.;Hennecke,A.;Helbing,D. Congestedtrafficstatesinempiricalobservationsandmicroscopicsimulations. Phys.Rev.
+E2000,62,1805–1824.[CrossRef][PubMed]
+41. Erdmann,J. SUMO’sLane-ChangingModel. InModelingMobilitywithOpenData;Behrisch,M.,Weber,M.,Eds.;Springer:Cham,
+Swizerland,2015;pp.105–123.
+42. OpenStreetMap—openstreetmap.org. Availableonline:https://www.openstreetmap.org/(accessedon8December2024).
+43. Laarabi,H.;Needell,Z.;Waraich,R.;Poliziani,C.;Wenzel,T. BEAM:TheModelingFrameworkforBehavior,Energy,Autonomy
+&Mobility.arXiv2023,arXiv:2308.02073.
+44. OSMWebWizard—SUMO Documentation—sumo.dlr.de. Available online: https://sumo.dlr.de/docs/Tutorials/
+OSMWebWizard.html(accessedon16October2024).
+45. netconvert—SUMODocumentation—sumo.dlr.de. Availableonline:https://sumo.dlr.de/docs/netconvert.html(accessedon16
+October2024).
+46. Moeckel,R.;Huang,W.C.;Ji,J.;Llorca,C.;Moreno,A.T.;Staves,C.;Zhang,Q.;Erhardt,G.D. TheActivity-basedIncremental
+Model(ABIT):Modeling24h,7daysperweek. InProceedingsoftheEuroWorkingGroupTransportation2023,Santander,
+Spain,6–8September2023.
+47. Moreno,A.T.;Moeckel,R. PopulationSynthesisHandlingThreeGeographicalResolutions. ISPRSInt.J.Geo-Inf.2018,7,174.
+[CrossRef]
+48. Turns—SUMODocumentation—sumo.dlr.de. Availableonline:https://sumo.dlr.de/docs/Tools/Turns.html(accessedon23
+October2024).
+49. Verkehrsmengenkarten2022-Schwerverkehr. Availableonline:https://stadt.muenchen.de/dam/jcr:bc42fe82-33cf-47fe-a0f0-306
+951c5312b/Verkehrsmengenkarte_2022_SV.pdf(accessedon8December2024).
+50. Loder,A.;Cantner,F.;Dahmen,V.;Bogenberger,K. TheMobilität.LebenStudy:AYear-LongMobility-TrackingPanel.arXiv2023,
+arXiv:2308.04973.
+51. Millard-Ball,A.;Hampshire,R.C.;Weinberger,R.R. Map-matchingpoor-qualityGPSdatainurbanenvironments:ThepgMap-
+Matchpackage. Transp.Plan.Technol.2019,42,539–553.[CrossRef]
+52. Mobilithek—mobilithek.info. Availableonline:https://mobilithek.info/(accessedon8December2024).
+53. Profillidis,V.;Botzoris,G. Chapter5—StatisticalMethodsforTransportDemandModeling. InModelingofTransportDemand;
+Profillidis,V.,Botzoris,G.,Eds.;Elsevier:Amsterdam,TheNetherlands,2019;pp.163–224.[CrossRef]
+54. Cascetta,E. TransportationSystemsEngineering: TheoryandMethods;SpringerScience&BusinessMedia: Berlin/Heidelberg,
+Germany,2013;Volume49.
+55. TransportAnalysisGuidanceUNITM3.1:HighwayAssignmentModelling. Availableonline:https://assets.publishing.service.
+gov.uk/media/664dad464f29e1d07fadcc39/tag-m3-1-highway-assignment-modelling.pdf(accessedon8December2024).
+56. Friedrich,M.;Pestel,E.;Schiller,C.;Simon,R. ScalableGEH:AQualityMeasureforComparingObservedandModeledSingle
+ValuesinaTravelDemandModelValidation. Transp.Res.Rec.2019,2673,722–732.[CrossRef]
+Disclaimer/Publisher’sNote: Thestatements, opinionsanddatacontainedinallpublicationsaresolelythoseoftheindividual
+author(s)andcontributor(s)andnotofMDPIand/ortheeditor(s).MDPIand/ortheeditor(s)disclaimresponsibilityforanyinjuryto
+peopleorpropertyresultingfromanyideas,methods,instructionsorproductsreferredtointhecontent.

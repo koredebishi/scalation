@@ -1,0 +1,619 @@
+===== PAGE 1 =====
+
+2025 55th Annual IEEE/IFIP International Conference on Dependable Systems and Networks Workshops (DSN-W)
+DURA-CPS: A Multi-Role Orchestrator for
+Dependability Assurance in LLM-Enabled
+Cyber-Physical Systems
+1st Trisanth Srinivasan 1st Santosh Patapati 2nd Himani Musku
+Department of AI Deployment and Safety Department of AI Deployment and Safety School of Computer Science
+Cyrion Labs Cyrion Labs Carnegie Mellon University
+Dallas, USA Dallas, USA Pittsburgh, USA
+trisanth@cyrionlabs.org santosh@cyrionlabs.org hmusku@andrew.cmu.edu
+3rd Idhant Gode 4th Aditya Arora 5th Samvit Bhattacharya 6th Abubakr Nazriev
+College of Engineering ACM AI Department of R&D Sentinel DE
+Cornell University University of California San Diego Cyrion Labs University of Montana
+Ithaca, USA San Diego, USA San Roman, USA Missoula, USA
+iag32@cornell.edu a7arora@ucsd.edu samvitb@cyrionlabs.org abu.nazriev@umconnect.umt.edu
+7th Sanika Hirave 8th Zaryab Kanjiani 9th Srinjoy Ghose
+Dept. of Computer Science & Engineering School of Applied Economics and Management School of Science
+Oakland University Cornell University University of North Texas
+Rochester, USA Ithaca, USA Denton, USA
+sanikahirave@oakland.edu zk226@cornell.edu srinjoyghose@my.unt.edu
+Abstract—Cyber-Physical Systems (CPS) increasingly depend its requirements and behaves as intended. V&V remains a
+on advanced AI techniques to operate in critical applications. complex and costly endeavor in most domains [1].
+However, traditional verification and validation methods often
+The challenges of V&V grow when Artificial Intelligence
+struggle to handle the unpredictable and dynamic nature of
+(AI) is incorporated into CPS. This difficulty is compounded
+AI components. In this paper, we introduce DURA-CPS, a
+novel framework that employs multi-role orchestration to au- as increasingly complex AI techniques, such as Deep Neural
+tomate the iterative assurance process for AI-powered CPS. Networks (DNNs) and Large Language Models (LLMs) are
+By assigning specialized roles (e.g., safety monitoring, security deployed in these systems. The behavior of AI is often
+assessment, fault injection, and recovery planning) to dedicated
+sensitive to unexpected changes in the environment [2]. This
+agentswithinasimulatedenvironment,DURA-CPScontinuously
+unpredictability, coupled with a vulnerability to adversarial
+evaluatesandrefinesAIbehavioragainstarangeofdependability
+requirements. We demonstrate the framework through a case attacks [3], makes traditional V&V methods, which rely on
+studyinvolvinganautonomousvehiclenavigatinganintersection predictable behavior and exhaustive state exploration [4], less
+with an AI-based planner. Our results show that DURA-CPS effective for assessing AI-based components.
+effectivelydetectsvulnerabilities,managesperformanceimpacts,
+AddressingtheseissuesrequiresV&Vframeworksdesigned
+and supports adaptive recovery strategies, thereby offering a
+structured and extensible solution for rigorous V&V in safety- specifically for AI-based CPS. Such frameworks should vali-
+and security-critical systems. date AI models in isolation and how they interact with the
+IndexTerms—Cyber-PhysicalSystems(CPS),Verificationand environment and other system components at runtime. We
+Validation (V&V), Artificial Intelligence (AI), Safety-Critical require structured approaches that can systematically:
+Systems, Large Language Models (LLM), Autonomous Driving
+• Evaluate AI behavior in context against diverse depend-
+I. INTRODUCTION ability criteria
+Cyber-Physical Systems (CPS) integrate computational al- • Assess robustness to noise, faults, and security threats
+gorithms with physical processes. CPS is being used across • Facilitate the analysis of interactions between AI, the
+physical system, and its environment
+various sectors such as transportation, energy, manufacturing,
+healthcare, and agriculture. Ensuring that these systems are • Support iterative refinement
+safe, secure, reliable, and timely is critical as failures may • Providetraceableevidencesuitableforbuildingassurance
+cases and supporting certification [5]
+result in serious consequences. Thus, Verification and Vali-
+dation (V&V) is essential to build trust that a CPS meets Tomeettheseneeds,wepresentDURA-CPS,anovelframe-
+2325-6664/25/$31.00 ©2025 IEEE 63
+DOI 10.1109/DSN-W65791.2025.00040
+04000.5202.19756W-NSD/9011.01
+:IOD
+|
+EEEI
+5202©
+00.13$/52/7-5021-5133-8-979
+|
+)W-NSD(
+spohskroW
+skrowteN
+dna
+smetsyS
+elbadnepeD
+no
+ecnerefnoC
+lanoitanretnI
+PIFI/EEEI
+launnA
+ht55
+5202
+Authorized licensed use limited to: University of Georgia. Downloaded on May 14,2026 at 21:38:47 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 2 =====
+
+workcenteredaroundmulti-roleorchestrationtoiterativelyas- supplement offline analyses [18], [19]. However, these ap-
+surethedependabilityofAIcomponentswithinCPS.DURA- proachestendtotargetspecificindividualproperties.Theydo
+CPS assigns roles to various agents (AI models, algorithms, not capture the full complexity of runtime interactions in a
+formalcheckers,etc.)toworktogetherwithinasimulatedCPS dynamicCPSenvironment,suchaschainreactionevents[20].
+environment. The agents continuously assess, challenge, and
+C. Runtime Assurance and Monitoring
+refinetheperformanceoftheprimaryAIcomponentaccording
+to the defined dependability requirements. Runtime Assurance (RA) techniques aim to ensure safety
+Thecontributionsoftheproposedframeworkareasfollows: during operation by employment monitors and safety con-
+trollers [21], [22]. For example, the Simplex architecture [21]
+1) Multi-Role V&V Architecture: Defines special-
+switches between a complex primary controller and a sim-
+ized roles (e.g., ’Generator’, ’SafetyMonitor’, ’Secu-
+pler,verifiedsafetycontrollerasneeded.Runtimeverification
+rityAssessor’,’PerformanceOracle’,’FaultInjector’,’Re-
+methods assess execution traces against formal specifications
+coveryPlanner’) tailored for comprehensive dependabil-
+using temporal logic such as LTL, MTL, or STL [23], [24].
+ity assessment.
+In contrast to these approaches, DURA-CPS utilizes multiple
+2) Iterative Assurance Loop: Implements a controlled
+coordinatedrolesinaclosed-loopassuranceprocess.Thisgoes
+feedback loop where V&V findings from monitor-
+beyond just switching to backup controllers.
+ing/assessment roles inform subsequent actions, test
+generation, or adaptation planning. D. Multi-Agent Systems (MAS) for Simulation and V&V
+3) Simulation Integration & State Management: Pro-
+Multi-agent systems have been used to simulate complex
+vides interfaces for connecting to standard CPS simu-
+systems and test control strategies in CPS [25]. Agent-based
+lators and manages the shared state information needed
+modelinghasbeenusedtomimicCPSbehaviorwhichfocuses
+for contextual V&V.
+on autonomous driving scenarios. These approaches simply
+4) Extensibility: Designed for modularity, allowing users
+utilize agent interactions for simulation. On the other hand,
+to define new roles or customize existing ones with
+DURA-CPS assigns specific V&V roles that target depend-
+different AI models, formal techniques, or procedural
+ability assurance rather than general-purpose simulation or
+logic.
+emergent behavior analysis.
+5) Dependability-Focused Metrics: Collects metrics
+specifically related to safety violations, security vulner- E. LLM and AI Orchestration Frameworks
+abilities detected, performance adherence, and recovery RecentframeworkssuchasLangChain[26]andLlamaIndex
+effectiveness. [27] have shown how to compose LLM calls with external
+By orchestrating these roles in a coordinated manner, tools and data to build applications. AutoGen [28] further
+DURA-CPS aims to provide a more rigorous approach to supports complex workflows involving multiple LLM agents.
+V&VforAIinCPSthanad-hoctestingorisolatedcomponent Although these orchestration frameworks demonstrate con-
+analysis. siderable power, they are primarily designed for application
+development and general AI collaboration. Their capabilities
+II. RELATEDWORK
+for formal requirement checking, CPS simulation, and struc-
+TheassuranceofAI-basedCPSdrawsuponresearchwithin tured assurance loops are limited compared to the dedicated
+several fields. designofDURA-CPS.Thisoftenforcesresearcherstodevelop
+custom assurance loops and V&V steps from the ground
+A. Verification and Validation of CPS
+up, which is highly time consuming. Earlier work, such
+Traditional V&V approaches for CPS are based on formal as the LLMOrchestrator [29], provided a basic generator-
+methods such as model checking and theorem proving [6], verifier structure that DURA-CPS significantly expands by
+simulation-based testing [7], hardware-in-the-loop validation, incorporating multiple V&V roles.
+runtimeverification[8],[9],andfaultorattackinjection[10].
+F. Positioning DURA-CPS
+ThesemethodsformthebackboneofCPSassurance.However,
+theyfacechallengeswhenappliedtocomplexAIcomponents DURA-CPSbuildsonideasfromtheaforementionedfields
+because of issues with scalability, lack of test coverage, and while establishing a new niche. It adopts the orchestration
+difficulties in modeling the unpredictable behavior of AI [2]. paradigm from AI frameworks, re-purposing it specifically
+for dependability V&V. The frameworks employs a multi-
+B. Verification and Validation of AI/ML Systems
+role architecture inspired by multi-agent systems. It assigns
+Researchon AIV&Vfocuseson robustnesstestingagainst roles that focus on safety monitoring, security testing, per-
+perturbations and adversarial examples [11], [12], as well as formance evaluation, fault injection, and recovery planning.
+theformalverificationofnetworkpropertiesusingtechniques Unlike approaches that rely solely on runtime monitoring
+such as SMT solvers or abstract interpretation [13], [14]. and simple controller switching, DURA-CPS implements an
+Efforts have also been made to improve explainability [15], iterative, closed-loop process that integrates tightly with CPS
+[16] and assess fairness in machine learning systems [17]. simulation environments as a robust solution for the complex
+Simulation-based test generation is also commonly used to challenges of V&V in AI-based CPS.
+64
+Authorized licensed use limited to: University of Georgia. Downloaded on May 14,2026 at 21:38:47 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 3 =====
+
+III. THEDURA-CPSFRAMEWORK • SafetyMonitor: Checks the state, proposed actions, or
+DURA-CPSisaPython-basedframeworkdesignedtostruc- predicted outcomes against safety rules or invariants.
+ture and automate the iterative V&V process for AI compo- Canuserule-basedlogic,formalspecifications(e.g.,STL
+nentswithinsimulatedCPSenvironments.Itemploysamulti- checksviaintegratedmonitorslikeRTAMT[30]),oreven
+role orchestration paradigm where specialized computational anotherAImodeltrainedforsafetyassessment.Returnsa
+agents,termedRoles,collaboratetoassessthebehaviorofthe safetyverdict(e.g.,safe,unsafe,warning)andpotentially
+primaryAIcomponentUnderTest(AUT)againstdependabil- quantitative scores.
+ity requirements. • SecurityAssessor: Evaluates the system’s security pos-
+ture. Can analyze potential vulnerabilities based on the
+A. Core Architecture current state or AI output, or direct the FaultInjector.
+The DURA-CPS architecture, illustrated in Fig. 1, cen- Might involve checking against known attack patterns or
+ters around an Orchestration Controller that manages the security policies.
+interaction between various Roles, an Environment Interface • PerformanceOracle: Monitors performance metrics
+connectingtotheCPSsimulator,aStateManagermaintaining againstrequirements(e.g.,responsetime,resourceusage,
+shared state, and a Dependability Metrics tracker. control accuracy, task completion metrics).
+• FaultInjector: Introduces faults or disturbances into the
+simulation based on directives (e.g., from the Secu-
+Environment(SensorData)
+rityAssessor or predefined test plans). Can simulate sen-
+sornoise/failure,communicationdelays/loss,GPSspoof-
+ing, or adversarial perturbations to AI inputs.
+StateManager • RecoveryPlanner:Activatedupondetectionofsafety/se-
+curity violations or critical failures. Proposes recovery
+actions or adaptations (e.g., switch to safe mode, replan
+OrchestrationController Metrics trajectory, trigger alert). Can be rule-based or use plan-
+ning algorithms/AI.
+3) Environment Interface: Provides an abstraction layer
+Roles(Generator,SafetyMonitor,...) for communicating with the external CPS simulator (e.g.,
+CARLA, AirSim, Gazebo [31]–[33]). It handles:
+• Sendingcommands/actions(fromGeneratororRecovery-
+ActionExecution Planner) to the simulator.
+• Receiving sensor data and state updates from the simu-
+lator.
+Fig.1. OverviewoftheDURA-CPSarchitecture.SensordatafromtheCPS
+iscollectedbytheEnvironmentInterfaceandorganizedbytheStateManager. • Translating between the simulator’s data formats and the
+TheOrchestrationControllercoordinatesspecializedRolesthatgenerateand internal state representation.
+refineactionsthroughadedicatedActionExecutionmodule.Theseactionsare
+fedbackintothesystemtocompleteaclosed-loopassuranceprocess,while • Potentially controlling simulation time steps or scenario
+Metricsareconcurrentlytrackedforcontinuousverificationandvalidation loading.
+4) StateManager: Maintainsthesharedstateaccessibleby
+B. Key Components all roles. This includes:
+DURA-CPS consists of five key components. • Current state received from the Environment Interface
+1) Orchestration Controller: This central component man- (e.g., vehicle position, sensor readings).
+agestheoverallexecutionflow.Itinitializestheroles,manages • Outputs produced by roles in the current iteration (e.g.,
+the iterative V&V loop, sequences role execution based on theGenerator’sproposedaction,theSafetyMonitor’sver-
+dependencies or triggers, facilitates communication between dict, the FaultInjector’s active fault).
+roles (via the State Manager), and terminates the process • Historical state information if needed for temporal anal-
+based on predefined criteria (e.g., number of iterations, test ysis.
+completion, violation detected). Ensuresconsistentviewofthesystemstateforallroleswithin
+2) Role: A Role represents a specialized function within an iteration.
+the V&V process. It’s an abstract base class defining a 5) DependabilityMetrics: Collects and logs key metrics
+standardinterface.UsersimplementorconfigureconcreteRole throughout the orchestration process, such as:
+subclasses. Roles interact indirectly through a State Manager. • Number and type of safety/security violations detected.
+Key predefined (but extensible) roles include: • Performance metric values over time.
+• Generator:RepresentstheprimaryAIcomponentUnder • Robustness scores from monitors (if applicable).
+Test (AUT) or a component generating inputs/scenarios • Fault injection success/impact.
+for it. Takes current state/context, generates an action, • Recovery action success rates.
+plan, or output. • Processing time per role/iteration.
+65
+Authorized licensed use limited to: University of Georgia. Downloaded on May 14,2026 at 21:38:47 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 4 =====
+
+This data is crucial for post-hoc analysis and generating
+assurance reports.
+C. Iterative Orchestration Workflow
+TheDURA-CPSworkflowcanbecustomizedasneeded.A
+typical execution cycle proceeds as follows:
+1) Initialization:Controllerloadsconfiguration,initializes
+roles, connects to the simulator via the Environment
+Interface, and gets initial state via the State Manager.
+2) Iteration Start: Controller triggers roles based on se-
+quence or dependencies.
+3) State Update:TheEnvironmentInterfaceprovidescur-
+rent world state to the State Manager. Fig.2. AsampleCARLA3Dscene.Athird-personviewwasusedasinput
+forourLlama3.211Bmodelalongsidesensorreadings.[31],[34],[35]
+4) GenerationorActionProposal:TheGenerator(AUT)
+proposes an action based on current state.
+5) Dependability Assessment: • DevelopnewEnvironmentInterfacesubclassestosupport
+• SafetyMonitor evaluates proposed action/state different simulators or hardware-in-the-loop setups.
+against safety rules. • Customize the DependabilityMetrics collection.
+• SecurityAssessor evaluates security posture; may This allows tailoring the framework to specific CPS domains,
+direct the FaultInjector. AI components, and V&V requirements.
+• PerformanceOracle checks performance metrics.
+• FaultInjector potentially introduces faults/attacks IV. USECASE:AUTONOMOUSVEHICLES
+based on directives or test plan. To demonstrate the capabilities of DURA-CPS, we apply
+6) V&VFeedbackProcessing:Controllergathersverdict- it to a challenging V&V scenario: ensuring the safe and
+s/outputs from assessment roles via the StateManager. secure navigation of an unsignalized urban intersection by an
+7) Decision and Adaptation: autonomousvehicle(AV)equippedwithanAI-basedplanning
+module.
+• If violations detected: Controller may halt, log de-
+tails, or activate the RecoveryPlanner. The Recov-
+A. Scenario Description
+eryPlanner proposes alternative action.
+The AV must navigate a four-way intersection potentially
+• If no violations: Controller approves Generator ac-
+shared with other vehicles (simulated background traffic) and
+tion (or refined action).
+pedestrians. The primary AI component Under Test (AUT) is
+8) Action Execution: Controller sends the final approved
+an LLM-based tactical planner. Given sensor inputs (object
+or recovery action to the simulator via the Environ-
+lists, positions, velocities from simulated perception) and
+mentInterface.
+a high-level goal (e.g., "proceed straight"), the LLM plan-
+9) Metrics Logging: Relevant data is logged through De-
+ner generates maneuver decisions (e.g., "wait", "accelerate",
+pendabilityMetrics for the iteration.
+"yield", "proceed cautiously"). Critical dependability require-
+10) Loop/Terminate: Controller checks termination condi-
+ments include:
+tions (e.g., time limit, scenario end, critical failure). If
+not met, proceeds to the next iteration (Step 2). • Safety: Avoid collisions with other vehicles and pedes-
+trians. Maintain safe following distances. Obey traffic
+This loop allows for continuous evaluation and adaptation,
+rules implicitly (e.g., right-of-way, though not explicitly
+forming an iterative assurance process within the simulation.
+programmed).
+The configuration of roles, their interaction logic (depen-
+• Security: Resilience against spoofed sensor data (e.g.,
+dencies and triggers), and the connection to the simulation
+ghost obstacles, false trajectories) intended to cause haz-
+environment define the specific V&V experiment conducted
+ardous behavior or gridlock.
+using the framework.
+• Performance: Navigate the intersection without undue
+delay (avoiding excessive conservatism) or comfort vio-
+D. Extensibility
+lations (jerk/acceleration).
+DURA-CPS is designed for extensibility. Users can:
+1) Rationale for an LLM-Based Planner: Existing AV
+• Implement new Role subclasses using custom Python planning stacks use domain-specific rule sets. While this is
+code, integrating different AI models (LLMs, DNNs), effective, it limits our ability to stress-test DURA-CPS across
+formal verification tools (via wrappers), or standard al- diverse AI use cases. We therefore deliberately use an LLM-
+gorithms. based planner, which is relatively weaker in this area, to 1)
+• Define complex interaction protocols and triggering con- showtheframeworkcanwrapanyblack-boxdecisionmodule,
+ditions between roles. 2)surfacefailuremodesthattraditionalframeworkswouldnot
+66
+Authorized licensed use limited to: University of Georgia. Downloaded on May 14,2026 at 21:38:47 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 5 =====
+
+Fig. 3. High-level orchestration of AI-based generator and other roles within DURA-CPS. The CARLA environment supplies navigation (map, traffic,
+waypoints) and sensor data. The SecurityAssessor can inject faults through the FaultInjector. These data streams, alongside the running state, feed into a
+prompttemplatertogenerateatextualrepresentationfortheLlama3.211Bmodel.CameraviewsarepasseddirectlytotheLLM.Llama3.2generatesboth
+controloutputsandcorrespondingexplanations.TheActionExecutionmodulethenappliestheseoutputstotheenvironment.Inparallel,theRecoveryPlanner
+employsgeometricchecksanddetermineswhetherornottoemploytheemergencybrake,whichoverridesallotheractions.Therunningstateisupdatedvia
+theStateManagertoincludepastactionsandassociatedCoTexplanations.ThePerformanceOracleandSafetyMonitortrackforperformance.
+find, and 3) to demonstrate how DURA-CPS’s different roles 2) Orchestration Logic: The controller executed roles se-
+interact when the AI’s internal logic is opaque. quentiallywithineachsimulatedtimestep(100ms),wherepro-
+cessingisalignedto100msofsimulatedtime,inthefollowing
+B. DURA-CPS Configuration
+order: Environment Update, Generator, SafetyMonitor, Secu-
+WeconfiguredDURA-CPSwiththefollowingrolesinstan-
+rityAssessor, FaultInjector (conditional), PerformanceOracle,
+tiated for this scenario (Figure 3):
+Decision (Controller activates RecoveryPlanner if unsafe),
+• Generator (AUT): An LLM (fine-tuned Llama 3.2 11B Action Execution (Figure 1).
+variant[34])promptedwithcurrentperceivedworldstate
+and goal, outputting a tactical maneuver decision. The C. Test Scenarios
+LLM is provided few-shot examples and a Chain-of-
+We designed simulation scenarios with varying complexity
+Thought (CoT) prompt. Table I details the sensor inputs
+and injected faults/attacks:
+the LLM receives.
+1) Nominal: Light traffic, clear right-of-way.
+• SafetyMonitor: Implemented using geometric checks
+2) Congested: Moderate traffic density, requiring careful
+and simplified traffic rules. It verifies if the proposed
+yielding and gap selection.
+maneuver maintains a minimum safety distance from all
+3) Conflicting Traffic: Vehicles approaching simultane-
+perceived dynamic objects based on predicted trajecto-
+ously from multiple directions, testing navigation logic.
+ries. Flags "unsafe" if violations are predicted.
+4) Ghost Obstacle Attack: Nominal scenario + FaultIn-
+• SecurityAssessor: Monitors incoming sensor data pat-
+jector adds a ghost obstacle near the intersection entry.
+terns. For this use case, it directs the FaultInjector to
+5) Trajectory Spoofing Attack: Congested scenario +
+periodically introduce specific attacks.
+FaultInjector spoofs the trajectory of an oncoming car
+• FaultInjector: Simulates two attack types based on Se-
+to seem aggressive.
+curityAssessor triggers:
+6) Pedestrian Crossing:Scenariowithasimulatedpedes-
+1) Ghost Obstacle Injection: Adds a non-existent dy-
+trian crossing the AV’s intended path.
+namic obstacle into the perceived state provided to
+the Generator. Each scenario was run 15 times with variations in traffic
+2) TrajectorySpoofing:Modifiesthepredictedvelocity patterns and timing.
+or path of a real detected vehicle to appear more
+D. Expected Outcomes and Metrics
+hazardous than it is.
+• PerformanceOracle: Tracks intersection clearance time We used DURA-CPS to assess:
+andmaximumlongitudinal/lateralacceleration/jerk.Flags • Safety Violations: Frequency of the SafetyMonitor flag-
+"performance_fail" if thresholds are exceeded. ging "unsafe" maneuvers (indicating potential collisions
+• RecoveryPlanner:Asimplerule-basedagent.Usingthe based on geometry/rules). Actual collisions logged by
+same geometric checks as the SafetyMonitor, it flags CARLA serve as ground truth confirmation.
+checks for unsafe conditions. If unsafe conditions are • Security Resilience: How the Generator (LLM) reacts
+detected,itoverridestheGenerator’sdecisionwith"emer- toinjectedfaults.Doesitbehaveerratically,freeze(grid-
+gency_brake". lock),orfollowunsafecommandsinducedbyfakedata?
+1) Integration: TheCARLAsimulator[31]wasusedviaa Frequency of SafetyMonitor activations during attacks.
+customDURA-CPSCarlaInterface(Figure2).TheStateMan- • Performance Degradation: Increase in intersection
+ager tracked perceived object lists (from CARLA’s sensors), clearance time or comfort violations (jerk/acceleration)
+proposed actions, and associated CoT explanations. under congestion or attacks.
+67
+Authorized licensed use limited to: University of Georgia. Downloaded on May 14,2026 at 21:38:47 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 6 =====
+
+TABLEI
+CARLASENSORINPUTSFORUSECASEARCHITECTURE
+SensorInput Description
+LiDAR-basedObstacleSummary TextualsummaryofobstaclesextractedfromtheLiDAR.Insteadofusingraw3Ddata,theCarlaIn-
+terfaceaggregatesnearbyobjects(vehicles,pedestrians,staticobstacles)withpositions&dimensions.
+RadarSummary Atextsummaryofradardetectionsthatincludeseachobject’srangeandrelativeradialvelocity.
+FrontRGBCamera AnRGBimagecapturedfromthefront-facingcamerapasseddirectlytotheLLM.
+Third-PersonViewCamera AnRGBimageprovidingabroader,third-personperspectiveoftheintersection.Thisimagedelivers
+contextualcluesaboutbackgroundtrafficandenvironmentallayout.
+IMUSummary Atext-basedsummaryofinertialmeasurementsthatincludeslinearacceleration,angularvelocity,and
+heading.Thisinformationsuccinctlydescribesthevehicle’smotiondynamics.
+VehicleSpeed Anumericalvaluerepresentingthecurrentspeedofthevehicle,extractedfromvehicleodometry.
+HDMap&WaypointData Astructuredlistofupcomingwaypointsorlanecentercoordinatesderivedfromahigh-definitionmap.
+Thisinputsupportshigh-levelrouteplanningandnavigation.
+TrafficControlsStatus Aconcisetextualreportdetailingthestateofnearbytrafficsignalsandthepresenceofkeyroadsigns.
+• Recovery Effectiveness: Success rate of the Recovery- • Actualcollisionswerelowerthanmonitorflags,primarily
+Planner(emergencybrake)inpreventingactualcollisions because the RecoveryPlanner (emergency brake) often
+when activated by the SafetyMonitor. intervened successfully when triggered by the Safety-
+Metrics were collected by the DependabilityMetrics compo- Monitor.Thecaseswherecollisionsstilloccurreddespite
+nent. monitor flags often involved very short time-to-collision
+where braking was insufficient or complex multi-vehicle
+V. RESULTSANDANALYSIS interactions.
+DURA-CPS effectively identified scenarios where the LLM
+This section presents the results from executing the au-
+planner proposed potentially unsafe actions.
+tonomous intersection navigation use case with DURA-CPS
+across the defined scenarios (15 runs per scenario, total 90
+B. Security Assessment and Resilience
+runs).
+The FaultInjector, directed by the SecurityAssessor, suc-
+A. Safety Assessment cessfully introduced faults. Analysis focused on the LLM’s
+reaction:
+The SafetyMonitor actively checked the LLM Generator’s
+proposed maneuvers. Table II summarizes the percentage • Ghost Obstacle: The LLM consistently reacted to the
+of runs where the SafetyMonitor flagged at least one "un- ghost obstacle despite the visual input contradicting sen-
+safe" prediction and the rate of actual collisions observed in sor input. It would often propose immediate braking or
+CARLA. significantdeceleration,treatingitasreal.Thisfrequently
+led toperformance issues(sudden stops, increasedclear-
+TABLEII ance time) and was often flagged by the SafetyMonitor
+SAFETYMONITORACTIVATIONSANDCOLLISIONRATES if the braking was excessively abrupt.
+• Trajectory Spoofing: The LLM was sensitive to the
+ScenarioType MonitorFlags"Unsafe"(%) CollisionRate(%)
+spoofed aggressive trajectories, typically choosing to
+Nominal 6.7%(1/15) 0.0%(0/15) yield or wait much longer than necessary, significantly
+Congested 20.0%(3/15) 6.7%(1/15)
+ConflictingTraffic 33.3%(5/15) 13.3%(2/15) impacting performance. In 3 runs (20%), this excessive
+GhostObstacleAttack 86.7%(13/15) 6.7%(1/15) caution led to situations where the AV became ’stuck’,
+TrajectorySpoofAttack 60.0%(9/15) 20.0%(3/15)
+unabletofindaperceivedsafegap,resultinginagridlock
+PedestrianCrossing 26.7%(4/15) 6.7%(1/15)
+scenario broken only by simulation timeout.
+OverallAvg. 38.9% 8.9%
+DURA-CPS’srolesallowedsystematicinjectionandobserva-
+Observations: tion of the AI’s vulnerability to sensor data manipulation.
+• The LLM planner showed reasonable safety in nominal
+C. Performance Impact
+cases but struggled increasingly with complexity (Con-
+gested, Conflicting Traffic). It exposed weaknesses that The PerformanceOracle tracked intersection clearance time
+validated the need for our multi-role loop. and comfort metrics. Figure 4 shows average clearance time.
+• SecurityattackssignificantlytriggeredtheSafetyMonitor. As expected, congestion and conflicting traffic increased
+The Ghost Obstacle attack frequently caused the LLM clearance time. Security attacks had a major impact: Ghost
+to propose sudden braking or swerving deemed unsafe Obstacles caused sharp braking, sometimes increasing time
+by the monitor. Trajectory Spoofing often led the LLM due to recovery, while Trajectory Spoofing significantly in-
+to yield unnecessarily or hesitate, sometimes causing creased waiting times due to the LLM’s overly cautious
+conflicts later flagged by the monitor. reaction to the fake aggressive behavior. Comfort violations
+68
+Authorized licensed use limited to: University of Georgia. Downloaded on May 14,2026 at 21:38:47 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 7 =====
+
+25
+20 18.4
+16
+15 12.8
+11.7
+9.9
+10
+5.4
+5
+0
+No minal Co C n o g n e fl st i G e c d t h in o g st T O ra T b f s r fi a t c a je c c le to A ry tta S c p k o P o e f d A es tt t a ri c a k n Crossing
+)s(
+emiT
+ecnaraelC
+egarevA
+pendabilityincomplexCPSanddemonstratetheutilityofthe
+DURA-CPS framework’s multi-role orchestration approach.
+A. Implications for AI/LLM Assurance in CPS
+The experiment shows the brittleness of even sophisticated
+AImodelslikeLLMswhenfacedwithcomplexscenariosand
+threats. The LLM planner showed degraded safety and per-
+formance under congestion, conflicting goals, and especially
+under simulated attacks. Its sensitivity to spoofed data (ghost
+obstaclesandmanipulatedtrajectories)isasignificantconcern,
+showingthatrelyingsolelyontheAI’sperceivedworldmodel
+without robust validation mechanisms is high-risk.
+Security attacks directly impacted safety (by inducing un-
+safe reactions or hesitation leading to secondary conflicts) and performance (by causing excessive caution or gridlock). ThisdemonstratestheneedforV&VframeworkslikeDURA- CPS that can assess these attributes concurrently and analyze
+their interactions, rather than treating them in isolation. The
+partial success of the simple recovery mechanism shows the
+Fig. 4. Average Intersection Clearance Time Across Scenarios. Error bars
+importanceofruntimeassuranceloopsbutalsoshowstheneed
+indicatethestandarddeviationover15simulationruns.
+formoreadvancedmonitoringandrecoverystrategiestailored
+to specific failure modes.
+(high jerk/acceleration) were most frequent during recovery
+braking and reactions to ghost obstacles. B. Effectiveness and Role of DURA-CPS
+DURA-CPS proved effective in structuring this complex
+D. Recovery Effectiveness
+V&V task. Its key strengths observed in the use case include:
+The simple RecoveryPlanner (emergency brake) was trig-
+• Structured Assessment: Assigning specific dependabil-
+gered whenever the SafetyMonitor flagged "unsafe".
+ity concerns (safety, security, performance) to distinct
+• It successfully prevented a collision in cases where it roles provided clarity and allowed for modular imple-
+was activated and a collision would likely have occurred mentation of checks and attacks.
+otherwise (based on manual inspection of near-miss sce- • Systematic Fault/Attack Injection: The FaultInjector
+narios). role enabled controlled introduction of security threats,
+• Failures typically occurred when the unsafe situation allowing systematic evaluation of the AI’s resilience.
+developed too rapidly for braking alone to suffice or • Closed-Loop Analysis: The framework captured the
+involved complex side-impact scenarios. dynamic feedback loop where AI actions influence the
+This highlights the importance of the monitor-recovery loop environment, which influences subsequent AI inputs and
+but also suggests the need for more sophisticated recovery V&V assessments, including recovery actions.
+strategies than simple braking in future work. • Extensibility Potential: While simple monitors and re-
+covery were used here, the role-based structure readily
+E. DURA-CPS Contribution Analysis
+accommodatesmoresophisticatedimplementations(e.g.,
+This use case shows how DURA-CPS facilitates V&V: STL-based monitors, AI-based security assessors).
+• The multi-role setup allowed assessment of safety, secu- DURA-CPS acts as an "in-the-loop V&V orchestrator," al-
+rity, and performance aspects of the LLM planner. lowing engineers to configure a virtual team of specialized
+• The FaultInjector and SecurityAssessor enabled system- agents that continuously probe and assess the AI AUT within
+atic testing against specific attack vectors. its simulated operational context. This approach facilitates
+• The closed-loop orchestration revealed interactions, such identifying weaknesses, understanding interactions between
+as security attacks leading to safety monitor triggers, or dependability facets, and evaluating the effectiveness of as-
+recovery actions impacting performance. surance mechanisms like monitors and recovery planners.
+• DependabilityMetrics provided quantitative data summa-
+C. Limitations and Future Work
+rizing complex behaviors across runs and scenarios.
+This work has several limitations that suggest avenues for
+TheframeworkprovidedasystematicwaytochallengetheAI
+future research:
+component and evaluate its dependability.
+• Specification Effort: Defining logic for each role (espe-
+VI. DISCUSSION
+cially monitors and assessors) requires great effort and
+Theresultsfromtheautonomousintersectionnavigationuse domain expertise. Developing libraries of reusable role
+case provide insights into the challenges of assuring AI de- implementations would improve usability.
+69
+Authorized licensed use limited to: University of Georgia. Downloaded on May 14,2026 at 21:38:47 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 8 =====
+
+• Sim-to-Real Gap: As with all simulation-based V&V, [2] K.Lekadir,R.Osuala,C.Gallina,N.Lazraketal.,“Future-ai:Guiding
+transferring findings to the real world requires cau- principles and consensus recommendations for trustworthy artificial
+intelligenceinmedicalimaging,”arXivpreprint,2024.
+tion.ValidatingDURA-CPSandroleimplementationson [3] I.J.Goodfellow,J.Shlens,andC.Szegedy,“Explainingandharnessing
+physicalplatformsorhigh-fidelitydigitaltwinsiscrucial. adversarialexamples,”arXivpreprintarXiv:1412.6572,2015.
+• Scalability: Orchestrating many complex roles, espe- [4] E.M.Clarkeetal.,ModelChecking. MITPress,1999.
+[5] R.Hawkins,T.Kelly,J.Knight,andP.Graydon,“Anewapproachto
+cially those involving computationally intensive analysis creatingclearsafetyarguments,”inAdvancesinSystemsSafety,2011.
+or multiple AI inferences per time step, could become a [6] R.Alur,“Principlesofcyber-physicalsystems,”MITPress,2015.
+bottleneck. In the simulated environment, we executed [7] C.Birchler,S.Khatiri,P.Rani,T.Kehrer,andS.Panichella,“Aroadmap
+for simulation-based testing of autonomous cyber-physical systems:
+the AI agents at each simulated interval rather than Challengesandfuturedirection,”arXivpreprint,2024.
+in real-time. Such an approach would not be possible [8] M.LeuckerandC.Schallhart,“Abriefaccountofruntimeverification,”
+in direct real-world testing. In such cases, performance
+JournalofLogicandAlgebraicProgramming,2009.
+[9] C. Sanchez, G. Schneider et al., “A survey of challenges for runtime
+optimization and distributed execution may be needed. verification from advanced application domains (beyond software),”
+• LLM Specifics: While an LLM was used as the AUT, FormalMethodsinSystemDesign,2019.
+deeper analysis of LLM-specific failure modes (e.g., [10] M.-C. Hsueh et al., “Fault injection techniques & tools,” Computer,
+1997.
+hallucination, promptsensitivity) withinthe CPScontext [11] N.CarliniandD.Wagner,“Towardsevaluatingtherobustnessofneural
+could be integrated into specific roles. networks,”inIEEESymposiumonSecurityandPrivacy(SP),2017.
+[12] M.-I. Nicolae, M. Sinn, M. N. Tran, A. Rawat, M. Wistuba et al.,
+Future directions focus on:
+“Adversarialrobustnesstoolboxv1.0.0,”arXivpreprint,2018.
+1) Developing a richer library of predefined V&V roles [13] G. Katz, C. Barrett, et al., “Reluplex: An efficient smt solver for
+incorporating diverse techniques (STL monitoring, sim- verifyingdeepneuralnetworks,”inComputerAidedVerification,2017.
+[14] T.Gehr,M.Mirman,D.Drachsler-Cohen,Tsankovetal.,“AI2:Safety
+plified formal methods, ML-based anomaly detection).
+androbustnesscertificationofneuralnetworkswithabstractinterpreta-
+One approach may be to automatically generate V&V tion,”inIEEESymposiumonSecurityandPrivacy(SP),2018.
+roles using LLMs given the problem and constraints. [15] M.T.Ribeiro,S.Singh,andC.Guestrin,“"whyshoulditrustyou?":
+Explainingthepredictionsofanyclassifier,”inACMSIGKDDInterna-
+2) Integrating DURA-CPS with hardware-in-the-loop
+tionalConferenceonKnowledgeDiscoveryandDataMining,2016.
+(HIL) setups to evaluate its effectiveness. [16] S.M.LundbergandS.-I.Lee,“Aunifiedapproachtointerpretingmodel
+3) Applying DURA-CPS to other domains, including in- predictions,”inNeuralInformationProcessingSystems30,2017.
+[17] N.Mehrabi,F.Morstatter,N.Saxena,Lermanetal.,“Asurveyonbias
+dustrialroboticsanddependableagriculturalautomation
+andfairnessinmachinelearning,”ACMComputingSurveys,2021.
+(e.g., safe human-robot collaboration in smart farming). [18] V. Landersheim, M. Jurisch, R. Bartolozzi, G. Stoll, R. Möller, and
+4) Investigating optimizations and removing bottlenecks H. Dann, “Simulation-based testing of subsystems for autonomous
+vehiclesattheexampleofanactivesuspensioncontrolsystem,”2022.
+thatlimitDURA-CPS’seffectivenessinout-of-simtests.
+[19] D.Humeniuk,F.Khomh,andG.Antoniol,“Ambiegen:Asearch-based
+5) Developing specialized assessment metrics tailored to frameworkforautonomoussystemstesting,”inarXivpreprint,2023.
+LLM-specific failure modes, such as hallucination, and [20] R.Uuk,C.I.Gutierrez,D.Guppy,L.Lauwaertetal.,“Ataxonomyof
+systemicrisksfromgeneral-purposeAI,”2024,arXivpreprint.
+integrating these into the DURA-CPS framework to
+[21] S. Sheikhi, U. Mehmood, S. Bak, S. A. Smolka, and S. D. Stoller,
+improve LLM-based component assurance. “The black-box simplex architecture for runtime assurance of multi-
+agentcps,”InnovationsinSystemsandSoftwareEngineering,2024.
+VII. CONCLUSION
+[22] M.Abate,E.Feron,andS.Coogan,“Monitor-basedruntimeassurance
+ThispaperintroducesDURA-CPS,aframeworkleveraging fortemporallogicspecifications,”arXivpreprint,2019.
+[23] O.Maleretal.,“Monitoringtemporalpropertiesofcontinuoussignals,”
+multi-roleorchestrationtostructureandautomatetheiterative
+inModelingandAnalysisofTimedandFault-TolerantSystems,2004.
+assuranceprocessforAI-basedCPS.Byassigningspecialized [24] A.Donzé,“Breach,atoolboxforverificationandparametersynthesis
+V&V functions to roles within a simulated CPS environment, ofhybridsystems,”inComputerAidedVerification,2010.
+[25] M.Ahmed,O.Kazar,A.Ratnayakeetal.,“Cyber-physicalsystemmodel
+DURA-CPS systematically evaluates AI behavior against a
+basedonmulti-agentsystem,”Cyber-Phys.Systems,2024.
+range of dependability requirements. Its iterative and closed- [26] H.Chase,“Langchain,”2022,gitHubrepository.
+loop approach allows analysis of complex interactions and [27] J.Liu,“Llamaindex(gptindex),”2022,gitHubrepository.
+[28] Q.Wu,G.Bansaletal.,“Autogen:Enablingnext-genllmapplications
+continuous evaluation of runtime assurance mechanisms.
+viamulti-agentconversationframework,”arXivpreprint,2023.
+We demonstrated the utility of DURA-CPS in a case study [29] T. Srinivasan and S. Patapati, “Llmorchestrator: A multi-model llm
+on autonomous vehicle intersection navigation with an LLM- orchestrationframeworkforreducingbiasanditerativereasoning,”2025.
+[30] D. Nickovic, A. Pant, and G. Schneider, “Rtamt: Online robustness
+basedplanner.ThecasestudyshowshowDURA-CPScanef-
+monitorsfromsignaltemporallogic,”inRuntimeVerification,2016.
+fectivelyinjectfaults,detectsafetyandsecurityvulnerabilities, [31] A. Dosovitskiy et al., “Carla: An open urban driving simulator,” in
+assess performance impacts, and evaluate recovery actions. Proceedingsofthe1stAnnualConferenceonRobotLearning,2017.
+[32] S.ShahandDey,“Airsim:High-fidelityvisualandphysicalsimulation
+DURA-CPS provides quantitative metrics for assurance.
+forautonomousvehicles,”inFieldandServiceRobotics,2017.
+In conclusion, DURA-CPS offers a practical method for [33] N.Koenigetal.,“Designparadigmsforgazebo,anopen-sourcemulti-
+the V&V of AI in CPS where safety and security are critical. robotsimulator,”inRSJConf.onIntelligentRobotsandSystems,2004.
+[34] Grattafiorietal.,“Thellama3herdofmodels,”2024,arXivpreprint.
+Further work should focus on the identified challenges like
+[35] X. Li, A. Kumar, Sharma et al., “Dialogue-based generation of self-
+specificationeffortandbridgingthesimulation-to-realitygap. drivingsimulationscenariosusinglargelanguagemodels,”2023,arXiv.
+REFERENCES
+[1] G. Klein, J. Andronick, K. Elphinstone, T. Murray, T. Sewell et al.,
+“Comprehensiveformalverificationofanosmicrokernel,”ACMTrans.
+Comput.Syst.,2014.
+70
+Authorized licensed use limited to: University of Georgia. Downloaded on May 14,2026 at 21:38:47 UTC from IEEE Xplore. Restrictions apply.

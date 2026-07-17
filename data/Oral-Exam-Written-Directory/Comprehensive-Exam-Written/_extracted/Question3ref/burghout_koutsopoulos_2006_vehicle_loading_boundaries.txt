@@ -1,0 +1,556 @@
+===== PAGE 1 =====
+
+Hybrid Traffic Simulation Models:
+Vehicle Loading at Meso – Micro Boundaries
+Wilco Burghout
+wilco@ctr.kth.se
+Assistant Professor
+Center for Traffic Simulation (CTR)
+Royal Institute of Technology, SE-100 44 Stockholm, Sweden
+Haris N. Koutsopoulos
+haris@coe.neu.edu
+Associate Professor
+Department of Civil and Environmental Engineering
+Northeastern University, Boston, MA 02115-5000, USA
+
+===== PAGE 2 =====
+
+Hybrid Traffic Simulation Models:
+Vehicle Loading at Meso – Micro Boundaries
+Wilco Burghout1
+Haris N. Koutsopoulos2
+Abstract. Traffic simulation models, especially microscopic, are becoming popular and used to
+address a wide range of problems, from planning to operations. However, for applications with large
+scale networks microscopic models are not practical because of input data and calibration
+requirements. Hybrid models, that combine simulation models at different levels of detail have the
+potential to address these practical issues. The paper presents a framework for implementing meso-
+micro hybrid models that facilitate consistent representation of traffic dynamics. Furthermore, the
+paper examines in detail an important element that impacts the consistent representation of traffic
+dynamics, the loading of vehicles from the meso to the micro model. A new loading method is
+presented that shows superior performance compared to existing approaches. The method is useful
+not only in the context of hybrid models, but also for microscopic models on their own. A case study
+illustrates the importance of the method in improving the fidelity of both hybrid and pure microscopic
+models.
+1. Introduction
+While microscopic traffic simulation is becoming ever more popular, especially in the evaluation of
+advanced traffic management systems and ITS, the amount of effort needed for model calibration and
+the preparation of input data often inhibits its use on large networks. Recently, hybrid mesoscopic-
+microscopic models have appeared (Burghout, 2004; Burghout, Koutsopoulos, and Andreasson, 2005;
+Yang and Morgan, 2006; Shi and Ziliaskopoulos, 2006) that allow for detailed microscopic simulation
+of specific areas of interest, while simulating the remaining areas in lesser detail on mesoscopic level.
+Since mesoscopic simulation has a more aggregate representation of the roadway and the vehicle
+interactions, it requires much less effort in calibration and preparation of input data (especially coding
+of the road network). In addition, a number of hybrid macroscopic-microscopic models have appeared
+recently (Bourrel and Lesort, 2003; Magne, Rabut and Gabard, 2000; Poschinger, Kates and Meier,
+2000; Espie, Gattuso and Galante, 2006; Mammar, Lebaque and Haj-Salem, 2006).
+Development and implementation of hybrid models that combine traffic simulation models at different
+levels of detail require the resolution of a number of issues, some of them related to the interaction of
+the two models at their boundaries. Important among those issues is the consistency in traffic
+dynamics at the meso and micro network boundaries.
+The objective of this paper is twofold: to a) present a general framework for the implementation of
+hybrid simulation models that satisfies the various integration requirements; and b) discuss in detail
+one important aspect that has serious implications for the validity of simulation models in general and
+hybrid models in particular. This aspect is the mechanism used to load vehicles arriving from the
+mesoscopic area into the microscopic area, and affects the consistency of traffic dynamics at the meso-
+micro boundaries.
+1
+Assistant Professor, Center for Traffic Simulation (CTR), Royal Institute of Technology, SE-100 44
+Stockholm, Sweden, wilco@ctr.kth.se
+2
+Associate Professor, Department of Civil and Environmental Engineering, Northeastern University,
+Boston, MA 02115-5000, USA, haris@coe.neu.edu
+2
+
+===== PAGE 3 =====
+
+The remainder of the paper is organized as follows. Section 2 discusses important requirements for
+hybrid models of high fidelity and presents a general framework for their implementation. Section 3
+looks into modeling traffic dynamics at the micro-meso boundary in more detail. Section 4 discusses
+issues related to existing vehicle loading mechanisms and proposes a loading mechanism that
+alleviates the negative impact of prior methods. The latter problem is important not only in the
+context of hybrid simulation models but also microscopic simulation models on their own. Section 5
+illustrates the impact of the loading mechanism through a case study with a small network and section
+6 concludes the paper.
+2. Hybrid modeling framework
+The main requirements that the integration of micro/meso models needs to satisfy in order to develop
+reliable hybrid models include:
+Consistency in network representation: One of the most basic conditions is general consistency of
+the two models in their representation of the road network, especially at the boundaries between the
+two models. Consistent network representation has important implications for capacity determination,
+and hence impacts traffic dynamics at the boundaries between the models. Furthermore, it impacts the
+links included in each model and hence, the consistency with respect to route choice as discussed
+below.
+Consistency in route choice representation: One of the most important conditions is consistency of
+the two models in their representation of paths, and route choice alternatives. The route choice needs
+to be consistent across the models to ensure that vehicles will make the same decision given the same
+route choice situation (pre-trip or en-route), regardless if they are in the micro or the meso model. This
+means also that the representation of the alternative paths needs to be consistent throughout the hybrid
+model, as well as the travel times (link costs).
+Consistency of traffic dynamics at meso-micro boundaries: Besides the consistency of network
+representation, the consistency of traffic dynamics at the boundaries between the meso and micro
+submodels needs to be ensured. This means that traffic dynamics upstream and downstream the
+boundaries need to be consistent. For instance, when a queue is forming downstream the boundary
+point, and grows until it reaches the boundary, it should continue in the other submodel, upstream the
+boundary, in a similar way as it would if the boundary had not been there.
+Consistency in traffic performance for meso and micro submodels: The two submodels need to be
+consistent with each other with regard to the results they produce. Ideally, for those facilities that can
+be simulated sufficiently well by both models, the results, in terms of common outputs, such as travel
+times, flows, speeds, densities, etc, should be similar. This implies the need for consistent calibration
+of the two models.
+Transparent communication and data exchanges: The submodels exchange large amounts of data
+conveying vehicle characteristics, and downstream traffic conditions. This requires an efficient
+synchronization and communication paradigm, and a design that minimizes the amount and frequency
+of data exchange. Otherwise the communication overhead may become very large. On the other hand,
+aggregation and disaggregation of information at the boundaries may introduce complications, and
+should thus be avoided.
+Figure 1 shows a general hybrid simulation framework (Burghout, Koutsopoulos and Andreasson,
+2005) that facilitates the resolution of the issues discussed above. The travel behavior component in
+the common module uses the database that contains the complete network representation, link travel
+times and known paths for the entire network. Both the micro and meso models supply descriptions of
+their subnetworks, from which the network representation is constructed. Each time a vehicle makes a
+route choice (whether in micro or meso), the common module is invoked. For the common route
+choice module to operate properly, the meso and micro models need to update the travel time database
+regularly with the link travel times in their subnetworks.
+3
+
+===== PAGE 4 =====
+
+Common Module
+Travel
+Database
+behavior
+Network graph
+Pre-trip
+Travel times
+En-Route
+Paths
+Path
+OD flows
+generation
+Route choices Route choices
+Travel times Vehicles, Travel times
+Traffic conditions
+Meso Micro
+Figure 1. Hybrid simulation framework
+The common module also includes the OD matrix for the entire network. To simplify the information
+exchange and facilitate a transparent data input interface, it is assumed that all origin and destination
+nodes in the network belong to the meso subnetwork. This assumption is not restrictive, since an
+origin or destination node in the micro area can always be designated as a boundary node in meso,
+connected directly to the micro subnetwork. In addition, the meso model contains the entire network
+and route representation, by representing the paths inside the micro, from entry nodes to exit nodes, as
+virtual links. These virtual links are then used as part of the meso network description, so that the
+meso model choice can provide consistent route choice across the submodels. This issue is discussed
+in more detail in Burghout, Koutsopoulos and Andreasson, 2005 and Burghout, 2004.
+3. Modeling traffic dynamics at meso-micro boundaries
+Consistency with respect to traffic dynamics at the boundaries of the two models is critical. The
+limited literature on hybrid simulation models focuses on aggregation/disaggregation issues between
+the macro and micro representations of traffic (Bourrel and Lesort, 2003; Magne, Rabut and Gabard,
+2000; Poschinger, Kates and Meier, 2000; Espie, Gattuso and Galante, 2006; Mammar, Lebaque and
+Haj-Salem, 2006). In the case of meso/micro models these issues are avoided since the integration
+involves two models that both have a vehicle-based representation of traffic flows. However, other
+issues concerning the interfaces between the models remain. In principle, the main sources of
+potential inconsistencies at the interface between the meso and micro models are:
+• Location of boundaries
+• Queue formation and representation
+• Vehicle attributes (i.e. determination of speeds and accelerations of vehicles crossing the
+micro/meso boundaries)
+Location of boundaries. Due to the fact that the meso and micro submodels may represent links and
+intersections differently, the positioning of the boundaries between them should be carefully
+considered. Placing them at nodes in the overall network would imply that some of the legs of an
+intersection would be at meso and some at micro level. This creates the problem of having to deal with
+the intersection behavior (signal controlled or otherwise) at different levels of detail. For instance, gap
+acceptance models in the micro module require vehicles’ positions, speeds and gaps in the opposing
+flows. This information though, is not typically available at the mesoscopic level. It is recommended
+therefore, that the boundaries be located in the middle of links, with exactly one entry and one exit
+segment.
+Queue formation and representation. The placement of boundaries is also dependent on the
+homogeneity of traffic conditions. Typically, micro models, due to their level of detail, represent lane-
+4
+
+===== PAGE 5 =====
+
+specific queues. Meso models on the other hand, usually do not have lanes. If this is the case, a queue
+on one lane in micro, even if the other lanes remain open, will block the boundary node completely,
+unless the exchange of vehicles at the boundary is taking place properly. The virtual links in the meso
+subnetwork play an important role in solving the problem of inconsistent queue representation.
+Virtual links that represent paths that can only use the blocked lanes will be blocked, while virtual
+links representing paths that use open lanes will have available capacity and allow the proper
+advancement of the corresponding vehicles.
+Crossing vehicle attributes. The attributes of the vehicles as they cross the boundaries need to be
+properly determined in both directions (micro (cid:1) meso) and (meso (cid:1) micro). Attributes such as
+speeds, accelerations, headways, etc should be consistent with the prevailing conditions in the new
+segment the vehicle is moving to, otherwise unnecessary shockwaves may propagate upstream. On
+the boundary from the meso to the micro (meso (cid:1) micro) submodel, information is exchanged in both
+directions: from meso to micro information about vehicles (with a certain speed and at certain time
+intervals) needs to be communicated; from micro to meso information about blocking of boundaries
+and downstream density needs to be communicated. If the entry to the micro link (downstream of the
+boundary point) is blocked, the meso needs to stop vehicles from exiting. The micro model informs
+meso when the blockage is removed, so that vehicles can start flowing (over that specific boundary)
+again. The micro also sends the density in the vicinity of the boundary to meso, where it is used to
+calculate the speed of the shockwave that propagates upstream.
+One very important aspect that relates to the questions raised above is the loading of vehicles from the
+meso to the micro model. Vehicle loading in hybrid and microscopic simulation models comprises the
+generation of initial values for state variables such as headway and speed. This is different from the
+correct setting of parameters such as desired speed, which are static inputs, whereas state variables
+vary continuously describing the state of the vehicles.
+4. Vehicle loading
+When vehicles enter the microscopic network, the initial values for speed and headway need to be in
+accordance with each other and with the traffic situation downstream (and upstream). Otherwise
+immediate deceleration (or acceleration) will occur, affecting the traffic conditions upstream. Correct
+vehicle loading is crucial in a hybrid model since the artificially created disturbances propagate
+upstream and cause shockwaves in the mesoscopic model. It is equally important for standalone
+microscopic simulation models, since it affects the capacity at the entrance of microscopic networks.
+This is all the more important since in most applications of microscopic models the vehicles are loaded
+at links, rather than at centroids.
+The issue of vehicle loading in microscopic models has been largely neglected until now, and
+publications and documentation of microscopic traffic models provide little or no information on how
+this issue is dealt with. The fact that the loaded vehicles are at the entrance of the network makes it
+difficult to observe errors in the loading mechanism since their immediate deceleration (or
+acceleration) does not cause an observable disturbance behind them. However, as will be shown in this
+paper, they do cause a drop in capacity at the entrances to the network, and therefore may affect the
+simulation results by prohibiting the loading of traffic at high volumes, or even cause distortion in the
+calibration process if other parameters are adjusted to compensate for the erroneous loading procedure.
+In short, incorrect vehicle speeds at micro-meso boundaries or micro origins lead to:
+• excessive decelerations and accelerations
+• volatility and delayed vehicle entry
+• reduced capacity at entry points
+• unnecessary turbulence and shockwave propagation upstream the meso component of hybrid
+models.
+5
+
+===== PAGE 6 =====
+
+Vehicle loading in existing microscopic models
+Although, details regarding the loading mechanism in existing micro simulation models are sketchy
+we present the default loading method used in two state of the art models, MITSIMLab (Yang,
+Koutsopoulos, and Ben-Akiva, 2000), and VISSIM (PTV, 2005).
+MITSIMLab. The vehicle loading in MITSIMLab consists of lane selection and speed assignment
+componets. The lane selection depends on lane permissions (e.g. bus lanes), the continued path of the
+vehicle (so that it will not have to immediately change lane to continue its path) and available space on
+lanes. Of the ‘acceptable lanes’ the lane with the most space is selected. The speed of the loaded
+vehicle is set based on the vehicle’s desired speed, the average segment speed and the entry queue
+length (see Figure 1). If the entry queue is 0 (no vehicles waiting to enter) the vehicle is loaded with its
+desired speed. When the entry queue grows (due to vehicles not being able to enter at the rate they
+arrive) the vehicle is loaded at a speed approaching the segment speed. The problem that this method
+may cause is that in congested situations, vehicles may be loaded at much higher speeds than the
+vehicles in front, causing immediate deceleration. This is expected to cause turbulence and
+shockwaves, and result in a reduced capacity for entry links.
+Desired
+speed
+Segment
+speed
+Entry queue length
+Figure 1. Vehicle loading speed in MITSIMLab
+VISSIM. As in MITSIMLab, the lane selection in VISSIM depends on lane permissions and the
+available space headway, where the acceptable lane with the largest space headway is selected. The
+speed of the loaded vehicle in VISSIM is a function of the vehicle’s desired speed, the speed of the
+vehicle in front (on the selected lane) and the space headway to the vehicle in front. If the front vehicle
+is beyond the look-ahead distance of the vehicle to be loaded, the speed of the loaded vehicle will be
+its desired speed. If the distance to the vehicle in front is 0, in theory the vehicle would be loaded with
+the same speed as the vehicle in front (provided that the vehicle in front has a lower speed than the
+loaded vehicle’s desired speed). However, the vehicle to be loaded will not be able to enter the
+network if the space headway is smaller than a predefined safe distance. So in practice the vehicle will
+usually be loaded at a speed somewhat higher than that of the front vehicle. While this method will
+prevent extreme decelerations at the entry, it will still induce slight shockwaves due to the fact that in
+saturated conditions, most entering vehicles will have a speed that is somewhat higher than the speed
+of the vehicle in front and therefore always decelerate upon entry (see Figure 2).
+6
+
+===== PAGE 7 =====
+
+Speed
+Desired Speed
+Front vehicle’s
+speed
+Safe distance Look-ahead Space headway
+Figure 2. Vehicle loading speed in VISSIM
+Proposed loading method
+We propose a new loading method that aims at loading vehicles in a way that is more consistent with
+their behavior when they enter the network. In microscopic simulation models the car-following is
+one of the main models used to move vehicles in the network. Typical car-following models relate the
+acceleration of a vehicle to the behavior of the surrounding vehicles, especially the speed of, and the
+distance to the leading vehicle. The proposed method assigns speed to the vehicles entering the
+network (either loaded at the origin, or transferred from the mesoscopic part of the network) using a
+multi-regime approach based on the time headway between the entering vehicle and its leading vehicle
+(in the same lane):
+• Regime 1 (bounded traffic): t < t ≤ t seconds
+1 h 2
+o V = V
+front
+• Regime 2 (partially bounded traffic): t < t ≤ t seconds
+2 h 3
+o a = ( t - t )/(t - t )
+h 2 3 2
+o V = a *V + (1-a )*V
+desired front
+• Regime 3 (unbounded traffic): t > t seconds
+h 3
+o V = V
+desired
+where,
+V: assigned initial speed,
+V : speed of the vehicle in front (in the same lane),
+front
+V : vehicle’s desired speed,
+desired
+t : time headway to the vehicle in front (in the same lane).
+h
+a : parameter (0,1] that interpolates between the desired speed and the speed of the leading
+vehicle. If V > V , V=V .
+front desired desired
+t : time headway thresholds, determined/calibrated from field data, i ∈ {1, 2, 3}.
+i,
+The time headway from the leading vehicle is defined as the time that has passed since the vehicle in
+front was at the loading point, assuming it had its current speed. This means that in case of queue
+build up and propagation towards the entry point, the vehicle in front is likely to have decelerated
+since entering, and therefore the time headway may be slightly overestimated.
+The above loading mechanism is supported by empirical data. On the E4 motorway (Essingeleden) in
+Stockholm, individual speed and time headway data was collected (by the Swedish National Road
+Administration) using high fidelity microwave detectors, using one detector for each lane. During the
+measurement period the flows varied between 800 and 1700 veh/h/lane.
+The measured speed and time headway data was grouped into time headway classes of 1 second each,
+i.e. one class for vehicles arriving with time headways of 0 – 1 seconds, one class for 1 – 2 seconds
+etc. Figure 3 illustrates the correlation coefficient between speeds of consecutive vehicles as a
+7
+
+===== PAGE 8 =====
+
+function of their time headway. A clear trend can be observed from the data, with very high
+correlation for the vehicles following at close time headways (classes 0 – 1, 1 – 2, and 2 – 3 seconds).
+As expected, for the 3 – 4, 4 – 5 and 5 – 6 second time headway classes the correlation coefficients
+decrease. It should be noted that the sample size of the classes for longer time headways is much
+smaller than for the classes for short headways.
+1
+0.9
+0.8
+0.7
+0.6
+0.5
+0.4
+0.3
+0.2
+0.1
+0
+0 2 4 6 8 10 12
+Timeheadway (s)
+Figure 3. Consecutive vehicle speed correlation
+Figure 4 compares the actual speeds of two consecutive vehicles in the two extreme classes 1 – 2
+seconds and 7 – 8. The scatter plots clearly show the high correlation in the 1 – 2 second group,
+compared to the correlation in the 7 – 8 second group.
+a) 1 – 2 second group b) 7 – 8 second group
+Figure 4. Scatter plots of consecutive vehicle speeds
+Based on the above data, the following default headway thresholds for the proposed loading method
+have been estimated:
+• t = 0.5 seconds (minimum headway parameter)
+1
+• t = 2.5 seconds
+2
+• t = 7.5 seconds
+3
+8
+noitalerroC
+
+===== PAGE 9 =====
+
+5. Case study
+We demonstrate the importance of loading using two state-of-the-art microscopic traffic simulation
+models, MITSIMLab (Yang, Koutsopoulos, et al., 2000) and VISSIM (PTV 2005). The impact on the
+performance of a hybrid model is also demonstrated using the hybrid model MiMe (Burghout, 2004)
+that combines MITSIMLab and the mesoscopic model MEZZO (Burghout 2004).
+A small, linear network is used to demonstrate the impact of the loading mechanism. The network in
+Figure 5 is used to evaluate the performance of each simulation model (MITSIMLab and VISSIM).
+Figure 5. Test network for MITSIMLab and VISSIM alone
+The network is loaded with a time dependent demand that increases slowly from t = 0 – 1800 sec and
+creates relatively high flows from t = 1800 – 2400 sec, after which it decreases gradually (Figure 6).
+Figure 6. Demand profile
+The importance of the loading method is best illustrated by the distribution of speeds at sensor
+locations 0 (at the entry) and 1 (500 m downstream). Figure 7 shows the speed at these locations for
+MITIMSLab (7a) and VISSIM (7b) when the default loading mechanism is used.
+Speed MITSIMlab
+70
+60
+50
+40
+30
+20
+10
+0
+0 1000 2000 3000 4000
+Time (s)
+9
+)hpm(
+deepS
+Speed MITSIMlab
+70
+60
+50
+40
+30
+20 Sensor 1: after 500m
+10 Sensor 0: at entry
+0
+0 1000 2000 3000 4000
+Time (s)
+)hpm(
+deepS
+Speeds Vissim
+100
+90
+80
+70
+60
+50
+40
+30 Sensor 1: after 500m
+20
+Sensor 0: at entry
+10
+0
+0 1000 2000 3000 4000
+time (s)
+)h/mk(
+deeps
+Speeds Vissim
+100
+90
+80
+70
+60
+50
+40
+30
+20
+Sensor 0: At entry
+10
+Sensor 1: after 500m
+0
+0 1000 2000 3000 4000
+time (s)
+)h/mk(
+deeps
+Demand
+2500
+2000
+1500
+1000
+500
+0
+0 1000 2000 3000 4000
+Time (sec)
+Sensor 0: At entry
+Sensor 1: after 500m
+a) MITSIMLab b) VISSIM
+Figure 7. Impact of default loading mechanism
+The loading in MITSIMLab clearly indicates a number of problems, especially since the vehicles enter
+the network at rather high speeds. Although the speeds in VISSIM appear more consistent between
+the sensors, problems still exist with respect to the loading of vehicles in VISSIM as well. Figure 8
+shows the minimum acceleration (i.e. max deceleration in absolute value) of the vehicles entering the
+)h/hev(
+wolF
+1 km, 2 lanes, 90 km/h
+Sensor 0 Sensor 1 (500m)
+
+===== PAGE 10 =====
+
+network in VISSIM. Ideally, the minimum accelerations over sensors 0 (at entry) and sensor 1 (after
+500m) should be similar. However, Figure 8 illustrates that the minimum accelerations over sensor 0
+are much greater than those over sensor 1, indicating that some friction is caused by the vehicle
+loading. This has implications on the number of vehicles the simulator is able to load on the network
+(capacity at entry points). During the peak demand period (1800 – 2400 sec) 18 vehicles were not
+able to enter the network.
+0 1000 2000 3000 4000
+1
+0
+-1
+-2
+-3
+-4
+-5
+-6
+-7
+-8
+-9
+time (s)
+10
+)2s/m(
+cca
+Sensor 0: At entry
+Sensor 1: after 500m
+Figure 8. Minimum acceleration of vehicles in VISSIM.
+The proposed loading mechanism was implemented in MITSIMLab. Figure 9a shows the speeds of
+the vehicles over sensors 0 and 1 with the new loading mechanism. Figure 9b shows the corresponding
+average accelerations, during the first 20 sec after vehicles enter the network (at 0.1 sec intervals), and
+compares them to the acceleration of the vehicles with the original loading method.
+a) speeds b) average acceleration
+Figure 9. MITSIMLab: Impact of proposed loading
+As discussed before, the original loading method in MITSIMLab generates initial speeds (sensor 0)
+that are too high for the time headway and the traffic conditions immediately downstream (see Figure
+7a), causing large decelerations of the entering vehicles (see Figure 9b) Because of the resulting
+turbulence, the capacity of the entry is underestimated. In contrast, the proposed loading method
+shows a much better behavior. The average speeds at the link entry are comparable to those in the
+interior of the link (Figure 9a), causing little deceleration upon entry (Figure 9b). Flows are no longer
+artificially disrupted by the decelerations of entering vehicles (Figure 9b).
+In addition, the impact of the loading mechanism is assessed using the hybrid simulation model MiMe
+in the same network. The mesoscopic (MEZZO) and microscopic (MITSIMLab) areas of the network
+are shown in Figure 10. MiMe was used to simulate the operations of the network first with the
+default MITSIMLab loading mechanism and then with the proposed method.
+
+===== PAGE 11 =====
+
+Figure 10. Test network for hybrid model MiMe
+The results show that the original loading method causes disturbances that result in high accelerations
+(Figure 11). The behavior is similar to the behavior observed with MITSIMLab alone, although the
+impact seems to be greater in the hybrid model (compare Figures 9b and 11).
+Figure 11. Entry acceleration pattern with original and proposed loading method in MiMe.
+The flows, under the default loading method, are very unstable (Figure 12a). The decelerations cause
+heavy disruptions of the flows, due to the shockwaves that propagate backward into the mesoscopic
+network. The proposed loading method generates more realistic accelerations during the first 20 sec
+(Figure 11) and, as a result, a much better flow profile as flows are no longer artificially disrupted by
+the decelerations of entering vehicles (Figure 12b).
+a) Original loading method. b) Proposed loading method.
+Figure 12. Flows in hybrid model MiMe
+6. Conclusion
+The paper discussed issues related to the integration of mesoscopic/microscopic traffic simulation
+models. Such hybrid models have a number of advantages over standard microscopic models,
+especially in large scale applications with extensive data input and calibration requirements.
+11
+
+===== PAGE 12 =====
+
+Successful hybrid models require, among other things, consistent representation of traffic dynamics at
+the boundaries between the meso and micro networks. A critical determinant of this consistency is the
+loading mechanism that transfers vehicles form the meso to the micro network. The loading
+mechanism is important for hybrid models as well as stand alone micro models.
+The paper presented an integrated framework for the development of hybrid models. In addition, the
+role of the vehicle loading mechanism on the validity of hybrid models (and microscopic models on
+their own) was also examined. A new loading method was proposed which, compared to existing
+approaches, resulted in a much more consistent performance. The results from a case study supported
+both the importance of the loading mechanism and the value of the proposed method. Inappropriate
+loading methods can result in excessive decelerations and accelerations, volatility and delayed vehicle
+entry, reduced capacity at entry points, and unnecessary turbulence and shockwave propagation.
+References
+M. Yang, Q., H.N. Koutsopoulos, and M. Ben-Akiva (2000), “A Simulation Laboratory for Evaluating
+Dynamic Traffic Management Systems” Transportation Research Record, No. 1710, pp 122-130,
+E. Bourrel and J.-B. Lesort (2003). Mixing Micro and Macro Representations of Traffic Flow: a
+Hybrid Model Based on the LWR Theory. Transportation Research Board, Washington DC.
+W. Burghout (2004). Hybrid Microscopic-Mesoscopic Traffic Simulation. Dept of Infrastructure.
+Stockholm, Royal Institute of Technology: 210.
+http://www.infra.kth.se/ctr/publikationer/ctr2004_04.pdf
+W. Burghout, H. Koutsopoulos and I. Andreasson (2005). Hybrid mesoscopic-microscopic traffic
+simulation. Transportation Research Record: Journal of the Transportation Research Board. No. 1934,
+pp 218-225.
+S. Espie, D. Gattuso and F. Galante (2006). A Hybrid Traffic Model Coupling Macro and Behavioural
+Micro Simulation. 85th Meeting of Transportation Research Board CD-ROM, Washington DC.
+L. Magne, S. Rabut and J.-F. Gabard (2000). Towards an hybrid macro-micro traffic simulation
+model. INFORMS, Salt Lake City, USA.
+S. Mammar, J.-P. Lebaque and H. Haj-Salem (2006). A Hybrid Model Based on a Second Order
+Traffic Model. 85th Meeting of Transportation Research Board CD-ROM, Washington DC.
+A. Poschinger, R. Kates and J. Meier (2000). The flow of data in coupled microscopic and
+macroscopic traffic simulation models. World Congress on Intelligent Transportation Systems, Torino.
+PTV (2005). VISSIM User's Manual 4.1. Karlsruhe, PTV AG.
+H. Shi and A. Ziliaskopoulos (2006). A Hybrid Mesoscopic-Microscopic Traffic Simulation model:
+Design, Implementation and Compuatational Analysis. 85th Meeting of Transportation Research
+Board, CD-ROM.
+Q. Yang and D. Morgan (2006). A Hybrid Traffic Simulation Model. 85th Meeting of the
+Transportation Research Board CD-ROM, Washington DC.
+12

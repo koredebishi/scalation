@@ -1,0 +1,2651 @@
+===== PAGE 1 =====
+
+Autonomous Agents for Scientific Discovery:
+Orchestrating Scientists, Language, Code, and Physics
+LianhaoZhou1 HongyiLing1 CongFu1 YepengHuang2
+MichaelSun3 WendiYu1 XiaoxuanWang4 XinerLi1
+XingyuSu1 JunkaiZhang4 XiusiChen5 ChenxingLiang1
+XiaofengQian6,7,8 HengJi5 WeiWang4 MarinkaZitnik2 ShuiwangJi1,6,9∗
+1DepartmentofComputerScienceandEngineering,TexasA&MUniversity
+2DepartmentofBiomedicalInformatics,HarvardMedicalSchool
+3ComputerScienceandArtificialIntelligenceLaboratory,MassachusettsInstituteofTechnology
+4DepartmentofComputerScience,UniversityofCalifornia,LosAngeles
+5SiebelSchoolofComputingandDataScience,UniversityofIllinoisUrbanaChampaign
+6DepartmentofMaterialsScienceandEngineering,TexasA&MUniversity
+7DepartmentofElectricalandComputerEngineering,TexasA&MUniversity
+8DepartmentofPhysicsandAstronomy,TexasA&MUniversity
+9J.MikeWalker’66DepartmentofMechanicalEngineering,TexasA&MUniversity
+Abstract
+Computinghaslongservedasacornerstoneofscientificdiscovery. Recently,a
+paradigmshifthasemergedwiththeriseoflargelanguagemodels(LLMs),intro-
+ducingautonomoussystems,referredtoasagents,thatacceleratediscoveryacross
+varyinglevelsofautonomy. Theselanguageagentsprovideaflexibleandversatile
+frameworkthatorchestratesinteractionswithhumanscientists,naturallanguage,
+computerlanguageandcode,andphysics. Thispaperpresentsourviewandvision
+ofLLM-basedscientificagentsandtheirgrowingroleintransformingthescientific
+discoverylifecycle,fromhypothesisdiscovery,experimentaldesignandexecution,
+toresultanalysisandrefinement. Wecriticallyexaminecurrentmethodologies,
+emphasizingkeyinnovations,practicalachievements,andoutstandinglimitations.
+Additionally,weidentifyopenresearchchallengesandoutlinepromisingdirections
+forbuildingmorerobust,generalizable,andadaptivescientificagents.Ouranalysis
+highlightsthetransformativepotentialofautonomousagentstoacceleratescientific
+discoveryacrossdiversedomains.
+1 Introduction
+Scientific discovery is fundamental to advancing human knowledge, driving innovations across
+diversefieldssuchasbiology,chemistry,physics,andmaterialsscience,etc.[Zhangetal.,2025a,
+Wangetal.,2023a].Thepivotalroleofcomputinginadvancingdiscoveriesacrossthenaturalsciences
+haslongbeenrecognized[Dirac,1929],withimpactsrangingfromquantummechanics[Landau
+andLifshitz,2013a,Tong,2025a]tofluiddynamics[LandauandLifshitz,2013b,Tong,2025b]. For
+manyyears,theprocessofscientificdiscoveryhasbeenpredominantlydependentonhumanintuition,
+expertise, anditerativeexperimentation[Xuetal.,2023]. Nevertheless, human-drivendiscovery
+processessometimesfacechallenges,includinghighcosts,substantialtimeinvestments,potential
+cognitivebiases,andlimitationsinexploringvasthypothesisspacesorcomplexdatainteractions
+systematically[Kitano,2021]. Additionally,theincreasingcomplexityandvolumeofdatagenerated
+∗Correspondenceto:ShuiwangJi<sji@tamu.edu>
+Preprint.
+6202
+rpA
+6
+]IA.sc[
+2v10990.0152:viXra
+
+===== PAGE 2 =====
+
+inmodernresearchdemandnovelapproachestoefficientlyanalyzeandinterpretsuchextensiveraw
+information[Miolane,2025,Chitturietal.,2024].
+Tomitigatetheselimitations,scientificagentshavebeendevelopedtoautomateandacceleratecritical
+aspectsofscientificdiscovery[Gridachetal.,2025a]. Suchagentsaredesignedtosystematically
+handleexperimentation,hypothesisformulation,dataacquisition,analysis,andinterpretation,thereby
+potentiallyenhancingresearchefficiencyandreducinghuman-inducederrorsorbiases. Computa-
+tionalagentspromisegreaterscalabilityandconsistencyinscientificexploration,openingdoorsto
+noveldiscoveriesthatmightotherwiseremainobscured[Szymanskietal.,2023,Ghafarollahiand
+Buehler,2024a,Liuetal.,2024a,Chenetal.,2023a,Gottweisetal.,2025a].
+Early computational scientific agents were often designed for specific, narrowly focused tasks,
+lackingtheadaptabilityrequiredtogeneralizeacrossvaryingresearchareasortohandleunforeseen
+challenges[Beeleretal.,2024,Maurizietal.,2024,Rajaketal.,2021,Dressleretal.,2018,Liang
+andZhong,2020]. Thesesystemswereeffectiveforwell-definedproblemsbutwerenotequippedto
+engageinthebroader,moreflexibleprocessesofscientificexploration. Theneedforamoreadaptive
+andpowerfulapproachwasclear.
+Recentbreakthroughsininlargelanguagemodels(LLMs)offerpotentialforscientificdiscoveryby
+introducingunprecedentedcapabilitiesinreasoning,planning,andhandlingcomplex,multimodal
+contexts. Afterbeingtrainedonvastamountsoftextualdata,LLMsprovideaunifiedframework
+capableofunderstandingandorchestratingdiverselanguages,includingnaturallanguage,computer
+language,andevenphysicalinformation(e.g. symbolicrepresentationsofphysicalphenomena)[Luo
+etal.,2022,Dunnetal.,2024,Huangetal.,2024a]. TheintegrativepowerofLLMsallowsthem
+toreasonoverscientificdatainmultiplemodalities[Edwardsetal.,2025],seamlesslyinteractwith
+humans,computationaltools,andphysicalinstrumentsalike,fosteringmoreintuitive,flexible,and
+efficientworkflowsinscientificdiscovery. Forexample,Zhangetal.[2024a]systematicallyreviews
+morethan260scientificLLMsacrossgeneralscience,mathematics,physics,chemistry,materials
+science,biology,medicine,andgeoscience. ItintroduceshowLLMsarebeingusedtoaugmentthe
+scientificdiscoveryprocess. ReddyandShojaee[2025]arguesthat,whileLLMsexcelatspecific
+scientifictasks,integratedsystemscapableofsupportingthefullautonomousscientificdiscovery
+cyclearestilllacking.
+FueledbyadvancesinLLMs,researchonscientificagentshasgrownrapidly,pointingtowardamore
+autonomousparadigmforscientificdiscovery. Thisapproachfullyleveragesthevariouscapabilities
+of LLMs at every stage of the scientific discovery cycle. While several surveys provide broad
+overviewsofgeneral-purposeLLMagents[Wangetal.,2024a,Guoetal.,2024,Mialonetal.,2023],
+onlyafewhavefocusedspecificallyontheirrolesinscientificresearch[Gaoetal.,2024,Renetal.,
+2025,Weietal.,2025a,Zhangetal.,Zhengetal.,2025,Luoetal.,2025a]. Gaoetal.[2024]posits
+AIagentsasthenextfrontierinscientificdiscovery,proposingaframeworkofautonomylevelsbased
+ontheirdegreeofparticipationinthescientificprocess. Itintroducesthecoremodulesofagentsthat
+enablethemtolearn,plan,andengageinthescientificprocess. Renetal.[2025]discussesrelated
+workonscientificagentsbyfocusingonthedifferentimplementationmethodsforeachofthecore
+modulesofagents. Weietal.[2025a]primarilyfocusesthecorrespondencebetweendifferentstages
+ofthescientificdiscoverycycleandthecapabilitiesofLLMagents. Itorganizesrelevantscientific
+discoverytasksandagent-basedresearchbyfourmajorfields, includinglifesciences,chemistry,
+physics,andmaterialsscience. Luoetal.[2025a]extendsscientificresearchtoincludeaspectssuch
+aspaperwritingandpeerreview. Zhengetal.[2025]proposesasimilarframeworkofagentlevels
+andstagesofscientificdiscoverytopreviousworksGaoetal.[2024],Weietal.[2025a]. Moving
+beyond individual agents, Zhang et al. argues that multi-agent systems can achieve a collective
+intelligencethatsurpassesthecapabilitiesofasingleagentbyemulatingthecollaborativedynamics
+ofhumanresearchteams. Theworkalsodetailstheadvantages,limitations,andfuturedirectionsof
+multi-agentsystemsinmultiplestagesofscientificdiscovery.
+Here,ourworksystematicallyexamineshowLLM-basedagentsoperateacrosskeystagesofscientific
+discovery,includinghypothesisdiscovery,experimentaldesignandexecution,andresultanalysis
+andrefinement. Figure1providesanoverviewofthethree-phaseworkflowforAI-drivenscientific
+discovery.WehighlighttheuniquestrengthsofLLMsinenablingmoreadaptive,flexible,andcapable
+scientificagentscomparedtotraditionalcomputationalapproaches. Furthermore,wecriticallyassess
+existingmethodologies,underscoringboththeirpracticalachievementsandprevailinglimitations.
+Wedevelopataxonomyofthemethodsusedbyscientificagentsineachphaseofscientificdiscovery
+2
+
+===== PAGE 3 =====
+
+Phase 1: Hypothesis Discovery
+H G u o m H a a i l g n / h P P -L r r o e o v p b e o le l s m es K E n x o tr w a l c e t d io g n e H G y e p n o e t r h a e ti s o i n s S H V c y a r p e li o e d t n a h i t n e io g s n i s &
+Experimental
+Design
+Phase 2: Experimental Design & Execution
+Existing Tool Library Tool Use :
+(Simulators, AI generates code to No
+Databases,Robots) call existing tools
+Detailed
+Tool Creation : New Tool Workflow
+New Scientific Tool AI generates code for Yes Needed?
+/Algorithm new algorithms/tools
+Experimental
+Data Phase 3: Result Analysis & Refinement
+Automatic Self-Correction
+Refinement
+External Evaluation &Feedback
+Results Loop Validated
+Analysis Human-in-the-Loop Findings
+Figure1: Anoverviewofthethree-phaseworkflowforAI-drivenscientificdiscovery. Theprocess
+beginswithPhase1: HypothesisDiscovery,whereahigh-levelhumangoalistransformedthrough
+knowledgeextractionandhypothesisgenerationintonovel,verifiablescientificquestions. InPhase2:
+ExperimentalDesign&Execution,thesehypothesesaretranslatedintodetailedworkflowswhichthe
+agentexecutesbyeitherusingexistingtoolsorcreatingnewscientifictoolstogenerateexperimental
+data. Finally,Phase3: ResultAnalysis&Refinementinvolvesinterpretingthedataandenteringan
+iterativerefinementlooptoprogressivelyimprovetheprocessandarriveatvalidatedfindings.
+andcategorizetheapplicationsandachievementsofscientificagentsbydomains(Figure2). Finally,
+weidentifyopenchallengesandoutlinefutureresearchdirectionstoadvancethedevelopmentof
+robust,generalizable,andhighlyadaptiveLLM-drivenscientificagents.
+2 OverviewofAutonomousAgentsforScientificDiscovery
+2.1 OverviewofScientificDiscovery
+TounderstandhowLLMagentstransformscientificdiscovery,wefirstrevisithowscientificpro-
+cesses are typically structured across domains. Scientific discovery is the systematic pursuit of
+understandingandgeneratingnewknowledgeorverifyinghypotheseswithinscientificdomains. It
+involvesidentifyingmeaningfulquestions,formulatinghypotheses[Wangetal.,2024d],generating
+experimentprocedures[Zhongetal.,2024],conductingexperiments,andrefiningresultsiteratively
+toenhanceunderstandingorachievepracticaloutcomes. Whileobjectivesdifferacrossfields,suchas
+identifyingstablecrystalstructuresinmaterialsscience,elucidatinggeneticmechanismsinbiology,
+orsystematicallysynthesizingtherapeuticcompoundsinpharmacology,thediscoveryprocessshares
+commoncorecomponentsandphasesacrossdisciplines. Weconceptualizethescientificdiscovery
+processesintothreephases.
+Hypothesis Discovery. This initial phase is a crucial creative process with the core objective of
+identifyingandformingnovel,verifiablescientifichypothesesfromvastamountsofdataandexisting
+knowledge. It aims to accelerate the pace of discovery by revealing hidden connections that are
+difficultforhumanresearcherstofindontheirown. Acompletehypothesisdiscoveryworkflowis
+typicallycomposedofthreekeystages,includingKnowledgeExtraction,HypothesisGeneration,and
+HypothesisScreeningandValidation. Thegoalistosystematicallyidentifymeaningfulquestions
+andformulatehypothesesthatcanbetestedinsubsequentstages.
+3
+
+===== PAGE 4 =====
+
+HypothesisDiscovery
+e.g.,BioBERT[Leeetal.,2020],BioGPT[Luoetal.,2022],Galactica[Tay-
+ScientificFoundationMod-
+loretal.,2022],ether0[Narayananetal.,2025],ChemDFM [Zhaoetal.,
+els
+2025],LPMs[Barmanetal.,2025]
+Knowledge e.g.,CLADD[Leeetal.,2025],CASSIA[Xieetal.,2024],FRAG[Gao
+Extraction RAG-based etal.,2025a],CLEAR[Lopezetal.,2025]
+e.g.,ChemMiner[Chenetal.,2024a],ChartAssistant[Mengetal.,
+MultimodalKnowledge
+2024],GPT-4o[Hurstetal.,2024],MatViX[Khalighinejadetal.,
+Extraction
+2024],nanoMINEROdobeskuetal.[2025]
+Prompt-Based e.g.,Biomedicine[Qietal.,2023],GeneralScience[Xiongetal.,2025]
+Knowledge-Grounded e.g.,KG-CoI[Xiongetal.,2024],ResearchLink[Borregoetal.,2025]
+Hypothesis
+e.g.,AIco-scientist[Gottweisetal.,2025a],ACCELMAT[Kumbharetal.,
+Generation Multi-Agent
+2025a],VIRSCI[Suetal.,2024],AstroAgents[Saeedietal.,2025]
+EvolutionaryAlgorithm- e.g.,MOOSE-Chem[Yangetal.,2025],HypoAgents[Duanetal.,2025],
+Based MolLEO[Wangetal.,2024b]
+e.g.,POPPER[Huangetal.,2025a],SCIMON[Wangetal.,2024c],MAT-
+Metric-BasedScreening DESIGN[Kumbharetal.,2025b],HypoBench[Liuetal.,2025a],Logit-
+Hypothesis
+basedCalibratedPrior[GongandFernandez,2025]
+Screening
+&Validation e.g.,ResearchAgent[Baeketal.,2024],ScientificGenerativeAgent
+Agent-BasedValidation
+(SGA)[Maetal.,2024]
+ExperimentalDesign&Execution
+e.g.,Biomni[Huangetal.,2025b],TxAgent[Gaoetal.,2025b],Chemist-
+RAG-basedPlanning
+X[Chenetal.,2023a],CLADD[Leeetal.,2025]
+HumanHigh-LevelGuid- e.g.,CRISPR-GPT[Quetal.,2025],AIco-scientist[Gottweisetal.,2025a],
+ance VirtualLab[Swansonetal.,2024]
+Experimental
+Design Templates&Predefined e.g.,k-agents[Caoetal.,2024],CRISPR-GPT[Quetal.,2025],PerTurboA-
+Actions gent[Haoetal.,2025]
+e.g.,ChemToolAgent[Yuetal.,2024a],BioInformaticsAgent[Xinetal.,
+Post-ExecutionFeedback 2024],BioDiscoveryAgent[Roohanietal.,2024],OSDAAgent[Huetal.,
+2025]
+e.g.,OSDAAgent[Huetal.,2025],LLMatDesign[Jiaetal.,2024],
+Embedded MatLLMSearch[Ganetal.,2025],scBaseCount[Youngblutetal.,2025],
+Chemist-X[Chenetal.,2023a]
+e.g.,AgentMD[Jinetal.,2024a],ChemCrow[M.Branetal.,2024],scA-
+Toolbox-Based gent[Maoetal.,2025],TxAgent[Gaoetal.,2025b],GISCopilot[Akin-
+boyewaetal.,2025],SciToolAgent[Chenetal.,2025a]
+ToolUse e.g.,ChemToolAgent[Yuetal.,2024b],Biomni[Huangetal.,2025b],Per-
+Reflective&Iterative TurboAgent[Haoetal.,2025]
+e.g.,TAIS[Liuetal.,2024a],MedAgents[Tangetal.,2023],ChemA-
+gents[Songetal.,2025],AtomAgent[GhafarollahiandBuehler,2024b],
+HierarchicalinMAS ProtAgents[GhafarollahiandBuehler,2024a],ChatGPTResearch
+Group[Zhengetal.,2023],VirtualLab[Swansonetal.,2024],k-
+agents[Caoetal.,2024]
+e.g.,ToolUniverse[Gaoetal.,2025c],MAPPS[Zhouetal.,2025a],CodePDE[Lietal.,2025a],AlphaE-
+ToolCreation
+volve[Novikovetal.,2025],TOOLMAKER[Wölfleinetal.,2025],ShinkaEvolveLangeetal.[2025]
+ResultAnalysis&Refinement
+e.g.,TheAIScientist-v2[Yamadaetal.,2025],PlotGen[Luoetal.,2024],
+Modality-Driven
+ChartLlama[Hanetal.,2023],ChartAssisstant[Mengetal.,2024]
+e.g.,ChemCrow[Branetal.,2023],Coscientist[Boikoetal.,2023],Virtual
+ResultAnalysis Tool-Augmented
+Lab[Boecketal.,2023]
+e.g.,DataInterpreter[Hongetal.,2024],LLM-SR[Kamiennyetal.,2024],
+Computation-Native
+MOBLLM[Binbasetal.,2024]
+e.g.,Self-Refine[Madaanetal.,2023],ChemAgent[Tangetal.,2025],Spa-
+AutomaticSelf-correction tialAgent[Wangetal.,2025a],TAIS[Liuetal.,2024a],BioInformatics
+Agent[Xinetal.,2024]
+Iterative
+e.g.,CRITIC[Gouetal.,2023],OSDAAgent[Huetal.,2025],AIco-
+Validation ExternalEvaluation& scientist[Gottweisetal.,2025a],BioDiscoveryAgent[Roohanietal.,2024],
+&Refinement Feedback SAMPLE[Rappetal.,2024],Biomni[Huangetal.,2025b]
+e.g.,AIco-scientist[Gottweisetal.,2025a],ResearchAgent[Baeketal.,
+Human-in-the-Loop
+2024],MAPPS[Zhouetal.,2025a]
+4
+
+===== PAGE 5 =====
+
+Domain-SpecificScientificAgents
+e.g.,SpatialAgent[Wangetal.,2025a],TAIS[Liuetal.,2024a],CRISPR-GPT[Quetal.,2025],BioDis-
+coveryAgent[Roohanietal.,2024],PerTurboAgent[Haoetal.,2025],BioAgents[Mehandruetal.,2025],
+Genomics BIA[Xinetal.,2024],scBaseCount[Youngblutetal.,2025],CellAgent[Xiaoetal.,2024],CompBioA-
+gent[Zhangetal.,2025b],scAgent[Maoetal.,2025],CASSIA[Xieetal.,2024]
+e.g.,SAMPLE[Rappetal.,2024],VirtualLab[Swansonetal.,2024],ProtAgents[GhafarollahiandBuehler,
+Protein 2024a],Sparks[GhafarollahiandBuehler,2025],VibeGen[NiandBuehler,2025],AutoProteinEngine(Au-
+toPE)[Liuetal.,2024b],ProChat[Huangetal.,2024b]
+e.g.,Biomni[Huangetal.,2025b],AIco-scientist[Gottweisetal.,2025b],TxAgent[Gaoetal.,2025b],
+BioResearcher[Luoetal.,2025b],STELLA[Jinetal.,2025a],CLADD[Leeetal.,2025],DrugAgent[Liu
+Medicine etal.,2024c],PharmAgents[Gaoetal.,2025d],LIDDiA[Averlyetal.,2025],AgentMD[Jinetal.,2024a],
+MedAgents[Tangetal.,2023],ClinicalGPT[Wangetal.,2023b],BehaveAgent[Aljovicetal.,2025]
+e.g.,Coscientist[Boikoetal.,2023],ChemCrow[M.Branetal.,2024],ChemAgents[Songetal.,2025],
+ChemReasoner[Sprueilletal.,2024],CACTUS[McNaughtonetal.,2024],Chemist-X[Chenetal.,2023a],El
+Chemistry
+AgenteQ[Zouetal.,2025],LLM-RDF[Ruanetal.,2024],FROGENT[Panetal.,2025],LARC[Bakeretal.,
+2025],FMG[Sunetal.,2025],MOOSE-Chem[Yangetal.,2024]
+e.g.,A-Lab[Szymanskietal.,2023],ChatMOF[KangandKim,2024],ChatGPTResearchGroup[Zheng
+etal.,2023],MDAgent[Shietal.,2025],HoneyComb[Zhangetal.,2024b],LLMatDesign[Jiaetal.,2024],
+Materials MatAgent[Bazgiretal.,2025a],MatSciAgent[Chaudharietal.,2025],MatPilot[Nietal.,2024],Materials
+LawsMulti-AgentFramework[Huetal.,2024]
+e.g.,k-agents[Caoetal.,2024],AtomAgents[GhafarollahiandBuehler,2024c],Mephisto[Sunetal.,2024],
+Physics QCopilot[Shaetal.,2025],OpenFOAMGPT[Pandeyetal.,2025],MetaOpenFOAM[Chenetal.,2024b],
+AI-ScientistFramework[Xuetal.,2025a]
+e.g.,AutonomousGISAgent[Ningetal.,2025],GISCopilot[Akinboyewaetal.,2025],LP-COMDA[Liu
+Others etal.,2024d],ReActagentforgasturbines[Songetal.,2024]
+Figure2: AcomprehensiveoverviewoftheroleofLLM-basedagentsinthescientificdiscovery
+lifecyclealongsideadiversecollectionofdomain-specificscientificagentsthatorganizevarious
+researchsystemsandpapersacrossfieldssuchasGenomics,Protein,Medicine,Chemistry,Materials,
+Physics,andOthers.
+ExperimentalDesignandExecution. Followinghypothesisdiscovery,experimentaldesignisa
+criticalstepthatinvolvescreatingastructuredplantosystematicallytestideasandachieveresearch
+objectives. This process is a form of workflow generation where high-level scientific goals are
+translatedintoconcrete,executableprotocols. Theexecutionstageservesasthecrucialbridgethat
+transformsabstractstrategiesintoconcreteactionsandempiricalevidenceneededforgenerating
+insights. Itinvolvescomplextaskssuchasorchestratingcomputationalresources,managinglarge
+datasets, interfacing with laboratory instruments or simulators, and continuously monitoring the
+workflow. It’simportanttoclarifythatourdefinitionofexperimentsincludesbothtraditionalwet-
+labexperimentsandcomputationalsimulations. Whilebothareintegraltothescientificprocess,
+currentLLM-basedscientificagentspredominantlyoperateinthecomputationaldomain,focusingon
+simulation-baseddiscovery. LLM-basedagentsaccomplishthisprimarilythroughtwointerconnected
+capabilities,namelytooluseandtoolcreation.
+ResultAnalysisandRefinement. Thisphasebeginswiththeanalysisofexperimentalresults,where
+autonomousagentsinterpretrawoutputstoderivemeaningfulscientificinsights. Sincescientific
+discoveryrarelyconcludesafterasingleiteration,thisstagefunctionsasacrucialiterativemechanism.
+Itinvolvescyclesofreviewingvalidatedresults,identifyingdiscrepanciesorunexpectedfindings,
+andthenmethodicallyrefiningtheproposedhypotheses,experimentaldesign,orcomputationaltools
+toprogressivelyenhancescientificoutcomes.
+Collectively,thesestagesencapsulatetheiterativeandcyclicalnatureofscientificinquiry,continu-
+ouslyrefiningandverifyinginsightstoproducecredibleandinnovativescientificknowledge.
+2.2 OverviewofScientificAgents
+AscientificagentisaspecializedAIsystemdesignedtosimulateandautonomouslyexecuteaspects
+ofthescientificresearchprocess. Unlikegeneral-purposeLLMagents[OpenAI,2023,Google,2024,
+Anthropic,2024], whicharebuiltforawidearrayoftaskslikeconversationandtextgeneration,
+scientificagentsarehighlydomain-specificandtask-oriented. Theirprimarygoalistoaccelerate
+scientificdiscoverybyautomatingandaugmentingthecapabilitiesofhumanresearchers,thereby
+allowingthenavigationoftheintricatelandscapeofmodernsciencewithgreaterspeedandefficiency.
+Table1summarizesthekeydifferencesbetweenscientificagentsandgeneral-purposeLLMagents.
+5
+
+===== PAGE 6 =====
+
+Table1: ComparisonofScientificAIAgentsandGeneralLLMAgents
+Feature ScientificAgent GeneralLLMAgent
+Tounderstandandrespondtoawide
+Primary Tosolvespecific,complexscientific
+rangeofgeneraluserqueriesand
+Objective problemsandgeneratenewknowledge.
+commands.
+Deeplyintegratedwithspecialized Reliesonbroad,generalknowledge
+Knowledge
+scientificdatabases,literature,and acquiredfromvast,diversetraining
+Base
+models. data.
+Employsrigorous,multi-steplogical
+Utilizescommonsense,associative,
+Reasoning deductionandinferencebasedon
+andheuristicreasoningforbroadtasks.
+scientificprinciples.
+Nativelyuseshighlyspecialized Interactswithgeneral-purposetools
+ToolUse software(e.g.simulators)and likewebsearchenginesandcode
+hardware(e.g.robots). interpreters.
+Utilizesmemorytoaccumulatedomain Memoryisprimarilyusedfor
+Memory knowledgeandlearnfrom maintainingconversationalcontextand
+experimentaloutcomes. userpreferences.
+Successismeasuredbytheaccuracy, Successismeasuredbytask
+Evaluation
+reproducibility,andnoveltyofthe completion,usersatisfaction,and
+Metrics
+scientificresults. conversationalquality.
+ReasoningandPlanning. ThecorecognitivefunctionsofanLLM-basedscientificagentareits
+advanced reasoning and planning abilities, which serve as its intellectual engine. Its reasoning
+capabilitiesallowittosiftthroughvastamountofscientificliteratureanddatatoformulatenovel
+hypotheses,identifypatterns,anddrawlogicalinferences[Ferragetal.,2025,Zhangetal.,2024c].
+Thisiscoupledwithasophisticatedplanningmodulethatcandecomposeahigh-levelresearchgoal
+intoacoherentsequenceofactionablesteps[Weietal.,2025b,Huangetal.,2024c].
+ToolUse. AdefiningcharacteristicofLLM-basedscientificagentsistheirdeepintegrationwith
+a wide array of specialized tools [Jin et al., 2024b, Shen, 2024]. This capability serves as the
+bridge between the agent’s cognitive processes and the practical execution of research. These
+toolsarenotlimitedtosoftware,suchasdomain-specificsimulators,dataanalysispackages,and
+proprietaryknowledgebases,butalsoextendtophysicalhardware. Throughprogrammaticinterfaces,
+scientificagentscanoperatelaboratoryautomationsystems,controlsensorarrays,andmanageother
+instrumentation, allowingthemtodirectlyinteractwithandconductexperimentsinthephysical
+world[Boikoetal.,2023].
+Memory. AnLLM-basedscientificagent’smemorymechanismisfundamentaltoitscapacityfor
+sustainedresearchandcumulativelearning[Xuetal.,2025b,Wuetal.,2025]. Actingasbotha
+workingmemoryforimmediatetasksandapersistentknowledgebase,itarchivesallpastoutcomes.
+Byretainingsuccessfulprotocolsandfailedinquiries,thislong-termmemoryenablestheagentto
+learnfromexperience. Thisabilitytocontinuouslyreferenceitsownhistoryallowstheagenttorefine
+strategies,avoidrepeatingerrors,andsystematicallydrivetheprocessofscientificdiscoveryforward.
+2.3 AnInformation-TheoreticFrameworkforAutonomousScientificDiscovery
+2.3.1 PropertiesofInformationinAutonomousScientificDiscovery
+Thetransitionfromhuman-ledresearchtoautonomousscientificdiscoverycanbeunderstoodthrough
+aformalanalyticalframework. Thecoreofthisframeworkistoexaminethreekeyaspectsofthe
+informationprocessedbyanintelligentagentinthescientificworkflow. First,weviewscientific
+discoveryasaninherentlydissipativeprocess,characterizedbyuncertaintyandtheneedforextensive
+trial-and-errorexploration. Second,weusethemathematicalmeasureofInformationEntropyto
+quantify the root of this uncertainty. Finally, we examine Verifiability, which measures whether
+informationcanbetestedagainstobjectivestandardsandistheultimategoaloftheresearchprocess.
+InformationEntropyisamathematicalmeasurefrominformationtheorythatquantifiestheun-
+certaintyorthesizeofthehypothesisspaceofagivenproblem. Ahigh-entropystate,suchasthe
+6
+
+===== PAGE 7 =====
+
+Human Intent
+Natural Language
+Computer Language
+V
+erifiability
+Physical
+Entropy
+Information
+Figure3: Aninformation-theoreticframeworkforautonomousscientificdiscovery,illustratingthe
+inverserelationshipbetweenInformationEntropyandVerifiability.
+setofallpossiblescientifichypotheses,presentsavastandunstructuredsearchspaceforanagent.
+AcoretaskfortheagentisthereforetoperformEntropyReduction—tosystematicallyreducethe
+uncertaintyoftheproblemthroughitsoperations[Yao,2003]. Ournotionofreducinginformation
+entropyisconsistentwiththeSecondLawofThermodynamics,whichstatesthatthetotalentropyof
+anisolatedsystemcanneverdecrease[Borgnakke,2024,Schroeder,2020]. Foranagenttoachieve
+InformationEntropyReductioninscientificdiscovery,thesystemmustbeanopensystem,instead
+ofanisolatedone. Thissystematicdecreaseininternalinformationaluncertaintyisdrivenbythe
+necessaryexchangeofinformationwiththephysicalworld. Theagent’sinternalentropyreduction
+isfundamentallydependentoninteractionswiththephysicalworld. Theinformationrequiredto
+constrain the hypothesis space cannot be generated internally. Instead, it must be obtained from
+real-worldprocesses(e.g.,performingexperimentsoranalyzingrawdatathatoriginatesfromphysical
+processes)toconstrainuncertainty.
+Verifiabilityisapropertyofaspecificinformationobjectthatmeasuresitsabilitytobeobjectively
+testedagainstaformal,logical,orempiricalstandard[Patterson,1978]. Theultimategoalofthe
+scientific process is to transform an initial idea with low verifiability into an empirical fact with
+veryhighverifiability. Theagent’sworkflow,therefore,isalsoaprocessofprogressivelyimparting
+verifiabilitytoinformation.
+Dissipationreferstotheunavoidablecomputationalcostandeffortexpendedonunproductivepaths
+duringtheexplorationofaproblemspace. Thiscostencompassestheresourcesconsumedinthe
+formulation, execution, and verification of incorrect hypotheses and experiments that ultimately
+donotleadtoasolution. Inthermodynamics, adissipativeprocessisdefinedbytheirreversible
+conversionofusableformsofenergy(suchasmechanical, electrical, orchemical)intounusable
+thermal energy [Borgnakke, 2024, Schroeder, 2020]. Landauer [Landauer, 1961] extended this
+concept into the Physics of Information. The Landauer’s Principle dictates that any irreversible
+information operation must be accompanied by a minimum energy dissipation. The dissipation
+definedhereisaninherentandunavoidablecostinscientificdiscovery. Theprocessofnavigating
+a high-entropy spacewhere the agent moves from many uncertainpotential solutions toa single
+determined solution is necessarily dissipative, because this transition constitutes an irreversible
+information operation. According to Landauer’s Principle, the degree of dissipation is directly
+proportionaltothenumberofnon-solutionpathsthatmustbeexploredandsubsequentlydiscarded
+tofindavalidone. Thistrial-and-errorcostisafundamentalchallengeinscientificdiscovery.
+7
+
+===== PAGE 8 =====
+
+st L a
+n
+ti n
+g
+S ci e
+F
+G
+e
+o
+e
+a
+d l b , G a c u k id a n c
+F S
+e
+i u n
+,
+m d i m n g a s rie s , S c L i i e t e n r t a i fi t c u
+F
+r
+o
+e
+H r m y
+e
+p
+s
+u o e l a t a h t r e e c
+d
+s h e P s, l
+u
+a n
+a
+s
+g e
+R
+P h y s K R n o a w w l e D d a g t a e E , , x L p a e w r R i s m es e u n A l t t a s g l ent Orchestr F a u T ti n o o c o n t l i o In n t a e l r it fa ie c s e P E & r x o e g c ra u m ta b le o d e
+ic C
+s
+Figure4: Anoverviewofautonomousagentsforscientificdiscoveryinwhichanagentorchestrates
+scientists,language,code,andphysics. Thisfigureillustratesthedynamic,closed-loopworkflow
+ofanLLM-basedscientificagentasthecoordinatororchestratingfourkeycomponents,including
+scientists, language, code, and physics. The agent continuously interacts with human scientists,
+receivinggoals,guidance,andfeedbacktodirectresearch,andprovidingsummariesandfindings.
+Itsinteractionwithlanguageinvolvesextractingknowledgefromliteraturetoformulateverifiable
+hypothesesanddetailedresearchplans. Theagent’sinterfacewithcodetranslateshigh-levelplans
+intoexecutableprogramsforsimulationsorinstrumentcontrolbyintegratingtoolfunctionalities.
+Finally,itinteractswithphysicsbyusingrawdataandlawstodirectphysicalorsimulatedinstruments,
+yieldingexperimentalresults. Thiscyclerepresentsaniterativeandautonomousdiscoverycycle,
+bridginghumanintenttoempiricalevidence.
+Usingthesepropertiesasananalyticallens, wecansystematicallyanalyzethetransformationof
+differenttypesofinformationastheyflowthroughtheautonomousdiscoveryprocess.
+2.3.2 ATaxonomyofInformationinAutonomousScientificDiscovery
+Inautonomousscientificdiscovery,informationtransformsthroughahierarchicalprocess,moving
+fromhigh-entropyhumanintenttolow-entropy,verifiablephysicalinformation. Figure3illustrates
+aseriesoftransitions: fromabstractHumanIntenttostructuredNaturalLanguage,thentoformal
+ComputerLanguage,andfinallytoverifiablePhysicalInformation. Eachstepreducesentropyby
+resolvingambiguityandincreasesverifiabilitybymakingtheinformationmorepreciseandtestable
+againstreality. 4illustratesthedynamic,closed-loopworkflowofanLLM-basedscientificagent
+asthecoordinatororchestratingfourotherkeycomponents,includingScientists,Language,Code,
+and Physics. These four components serve as concrete instantiations of the four corresponding
+informationlevels: HumanIntent,NaturalLanguage,ComputerLanguage,andPhysicalInformation.
+HumanIntentservesastheoriginpointofthescientificprocess. Itexistsasanabstracthypothesis
+or goal within a vast, unstructured conceptual space. This state possesses the highest possible
+8
+
+===== PAGE 9 =====
+
+Table2: InformationAnalysisAcrossAutonomousScientificDiscoveryPhases
+ScientificPhase HumanIntent NaturalLanguage ComputerLanguage PhysicalInformation OverallDissipation
+Hypothesis Dis- VeryHighEntropy VeryHighEntropy MediumEntropy HighEntropy High
+covery The intent is abstract Requires the highest Primarilyusedforaux- Historicaldataserves Requires overcoming
+and completely open- leveloflinguisticcre- iliarytaskslikeknowl- asinspiration;thevol- high entropy in cre-
+ended(e.g.,"discover ativity to synthesize edge graph construc- ume is vast, unstruc- ativethought,making
+anovelresearchgap"). disparateconceptsand tionordatamining,not tured, and the valu- itdifficulttoautomate.
+articulatenewideas. thecorecreativeact. able signals are non-
+obvious.
+Experimental HighEntropy MediumEntropy MediumEntropy MediumEntropy Medium
+Design Theintentiscreative Involves creating a Requires selecting, Must predict and Connects abstract hy-
+andrequiresnavigating novel, precise, and configuring, and model real-world pothesestothephysi-
+avastspaceofpossi- unambiguousprotocol integrating from a physical laws and cal world, navigating
+bilities(e.g.,"designa fromanabstractidea. vastlibraryofexisting constraints,whichare avastandconstrained
+newexperiment"). tools. inherently complex searchspace.
+anduncertain.
+ToolUse LowEntropy LowEntropy VeryLowEntropy LowEntropy VeryLow
+The intent is highly Typically consists of Involves calling pre- Inputandoutputdata The process is deter-
+specificanddirect(e.g., structured commands defined functions or formats are generally ministicwithlowen-
+"runthisspecificanaly- orsimpleinstructions APIs; thesyntaxand well-definedandstruc- tropy, making it the
+sistool"). withlowambiguity. logicaredeterministic. tured,reducinguncer- easieststageforAIto
+tainty. automatereliably.
+ToolCreation VeryHighEntropy VeryHighEntropy VeryHighEntropy VeryHighEntropy VeryHigh
+Requiresdefiningand Needstodescribethe Involvesdesigningand Thenewtoolmustre- Combinesthecreative
+solvingaproblemfor principles,architecture, implementing new, liablyandrobustlyin- difficultyofhypothesis
+whichnosolutioncur- and logic of a novel, complex algorithms teractwiththecomplex discoverywiththeen-
+rentlyexists. non-existententity. and systems from physical or computa- gineeringchallengeof
+scratch. tionalworld. buildingarobust,func-
+tionalsystem.
+ResultsAnalysis LowEntropy LowEntropy LowEntropy LowEntropy Low
+&Refinement The intent is more Requires generating Involveswritinganaly- Rawexperimentaldata Thetaskisconstrained
+openthantooluse(e.g., interpretations, sum- sisscriptsthataremore often contains noise by the provided data,
+"find meaningful pat- maries, and insights, complex than simple andartifacts,introduc- but requires sophisti-
+ternsinthedata"). allowing for more APIcallsbutoftenrely inguncertaintyintothe catedreasoningtoin-
+linguisticflexibility. onstandardlibraries. interpretationprocess. terpretresultsandsug-
+gestrefinements.
+InformationEntropy,representingtheprofounduncertaintyattheoutsetofanynovelinquiry. Asa
+pure,unarticulatedconcept,itisnotafalsifiablepropositionabouttheworld;therefore,itsVerifiability
+isalmostzero.
+Natural Language is the primary medium for structuring this high-entropy intent into a more
+tractableform. Thepropertiesofanaturallanguageobjectarehighlycontext-dependent. During
+creativephaseslikehypothesisgeneration,itsEntropyisextremelyhightoallowforexploration.
+Duringplanningorcommandphases, anagent’staskistogeneratealow-entropy, unambiguous
+statement. TheVerifiabilityofanaturallanguageartifact,suchasaresearchplan,isbasedonits
+logicalconsistencyandcanbeassessedagainstanexistingknowledgebase.
+ComputerLanguageisthemediumforformal,unambiguousrepresentationandexecution. The
+computerlanguagediscussedinthiscontextisprimarilypresentedascode. Generatingacomputer
+languageobject,suchasaquery,asimulationscript,oranewtool,isaprocessofsignificantentropy
+reduction because it transforms the ambiguity of natural language into a deterministic form. A
+computerlanguageartifactpossessesahighdegreeofVerifiability;itcanbeformallytestedagainsta
+specificationtodetermineifitsbehavioriscorrect.
+PhysicalInformationistheraw,empiricaldatagathereddirectlyfromthephysicalworld. Itmay
+includemeasurements,signals,andexperimentalobservations,etc. Thisisdifferentfromphysics
+information, whichreferstotheoreticalknowledgeandconceptswithinthedisciplineofphysics
+itself. Suchdataplaysadualroleinscientificdiscoveriesinthesensethatexistingdatasetsserve
+asaninputforgeneratinghypotheses,whilenewexperimentaldataprovidestheoutputfortesting
+them. Althoughthephysicalprocessgeneratingthedatamayhavehighentropyduetofactorslike
+randomnoiseorcomplexity,therecordeddataitselfisafactualobservation. Consequently,physical
+informationpossessesthehighestdegreeofVerifiability,whichisformallydeterminedbystatistical
+significanceandreproducibility. Thisverifiabledataconstitutestheevidencerequiredtoevaluatethe
+originalhypothesis.
+2.3.3 AnAnalysisofInformationAcrossAutonomousScientificDiscoveryPhases
+Usinganinformationtheoryframework,weevaluatetheentropyofdifferenttypesofinformation,
+includinghumanintent,naturallanguage,computerlanguage,andphysicalinformationwithineach
+phase,linkingthistothedifficultyofautomation(dissipation). AsshowninTable2andFigure5and
+6,ourfindingsrevealwhichphasesarethemostchallengingtoautomateandwhicharetheeasiest.
+9
+
+===== PAGE 10 =====
+
+Information Analysis Across Autonomous Scientific Discovery Phases
+Very High
+High
+Medium
+leveL
+noitapissiD
+/
+yportnE
+Hypothesis Very High Very High Medium High High
+Discovery
+Experimental
+Design High Medium Medium Medium Medium
+Tool Use Low Low Very Low Low Very Low
+Tool Creation Very High Very High Very High Very High Very High
+Low
+Results Analysis &
+Low Low Low Low Low
+Refinement
+Very Low
+Hu
+man
+Intent
+Natural
+Language
+Co
+mputer
+Language
+Physical
+Infor
+mation
+Overall
+Dissipation
+Figure5: Aheatmaprepresentationofinformationanalysisacrossautonomousscientificdiscovery
+phases.
+Wewilldelveintotheuniquechallengesandinformationcharacteristicsofeachphase,providinga
+blueprintforbuildingafullyautonomousscientificdiscoverysystem.
+HypothesisDiscoveryischaracterizedbyhighlevelsofuncertainty,exhibitingveryhighentropyin
+HumanIntentandNaturalLanguage. Theinitialintentisabstractandopen-ended,requiringsignifi-
+cantlinguisticcreativitytoarticulatenovelconceptsbysynthesizingdisparateideas. Althoughthe
+computerlanguageusedforauxiliarydataminingislesscomplex,therelianceonvast,unstructured
+historicaldataalsocontributestohighentropy. Theimmenseinitialuncertaintyandtheneedtosift
+throughavastspaceofpossibilitiestofindasinglevaluableinsightleadtohighoveralldissipation,
+makingthisafundamentallycreativeandchallengingphasetoautomate.
+ExperimentalDesignservesasacrucialbridgefromabstractconceptstoconcreteactions. The
+entropy across all types of information is medium to high. The creative intent to design a novel
+experimentfromnumerouspossibilitiesandtheneedtotranslatethatintoaprecisenaturallanguage
+protocolcontributetothisuncertainty. Furthermore,orchestratingexistingcomputationaltoolsfor
+simulationandmodelingtheinherentuncertaintiesofreal-worldphysicallawsaddstothecomplexity.
+Thisefforttostructureanabstractideaintoaconcreteplaninvolvesnavigatingalargebutconstrained
+searchspace,leadingtomediumoveralldissipation.
+Tool Use represents the most structured and deterministic phase of the scientific workflow. It is
+definedbyloworverylowentropyacrossallinformationcategories. Theintentishighlyspecific,the
+naturallanguageusedistypicallyasimplecommand,andthecomputerlanguagerequiredisoften
+adirect,deterministicAPIcallorfunction. Becausetheprocessispredictableandtheinformation
+involvedisunambiguous,theoveralldissipationisverylow,makingthisthemoststraightforward
+phasetoautomatereliably.
+ToolCreationstandsasthepinnacleofcomplexityinthisframework,exhibitingveryhighentropy
+across every information category. The process begins with the highly abstract intent to solve a
+problemforwhichnotoolcurrentlyexists. Itrequiresimmensecreativitytodescribetheprinciplesof
+anovelsysteminnaturallanguageandtodesignandimplementnew,complexalgorithmsincomputer
+language. Theresultingtoolmustalsoreliablyinteractwiththecomplexphysicalorcomputational
+world. This combination of high-entropy creative demands and rigorous engineering challenges
+resultsinveryhighoveralldissipation,markingitasthemostdifficultphasetofullyautomate.
+10
+
+===== PAGE 11 =====
+
+Information Analysis Across Autonomous Scientific Discovery Phases
+Overall Dissipation
+Very
+High
+High
+Medium
+Physical Low Human
+Information Intent
+(Entropy) Very
+Low
+(Entropy)
+Scientific Discovery Phases
+Hypothesis Discovery
+Experimental Design
+Tool Use
+Computer Natural
+Tool Creation
+Language Language
+Results Analysis & Refinement
+(Entropy) (Entropy)
+Figure6: Aradarchartrepresentationofinformationanalysisacrossautonomousscientificdiscovery
+phases.
+ResultsAnalysisandRefinementisaphasethatoperatesunderthestrongconstraintsofthedata
+generatedfromexperiments. Thisgroundingindataleadstolowentropyacrosstheinformationtypes
+involved.Theintentistofindpatternswithinadefineddataset,andthenaturallanguageandcomputer
+languagerequiredareforinterpretingandprocessingthisdata,notforopen-endedcreation. While
+thisphaserequiressophisticatedreasoningtogenerateinsightsandsuggestrefinements,thetaskis
+oneofinferencewithinaboundedcontextratherthanunconstrainedexploration. Thisgroundingin
+specificdataresultsinlowoveralldissipation.
+2.4 DifferentLevelsofAutonomousAgentsforScientificDiscovery
+Figure7illustratesafive-levelframeworkforscientificagents,detailingaclearprogressionfrom
+human-centric research to full AI autonomy across five key dimensions: Hypothesis Discovery,
+ExperimentalDesign,ToolUse,ToolCreation,andAnalysisandRefinement.
+Theproposedfive-levelframeworkprovidesamoregranularandclearlydelineatedmodelofAI
+autonomyinsciencecomparedtoexistingrole-basedclassifications. Frameworkssuchasthoseby
+Zhengetal.[2025],Gaoetal.[2024],Weietal.[2025a]definelevelsbasedontheholisticroleor
+overallcapabilityoftheAIsystem,makingtheboundariesbetweenstagesdescriptiveratherthan
+precise.
+In contrast, this new framework’s strength lies in grounding the progression of autonomy in the
+core information-processing challenges of scientific discovery. The transition through the levels
+canbeunderstoodasanagent’sincreasingcapacitytoindependentlyreduceinformationentropy,
+minimizedissipation,andsystematicallygenerateartifactswithhighverifiability. Thisprovidesa
+morestructuredandmeasurablemethodologyforassessinganagent’struecapabilities.
+Level1: Human-LedModel. Atthisfoundationallevel, theagent’sroleispurelyinstrumental,
+confinedtothelowest-entropyandlowest-dissipationtaskswheretheworkflowispredictable(e.g.,
+Tool Use). Humans bear the full cognitive load of managing the immense information entropy
+inherentincreativeprocesseslikeHypothesisDiscoveryandToolCreation. Thehumanisthesole
+engineforreducingthisinitialuncertaintyanddrivingtheprocesstowardaverifiableoutcome.
+Level2: AI-AugmentedModel. Theagentevolvesintoasupportivepartner,beginningtoassistin
+higher-entropydomains. Whilehumansstilllead,theAIcollaboratesinHypothesisDiscoveryand
+11
+
+===== PAGE 12 =====
+
+Full AI
+Hypothesis Experimental Result Analysis Autonomy
+Tool Use Tool Creation
+Discovery Design & Validation
+AI-Led Hybrid
+Result Analysis Hypothesis Experimental Model
+Tool Creation Tool Use
+& Validation Discovery Design
+Full Human-AI
+Hypothesis Experimental Tool Use Tool Creation Result Analysis Collaboration
+Discovery Design & Validation
+AI-Augmented
+Hypothesis Experimental Result Analysis Model
+Tool Creation Tool Use
+Discovery Design & Validation
+Human-Led
+Hypothesis Experimental Result Analysis Model
+Tool Creation Tool Use
+Discovery Design & Validation
+Human Human-AI AI
+ymonotuA
+eroM
+Figure7: Afive-levelframeworkforclassifyingtheautonomyofscientificagents. Theframework
+progressesfromaHuman-LedModel(Level1),wheretheagentisconfinedtosimple,low-entropy
+tasks,toanAI-AugmentedModel(Level2)andaFullHuman-AICollaborationModel(Level3),
+wheretheagent’sroleexpandstothatofasupportivepartner. AsignificantshiftoccursintheAI-Led
+HybridModel(Level4),wheretheagenttakestheleadonmostcorescientifictasks,withhumans
+collaboratingonthemostcomplexchallenges. ThefinalstageisFullAIAutonomy(Level5),where
+the agent can manage the entire scientific process from abstract ideation to validated discovery,
+functioningasatrulyautonomousresearcher.
+ExperimentalDesign,helpingtoexplorethelargepossibilityspaces. However,itreliesonhuman
+guidancetonavigatethehighdissipation(thecostofexploringunproductivepaths)andconvergeon
+aviableresearchdirection.
+Level3: FullHuman-AICollaborationModel. Thislevelischaracterizedbyacomprehensive
+partnershipwhereeverytaskisperformedcollaboratively. Theagentisnowcapableoffunctioning
+effectivelyacrosstheentireentropyspectrum,fromcreativeideationtodataanalysis. Itactsasa
+forcemultiplier,jointlytacklinghigh-entropychallengeswiththehuman. However,itdoesnotyet
+possesstheautonomytoleadtheprocessormanagethemostuncertain,dissipativephasesonitsown.
+Level4: AI-LedHybridModel. Acriticalthresholdiscrossedasagentstakeleadinautonomously
+reducingentropyforcorescientifictasks.ItindependentlydrivesHypothesisDiscovery,Experimental
+Design, and Tool Use, demonstrating a sophisticated ability to navigate vast and unstructured
+informationspaces. Humancollaborationremainsessentialforthetaskwiththeabsolutehighest
+entropyanddissipation(ToolCreation)andforthefinalstepofanalysisandrefinement,wherehuman
+judgmentensurestheultimateverifiabilityoffindings.
+Level5: FullAIAutonomyModel. Thisrepresentsthepinnacleofautonomousscience. Theagent
+possessescompletemasteryovertheentireinformationlifecycle. ALevel5agentcanindependently
+manage the workflow from start to finish: confronting the maximum information entropy of an
+abstract scientific goal, navigating the extreme dissipation inherent in creating novel tools from
+scratch,andproducingvalidated,highverifiabilityscientificfacts. Atthisstage,theagentoperatesas
+atrulyautonomousscientificresearcher.
+Bydefiningthelevelsbasedonhowanagenthandlesthesefundamentalpropertiesofinformation,
+thisframeworkmovesbeyondcoarseroledescriptions. Theboundarybetweenlevelsismarkedbya
+concrete,observableshiftintheagent’sabilitytoprocessuncertaintyandcreateknowledge,offering
+amorerobustanddetailedmethodologyformeasuringprogressinthefieldofautonomousscience.
+12
+
+===== PAGE 13 =====
+
+Prompt-Based
+Hypothesis Knowledge-Grounded
+Generation Multi-Agent-Based
+Evolutionary-Algorithm-Based
+Passive Knowledge Injection
+Bottom-Up Hypothesis
+Discovery Loop
+Active Knowledge Acquisition
+Top-Down
+External Knowledge Base LLM Agent
+Hypothesis Metric-Based Screening
+Validation Agent-Based Validation
+Figure8: TheLLM-agent-drivenworkflowforAutomatedHypothesisDiscovery,centeredaround
+an iterative loop of generation and validation. The agent’s reasoning is informed by an external
+knowledge base through two distinct paradigms: a passive, bottom-up knowledge injection and
+an active, top-down knowledge acquisition. During the Hypothesis Generation phase, the agent
+employsoneoffourprimarystrategies: Prompt-Based,Knowledge-Grounded,Multi-Agent-Based,
+orEvolutionary-Algorithm-Based. TheresultingideasarethenfilteredandrefinedintheHypothesis
+Validationphase,whichutilizeseitherautomatedMetric-BasedScreeningorinteractiveAgent-Based
+Validationtoproduceafinalsetofverifiedhypotheses.
+3 HypothesisDiscovery
+HypothesisDiscoveryisacrucialcreativeprocessinscientificdiscovery,withthecoreobjective
+of identifying and forming novel, verifiable scientific hypotheses from vast amounts of data and
+existingknowledge. Thisprocessaimstoacceleratethepaceofknowledgediscoverybyrevealing
+hiddenconnectionsthataredifficultforhumanresearcherstofindalone[Swanson,1986]. With
+theriseofLargeLanguageModels(LLMs),thelevelofautomationandefficiencyinhypothesis
+discoveryhasbeenenhancedtoanunprecedenteddegree[HeandChen,2025,Luoetal.,2025a]. A
+completehypothesisdiscoveryworkflowtypicallyincludesthefollowingthreekeystages:Knowledge
+Extraction,HypothesisGeneration,andHypothesisScreeningandValidation(Figure8).
+3.1 KnowledgeExtraction
+KnowledgeExtractionisthecornerstoneofthehypothesisdiscoverypipeline. Itscoretaskisto
+automaticallyidentify,extract,andstructurekeyinformationfromlargevolumesofunstructured
+data,especiallyscientificliterature,tolaythegroundworkforsubsequenthypothesisgenerationand
+validation.
+Traditionalknowledgeextractionmethodsinvolvealabor-intensive,bottom-uppipelineusingtech-
+niqueslikeNamedEntityRecognition(NER)andRelationExtraction(RE)tobuildstatic,structured
+KnowledgeGraphs(KGs)fromunstructuredtext[Nickeletal.,2015,Jietal.,2021]. Incontrast,
+modernparadigmsleveragethevastimplicitknowledgealreadyembeddedwithinLargeLanguage
+Models(LLMs). Thisshiftmovesawayfrombuildingfixedknowledgebasesandinsteadfocuses
+ondynamicallyactivatingandapplyingtheLLM’sbuilt-inreasoningcapabilities. Crucially,this
+transitionreframestheentireprocess: multi-stepextractiontasksarenowoftenreshapedintoasingle,
+end-to-endgenerativetask,wheretheLLMdirectlygeneratesthedesiredstructuredknowledge.
+Scientific Foundation Models. To overcome the limitations of general models in specialized
+fields,expertmodelsarecreatedbytrainingorfine-tuningthemonvast,domain-specificscientific
+data[Gururanganetal.,2020,Pyzer-Knappetal.,2025,Zhaoetal.,2025,Subramanianetal.,2023,
+Barmanetal.,2025,Narayananetal.,2025]. Forinstance,modelslikeBioBERTarepre-trained
+onbiomedicaltexts,enablingthemtomoreaccuratelyextractspecificentitieslikegenes,diseases,
+andchemicals,aswellastherelationshipsbetweenthemfromresearcharticles[Leeetal.,2020].
+Similarly,generativemodelslikeBioGPTcannotonlyextractbutalsosummarizecomplexbiological
+informationcoherently[Luoetal.,2022].Onabroaderscale,modelssuchasGalacticaweredesigned
+13
+
+===== PAGE 14 =====
+
+withtheexplicitgoalofstructuringandorganizingscientificknowledgefrompapers,lecturenotes,
+andtextbooks,essentiallyperformingknowledgeextractiononamassivescale[Tayloretal.,2022].
+Byinternalizingthenuancesofaspecificscientificlanguage,thesemodelsserveasfarmoreeffective
+toolsforbuildingaccurateandcomprehensiveknowledgebasesfromtechnicaldocuments.
+Retrieval-AugmentedGeneration(RAG).Retrieval-AugmentedGeneration(RAG)isatechnique
+designedtoaddressthecriticalissuesofoutdatedknowledgeandhallucinationinLLMsbyconnecting
+the model to external knowledge sources [Lewis et al., 2020, Guu et al., 2020, Gao et al., 2023,
+Izacardetal.,2023,Fanetal.,2024].Inthecontextofknowledgeextraction,itsprimaryfunctionisto
+transformvast,unstructuredscientificliteratureintoaverifiedandstructuredknowledgebase[Garcia
+et al., 2024, Lopez et al., 2025, Feng et al., 2025a, Krotkov et al., 2025]. By retrieving relevant
+documents and using them as a direct source, RAG generates factually-grounded and traceable
+outputs,suchasprecisesummariesorextractedentity-relationshippairs,whichserveasthereliable
+foundationforsubsequentanalysisanddiscovery[Leeetal.,2025,Xieetal.,2024,Gaoetal.,2025a].
+MultimodalKnowledgeExtraction. Withtheadventofmultimodalmodelsandagentsthatcanin-
+vokeanalysistools,knowledgeextractionfromscientificliteratureisnolongerconfinedtotext[Kha-
+lighinejad et al., 2024, Odobesku et al., 2025]. For instance, systems like ChemMiner leverage
+multimodal capabilities to extract chemical information from both text and diagrams within pa-
+pers[Chenetal.,2024a],whileChartAssistantdemonstratestheabilitytoreverse-engineerscientific
+chartsbyconvertingvisualdatabackintostructuredtables[Mengetal.,2024]. Similarly,theuseof
+MultimodalModels,suchasGPT-4o,enablestheprocessingofcomplexbiomedicaldocumentsby
+integratinginformationacrosstext,tables,anddiagramstoanswerquestions[Hurstetal.,2024].
+3.2 HypothesisGeneration
+Hypothesisgenerationisthecoreofhypothesisdiscovery,aimingtoformulateplausibleandtestable
+statements that explain observed phenomena or predict outcomes under certain conditions. In
+scientificpractice,itisacreativeyetstructuredstepthatbridgesobservationandprediction. Agood
+hypothesisshouldbegroundedinexistingknowledgeandmakepredictionsthatcanbeempirically
+testedandpotentiallyprovenwrong. Traditionally, scientistsgeneratehypothesesbyidentifying
+gapsorcontradictionsfrompreviousliterature,drawinganalogiesfromotherdomains,andapplying
+domainexpertisetoreason. Recentadvancementsareprogressingbeyondclassicliterature-based
+discovery(LBD) [Swanson,1986]todevelopdynamic,agenticsystemscapableofindependently
+reading,reasoning,anditerativelyproposingsophisticated,testableconjectures. Thisevolutionin
+methodologycanbecategorizedintofourkeyapproaches:
+Prompt-BasedSystems. Atitsmostfundamentallevel,hypothesisgenerationusingLLMscanbe
+achievedthroughprompt-basedmethods. Thisapproachdirectlyleveragestheextensiveknowledge
+anLLMacquiresduringitspre-trainingphase. Byformulatingacarefullyconstructedprompt,a
+usercanquerythemodeltoproposehypothesesinazero-shotfashion[Qietal.,2023,Zhouetal.,
+2024]. EarlyevidenceshowsLLMscanactaszero-shothypothesisproposersinbiomedicine[Qi
+etal.,2023],relyingontheirpre-trainedknowledgealonetoformulateideas. Theefficacyofthis
+methodiscontingentupontheLLM’sinternalrepresentationofscientificconceptsandrelationships.
+Whilethisallowsfortheexplorationofabroadrangeofideas,italsointroducesasusceptibilityto
+generatingplausiblebutfactuallyincorrectstatementsorrestatingknownfacts[Xiongetal.,2025].
+Knowledge-Grounded Systems. To enhance the factual accuracy and novelty of generated hy-
+potheses,knowledge-groundedmethodshavebeendeveloped. ThesetechniquesaugmenttheLLM’s
+internalknowledgewithexternal,authoritativeinformation. OneprominenttechniqueisRetrieval-
+Augmented Generation (RAG), which dynamically retrieves unstructured textual evidence from
+literature. Bysynthesizinginformationfrommultiple,potentiallydisparatesources,itenablesthe
+modeltoinfernovelconnectionsandproposeinnovative,evidence-backedhypotheses[Bazgiretal.,
+2025b]. Another powerful technique involves the injection of structured knowledge, often from
+curated knowledge graphs (KGs). KG-CoI [Xiong et al., 2024], for example, utilizes structured
+knowledgesourcessuchasknowledgegraphs(KGs)togrounditshypotheses, improvingtheac-
+curacy of its reasoning chains and reducing factual errors. ResearchLink [Borrego et al., 2025],
+forexample,integratesgraphembeddings,path-basedfeatures,andbibliometricdatatogenerate
+cross-domainhypotheseswithhighprecision. Moreover,arecentstudy[Tongetal.,2024]presents
+anovelframeworkthatcombineslargelanguagemodels(LLMs)withcausalknowledgegraphsto
+generate psychological hypotheses. By analyzing over 43,000 psychology articles, the approach
+14
+
+===== PAGE 15 =====
+
+producedhypothesesonwell-beingthatmatchedexpert-levelnoveltyandsignificantlyoutperformed
+LLM-onlymethods.
+Multi-Agent Systems. To broaden the scope of hypothesis generation, multi-agent frameworks
+emulate collective brainstorming by leveraging diversity from multiple sources [Wu et al., 2023,
+Chase, 2022]. This approach generates a richer pool of initial ideas by either utilizing different
+foundation models as distinct agents or by assigning different roles and prompts to instances of
+thesamemodel. Thesevariedconfigurationssteerthemodelstogenerateoutputsfromdifferent
+conceptualanglesbyactivatingdistinctgenerativedistributions. Bysynthesizingideasfromthese
+diverseagents,theframeworkeffectivelyuncoverslessobviousconnectionsandproducesamore
+comprehensivesetofpotentialhypothesesthanamonolithicapproachcouldachievealone[Chenetal.,
+2025b,Bazgiretal.,2025b]. Forexample,systemssuchasAIco-scientist[Gottweisetal.,2025a]
+employaproposer-criticdynamic,wheresomeagentsgenerateinitialideaswhileothersrigorously
+challengetheirassumptionstorefinethemthroughinteraction. Thisparadigmisimplementedin
+specialized frameworks like ACCELMAT for materials science [Kumbhar et al., 2025a], which
+uses a structured, iterative loop of proposal and critique among multiple agents to progressively
+enhancethequalityofnovelmaterialhypotheses. VIRSCI[Suetal.,2024]extendsthisbysimulating
+scientific teams using real-world academic data, enabling agents to form collaborative research
+teams and generate novel ideas through inter- and intra-team discussion mechanisms. Similarly,
+AstroAgents[Saeedietal.,2025]deploysdomain-specificagentstointerpretmassspectrometrydata
+andhypothesizeaboutprebioticchemicalpathwaysrelatedtotheoriginsoflife,withmorethan30%
+ofhypothesesvalidatedasscientificallyplausiblebyexpertreviewers.
+EvolutionaryAlgorithm-BasedSystems. ForadynamicandautomatedLLM-basedapproachto
+discovery,closed-loopsystemsapplyprinciplesfromevolutionaryalgorithmstotreathypothesis
+generation as an optimization problem. An initial population of hypotheses undergoes iterative
+refinementusingoperatorssuchasmutationandrecombination,whileafitnessfunctionevaluates
+thequalityofthehypothesistoguidetheselection. Thisparadigmisexemplifiedbysystemslike
+MOOSE-Chem [Yang et al., 2025], which uses evolutionary search to guide different ways of
+associating inspirations and background to generate hypotheses. This combination ensures that
+generatedhypothesesarenotonlyoptimizedbutalsovalidatedfornoveltyagainsttheknowledge
+baseline established during the LLM’s pretraining. Similarly, HypoAgents [Duan et al., 2025]
+integrate Bayesian updating within an evolutionary loop: agents propose hypotheses, test them
+viaRAG-informedevidence,updateprobabilities,andrefineuncertainhypothesesinacontinuous
+scientificfeedbackcycle. MolLEO[Wangetal.,2024b]leveragesLLMsdirectlyasmutationand
+recombinationoperators,promptedwithtext-basedinstructionsanddesirabletargetproperties. LLM-
+basedevolutionarysystemsshowimmensepromisefornavigatingvastcombinatorialspaces[Liu
+etal.,2025b]withtextualinformationextractionorrich,semanticobjectives,suchasdiscovering
+new materials [Jia et al., 2024], mechanical structures [Jadhav and Farimani, 2024], molecules
+[Wangetal.,2024b]ormacromolecules[ReinhartandStatt,2024]. Theyalsoshowpotentialfor
+multi-objectivenumericaloptimization[Liuetal.,2024e],whichincludesreal-worldproblemslike
+optimizingnozzledesign,heattransferorwindfarmlayout[Brahmacharyetal.,2025].
+3.3 HypothesisScreeningandValidation
+Rigorous screening and validation of automatically generated hypotheses rely on a clear set of
+evaluationaxes,suchasplausibility,novelty,feasibility,andcost[Alkanetal.,2025,Bazgiretal.,
+2025c]. Thisstepisnecessarytomanagethelargevolumeofgeneratedideasandrequirestransparent
+assessmentmethodstoavoidover-claiming[Beeletal.,2025]. Methodologiesforthisstagecanbe
+broadlyclassifiedintotwoapproaches: automatedevaluationbasedondefinedmetricsanddynamic
+refinementthroughagent-basedcritique.
+Metric-BasedScreening. Thisapproachfocusesondevelopingautomated,scalable,andobjective
+criteriatoevaluatehypotheses. Someframeworksimplementformalstatisticalcontrols;forexample,
+POPPERintroducesanautomatedvalidationframeworkthatachieveshuman-levelaccuracyatsignif-
+icantlygreaterspeedbyapplyingrigorousstatisticalchecks[Huangetal.,2025a]. Othermethods
+focusonspecificmetricslikenovelty,wheresystemssuchasSCIMONexplicitlycomparenewideas
+againstexistingliteratureandrevisethemuntiltheynolongerresemblepriorwork[Wangetal.,
+2024c]. Toenhanceexternalvalidityandenableconsistentcomparisons,standardizedbenchmarks
+areemerging. Theseincludetask-specificsuiteslikeMATDESIGNformaterialsscience, which
+15
+
+===== PAGE 16 =====
+
+introducesscalablequalitymetrics[Kumbharetal.,2025b],andgeneralplatformslikeHypoBench,
+whichprovidesamainbenchmarkforhypothesisdiscoveryacrossdiversetasks[Liuetal.,2025a].
+Beyondthese,recentapproachesemployLLM-derivedpriorsforautomatichypothesisassessment.
+Inparticular,theLogit-basedCalibratedPriortechnique[GongandFernandez,2025]usesLLM-
+generatedexpectationstoquantifyhowsurprisingacorrelationis,enablingrankingofhypothesesby
+noveltyandrelevancewithhighaccuracyinreal-worlddata. Meanwhile,Bayesianframeworkshave
+beendeployedforevaluatingmodelcapabilities[Xiaoetal.,2025],treatingperformanceassessment
+asahypothesistestingtaskunderuncertainty—anapproachthatintroducesprobabilisticrobustness
+whensamplesizesarelimited.
+Agent-BasedValidation.Thisapproachsimulatesthecollaborativeandcriticalprocessesofscientific
+inquiry,whereagentsinteracttochallengeandimprovehypotheses. FrameworkslikeResearchAgent
+facilitateaniterativedialoguebetweenaproposal-generatingagentandapanelofrevieweragents.
+Thisprocessmimicspeerreview,refiningthehypothesisuntilitmeetsrigorouscriteria[Baeketal.,
+2024]. Similarly,toensureempiricaltestability,othersystemsclosetheloopbetweentheoryand
+evidence. The Scientific Generative Agent (SGA), for instance, combines an LLM acting as a
+theoristwithscientificsimulatorsthatfunctionasexperimentalsystems. Thisallowstheagentto
+immediately test and revise its hypotheses based on simulated experimental outcomes, ensuring
+ongoingrefinementbasedonfeedback[Maetal.,2024].
+4 ExperimentalDesignandExecution
+In this section, we analyze the critical phases of Experimental Design and Execution within the
+autonomous scientific discovery process. As depicted in Figure 9, we first examine how LLM
+agents generate robust experimental plans by integrating high-level human guidance, leveraging
+externalknowledgesourcesviaRetrieval-AugmentedGeneration(RAG),andincorporatingfeedback
+frompriorexperiments. WethendetailtheExperimentalExecutionphase,focusingonthevarious
+strategies,fromhighlystructuredtodynamicallycollaborative,thatagentsusetointeractwithand
+manageexternaltools,bridgingthegapbetweenabstractplansandphysicalreality.
+4.1 ExperimentalDesign
+Acriticalstepinscientificdiscovery,followinghypothesisgeneration,isexperimentaldesign. This
+involves creating a structured plan to systematically test ideas and achieve research objectives.
+Theprocessisfundamentallyaformofworkflowgeneration,wherehigh-levelscientificgoalsare
+translatedintoconcrete,executableprotocols. LLM-basedscientificagentsareincreasinglyused
+forthistask,combiningnaturallanguagereasoningwithplanningcapabilities,oftenenhancedby
+retrievaltoolsandphysicalknowledge,togeneratecoherentanddetailedexperimentalplans.
+ThecorechallengeforLLMagentsinexperimentaldesignisnavigatinganearlyinfinitespaceof
+possibleactionsequencestofindasolutionthatisbothscientificallysoundandpracticallyfeasible.
+Toaddressthis,agentsemployvariousstrategiestoeffectivelyconstrainandnavigatethiscomplex
+space.[Huangetal.,2025b,Zhouetal.,2025a,Caoetal.,2024,Yuetal.,2024a]Thesestrategiescan
+begroupedintofourmaincategories: RAGforGroundedPlanning,HumanHigh-LevelGuidance,
+TemplatesandPredefinedActions,Post-ExecutionFeedback.
+Retrieval-AugmentedGenerationforGroundedDesign. Thisstrategyensuresthatanagent’s
+planisscientificallyvalidfromtheoutsetbygroundingitsreasoninginexternal,reliableknowledge
+sources. Instead of relying solely on its internal training, the agent uses a Retrieval-Augmented
+Generation (RAG) approach to query specialized tools, databases, and scientific literature. This
+allowstheagenttobuilditsexperimentalplanonafoundationofestablishedfactsandmethods.
+Biomni[Huangetal.,2025b]firstcreatesacomprehensiveactionspacebyautomaticallymining
+tensofthousandsofscientificpapersforrelevanttoolsanddatabases. Whengivenatask,itretrieves
+themostpertinenttoolsfromthisspacetoconstructitsplan. TxAgent[Gaoetal.,2025b]usesa
+specializedretrievalmodelcalledToolRAGtoselectthemostappropriatetoolsfromitsToolUniverse
+of211clinicalinstruments,ensuringitstherapeuticreasoningisbasedonevidence. Chemist-X[Chen
+etal.,2023a]leveragesRAGtosearchliteratureandmoleculardatabasestodefineapromisingand
+constrainedsearchspaceforreactionconditionoptimizationbeforeanyphysicalexperimentsarerun.
+CLADD[Leeetal.,2025]hasaPlanningTeamwhichretrievesthemostrelevantresourcesfrom
+16
+
+===== PAGE 17 =====
+
+Human Scientists
+Domain Knowledge Templates
+Feedback Action Pool
+High Level Guidance Predefined Components
+Human in the loop
+External Sources
+Databases
+RAG Experimental Design
+Tools
+Scientific Literature
+Detailed Workflow
+LLM Agent
+Experimental Experimental
+Results Execution
+Tool Use Tool Creation
+Embedded Toolbox-Based Reflective and Iterative Hierarchical
+Stage 1 Description & Think & Plan Agent 1
+Examples
+LLM as
+Generator, Toolbox 1
+Coder, Analyzer Tool 1 Reflection Action
+...
+...
+Result
+Stage 2 Tool N Observe Tool Use Agent N
+Hard-coded Toolbox N
+Tool Use
+Figure9: AnLLM-agent-drivenworkflowofautomatedExperimentalDesignandExecution. This
+workflowillustrateshowanLLMagentorchestratesexperimentaldesignandexecution. IntheEx-
+perimentalDesignphase,thecentralagentgeneratesadetailedworkflowbyintegratinginformation
+frommultipleinputs. Itreceiveshigh-levelguidance(domainknowledge,feedback)andpredefined
+components(templates,actionpools)fromHumanScientists,leveragesRetrieval-AugmentedGener-
+ation(RAG)topullinknowledgefromExternalSources,andincorporatesExperimentalResultsfrom
+previousexecutioncyclesasacriticalfeedbackmechanismforrefinement. FortheExperimental
+Executionphase,theagentactsuponthedetailedworkflow,decidingbetweenusingexistinginstru-
+ments(ToolUse)ordevelopingnewones(ToolCreation). Toolusecanbeimplementedthrough
+fourprimarystrategiesfortoolinteraction: Embedded,Toolbox-Based,ReflectiveandIterative,and
+Hierarchical.
+databasesandtools. TheMoleculeUnderstandingTeamthengeneratestructuredreportsbasedon
+theseexternalsourceswhicharesynthesizedbyaPredictionAgent.
+HumanHigh-LevelGuidance. Forcomplexornovelscientificchallenges,LLMsmaystruggle
+togenerateahigh-qualityexperimentaldesignonitsown. Asnotedinsomestudies[Zhouetal.,
+2025a,Quetal.,2025],humanexpertiseisoftencrucialtorefiningandvalidatingtheagentplan. In
+thiscollaborativemodel,thehumanscientistactsasasupervisor,providinghigh-levelguidanceand
+feedbacktoguidetheagent’sdecision-makingprocess.
+MAPPS[Zhouetal.,2025a]frameworkincludesaScientificMediatormodule. Thiscomponent
+allowshumanscientiststointeractwiththeagent,providingfeedback,offeringguidance,andmaking
+correctionstotheexperimentalplan,ensuringthattheagent’sautonomousdiscoveryprocessremains
+alignedwithscientificprinciplesandtheresearcher’sgoals. AIco-scientist[Gottweisetal.,2025a]
+introducesascientist-in-the-loopparadigm,wherehumanscientistsactivelycollaboratewithagents
+throughouttheresearchcycle. Humanscientistsinteractwiththesystembyspecifyingaresearch
+goal,suggestingtheirownideas,providingfeedbackandreviews. InVirtualLab[Swansonetal.,
+2024],ThehumanresearcherdefinesthePrincipalInvestigator(PI)andScientificCriticagentsby
+17
+
+===== PAGE 18 =====
+
+specifyingtheirtitle,expertise,goal,androle,andsetstheagendaforeachmeeting,whichguidesthe
+agentstofurtherdesignexperimentsandsolutions.
+Human-ProvidedTemplatesandPredefinedActionsThisisamorestructuredformofhuman-
+AIcollaborationwherehumansdefinethefundamentalbuildingblocksofanexperiment,andthe
+LLM’sroleistoassemblethemintoacoherentworkflow. Humansmayprovideasetofallowed
+"meta-actions"inanactionpoolorcreatehigh-levelworkflowtemplates. Theagentthenfillsinthe
+specificparametersanddetails. Thisapproachofteninvolvesmodelingtheexperimentasastate
+machine,wheretheagent’sprimarytaskistoestablishtherulesfortransitioningbetweenpredefined
+experimentalstates.
+The k-agents [Cao et al., 2024] framework exemplifies this by having an execution agent that
+decomposesahuman-providedexperimentalprocedureintoastatemachine. Theagenttheninteracts
+withotherknowledgeagentstoexecuteeachstateandusestheresultstodeterminethenexttransition,
+enablingclosed-loopcontrol. CRISPR-GPT[Quetal.,2025]utilizesexpert-predefinedmeta-tasksas
+high-leveltemplates,whileitsLLMplannerdecomposestheuser’shigh-levelrequestandlinksitto
+correspondingstatemachinestoassembleacomplete,executableworkflow. PerTurboAgent[Hao
+etal.,2025]operatesusingapredefinedActionPoolcontaininghigh-levelactionslikepredict,reflect,
+andrefine. Theagentdesignsitsexperimentbyselectingandsequencingtheseactionstodecide
+whichgenestoperturbineachround.
+Post-ExecutionFeedback. Thisstrategydoesnotrequireaperfectplanfromthestart. Instead,the
+agent’sdesignprocessisanexploratoryone,whereitlearnsandadaptsbyobservingtheresultsof
+itsactions. Thisfeedbackcanbeusedtomakeimmediate,step-by-stepcorrectionsortoinformthe
+designofthenextmajorexperimentalcycle.
+Agents like ChemToolAgent [Yu et al., 2024a] use the ReAct loop to solve chemistry problems
+by calling a tool, observing the output, and planning the subsequent action based on that result.
+BioInformatics Agent [Xin et al., 2024] uses a self-correction loop; if an analysis workflow’s
+initial output doesn’t meet user expectations, it modifies the entire workflow and re-executes it.
+BioDiscoveryAgent[Roohanietal.,2024]operatesinaclosedloop,usingtheresultsfromoneround
+ofgeneticperturbationstoreasonaboutwhichgenesaremostpromisingtotestinthesubsequent
+round. OSDAAgent[Huetal.,2025]adoptsanActor-Evaluator-Reflectionloop,whereanLLM-
+basedActorgeneratescandidateOSDAmolecules,whicharesubsequentlyassessedbyanEvaluator
+throughchemicalvaliditychecks. ASelf-reflectormodulethenintegratesthisfeedbacktoguidethe
+iterativerefinementoftheActor’soutputs.
+4.2 ExperimentalExecution
+Theexperimentalexecutionstageisacentralphaseinthescientificdiscoveryprocess,servingas
+thecrucialbridgethattransformsabstractstrategiesintotheconcreteactionsandempiricalevidence
+neededforgeneratinginsights. Itinvolvesthesystematicimplementationofadesignedworkflow,
+whichextendsbeyondsimplyrunningcodetoincludearangeofcomplextasks: orchestratingcom-
+putationalresources,managinglargedatasets,interfacingwithlaboratoryinstrumentsorsimulators,
+andcontinuouslymonitoringtheworkflowtoensureitscorrectness,efficiency,andreproducibility.
+LLM-basedagentsoperateattheintersectionofnaturallanguageinstructions,computerlanguage,
+andphysicalinformation,enablingafluidtransitionfromconcepttoexecution. Theexecutionof
+plannedexperimentsbyLLMagentsisprimarilyachievedthroughtwointerconnectedcapabilities,
+namelytooluseandtoolcreation.
+4.2.1 ToolUse
+ForLLM-basedagentstobeeffectiveinscience,theabilitytousetoolsisessential. First,general-
+purposetoolslikesearchenginesallowagentstosurveythedynamiclandscapeofscientificresearch.
+Thisensurestheirworkisgroundedinthemostrecentfindingsandestablishedprinciples. More
+critically,sinceLLMsarefundamentallytext-basedmodelsandlacktheabilitytodirectlyinteractwith
+ormeasurethephysicalworld,theymustrelyondomain-specifictoolsforanalysisandexploration.
+Byinterfacingwithchemicalsimulationsoftware,dataanalysispipelines,orrobotlabequipment,
+agentscanbridgethegapbetweentext-basedreasoningandempiricalscience. Overthepastfew
+years,severaldistinctstrategiesforintegratingagentswithexternaltoolshaveemerged,representing
+aspectrumofautonomyfromhighlycontrolledpipelinestodynamic, collaborativesystems.[Hu
+18
+
+===== PAGE 19 =====
+
+etal.,2025,Swansonetal.,2024,Jinetal.,2024a,Yuetal.,2024a,Huangetal.,2025b]Toprovidea
+structuredview,wecategorizethesestrategiesintofourrepresentativemodelsoftooluse: Embedded
+ToolUse,Toolbox-basedToolUse,Reflective&IterativeToolUse,andHierarchicalToolUsein
+Multi-AgentSystems.
+EmbeddedToolUse. TheEmbeddedToolUsemethodrepresentsastructuredandhighlycontrolled
+approachtointegratingAIwithscientificworkflows. Inthismodel,developerspre-defineacomplete
+research pipeline where specific tools are hard-coded to execute at particular stages. The Large
+LanguageModel(LLM)actsnotasadecision-makerfortoolselection,butratherasacomponent
+withintheworkflow. Itsroleisoftenconfinedtointerpretingtheoutputofatool,generatingcodefor
+aspecific,predeterminedstep,ortranslatinghumaninstructionsintoparametersforthenexttoolin
+thesequence. Thismethodensuresreliabilityandreproducibility,makingitwell-suitedforroutine,
+high-throughputanalyseswherethescientificprocessisalreadywell-established.
+Forexample,OSDAAgent[Huetal.,2025]embedstheLLMintoafixed"Actor-Evaluator-Reflector"
+loop, where the LLM acts as a molecule generator and reflector, while a set of hard-coded com-
+putationalchemistrytoolsservesastheevaluatortovalidateitsoutput. LLMatDesign[Jiaetal.,
+2024]adoptsapre-setiterativedesignloop,inwhichtheLLMisresponsibleforproposingmaterial
+modificationplansandreflectingontheresults,butthespecificstructurerelaxationandproperty
+predictionareexecutedbyhard-codedMachineLearningForceField(MLFF)andMachineLearning
+PropertyPredictor(MLPP)tools. MatLLMSearch[Ganetal.,2025]embedstheLLMintoafixed
+evolutionaryalgorithmframework,whereitsroleisconfinedtothestagetogeneratenewcrystal
+structurecandidates,whicharethenpassedtoapresetevaluationpipelinecomposedoftoolslike
+MLFF and DFT. scBaseCount [Youngblut et al., 2025] embeds the LLM in a fixed pipeline for
+large-scalesingle-celldataretrieval,preprocessing,normalizationandformatting,tocreateaunified
+repositoryforsingle-cellRNA-seqdata. Chemist-X[Chenetal.,2023a]embedstheLLMtointeract
+withpre-packagedAPIfunctionsincludingCADtoolsandMLmodels.
+Toolbox-BasedToolUse. ThismethodempowerstheAIagentwithsignificantlymoreautonomy.
+Theagentisprovidedwithatoolboxoralibraryofavailablefunctions. Eachtoolisaccompaniedby
+anaturallanguagedescriptionofitspurpose,inputs,andoutputs. TheLLMleveragesitsreasoning
+capabilitiestointerpretauser’shigh-levelgoal,decomposeitintosmallersteps,andselectthemost
+appropriate tool from the toolbox to accomplish each step. This approach transforms the LLM
+fromasimplecomponentintoacentralcoordinator,capableoforchestratingcomplexsequencesof
+operations.
+ThisapproachisdemonstratedinworkssuchasAgentMD[Jinetal.,2024a]isaclinicalagentthat
+curatesandappliesmedicalriskcalculatorsbyselectingfrom2,164minedclinicaltools. Chem-
+Crow[M.Branetal.,2024]bridgesdrugdiscoveryandmaterialsscienceusing18expert-designed
+tools. scAgent[Maoetal.,2025]containsatoolhuboffersover30pluginsthatcentralizesdiverse
+single-cellanalysismethodsintoaunifiedinterface. TxAgent[Gaoetal.,2025b]leveragesabroad
+ToolUniverse,spanningdrugdatabases,molecularanalysis,andclinicalresources,whichallows
+theagenttodynamicallyselectandintegratemultipletoolsfortherapeuticreasoning. GISCopilot
+[Akinboyewa et al., 2025] integrates Agent into QGIS to autonomously conduct spatial analysis.
+Equipped with comprehensive tool documentation and external libraries, it enables the agent to
+dynamicallydynamicallyselect,generate,andexecutegeospatialanalysisworkflows. SciToolAgent
+[Chenetal.,2025a]buildsaScientificToolKnowledgeGraphthatmapstheintricaterelationships,
+dependencies,andcompatibilitiesamongavastlibraryofscientifictools,whichallowsanLLMto
+createanoptimalChain-of-Toolstailoredforaspecificscientificquery. Thisgraph-basedtoolbox
+overcomes the limitations of previous agents that struggled with integrating a large and diverse
+toolset.
+ReflectiveandIterativeToolUse. Thisapproachmovesbeyondsimpletoolselection,enablingthe
+agenttoreflectontheresultsofeachtooluseanddynamicallyplanitsnextsteps.Thisprocessmimics
+thehumanapproachtoproblem-solving: try,observe,reflect,andthendecidewhattodonext. The
+ReAct [Yaoetal.,2023](ReasoningandActing)frameworkisaprimeexampleofthismethodology.
+ItoperatesinacontinuousloopofThought-Action-Observation. Similarly,theCodeAct[Wangetal.,
+2024e]frameworkisaspecializedextensionofReAct. Here,theagent’sactionsinvolvegenerating
+and executing code in a sandboxed environment. After execution, the agent observes the code’s
+outputoranyerrormessages. Ifthecodefails,theagentreflectsontheerror,iterativelygeneratesa
+correctedversion,andtriesagain.
+19
+
+===== PAGE 20 =====
+
+ChemToolAgent[Yuetal.,2024b]isaprimeexample,usingtheReActframeworktoorchestratea
+suiteof29differenttools,fromsearchingthePubChemdatabasetopredictingmolecularproperties.
+Itcanreasonaboutauser’schemistryquestion,calltherighttool,andthenanalyzetheoutputto
+decidethenextlogicalstep,likeperforminganothercalculationorsynthesizingtheresultsintoa
+finalanswer. Biomni[Huangetal.,2025b]isageneral-purposebiomedicalAIagentthatautomates
+complexdataanalysisbyleveragingtheCodeActframework.Thiscode-basediterativemethodallows
+Biomnitonavigatevast,interconnectedknowledgedomainswiththeflexibilityofavirtualbiologist,
+writing,running,observing,anddebuggingcodetoaccomplishitsgoals. PerTurboAgent[Haoetal.,
+2025]isanagentforsequentialPerturb-seq. Ateachround,theagentintegratespriorknowledge,
+perturbation-effectmodels,andpastexperimentalresultstoreflectonoutcomes,updatepredictions,
+andproposethenextgenepanel. Thisclosed-loopprocessadaptivelyprioritizesperturbationswith
+thehighestphenotypicimpact.
+HierarchicalToolUseinMulti-AgentSystems. Asthecomplexityofscientificinquiryincreases,a
+singleagentmaystruggletomanageanoverwhelminglylargeanddiversetoolbox. Thehierarchical
+delegationmethodaddressesthisbyemployingateamofspecializedAIagents. Ahigh-levelplanner
+agentfirstdeconstructsacomplexproblemintosub-tasks. Thesesub-tasksarethendelegatedto
+differentexpertagents,eachequippedwithitsownsmaller,specializedtoolbox. Thisdivisionof
+labormakesthetoolselectionprocessmoremanageableandrobust,mirroringthestructureofhuman
+scientificteams.
+For example, the Team of AI-made Scientists (TAIS) [Liu et al., 2024a] framework simulates a
+researchteambyassigningLLMagentsspecializedrolessuchasplanner,datahandler,andanalyst.
+Similarly, MedAgents [Tang et al., 2023] uses a collaborative approach where distinct medical
+expert agents, each with specialized tools, iterate to reach a consensus diagnosis. In chemistry,
+ChemAgents[Songetal.,2025]employsahierarchicalsystemwithfivespecializedagents,including
+a Literature Reader and Robot Operator. In materials, AtomAgent [Ghafarollahi and Buehler,
+2024b]collaborateacrossknowledgeretrieval,multimodaldataanalysis,andmolecularsimulations,
+autonomouslyorchestratingalloydesignworkflowsandacceleratingdata-drivendiscoveryofhigh-
+performancematerials. Forproteindesign,ProtAgents[GhafarollahiandBuehler,2024a]deploys
+multipleagentswithdistinctskillsthatdynamicallycollaborateonengineeringtasks. The“ChatGPT
+ResearchGroup”[Zhengetal.,2023]integratessevenspecializedassistantsforMOF/COFsynthesis,
+withagentsdedicatedtoplanning,literaturemining,androbotoperation. Inantiviralantibodydesign,
+VirtualLab[Swansonetal.,2024]introducesamulti-agentsystemwhereaPIagentcoordinates
+scientistagentsusingtheproteinlanguagemodel(PLM)ESM[Linetal.,2023],theproteinfolding
+modelAlphaFold-Multimer[Abramsonetal.,2024],andthecomputationalbiologysoftwareRosetta
+[Boorlaetal.,2023],generating92nanobodycandidatesandexperimentallyvalidatingtwowith
+improvedbindingtoSARS-CoV-2variants. Inphysics,thek-agentsframework[Caoetal.,2024]
+enablesanautonomousquantumlaboratorywhereagentsplanandexecuteexperimentsonquantum
+processors.
+4.2.2 ToolCreation
+WhilemanyAIagentsdemonstratearemarkableabilitytouseexistingsoftwarelibrariesanddigital
+tools,anewfrontierisemergingwheretheirprimaryfunctionshiftsfromapplicationtoinvention.
+Themostadvancedscientificagentsaretranscendingmeretoolorchestrationtocreateentirelynew
+scientifictoolsandalgorithms. ThisparadigmshiftmarkstheevolutionofAIfromadigitalassistant
+thatfollowsaplaybooktoacreativepartnercapableofcontributingnovelmethodsandsolutionsto
+complexscientificproblems.
+Attheforefrontofthecreativeparadigmareagentsthatgeneratecodenotjusttoexecuteaworkflow,
+buttodiscovernewmethods. ToolUniverse[Gaoetal.,2025c]isdesignedtodemocratizethepower
+ofAIscientistsbyenablingLLMagentstonotonlyexecuteworkflowswithacomprehensivesuite
+ofexistingtools,butalsoautonomouslyinvent,implement,andintegratenew,reusablescientific
+algorithms,transformingagentsfrommereuserstocreativetoolmakers. MAPPS[Zhouetal.,2025a]
+represents a powerful hybrid approach that blends the use of existing tools with the creation of
+newalgorithms. Itscodegenerationistwofold: itgeneratescodetouseestablishedphysics-based
+foundationmodelsforanalysis,butmoreimportantly,itsimultaneouslyinventsandimplementsnew
+algorithmstailoredtodiscovernovelmaterialsmoreefficiently.CodePDE[Lietal.,2025a]iteratively
+generates,tests,andrefinescodetoproducehigh-performancesolversforpartialdifferentialequations
+(PDEs). Thefinaloutputisnotjustthesolutiontoasingleproblem,butarobust,reusablesolverthat
+20
+
+===== PAGE 21 =====
+
+constitutesanewandvaluablescientifictool. AlphaEvolve[Novikovetal.,2025]takesthisconcept
+furtherbyemployinganevolutionaryframework. Ittreatsapopulationofalgorithmsasagenepool
+andusesanLLMto“mutate”thecode,iterativelyevolvingbettersolutions. Thisprocesshasled
+tothediscoveryofentirelynewalgorithmsthataremoreefficientthanthosedesignedbyhumans,
+showcasingcodegenerationasamechanismforpurealgorithmicinvention[Nagdaetal.,2025].
+ShinkaEvolve[Langeetal.,2025]similarlyevolvesprograms,improvingsampleefficiencythrough
+exploration–exploitation-balancedparentselection,novelty-basedprogramrejectionsampling,and
+bandit-based,task-dependentLLMprioritization. TOOLMAKER[Wölfleinetal.,2025]introduces
+anautonomousframeworkfortransformingscientificcoderepositoriesintoLLM-compatibletools,
+enablingagentstonotonlyemploybutalsosystematicallygeneratenewutilities,withcross-domain
+evaluationsdemonstratingsubstantiallyhigherreliabilitythanpriorsoftware-engineeringagents.
+5 ResultAnalysisandRefinement
+5.1 ResultAnalysis
+Experimentalresultanalysisinscientificdiscoveryisthecriticalprocesswhereautonomousagents
+interpretrawoutputs—suchasnumericaldata,plots,andimages—toderivemeaningfulscientific
+insights[Gridachetal.,2025b]. Thisstagepresentssignificantchallenges,includingtheneedto
+handlecomplex,multimodaldatatypesandensuretheanalysisisscientificallyrobust[Liuetal.,
+2025c,Zhangetal.,2024d]. Theapproachestothistaskareclassifiedintodistinctparadigmsbased
+onthecoremechanismtheagentusestointeractwithandprocessthedata.
+TheanalysisofexperimentalresultsbyAIagentscanbecategorizedintothreeprimaryparadigms,
+distinguished by the agent’s core mechanism for interacting with and interpreting scientific data.
+Theseapproachesarenotmutuallyexclusive;rather,themostadvancedsystemsoftenblendthem
+totacklecomplex,multi-facetedresearchproblems. Table3presentsaconciseoverviewofthree
+distinctapproachestoanalyzingandinterpretingscientificresults.
+Modality-DrivenAnalysis. Thisparadigmisdefinedbyitsrelianceontheadvancedperceptualand
+interpretivecapabilitiesofMultimodalLargeLanguageModels(MLLMs)[Hanetal.,2023,Meng
+etal.,2024,Hurstetal.,2024,Lietal.,2024a,Fuetal.,2024,Yanetal.,2024]. Thecoremechanism
+involvesthedirectprocessingofnon-textualdataformats,suchasimages,charts,videos,andeven
+audio,toextractscientificinsights. Insteadofrelyingonstructurednumericalinputs,theagent"sees"
+thedataasahumanresearcherwould. Thisapproachiscriticalfordisciplineswherevisualevidence
+is paramount. Representative systems like The AI Scientist-v2 [Yamada et al., 2025] leverage a
+Vision-LanguageModel(VLM)inafeedbacklooptocritiqueandrefinegeneratedplots,ensuring
+theyarenotonlyaccuratebutalsoclearlyinterpretable. Otherspecializedwork,suchasPlotGen
+[Luoetal.,2024],focusesondeconstructingscientificchartsintotheirsemanticcomponents—axes,
+legends,datapoints—toperformdetailedanalysisandverification.
+However,thisparadigmfacessignificantlimitations. Theinherentheterogeneityofscientificdata
+(e.g.,diversecharttypes,microscopyimages,spectralgraphs)posesamajorprocessingchallenge.
+Furthermore, the ambiguity of visual information can lead to misinterpretations, and the high
+computationalcostoftrainingandrunninglarge-scaleMLLMsremainsapracticalbarrier.
+Tool-AugmentedAnalysis. Asthemostprevalentandmatureparadigm,tool-augmentedanalysis
+centersontheagent’sabilitytointeractwithexternal,domain-specificresources,includingsoftware
+APIs,databases,andevenphysicalhardware. ThisapproachgroundstheLLM’sreasoningprocessin
+thedeterministicandvalidatedoutputsofspecializedtools,mitigatingtheriskoffactualhallucination
+andenablinghighlytechnicaloperations. Forinstance,ChemCrow[Branetal.,2023]isequipped
+withasuiteofchemistrytoolsfortaskslikepredictingreactionoutcomesandsearchingmolecular
+databases. Coscientist[Boikoetal.,2023]hasdemonstratedtheabilitytonotonlyusebioinformatics
+softwarebutalsocontrolliquidhandlingrobotstoexecuteexperiments. Similarly,VirtualLab[Boeck
+etal.,2023]followsacomputationalpipelineofspecializedtoolsfornanobodydesign.
+Theprimarylimitationsofthisparadigmincludethereliabilityoftheexternaltoolsthemselves,the
+riskoferrorpropagationthroughachainoftoolcalls,andpracticalchallengeslikeAPIcosts,latency,
+andthelackofinterfacestandardizationacrossthescientificsoftwareecosystem.
+Computation-NativeAnalysis. Thisparadigmleveragestheagent’sintrinsicabilitytogenerateand
+executecodeandperformsymbolicreasoning. Ittreatsdataanalysisasacomputationaltasktobe
+21
+
+===== PAGE 22 =====
+
+Table3: ComparisonofResultsAnalysisParadigms
+PrimaryData
+Paradigm CoreMechanism RepresentativeSystems
+Modality
+ChartLlama[Hanetal.,2023],
+ChartAssisstant[Mengetal.,
+Modality-Driven Visual/multimodalperception Images,charts,
+2024],TheAIScientist-v2
+Analysis andinterpretation video,audio
+[Yamadaetal.,2025],
+PlotGen[Luoetal.,2024]
+ChemCrow[Branetal.,
+Tool-Augmented Interactionwithexternal Domain-specific 2023],Coscientist[Boiko
+Analysis APIs,software,orhardware dataformats etal.,2023],VirtualLab
+[Boecketal.,2023]
+DataInterpreter[Hongetal.,
+Generalcode
+Computation- Tabulardata,text, 2024],LLM-SR[Kamienny
+generation/execution,
+NativeAnalysis numericalarrays etal.,2024],MOBLLM
+symbolicreasoning
+[Binbasetal.,2024]
+solvedfromfirstprinciples,ratherthanrelyingonpre-builttools. Thisgrantstheagentmaximum
+flexibility,allowingittohandleawidearrayofstructureddataformatsliketabulardata,text,and
+numerical arrays to perform bespoke analyses. For example, Data Interpreter translates natural
+languagequeriesintoPythonscripts,usinglibrarieslikePandasandMatplotlibwithinasecurecode
+interpretertoexecuteafulldatascienceworkflowfromcleaningtovisualization[Hongetal.,2024].
+Intherealmoffundamentalscience,frameworkslikeLLM-SRandMOBLLMusetheagent’scode
+generationcapabilitiestoperformsymbolicregression—discoveringtheunderlyingmathematical
+equationsthatdescribeexperimentaldata[Kamiennyetal.,2024,Binbasetal.,2024].
+Thekeychallengesherearetechnicalandphilosophical: theriskof"codehallucination"(generating
+incorrectorinefficientcode),thedifficultyofscalinglogicalreasoningforhighlycomplexproblems,
+and the fundamental question of verifying whether an agent is making a novel discovery versus
+merelyrecallingasimilarsolutionfromitsvasttrainingdata.
+5.2 IterativeResultValidationandRefinement
+Scientificdiscoveryrarelyconcludesafterasingleiterationofexperiments. Theiterativeresultrefine-
+mentandvalidationphaseemergesasacrucialmechanismforenhancingscientificoutcomes. This
+stageinvolvesmultipleiterativecycles,eachfocusedoncarefullyreviewingtheresultsfromprevious
+stages, identifyingdiscrepanciesorunexpectedfindings, andmethodicallyrefiningexperimental
+procedures,computationalmodels,oranalyticaltechniques. Activitiessuchasdebuggingcomputa-
+tionalworkflowstodetectandcorrecterrorsandsystematicallyverifyingadherencetoestablished
+experimentalprotocolsareessentialtothisprocess. Eachiterationprovidesvaluablefeedbackthat
+informssubsequentimprovements,therebyprogressivelyaligningexperimentaloutcomeswithorigi-
+nalhypothesesandresearchobjectives. Concurrently,validationrigorouslycomparesresultsagainst
+establishedscientificknowledge,predefinedbenchmarks,andreproducibilitystandards,ensuringthe
+reliability,accuracy,andintegrityofthescientificconclusionsdrawn.
+Refinement within LLM-based systems typically uses three major strategies: automatic self-
+correction,externalevaluationandfeedback,andhuman-in-the-loopapproaches(Figure10).
+AutomaticSelf-correction. Automaticself-correctionemploysintrospectiveandself-debugging
+strategies,promptingLLMstoiterativelyevaluateandrefinetheirownoutputs. Thismethodtypically
+involvestheuseofspecializedpromptsthatencouragemodelstocritiqueandrevisetheirresponses
+based on internal reasoning. For example, the Self-Refine framework [Madaan et al., 2023] has
+shownsignificantimprovementsinreasoningtasksbyenablingLLMstocritiqueanditerativelyrefine
+theirresponses. Additionally,frameworkssuchasthoseexploredbyChenetal.[2023b]highlight
+howiterativeintrospectionsignificantlyenhancescode-generationaccuracy. WithinscientificLLM
+agents,ChemAgentusesdynamicmemoryretrievaltoself-correctandrefinereasoningbasedon
+priorexperiences[Tangetal.,2025]. SpatialAgent[Wangetal.,2025a]reliesonchain-of-thought
+reasoningandself-reflectiontoiterativelyrefineplanstoachievespecificgoals. TeamofAI-made
+Scientists(TAIS)[Liuetal.,2024a]usesmultipleLLMsasdistinctagentsthatprovidefeedbacktoone
+another,collaborativelyrefiningandimprovingtheoverallresults. BioInformaticsAgent[Xinetal.,
+2024]firstsummarizesandanalyzestheresultsfromtheinitialrun,comparesthemwiththeuser’s
+expectedoutcomes,andthenmodifiestheentireworkflowtobetteralignwiththeuser’sobjectives.
+22
+
+===== PAGE 23 =====
+
+Start Automatic External Human-in-the-Loop
+Refinement Self-Correction Evaluation and Approaches
+Cycle Feedback
+Feedback Feedback Feedback
+Continuous Refinement Loop
+Refine Agent
+Increasing Validation Difficulty
+Figure 10: A diagram of the scientific agent’s continuous refinement cycle, which employs a
+progressive validation strategy. The process escalates through three stages as the difficulty of
+verifyingtheresultsincreases. ItbeginswithinternalAutomaticSelf-Correction,movestovalidation
+againsttoolsanddataviaExternalEvaluationandFeedback,andforthemostchallengingcases,
+incorporatesexpertjudgmentthroughHuman-in-the-LoopApproaches.
+Recentworksincorporateself-verificationandself-correctionmechanismsintoreinforcementlearning
+trainingtoimprovetherobustnessandreasoningcapabilitiesoflargelanguagemodelsZhangetal.
+[2025c],Jiangetal.[2025],Liuetal.[2025d]. However,self-correctionmethodsaloneareoften
+insufficientduetoinherentlimitationsinLLMself-assessmentcapabilities[Huangetal.,2023].
+External Evaluation and Feedback. External evaluation and feedback strategies use tools and
+automatedmetricsexternaltotheLLMtoobjectivelyvalidateandrefinethemodel’soutputs. These
+externalmethodsincludecomputationalassessments,fact-checkingtools,orspecializeddomain-
+specifictoolstoguideiterativeimprovement. Forinstance,theCRITICframework[Gouetal.,2023]
+systematically validates LLM outputs using external fact-checking, such as a search engine or a
+knowledgebase. Inscientificapplications,OSDAAgent[Huetal.,2025]usescomputationalchem-
+istrytoolstoevaluateanditerativelyrefinemolecularstructureproposals. Similarly,MAPPS[Zhou
+etal.,2025a]integratesfeedbackfromscientificcomputationaltoolsandscientistinsightstooptimize
+experimentalworkflowsandenhancediscoveryoutcomes. Besides,theAIco-scientist[Gottweis
+etal.,2025a]employsanexternalmulti-agentcritiqueapproach,facilitatingpeer-review-styleeval-
+uationsthatiterativelyimprovescientifichypotheses. BioDiscoveryAgent[Roohanietal.,2024]
+incorporatesthephenotypicscorefrompreviousroundsintheprompttohelpgenerateabetterset
+of genes to experimentally perturb. SAMPLE [Rapp et al., 2024] connects with gene assembly,
+proteinexpression,andbiochemicalanalysissystems,feedingtheresultsbacktorefinetheagent’s
+understandinginaniterativeloop. Biomni[Huangetal.,2025b]iterativelyrefinesitsreasoningusing
+feedbackfromtoolsandcodeexecutionresults.
+Human-in-the-Loop. Human-in-the-loopmethodsintegratedirecthumanexpertiseandoversight
+intotheLLMrefinementprocess.Thesemethodsofteninvolvestructurediterativehumanevaluations,
+ensuring that outputs align closely with expert standards and real-world applicability. General
+researchhasextensivelyusedreinforcementlearningfromhumanfeedback(RLHF)toguidemodels
+towardbehaviorsreflectingexpertevaluations. Withinscientificcontexts,AIco-scientist[Gottweis
+etal.,2025a]explicitlyintegrateshumanexpertisewithinitsiterative"generate,debate,andevolve"
+framework,ensuringrobustscientificoutcomes. ResearchAgent[Baeketal.,2024]similarlyuses
+human-aligned reviewing agents to simulate structured peer review, significantly enhancing the
+feasibilityandnoveltyofscientificresearchproposals. MAPPS[Zhouetal.,2025a]reliesonhuman
+scientiststoverifythegeneratedworkflowtoensureseamlessmaterialsdiscovery,leadingtomore
+robustresults.
+23
+
+===== PAGE 24 =====
+
+6 Domain-SpecificScientificAgents
+Anewgenerationofscientificagentsisbeingdevelopedforfieldsasdiverseasbiology,chemistry,
+andmaterialsscience. Byintegratingandusingadvanceddomain-specifictools,theseagentsare
+beginningtotacklechallengingdiscoverytaskssuchasdesigningnovelmolecules,predictingprotein
+structures,anddiscoveringnewmaterialswithunprecedentedspeed.
+Ingenomics,toolssuchastheUCSCGenomeBrowser[Kuhnetal.,2013],AlphaGenome[Avsec
+et al., 2025], and Evo2 [Brixi et al., 2025] provide powerful resources for genome annotation,
+regulatoryfunctionprediction,andlarge-scalegenomemodeling[Avsecetal.,2021,Nguyenetal.,
+2024,Suetal.,2025a,b]. Insinglecellbiology,Seurat[Haoetal.,2021]andScanpy[Wolfetal.,
+2018]analyzelargedatasets. Forproteomics,theAlphaFoldfamilyofmodels[Jumperandetal.,
+2021,Abramsonetal.,2024]andESMseries[Linetal.,2023,Hayesetal.,2025]predictprotein
+structuresandareincreasinglyappliedinproteindesignworkflows,whileRosetta[Leaver-Fayand
+et al., 2011, Watson et al., 2023, Dauparas et al., 2022] serves as a versatile library for protein
+modelinganddesignandhasgivenrisetosomeofthemostpowerfuldeeplearningmodelsinthe
+field. Inchemistry,RDKit[Landrum,2006]processesmoleculardata,andQ-Chem[Shaoandetal.,
+2006]andPsi4[Smithetal.,2020]performquantumchemistrycalculations. Inmaterialsscience,
+ASE[Larsenandetal.,2017], VASP[KresseandFurthmüller,1996], andLAMMPS[Plimpton,
+1995,Thompsonetal.,2022]simulatemolecularandmaterialsbehavior. Recently,machinelearning
+isadvancingmolecularandmaterialssimulationthroughMachineLearningInteratomicPotentials
+(MLIPs)andnewermethodsthatdirectlypredictquantumHamiltonianmatrices[Yuetal.,2023a,b,
+2025]. Inphysics,toolslikeOpenFOAM[OpenCFDLtd,2024]forfluiddynamicsandCIGALE
+[Noll et al., 2009] for galaxy evolution enable complex simulations. This diverse suite of tools
+highlightshowspecializedcomputationalresourcesaredrivingscientificdiscoveryforward.
+Genomics. Thebiologicalscienceshaveseenexplosivegrowthinautonomousagentdevelopment.
+SpatialAgent[Wangetal.,2025a]runsend-to-endspatialbiologystudiesatscale,autonomously
+processing2M+cellsacrossspatialtranscriptomicsandMERFISHpipelinestoannotatetissueniches
+and map cell–cell interactions, demonstrating parity or gains against automated baselines while
+handlingfullprojectswithminimalhumaninput. TeamofAI-madeScientists(TAIS)[Liuetal.,
+2024a]isaframeworkthatsimulatesresearchers’worksforgenomicsbyassigningLLMagents
+specialized roles, including agents to plan the analysis, handle data selection and preprocessing,
+conductbiomedicalresearchandanalyticalstudies,analyzedatastatisticsandinterpretresults,and
+review the quality of codes. Working together, these agents analyze gene expression datasets to
+identify disease-predictive genes, streamlining the pipeline of gene discovery (from raw data to
+insights)withouthumanintervention. CRISPR-GPT[Quetal.,2025]automatesgene-editingexperi-
+mentdesign—fromsystemandgRNAselectiontodeliveryandvalidationprotocols—andreports
+successfulreal-worldusetranslatingagent-generateddesignsintowet-labexecution. BioDiscoveryA-
+gent[Roohanietal.,2024]choosesgenestoperturbtoachieveatargetphenotype,outperforming
+trainedBayesian-optimizationbaselinesby+21%onaverage(and+46%onnon-essentialgenes)
+acrosssixdatasets,anddoublingthehit-rateformulti-genecombinationsoverrandom. PerTurboA-
+gent [Hao et al., 2025] plans iterative Perturb-seq campaigns, predicting next-round gene panels
+and improving panel quality over static or heuristic baselines in retrospective/simulation studies,
+therebyshorteningcyclesinpooledgeneticscreens. BioAgents[Mehandruetal.,2025]delivers
+locallyrunnable,privacy-preservingbioinformaticsworkflowsusingmulti-agentSLMswithRAG,
+achievingnear-expertperformanceonconceptualgenomicstaskswhileenablingon-premisescus-
+tomization with proprietary data. Single-cell genomics has also benefited greatly from multiple
+agentsystems. BioInformaticsAgent(BIA)[Xinetal.,2024]runsend-to-endscRNA-seqanalyses
+(dimensionalityreduction,clustering,DE,enrichment),producingready-to-usefiguresandreports
+withminimaluserintervention. scBaseCount[Youngblutetal.,2025]usesanagentic,hierarchical
+workflowtocontinuouslymine,standardize,andexpandasingle-cellcompendiumnowexceeding
+230millioncellsacross21organismsand72tissues,givingdownstreamagentsaharmonizeddata
+backbone. CellAgent[Xiaoetal.,2024]automatesscRNA-seq(andspatial)pipelinesend-to-end
+via planner–executor–evaluator roles, delivering high-quality analyses without human steps and
+exportablenarratives/plotsfordownstreaminterpretation. CompBioAgent[Zhangetal.,2025b]pro-
+videsnatural-languageexplorationofscRNA-seqcohorts,turninguserqueriesintoJSONplansand
+returningtargetedsummariesandvisualizationsthatlowerthebarrierfornon-computationalusers.
+scAgent[Maoetal.,2025]targetsuniversalcell-typeannotationandnovel-typediscovery;across160
+celltypesin35tissuesitreportsstate-of-the-artaccuracyandgeneralization,includingdata-efficient
+24
+
+===== PAGE 25 =====
+
+extensiontounseentypes. CASSIA[Xieetal.,2024]isamulti-agentannotatorthatproducesinter-
+pretablecell-typecallswithfullreportsandimproveslow-qualityannotationsbyretrievingexternal
+evidenceandconsolidatingtooloutputsintoaudit-readydocumentation. GeneAgent[Wangetal.,
+2025b]performsgene-setanalysisandqueriesexpert-curatedbiologicaldatabasestocross-check
+itsclaims, reducinghallucinationsandproducingauditablerationalesforfunctionaldescriptions.
+STAgent [Lin et al., 2025] couples perception, dynamic code generation, tool use, and literature
+groundingtodeliverend-to-endspatialtranscriptomicsanalysesandstructuredreportswithminimal
+humaninput. MRAgent[Xuetal.,2025c]automatesMendelianrandomizationstudiesend-to-end
+bytriagingliteratureforexposure–outcomepairs,selectingGWAS,executingMRpipelines,and
+producingstandardizedreports.
+Protein. The protein engineering domain has witnessed significant advances. SAMPLE [Rapp
+etal.,2024]deliversafullclosed-loop,self-drivingproteinengineeringpipelinethatexperimentally
+discoversthermostableenzymevariants,identifyingGH1hydrolaseswith≥12°Chigherstability
+thanthestartingsequencesviaautonomousdesign–build–testcyclesinaroboticlab, ratherthan
+manualmutagenesiscampaigns. TheVirtualLab[Swansonetal.,2024]pushesfromcomputationto
+wet-laboutcomesbydesigning92novelSARS-CoV-2nanobodiesandexperimentallyvalidatingex-
+pressionandbindingacrossvariants(with>90%expressionintestedconstructs),demonstratingthat
+multi-agentpipelinescantranslatein-silicodesignsintoviablebinders. ProtAgents[Ghafarollahiand
+Buehler,2024a]demonstratesdenovoproteinstailoredtomechanicaltargets,generatingsequences
+thatmeettargetvibrational-frequencyprofilesandstructuralspecificationsvalidatedthroughstructure
+predictionandphysics-awareanalyses—showingagenticdesigncanhitpropertyconstraints,notjust
+folds. Sparks[GhafarollahiandBuehler,2025]showsagenticdiscoverycanmovefrominstancesto
+generalprinciples,autonomouslyuncoveringtwoprotein-designrules: alength-dependentcrossover
+where β-biased peptides surpass α-helical ones in unfolding force beyond ∼80 residues, and a
+chain-length/secondary-structurestabilitymapwithahigh-variance“frustrationzone”forα/β folds.
+VibeGen[NiandBuehler,2025]extendsthistodynamics-awaredesign,whereadesigner–predictor
+duoproducesdenovoproteinswhoseall-atomMDtrajectoriesreproduceprescribednormal-mode
+amplitudes,expandingbeyondevolutionarytemplatestowardmotion-tunedbiomolecules. AutoPro-
+teinEngine(AutoPE)[Liuetal.,2024b]lowersthebarrierforbiologistsbyautomatingmodelchoice,
+HPO,anddatahandling;ontworealprotein-engineeringtasksitshowssubstantialaccuracygains
+overzero-shotandmanualfine-tuning,turningadvancedDLpipelinesintopractical,conversational
+workflows. ProtChat[Huangetal.,2024b]furtherstreamlinesproteinanalysistasksintoamulti-
+agentworkflowbycombiningahigh-levelgeneralistLLM(e.g. GPT-4o)fortask-planning,chatting
+and visualization, with specialized PLMs (e.g. ESM) for protein understanding. PRIME [Zhou
+etal.,2025b]interpretshigh-levelgoalsanddynamicallysynthesizescomputationalworkflowsfor
+proteinengineeringbyreasoningoveracuratedlibraryof65+validatedproteintools,constructing
+customizedpipelinesend-to-end.
+Medicine. ArecentgroundbreakingstudyisBiomni[Huangetal.,2025b],whichfunctionsasa
+general-purposebiomedicalagentthatactuallycompletesend-to-endanalyses—causalgeneprioriti-
+zation,drugrepurposing,rare-diseaseworkups,andmulti-omicsintegration—bydriving150+tools,
+105softwarepackages,and59databases,returningrankedcandidateswithtraceableevidence. AI
+co-scientist[Gottweisetal.,2025b]operationalizeshypothesis-drivenresearch: aGemini-2.0multi-
+agentsystemthatturnsliterature+modelfeedback(e.g.,structureprediction)intonovel,testable
+hypothesesandstudyproposalswithiterativereview. TxAgent[Gaoetal.,2025b]convertspatient
+context into actionable therapy decisions, using 211 tools for up-to-date interaction checks, con-
+traindications,andpersonalizedregimenselectionviamulti-steptool-augmentedreasoning. Beyond
+these,BioResearcher[Luoetal.,2025b]demonstratesdry-labautomationend-to-end—fromgoal→
+literaturesynthesis→executableanalysis/protocoldrafts→reviewer-stylecritiques—showingmea-
+surablegainsoncomplexresearchobjectiveswithoutmanual“gluecode.”STELLA[Jinetal.,2025a]
+targetstheevidence-curationbottleneckinbiomedicinewithaself-evolving,multi-agentliterature
+analysisworkflowthatstructureslargecorporaintomachine-navigableknowledgetosupporthypoth-
+esisgeneration/validation. Inthedomainofdrugdiscovery,CLADD[Leeetal.,2025]coordinates
+collaborative agents with RAG to design/dock/triage while ingesting heterogeneous biochemical
+knowledgewithoutfine-tuning,improvingtaskperformanceovergeneralLLMsandclassicalDL
+baselines. DrugAgent[Liuetal.,2024c]automatesend-to-endMLprogrammingforADMET/repur-
+posingtasks(dataacquisition→training→evaluation),reportingstrongcase-studymetrics(e.g.,
+PAMPAabsorptionF1≈0.92). PharmAgents[Gaoetal.,2025d]buildsa“virtualpharma”where
+specialistagentsspanscreening→modeling→triage,outputtingprioritizedleadswithassay-ready
+25
+
+===== PAGE 26 =====
+
+metadata. LIDDiA[Averlyetal.,2025]isanautonomous, language-drivendiscoveryagentthat
+generatesmoleculesmeetingpharmaceuticalcriteriaonmanytargetsandsurfacespromisingEGFR
+candidates,emphasizinglow-costadaptability. AgentMD[Jinetal.,2024a]automaticallyselectsand
+executesfrom2,164curatedclinicalcalculators(RiskCalcs)toreturnriskestimateswithformula
+provenance,substantiallyoutperformingstrongpromptingbaselinesonRiskQA.MedAgents[Tang
+etal.,2023]deliversmulti-specialistdeliberationinzero-shotsettingstoreachconsensusdiagnoses/-
+plansacrossstandardmedicalQAsuites. ClinicalGPT[Wangetal.,2023b]isadomainLLMfor
+clinicaltasks;EHR-integratedagenticexamplesincludeEHRAgent,whichauto-generates/executes
+codeagainstEHRdatatoanswercomplexpatientqueriesandcomputescores. BehaveAgent[Aljovic
+etal.,2025]providesturn-keycross-speciesbehavioranalysisfromrawvideo—planningtheanaly-
+sis,tracking/poseestimation,sequencelabeling,andreportgeneration—withoutretrainingacross
+paradigms.
+Chemistry. Chemistry has emerged as a particularly fertile ground for autonomous agents. For
+instance,theagentCoscientist[Boikoetal.,2023]tackledtheoverarchingproblemofautonomously
+designing and executing complex physical experiments from high-level prompts, demonstrating
+itscapabilitybysuccessfullyperformingNobelPrize-winningpalladium-catalyzedcross-coupling
+reactionsinunder4minutes. TobroadentheutilityofLLMsinchemistry,ChemCrow[M.Bran
+etal.,2024]addressedthechallengeofequippingthemwithspecializedknowledgebyintegrating
+18 expert-designed tools, successfully performing autonomous planning and multi-tool analysis
+across organic synthesis, drug discovery, and materials science. For managing highly complex
+workflows,ChemAgents[Songetal.,2025]solvedtheneedfordistributedexpertisebydeploying
+ahierarchicalmulti-agentsystemwhereamanageragentcoordinatesspecializedagentsfortasks
+rangingfromliteratureanalysistoroboticoperation. Bridginglinguisticreasoningwithquantum
+mechanics,ChemReasoner[Sprueilletal.,2024]focusedonthedifficulttaskofcatalystdiscoveryby
+creatingasynergisticloopbetweenLLM-drivenhypothesisgenerationandrapidfeedbackfromDFT
+simulations,therebyacceleratingthematerialsdesigncycle. Toimproveaccessibility,CACTUS[Mc-
+Naughtonetal.,2024]solvedtheuser-interfaceproblemforcomplexcomputationalchemistrytools,
+actingasanintelligentconversationalassistantthataccuratelytranslatesnaturallanguagequestions
+intothepropertoolcallsforpropertyprediction,similaritysearches,andtoxicityestimation. Inthe
+domainofexperimentaloptimization,Chemist-X[Chenetal.,2023a]focusedonautomatingthe
+tediousprocessofrefiningreactionconditions,achievingafullyautomated,closed-loopsystemthat
+usesretrieval-augmentedgenerationtoproposeconditionsandthendirectsaroboticplatformfor
+wet-labvalidation. Incomputationalchemistry,ElAgenteQ[Zouetal.,2025]tackledthemanual,
+error-pronestepsincomputationalchemistry,demonstratinghowitscognitivearchitecturecould
+autonomouslyhandleanentireworkflow—fromfilepreparationtoclustersubmissionandresult
+parsing—basedonasimplenaturallanguageprompt. Toempowerbenchchemists,LLM-RDF[Ruan
+etal.,2024]aimedtoprovideafullyautomatedsynthesisworkflowforuserswithoutcodingexpertise,
+successfullyenablinganend-to-endprocessfromliteraturesearchtoproductpurificationthrough
+itsconversational,six-agentframework. Inthepharmaceuticalspace,FROGENT[Panetal.,2025]
+addressedthecomplex,end-to-endprocessofdrugdesign,showingsuperiorperformanceonmulti-
+stepdiscoverybenchmarksbyintegratingdiversebiochemicaldatabasesandpredictivemodelsintoa
+unifiedframework. LARC[Bakeretal.,2025]solvedthecriticalchallengeofapplyingpractical,
+real-world constraints to retrosynthesis planning, employing an Agent-as-a-Judge mechanism to
+generatemorefeasibleroutesandachievinganear-human-levelsuccessrateondiversetasks. FMG
+[Sunetal.,2025]demonstratesexpert-levelmoleculardesigncanbeachievedbyadoptinggraph
+representationsandrenderingthemasimages,highlightingmultiplemodalitiescanenabledeeper
+understanding. Finally,addressingthecoreofscientificinquiry,MOOSE-Chem[Yangetal.,2024]
+aimedtoautomatethecreativeprocessofhypothesisgenerationbymimickinghumancognition,
+successfullyrediscoveringthecoreinnovationsfromrecenthigh-impactchemistrypaperswithout
+anypriorknowledgeoftheircontent.
+Materials. Theapplicationofscientificagentsinmaterialssciencehasledtoinnovativesolutionsfor
+long-standingresearchchallenges,spanningfromdiscoverytosynthesisandanalysis. TheA-Lab
+[Szymanskietal.,2023]ofLawrenceBerkeleyNationalLaboratoryrepresentsafullyautonomous
+materialssynthesisfacility. Usingthreeroboticarms,boxfurnaces,andX-raydiffractometers,it
+synthesized41novelcompoundsfrom58targetsover17daysofcontinuousoperation,achieving
+a 71% success rate. ChatMOF [Kang and Kim, 2024] addresses the complex scientific problem
+ofdiscoveringnovelMetal-OrganicFrameworks(MOFs),aprocessthatrequiresnavigatingvast
+chemicaldatabases,predictingpropertiesofhypotheticalstructures,andgeneratingnewcandidates.
+26
+
+===== PAGE 27 =====
+
+Itsprimaryscientificcontributionisaunified,autonomousworkflowthatorchestratesthesedisparate
+tools, successfully translating high-level goals into a concrete series of actions to accelerate the
+identification of promising materials for applications like gas storage. Similarly, the “ChatGPT
+ResearchGroup”[Zhengetal.,2023]tacklestheresource-intensive,iterativeprocessofoptimizing
+experimentalsynthesisconditionsforadvancedmaterials. Itsachievementisacollaborativemulti-
+agentsystemthatmimicsahumanresearchteam,dividinglaboramongspecializedLLMagentsto
+significantlyacceleratetheexperimentaloptimizationcycleandmakethediscovery-to-production
+pipelinemoresystematic. Inthecomputationaldomain,MDAgent[Shietal.,2025]confrontsthe
+efficiencybottleneckinMolecularDynamics(MD)simulations,whicharecriticalforunderstanding
+materialbehaviorbutrequiresignificantuserexpertise. ItautomatestheentireMDworkflowfrom
+codegenerationtoexecution,achievinganotablescientificresultbyreducingthetotaltasktime
+forthermodynamiccalculationsbyover40%andloweringthebarriertoentryforperformingthese
+complexsimulations. Toaddressthelimitationsofgeneral-purposeLLMs,HoneyComb[Zhangetal.,
+2024b]solvestheproblemoftheirlackofdeep,domain-specificknowledgeandreliabilityinscientific
+computations. Itcontributesarobustagentframeworkgroundedwithacuratedmaterialsknowledge
+baseandahubofvalidatedscientifictools,resultinginsignificantlyhigheraccuracyinbothreasoning
+andcomputation. Addressingthegrandchallengeofinversedesign,LLMatDesign[Jiaetal.,2024]
+introducesaframeworkforautonomousmaterialsdiscovery,particularlyinlow-dataregimes. Itskey
+scientificachievementisaself-reflectionmechanismthatallowstheagenttolearnfromcomputational
+outcomes and adapt its strategy, enabling the effective discovery of materials with specific, user-
+definedproperties. Meanwhile,MatAgent[Bazgiretal.,2025a]targetsthefragmentationandlackof
+reproducibilityintypicalmaterialsdiscoveryworkflows. Itprovidesanintegrated,human-in-the-
+loopmulti-agentframeworkthatstreamlinestheresearchprocess,fosteringanAI-guided,adaptive
+laboratory workflow that enhances both the speed and reproducibility of materials research. For
+managingmulti-facetedresearchprojects,MatSciAgent[Chaudharietal.,2025]solvesthechallenge
+oforchestratingdiversecomputationaltasks. Itachievesthiswithamodulararchitecturewherea
+masteragentinterpretshigh-levelgoalsanddelegatestaskstospecializedsub-agents,creatingan
+extensibleandrobustsystemforcomplexresearchquestions. Tobetterintegratehumanexpertise,
+MatPilot [Ni et al., 2024] demonstrates a powerful human-machine collaborative framework. It
+resolvesthechallengeofseamlesslycombininghumanintuitionwithAI’scomputationalpowerby
+usingmulti-agentLLMsforhypothesisgenerationwhileallowinghumanexpertstoguidetheoverall
+strategy,enablingacontinuouslearningloop. MaterialsLawsMulti-AgentFramework[Huetal.,
+2024]tacklesthefundamentalscientificgoalofdistillingcomplexdataintosimple,interpretable
+physicallaws. ItsmajorscientificresultwasthesuccessfuluseofLLMagentstoperformsymbolic
+regression,derivingalow-complexity,highlyaccurateformulaforpredictingglass-formingabilityin
+metallicglassesandshowcasingthepotentialofAItoautomatescientificlawdiscovery.
+Physics. Scientificagentsareincreasinglybeingappliedtosolvecomplexproblemsinphysicsand
+engineering,demonstratingcapabilitiesrangingfromcontrollingphysicalhardwaretoautomating
+sophisticatedsimulations.Inquantumcomputing,thek-agentsframework[Caoetal.,2024]addresses
+the scientific challenge of automating quantum experiment design and execution, a process that
+typicallyrequiresdeephumanexpertise. Itssignificantscientificachievementwasthecreationofa
+fullyautonomouslaboratorywhereLLMagentssuccessfullyplannedandexecutedexperimentson
+superconductingquantumprocessorstoproduceentangledstatesataperformancelevelequivalent
+tohumanexperts. Inmaterialsphysics,AtomAgents[GhafarollahiandBuehler,2024c]tacklesthe
+complex,multi-factorialproblemofdesigningnewalloyswithspecificproperties. Itcontributesa
+physics-aware,multi-agentframeworkthatsuccessfullyintegratesknowledgeretrievalwithphysics-
+basedsimulationsinaniterativeloop,enablingthesystemtoautonomouslypropose,simulate,and
+refinealloycompositionstomeetperformancetargets. Inastrophysics,Mephisto[Sunetal.,2024]
+solves the complex inverse problem of interpreting multi-band galaxy observations to determine
+theirphysicalproperties. Itskeyresultisamulti-agentframeworkthatautomatesthisbycalling
+the CIGALE astrophysics code as a tool, successfully proposing and testing hypotheses against
+observationaldatainaniterativereasoningloop. Inquantuminstrumentation,QCopilot[Shaetal.,
+2025]confrontsthechallengeofdesigninganddiagnosinghighlysensitivequantumsensors,aprocess
+thatinvolvestime-consumingmanualparametertuning. Itachievedaremarkable 100-foldspeedup
+overmanualproceduresbyautonomouslyperformingmodeling,optimization,andanomalydetection
+inatomcoolingexperiments. Incomputationalfluiddynamics(CFD),OpenFOAMGPT[Pandey
+et al., 2025] solves the problem of the steep learning curve and tedious setup process associated
+withcomplexsimulationsoftwarelikeOpenFOAM.Itsuccessfullyautomatestheentireworkflow,
+27
+
+===== PAGE 28 =====
+
+fromcasesetuptoiterativecorrection,significantlyloweringthebarriertoentryforadvancedCFD.
+MetaOpenFOAM[Chenetal.,2024b]furtheraddressestheneedforrobustandgeneralizedCFD
+automation by using a multi-agent system to decompose complex natural language instructions,
+achieving strong performance across a diverse range of flow simulations. Finally, to address the
+critical need for interpretability in scientific AI, the AI-Scientist Framework [Xu et al., 2025a]
+introducesamulti-agentsystemthatstructuresLLMoutputsintotransparent,executablemodels. Its
+maincontributionisenhancingsystematicvalidationandhuman-AIcollaborationbymakingthe
+agent’sreasoningprocessphysicallygroundedandverifiable.
+OtherScienceandEngineering. Beyondthefoundationalscientificdisciplines,scientificagentsare
+drivingsignificantadvancementsinarangeofotherscientificandengineeringfields.TheAutonomous
+GISAgent[Ningetal.,2025]anditssuccessorGISCopilot[Akinboyewaetal.,2025]addressthe
+accessibilitybarrieringeospatialscience,whereansweringspatialquestionsoftenrequiresspecialized
+programmingskills. Theysuccessfullyautomatedworkflowsfromdataretrievaltothegeneration
+ofmapsandstatisticsbytranslatingnaturallanguagerequestsintoexecutableprograms,making
+advancedgeospatialanalysismoreaccessible. Forcomplexengineeringsystems,thedomain-specific
+ReActagentforgasturbines[Songetal.,2024]tacklesthechallengeofmodelingandanalyzing
+thethermodynamicsofmulti-componentsystems. Itsuccessfullyintegratedexpertknowledgewith
+predefinedtoolstoperformiterativegaspathanalysis,demonstratingaviablepathforAI-driven
+diagnosticsinpowerengineering.LP-COMDA[Liuetal.,2024d]extendsagentapplicationstopower
+electronics,solvingthechallengeofdesigningcomplexanderror-pronemodulationstrategiesfor
+powerconverters.Itsuccessfullyautomatedthisprocesswithaphysics-informedplanner,accelerating
+designtimebyover30xwhilereducingerrorsbyover60%.
+7 Discussions
+7.1 FromLLMReasoningtoAgenticReasoningviaReinforcementLearning
+The advent of Large Language Models (LLMs) has brought the promise of automating complex
+tasks, but Reinforcement Learning (RL) plays a crucial role in transitioning from passive text
+generation to active decision-making and discovery. While Supervised Fine-Tuning (SFT) can
+enhancedomainknowledgeandchangemodelbehaviors,itisfundamentallyaformofimitation
+learning,limitingamodel’sabilitytogeneralizetonewdomains[Chuetal.,2025]andexploremore
+optimalordiverseproblem-solvingstrategies. ReinforcementLearning,particularlyfromverifiable
+rewards,providesafundamentalsolution[Parasharetal.,2025,Suetal.,2025c,Lietal.,2024b,
+2025b]toelicitgeneralizablereasoningabilityfromthebasepolicymodel. Workexemplifiedby
+DeepSeek-R1[Guoetal.,2025]demonstratesthatmodelscanlearncomplexreasoningbehaviors,
+includingself-verificationandself-correction,bybeingrewardedsolelyfromfinalanswercorrectness.
+TheseemergentcapabilitiesrevealRL’spotentialfortransformingLLMsfrompassiveknowledge
+repositoriesintoactiveproblemsolvers.
+TheagenticRLparadigmextendsmodelbehaviorsfrompurereasoningtoactionableinteractionswith
+environments,whereagentslearntodynamicallyinterleavereasoningandtoolexecution. Through
+RL, agents optimize not just what to think, but when and how to act. Code interpreters enhance
+mathematicalabilities[Fengetal.,2025b,Maietal.,2025]ofagents,withagentslearningthrough
+RLtooptimizereasoningtrajectoriesviamulti-turnreal-timecodeexecution. Searchenginesenable
+agentstoacquireexternalknowledgeandup-to-dateinformation,whereRLhelpsagentsgenerate
+effective search queries as part of their reasoning process [Jin et al., 2025b, Chen et al., 2025c].
+Beyondaugmentingcapabilities,agenticRLalsoenablesmodelstooperateincomplex,dynamic
+environments. Webbrowsingagents[Weietal.,2025c,Qietal.,2025]andGUIagents[Qinetal.,
+2025, Agashe et al., 2024] position models in human-like scenarios, requiring them to interact
+withenvironmentswherestateschangeinresponsetotheiractions. AgenticRLfosterthemodel
+capabilityinhandlingcontinuousperception,decision-making,andactionexecutioninresponseto
+environmentalfeedback. Beyondasingletool,RLalsotrainsagentstocoordinatemultipletools
+concurrentlytosolvehardertaskslikedeepresearch[Gengetal.,2025,Lietal.,2025c].
+ApplyingthesuccessfulAgenticRLmethodstoscientificdiscoveryisapromisingwayforrealizing
+an AI-driven scientific revolution. However, the unique nature of the scientific domain presents
+challengesthatfarexceedthoseinexistingwork.
+28
+
+===== PAGE 29 =====
+
+TheEnvironmentProblem. TheenvironmentforaScienceAgentisanunavoidablyheterogeneous
+hybrid. The system parses outputs from diverse digital tools with non-standard interfaces (e.g.,
+command-linesoftware,databaseAPIs,graphicaluserinterfaces)andinteractsdirectlywithphysical
+laboratoryequipmentsuchasroboticarmsandchemicalsynthesizers.Theintroductionofthephysical
+worldbringswithitlatency,noise,irreversibleactions,andtheriskofhardwaredamage—challenges
+thatpurelydigitalagentshaveneverfaced.
+TheActionProblem. TheactionspaceforaScienceAgent,however,isenormousandnon-standard,
+astheactionstocontrolamassspectrometerareentirelydifferentfromthosetocalladataanalysis
+library. Moreimportantly,anadvancedScienceAgentisexpectednotonlytousetools,butalsoto
+createnewonesbywritingcode. Thisexpandstheactionspacefromafinitesettothenear-infinite
+space of all possible programs, posing a massive challenge for exploration-based RL. While the
+AgentRLScalingLawstudyrevealsthatperformancescaleswiththenumberofinteractions,the
+astronomicalnumberofinteractionsrequiredtoeffectivelyexploretheexplosiveactionspaceofa
+ScienceAgentispracticallyinfeasible.
+TheObservationProblem. AScienceAgentneedstoprocessmixed-modalityobservations,includ-
+ingexperimentalimages,massspectrometrydata,simulationcurves,structureddatalikeSMILES
+chemical formulas, and unstructured text from scientific papers. Furthermore, research projects
+have long durations, requiring the agent to possess long-term memory capabilities to connect a
+serendipitousfindingfrommonthsagotoacurrentproblem. Thisfarexceedsthecapacityofexisting
+agentsthatprimarilyrelyonshort-termcontextfordecision-makingandplacesextremedemandson
+themodel’smemoryandretrievalsystems.
+TheRewardProblem. AllsuccessfulAgentRLworksrelyonaclear,sparse,butdefinitivefinal
+rewardsignal,suchaswhetheramathproblemiscorrect,awebtaskiscompleted,oraquestion
+is answered correctly [Jin et al., 2025b, Wei et al., 2025c, Chen et al., 2025d]. This paradigm
+almost completely breaks down in scientific discovery. The reward is highly sparse, as a true
+discovery can take years, and the outcome of a single experiment does not serve as an effective
+rewardsignal[Ueharaetal.,2025a,b]. Theobjectiveofsuccessisalsoambiguous. Designinga
+rewardfunctionthatcanmeasurenovelty,impact,orreproducibilityisamajor,unresolvedproblem.
+Althoughtheself-evolvingcurriculumproposedinWebRLoffersapromisingdirectionbygenerating
+easiersub-tasksfromfailures,itisstillconfinedtotaskswithclearsuccesscriteria. Foropen-ended
+scientificexploration,definingandcalculatingtherewardremainsthemostcentralobstacleonthe
+pathtoageneral-purposeScienceAgent.
+7.2 TheLeapfromLLMstoAgentsinAutonomousScientificDiscovery
+LLMs are primarily seen as powerful reasoning engines, like our human brain. Trained on vast
+amounts of data, they excel at processing, analyzing, and verifying existing human knowledge.
+However,evenifanLLMcouldproposeanovel,unconventionalhypothesis,itlackstheabilityto
+physicallyinteractwiththeworldtoverifyitsownideas. Itisnotabletodesignexperiments,conduct
+tests,orobservereal-worldresults,whichareessentialstepsforturningahypothesisintoavalidated
+discovery. ThislimitationisvisuallydepictedintheFigure11,wheretheLLMistrappedinside
+the Humanity’s Knowledge Closure. It performs efficient reasoning within the existing circle of
+knowledgebutstrugglestocrossthisboundarytoreachNewDiscoveries.
+To overcome this challenge, the LLM needs to evolve from a passive reasoning engine into an
+activescientificagent. AsKambhampati[2025]emphasizes,humancaninteractwiththeworldand
+explorenewknowledge,andacompletescientificagentshouldalsopossessthisability. Froman
+information-theoreticperspective,asdetailedinSection2.3.1,theagent’sinternalentropyreduction
+is fundamentally dependent on irreversible interactions with the physical world. The necessary
+constraining information cannot be generated internally but must be obtained from real-world
+processestotrulyreducethehypothesisspace.
+A scientific agent can not only process data but also design and execute experiments, actively
+exploringunknowndomains. Theycanacquirenewdatathroughtrialanderror,observation,and
+hands-onactions,muchlikeahumanscientist,ratherthansolelyrelyingonexistinginformation. A
+scientificagentisnolongerapassiverecipientofinformation;itcantranslateitsinternalknowledge
+(explicitfacts,proceduralmodels,etc.) intoconcreteactionsintherealworld. Thisaction-feedback
+29
+
+===== PAGE 30 =====
+
+New
+Inferable
+ntific
+Agent Discoveries
+e
+Knowledge ci
+S
+Humanity’s
+Collective Knowledge
+(Explicit Facts, LLM
+Procedural Models
+and Verifiers)
+Humanity’s
+Knowledge
+Closure
+MLL
+LLLLMM
+LLM
+Figure 11: A conceptual model illustrating the limitation of a Large Language Model (LLM)
+comparedtothepotentialofaScientificAgent. AnLLM,actingpurelyasareasoningengine,is
+fundamentallyconfinedwithinHumanity’sKnowledgeClosure. Itexcelsatprocessingandmaking
+connectionswithinthespaceofexistingandInferableKnowledgebutstrugglestogeneratetruly
+novelinsightsthatlieoutsidethisboundary. Incontrast,aScientificAgentisdesignedtoovercome
+thislimitation. Byactivelyinteractingwiththeworld—designingexperiments,executingactions,and
+employingexplorationstrategies—itcanbreakthroughtheknowledgeclosuretoproducegenuinely
+New Discoveries, thereby expanding the frontier of human understanding. This discussion was
+motivatedbyandadaptedfromKambhampati[2025],andthefigureisexpandedandrecreatedwith
+permission.
+loopallowstheagenttocontinuouslybreakthroughtheboundariesofinferableknowledge,gradually
+expandingthecircleofhumanknowledge.
+Inthisway,anLLM-drivenscientificagentwillnolongerbemerelyanextensionofhumanthought
+butcanbecomeanindependent,exploratorypioneer. Itcanassisthumansinefficientlyexploringthe
+frontiersofinferableknowledgeandmayeven,throughachancedeviation,helphumanitydiscover
+entirelynewinsightsandgroundbreakingdiscoveriesthattrulyliebeyondthecurrentknowledge
+closure.
+7.3 RoleofSerendipityinDiscovery
+Anessentialaspectofscientificdiscoveryistheinherentunpredictabilityandtherolethatchanceand
+unexpectedfindingsplayinsignificantbreakthroughs. Historicalmilestones,suchasthediscovery
+ofpenicillin,cosmicmicrowavebackgroundradiation,andgraphene,highlighthowserendipitous
+findingsarepivotalindrivingscientificadvancement. Thisphenomenonunderscoresacrucialgap
+betweenhuman-drivenscientificinquiryandcurrentcapabilitiesofLLM-basedscienceagents.
+LLMsaretrainedtomaximizelikelihoodbasedonextensivehistoricaldata,inherentlyoptimizing
+towardspredictableandprobableoutcomes. Suchatrainingobjectiveinadvertentlyconstrainsthe
+models’ abilities to venture into the realms of randomness and serendipity that frequently yield
+novelinsightsinhumanscience. Majorhistoricalscientificbreakthroughs,suchasthediscoveryof
+penicillin[Fleming,1929],cosmicmicrowavebackgroundradiation[PenziasandWilson,1965],
+andgraphene[Novoselovetal.,2004], oftenoriginatedfromchanceorunexpectedobservations
+thatbreakfreefromtheconfinesofpurelogicaldeduction. Consequently,purelylikelihood-driven
+agentsmightoverlookunconventionalhypothesesorunexpectedpatternsthatdonotalignclosely
+30
+
+===== PAGE 31 =====
+
+withexistingdatadistributions. Tobridgethisgap,specificmechanismsordesignprinciplescouldbe
+integratedintoLLM-basedscienceagentstobetteraccommodatechanceandunexpecteddiscoveries.
+Forinstance,stochasticexplorationstrategiescouldbeemployedtooccasionallydeviatefromthe
+highestprobabilityoutputs,therebysimulatingtheconditionsunderwhichhumanscientistsencounter
+serendipitousresults.
+8 SummaryandOutlook
+TheemergenceofLLM-basedagentsrepresentsasubstantialstepforwardintheautomationand
+accelerationofscientificdiscovery. Byaddressingcriticallimitationsinherenttotraditionalhuman-
+drivenapproachesandreinforcementlearning-basedcomputationalagents,LLM-drivenmethods
+provideaunifiedandhighlyflexibleframeworkcapableofoperatingseamlesslyacrosshumanintent,
+naturallanguage,computerlanguage,andphysicalinformation. Thisunifiedcapacitysignificantly
+enhances the adaptability, scalability, and generalizability of scientific agents, enabling dynamic
+engagementacrossallstagesofthediscoverylifecycle.
+Asscientificinquirycontinuestoconfrontincreasinglycomplexchallengesandlargervolumesofdata,
+thecontinueddevelopmentandrefinementofLLM-basedscientificagentsbecomeessential. Future
+research should focus on overcoming existing limitations, such as better understanding physical
+laws,integratingrobustmechanismsforusingphysicaltools,anddesigningsophisticatedinteractions
+with experimental environments and physical instrumentation. Such advancements will further
+strengthen the capabilities of scientific agents, promoting deeper collaboration between humans
+andcomputationalintelligence. Ultimately,theongoingevolutionofLLM-basedagentsholdsthe
+promiseofrevolutionizingscientificdiscovery,enablingunprecedentedefficiency,adaptability,and
+creativityingeneratingnovel,transformativeinsightsacrossallscientificdisciplines.
+Acknowledgments
+TheauthorsthankMs. XiaomengFufortheprofessionalgraphicdesignsupport. S.J.gratefully
+acknowledgessupportfromtheNationalScienceFoundationundergrantsIIS-2243850,MOMS-
+2331036, and CNS-2328395; the Advanced Research Projects Agency for Health under grant
+1AY1AX000053; and the National Institutes of Health under grant U01AG070112. Additional
+support to S.J. was provided by the Texas A&M Institute of Data Science, the Truchard Family
+EndowedChair,thePresidentialImpactFellowship,andtheChancellorEDGESFellowshipatTexas
+A&M University. W.W. gratefully acknowledges support from the National Science Foundation
+under grants 2106859, 2119643, 2200274, 2202693, 2312501; the National Institute of Health
+undergrantsU54OD036472,U54HG012517,U24DK097771,OT2OD038003;theUnitedStates
+Department of Agriculture under grant 13434200; as well as support from Amazon, NEC, and
+OptumAI.X.Q.gratefullyacknowledgessupportfromtheNationalScienceFoundationundergrants
+CMMI-2226908,DMR-2103842,andDMR-1753054;theAirForceOfficeofScientificResearch
+undergrantFA9550-24-1-0207;andpartialsupportbythedonorsofACSPetroleumResearchFund
+undergrant#65502-ND10. H.J.acknowledgessupportfromtheMoleculeMakerLabInstitute: an
+AIresearchinstituteprogramsupportedbyNSFunderawardNo. 2019897andNo. 2034562. The
+viewsandconclusionscontainedhereinarethoseoftheauthorsandshouldnotbeinterpretedas
+necessarilyrepresentingtheofficialpolicies,eitherexpressedorimplied,oftheU.S.Government.
+TheU.S.Governmentisauthorizedtoreproduceanddistributereprintsforgovernmentalpurposes
+notwithstandinganycopyrightannotationtherein.H.J.isalsosupportedbyDOECenterforAdvanced
+Bioenergy and Bioproducts Innovation U.S. Department of Energy, Office of Science, Office of
+BiologicalandEnvironmentalResearchunderAwardNumberDE-SC0018420.
+References
+XuanZhang,LimeiWang,JacobHelwig,YouzhiLuo,CongFu,YaochenXie,...,andShuiwangJi.
+Artificialintelligenceforscienceinquantum,atomistic,andcontinuumsystems. Foundationsand
+TrendsinMachineLearning,18(4):385–912,2025a.
+HanchenWang,TianfanFu,YuanqiDu,WenhaoGao,KexinHuang,ZimingLiu,PayalChandak,
+ShengchaoLiu,PeterVanKatwyk,AndreeaDeac,etal. Scientificdiscoveryintheageofartificial
+intelligence. Nature,620(7972):47–60,2023a.
+31
+
+===== PAGE 32 =====
+
+PaulAdrienMauriceDirac. Quantummechanicsofmany-electronsystems. ProceedingsoftheRoyal
+SocietyofLondon.SeriesA,123(792):714–733,1929.
+LevDavidovichLandauandEvgeniiMikhailovichLifshitz. Quantummechanics: non-relativistic
+theory,volume3. Elsevier,2013a.
+DavidTong. QuantumMechanics. LecturesonTheoreticalPhysics.CambridgeUniversityPress,
+2025a. ISBN9781009594820.
+LevDavidovichLandauandEvgeniiMikhailovichLifshitz. Fluidmechanics: courseoftheoretical
+physics,volume6. Elsevier,2013b.
+DavidTong. FluidMechanics. LecturesonTheoreticalPhysics.CambridgeUniversityPress,2025b.
+ISBN9781009594691.
+YongjunXu,FeiWang,ZhulinAn,QiWang,andZhaoZhang. Artificialintelligenceforscience—
+bridgingdatatowisdom. Innovation,4(6):100525,2023. doi: 10.1016/j.xinn.2023.100525.
+HiroakiKitano. Nobelturingchallenge: creatingtheengineforscientificdiscovery. npjSystems
+BiologyandApplications,7:29,2021. doi: 10.1038/s41540-021-00189-3.
+Nina Miolane. The fifth era of science: Artificial scientific intelligence. PLoS Biology, 23(6):
+e3003230,2025. doi: 10.1371/journal.pbio.3003230.
+Sathya R. Chitturi, Akash Ramdas, Yue Wu, Willie Neiswanger, Daniel Ratner, et al. Targeted
+materialsdiscoveryusingbayesianalgorithmexecution. npjComputationalMaterials,10:156,
+2024. doi: 10.1038/s41524-024-01326-2.
+Mourad Gridach, Jay Nanavati, Khaldoun Zine El Abidine, Lenon Mendes, and Christina Mack.
+Agenticaiforscientificdiscovery: Asurveyofprogress,challenges,andfuturedirections. arXiv
+preprintarXiv:2503.08979,2025a.
+Nathan J Szymanski, Bernardus Rendy, Yuxing Fei, Rishi E Kumar, Tanjin He, David Milsted,
+MatthewJMcDermott,MaxGallant,EkinDogusCubuk,AmilMerchant,etal. Anautonomous
+laboratoryfortheacceleratedsynthesisofnovelmaterials. Nature,624(7990):86–91,2023.
+AlirezaGhafarollahiandMarkusJBuehler. Protagents: proteindiscoveryvialargelanguagemodel
+multi-agent collaborations combining physics and machine learning. Digital Discovery, 3(7):
+1389–1409,2024a.
+HaoyangLiu,YijiangLi,JinglinJian,YuxuanCheng,JianrongLu,ShuyiGuo,JingleiZhu,Mianchen
+Zhang,MiantongZhang,andHaohanWang. Towardateamofai-madescientistsforscientific
+discoveryfromgeneexpressiondata. arXivpreprintarXiv:2402.12391,2024a.
+KexinChen,JunyouLi,KunyiWang,YuyangDu,JiahuiYu,JiaminLu,LanqingLi,JiezhongQiu,
+JianzhangPan,YiHuang,etal. Chemist-x: largelanguagemodel-empoweredagentforreaction
+conditionrecommendationinchemicalsynthesis. arXivpreprintarXiv:2311.10776,2023a.
+JurajGottweis,Wei-HungWeng,AlexanderDaryin,TaoTu,AnilPalepu,PetarSirkovic,Artiom
+Myaskovsky, Felix Weissenberger, Keran Rong, Ryutaro Tanno, Khaled Saab, Dan Popovici,
+Jacob Blum, Fan Zhang, Katherine Chou, Avinatan Hassidim, Burak Gokturk, Amin Vahdat,
+PushmeetKohli,YossiMatias,AndrewCarroll,KavitaKulkarni,NenadTomasev,YuanGuan,
+Vikram Dhillon, Eeshit DhavalVaishnav, ByronLee, TiagoR DCosta, JoséRPenadés, Gary
+Peltz,YunhanXu,AnnalisaPawlosky,AlanKarthikesalingam,andVivekNatarajan. Towardsan
+aico-scientist,2025a. URLhttps://arxiv.org/abs/2502.18864.
+ChrisBeeler,SriramGanapathiSubramanian,KyleSprague,MarkBaula,NouhaChatti,Amanuel
+Dawit,XinkaiLi,NicholasPaquin,MitchellShahen,ZihanYang,etal. Chemgymrl: Acustomiz-
+ableinteractiveframeworkforreinforcementlearningfordigitalchemistry. DigitalDiscovery,3
+(4):742–758,2024.
+Marco Maurizi, Derek Xu, Yu-Tong Wang, Desheng Yao, David Hahn, Mourad Oudich, Anish
+Satpati, MathieuBauchy, WeiWang, YizhouSun, etal. Inversedesigningmetamaterialswith
+programmablenonlinearfunctionalresponsesingraphspace. arXivpreprintarXiv:2408.06300,
+2024.
+32
+
+===== PAGE 33 =====
+
+Pankaj Rajak, Aravind Krishnamoorthy, Ankit Mishra, Rajiv Kalia, Aiichiro Nakano, and Priya
+Vashishta. Autonomousreinforcementlearningagentforchemicalvapordepositionsynthesisof
+quantummaterials. npjComputationalMaterials,7(1):108,2021.
+OliverJDressler,PhilipDHowes,JaebumChoo,andAndrewJdeMello. Reinforcementlearningfor
+dynamicmicrofluidiccontrol. ACSomega,3(8):10084–10091,2018.
+Tung-CheLiangandZhanweiZhong. Adaptivedropletroutingindigitalmicrofluidicbiochipsusing
+deepreinforcementlearning. InProceedingsofthe37thInternationalConferenceonMachine
+Learning,2020.
+RenqianLuo,LiaiSun,YingceXia,TaoQin,ShengZhang,HoifungPoon,andTie-YanLiu. Biogpt:
+Generativepre-trainedtransformerforbiomedicaltextgenerationandmining,2022.
+Alexander Dunn, Bernardino Romera-Paredes, Pushmeet Kohli, et al. Foundational models for
+scientificdiscovery. Nature,633(8031):772–784,2024.
+YueHuang,LichaoSun,HaoranWang,SiyuanWu,QihuiZhang,YuanLi,ChujieGao,YixinHuang,
+WenhanLyu,YixuanZhang,etal. Trustllm: Trustworthinessinlargelanguagemodels. arXiv
+preprintarXiv:2401.05561,2024a.
+CarlEdwards,ChiHan,GawonLee,ThaoNguyen,ChetanKumarPrasad,SaraSzymkuc,BartoszA.
+Grzybowski,BowenJin,YingDiao,JiaweiHan,GeLiu,HaoPeng,MartinD.Burke,andHeng
+Ji. mclm: Afunction-infusedandsynthesis-friendlymodularchemicallanguagemodel. Inarxiv,
+2025.
+Yu Zhang, Xiusi Chen, Bowen Jin, Sheng Wang, Shuiwang Ji, Wei Wang, and Jiawei Han. A
+comprehensive survey of scientific large language models and their applications in scientific
+discovery. InConferenceonEmpiricalMethodsinNaturalLanguageProcessing,pages8783–
+8817,2024a.
+ChandanKReddyandParshinShojaee. Towardsscientificdiscoverywithgenerativeai: Progress,
+opportunities,andchallenges. InProceedingsoftheAAAIConferenceonArtificialIntelligence,
+volume39,pages28601–28609,2025.
+LeiWang,ChenMa,XueyangFeng,ZeyuZhang,HaoYang,JingsenZhang,ZhiyuanChen,Jiakai
+Tang,XuChen,YankaiLin,etal. Asurveyonlargelanguagemodelbasedautonomousagents.
+FrontiersofComputerScience,18(6):186345,2024a.
+TaichengGuo,XiuyingChen,YaqiWang,RuidiChang,ShichaoPei,NiteshVChawla,OlafWiest,
+and Xiangliang Zhang. Large language model based multi-agents: A survey of progress and
+challenges. arXivpreprintarXiv:2402.01680,2024.
+GrégoireMialon,RobertoDessì,MariaLomeli,ChristoforosNalmpantis,RamPasunuru,Roberta
+Raileanu,BaptisteRozière,TimoSchick,JaneDwivedi-Yu,AsliCelikyilmaz,etal. Augmented
+languagemodels: asurvey. arXivpreprintarXiv:2302.07842,2023.
+ShanghuaGao,AdaFang,YepengHuang,ValentinaGiunchiglia,AyushNoori,JonathanRichard
+Schwarz,YashaEktefaie,JovanaKondic,andMarinkaZitnik. Empoweringbiomedicaldiscovery
+withAIagents. Cell,187(22):6125–6151,2024.
+ShuoRen,PuJian,ZhenjiangRen,ChunlinLeng,CanXie,andJiajunZhang. Towardsscientific
+intelligence: AsurveyofLLM-basedscientificagents. arXivpreprintarXiv:2503.24047,2025.
+JiaqiWei,YuejinYang,XiangZhang,YuhanChen,XiangZhuang,ZhangyangGao,DongzhanZhou,
+GuangshuaiWang, ZhiqiangGao, JuntaiCao, etal. Fromaiforsciencetoagenticscience: A
+surveyonautonomousscientificdiscovery. arXivpreprintarXiv:2508.14111,2025a.
+TerryJingchenZhang,YongjinYang,YinyaHuang,SiruiLu,BernhardSchölkopf,andZhijingJin.
+Collectiveintelligence: Onthepromiseandrealityofmulti-agentsystemsasakeycatalystfor
+ai-drivenscientificdiscovery.
+TianshiZheng,ZheyeDeng,HongTingTsang,WeiqiWang,JiaxinBai,ZihaoWang,andYangqiu
+Song. Fromautomationtoautonomy: Asurveyonlargelanguagemodelsinscientificdiscovery.
+arXivpreprintarXiv:2505.13259,2025.
+33
+
+===== PAGE 34 =====
+
+ZimingLuo,ZonglinYang,ZexinXu,WeiYang,andXinyaDu. Llm4sr: Asurveyonlargelanguage
+modelsforscientificresearch. arXivpreprintarXiv:2501.04306,2025a.
+JinhyukLee,WonjinYoon,SungdongKim,DonghyeonKim,SunkyuKim,ChanHoSo,andJaewoo
+Kang. Biobert: apre-trainedbiomedicallanguagerepresentationmodelforbiomedicaltextmining.
+Bioinformatics,36(4):1234–1240,2020.
+RossTaylor,MarcinKardas,GuillemCucurull,ThomasScialom,AnthonyHartshorn,ElvisSaravia,
+AndrewPaster,Oana-EugenGanea,PeterGray,andMuraliKambadur.Galactica:Alargelanguage
+modelforscience,2022.
+Siddharth M Narayanan, James D Braza, Ryan-Rhys Griffiths, Albert Bou, Geemi Wellawatte,
+MaykCaldasRamos,LudovicoMitchener,SamuelGRodriques,andAndrewDWhite. Traininga
+scientificreasoningmodelforchemistry. arXivpreprintarXiv:2506.17238,2025.
+ZihanZhao,DaMa,LuChen,LiangtaiSun,ZihaoLi,YiXia,BoChen,HongshenXu,ZichenZhu,
+SuZhu,etal. Developingchemdfmasalargelanguagefoundationmodelforchemistry. Cell
+ReportsPhysicalScience,6(4),2025.
+KristianGBarman,SaschaCaron,EmilySullivan,HenkWdeRegt,RobertoRuizdeAustri,Mieke
+Boon,MichaelFärber,StefanFröse,TobiasGolling,LuisGLopez,etal. Largephysicsmodels:
+towardsacollaborativeapproachwithlargelanguagemodelsandfoundationmodels.TheEuropean
+PhysicalJournalC,85(9):1066,2025.
+NamkyeongLee,EdwardDeBrouwer,EhsanHajiramezanali,TommasoBiancalani,Chanyoung
+Park, and Gabriele Scalia. Rag-enhanced collaborative llm agents for drug discovery. arXiv
+preprintarXiv:2502.17506,2025.
+ElliotXie,LingxinCheng,JackShireman,YujiaCai,JihuaLiu,ChitrasenMohanty,MahuaDey,and
+ChristinaKendziorski. Cassia: amulti-agentlargelanguagemodelforreferencefree,interpretable,
+andautomatedcellannotationofsingle-cellrna-sequencingdata. bioRxiv,pages2024–12,2024.
+ZengyiGao,YukunCao,HairuWang,AoKe,YuanFeng,XikeXie,andSKevinZhou. Frag: A
+flexiblemodularframeworkforretrieval-augmentedgenerationbasedonknowledgegraphs. arXiv
+preprintarXiv:2501.09957,2025a.
+IvanLopez,AkshaySwaminathan,KarthikVedula,SanjanaNarayanan,FatemeNateghiHaredasht,
+StephenPMa,AprilSLiang,StevenTate,ManojMaddali,RobertJosephGallo,etal. Clinical
+entityaugmentedretrievalforclinicalinformationextraction. npjDigitalMedicine,8(1):45,2025.
+KexinChen,HanqunCao,JunyouLi,YuyangDu,MenghaoGuo,XinZeng,LanqingLi,Jiezhong
+Qiu,PhengAnnHeng,andGuangyongChen. Anautonomouslargelanguagemodelagentfor
+chemicalliteraturedatamining. arXivpreprintarXiv:2402.12993,2024a.
+Fanqing Meng, Wenqi Shao, Quanfeng Lu, Peng Gao, Kaipeng Zhang, Yu Qiao, and Ping Luo.
+Chartassisstant: Auniversalchartmultimodallanguagemodelviachart-to-tablepre-trainingand
+multitaskinstructiontuning. arXivpreprintarXiv:2401.02384,2024.
+AaronHurst,AdamLerer,AdamPGoucher,AdamPerelman,AdityaRamesh,AidanClark,AJOs-
+trow, Akila Welihinda, Alan Hayes, Alec Radford, et al. Gpt-4o system card. arXiv preprint
+arXiv:2410.21276,2024.
+GhazalKhalighinejad,SharonScott,OllieLiu,KellyLAnderson,RickardStureborg,AmanTyagi,
+and Bhuwan Dhingra. Matvix: Multimodal information extraction from visually rich articles.
+arXivpreprintarXiv:2410.20494,2024.
+R Odobesku, K Romanova, S Mirzaeva, O Zagorulko, R Sim, R Khakimullin, J Razlivina,
+A Dmitrenko, and V Vinogradov. Agent-based multimodal information extraction for nano-
+materials. npjComputationalMaterials,11(1):194,2025.
+BiqingQi,KaiyanZhang,HaoxiangLi,KaiTian,SihangZeng,Zhang-RenChen,andBowenZhou.
+Large language models are zero shot hypothesis proposers. arXiv preprint arXiv:2311.05965,
+2023.
+34
+
+===== PAGE 35 =====
+
+GuangzhiXiong,EricXie,CoreyWilliams,MylesKim,AmirHassanShariatmadari,SikunGuo,
+StefanBekiranov,andAidongZhang. Towardreliablescientifichypothesisgeneration: Evaluating
+truthfulnessandhallucinationinlargelanguagemodels. arXivpreprintarXiv:2505.14599,2025.
+GuangzhiXiong,EricXie,AmirHassanShariatmadari,SikunGuo,StefanBekiranov,andAidong
+Zhang. Improving scientific hypothesis generation with knowledge grounded large language
+models. arXivpreprintarXiv:2411.02382,2024.
+AgustínBorrego,DaniloDessì,DanielAyala,InmaHernández,FrancescoOsborne,DiegoReforgiato
+Recupero,DavideBuscaldi,DavidRuiz,andEnricoMotta. Researchhypothesisgenerationover
+scientificknowledgegraphs. Knowledge-BasedSystems,315:113280,2025.
+ShrinidhiKumbhar,VenkateshMishra,KevinCoutinho,DivijHanda,AshifIquebal,andChittaBaral.
+Hypothesisgenerationformaterialsdiscoveryanddesignusinggoal-drivenandconstraint-guided
+llmagents,2025a. URLhttps://arxiv.org/abs/2501.13299.
+HaoyangSu,RenqiChen,ShixiangTang,ZhenfeiYin,XinzheZheng,JinzheLi,BiqingQi,QiWu,
+HuiLi,WanliOuyang,etal. Manyheadsarebetterthanone: Improvedscientificideageneration
+byallm-basedmulti-agentsystem. arXivpreprintarXiv:2410.09403,2024.
+DanielSaeedi,DeniseBuckner,JoseCAponte,andAmiraliAghazadeh. Astroagents: Amulti-agent
+aiforhypothesisgenerationfrommassspectrometrydata. arXivpreprintarXiv:2503.23170,2025.
+ZonglinYang,WanhaoLiu,BenGao,TongXie,YuqiangLi,WanliOuyang,SoujanyaPoria,Erik
+Cambria,andDongzhanZhou. Moose-chem: Largelanguagemodelsforrediscoveringunseen
+chemistryscientifichypotheses,2025. URLhttps://arxiv.org/abs/2410.07076.
+ShiyangDuan,YuanTian,QiBing,andXiaoweiShao. Bayes-entropycollaborativedrivenagentsfor
+researchhypothesesgenerationandoptimization. arXivpreprintarXiv:2508.01746,2025.
+Haorui Wang, Marta Skreta, Cher-Tian Ser, Wenhao Gao, Lingkai Kong, Felix Strieth-Kalthoff,
+ChenruDuan,YuchenZhuang,YueYu,YanqiaoZhu,etal. Efficientevolutionarysearchover
+chemicalspacewithlargelanguagemodels. arXivpreprintarXiv:2406.16976,2024b.
+KexinHuang,YingJin,RyanLi,MichaelY.Li,EmmanuelCandès,andJureLeskovec. Automated
+hypothesisvalidationwithagenticsequentialfalsifications,2025a. URLhttps://arxiv.org/
+abs/2502.09858.
+QingyunWang,DougDowney,HengJi,andTomHope.Scimon:Scientificinspirationmachinesopti-
+mizedfornovelty.InProceedingsofthe62ndAnnualMeetingoftheAssociationforComputational
+Linguistics(Volume1: LongPapers),pages279–299,2024c.
+ShrinidhiKumbhar,VenkateshMishra,KevinCoutinho,DivijHanda,AshifIquebal,andChittaBaral.
+Hypothesisgenerationformaterialsdiscoveryanddesignusinggoal-drivenandconstraint-guided
+llmagents. arXivpreprintarXiv:2501.13299,2025b.
+Haokun Liu, Sicong Huang, Jingyu Hu, Yangqiaoyu Zhou, and Chenhao Tan. Hypobench:
+Towards systematic and principled benchmarking for hypothesis generation. arXiv preprint
+arXiv:2504.11524,2025a.
+YueGongandRaulCastroFernandez. Exploitingllmsforautomatichypothesisassessmentviaa
+logit-basedcalibratedprior. arXivpreprintarXiv:2506.03444,2025.
+JinheonBaek,SujayKumarJauhar,SilviuCucerzan,andSungJuHwang. Researchagent: Iterative
+research idea generation over scientific literature with large language models. arXiv preprint
+arXiv:2404.07738,2024.
+PingchuanMa,Tsun-HsuanWang,MinghaoGuo,ZhiqingSun,JoshuaBTenenbaum,DanielaRus,
+ChuangGan,andWojciechMatusik. Llmandsimulationasbileveloptimizers: Anewparadigm
+toadvancephysicalscientificdiscovery. arXivpreprintarXiv:2405.09783,2024.
+KexinHuang,SerenaZhang,HanchenWang,YuanhaoQu,YingzhouLu,YusufRoohani,RyanLi,
+LinQiu,JunzeZhang,YinDi,etal. Biomni: Ageneral-purposebiomedicalaiagent. bioRxiv,
+pages2025–05,2025b.
+35
+
+===== PAGE 36 =====
+
+ShanghuaGao,RichardZhu,ZhenglunKong,AyushNoori,XiaoruiSu,CurtisGinder,Theodoros
+Tsiligkaridis,andMarinkaZitnik. Txagent: Anaiagentfortherapeuticreasoningacrossauniverse
+oftools. arXivpreprintarXiv:2503.10970,2025b.
+YuanhaoQu,KaixuanHuang,MingYin,KanghongZhan,DyllanLiu,DiYin,HenryC.Cousins,
+WilliamA.Johnson,XiaotongWang,MihirShah,RussB.Altman,DennyZhou,MengdiWang,
+andLeCong. Crispr-gptforagenticautomationofgene-editingexperiments. NatureBiomedical
+Engineering,page1–14,July2025. ISSN2157-846X. doi: 10.1038/s41551-025-01463-z. URL
+https://www.nature.com/articles/s41551-025-01463-z.
+KyleSwanson,WesleyWu,NashLBulaong,JohnEPak,andJamesZou. Thevirtuallab: Aiagents
+designnewsars-cov-2nanobodieswithexperimentalvalidation. bioRxiv,pages2024–11,2024.
+ShuxiangCao,ZijianZhang,MohammedAlghadeer,SimoneDFasciati,MichelePiscitelli,Mustafa
+Bakr,PeterLeek,andAlánAspuru-Guzik. Agentsforself-drivinglaboratoriesappliedtoquantum
+computing. arXivpreprintarXiv:2412.07978,2024.
+MinshengHao,YongjuLee,HanchenWang,GabrieleScalia,andAvivRegev. Perturboagent: A
+self-planning agent for boosting sequential perturb-seq experiments. bioRxiv, pages 2025–05,
+2025.
+BotaoYu,FrazierNBaker,ZiruChen,GarrettHerb,BoyuGou,DanielAdu-Ampratwum,XiaNing,
+andHuanSun. Chemtoolagent: Theimpactoftoolsonlanguageagentsforchemistryproblem
+solving. arXivpreprintarXiv:2411.07228,2024a.
+QiXin,QuyuKong,HongyiJi,YueShen,YuqiLiu,YanSun,ZhilinZhang,ZhaorongLi,Xunlong
+Xia,BingDeng,etal. Bioinformaticsagent(bia): Unleashingthepoweroflargelanguagemodels
+toreshapebioinformaticsworkflow. BioRxiv,pages2024–05,2024.
+YusufRoohani,AndrewLee,QianHuang,JianVora,ZacharySteinhart,KexinHuang,Alexander
+Marson,PercyLiang,andJureLeskovec. Biodiscoveryagent: Anaiagentfordesigninggenetic
+perturbationexperiments. arXivpreprintarXiv:2405.17631,2024.
+ZhaolinHu,YixiaoZhou,ZhonganWang,XinLi,WeiminYang,HeheFan,andYiYang. OSDA
+agent: Leveraginglargelanguagemodelsfordenovodesignoforganicstructuredirectingagents.
+In The Thirteenth International Conference on Learning Representations, 2025. URL https:
+//openreview.net/forum?id=9YNyiCJE3k.
+ShuyiJia,ChaoZhang,andVictorFung. Llmatdesign: Autonomousmaterialsdiscoverywithlarge
+languagemodels,2024.
+JingruGan,PeichenZhong,YuanqiDu,YanqiaoZhu,ChenruDuan,HaoruiWang,CarlaP.Gomes,
+KristinA.Persson,DanielSchwalbe-Koda,andWeiWang. Largelanguagemodelsareinnate
+crystalstructuregenerators,2025.
+NicholasDYoungblut, ChristopherCarpenter, JaanakPrashar, ChiaraRicci-Tam, RajeshIlango,
+Noam Teyssier, Silvana Konermann, Patrick D Hsu, Alexander Dobin, David P Burke, et al.
+scbasecount: anaiagent-curated,uniformlyprocessed,andcontinuallyexpandingsinglecelldata
+repository. bioRxiv,pages2025–02,2025.
+Qiao Jin, Zhizheng Wang, Yifan Yang, Qingqing Zhu, Donald Wright, Thomas Huang, W John
+Wilbur,ZheHe,AndrewTaylor,QingyuChen,etal. Agentmd: Empoweringlanguageagentsfor
+riskpredictionwithlarge-scaleclinicaltoollearning. arXivpreprintarXiv:2402.13225,2024a.
+Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D White, and Philippe
+Schwaller. Augmentinglargelanguagemodelswithchemistrytools. NatureMachineIntelligence,
+6(5):525–535,2024.
+YurenMao,YuMi,PeigenLiu,MengfeiZhang,HanqingLiu,andYunjunGao. scagent: Universal
+single-cellannotationviaallmagent. arXivpreprintarXiv:2504.04698,2025.
+TemitopeAkinboyewa,ZhenlongLi,HuanNing,andMNaserLessani. Giscopilot: Towardsan
+autonomousgisagentforspatialanalysis. InternationalJournalofDigitalEarth,18(1):2497489,
+2025.
+36
+
+===== PAGE 37 =====
+
+HuajunChen,KeyanDing,JingYu,JunjieHuang,YuchenYang,andQiangZhang. Scitoolagent: A
+knowledgegraph-drivenscientificagentformulti-toolintegration. 2025a.
+BotaoYu,FrazierNBaker,ZiruChen,GarrettHerb,BoyuGou,DanielAdu-Ampratwum,XiaNing,
+and Huan Sun. Tooling or not tooling? the impact of tools on language agents for chemistry
+problemsolving. arXivpreprintarXiv:2411.07228,2024b.
+XiangruTang,AnniZou,ZhuoshengZhang,ZimingLi,YilunZhao,XingyaoZhang,ArmanCohan,
+andMarkGerstein. Medagents: Largelanguagemodelsascollaboratorsforzero-shotmedical
+reasoning. arXivpreprintarXiv:2311.10537,2023.
+TaoSong,ManLuo,XiaolongZhang,LinjiangChen,YanHuang,JiaqiCao,QingZhu,DaobinLiu,
+BaichengZhang,GangZou,etal. Amultiagent-drivenroboticaichemistenablingautonomous
+chemicalresearchondemand. JournaloftheAmericanChemicalSociety,147(15):12534–12545,
+2025.
+Alireza Ghafarollahi and Markus J. Buehler. Atomagents: Alloy design and discovery through
+physics-awaremulti-modalmulti-agentartificialintelligence,2024b. URLhttps://arxiv.org/
+abs/2407.10022.
+ZhilingZheng,OufanZhang,HaLNguyen,NakulRampal,AliHAlawadhi,ZichaoRong,Teresa
+Head-Gordon,ChristianBorgs,JenniferTChayes,andOmarMYaghi. Chatgptresearchgroupfor
+optimizingthecrystallinityofmofsandcofs. ACSCentralScience,9(11):2161–2170,2023.
+ShanghuaGao,RichardZhu,PengweiSui,ZhenglunKong,SufianAldogom,YepengHuang,Ayush
+Noori, Reza Shamji, Krishna Parvataneni, Theodoros Tsiligkaridis, et al. Democratizing ai
+scientistsusingtooluniverse. arXivpreprintarXiv:2509.23426,2025c.
+LianhaoZhou,HongyiLing,KeqiangYan,KaijiZhao,XiaoningQian,RaymundoArróyave,Xi-
+aofengQian,andShuiwangJi. Towardgreaterautonomyinmaterialsdiscoveryagents: Unifying
+planning,physics,andscientists,2025a. URLhttps://arxiv.org/abs/2506.05616.
+ShandaLi,TanyaMarwah,JunhongShen,WeiweiSun,AndrejRisteski,YimingYang,andAmeet
+Talwalkar. Codepde: Aninferenceframeworkforllm-drivenpdesolvergeneration,2025a. URL
+https://arxiv.org/abs/2505.08783.
+AlexanderNovikov,NgânVu˜,MarvinEisenberger,EmilienDupont,Po-SenHuang,AdamZsoltWag-
+ner,SergeyShirobokov,BorislavKozlovskii,FranciscoJ.R.Ruiz,AbbasMehrabian,M.Pawan
+Kumar,AbigailSee,SwaratChaudhuri,GeorgeHolland,AlexDavies,SebastianNowozin,Push-
+meetKohli,andMatejBalog.Alphaevolve:Acodingagentforscientificandalgorithmicdiscovery,
+2025.
+GeorgWölflein,DykeFerber,DanielTruhn,OgnjenArandjelovic´,andJakobNikolasKather. Llm
+agentsmakingagenttools. arXivpreprintarXiv:2502.11705,2025.
+RobertTjarkoLange,YukiImajuku,andEdoardoCetin. Shinkaevolve: Towardsopen-endedand
+sample-efficientprogramevolution. arXivpreprintarXiv:2509.19349,2025.
+YutaroYamada,RobertTjarkoLange,CongLu,ShengranHu,ChrisLu,JakobFoerster,JeffClune,
+andDavidHa. Theaiscientist-v2: Workshop-levelautomatedscientificdiscoveryviaagentictree
+search. arXivpreprintarXiv:2504.08066,2025.
+YanchengLuo,ZihanWang,JingwenLi,ZiqiMin,KexinXiao,HowardLiu,andZijieJ.Wang. Plot-
+Gen: ANewEraofLLM-BasedMulti-AgentFrameworkforScientificVisualizationGeneration,
+2024.
+Yucheng Han, Chi Zhang, Xin Chen, Xu Yang, Zhibin Wang, Gang Yu, Bin Fu, and Hanwang
+Zhang. Chartllama: Amultimodalllmforchartunderstandingandgeneration. arXivpreprint
+arXiv:2311.16483,2023.
+Andres M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D White, and Philippe
+Schwaller. Chemcrow: Augmentinglarge-languagemodelswithchemistrytools. arXivpreprint
+arXiv:2304.05376,2023.
+37
+
+===== PAGE 38 =====
+
+DaniilABoiko,RobertMacKnight,BenKline,andGabeGomes. Autonomouschemicalresearch
+withlargelanguagemodels. Nature,624(7992):570–578,2023.
+FlorianBoeck,MogensJørgensen,JesperJørgensen,andNikolajand-othersBåk. Amulti-agentllm
+frameworkforacceleratingmaterialsdesign. arXivpreprintarXiv:2310.09133,2023.
+Sirui Hong, Yizhang Lin, Bang Liu, Bangbang Liu, Binhao Wu, Ceyao Zhang, Chenxing Wei,
+DanyangLi,JiaqiChen,JiayiZhang,etal. Datainterpreter: Anllmagentfordatascience. arXiv
+preprintarXiv:2402.18679,2024.
+Pierre-AlexandreKamienny,StéphaneD’Ascoli,GuillaumeLample,andFrançoisCharton.LLM-SR:
+Aframeworkfordiscoveringscientificequationswithlargelanguagemodels,2024.
+Boran Binbas, Meng-Chen Hsieh, Alán Aspuru-Guzik, Florian E. Futschik, and Mario Krenn.
+Autonomousscientificdiscoverywithlargelanguagemodels,2024.
+Aman Madaan, Niket Tandon, Prakhar Gupta, Skyler Hallinan, Luyu Gao, Sarah Wiegreffe, Uri
+Alon,NouhaDziri,ShrimaiPrabhumoye,YimingYang,etal. Self-refine: Iterativerefinement
+withself-feedback. AdvancesinNeuralInformationProcessingSystems,36:46534–46594,2023.
+Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, Xunjian Yin, Siru Ouyang, Wangchunshu
+Zhou,PanLu,ZhuoshengZhang,YilunZhao,ArmanCohan,andMarkGerstein. Chemagent:
+Self-updatinglibraryinlargelanguagemodelsimproveschemicalreasoning,2025. URLhttps:
+//arxiv.org/abs/2501.06590.
+HanchenWang,YichunHe,PaulaPCoelho,MatthewBucci,AbbasNazir,BobChen,LinhTrinh,
+SerenaZhang,KexinHuang,VineethkrishnaChandrasekar,etal. Spatialagent: Anautonomousai
+agentforspatialbiology. bioRxiv,pages2025–04,2025a.
+ZhibinGou,ZhihongShao,YeyunGong,YelongShen,YujiuYang,NanDuan,andWeizhuChen.
+Critic: Largelanguagemodelscanself-correctwithtool-interactivecritiquing. arXivpreprint
+arXiv:2305.11738,2023.
+JacobTRapp,BennettJBremer,andPhilipARomero. Self-drivinglaboratoriestoautonomously
+navigatetheproteinfitnesslandscape. Naturechemicalengineering,1(1):97–107,2024.
+NikitaMehandru,AmandaKHall,OlesyaMelnichenko,YuliaDubinina,DanielTsirulnikov,David
+Bamman,AhmedAlaa,ScottSaponas,andVenkatSMalladi. Bioagents: Democratizingbioinfor-
+maticsanalysiswithmulti-agentsystems. arXivpreprintarXiv:2501.06314,2025.
+YihangXiao,JinyiLiu,YanZheng,XiaohanXie,JianyeHao,MingzhiLi,RuitaoWang,FeiNi,
+Yuxiao Li, Jintian Luo, et al. Cellagent: An llm-driven multi-agent framework for automated
+single-celldataanalysis. arXivpreprintarXiv:2407.09811,2024.
+HaotianZhang,YuHSun,WenxingHu,XuCui,ZhengyuOuyang,DerrickCheng,XinminZhang,
+andBaohongZhang.Compbioagent:Anllm-poweredagentforsingle-cellrna-seqdataexploration.
+bioRxiv,pages2025–03,2025b.
+AlirezaGhafarollahiandMarkusJBuehler.Sparks:Multi-agentartificialintelligencemodeldiscovers
+proteindesignprinciples. arXivpreprintarXiv:2504.19017,2025.
+BoNiandMarkusJBuehler. Agenticend-to-enddenovoproteindesignfortailoreddynamicsusing
+alanguagediffusionmodel. arXivpreprintarXiv:2502.10173,2025.
+YungengLiu,ZanChen,YuGuangWang,andYiqingShen. Autoproteinengine: Alargelanguage
+model driven agent framework for multimodal automl in protein engineering. arXiv preprint
+arXiv:2411.04440,2024b.
+HuazhenHuang,XianguoShi,HongyangLei,FanHu,andYunpengCai. Protchat: Anaimulti-agent
+forautomatedproteinanalysisleveraginggpt-4andproteinlanguagemodel. JournalofChemical
+InformationandModeling,65(1):62–70,2024b.
+JurajGottweis,Wei-HungWeng,AlexanderDaryin,TaoTu,AnilPalepu,PetarSirkovic,Artiom
+Myaskovsky,FelixWeissenberger,KeranRong,RyutaroTanno,etal. Towardsanaico-scientist.
+arXivpreprintarXiv:2502.18864,2025b.
+38
+
+===== PAGE 39 =====
+
+YiLuo,LinghangShi,YihaoLi,AoboZhuang,YeyunGong,LingLiu,andChenLin. Fromintention
+toimplementation: automatingbiomedicalresearchviallms. ScienceChinaInformationSciences,
+68(7):1–18,2025b.
+RuofanJin,ZaixiZhang,MengdiWang,andLeCong. Stella: Self-evolvingllmagentforbiomedical
+research. arXivpreprintarXiv:2507.02004,2025a.
+SizheLiu,YizhouLu,SiyuChen,XiyangHu,JieyuZhao,YingzhouLu,andYueZhao. Drugagent:
+Automatingai-aideddrugdiscoveryprogrammingthroughllmmulti-agentcollaboration. arXiv
+preprintarXiv:2411.15692,2024c.
+BowenGao,YanwenHuang,YiqiaoLiu,WenxuanXie,Wei-YingMa,Ya-QinZhang,andYanyan
+Lan. Pharmagents: Buildingavirtualpharmawithlargelanguagemodelagents. arXivpreprint
+arXiv:2503.22164,2025d.
+RezaAverly,FrazierNBaker,IanAWatson,andXiaNing. Liddia: Language-basedintelligentdrug
+discoveryagent. arXivpreprintarXiv:2502.13959,2025.
+Guangyu Wang, Guoxing Yang, Zongxin Du, Longjun Fan, and Xiaohu Li. Clinicalgpt: large
+languagemodelsfinetunedwithdiversemedicaldataandcomprehensiveevaluation.arXivpreprint
+arXiv:2306.09968,2023b.
+AlmirAljovic,ZuwanLin,WenboWang,XinheZhang,ArnauMarin-Llobet,NingyueLiang,Bradley
+Canales,JaeyongLee,JongminBaek,RenLiu,etal.Anautonomousaiagentforuniversalbehavior
+analysis. bioRxiv,pages2025–05,2025.
+HenryWSprueill,CarlEdwards,KhushbuAgarwal,MariefelVOlarte,UdishnuSanyal,Conrad
+Johnston,HongbinLiu,HengJi,andSutanayChoudhury. Chemreasoner: Heuristicsearchover
+a large language model’s knowledge space using quantum-chemical feedback. arXiv preprint
+arXiv:2402.10980,2024.
+AndrewDMcNaughton,GauthamKrishnaSankarRamalaxmi,AgustinKruel,CarterRKnutson,
+RohithAVarikoti,andNeerajKumar. Cactus: Chemistryagentconnectingtoolusagetoscience.
+ACSomega,9(46):46563–46573,2024.
+YunhengZou,AustinHCheng,AbdulrahmanAldossary,JiaruBai,ShiXuanLeong,JorgeArturo
+Campos-Gonzalez-Angulo,ChanghyeokChoi,CherTianSer,GaryTom,AndrewWang,etal. El
+Agente: Anautonomousagentforquantumchemistry. Matter,8(7),2025.
+YixiangRuan,ChenyinLu,NingXu,YuchenHe,YixinChen,JianZhang,JunXuan,JianzhangPan,
+QunFang,HanyuGao,etal. Anautomaticend-to-endchemicalsynthesisdevelopmentplatform
+poweredbylargelanguagemodels. Naturecommunications,15(1):10160,2024.
+QihuaPan,DongXu,JennaXinyiYao,LijiaMa,ZexuanZhu,andJunkaiJi. Frogent: Anend-to-end
+full-processdrugdesignagent. arXivpreprintarXiv:2508.10760,2025.
+FrazierNBaker,DanielAdu-Ampratwum,RezaAverly,BotaoYu,HuanSun,andXiaNing. Larc:
+Towardshuman-levelconstrainedretrosynthesisplanningthroughanagenticframework. arXiv
+preprintarXiv:2508.11860,2025.
+Michael Sun, Weize Yuan, Gang Liu, Wojciech Matusik, and Jie Chen. Foundation molecular
+grammar: Multi-modalfoundationmodelsinduceinterpretablemoleculargraphlanguages. arXiv
+preprintarXiv:2505.22948,2025.
+ZonglinYang,WanhaoLiu,BenGao,TongXie,YuqiangLi,WanliOuyang,SoujanyaPoria,Erik
+Cambria,andDongzhanZhou. Moose-chem: Largelanguagemodelsforrediscoveringunseen
+chemistryscientifichypotheses. arXivpreprintarXiv:2410.07076,2024.
+Yeonghun Kang and Jihan Kim. Chatmof: an artificial intelligence system for predicting and
+generatingmetal-organicframeworksusinglargelanguagemodels. Naturecommunications,15
+(1):4705,2024.
+39
+
+===== PAGE 40 =====
+
+ZhuofanShi,ChunxiaoXin,TongHuo,YuntaoJiang,BowenWu,XingyueChen,WeiQin,Xinjian
+Ma, Gang Huang, Zhenyu Wang, et al. A fine-tuned large language model based molecular
+dynamics agent for code generation to obtain material thermodynamic parameters. Scientific
+Reports,15(1):10295,2025.
+HuanZhang,YuSong,ZiyuHou,SantiagoMiret,andBangLiu. Honeycomb: Aflexiblellm-based
+agentsystemformaterialsscience. arXivpreprintarXiv:2409.00135,2024b.
+AdibBazgir,YuwenZhang,etal. Matagent: Ahuman-in-the-loopmulti-agentllmframeworkfor
+acceleratingthematerialsciencediscoverycycle. InAIforAcceleratedMaterialsDesign-ICLR
+2025,2025a.
+AkshatChaudhari,JanghoonOck,andAmirBaratiFarimani. Modularlargelanguagemodelagents
+formulti-taskcomputationalmaterialsscience. ChemRxiv,2025.
+ZiqiNi,YahaoLi,KaijiaHu,KunyuanHan,MingXu,XingyuChen,FengqiLiu,YicongYe,and
+ShuxinBai.Matpilot:anllm-enabledaimaterialsscientistundertheframeworkofhuman-machine
+collaboration. arXivpreprintarXiv:2411.08063,2024.
+BoHu,SiyuLiu,BeilinYe,YunHao,andTongqiWen. Amulti-agentframeworkformaterialslaws
+discovery. arXivpreprintarXiv:2411.16416,2024.
+Alireza Ghafarollahi and Markus J Buehler. Atomagents: Alloy design and discovery through
+physics-awaremulti-modalmulti-agentartificialintelligence. arXivpreprintarXiv:2407.10022,
+2024c.
+Zechang Sun, Yuan-Sen Ting, Yaobo Liang, Nan Duan, Song Huang, and Zheng Cai. Interpret-
+ing multi-band galaxy observations with large language model-based agents. arXiv preprint
+arXiv:2409.14807,2024.
+RongSha,BinglinWang,JunYang,XiaoxiaoMa,ChengkunWu,LiangYan,ChaoZhou,Jixun
+Liu,GuochaoWang,ShuhuaYan,etal. Llm-basedmulti-agentcopilotforquantumsensor. arXiv
+preprintarXiv:2508.05421,2025.
+SandeepPandey,RanXu,WenkangWang,andXuChu. Openfoamgpt: Aretrieval-augmentedlarge
+languagemodel(llm)agentforopenfoam-basedcomputationalfluiddynamics. PhysicsofFluids,
+37(3),2025.
+Yuxuan Chen, Xu Zhu, Hua Zhou, and Zhuyin Ren. Metaopenfoam: an llm-based multi-agent
+frameworkforcfd. arXivpreprintarXiv:2407.21320,2024b.
+YingganXu,HanaKimlee,YijiaXiao,andDiLuo. Advancingai-scientistunderstanding: Making
+llmthinklikeaphysicistwithinterpretablereasoning. arXivpreprintarXiv:2504.01911,2025a.
+HuanNing,ZhenlongLi,TemitopeAkinboyewa,andMNaserLessani. Anautonomousgisagent
+frameworkforgeospatialdataretrieval. InternationalJournalofDigitalEarth,18(1):2458688,
+2025.
+JunhuaLiu,FanfanLin,XinzeLi,KwanHuiLim,andShuaiZhao. Physics-informedllm-agent
+forautomatedmodulationdesigninpowerelectronicssystems. arXivpreprintarXiv:2411.14214,
+2024d.
+TaoSong,YuweiFan,ChenlongFeng,KeyuSong,ChaoLiu,andDongxiangJiang. Domain-specific
+reactforphysics-integratediterativemodeling: Acasestudyofllmagentsforgaspathanalysisof
+gasturbines. arXivpreprintarXiv:2406.07572,2024.
+QingyunWang,DougDowney,HengJi,andTomHope. Scimon: Scientificinspirationmachines
+optimizedfornovelty. InProc.The62ndAnnualMeetingoftheAssociationforComputational
+Linguistics(ACL2024),2024d.
+XianruiZhong,YufengDu,SiruOuyang,MingZhong,TingfengLuo,QirongHo,HaoPeng,HengJi,
+andJiaweiHan. Actionie:Actionextractionfromscientificliteraturewithprogramminglanguages.
+InProc.The62ndAnnualMeetingoftheAssociationforComputationalLinguistics(ACL2024),
+2024.
+40
+
+===== PAGE 41 =====
+
+OpenAI. Chatgpt. https://openai.com/chatgpt,2023.
+Google. Gemini. https://deepmind.google/technologies/gemini/,2024.
+Anthropic. Claude. https://www.anthropic.com/product/claude,2024.
+MohamedAmineFerrag,NorbertTihanyi,andMerouaneDebbah.Fromllmreasoningtoautonomous
+aiagents: Acomprehensivereview. arXivpreprintarXiv:2504.19678,2025.
+YadongZhang,ShaoguangMao,TaoGe,XunWang,AdriandeWynter,YanXia,WenshanWu,Ting
+Song,ManLan,andFuruWei. Llmasamastermind: Asurveyofstrategicreasoningwithlarge
+languagemodels. arXivpreprintarXiv:2404.01230,2024c.
+HuiWei,ZihaoZhang,ShenghuaHe,TianXia,ShijiaPan,andFeiLiu. Plangenllms: Amodern
+surveyofllmplanningcapabilities. arXivpreprintarXiv:2502.11221,2025b.
+XuHuang,WeiwenLiu,XiaolongChen,XingmeiWang,HaoWang,DefuLian,YashengWang,
+RuimingTang,andEnhongChen. Understandingtheplanningofllmagents: Asurvey. arXiv
+preprintarXiv:2402.02716,2024c.
+HaolinJin,LinghanHuang,HaipengCai,JunYan,BoLi,andHuamingChen. Fromllmstollm-
+basedagentsforsoftwareengineering: Asurveyofcurrent,challengesandfuture. arXivpreprint
+arXiv:2408.02479,2024b.
+ZhuochengShen. Llmwithtools: Asurvey. arXivpreprintarXiv:2409.18807,2024.
+WujiangXu,KaiMei,HangGao,JuntaoTan,ZujieLiang,andYongfengZhang. A-mem: Agentic
+memoryforllmagents. arXivpreprintarXiv:2502.12110,2025b.
+YaxiongWu,ShengLiang,ChenZhang,YichaoWang,YongyueZhang,HuifengGuo,Ruiming
+Tang,andYongLiu. Fromhumanmemorytoaimemory: Asurveyonmemorymechanismsinthe
+eraofllms. arXivpreprintarXiv:2504.15965,2025.
+YYYao.Information-theoreticmeasuresforknowledgediscoveryanddatamining.Entropymeasures,
+maximumentropyprincipleandemergingapplications,pages115–136,2003.
+ClausBorgnakke. FundamentalsofThermodynamics. Wiley,Hoboken,NJ,11thedition,2024.
+DanielVSchroeder. AnIntroductiontoThermalPhysics. OxfordUniversityPress,2020.
+ColinPatterson. Verifiabilityinsystematics. SystematicZoology,27(2):218–222,1978.
+RolfLandauer. Irreversibilityandheatgenerationinthecomputingprocess. IBMjournalofresearch
+anddevelopment,5(3):183–191,1961.
+DonRSwanson. Undiscoveredpublicknowledge. TheLibraryQuarterly,56(2):103–118,1986.
+KaiyuHeandZhiyuChen. Fromreasoningtolearning: Asurveyonhypothesisdiscoveryandrule
+learningwithlargelanguagemodels. arXivpreprintarXiv:2505.21935,2025.
+MaximilianNickel,KevinMurphy,VolkerTresp,andEvgeniyGabrilovich. Areviewofrelational
+machinelearningforknowledgegraphs. ProceedingsoftheIEEE,104(1):11–33,2015.
+ShaoxiongJi,ShiruiPan,ErikCambria,PekkaMarttinen,andPhilipSYu. Asurveyonknowledge
+graphs: Representation,acquisition,andapplications. IEEEtransactionsonneuralnetworksand
+learningsystems,33(2):494–514,2021.
+SuchinGururangan, AnaMarasovic´, SwabhaSwayamdipta, KyleLo, IzBeltagy, DougDowney,
+andNoahA.Smith. Don’tstoppretraining: Adaptlanguagemodelstodomainsandtasks. In
+Proceedingsofthe58thAnnualMeetingoftheAssociationforComputationalLinguistics,2020.
+EdwardOPyzer-Knapp,MatteoManica,PeterStaar,LucasMorin,PatrickRuch,TeodoroLaino,
+JohnRSmith,andAlessandroCurioni. Foundationmodelsformaterialsdiscovery–currentstate
+andfuturedirections. NpjComputationalMaterials,11(1):61,2025.
+41
+
+===== PAGE 42 =====
+
+ShashankSubramanian,PeterHarrington,KurtKeutzer,WahidBhimji,DmitriyMorozov,MichaelW
+Mahoney,andAmirGholami. Towardsfoundationmodelsforscientificmachinelearning: Charac-
+terizingscalingandtransferbehavior. AdvancesinNeuralInformationProcessingSystems,36:
+71242–71262,2023.
+PatrickLewis,EthanPerez,AleksandraPiktus,FabioPetroni,VladimirKarpukhin,NamanGoyal,
+HeinrichKüttler,MikeLewis,Wen-tauYih,TimRocktäschel,etal. Retrieval-augmentedgenera-
+tionforknowledge-intensivenlptasks. InAdvancesinNeuralInformationProcessingSystems,
+volume33,pages9459–9474,2020.
+KelvinGuu,KentonLee,ZoraTung,PanupongPasupat,andMingweiChang. Retrievalaugmented
+languagemodelpre-training. InInternationalconferenceonmachinelearning,pages3929–3938.
+PMLR,2020.
+YunfanGao, YunXiong, XinyuGao, KangxiangJia, JinliuPan, YuxiBi, YixinDai, JiaweiSun,
+HaofenWang,andHaofenWang. Retrieval-augmentedgenerationforlargelanguagemodels: A
+survey. arXivpreprintarXiv:2312.10997,2(1),2023.
+GautierIzacard,PatrickLewis,MariaLomeli,LucasHosseini,FabioPetroni,TimoSchick,Jane
+Dwivedi-Yu, Armand Joulin, Sebastian Riedel, and Edouard Grave. Atlas: Few-shot learning
+withretrievalaugmentedlanguagemodels. JournalofMachineLearningResearch,24(251):1–43,
+2023.
+WenqiFan,YujuanDing,LiangboNing,ShijieWang,HengyunLi,DaweiYin,Tat-SengChua,and
+QingLi. Asurveyonragmeetingllms: Towardsretrieval-augmentedlargelanguagemodels. In
+Proceedingsofthe30thACMSIGKDDconferenceonknowledgediscoveryanddatamining,pages
+6491–6501,2024.
+Gabriel Lino Garcia, Joao Renato Ribeiro Manesco, Pedro Henrique Paiola, Lucas Miranda,
+Maria Paola de Salvo, and Joao Paulo Papa. A review on scientific knowledge extraction us-
+inglargelanguagemodelsinbiomedicalsciences. arXivpreprintarXiv:2412.03531,2024.
+YichunFeng,JiaweiWang,RuikunHe,LuZhou,andYixueLi. Aretrieval-augmentedknowledge
+miningmethodwithdeepthinkingllmsforbiomedicalresearchandclinicalsupport. GigaScience,
+14:giaf109,2025a.
+NikitaAKrotkov,DmitriiASbytov,AnnaAChakhoyan,PolinaIKornienko,AnnaAStarikova,
+MaximGStepanov,AnastasiiaOPiven,TimurAAliev,TetianaOrlova,MusheghSRafayelyan,
+etal.Nanostructuredmaterialdesignviaaretrieval-augmentedgeneration(rag)approach:Bridging
+laboratorypracticeandscientificliterature. JournalofChemicalInformationandModeling,2025.
+YangqiaoyuZhou,HaokunLiu,TejesSrivastava,HongyuanMei,andChenhaoTan. Hypothesis
+generationwithlargelanguagemodels. arXivpreprintarXiv:2404.04326,2024.
+Adib Bazgir, Yuwen Zhang, et al. Proteinhypothesis: A physics-aware chain of multi-agent rag
+llmforhypothesisgenerationinproteinscience. InTowardsAgenticAIforScience: Hypothesis
+Generation,Comprehension,Quantification,andValidation,2025b.
+Song Tong, Kai Mao, Zhen Huang, Yukun Zhao, and Kaiping Peng. Automating psychological
+hypothesisgenerationwithai: whenlargelanguagemodelsmeetcausalgraph. Humanitiesand
+SocialSciencesCommunications,11(1):1–14,2024.
+Qingyun Wu, Gagan Bansal, Jie Zhang, Yiran Wu, Shaokun Li, Erkang Zhu, Li Jiang, Xiaoyun
+Zhang,ChiWang,andSongHan. Autogen: Enablingnext-genllmapplicationsviamulti-agent
+conversation. InThirty-seventhConferenceonNeuralInformationProcessingSystems,2023. URL
+https://arxiv.org/abs/2308.08155.
+HarrisonChase. Langchain,102022. URLhttps://github.com/langchain-ai/langchain.
+NuoChen,YichengTong,JiayingWu,MinhDucDuong,QianWang,QingyunZou,BryanHooi,
+andBingshengHe. Beyondbrainstorming: Whatdriveshigh-qualityscientificideas? lessonsfrom
+multi-agentcollaboration. arXivpreprintarXiv:2508.04575,2025b.
+42
+
+===== PAGE 43 =====
+
+FeiLiu,XiLin,ShunyuYao,ZhenkunWang,XialiangTong,MingxuanYuan,andQingfuZhang.
+Largelanguagemodelformultiobjectiveevolutionaryoptimization. InInternationalConference
+onEvolutionaryMulti-CriterionOptimization,pages178–191.Springer,2025b.
+YayatiJadhavandAmirBaratiFarimani. Largelanguagemodelagentasamechanicaldesigner.
+arXivpreprintarXiv:2404.17525,2024.
+Wesley F Reinhart and Antonia Statt. Large language models design sequence-defined macro-
+moleculesviaevolutionaryoptimization. npjComputationalMaterials,10(1):262,2024.
+ShengcaiLiu,CaishunChen,XinghuaQu,KeTang,andYew-SoonOng. Largelanguagemodelsas
+evolutionaryoptimizers. In2024IEEECongressonEvolutionaryComputation(CEC),pages1–8.
+IEEE,2024e.
+Shuvayan Brahmachary, Subodh M Joshi, Aniruddha Panda, Kaushik Koneripalli, Arun Kumar
+Sagotra, Harshil Patel, Ankush Sharma, Ameya D Jagtap, and Kaushic Kalyanaraman. Large
+languagemodel-basedevolutionaryoptimizer: Reasoningwithelitism. Neurocomputing, 622:
+129272,2025.
+AtillaKaanAlkan,ShashwatSourav,MajaJablonska,SimoneAstarita,RishabhChakrabarty,Nikhil
+Garuda,PranavKhetarpal,MaciejPióro,DimitriosTanoglidis,KartheikGIyer,etal. Asurveyon
+hypothesisgenerationforscientificdiscoveryintheeraoflargelanguagemodels. arXivpreprint
+arXiv:2504.05496,2025.
+AdibBazgir,YuwenZhang,etal. Agentichypothesis: Asurveyonhypothesisgenerationusingllm
+systems. TowardsAgenticAIforScience: HypothesisGeneration,Comprehension,Quantification,
+andValidation,2025c.
+JoeranBeel,Min-YenKan,andMoritzBaumgart. Evaluatingsakana’saiscientistforautonomous
+research: Wishfulthinkingoranemergingrealitytowards’artificialresearchintelligence’(ari)?
+arXivpreprintarXiv:2502.14297,2025.
+XiaoXiao, YuSu, SijingZhang, ZhangChen, YadongChen, andTianLiu. Confidenceinlarge
+languagemodelevaluation: Abayesianapproachtolimited-samplechallenges. arXivpreprint
+arXiv:2504.21303,2025.
+ShunyuYao,JeffreyZhao,DianYu,NanDu,IzhakShafran,KarthikNarasimhan,andYuanCao.
+React: Synergizing reasoning and acting in language models. In International Conference on
+LearningRepresentations(ICLR),2023.
+Xingyao Wang, Yangyi Chen, Lifan Yuan, Yizhe Zhang, Yunzhu Li, Hao Peng, and Heng Ji.
+Executablecodeactionselicitbetterllmagents. InForty-firstInternationalConferenceonMachine
+Learning,2024e.
+Zeming Lin, Halil Akin, Roshan Rao, Brian Hie, Zhongkai Zhu, Wenting Lu, Nikita Smetanin,
+RobertVerkuil,OriKabeli,YanivShmueli,etal. Evolutionary-scalepredictionofatomic-level
+proteinstructurewithalanguagemodel. Science,379(6637):1123–1130,2023.
+Josh Abramson, Jonas Adler, Jack Dunger, Richard Evans, Tim Green, Alexander Pritzel, Olaf
+Ronneberger,LindsayWillmore,AndrewJBallard,JoshuaBambrick,etal. Accuratestructure
+predictionofbiomolecularinteractionswithalphafold3. Nature,630(8016):493–500,2024.
+VedaSheershBoorla,RatulChowdhury,RanjaniRamasubramanian,BrandonAmeglio,RahelFrick,
+JeffreyJGray,andCostasDMaranas.Denovodesignandrosetta-basedassessmentofhigh-affinity
+antibodyvariableregions(fv)againstthesars-cov-2spikereceptorbindingdomain(rbd). Proteins:
+Structure,Function,andBioinformatics,91(2):196–208,2023.
+AnshNagda,PrabhakarRaghavan,andAbhradeepThakurta. Reinforcedgenerationofcombinatorial
+structures: Applicationstocomplexitytheory. arXivpreprintarXiv:2509.18057,2025.
+M.Gridach,L.Chen,Y.Li,S.Wang,andX.Zhang. Agenticaiforscientificdiscovery: Asurveyof
+progress,challenges,andfuturedirections. arXivpreprintarXiv:2503.08979,2025b.
+43
+
+===== PAGE 44 =====
+
+J. Liu, X. Cen, C. Yi, W. Huang, and H. Wang. Challenges in ai-driven biomedical multimodal
+datafusionandanalysis. Genomics,Proteomics&Bioinformatics,23(1):qzaf011,2025c. doi:
+10.1093/gpbjnl/qzaf011.
+Q.Zhang,L.Wang,P.Liu,andM.Zhao. Robustmultimodalperceptioninautonomoussystems: a
+comprehensivereviewandenhancementstrategies. ResearchGate,2024d.
+XinerLi,LimeiWang,YouzhiLuo,CarlEdwards,ShuruiGui,YuchaoLin,HengJi,andShuiwang
+Ji. Geometryinformedtokenizationofmoleculesforlanguagemodelgeneration. arXivpreprint
+arXiv:2408.10120,2024a.
+Cong Fu, Xiner Li, Blake Olson, Heng Ji, and Shuiwang Ji. Fragment and geometry aware tok-
+enizationofmoleculesforstructure-baseddrugdesignusinglanguagemodels. arXivpreprint
+arXiv:2408.09730,2024.
+KeqiangYan,XinerLi,HongyiLing,KennaAshen,CarlEdwards,RaymundoArróyave,Marinka
+Zitnik, Heng Ji, Xiaofeng Qian, Xiaoning Qian, and Shuiwang Ji. Invariant Tokenization of
+CrystallineMaterialsforLanguageModelEnabledGeneration. AdvancesinNeuralInformation
+ProcessingSystems,37:125050–125072,2024.
+XinyunChen,MaxwellLin,NathanaelSchärli,andDennyZhou. Teachinglargelanguagemodelsto
+self-debug. arXivpreprintarXiv:2304.05128,2023b.
+XiaoyingZhang, HaoSun, YipengZhang, KaituoFeng, ChaoYang, andHelenMeng. Critique-
+grpo: Advancingllmreasoningwithnaturallanguageandnumericalfeedback. arXivpreprint
+arXiv:2506.03106,2025c.
+YuhuaJiang,YuwenXiong,YufengYuan,ChaoXin,WenyuanXu,YuYue,QianchuanZhao,and
+LinYan. Pag: Multi-turnreinforcedllmself-correctionwithpolicyasgenerativeverifier. arXiv
+preprintarXiv:2506.10406,2025.
+XiaoyuanLiu,TianLiang,ZhiweiHe,JiahaoXu,WenxuanWang,PinjiaHe,ZhaopengTu,Haitao
+Mi,andDongYu. Trust,butverify: Aself-verificationapproachtoreinforcementlearningwith
+verifiablerewards. arXivpreprintarXiv:2505.13445,2025d.
+JieHuang,XinyunChen,SwaroopMishra,HuaixiuStevenZheng,AdamsWeiYu,XinyingSong,
+and Denny Zhou. Large language models cannot self-correct reasoning yet. arXiv preprint
+arXiv:2310.01798,2023.
+RobertMKuhn,DavidHaussler,andWJamesKent. Theucscgenomebrowserandassociatedtools.
+Briefingsinbioinformatics,14(2):144–161,2013.
+ŽigaAvsec,NatashaLatysheva,JunCheng,GuidoNovati,KyleRTaylor,TomWard,ClareBycroft,
+LaurenNicolaisen,EiriniArvaniti,JoshuaPan,etal. Alphagenome: advancingregulatoryvariant
+effectpredictionwithaunifieddnasequencemodel. bioRxiv,pages2025–06,2025.
+GarykBrixi,MatthewGDurrant,JeromeKu,MichaelPoli,GregBrockman,DanielChang,GabrielA
+Gonzalez,SamuelHKing,DavidBLi,AditiTMerchant,etal. Genomemodelinganddesign
+acrossalldomainsoflifewithevo2. BioRxiv,pages2025–02,2025.
+ŽigaAvsec,VikramAgarwal,DanielVisentin,JosephRLedsam,AgnieszkaGrabska-Barwinska,
+KyleRTaylor,YannisAssael,JohnJumper,PushmeetKohli,andDavidRKelley. Effectivegene
+expressionpredictionfromsequencebyintegratinglong-rangeinteractions. Naturemethods,18
+(10):1196–1203,2021.
+EricNguyen,MichaelPoli,MatthewGDurrant,BrianKang,DhruvaKatrekar,DavidBLi,LiamJ
+Bartie,ArminWThomas,SamuelHKing,GarykBrixi,etal. Sequencemodelinganddesignfrom
+moleculartogenomescalewithevo. Science,386(6723):eado9336,2024.
+XingyuSu,HaiyangYu,DeguiZhi,andShuiwangJi. Learningtodiscoverregulatoryelementsfor
+geneexpressionprediction. arXivpreprintarXiv:2502.13991,2025a.
+XingyuSu,XinerLi,YuchaoLin,ZiqianXie,DeguiZhi,andShuiwangJi. Languagemodelsfor
+controllablednasequencedesign. arXivpreprintarXiv:2507.19523,2025b.
+44
+
+===== PAGE 45 =====
+
+Y.Hao,S.Hao,J.T.Andersen,andetal. Integratedanalysisofmultimodalsingle-celldata. Cell,184
+(13):3573–3587,2021.
+F.A.Wolf,P.Angerer,andF.J.Theis. Scanpy: large-scalesingle-cellgeneexpressiondataanalysis.
+GenomeBiology,19(1):15,2018.
+JohnJumperandetal. HighlyaccurateproteinstructurepredictionwithAlphaFold. Nature,596
+(7873):583–589,2021.
+ThomasHayes,RoshanRao,HalilAkin,NicholasJSofroniew,DenizOktay,ZemingLin,Robert
+Verkuil,VincentQTran,JonathanDeaton,MariusWiggert,etal. Simulating500millionyearsof
+evolutionwithalanguagemodel. Science,387(6736):850–858,2025.
+Andrew Leaver-Fay and et al. Rosetta3: an object-oriented software suite for macromolecular
+modelinganddesign. MethodsinEnzymology,487:515–575,2011.
+JosephLWatson,DavidJuergens,NathanielRBennett,BrianLTrippe,JasonYim,HelenEEisenach,
+WoodyAhern,AndrewJBorst,RobertJRagotte,LukasFMilles,etal. Denovodesignofprotein
+structureandfunctionwithrfdiffusion. Nature,620(7976):1089–1100,2023.
+JustasDauparas,IvanAnishchenko,NathanielBennett,HuaBai,RobertJRagotte,LukasFMilles,
+BasileIMWicky,AlexisCourbet,RobJdeHaas,NevilleBethel,etal.Robustdeeplearning–based
+proteinsequencedesignusingproteinmpnn. Science,378(6615):49–56,2022.
+GregLandrum. RDKit: Open-sourcecheminformatics. JournalofCheminformatics,1(1):10,2006.
+Yihan Shao and et al. Advances in molecular quantum chemistry contained in the Q-Chem 3.0
+programpackage. PhysicalChemistryChemicalPhysics,8(27):3172–3191,2006.
+DanielG.A.Smith,L.A.Burns,D.A.Sirianni,andetal. Psi4: anopen-sourceabinitioelectronic
+structureprogram. TheJournalofChemicalPhysics,152(18):184108,2020.
+AskLarsenandetal. TheAtomicSimulationEnvironment–APythonlibraryforworkingwithatoms.
+JournalofPhysics: CondensedMatter,29(27):273002,2017.
+GeorgKresseandJürgenFurthmüller. Efficiencyofab-initiototalenergycalculationsformetalsand
+semiconductorsusingaplane-wavebasisset. ComputationalMaterialsScience,6(1):15–50,1996.
+StevePlimpton. Fastparallelalgorithmsforshort-rangemoleculardynamics. JournalofComputa-
+tionalPhysics,117(1):1–19,1995.
+A.P.Thompson,H.M.Aktulga,R.Berger,D.S.Bolintineanu,W.M.Brown,P.S.Crozier,P.J.
+in ’t Veld, A. Kohlmeyer, S. G. Moore, T. D. Nguyen, R. Shan, M. J. Stevens, J. Tranchida,
+C.Trott,andS.J.Plimpton. LAMMPS-aflexiblesimulationtoolforparticle-basedmaterials
+modelingattheatomic,meso,andcontinuumscales. Comp.Phys.Comm.,271:108171,2022. doi:
+10.1016/j.cpc.2021.108171.
+HaiyangYu,ZhaoXu,XiaofengQian,XiaoningQian,andShuiwangJi. EfficientandEquivariant
+GraphNetworksforPredictingQuantumHamiltonian. InInternationalConferenceonMachine
+Learning,pages40412–40424.PMLR,2023a.
+HaiyangYu,MengLiu,YouzhiLuo,AlexStrasser,XiaofengQian,XiaoningQian,andShuiwangJi.
+QH9: AQuantumHamiltonianPredictionBenchmarkforQM9Molecules. AdvancesinNeural
+InformationProcessingSystems,36:40487–40503,2023b.
+HaiyangYu, YuchaoLin, XuanZhang, XiaofengQian, andShuiwangJi. Efficientpredictionof
+SO(3)-equivariantHamiltonianmatricesviaSO(2)localframes. arXivpreprintarXiv:2506.09398,
+2025.
+OpenCFDLtd. OpenFOAM:TheOpenSourceComputationalFluidDynamicsToolbox. https:
+//www.openfoam.com,2024. Accessed: 2024-08-25.
+S.Noll,D.Burgarella,E.Giovannoli,V.Buat,D.Marcillac,andJ.C.Muñoz-Mateos. CIGALE,
+a code for galaxy evolution: a new version with improved features. Astron. Astrophys., 507:
+1793–1804,2009.
+45
+
+===== PAGE 46 =====
+
+Zhizheng Wang, Qiao Jin, Chih-Hsuan Wei, Shubo Tian, Po-Ting Lai, Qingqing Zhu, Chi-Ping
+Day, Christina Ross, Robert Leaman, and Zhiyong Lu. Geneagent: self-verification language
+agentforgene-setanalysisusingdomaindatabases. NatureMethods,22(8):1677–1685,August
+2025b. ISSN1548-7105. doi: 10.1038/s41592-025-02748-6. URLhttps://www.nature.com/
+articles/s41592-025-02748-6.
+ZuwanLin,WenboWang,ArnauMarin-Llobet,QiangLi,SamuelD.Pollock,XinSui,AlmirAljovic,
+JaeyongLee,JongminBaek,NingyueLiang,XinheZhang,ConnieKangniWang,JiahaoHuang,
+MaiLiu,ZihanGao,HaoSheng,JinDu,StephenJ.Lee,BrandonWang,YichunHe,JieDing,
+Xiao Wang, Juan R. Alvarez-Dominguez, and Jia Liu. Spatial transcriptomics ai agent charts
+hpsc-pancreasmaturationinvivo. bioRxiv,DOI:10.1101/2025.04.01.646731,2025.
+Wei Xu, Gang Luo, Weiyu Meng, Xiaobing Zhai, Keli Zheng, Ji Wu, Yanrong Li, Abao Xing,
+JunrongLi, ZhifanLi, KeZheng, andKefengLi. Mragent: anllm-basedautomatedagentfor
+causalknowledgediscoveryindiseaseviamendelianrandomization. BriefingsinBioinformatics,
+26(2):bbaf140, March 2025c. ISSN 1467-5463, 1477-4054. doi: 10.1093/bib/bbaf140. URL
+https://academic.oup.com/bib/article/doi/10.1093/bib/bbaf140/8107848.
+Yuyang Zhou, Jin Su, Jiawei Zhang, Wangyang Hu, Tianli Tao, Guanqi Li, Xibin Zhou, Li Fan,
+and Fajie Yuan. Prime: A multi-agent environment for orchestrating dynamic computational
+workflows in protein engineerings. bioRxiv, DOI:10.1101/2025.09.22.677756, 2025b. URL
+http://biorxiv.org/lookup/doi/10.1101/2025.09.22.677756.
+TianzheChu,YuexiangZhai,JihanYang,ShengbangTong,SainingXie,DaleSchuurmans,QuocV
+Le,SergeyLevine,andYiMa. Sftmemorizes,rlgeneralizes: Acomparativestudyoffoundation
+modelpost-training. arXivpreprintarXiv:2501.17161,2025.
+Shubham Parashar, Shurui Gui, Xiner Li, Hongyi Ling, Sushil Vemuri, Blake Olson, Eric Li,
+YuZhang,JamesCaverlee,DileepKalathil,etal. Curriculumreinforcementlearningfromeasyto
+hardtasksimprovesllmreasoning. arXivpreprintarXiv:2506.06632,2025.
+XingyuSu, XinerLi, MasatoshiUehara, SunwooKim, YulaiZhao, GabrieleScalia, EhsanHaji-
+ramezanali,TommasoBiancalani,DeguiZhi,andShuiwangJi. Iterativedistillationforreward-
+guidedfine-tuningofdiffusionmodelsinbiomoleculardesign. arXivpreprintarXiv:2507.00445,
+2025c.
+Xiner Li, Yulai Zhao, Chenyu Wang, Gabriele Scalia, Gokcen Eraslan, Surag Nair, Tommaso
+Biancalani,ShuiwangJi,AvivRegev,SergeyLevine,etal. Derivative-freeguidanceincontinuous
+anddiscretediffusionmodelswithsoftvalue-baseddecoding. arXivpreprintarXiv:2408.08252,
+2024b.
+XinerLi,MasatoshiUehara,XingyuSu,GabrieleScalia,TommasoBiancalani,AvivRegev,Sergey
+Levine,andShuiwangJi. Dynamicsearchforinference-timealignmentindiffusionmodels. arXiv
+preprintarXiv:2503.02039,2025b.
+Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu,
+ShirongMa,PeiyiWang,XiaoBi,etal. Deepseek-r1: Incentivizingreasoningcapabilityinllms
+viareinforcementlearning. arXivpreprintarXiv:2501.12948,2025.
+JiazhanFeng,ShijueHuang,XingweiQu,GeZhang,YujiaQin,BaoquanZhong,ChengquanJiang,
+Jinxin Chi, and Wanjun Zhong. Retool: Reinforcement learning for strategic tool use in llms,
+2025b. URLhttps://arxiv.org/abs/2504.11536.
+XinjiMai,HaotianXu,XingWu,WeinongWang,YingyingZhang,andWenqiangZhang. Agent
+rl scaling law: Spontaneous code execution for mathematical problem solving, 2025. URL
+https://arxiv.org/abs/2505.07773.
+BowenJin,HansiZeng,ZhenruiYue,JinsungYoon,SercanÖ.Arık,DongWang,HamedZamani,
+andJiaweiHan. Search-r1:Trainingllmstoreasonandleveragesearchengineswithreinforcement
+learning,2025b. URLhttps://arxiv.org/abs/2503.09516.
+46
+
+===== PAGE 47 =====
+
+MingyangChen,TianpengLi,HaozeSun,YijieZhou,ChenzhengZhu,HaofenWang,JeffZ.Pan,
+WenZhang,HuajunChen,FanYang,ZenanZhou,andWeipengChen. Research: Learningto
+reasonwithsearchforllmsviareinforcementlearning,2025c. URLhttps://arxiv.org/abs/
+2503.19470.
+ZhepeiWei,WenlinYao,YaoLiu,WeizhiZhang,QinLu,LiangQiu,ChanglongYu,PuyangXu,
+ChaoZhang,BingYin,HyokunYun,andLihongLi. Webagent-r1: Trainingwebagentsviaend-
+to-endmulti-turnreinforcementlearning,2025c. URLhttps://arxiv.org/abs/2505.16421.
+Zehan Qi, Xiao Liu, Iat Long Iong, Hanyu Lai, Xueqiao Sun, Wenyi Zhao, Yu Yang, Xinyue
+Yang, Jiadai Sun, Shuntian Yao, Tianjie Zhang, Wei Xu, Jie Tang, and Yuxiao Dong. Webrl:
+Trainingllmwebagentsviaself-evolvingonlinecurriculumreinforcementlearning,2025. URL
+https://arxiv.org/abs/2411.02337.
+YujiaQin,YiningYe,JunjieFang,HaomingWang,ShihaoLiang,ShizuoTian,JundaZhang,Jiahao
+Li, Yunxin Li, Shijue Huang, et al. Ui-tars: Pioneering automated gui interaction with native
+agents. arXivpreprintarXiv:2501.12326,2025.
+SaaketAgashe,JiuzhouHan,ShuyuGan,JiachenYang,AngLi,andXinEricWang. Agents: An
+open agentic framework that uses computers like a human. arXiv preprint arXiv:2410.08164,
+2024.
+Xinyu Geng, Peng Xia, Zhen Zhang, Xinyu Wang, Qiuchen Wang, Ruixue Ding, Chenxi Wang,
+JialongWu,YidaZhao,KuanLi,etal. Webwatcher: Breakingnewfrontierofvision-language
+deepresearchagent. arXivpreprintarXiv:2508.05748,2025.
+XiaoxiLi,JiajieJin,GuantingDong,HongjinQian,YutaoZhu,YongkangWu,Ji-RongWen,and
+ZhichengDou. Webthinker: Empoweringlargereasoningmodelswithdeepresearchcapability.
+arXivpreprintarXiv:2504.21776,2025c.
+XiusiChen,GaotangLi,ZiqiWang,BowenJin,ChengQian,YuWang,HongruWang,YuZhang,
+Denghui Zhang, Tong Zhang, et al. Rm-r1: Reward modeling as reasoning. arXiv preprint
+arXiv:2505.02387,2025d.
+MasatoshiUehara,YulaiZhao,ChenyuWang,XinerLi,AvivRegev,SergeyLevine,andTommaso
+Biancalani. Inference-timealignmentindiffusionmodelswithreward-guidedgeneration: Tutorial
+andreview. arXivpreprintarXiv:2501.09685,2025a.
+MasatoshiUehara,XingyuSu,YulaiZhao,XinerLi,AvivRegev,ShuiwangJi,SergeyLevine,and
+TommasoBiancalani. Reward-guidediterativerefinementindiffusionmodelsattest-timewith
+applicationstoproteinanddnadesign. arXivpreprintarXiv:2502.14944,2025b.
+Subbarao Kambhampati. Neither LLMs nor LRMs have the ability to go beyond humanity’s
+knowledgeclosure–whichisneededfortruediscoveries,2025. URLhttps://www.linkedin.
+com/feed/update/urn:li:activity:7351769291123314688/.
+AlexanderFleming. Ontheantibacterialactionofculturesofapenicillium,withspecialreferenceto
+theiruseintheisolationofb.influenzae. BritishJournalofExperimentalPathology,10:226–236,
+1929.
+A.A.PenziasandR.W.Wilson. Ameasurementofexcessantennatemperatureat4080mc/s. The
+AstrophysicalJournal,142(1):419–421,1965.
+K.S.Novoselov,A.K.Geim,S.V.Morozov,D.Jiang,Y.Zhang,S.V.Dubonos,I.V.Grigorieva,
+andA.A.Firsov. Electricfieldeffectinatomicallythincarbonfilms. Science,306(5696):666–669,
+2004. doi: 10.1126/science.1102896. URLhttps://www.science.org/doi/abs/10.1126/
+science.1102896.
+47

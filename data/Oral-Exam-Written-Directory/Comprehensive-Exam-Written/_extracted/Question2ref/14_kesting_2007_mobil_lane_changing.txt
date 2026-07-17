@@ -1,0 +1,968 @@
+===== PAGE 1 =====
+
+MOBIL: General Lane-Changing Model for Car-Following Models
+Arne Kesting, Dipl.-Phys. (corresponding author)
+Institute for Transport & Economics
+Technische Universit¨at Dresden
+Andreas-Schubert-Strasse 23
+D-01062 Dresden, Germany
+phone: +49 351 463 36838
+fax: +49 351 463 36809
+kesting@vwi.tu-dresden.de
+Martin Treiber, Dr.
+Institute for Transport & Economics
+Technische Universit¨at Dresden
+Andreas-Schubert-Strasse 23
+D-01062 Dresden, Germany
+phone: +49 351 463 36794
+fax: +49 351 463 36809
+treiber@vwi.tu-dresden.de
+Dirk Helbing, Prof. Dr.
+Institute for Transport & Economics
+Technische Universit¨at Dresden
+Andreas-Schubert-Strasse 23
+D-01062 Dresden, Germany
+phone: +49 351 463 36802
+fax: +49 351 463 36809
+helbing@vwi.tu-dresden.de
+Word count:
+Abstract: 234
+Main text: 5500
+Figures and Tables: 5
+Revision date: November 15, 2006
+
+===== PAGE 2 =====
+
+Kesting, Treiber, and Helbing 2
+Abstract
+Weproposeageneralmodeltoderivelane-changingrulesfordiscretionaryandmandatorylane
+changes for a wide class of car-following models. Both the utility of a given lane and the risk
+associated with lane changes is determined in terms of longitudinal accelerations calculated
+with the microscopic traffic models. This allows for the formulation of compact and general
+safety and incentive criteria both for symmetric and asymmetric passing rules. Moreover,
+anticipative elements and the crucial influence of velocity differences of these car-following
+models are automatically transferred to the lane-changing rules.
+Whilethesafetycriterionpreventscriticallanechangesandcollisions, theincentivecriterion
+also takes into account the (dis-)advantages of other drivers associated with a lane change via
+the ’politeness factor’. The parameter allows to vary the motivation for lane-changing from
+purely egoistic to more cooperative driving behavior. This novel feature allows first to prevent
+change lanes for a marginal advantage if this obstructs other drivers, and, second, to let a
+’pushy’driverinducealanechangeofaslowerdriveraheadinordertobenolongerobstructed.
+This is a common phenomenon for asymmetric passing rules with a dedicated lane for passing.
+We apply the model to traffic simulations of cars and trucks with the Intelligent Driver
+Model (IDM) as underlying car-following model. We study an open system with an on-ramp
+and investigate the resulting lane-changing rate as a function of the spatial coordinate as well
+as a function of traffic density.
+
+===== PAGE 3 =====
+
+Kesting, Treiber, and Helbing 3
+1 Introduction
+In the past, single-lane car-following models have been successfully applied to describe traffic
+dynamics (Nagatani, 2002; Helbing, 2001). Particularly collective phenomena such as traf-
+fic instabilities and the spatiotemporal dynamics of congested traffic can be well understood
+within the scope of single-lane traffic models. But real traffic consists of different types of ve-
+hicles, e.g., cars and trucks. Therefore, a realistic description of heterogeneous traffic streams
+is only possible within a multi-lane modeling framework allowing faster vehicles to improve
+their driving conditions by passing slower vehicles. Hence, freeway lane changing has recently
+received increased attention (Laval and Daganzo, 2006; Hidas, 2005; Coifman et al., 2005;
+Wei et al., 2000; Brackstone et al., 1998; Nagel et al., 1998). Moreover, since lane-changing
+maneuvers often act as initial perturbations, it is crucial to understand their impact on the
+capacity, stability, and breakdown of traffic flows. Particularly near bottleneck sections such
+as on-ramps and off-ramps, lane changing is often a significant ingredient to trigger a traffic
+breakdown (provided that the traffic volume is high) (Laval and Daganzo, 2004). Additionally,
+the drivers’ lane-changing behavior has direct influence on traffic safety.
+Despite its great significance, lane-changing has by far not been studied as extensively as
+the longitudinal acceleration and deceleration behavior. One reason for this is the scarcity
+of reliable data (Hidas and Wagner, 2004; Brackstone and McDonald, 1996). For measuring
+lane changes, cross-sectional data from detectors are not sufficient and, therefore, only a few
+empiricalstudiesaboutlane-changingratesasafunctionoftrafficflowordensityareavailable.
+Sparmann (1978) investigated the lane-changing rates on a German two-lane autobahn. Data
+for a British motorway were presented by Yousif and Hunt (1995). Recent progress in video
+tracking methods, however, allows for a collection of high-quality trajectory data from aerial
+observations (Hoogendoorn et al., 2003; NGSIM, 2006). These 2D data will become more
+and more available in the future and will allow for a more profound understanding of the
+microscopic lane-changing processes.
+The modeling of lane changes is typically considered as a multi-step process. On a strategic
+level, the driver knows about his or her route in a network, which influences the lane choice,
+e.g., with regard to lane blockages, on-ramps, off-ramps, or other mandatory merges (Toledo
+etal.,2005). Inthetactical stage,anintendedlanechangeispreparedandinitiatedbyadvance
+accelerations or decelerations of the driver, and possibly by cooperation of drivers in the target
+lane (Hidas, 2005). Finally, in the operational stage, one determines if an immediate lane
+change is both safe and desired (Gipps, 1986). This choice is typically modeled by the use of
+gap-acceptance models, in which drivers compare the available gaps to the smallest acceptable
+gap,thecriticalgap. Criticalgapsdependingeneralontherelativespeedofthesubjectvehicle
+withrespecttothoseoftheleadandthelagvehiclesintheadjacentlaneandonthetypeoflane
+change (Toledo et al., 2003). Most lane-changing models in the literature classify lane changes
+as either mandatory or discretionary (Gipps, 1986; Yang and Koutsopoulos, 1996; Ahmed,
+1999; Toledo et al., 2003; Halati et al., 1997; Skabardonis, 2002). While mandatory changes
+are performed for strategic reasons, the driver’s motivation for discretionary lane changes is
+a perceived improvement of the driving conditions in the target lane compared to the actual
+situation.
+In this paper, we present a lane-changing model for microscopic car-following models, which
+describes the rational decision to change lanes and, therefore, only deals with the operational
+decision process. When considering a lane change, we assume that a driver makes a trade-
+off between the expected own advantage and the disadvantage imposed on other drivers. In
+particular, our model includes the follower on the target lane in the decision process. For a
+
+===== PAGE 4 =====
+
+Kesting, Treiber, and Helbing 4
+driver considering a lane change, the subjective utility of a change increases with the gap to
+the new leader on the target lane. However, if the velocity of this leader is lower, it may be
+favorable to stay on the present lane despite of the smaller gap. A criterion for the utility
+including both situations is the difference of the accelerations after and before the lane change.
+In this work, we therefore propose as utility function considering the difference in vehicle
+accelerations (or decelerations) after a lane change, calculated with an underlying microscopic
+longitudinal traffic model. The higher the acceleration on a given lane, the nearer it is to the
+’ideal’ acceleration on an empty road and the more attractive it is to the driver. Therefore,
+the basic idea of our proposed lane-changing model is to formulate the anticipated advantages
+and disadvantages of a prospective lane change in terms of single-lane accelerations.
+Compared to explicit lane-changing model, the formulation in terms of accelerations of a
+longitudinal model has several advantages. First, the assessment of the traffic situation is
+transfered to the acceleration function of the car-following model, which allows for a compact
+and general model formulation with only a small number of additional parameters. In contrast
+to the classical gap-acceptance approach, critical gaps are not taken into account explicitly.
+Second, it is ensured that both longitudinal and lane-changing models are consistent with each
+other. For example, if the longitudinal model is collision-free, the combined models will be
+accident-free as well. Third, any complexity of the longitudinal model such as anticipation
+is transfered automatically to a similarly complex lane-changing model. Finally, the braking
+deceleration imposed on the new follower on the target lane to avoid accidents is an obvious
+measure for the (lack of) safety. Thus, safety and motivational criteria can be formulated in a
+unified way.
+Apart from using accelerations as utility functions, the main novel feature of the proposed
+lane-changing model consists in taking into account the (dis-) advantage of the followers via
+a politeness parameter. By adjusting this parameter, the motivations for lane-changing can
+be varied from purely egoistic to a more altruistic behavior. Particularly, there exists a value
+where lane changes are only carried out if this increases the combined accelerationsof the lane-
+changing driver and all affected neighbors. This strategy can be paraphrased by the acronym
+’MinimizingOverallBrakingInducedbyLaneChanges’(MOBIL).Inthefollowing,wewillrefer
+to our concept by this acronym, regardless of the value of the politeness parameter. Notice
+that all lane-changing models cited before assume egoistic behavior. By the politeness factor,
+we can model two common lane-changing patterns. First, most drivers do not change lanes for
+a marginal advantage if this obstructs other drivers in addition to a common safety condition.
+Second, in countries with asymmetric lane-changing rules, ’pushy’ drivers may induce a lane
+change of a slower driver in front of them in order to the slower lane to be no longer obstructed
+on the faster lane, which is dedicated to passing.
+Our paper is organized as follows: In Sec. 2, we formulate the lane-changing model MOBIL
+both for symmetric (’US’) and asymmetric (’European’) passing rules. In Sec. 3, we apply
+the MOBIL rules and simulate multi-lane traffic in combination with the Intelligent Driver
+Model (IDM) as underlying longitudinal car-following model (Treiber et al., 2000). Finally, in
+Sec. 4, we will conclude with a discussion of the proposed model, future research directions,
+and a generalization of the MOBIL concept to other traffic-related decision processes, e.g.,
+when approaching traffic lights.
+2 The lane-changing model MOBIL
+Most time-continuous microscopic single-lane traffic models describe the motion of single
+’vehicle-driver units’ α as a function of their own velocity vα, the bumper-to-bumper distance
+
+===== PAGE 5 =====
+
+Kesting, Treiber, and Helbing 5
+~
+a
+n c
+a
+o c c
+Figure 1: Sketch of the nearest neighbors of a central vehicle c considering a lane change to the left.
+The new and old successors are denoted by n and o, respectively. Accelerations after a possible change
+are denoted with a tilde.
+sα to the front vehicle (α 1) and the relative velocity ∆vα = vα vα−1 . The acceleration of
+− −
+these car-following models is of the general form
+dvα
+aα := = a(sα, vα, ∆vα). (1)
+dt
+Some examples are the model of Gipps (1986), the ’optimal velocity model’ (Bando et al.,
+1995), the ’intelligent driver model’ (Treiber et al., 2000), or the ’velocity difference model’
+(Helly,1959;Jiangetal.,2001). Moreover,ageneralizationtomodelstakingintoaccountmore
+than one predecessor (Belexius, 1968; Lenz et al., 1999; Treiber et al., 2006), or to models with
+explicit reaction time, is straightforward.
+A specific lane change, e.g., from the center lane to the median lane as shown in Fig. 1
+dependsgenerallyonthetwofollowingvehiclesonthepresentandthetargetlane, respectively.
+In order to formulate the lane-changing criteria, we use the following notation: For a vehicle c
+consideringalanechange,thesuccessivevehiclesonthetargetandpresentlanearerepresented
+by n and o, respectively. The acceleration ac denotes the acceleration of vehicle c on the actual
+lane, while a˜c refers to the situation on the target lane, i.e., to the new acceleration of vehicle
+c on the target lane. Likewise, a˜o and a˜n denote the acceleration of the old and new followers
+after the lane change of vehicle c.
+2.1 Safety criterion
+Like other lane-changing models (Gipps, 1986), we distinguish between an incentive to change
+lanes and safety constraints. The safety criterion checks the possibility of executing a lane
+change (gap acceptance) by considering the effect on the upstream vehicle on the target lane.
+Formulated in terms of longitudinal accelerations, our safety criterion guarantees that, after
+the lane change, the deceleration of the successor a˜n on the target lane does not exceed a given
+safe limit b , i.e.,
+safe
+a˜n b
+safe
+. (2)
+≥ −
+Althoughformulatedasasimpleinequality,thisconditioncontainsalltheinformationprovided
+by the longitudinal car-following model via the acceleration a˜n(t) typically depending on the
+gap, the velocity and, eventually, on the approaching rate, cf. Eq. (1). In particular, if the
+longitudinal model has a built-in sensitivity with respect to velocity differences, this essential
+dependence is transfered to the lane-changing decisions. In this way, larger gaps between the
+following vehicle in the target lane and the own position are required to satisfy the safety
+constraint if the following vehicle is faster than the own speed. In contrast, lower values for
+thegapareallowedifthefollowingvehicleisslower. Comparedtoconventionalgap-acceptance
+
+===== PAGE 6 =====
+
+Kesting, Treiber, and Helbing 6
+models this approach depends on gaps only indirectly, via the dependence on the longitudinal
+acceleration. The assessment of the situation in terms of accelerations allows for the compact
+formulation.
+Moreover, by formulating the criterion in terms of safe braking decelerations of the longitu-
+dinal model, crashes due to lane changes are automatically excluded. For realistic longitudinal
+models, b should be well below the maximum possible deceleration b , which is about
+safe max
+9m/s2 on dry road surfaces. Notice that the maximum safe deceleration b prevents ac-
+safe
+cidents even in the case of totally selfish drivers as long as its value is not greater than the
+maximum possible deceleration b of the underlying longitudinal model.
+max
+Increasing the value for b generally leads to stronger perturbations due to individual lane
+safe
+changes. But the braking reaction of the follower on the target lane is always limited by the
+value of b . This is relevant in traffic simulations due to the fact that performing a lane
+safe
+change implies a discontinuous change in the input parameters for the acceleration function
+for the new follower.
+2.2 Incentive criterion for symmetric (’US’) lane-changing rules
+The incentive criterion typically determines if a lane change improves the individual local
+traffic situation of a driver. In our model, we generalize the incentive criterion to include the
+immediately affected neighbors as well. The politeness factor p determines to which degree
+these vehicles influence the lane-changing decision. For symmetric overtaking rules, we neglect
+differences between the lanes and propose the following incentive condition for a lane-changing
+decision of the driver of vehicle c:
+a˜c ac+p a˜n an + a˜o ao > ∆a
+th
+. (3)
+− − −
+driver (cid:0)newfollower oldfollower(cid:1)
+The first two terms denote the advantage (utility) of a possible lane change for the driver
+| {z } | {z } | {z }
+him- or herself, where a˜c refers to the new acceleration for vehicle c after a prospective lane
+change. The considered lane change is favorable if the driver can accelerate more, i.e., go
+faster in the new lane. The third term with the politeness factor p is the main innovation in
+our model. It denotes the total advantage (acceleration gain or loss, if negative) of the two
+immediately affected neighbors, weighted with p. Finally, the switching threshold ∆a on the
+th
+right-hand side of Eq. (??) models a certain inertia and prevents lane changes if the overall
+advantage is only marginal compared to a ’keep lane’ directive. In summary, the incentive
+criterion is fulfilled if the own advantage (acceleration gain) is higher than the weighted sum of
+the disadvantages (acceleration losses) of the new and old successors and the threshold ∆a .1
+th
+Noticethatthethresholda influencesthelane-changingbehaviorglobally,whilethepoliteness
+th
+parameter affects the local lane-changing behavior depending on the involved neighbors.
+The generalization to traffic on more than two lanes per direction is straightforward. If, for
+a vehicle on a center lane, the incentive criterion is satisfied for both neighboring lanes, the
+change is performed to the lane where the incentive is larger.
+Since the disadvantages of other drivers and the own advantage are balanced via the polite-
+ness factor p, the lane-changing model contains typical strategical features of classical game
+1 NoticethatEq.(??)containsboththepossibilityandtheincentivetochangelanes. Evenforapolitenessp=0,
+the condition makes sure that lane changes only take place if the distance to the next downstream vehicle
+in the target lane is large enough to prevent a collision. Otherwise, the acceleration function would result
+in an boundless braking deceleration. Therefore, this scenario is automatically excluded when comparing it
+to the actual traffic situation in the current lane. However, for reasons of numerical efficiency, the safety
+criterion (2) can be initially applied to a˜c as well.
+
+===== PAGE 7 =====
+
+Kesting, Treiber, and Helbing 7
+theory. The value of p can be interpreted as the degree of altruism. It can vary from p = 0
+(for selfish lane-hoppers) to p > 1 for altruistic drivers who do not change if that would de-
+teriorate the overall traffic situation considering the followers, while they would perform even
+disadvantageous lane changes if this improves the situation of the followers sufficiently. By
+setting p < 0, even malicious drivers could be modeled, who accept own disadvantages in order
+to thwart others. In the special case p = 1 and ∆a = 0, the incentive criterion simplifies to
+th
+a˜c+a˜n+a˜o > ac+an+ao. (4)
+Thus, lane changes are only performed when they increase the sum of accelerations of all
+involved vehicles, which corresponds to the concept of ’Minimizing Overall Braking Induced
+by Lane Changes’ (MOBIL) in the ideal sense. In this case, no additional safety constraint is
+neededsinceabrakingmaneuverinordertoavoidanaccidentwouldbeautomaticallyexcluded
+by Eq. (4) as long as the advantage in terms of the acceleration is lower than the disadvantage
+in terms of the braking deceleration. Therefore, the ’ideal’ MOBIL strategy corresponding
+to p = 1 has no free parameters and might therefore be considered as a ’minimal model’ for
+lane-changing decisions. In Sec. 3, we investigate the rate of lane changes (per km and hour)
+that is primarily determined by the politeness factor p.
+2.3 Incentive criterion for asymmetric (’European’) passing rules
+In most European countries, the driving rules for lane usage are restricted by legislation.
+We now formulate an asymmetric lane-changing criterion for two-lane freeways and assume,
+without loss of generality, that the right lane is the default lane, i.e., a ’keep-right’ directive is
+implemented. A reformulation for left-oriented traffic describing, e.g., traffic rules in the UK
+as well as generalizations to more than two lanes are straightforward. Specifically, we assume
+the following ’European’ traffic rules:
+(i) Passing rule: Passing on the right-hand lane is forbidden, unless traffic flow is congested,
+in which case the symmetric rule (??) applies. We treat any vehicle driving at a velocity
+below some suitably specified velocity v as driving in bound or congested traffic, e.g.,
+crit
+v = 60km/h.
+crit
+(ii) Lane usage rule: The right lane is the default lane. The left lane should only be used for
+the purpose of overtaking.
+We have implemented the passing rule by replacing the longitudinal dynamics on the right-
+hand lane by the condition
+ae c ur =
+min(ac,a˜c) if vc > v˜
+lead
+> v
+crit
+,
+(5)
+a otherwise,
+c
+(cid:26)
+where a˜c corresponds to the acceleration on the left lane and v˜
+lead
+denotes the velocity of
+the front vehicle on the left-hand lane. The passing rule influences the acceleration on the
+right-hand lane only (i) if there is no congested traffic (v˜ > v ), (ii) if the front vehicle
+lead crit
+on the left-hand lane is slower (vc > v˜
+lead
+), and (iii) if the acceleration a˜c for following this
+vehicle would be lower than the single-lane acceleration ac in the actual situation. Notice that
+the condition vc > v˜
+lead
+prevents that vehicles on the right-hand lane brake whenever they are
+passed.
+The ’keep-right’ directive of the lane-usage rule is implemented by a constant bias ∆a in
+bias
+addition to the threshold ∆a . Furthermore, we neglect the disadvantage of the successor in
+th
+
+===== PAGE 8 =====
+
+Kesting, Treiber, and Helbing 8
+the right lane in Eq. (??), because the left lane has priority. Explicitly speaking, the resulting
+asymmetric incentive criterion for lane changes from left (L) to right (R) reads
+L R : a˜e c ur ac+p(a˜o ao) > ∆a th ∆a bias . (6)
+→ − − −
+Moreover, the incentive criterion for a lane change from right (R) to left (L) is given by
+R L : a˜c ae c ur+p(a˜n an) > ∆a th +∆a bias . (7)
+→ − −
+Again, the quantities with a tilde refer to the new situation after a prospective lane change.
+While the parameter ∆a is small, it clearly has to be larger than the threshold ∆a .
+bias th
+Otherwise, the switching threshold would prevent changes to the right-hand lane even on an
+empty road.
+Neglecting the follower on the right-hand lane leads to a different interpretation of the
+politeness parameter p than for the symmetric rule. Via the politeness factor p, a driver on the
+right lane considering a lane change to the left takes into account the disadvantage measured
+in terms of the braking deceleration for the approaching vehicle on the target lane. This can
+prevent the considered lane change even if the lane change is not critical, which is assured by
+the safety criterion (2). This feature of the MOBIL lane-changing model reflects realistically a
+far-seeing and anticipative driving behavior commonly observed for asymmetric passing rules.
+Furthermore, taking into account only the follower of the faster (left) lane via the politeness
+factor p applies a selective dynamic pressure on slow vehicles driving on the left lane in order
+to let fast vehicles pass on the left lane, which is a frequently observed behavior on European
+freeways, particularly on Germany freeways with their broad distribution of desired velocities.
+Notice that the safety criterion prevents a critical lane change to the slower lane.
+3 Application to multi-lane traffic simulations
+Let us now apply the MOBIL concept to simulate two-lane freeway traffic with an on-ramp as
+mergingzone. Sincetherulesareformulatedinamodel-independentwaybasedonlongitudinal
+accelerations, we have to specify the underlying microscopic traffic model. In the following,
+we will use the Intelligent Driver Model (IDM) (Treiber et al., 2000), which is a simple car-
+following model with descriptive parameters (Treiber, 2006).
+The IDM acceleration v˙ of each vehicle α is a continuous function of the velocity vα, the net
+distance gap sα, and the velocity difference ∆vα to the leading vehicle:
+4 ∗ 2
+vα s (vα,∆vα)
+v˙α = a 1 . (8)
+"
+− v
+0
+− sα
+#
+(cid:18) (cid:19) (cid:18) (cid:19)
+This expression is a superposition of the acceleration v˙ (v) = a[1 (v/v )4] on a free road
+free 0
+and the braking deceleration v˙ (s,v,∆v) = a(s ∗ /s)2, when vehi − cle α comes too close to
+int
+−
+the vehicle ahead. The deceleration term depends on the ratio between the effective ’desired
+minimum gap’
+v∆v
+∗
+s (v,∆v) = s +vT + (9)
+0
+2√ab
+and the actual gap sα. The minimum distance s
+0
+in congested traffic is significant for low
+velocities only. The main contribution in stationary traffic is the term vT, which corresponds
+to following the leading vehicle with a constant ’safe time gap’ T. The last term is only
+active in non-stationary traffic and implements an ’intelligent’ driving behavior including a
+
+===== PAGE 9 =====
+
+Kesting, Treiber, and Helbing 9
+braking strategy that, in nearly all situations, limits braking decelerations to the ’comfortable
+deceleration’ b. Notice that the IDM guarantees crash-free driving.
+Thelane-changingbehaviordoesnotonlydependonthelane-changingandthecar-following
+model, but also on the heterogeneity of the vehicle-driver units. Particularly, for identical
+vehicle-driver units, a stationary state would be reached soon. To avoid this artifact, we have
+introduced heterogeneity by implementing two types of vehicles. The slower ’trucks’ differ in
+their reduced desired velocity v = 80km/h compared to the faster ’cars’ (v = 120km/h).
+0 0
+Apart from different desired velocities for the vehicle type, we have also uniformly distributed
+the desired velocity with a variation of 20% for each single vehicle in order to increase the
+±
+degree of heterogeneity. For our simulations, we use the following IDM parameters: The time
+gap is set to T = 1.2s, the maximum acceleration to a = 1.5m/s2, the desired deceleration
+to b = 2 m/s2, and the minimum distance to s = 2m. Furthermore, the vehicle length is
+0
+assumed to be 4 m for cars and 12 m for trucks. In addition, we assumed a truck fraction of
+20%. The values of the MOBIL parameters used in the simulations are listed in Table 1.
+The incentive criterion is evaluated in each numerical update step in the simulation, i.e.,
+the drivers continuously check their incentives. If a lane change is favorable and safe, the
+lane change is performed immediately and the transition from the present lane to the target
+lane is neglected. Notice that the acceleration will be discontinuous for the considered vehicle,
+and also for the old and new successors. However, as the velocity is given by integrating
+the acceleration, the velocities of all vehicles (and the accelerations of all other vehicles not
+directly involved in the lane change) remain continuous. We checked the simulation results
+for the different numerical update steps ∆t = 0.25, 0.1 and 0.01s and found only a marginal
+quantitative difference with respect to lane-changing rates. Furthermore, the multi-lane model
+combination of IDM and MOBIL is mathematically consistent in the sense that the numerical
+results for a limited simulation period converge in the limit ∆t 0s. For the following
+→
+simulations, we used an explicit numerical update of ∆t = 0.25s.
+When evaluating the MOBIL accelerations for the old and new followers, one has, in prin-
+ciple, the freedom to evaluate the accelerations using the own model parameter set or that
+of the respective successors. Clearly, using the driving parameters of the followers is in line
+with the reasoning behind MOBIL, although they are not directly observable by the driver
+initiating a lane change. However, strong clues are given to the driver both by the vehicle type
+(truck, family car, sports car) and by the past driving style. Therefore, we evaluate all MOBIL
+accelerations with the model parameters of the respective successors.
+3.1 Spatial distribution of the lane-changing rate
+In this section, we apply the proposed lane-changing model to the simulations of discretionary
+and mandatory lane changes. To this end, we have simulated a two-lane road section of
+10km length with open boundary conditions. For an open system, the inflow at the upstream
+boundary is the natural control parameter. The inflow at the upstream boundary has been
+kept constant at 1000vehicles/h/lane. Furthermore, we have assumed an on-ramp (merging
+length 300 m) at the location x = 7.5 km with a constant inflow of 500vehicles/h.
+Themandatory mergefromtheon-ramptotherightlaneofthefreewayismodeledbya’vir-
+tual vehicle’ standing at the end of the merging lane. Due to the imposed deceleration to avoid
+a collision, the attractiveness of the merging lane automatically decreases, and, consequently
+the incentive to merge to the freeway increases, when approaching the standing vehicle. To
+favor lane-changing in this situation, we assume an egoistic behavior for the merging vehicle
+in the weaving lane by setting p = 0.
+
+===== PAGE 10 =====
+
+Kesting, Treiber, and Helbing 10
+Table 1: Parameters of the MOBIL lane-changing model. The politeness parameter p of the incentive
+criterionmainlydeterminesthelane-changingrate. Thechangingthreshold∆ath preventslanechanges
+of marginal advantage. For p < 1, the maximum safe deceleration bsafe serves as additional safety
+criterion. The value of bsafe is chosen considerably below the physically possible maximum deceleration
+2
+ofabout9m/s ondryroads. Inthecaseofasymmetric(’European’)lane-changingrules,theadditional
+bias ∆abias models a preferred lane-usage of the default lane. The values are used in the simulations
+in combination with the Intelligent Driver Model (IDM). Notice that lane-changing properties and,
+consequently, the values depend on the respective longitudinal traffic model.
+Parameter Value
+Politeness Factor p 0 ...1
+Changing threshold ∆a 0.1 m/s2
+th
+Maximum safe deceleration b 4 m/s2
+safe
+Bias for right lane ∆a 0.3 m/s2
+bias
+The impact of the on-ramp on the lane-changing behavior with symmetric rules is displayed
+in a spatiotemporal diagram of the lane-changing events in Fig. 2 (upper row) for a politeness
+factor p = 1. The displayed lane-changing events from the right to the left lane, and from the
+left to the right lane express clearly the inhomogeneity of the road section. As expected, the
+local lane-changing rate is increased near the on-ramp located at x = 7.5km. The on-ramp
+induces a locally strongly increased activity of discretionary lane changes from the right to the
+left lane, while the number of lane changes from the left to the right is reduced. Since vehicles
+merge from the on-ramp to the right lane of the freeway, the right lane becomes less attractive
+for vehicles on the freeway upstream the merging zone. Therefore, the incentive to change to
+the left lane is locally increased.
+This observation is displayed in the distribution of lane-changing events as a function of
+space. The diagrams in the lower row of Fig. 2 show the lane-changing rates for simulations
+with politeness factors p = 0 and p = 1. The lane-changing rate measures the performed lane
+changes per kilometer and hour. The simulations for different values of p show the same form
+of the spatial distribution: The lane-changing rate is nearly homogeneously distributed up-
+and downstream the on-ramp. In a range of about 500m around the center of the on-ramp at
+x = 7.5km, the number of lane changes to the left lane is increased by approximately a factor
+of 4, while the changes to the right lane are slightly reduced. This demonstrates the strong
+dependence of the lane-changing behavior due to spatial inhomogeneities of the road section.
+The relative increase is even higher for ’polite’ drivers (p = 1) compared to the simulated
+’egoistic’ behavior referring to p = 0. Notice that the lane-changing rate is slightly increased
+downstream the on-ramp because of the increased traffic density, see the following section.
+3.2 Lane-changing rate
+Let us now investigate the lane-changing rate as a function of the traffic density. A method
+to measure locally the lane-changing rate and the traffic density in a microscopic simulation
+is as follows: The road is divided into subsections, e.g., of length ∆x = 1km, and time is
+divided into time intervals of durations ∆t = 1min. For each spatiotemporal element ∆x∆t
+obtained in this way, the number n of lane changes and the average density ρ is determined.
+
+===== PAGE 11 =====
+
+Kesting, Treiber, and Helbing 11
+9
+8.5
+8
+7.5
+7
+6.5
+6
+0 100 200 300 400 500 600 700 800 900
+)mk(
+x
+noitisoP
+Lane-changing events from right to left lane (p=1)
+9
+8.5
+8
+7.5
+7
+6.5
+6
+0 100 200 300 400 500 600 700 800 900
+Time t (min)
+)mk(
+x
+noitisoP
+Lane-changing events from left to right lane (p=1)
+Time t (min)
+2000
+1500
+1000
+500
+0
+6 6.5 7 7.5 8 8.5 9
+)mk
+h/1(
+stneve
+gnignahc-enaL
+2000
+(a) Politness Factor p=0 Right to Left
+Left to Right
+1500
+1000
+500
+0
+6 6.5 7 7.5 8 8.5 9
+Position x (km)
+)mk
+h/1(
+stneve
+gnignahc-enaL
+(b) Politness Factor p=1 Right to Left
+Left to Right
+Position x (km)
+Figure 2: (Upper row) Spatiotemporal diagrams of the lane-changing events from the right to the left
+laneandviceversaforsymmetriclane-changingrulesandapolitenessfactorofp=1. Eachlanechange
+isdisplayedasadot. Thetrafficdemandsare1000vehicles/h/laneonthemainroadand500vehicles/h
+on the on-ramp. (Lower row) Distributions of the lane-changing rate as a function of space for p = 0
+and p=1.
+
+===== PAGE 12 =====
+
+Kesting, Treiber, and Helbing 12
+1600
+1400
+1200
+1000
+800
+600
+400
+200
+0
+0 5 10 15 20 25 30 35
+))mk
+h(/1(
+etar
+gnignahc-enaL
+(a) Symmetric lane-changing rules
+Politness factor p=0 x=5.5 km 1600
+x=7.5 km
+1400
+1200
+1000
+800
+600
+400
+200
+0
+0 5 10 15 20 25 30 35
+Traffic density (vehicles/km/lane)
+))mk
+h(/1(
+etar
+gnignahc-enaL
+(b) Asymmetric lane-changing rules
+Politness factor p=0 x=5.5 km
+x=7.5 km
+Traffic density (vehicles/km/lane)
+1600
+1400
+1200
+1000
+800
+600
+400
+200
+0
+0 5 10 15 20 25 30 35
+))mk
+h(/1(
+etar
+gnignahc-enaL
+(c) Symmetric lane-changing rules
+Politness factor p=1 x=5.5 km 1600
+x=7.5 km
+1400
+1200
+1000
+800
+600
+400
+200
+0
+0 5 10 15 20 25 30 35
+Traffic density (vehicles/km/lane)
+))mk
+h(/1(
+etar
+gnignahc-enaL
+(d) Asymmetric lane-changing rules
+Politness factor p=1 x=5.5 km
+x=7.5 km
+Traffic density (vehicles/km/lane)
+Figure 3: Lane-changing rates for symmetric (’US’) and asymmetric (’European’) lane-changing rules
+as a function of traffic density. In the simulations, the politeness parameter has been considered for
+values of p = 0 and p = 1. Furthermore, the diagrams show the lane-changing rates measured in the
+roadsections[5,6]kmand[7,8]kmofthe10kmroadstretch. Asshowninthediagrams, themaximum
+lane-changing rate is mainly determined by the politeness factor. An on-ramp at location x = 7.5km
+with a merging zone of 300m increases the lane-changes locally.
+The lane-changing rate is then given by
+n
+r(ρ) = . (10)
+∆x∆t
+Finally, we average over all lane-changing rates belonging to the same density interval. Taking
+different values of ∆x, ∆t, or ∆ρ have not changed the results qualitatively.
+We have run multiple simulations of the scenario presented in the previous section with
+inflows varying from 100 vehicles/h/lane up to 1800 vehicles/h/lane and a constant ramp flow
+of Q = 500 vehicles/h. The resulting lane-changing rates for politeness factors of p = 0 and
+rmp
+p = 1 and for symmetric and asymmetric lane-changing rules are shown in Fig. 3. The results
+for the considered road sections around x = 5.5km and x = 7.5km of length 1km displayed
+in Fig. 3 show the following characteristics:
+The lane-changing rates increase for traffic densities 1km/lane < ρ < 10/km/lane. A
+•
+more detailed analysis revealed a quadratic slope at the origin for small densities.
+The maximum lane-changing rates are reached for intermediate densities. The maximum
+•
+is located between 10/km/lane (for p = 1 and asymmetric rules), and 15/km/lane (other
+cases).
+
+===== PAGE 13 =====
+
+Kesting, Treiber, and Helbing 13
+The peak value depends strongly on the value of the politeness parameter. For p =
+•
+0, the maximum lane-changing rate is about 1100/h/km (1400/h/km) for symmetric
+(asymmetric) rules. For p = 1, the maximum lane-changing rate is only 600 (450)
+vehicles/h/km approximately. Further simulations show that already a positive value
+p > 0 reduces the maximum number of lane changes significantly.
+With increasing density, velocity differences between neighboring lanes are reduced.
+•
+Thus, the lane-changing rates decrease.
+For density values around 30vehicles/km/lane, the lane-changing rates on the homoge-
+•
+neous road section around x = 5.5km are negligible because changing lanes is no more
+profitableorpossibleduetoalackofsuitablegaps. Thiscouldbeattributedtoa’moving
+like a solid block’ effect proposed by Helbing and Huberman (1998).
+The curves of the lane-changing rates measured at the homogeneous road section located
+•
+aroundx = 5.5kmandthesectionatx = 7.5kmincludingthemergingareashowsimilar
+shapes. Due to the slower vehicles merging from the on-ramp to the freeway, the lane-
+changing rate is systematically shifted to higher values (cf. the previous section). Notice
+that, for high traffic densities, the lane-changing rate does not drop to zero. There are
+still about 100–200 lane changes per hour and kilometer. This agrees with the findings
+in Sparmann (1978).
+The politeness parameter p is the most important parameter determining the lane-changing
+rate. However, let us discuss the influence of the other MOBIL parameters as well. The
+lane-changing threshold ∆a influences the peak of the curve weakly, but does not change
+th
+r(ρ) qualitatively. For example, increasing ∆a from 0.1 to 0.3m/s2 reduces the maximum
+th
+number of lane changes by approximately 100/h/km. Moreover, the influence of the maximum
+safe deceleration b is negligible within a reasonable range of braking accelerations from
+safe
+8m/s2 to b as the IDM braking strategy limits braking decelerations to the ’comfortable
+− −
+deceleration’ b in nearly all situations Treiber et al. (2000). Notice that for the special case
+p = 1, the safety criterion is even dispensable as discussed in Sec. 2.1.
+Let us finally discuss the mean velocities as a function of traffic density corresponding to
+the lane-changing rates shown in Fig. 3 of the open system. In the simulations, we have im-
+plemented ’virtual’ cross sections in order to aggregate the data with 1-min sampling intervals
+mimicking real-world double-loop detector measurements. For each sample interval, we have
+recorded the lane-resolved traffic flow Qi and determined the arithmetic velocity averages Vi.
+The density ρ was calculated by the hydrodynamic relation Q = ρV from the lane-averaged
+L L
+quantities Q =
+i=1
+Qi and V =
+i=1
+(QiVi)/Q for the road consisting of L = 2 lanes. To
+facilitate the discussion, we have suppressed the fluctuations in the velocities occurring in the
+P P
+1-min data by averaging over all data belonging to the same density class (of class width
+∆ρ = 2/km/lane).
+Figure 4 shows the velocities of the left and the right lane measured with a detector located
+at x = 5km for symmetric and asymmetric lane-changing rules and for politeness settings
+p = 0 and p = 1. In the simulations, traffic is always free with speeds about V 65km/h.
+≥
+For symmetric lane-changing rules without any bias, the velocity is primarily synchronized in
+all lanes for all densities due to the lack of any lane preference, see Fig. 4(a). In contrast,
+the difference of average velocities in different lanes in free traffic, Fig. 4(b), is a consequence
+of explicitly asymmetric lane-changing rules modeled by the parameter a in combination
+bias
+with the passing rule (5). The initially equally distributed trucks are mostly found on the
+
+===== PAGE 14 =====
+
+Kesting, Treiber, and Helbing 14
+110
+105
+100
+95
+90
+85
+80
+75
+70
+65
+60
+0 5 10 15 20 25 30 35
+)h/mk(
+yticoleV
+naeM
+(a) Symmetric lane-changing rules
+130
+Detector at 5 km p=0, left lane p=0, right lane 120
+p=1, left lane
+p=1, right lane
+110
+100
+90
+80
+70
+60
+0 5 10 15 20 25 30 35
+Traffic density (vehicles/km/lane)
+)h/mk(
+yticoleV
+naeM
+(b) Asymmetric lane-changing rules
+p=0, left lane Detector at 5 km p=0, right lane
+p=1, left lane
+p=1, right lane
+Traffic density (vehicles/km/lane)
+Figure4: Lane-resolvedvelocitiesaveragedfromdouble-loopdetectorsamplesof1minatacrosssection
+x = 5km for symmetric (a) and asymmetric (b) MOBIL rules. The simulation results correspond to
+the lane-changing rates shown in Fig. 3 for politeness factors p = 0 and p = 1. Notice the different
+vertical scale in both diagrams.
+right-most lane. The separation results in a different velocity-density relation for the fast (left)
+lane and the slow (right) lane as shown in Fig. 4(b). For both lane-changing scenarios, the
+velocity differences decrease with increasing traffic density.
+The influence of the politeness factor p leads to the following findings:
+For symmetric lane-changing behavior, the ’altruistic’ lane-changing behavior corre-
+•
+sponding to p = 1 increases the mean speed of both lanes for traffic densities of about
+ρ 20/km/lane. Therefore, the suppression of disadvantageous lane changes for the
+≤
+direct environment (Eq. (4)) improves the overall traffic performance. In contrast, an
+’egoistic’ lane-changing behavior (p = 0) results (in average) in higher travel times.
+For asymmetric MOBIL rules, the lane-changing behavior corresponding to p = 1 leads
+•
+to more articulate velocity differences between the lanes. While the speed in the passing
+(left) lane is higher than in the case for p = 0, the slow (right) lane gets slower. Notice
+that these variations only occur for intermediate traffic densities, i.e., when lane changes
+lead to interactions between vehicles in neighboring lanes. When a vehicle-driver unit
+considers to change to the fast lane, the disadvantage of the follower in the target lane
+is included (and weighted) by the politeness factor. An unselfish driver, therefore, stays
+in the slower lane to avoid the perturbation of the faster vehicles in the left lane. As a
+consequence, the lane-changing rate is reduced (see Fig. 3), and velocity differences in
+the right lane decreases as well.
+However, for symmetric and asymmetric MOBIL rules, the differences between the lane-
+•
+changing behavior for different p settings disappear for densities ρ > 20/km/lane. This
+result is consistent with the measured lane-changing rate, cf. Fig. 3, as the number of
+lane changes decrease with increasing density due to a lack of suitable gaps independent
+from the value of the politeness.
+4 Conclusions and outlook
+Lane-changing models are an important component of microscopic traffic simulation software.
+Most of the published and implemented lane-changing models follow a rule-based approach
+
+===== PAGE 15 =====
+
+Kesting, Treiber, and Helbing 15
+with different gap-acceptance conditions and, consequently, different lane-changing behavior
+for various situations. Due to the multiplicity of possible driving conditions associated with
+discretionaryandmandatorylanechanges,thisapproachoftentendstoleadtocomplexmodels
+with many parameters.
+In this paper, we have presented the general concept MOBIL defining lane-changing models
+for a broad class of car-following models. The basic idea of MOBIL is to measure both the
+attractiveness of a given lane, i.e., its utility, and the risk associated with lane changes in
+terms of accelerations. This means, both the incentive criterion and the safety constraint can
+be expressed in terms of the acceleration function of the underlying car-following model, which
+allows for an efficient and compact formulation of the lane-changing model with only a small
+number of additional parameters. As a consequence, the properties of the car-following model,
+e.g., any dependence on relative velocities or the exclusion of collisions are transfered to the
+lane-changing behavior. Moreover, the model is able to describe mandatory and discretionary
+lane changes as well as symmetric and asymmetric lane changing behavior in a unified and
+consistent way.
+As a novel feature, our model takes into account other drivers via a politeness factor p. The
+politeness factor characterizes the degree of ’passive’ cooperativeness among drivers, i.e., the
+subject vehicle makes a decision by considering its effects on other drivers. More specifically,
+evenadvantageouslanechangeswillnotbeperformedifthepersonaladvantageissmallerthan
+the disadvantage to the traffic environment, multiplied by p. Furthermore, a ’pushy’ driver
+is able to initiate a lane change of his or her leader, which is a commonly observed driving
+behavior in countries with asymmetric lane-changing rules and dedicated passing lanes.
+The MOBIL concept has only few parameters and each parameter is associated with an
+intuitive meaning. The safety criterion is simply described by a critical acceleration thresh-
+old b . The threshold a prevents lane-changing yielding only a marginal advantage. For
+safe th
+the asymmetric incentive criterion, an additional bias parameter a differentiates between
+bias
+default and passing lanes. The optional politeness parameter p weights the accelerations and
+decelerations of the vehicles directly affected by a lane change. The parameters b ,a and
+safe th
+a aregiveninunitsoftheaccelerationandaredirectlymeasurablequantities. Therefore,the
+bias
+model parameters could be calibrated by using highly resolved trajectory data (Hoogendoorn
+et al., 2003; NGSIM, 2006). Moreover, the politeness factor can also be empirically tested and
+measured by comparing the situation before and after the lane change for the affected vehicles.
+We have investigated the lane-changing rate by means of simulation in an open system with
+an on-ramp in combination with the Intelligent Driver Model (IDM) leading to deterministic
+lane-changing behavior. The lane-changing rate is mainly determined by the politeness factor
+p,butdependsalsoontheconsideredlocationoftheroadsection. Asshowninthesimulations,
+the lane-changing rate is locally increased at the location of an road inhomogeneity, which is
+related to mandatory lane changes. In order to investigate the role of ’critical’ lane changes in
+increasing the breakdown probability, one could vary the safety threshold b . A more generic
+safe
+stochastic approach would be based on a car-following model that takes explicitly into account
+perception errors that lead to a subjective estimate for the utility and safety of a lane change
+(Treiber et al., 2006).
+Obviously, research into empirical justification and model calibration and validation is the
+next step using highly resolved trajectory data (Hoogendoorn et al., 2003; NGSIM, 2006).
+However, the empirical investigation of lane-changing behavior is even more difficult than the
+car-following behavior because more vehicles are involved, the situations are more singular due
+to the overlap of the strategic, tactical, and operational behavior, and, finally, the intra- and
+inter-driver differences will play even a stronger role as for the longitudinal behavior (Ossen
+
+===== PAGE 16 =====
+
+Kesting, Treiber, and Helbing 16
+et al., 2006). The diversity of the drivers could be represented in a microscopic simulation
+by statistically distributed values for the MOBIL parameters, particularly for the politeness
+parameter.
+Furthermore, extensions of the proposed acceleration-based concept to other traffic-related
+decision processes are possible as well. For example, when approaching a traffic light that
+switches from green to yellow, one has to decide whether to stop in front of the signal, or still
+to pass it. In the framework of MOBIL, the ’stop’ decision will be based on the safe braking
+deceleration b . Similar considerations apply when deciding whether it is safe enough to
+safe
+cross an unsignalized intersection (Helbing et al., 2005), to turn into another road in a ’yield
+situation’, or to start an overtaking maneuver on the opposite lane of a two-way rural road.
+Finally, we emphasize that MOBIL is meant to represent only the last ’operational’ decision
+whether to immediately perform a lane change or not. In reality, a lane-changing decision also
+includes strategical and tactical aspects in preparation for this final step, which are relevant
+particularlyforcongestedtrafficandformandatorylanechanges. Forexample, tacticalbehav-
+ior may involve accelerations (or decelerations) of the own vehicle or of vehicles in the target
+lane in preparation for a lane change, which corresponds to ’active’ cooperation between the
+drivers. This ’longitudinal-transverse coupling’ will be the subject of a forthcoming paper.
+Acknowledgments:
+The authors would like to thank for partial support by the Volkswagen AG within the BMBF
+project INVENT.
+References
+Ahmed, K. I., 1999. Modeling drivers’ acceleration and lane change behavior. Ph.D. thesis,
+Massachusetts Institute of Technology.
+Bando, M., Hasebe, K., Nakayama, A., Shibata, A., Sugiyama, Y., 1995. Dynamical model of
+traffic congestion and numerical simulation. Phys. Rev. E 51, 1035–1042.
+Belexius, S., 1968. An extended model for car-following. Transportation Research 2 (1), 13–21.
+Brackstone, M., McDonald, M., 1996. The microscopic modelling of traffic flow: Weaknesses
+and potential developments. In: Wolf, D. E., Schreckenberg, M., Bachem, A. (Eds.), Traffic
+and Granular Flow. World Scientific, Singapore, pp. 151–165.
+Brackstone, M., McDonald, M., Wu, J., 1998. Lane changing on the motorway: Factors affect-
+ing its occurrence, and their implications. In: Proc. of the 9th Int. Conf. on Road Trans-
+portation Information and Control. Conference Publication No. 454, London, pp. 160–164.
+Coifman,B.,Krishnamurthy,S.,Wang,X.,2005.Lane-changingmaneuversconsumingfreeway
+capacity. In: Hoogendoorn, S., Luding, S., Bovy, P., Schreckenberg, M., Wolf, D. (Eds.),
+Traffic and Granular Flow ’03. Springer, Berlin, pp. 3–14.
+Gipps, P. G., 1986. A model for the structure of lane-changing decisions. Transportation Re-
+search 20B, 403–414.
+Halati,A.,Lieu,H.,Walker,S.,1997.Corsim-corridortrafficsimulationmodel.In: Benekohal,
+R. F. (Ed.), Proceedings of the Traffic Congestion and Traffic Safety in the 21th Century
+Conference. ASCE, New York, pp. 570–576.
+
+===== PAGE 17 =====
+
+Kesting, Treiber, and Helbing 17
+Helbing, D., 2001. Traffic and related self-driven many-particle systems. Reviews of Modern
+Physics 73, 1067–1141.
+Helbing, D., Huberman, B. A., 1998. Coherent moving states in highway traffic. Nature 396,
+738–740.
+Helbing, D., Jiang, R., Treiber, M., 2005.Analyticalinvestigation ofoscillationsinintersecting
+flows of pedestrian and vehicle traffic. Phys. Rev. E 72, 046130.
+Helly, W., 1959. Simulation of bottlenecks in single lane traffic flow. In: General Motors Re-
+search Loratories (Ed.), Proceedings of the Symposium on the Theory of Traffic Flow. Else-
+vier, New York, pp. 207–238.
+Hidas, P., 2005. Modelling vehicle interactions in microscopic traffic simulation of merging and
+weaving. Transportation Research C 13, 37–62.
+Hidas, P., Wagner, P., 2004. Review of data collection methods for microscopic traffic simula-
+tion. In: World Conference on Transport Research. WCTR, Istanbul, Turkey.
+Hoogendoorn, S. P., Zuylen, H. J. V., Schreuder, M., Gorte, B., Vosselman, G., 2003. Mi-
+croscopic traffic data collection by remote sensing. Transportation Research Record 1855,
+121–128.
+Jiang,R., Wu, Q.,Zhu, Z.,2001.Fullvelocitydifferencemodelforacar-followingtheory.Phys.
+Rev. E 64, 017101.
+Laval, J. A., Daganzo, C. F., 2004. Multi-lane hybrid traffic flow model: Quantifying the
+impacts of lane-changing maneuvers on traffic flow.
+Laval, J. A., Daganzo, C. F., 2006. Lane-changing in traffic streams. Transportation Research
+Part B 40 (3), 251–264.
+Lenz, H., Wagner, C., Sollacher, R., 1999. Multi-anticipative car-following model. European
+Physical Journal B 7, 331–335.
+Nagatani, T., 2002. The physics of traffic jams. Reports of Progress in Physics 65, 1331–1386.
+Nagel, K., Wolf, D., Wagner, P., Simon, P., 1998. Two-lane traffic rules for cellular automata:
+A systematic approach. Phys. Rev. E 58, 1425–1437.
+NGSIM, 2006. Next Generation Simulation. Department of Transportation,
+www.http://ngsim.fhwa.dot.gov.
+Ossen, S. J., Hoogendoorn, S. P., Gorte, B. G., 2006. Inter-driver differencesin carfollowing: a
+vehicle trajectory based study. Vol. Paper 06-1028. Transportation Research Board Annual
+Meeting, Washington, D.C.
+Skabardonis, A., 2002. Simulation of freeway weaving areas. Transportation Research Record
+1802, 115–124.
+Sparmann, U., 1978. Spurwechselvorga¨nge auf zweispurigen BAB-Richtungsfahrbahnen. In:
+Forschung, Straßenbau und Straßenverkehrstechnik. Vol. 263. Bundesminister fu¨r Verkehr,
+Bonn-Bad Godesberg.
+
+===== PAGE 18 =====
+
+Kesting, Treiber, and Helbing 18
+Toledo, T., Choudhury, C. F., Ben-Akiva, M. E., 2005. Lane-changing model with explicit
+targetlanechoice.Transportation ResearchRecord: Journalof the Transportation Research
+Board 1934, 157–165.
+Toledo, T., Koutsopoulos, H. N., Ben-Akiva, M. E., 2003. Modeling integrated lane-changing
+behavior. Transportation Research Record 1857, 30–38.
+Treiber, M., 2006. The website http://www.traffic-simulation.de provides an interactive
+simulation of the Intelligent Driver Model (IDM) in combination with the lane-changing
+model MOBIL.
+Treiber, M., Hennecke, A., Helbing, D., 2000.Congestedtrafficstatesinempiricalobservations
+and microscopic simulations. Phys. Rev. E 62, 1805–1824.
+Treiber, M., Kesting, A., Helbing, D., 2006. Delays, inaccuracies and anticipation in micro-
+scopic traffic models. Physica A 360, 71–88.
+Wei,H.,Lee,J.,Li,Q.,Li,C.J.,2000.Observation-basedlane-vehicle-assignmenthierarchyfor
+microscopic simulation on an urban street network. Transportation Research Record 1710,
+96–103.
+Yang, Q., Koutsopoulos, H. N., 1996. A microscopic traffic simulator for evaluation of dynamic
+traffic management systems. Transportation Research C 4 (3), 113.
+Yousif, S., Hunt, J., December 1995. Modelling lane utilization on British dual-carriageway
+roads: effects on lane-changing. Traffic Engineering + Control 36 (12), 680 – 687.

@@ -1,0 +1,517 @@
+===== PAGE 1 =====
+
+Assessment of I-4 Contraflow Plans
+Microscopic Versus Mesoscopic Simulation
+Vinayak V. Dixit, Shankar Ramasamy, and Essam Radwan
+Better use of the available road network is critical to improving the safety, operational, accessibility, and cost issues associated with
+evacuation operation during a disaster. Contraflow operations help contraflow lanes. That work also tabulated the gains in capacity for
+increase the capacity of the available network by reversing the direction each lane from the conversion of lanes to contraflow operations.
+of inbound lanes to outbound lanes. This helps improve the outflow from The paper pointed out that when all the lanes were reversed, the total
+a region threatened by disaster. One of the major issues associated with increase in capacity was only 67%, although a 100% increase in
+contraflow operations is determining the locations for access to the capacity should have been achieved because of the reversal of all
+contraflow lanes from the normal-flow lanes. These accesses are also lanes. This less than 100% increase in capacity was attributed to the
+referred to as crossovers. Four different strategies with different crossover unfamiliarity and discomfort of drivers driving on the contraflow
+locations were tested on the I-4 evacuation route from Tampa to Orlando, lane, resulting in lower speeds.
+Florida. It was found that the provision of two crossovers, one after Tampa Wolshon and Urbina published a comprehensive review of the
+and another after Plant City, performed the best but was only margin- evacuation plans of all states affected by hurricanes (2). They rec-
+ally better than the provision of one crossover after Tampa. Therefore, ommended the need to control evacuation demand and increase the
+considering the cost and personnel needed to provide a crossover, the capacity of evacuation routes and develop a standard set of evacua-
+provision of one crossover after Tampa was found to be a more logical tion guidelines. They suggested that the evacuation plans need to be
+choice than the provision of two crossovers. It was observed that the more flexible to handle eventualities.
+time required to run the microscopic simulation to arrive at the results Tuydes and Ziliaskopoulos proposed the use of an optimization
+was extremely long. To overcome this drawback, the cell transmission model to determine sections of roads where contraflow plans need
+model (CTM) was calibrated and run for the same four strategies. It was to be implemented (3). One of the drawbacks was that the results
+observed that the results were extremely close to the results from the generated with this model did not incorporate merge and diverge
+microscopic simulation. The robustness and speed of CTM make it ideal congestions, which might be crucial in determining the location of
+for use as part of a decision support system to help determine the best crossovers.
+strategies in real time. This will help emergency management officials Theodoulou (4) and Theodoulou and Wolshon (5) modeled and
+make real-time decisions in the event of unforeseen drops in capacities analyzed certain freeway contraflow operations in the New Orleans,
+because of incidents or vehicle breakdowns. Louisiana, area. Theirs was one of the first efforts to discuss design
+issues with respect to entry–exit and termination strategies. The basic
+idea that they used was to manage the congestion caused by merge
+Contraflow operations are widely being used to improve evacua- and diverge and improve the use of the capacity created because
+tion operations. Contraflow operation is the reversal of inbound of contraflow operations. In his study, Theodoulou had assumed
+lanes to outbound lanes to increase the capacities of evacuation 15% heavy vehicles (4). As stated in his research (4), he assumed a
+routes. One of the main issues related to contraflow operations is high percentage of heavy vehicles, because it has been observed in
+access to contraflow lanes. These accesses are also referred to as previous studies (6, 7) that evacuees instinctively tend to carry as many
+crossovers. Placement of these crossovers at inappropriate loca- of their belongings as possible. Theodoulou also observed that 60%
+tions might result in bottlenecks, which adversely affect evacua- of evacuees tend to use normal-flow lanes, whereas the remaining
+tion operations. Therefore, it is of utmost importance to determine 40% use the contraflow lanes (4).
+locations for crossovers that will help improve evacuation opera- The road signs and markings on the contraflow lanes are created
+tions. The number of crossovers is also constrained by the amount for vehicles traveling in the opposite direction of the evacuating traf-
+of personnel required and the logistics and cost required to imple- fic. This results in driver unfamiliarity with the driving conditions,
+ment them. Hence, it is crucial to determine the locations and num- resulting in a drop in free-flow speeds. For the purpose of this study,
+ber of crossovers under constraints that will provide the best benefit it was assumed that the free-flow speeds on the contraflow lanes
+to the evacuation operation. dropped from 60 to 55 mph. Discomfort is also associated with
+Work done by Wolshon helped provide an understanding of con- driving on the contraflow lanes because of the limited number of
+traflow operations during an evacuation (1). That work discussed the exits on the contraflow lanes, which provide limited opportunities
+to stop for rest. The unfamiliarity and discomfort associated with
+traveling on contraflow lanes would result in fewer evacuees prefer-
+Department of Civil and Environmental Engineering, University of Central Florida,
+Orlando, FL 32816-2450. Corresponding author: V.V. Dixit, vvdixit@yahoo.com. ring to use contraflow lanes than normal-flow lanes. The rates of use
+of the contraflow lanes compared with the rates of use of the normal-
+Transportation Research Record: Journal of the Transportation Research Board, flow lanes were assumed to be similar to the values observed by
+No. 2041,Transportation Research Board of the National Academies, Washington,
+Theodoulou (4): 60% evacuees use normal-flow lanes, whereas the
+D.C., 2008, pp. 89–97.
+remaining 40% use the contraflow lanes.
+DOI: 10.3141/2041-10
+89
+
+===== PAGE 2 =====
+
+90 Transportation Research Record 2041
+TABLE 1 Demand from Each Crossover Location first analysis was done with microscopic simulation software called
+to Orlando on I-4 VISSIM (10). The second analysis was done by using the cell trans-
+mission model (CTM) proposed by Daganzo (11, 12). The results from
+Total Entry Flow Time Period
+both analyses are compared to determine the appropriate locations
+City Vehicles Rate (veh/h) (h)
+for the crossover point.
+Tampa 67,000 3,600 18.61
+Plant City 12,000 1,000 12 MICROSCOPIC SIMULATION ANALYSIS
+Lakeland 33,000 2,400 13.75
+The traffic network (Figure 1) was coded in VISSIM software as
+links and connectors by using aerial photographs as overlays. Three
+possible crossover locations were available for this study area.
+The first feasible crossover location was 4 mi from the start of I-4,
+The present study evaluated the contraflow plans for Interstate-4,
+the second crossover location (Plant City) was 46 mi from the first
+which is a major evacuation route from Tampa to Orlando, Florida. A
+feasible crossover location, and the last feasible crossover location
+Post, Buckley, Schuh, & Jernigan, Inc., report on contraflow opera-
+(Lakeland) was 16 mi from the crossover at Plant City. Under free-
+tions for Interstate-4 stated that the contraflow operation is to oper-
+flowconditions, it takes 30 min to travel from the crossover at
+ate from Tampa to the Orange County, Florida, line (8). This was used Tampa to the crossover at Plant City and it takes 15 min to travel
+as the guideline for the contraflow operations on I-4. Under free- from the crossover at Plant City to the crossover at Lakeland.
+flow conditions, it takes 1.5 h to travel from Tampa (I-4 Milepost 1) To determine the best crossover locations, four strategies were com-
+to the start of the Orange County line in Orlando. pared with each other and the base case, which is normal operations
+Plant City and Lakeland were identified as the other two major with no contraflow lanes. The four strategies are as follows:
+demand origins along I-4. I-4 has three lanes in each direction, with
+a free-flow speed of 60 mph. All westbound lanes were reversed dur- Strategy 1. One crossover after Tampa,
+ing contraflow operations. As discussed earlier, the free-flow speed Strategy 2. Two crossovers, one after Tampa and the other after
+on the contraflow lanes was assumed to be 55 mph. The demands Plant City,
+for the region were estimated on the basis of the number of house- Strategy 3. Two crossovers, one after Plant City and the other
+holds from U.S. census data (9). It was assumed that each household after Lakeland, and
+would evacuate with only one vehicle. It was also assumed that Strategy 4. Two crossovers, one after Tampa and the other after
+50% of the evacuees from Tampa and 100% from Plant City and Lakeland.
+Lakeland would evacuate toward Orlando. The demand from each
+region is shown in Table 1. Vehicles were loaded from the three The crossover locations are shown in Figure 1. For all of these
+locations on the basis of fixed entry flow rate for a predetermined strategies with contraflow operations, the contraflow lanes were
+time. Time period is defined as the demand input period for all the terminated by making the normal-flow lanes exit and then trans-
+vehicles to be evacuated. The entry flow rates and the time for the ferring vehicles from the contraflow lanes to the normal-flow
+simulation model are also shown in Table 1. lanes. Also, all the crossovers discussed in the strategies provide
+The analysis for determination of the locations of crossovers was access for vehicles on the normal-flow lanes so that they may use
+conducted by the use of two distinct simulation approaches. The the contraflow lanes. This was done to ensure that there was no
+FIGURE 1 VISSIM-coded Map of I-4 from Tampa to Orlando.
+
+===== PAGE 3 =====
+
+Dixit, Ramasamy, and Radwan 91
+TABLE 2 VISSIM Simulation Results for Base Case and Four Evacuation Clearance
+Time Strategies
+Evacuation Clearance Time (h)
+Microscopic Total Travel Excess Vehicles
+Simulation Time (h) t80 t85 t90 t95 at Lakeland
+Base case 134,012.9 14.77 15.65 16.99 18.39 13,014
+Strategy 1 113,179.7 13.76 14.91 16.53 18.16 0
+Strategy 2 112,056.1 13.73 14.86 16.53 18.19 0
+Strategy 3 119,408.3 14.18 15.28 16.78 18.26 8,840
+Strategy 4 114,301 14.1 15.22 16.74 18.27 11,135
+NOTE: t80, t85, t90, and t95 =80%, 85%, 90%, and 95% evacuation clearance times, respectively.
+congestion because of the merging of vehicles at the termination This effect occurred at the crossover after Lakeland, where a large
+of the contraflow lanes. Merging at the termination of contraflow number of vehicles could not enter the network at Lakeland in Strat-
+could result in huge backups and reduce the benefits of contraflow egy 3, whereas in Strategy 1, all the vehicles were able to enter
+operations. the network at Lakeland. This difference cannot be attributed to the
+Vehicles were loaded from the three locations on the basis of a merge congestion, because the flows on the normal-flow lanes after
+fixed entry flow rate for a predetermined time. The entry flow rates Plant City in Strategy 1 and Strategy 3 were the same, but can be
+and times for the simulation model are shown in Table 1. Because attributed only to the shockwave effects because of the downstream
+of congestion at the Lakeland on-ramp, the simulation software was crossover at Lakeland. The downstream crossover after Plant City
+unable to load the vehicles on the on-ramp according to the pre- does not result in excess vehicles left at Plant City because of the
+specified flow during the prespecified time. This resulted in the low flows entering at Plant City.
+inability of some vehicles to enter the network. Therefore, the num- Total vehicle travel time is an important MOE for an evacua-
+ber of vehicles unable to enter the network is used a measure of tion plan. A lower total vehicle travel time indicates a reduction of
+performance of congestion. the amount of time that vehicles spend in the network. Figure 2b
+Multiple measures of effectiveness (MOEs) were considered for shows the total vehicle travel time for the base case and the four
+comparison of the base case and the four strategies. The MOEs used strategies. Even though all the demand was not loaded onto the net-
+were the total travel time of all the vehicles; the number of vehicles work, Strategy 2 had the least total vehicle travel time and performed
+unable to enter the network; and the 80%, 85%, 90%, and 95% evac- only marginally better than Strategy 1.
+uation clearance times. Loop detectors were placed at the destina- Evacuation clearance time is an important MOE for evacuation
+tion link to count the 80%, 85%, 90%, and 95% of vehicles exiting strategies. It is a measure of how quickly people are able to get out
+the network. The VISSIM microscopic simulation results for all the of the threat zone. Four different measures of evacuation clearance
+scenarios are shown in Table 2. time were considered: the times required to clear 80%, 85%, 90%,
+As can be seen in Figure 2a,Strategy 1 and Strategy 2 performed and 95% of the evacuees who reached the destination. From Figure 2c,
+the best, with all vehicles from all three regions being loaded onto it can be concluded that Strategy 2 performed the best but was
+the network. The base case performed the worst, with an average only marginally better than Strategy 1. Figure 2calso shows that
+of approximately 13,000 vehicles being unable to enter the network as the proportion of evacuees reaching the destination increases
+at Lakeland. Approximately 11,134 and 8,840 vehicles were unable from 80% to 95%, the difference between the clearance times between
+to enter the network for Strategies 4 and 3, respectively. It should the strategies decreases. This is observed as the flattening of the
+be noted that the availability of one crossover (Strategy 1) per- dip in Strategy 1 and Strategy 2 as the percentage of evacuees reach-
+formed better than the availability of two crossovers (Strategies 3 ing the destination increases. This is because as the percentage of
+and 4). evacuees reaching their destination increases, there are origins that
+It was observed that more vehicles were unable to enter the net- were totally evacuated and no vehicles that could affect operations
+work at Lakeland in Strategy 4 than in Strategy 3. This is because are entering from those origins. Hence, the strategies that helped
+the crossover alleviates the merge congestion where on-ramps merge reduce the congestion were not being effective, because there was
+with normal-flow lanes. In Strategy 3, the upstream crossover is located no congestion to be alleviated in the later stages (when the percent-
+at Plant City, whereas in Strategy 4 the upstream crossover is located age of evacuees reaching their destination increased). For exam-
+at Tampa. In Strategy 4, the vehicles entering at Plant City do not ple, after 13.75 h all vehicles from both Plant City and Lakeland
+get an opportunity to access the contraflow lanes, which adds to the had left their respective origins, after which there were no merge
+flow on the normal-flow lanes compared with the flow on those lanes congestions at these two on-ramps. A total of about 86% of the
+in Strategy 3, in which vehicles get distributed to the contraflow vehicles had left their respective origins after 13.75 h, after which
+lanes. Therefore, because of the higher flows on the normal-flow there would be no congestion at these on-ramps; therefore, it is no
+lanes in Strategy 4, the congestion at the merge at Lakeland is higher, coincidence that a significant flattening of the dip was observed
+resulting in a larger number of vehicles not being able to enter the from 85% to 90% evacuee clearance. The minute difference for the
+network at Lakeland. evacuation clearance times for 90% and 95% of the evacuees reach-
+Another interesting aspect observed was the shockwave effect ing their destination still observed in the strategies was due to the
+because of the slower speeds and the lower flow rates at the crossover. shockwave effect.
+
+===== PAGE 4 =====
+
+92 Transportation Research Record 2041
+140,000
+135,000
+130,000
+125,000
+120,000
+115,000
+110,000
+105,000
+100,000
+)srh
+elciheV(
+emiT
+elciheV
+latoT
+14,000
+12,000
+10,000
+8,000
+6,000
+4,000
+2,000
+0
+Base Case Strategy 1 Strategy 2 Strategy 3 Strategy 4
+Strategies
+selciheV
+fo
+rebmuN
+Base Case Strategy 1 Strategy 2 Strategy 3 Strategy 4
+Strategies
+(a)
+(b)
+19
+18
+17
+16
+15
+14
+13
+12
+Base Case Strategy 1 Strategy 2 Strategy 3 Strategy 4
+Strategies
+(c)
+)srH(
+emiT
+ecnaraelC
+noitaucavE
+80% Evacuation
+85% Evacuation
+90% Evacuation
+95% Evacuation
+FIGURE 2 MOEs for various evacuation clearance time strategies obtained by using VISSIM
+microscopic simulation: (a) number of vehicles not dissipated into the network for various
+strategies, (b) total vehicle travel time for various strategies, and (c) 80%, 85%, 90%,
+and 95% evacuation clearance times for various strategies.
+
+===== PAGE 5 =====
+
+Dixit, Ramasamy, and Radwan 93
+The results show that the provision of one crossover after Tampa where δis equal to w/v,where wis the speed with which distur-
+and another after Plant City provided the best evacuation operations bances propagate backward when traffic is congested and vis the
+but was only marginally better than the provision of one crossover free-flow speed. It was seen by Daganzo (11, 12) that the accuracy
+at Tampa. It was also observed that the provision of one crossover of the model is enhanced if δis redefined such that
+after Tampa was better than the provision of two crossovers, corre-
+sponding to Strategy 4 and Strategy 5, because of merge and diverge ⎡1 ifn ( t ) ≤Q ( t )
+congestion.
+δ=⎢
+⎢ w ifn
+i−1
+( t ) >Q
+i
+( t ) (3))
+It was observed that microscopic simulation analysis for such a ⎣v i−1 i
+simple network structure took an extremely large amount of time (4 h)
+for a single run on a Pentium 4 processor with 2 GB of RAM on a CTM can be formulated as a linear programming problem
+Windows XP machine. This was a huge drawback to the use of this (3, 13) that can provide guidelines for traffic assignment and signal
+approach. In the case of bottlenecks created by unforeseen events timings.
+leading to a drop in capacity (such as incidents and breakdown of
+vehicles), it is crucial to make real-time decisions to ensure the
+smooth flow of traffic. These decisions might include having to CALIBRATION OF CTM FOR INTERSTATE 4
+create a new location for a crossover. Because approximately 4 h of
+time is taken to execute one run for a scenario, at least five runs are The first step for the calibration of CTM for Interstate 4 was to
+required to come to some kind of statistical confidence, and because determine the size of the smallest tick of the clock in CTM. To main-
+five scenarios need to be tested, simple number crunching leads to tain an acceptable amount of resolution, each tick was chosen to
+the conclusion that approximately 100 computer hours is required be 30 s. Because the free-flow speed on the normal-flow lanes was
+to decide on a strategy. Real-time decisions cannot be made with 60 mph and that on the contraflow lanes was 55 mph, the cell length
+such a long computing time. This problem created a need to explore was determined by multiplying the number of seconds in a tick by
+other simulation models. CTM, a mesoscopic model, seemed to the free-flow speed of the type of lanes. Therefore, the cell length of
+hold the solution to this problem. The nice linear relationships between the normal-flow lanes is 0.5 mi, whereas that of the contraflow lanes
+flows and occupancies made it seem to be an ideal candidate for use is 0.46 mi.
+for real-time simulation. The deterministic nature of this simulation Because it was assumed that the proportion of heavy vehicles was
+also resulted in doing away with the need for multiple runs to evaluate 15% during the simulation, the average length of vehicles would be
+a strategy. greater than the length of a normal vehicle. The length of a normal
+vehicle is assumed to be 22 ft, whereas that of a heavy vehicle is
+assumed to be 40 ft. To determine the average length of vehicles, a
+CELL TRANSMISSION MODEL
+weighted average of the lengths of the two types of vehicles was
+taken on the basis of the percentage of each kind of vehicle on the
+The CTM proposed by Daganzo is an interesting way to model traf-
+road. This implies that 0.15 *40 +0.85 *22 =24.7 ft is the average
+fic flow in a network and in a freeway corridor (11, 12). CTM is a
+length of the vehicles.
+deterministic mesoscopic model that predicts flow, occupancy, and
+The average length of the vehicles, the length of a cell, and the
+density with accuracy. Unlike macroscopic models, CTM is able to
+number of lanes in a cell were considered to determine the maximum
+account for backward wave propagation because of congestions
+number of vehicles that a cell can hold. It was found that a cell on
+downstream and is also able to predict the merge and diverge behav-
+normal-flow lanes could hold a maximum of 320 vehicles and a cell
+iors of traffic at junctions. Unlike microscopic simulations, CTM
+on the contraflow lanes could hold a maximum of 293 vehicles.
+consumes far less time and space on the computer and is much easier
+The maximum flows in each cell were determined by the number
+to code. This makes CTM an ideal tool for use as an underlying basis
+for a decision support system that will help decision makers deter- of lanes in each cell. Considering that the maximum flow per lane is
+mine quickly and accurately the best possible strategies to be used 1,800 vehicles per hour, it was calculated that 15 vehicles per tick per
+during an evacuation. lane was the maximum flow through a lane in a cell. The cells at the
+In CTM, the road section is divided into homogeneous cells, such on-ramp from Plant City had four lanes and those at Lakeland had
+that the length of each cell is the time that it takes for a vehicle at five lanes, in agreement with the network designed in the VISSIM
+free-flow speed to traverse the length of that section in one clock tick simulation.
+(time unit). The state of the system at any time tis determined by the For the crossovers, the free-flow speeds were lower than those
+number of vehicles in cell iand is expressed as n(t). Parameter N(t) for the normal-flow lanes and the contraflow lanes. Therefore, the
+i i
+defines the maximum number of vehicles allowed in cell iduring lengths of the cells for crossovers were smaller than those for the other
+time interval t. Parameter Q(t) defines the maximum number of cells.
+i
+vehicles that can flow into cell iwhen the clock advances from tto The parameter δis used to enhance the modeling realism on free-
+t + 1. If the cells are numbered consecutively starting with the ways and was assumed to be 1. The reason for this was inspired by
+upstream end of the road from i=1 to I,the recursive relationship the work done by Kalafatas and Peeta (14), in that it does not require
+of CTM can be expressed as the incorporation of the value of δ, since for freeway cells Q(t)/[N(t) −
+i i
+Q(t)] is approximately equal to 1⁄, which is close to the accepted
+( ) ( ) ( ) ( ) i 5
+n i t+1 =n i t +y i t −y i+1 t (1) value, which ranges from 1⁄ 4 to 1⁄ 6 . For this modeling, Q i (t)/[N i (t) −Q i (t)]
+is 1⁄ for both the normal and the contraflow lanes.
+6
+where y i (t) is the inflow to cell iin the time interval (t, t+1), given by To mimic the same conditions used in the VISSIM network,
+excess vehicles at Lakeland were not loaded onto the network
+y i ( t ) =min { n i−1 ( t ) ,Q i ( t ) ,δ [ N i ( t ) −n i ( t )]} (2) after a predetermined time period. The number of vehicles left in
+
+===== PAGE 6 =====
+
+94 Transportation Research Record 2041
+the source cell at Lakeland was recorded but was not loaded onto 16% from that in the base case. The plots of the MOEs for the various
+the network. strategies by the use of CTM are shown in Figure 4.
+RESULTS CONCLUSIONS
+Results of CTM for Interstate 4 The paper compares two levels of simulation, mesoscopic and micro-
+scopic, represented by CTM and VISSIM, respectively. The two sim-
+The results of the simulation executed with CTM are shown in ulations were also used to determine the best crossover locations for
+Table 3. the evacuation routes on Interstate-4 between Tampa and Orlando.
+Graphs are plotted for the various strategies and MOEs as the It was interesting to find that the provision of one crossover after
+number of vehicles that were unable to be loaded onto the network Tampa and another after Plant City provided the best evacuation
+(Figure 3a); total vehicle travel time (Figure 3b); and the evacuation operations but was only marginally better than the provision of one
+clearance times for 80%, 85%, 90%, and 95% of the evacuees (Fig- crossover at Tampa. Therefore, considering the cost and personnel
+ure 3c). The results from CTM are similar to the results observed in needed to provide a crossover, the provision of one crossover after
+the VISSIM simulation. Strategy 2 was found to have the least total Tampa was found to be a more logical choice than the provision
+vehicle travel time, but it was only marginally better than that for of two crossovers. It was also observed that the provision of two
+Strategy 1. It was also found that the evacuation clearance times for crossovers, with one of those crossovers being after Lakeland, per-
+80%, 85%, 90%, and 95% of the evacuees were the same for Strat- formed worse than the provision of just one crossover. This shows
+egy 1 and Strategy 2. This was because the difference between the that the idea that more crossovers is better is wrong and that the
+clearance times for Strategy 1 and Strategy 2 from the VISSIM sim- location and the number of crossovers needed should be considered.
+ulation results was less than 1%. Therefore, CTM could not predict From the results observed in this study, two main aspects need to be
+the slight difference in clearance times. addressed for contraflow planning for a general corridor. The first is
+that contraflow operations reduce the number of vehicles flowing on
+the normal-flow lanes and therefore reduce the merge congestion at
+Comparison of CTM with VISSIM downstream locations where vehicles from the on-ramp merge with
+the normal-flow lanes. This phenomenon was observed from the fact
+A comparison of CTM with VISSIM shows that the errors in esti- that a larger number of vehicles was unable to enter the network at
+mation of the MOEs (total travel time; evacuation clearance times Lakeland in Strategy 4 than in Strategy 3. The second aspect that
+for 80%, 85%, 90%, and 95% of the evacuees; and the excess num- should be kept in mind is the shockwave effect due to the slower speeds
+ber of vehicles that were not able to enter the network from Lake- and the lower flow rates at the crossover. This case occurred at the
+land) were much less than or close to 5% (Table 4). This indicates crossover after Lakeland and could be attributed to the shockwave
+that the results obtained with CTM are comparable to those obtained effect of vehicles at the crossover, because a large number of vehicles
+with VISSIM. could not enter the network at Lakeland in Strategy 3, whereas all
+It was observed that the computing time for the five scenarios in vehicles were able to enter the network at Lakeland in Strategy 1.
+CTM was 7.5 min, whereas that in VISSIM was 100 h. This indi- It was also found that CTM predicted the MOEs as well as VIS-
+cates that CTM is an ideal tool for use as a real-time decision support SIM did, with an approximately 5% error in the results between CTM
+system to determine dynamic crossovers because of an unforeseen and VISSIM. With its faster computing time, CTM is ideal for use as
+incident. a real-time decision support system and will be able to determine
+It was also observed that VISSIM did not load the vehicles if they dynamic crossovers in the event of bottlenecks caused by incidents
+could not enter the network during a given time frame. This draw- or vehicle breakdowns. The fast computation and realistic represen-
+back can easily be handled in CTM, so that more reliable estimates tation of traffic flow make it suitable for use for the modeling of evac-
+of the evacuation clearance time and total vehicle travel time can uation routes and quick verification of the effectiveness of evacuation
+be made. The results for all the vehicles loaded onto the network plans. CTM is also able to dissipate all vehicles into the network,
+are shown in Table 5. It is seen that 2.6 h is saved in clearing 80% allowing a more holistic comparison of the various strategies. With
+of the evacuees by using Strategy 1. It was also observed that the the need for more flexible evacuation plans, CTM’s capability makes
+total vehicle travel time for Strategy 1 was significantly reduced by it an ideal tool for use in the testing of various scenarios.
+TABLE 3 CTM Results for Each Strategy
+Evacuation Clearance Time (h)
+Total Travel Excess Vehicles
+CTM Time (h) t80 t85 t90 t95 at Lakeland
+Base case 129,375 14.73 15.65 17.03 18.42 12,440
+Strategy 1 109,583.3 13.91 15.13 16.68 18.24 0
+Strategy 2 109,466.7 13.91 15.13 16.68 18.24 0
+Strategy 3 114,191.7 14.32 15.48 16.91 18.35 8,386
+Strategy 4 113,050 14.41 15.58 16.98 18.39 10,819
+
+===== PAGE 7 =====
+
+Dixit, Ramasamy, and Radwan 95
+135,000
+130,000
+125,000
+120,000
+115,000
+110,000
+105,000
+100,000
+95,000
+)srh
+elciheV(
+emiT
+levarT
+latoT
+14,000
+12,000
+10,000
+8,000
+6,000
+4,000
+2,000
+0
+Base Case Strategy 1 Strategy 2 Strategy 3 Strategy 4
+Strategies
+selciheV
+fo
+rebmuN
+Base Case Strategy 1 Strategy 2 Strategy 3 Strategy 4
+Strategies
+(a)
+(b)
+19
+18
+17
+16
+15
+14
+13
+12
+Base Case Strategy 1 Strategy 2 Strategy 3 Strategy 4
+Strategies
+(c)
+)srh(
+emiT
+ecnaraelC
+noitaucavE
+80% Evacuation
+85% Evacuation
+90% Evacuation
+95% Evacuation
+FIGURE 3 MOEs for various evacuation clearance time strategies obtained using CTM
+mesoscopic simulation: (a) number of vehicles not dissipated into the network for various
+strategies, (b) total vehicle travel time for various strategies, and (c) 80%, 85%, 90%,
+and 95% evacuation clearance times for various strategies.
+
+===== PAGE 8 =====
+
+96 Transportation Research Record 2041
+140,000
+135,000
+130,000
+125,000
+120,000
+115,000
+110,000
+105,000
+100,000
+)srh
+elciheV(
+emiT
+levarT
+elciheV
+latoT
+Base Case Strategy 1 Strategy 2 Strategy 3 Strategy 4
+Strategies
+(a)
+20
+19
+18
+17
+16
+15
+14
+13
+Base Case Strategy 1 Strategy 2 Strategy 3 Strategy 4
+Strategies
+(b)
+)srh(
+emiT
+ecnaraelC
+noitaucavE
+TABLE 4 Percentage Errors Between Estimates of Microscopic TABLE 5 CTM Results for Each Strategy with Dissipation of All
+Simulation (VISSIM) and Mesoscopic Simulation (CTM) Vehicles into the Network
+Total Excess Total Evacuation Clearance Time (h) Excess
+Travel Vehicles at Travel Vehicles at
+Errors Time (h) t80 t85 t90 t95 Lakeland CTM Time (h) t80 t85 t90 t95 Lakeland
+Base case −3.46 −0.26 0.03 0.23 0.16 −4.41 Base case 140,825.00 16.46 17.43 18.4 19.38 0
+Strategy 1 −3.18 1.05 1.49 0.93 0.47 0 Strategy 1 109,583.33 13.91 15.13 16.68 18.24 0
+Strategy 2 −2.31 1.27 1.81 0.96 0.3 0 Strategy 2 109,466.67 13.91 15.13 16.68 18.24 0
+Strategy 3 −4.37 0.99 1.27 0.78 0.48 −5.14 Strategy 3 122,775.00 15.47 16.43 17.39 18.35 0
+Strategy 4 −1.09 2.19 2.41 1.48 0.68 −2.83 Strategy 4 123,816.67 15.85 16.78 17.72 18.65 0
+80% Evacuation
+85% Evacuation
+90% Evacuation
+95% Evacuation
+FIGURE 4 MOEs for various evacuation clearance time strategies obtained using CTM
+mesoscopic simulation with all vehicles allowed to dissipate into the network: (a) total vehicle
+travel time for various strategies and (b) 80%, 85%, 90%, and 95% evacuation clearance
+time for various strategies.
+
+===== PAGE 9 =====
+
+Dixit, Ramasamy, and Radwan 97
+REFERENCES 8. Analysis of Florida’s One-Way Operations for Hurricane Evacuation.
+Compendium of Route-by-Route Technical Memorandum. Post, Buckley,
+Schuh, & Jernigan, Inc., Tampa, Fla., 2000.
+1. Wolshon, B. One-Way-Out: Contraflow Freeway Operation for Hur-
+9. U.S. Bureau of the Census. quickfacts.census.gov/qfd/states/12/1238250.
+ricane Evacuation. National Hazards Review,Vol. 2, No. 3, 2001,
+html. Accessed July 21, 2007.
+pp. 102–112.
+10. VISSIM. PTV America, Corvallis, Oregon. www.ptvamerica.com/vissim.
+2. Wolshon, B., and E. Urbina. National Review of Hurricane Evacuation
+html. Accessed July 21, 2007.
+Plans and Policies: A Comparison and Contrast of State Practices.
+11. Daganzo, C. The Cell Transmission Model: A Dynamic Representation of
+Transportation Research, Part A,Vol. 37, No. 3, 2003, pp. 257–275.
+Highway Traffic Consistent with Hydrodynamic Theory. Transportation
+3. Tuydes, H., and A. Ziliaskopoulos. Network Redesign to Optimize
+Research, Part B,Vol. 28, No. 4, 1994, pp. 269–287.
+Evacuation Contraflow. Presented at 83rd Annual Meeting of the Trans-
+12. Daganzo, C. The Cell Transmission Model. Part II. Network Traffic.
+portation Research Board, Washington, D.C., 2004.
+Transportation Research, Part B,Vol. 29, No. 2, 1994, pp. 79–93.
+4. Theodoulou, G. Contraflow Evacuation on Westbound I-10 out of the
+13. Chiu, Y.C., J. Villalobos, B. Gautam, and H. Zheng. Modeling and
+City of New Orleans. MS thesis. Louisiana State University, Baton Solving the Optimal Evacuation Destination-Route-Flow-Staging Problem
+Rouge, 2003. for No-Notice Extreme Events. Presented at 85th Annual Meeting of the
+5. Wolshon, B., and G. Theodoulou. Modeling and Analyses of Freeway Transportation Research Board, Washington, D.C., 2006.
+Contraflow to Improve Future Evacuations. Presented at 83rd Annual 14. Kalafatas, G., and S. Peeta. An Exact Graph Structure for Dynamic Traf-
+Meeting of the Transportation Research Board, Washington, D.C., 2004. fic Assignment: Formulation, Properties, and Computational Experience.
+6. Baker, E. Hurricane Evacuation Behavior. International Journal of Presented at 86th Annual Meeting of the Transportation Research
+Mass Emergencies and Disasters,Vol. 9, No. 2, 1991, pp. 287–310. Board, Washington, D.C., 2007.
+7. Baker, E.J. Hurricane Evacuations in the United States. In Storms,Vol. 1,
+Routledge Hazards and Disasters Series, Routledge, New York, 2000, The Transportation Safety Management Committee sponsored publication of
+pp. 306–319. this paper.

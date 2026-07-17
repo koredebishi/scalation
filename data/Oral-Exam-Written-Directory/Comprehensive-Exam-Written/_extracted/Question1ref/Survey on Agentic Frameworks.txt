@@ -1,0 +1,2797 @@
+===== PAGE 1 =====
+
+LLM-based Agentic Reasoning Frameworks: A Survey from
+Methods to Scenarios
+BINGXIZHAO∗,
+BeijingJiaotongUniversity,ChinaandLancasterUniversity,UnitedKingdom
+LINGENGFOO∗,
+MaxPlanckInstituteforInformatics,SaarlandInformaticsCampus,Germany
+PINGHU,
+UniversityofElectronicScienceandTechnologyofChina,China
+CHRISTIANTHEOBALT,
+MaxPlanckInstituteforInformatics,SaarlandInformaticsCampus,Germany
+HOSSEINRAHMANI,
+LancasterUniversity,UnitedKingdom
+JUNLIU†, LancasterUniversity,UnitedKingdom
+Recentadvancesintheintrinsicreasoningcapabilitiesoflargelanguagemodels(LLMs)havegivenriseto
+LLM-basedagentsystemsthatexhibitnear-humanperformanceonavarietyofautomatedtasks.However,
+althoughthesesystemssharesimilaritiesintermsoftheiruseofLLMs,differentreasoningframeworksofthe
+agentsystemsteerandorganizethereasoningprocessindifferentways.Inthissurvey,weproposeasystematic
+taxonomythatdecomposesagenticreasoningframeworksandanalyzehowtheseframeworksdominate
+framework-levelreasoningbycomparingtheirapplicationsacrossdifferentscenarios.Specifically,wepropose
+anunifiedformallanguagetofurtherclassifyagenticreasoningsystemsintosingle-agentmethods,tool-based
+methods,andmulti-agentmethods.Afterthat,weprovideacomprehensivereviewoftheirkeyapplication
+scenariosinscientificdiscovery,healthcare,softwareengineering,socialsimulation,andeconomics.Wealso
+analyzethecharacteristicfeaturesofeachframeworkandsummarizedifferentevaluationstrategies.Our
+surveyaimstoprovidetheresearchcommunitywithapanoramicviewtofacilitateunderstandingofthe
+strengths,suitablescenarios,andevaluationpracticesofdifferentagenticreasoningframeworks.
+CCSConcepts:•Generalandreference→Surveysandoverviews;•Computingmethodologies→
+Naturallanguageprocessing.
+AdditionalKeyWordsandPhrases:AgenticReasoning,LLM-basedAgent,ReasoningFrameworks.
+ACMReferenceFormat:
+BingxiZhao,LinGengFoo,PingHu,ChristianTheobalt,HosseinRahmani,andJunLiu.2025.LLM-based
+AgenticReasoningFrameworks:ASurveyfromMethodstoScenarios.J.ACM37,4,Article111(August2025),
+51pages.https://doi.org/XXXXXXX.XXXXXXX
+1 Introduction
+Large Language Models (LLMs), with their powerful generalization and promising reasoning
+capabilities,havebeenrapidlyreshapingnumerousdomainsfromourdailylives(e.g.,ideacreation,
+∗Bothauthorscontributedequallytothisresearch.
+†Correspondingauthor.
+Authors’ContactInformation:BingxiZhao,bingxizhao@bjtu.edu.cn,BeijingJiaotongUniversity,Beijing,Chinaand
+LancasterUniversity,Lancaster,UnitedKingdom;LinGengFoo,lfoo@mpi-inf.mpg.de,MaxPlanckInstituteforInformatics,
+SaarlandInformaticsCampus,Saarbrücken,Germany;PingHu,UniversityofElectronicScienceandTechnologyofChina,
+Chengdu,China;ChristianTheobalt,MaxPlanckInstituteforInformatics,SaarlandInformaticsCampus,Saarbrücken,
+Germany;HosseinRahmani,LancasterUniversity,Lancaster,UnitedKingdom;JunLiu,j.liu81@lancaster.ac.uk,Lancaster
+University,Lancaster,UnitedKingdom.
+Permissiontomakedigitalorhardcopiesofallorpartofthisworkforpersonalorclassroomuseisgrantedwithoutfee
+providedthatcopiesarenotmadeordistributedforprofitorcommercialadvantageandthatcopiesbearthisnoticeandthe
+fullcitationonthefirstpage.Copyrightsforcomponentsofthisworkownedbyothersthantheauthor(s)mustbehonored.
+Abstractingwithcreditispermitted.Tocopyotherwise,orrepublish,topostonserversortoredistributetolists,requires
+priorspecificpermissionand/orafee.Requestpermissionsfrompermissions@acm.org.
+©2025Copyrightheldbytheowner/author(s).PublicationrightslicensedtoACM.
+ACM1557-735X/2025/8-ART111
+https://doi.org/XXXXXXX.XXXXXXX
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+5202
+guA
+52
+]IA.sc[
+1v29671.8052:viXra
+
+===== PAGE 2 =====
+
+111:2 Zhaoetal.
+Fig.1. NumberofpublicationsregardingLLM-basedAgenticFrameworksfrom2020to2025injournalsand
+conferencesindexedbyWebofScience.Fordiscussingmethoddevelopments(§3),wemainlyselecttechnical
+paperspublishedattopcomputerscienceconferences(e.g.,ICLR,NeurIPS,ACL,EMNLP,AAAI,andICML).
+Todiscussaboutscenarios(§4),wecollectadiversesetofrepresentativeworks:fromtopcomputerscience
+conferences(sameasabove)totopjournalswithinspecificdomains(e.g.,Nature,Science,Cell,Nat.Mach.
+Intell,Adv.Mater,Adv.Sci,Nat.Med,PNAS,andNAR).Weobserveafast-increasingtrendsince2023,showing
+thegrowingimportanceofthefield.For2025,wepredicttheoverallamountofpaperslinearlybasedondata
+accessedat14thAugust.
+emailwriting,orlearningofnewconcepts)todomain-specificresearch[198].Researchershave
+beenincreasinglyleveragingLLMsascorecomponentstoempowerresearchandinnovation[166],
+fromdomain-specificknowledgeQ&A[310]andcodegeneration[118],toassistinginresearch
+endeavors[164].Throughtheseaspects,LLMsarequicklybecomingakeypartofmodernlifeand
+research.
+Yet,despitetheirimmensepotentialacrossvariousfields,LLMshaveintrinsiclimitations,which
+may limit their usefulness. For instance, LLMs often suffer from issues such as hallucinations,
+outdatedknowledge,andhightrainingandinferencecosts[111].Theseissuesoftenleadtoproblems
+inthereliabilityandconsistencyofLLMs,andconsequentlyrestricttheirapplicationincritical
+fieldslikehealthcareandsoftwareengineering,whichdemandhighlydependableoutcomes.
+Toovercomethisbarrier,theacademiccommunityhasbeenactivelyexploringtheuseofLLMs
+asacoreenginetobuildLLM-basedagenticreasoningframeworkscapableofexecutingcomplex,
+multi-stepreasoningtasks[217,266].AsillustratedinFig.1,weobserveasignificantupwardstrend
+intermsofpaperspublishedattopconferences.Initially,“Agents”aredefinedin[227]assystems
+that“perceivetheirenvironmentthroughsensorsandactuponthatenvironmentthroughactuators”,
+candynamicallyadapttotheirenvironmentsandtakecorrespondingactions[166].Thisemerging
+paradigmorganicallyintegrateskeymoduleslikeplanning,memory,andtool-use,reshapingthe
+LLMintoataskexecutorthatcanperceiveitsenvironment,adaptdynamically,andtakesustained
+action[112,154,266].Byextendingvertically,expandinghorizontally,orbacktrackinglogically,
+thisparadigmfundamentallysurpassesthesingle-stepreasoningcapabilitiesoftraditionalLLMsin
+bothreliabilityandtaskcomplexity.
+Thistrendhasalsobeenwidelymirroredinindustry,wheretechgiantsareactivelyintegrating
+agentworkflowsintotheircorebusinesses.Forinstance,frameworkslikeMicrosoft’sAutoGen1
+aredesignedtoempowerenterprisestobuildcustomizedmulti-agentapplications.Moreover,from
+“vibe coding” editors like Cursor2 that deeply integrate agentic capabilities to autonomous AI
+softwareengineerslikeDevin3,aclearevolutionbasedonagenticreasoningframeworksisgaining
+widespreadrecognition,graduallyreplacingtraditionaldevelopmentapproaches.
+1https://github.com/microsoft/autogen
+2https://cursor.com/en/dashboard
+3https://devin.ai/
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 3 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:3
+However,atthesametime,theexplosivegrowthinthisfieldhasalsoblurredtheboundaries
+of LLM-based agents [305]. For instance, the overlap with concepts from areas like traditional
+multi-agentsystems[30,87,315]andautonomoussystems[255]makesitdifficulttodefinethe
+scopeofresearch.Meanwhile,itisoftenhardtoclearlyseparatewhetherenhancedcapabilities
+ofanagentcomefromcarefulframeworkdesign,model-levelimprovements,ortechnological
+advancements.Thisdualambiguityposesaseriouschallengeforthehorizontalcomparisonof
+differentprojectsandrisksoverlookingthefoundationalroleofframeworkdesigninanagent
+system’sreasoningability.
+Therefore,webelievethatitistimelyforasurveytosystematicallysummarizetherecentprogress
+andapplicationscenariosofagenticreasoningframeworks.Wefirstclearlydefinetheboundaries
+oftheseframeworksand,basedonthat,proposeaunifiedmethodologicalclassificationsystem.
+Wethenfurtheranalyzetheapplicationandevaluationstrategiesofthesemethodsacrossdiverse
+scenarios,aimingtoprovideaclearroadmapforthestandardizedandsafedevelopmentofagentic
+developments.Ourtaxonomyalsofitsthecurrentpopulartopicslikecontextengineering.
+Overall,thecontributionsofoursurveyareasfollows:
+• Tothebestofourknowledge,thisisthefirstsurveythatproposesaunifiedmethodological
+taxonomytosystematicallyhighlightthecorereasoningmechanismsandmethodswithin
+agenticframeworks;
+• Weemployaformallanguagetodescribethereasoningprocess,clearlyillustratingtheimpact
+ofdifferentmethodsonkeysteps;
+• Weextensivelyinvestigatetheapplicationofagentreasoningframeworksinseveralkey
+scenarios.Intheseapplicationscenarios,weconductin-depthanalysesofrepresentative
+worksaccordingtoourproposedtaxonomy,andpresentacollectionofevaluationsetups
+withdatasets.
+Thestructureofthesurveyisasfollows:Chapter§2willfurtherintroducecomparethedifference
+between related surveys and our survey. Chapter §3 will present the taxonomy of techniques,
+whichsystematicallyanalysestheexistingtechniquesforagenticreasoning.Chapter§4willfurther
+provideapplicationscenariosofagenticreasoningframeworks,andhowagentsineachscenario
+are often designed. Lastly, Chapter §5 will discuss future directions and Chapter §6 states the
+conclusionofthesurvey.
+2 RelatedSurveys
+RecentsurveysonagenticAIhaveexploredtheagenticreasoninglandscapefromseveralvaluable
+perspectives. A primary focus has been model-centric, examining how to enhance the agentic
+capabilitiesofLLMs.Forinstance,severalsurveys[129,250,292]reviewtrainingmethodologies
+suchasProximalPolicyOptimization(PPO),SupervisedFine-Tuning(SFT)andReinforcement
+Learning from Human Feedback (RLHF). Other surveys also explore the potential of smaller,
+specializedagenticmodelsonspecificreasoningtasks[18],orexaminetheplanningabilitiesof
+agenticfoundationmodels[112,154].Overall,thesesurveysprimarilyfocusonthe“LLM”side
+developmentsofLLM-basedagents.
+Yet,recentlyinthefieldofLLM-basedagents,numerousrepresentativemethodsaboutagentic
+frameworkshaveemerged,whichexplorehowtoleveragestate-of-the-artLLMswithtraining-free
+methodstobuildagenticframeworksthroughframework-levelreasoning.However,tothebestof
+ourknowledge,therestillhasnotbeenasurveythatsystematicallyorganizesthese“framework”
+sidedevelopmentsanddiscussestheirvalueinvariousapplicationscenarios.Therefore,incontrast
+toothersurveys,oursurveyspecificallyconcentratesonagenticreasoningframeworks,reviewing
+themostrecentdevelopmentonframework-levelagenticreasoningmethods,insteadoforthogonal
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 4 =====
+
+111:4 Zhaoetal.
+Fig.2. Taxonomyofourproposedagenticreasoningframeworks.Wedecomposeagenticreasoningmethods
+intothreeprogressivecategories:a)single-agentmethods,b)tool-basedmethods,andc)multi-agentmethods.
+developmentsinmodelarchitecturesandfine-tuningtechniques.Wecategorizeexistingmethods
+alongthreeprogressivedimensions:single-agent,tool-based,andmulti-agent,andproposeaunified
+taxonomytoanalyzethedifferentstagesofthemulti-stepreasoningprocess,whichhasnotbeen
+exploredinprevioussurveys.
+Closertoourwork,therearesurveysexploringhowagentictechnologiescouldbeusedwithin
+specific domains, such as scientific discovery [86, 222], software engineering [122], medicine
+[274],orsocialsciences[55].However,theirscopeisoftenlimitedandfocusesonlyonasingle
+specificdomain,whichcansignificantlyincreasethedifficultywhencomparingbetweenagentic
+frameworksacrossdifferentdomains.Forinstance,eachofthesesurveysutilizesadifferentway
+tocategorizeandlisttheresearchworks,thismakesitdifficulttoobservetheabilitiesandtrends
+ofLLMagentsatthefrontierofresearchorthespecialdesignsineachscenario,sincethereisno
+unifiedtaxonomyofthesemethods.Thus,weproposeasystematictaxonomywhichprovidesa
+unifiedviewofLLMagenticframeworks.Thisallowsustosystematicallyanalyzehowtheunique
+requirementsofeachapplicationscenarioshapethedesignandadaptationoftheseframeworksin
+thosescenarios,therebybridgingthegapbetweenmethodsandapplicationscenarios.Furthermore,
+oursurveyadoptsascenario-drivenapproachtotraceandcomparetheevaluationsetupsand
+datasetsusedineachrepresentativeworks,acrossdifferentapplicationdomains.Tothebestofour
+knowledge,suchsystematicexplorationofagenticreasoningandevaluationsetupsacrossdifferent
+scenarioshasnotyetbeenexplored.
+3 Methods
+ExtendedfromFoundationLLMs,agenticreasoningframeworksisakeydevelopmentinorderto
+achieveaautonomousandenvironmental-awaresystemswhichcouldsolvecomplicatedproblems
+intherealworld.Inthissection,weproposeataxonomytocategorizethesemethods.Atthetop,
+wedeconstructthereasoningframeworkintothreedistinctlevels,namelysingle-agent,external
+toolcalling,andmulti-agent,asshowninFigure2.Single-agentmethodsfocusonenhancing
+thereasoningcapabilityofindividualagents;tool-basedmethodsextendtheboundariesofagent
+reasoning through external tools; and multi-agent methods enable more flexible reasoning
+throughdifferentparadigmsoforganizationandinteractionamongmultipleagents.Wecoverthese
+levelsinChapters§3.2,§3.3,§3.4respectively,afterweintroducethenotationsinChapter§3.1.
+Together,thesemethodsatdifferentlevelscanbeintegratedindifferentwaystofulfillspecific
+scenarios,whichiscoveredinChapter§4.
+3.1 Notations
+Wehighlightthatagentsystemscanachievetheirgoalsthroughacompleteprocessthatincludes
+multiplereasoningsteps.Multi-agentsystemscanfurtherexecuteacompletereasoningprocess
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 5 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:5
+underthecollaborationofdifferentagents[258].Toclearlyintroducethiscomplexprocess,we
+proposeageneralreasoningalgorithm(Alg.1)andanotationtable(Table1)inthissection,which
+bringsanotherlevelofabstraction.Inthesubsequentchapters(Chapters§3.2,§3.3,and§3.4),we
+willfurtherdiscusshoweachrepresentativelineofworksimprovethereasoningperformancesby
+modifyingoradjustingthisgeneralalgorithm.
+Table1. NotationsUsedinThisChapter
+Notation Description
+𝑃 𝑈 Theuser’sinputquery.
+𝑄 Theterminationconditionforthereasoningprocess.
+𝑔 Thesetofpredefinedgoalstobeachieved.
+𝑡 Anexternaltoolavailabletotheagent.
+C Theinternalcontextofanagent.
+𝑦 Theoutputofanagentafteranaction.
+𝑘 Acountofreasoningsteps.
+A Theentireactionspace,containingallpossibleactions.
+𝑎 Ageneralactionthatproducesanoutputfromagiveninput.
+𝑎′ Anactionthatupdatesthecurrentcontextbasedonaninput.
+𝑎 Anactionthatperformsastepofdeepreasoning.
+reason
+𝑎 Anactionthatinvolvesaninteractionwithanexternaltool𝑡.
+tool
+𝑎 Anactiontoreflectonandevaluatepreviousreasoningsteps.
+reflect
+AkeydifferentiatorbetweenanagenticsystemandastandardLargeLanguageModelisthe
+abilitytoperformmulti-stepreasoning[89].Thiscapabilityreliesontheactivemanagementof
+apersistentcontextthroughoutthelifecycleofataskwithintheagenticsystem[190].Whilea
+standardLLMprocessesagivencontexttoproduceasingle-stepoutput,anagentsystem,baseon
+itsvariousactionchoice,iterativelyupdatesitscontexttosupportamulti-stepreasoning.Each
+action,thoughhasdifferenttargetsorintentions,followsasimilarlogictotacklesuchinput-output
+relations.Therefore,weformalizeasinglereasoningstepasanoperationwheretheagentexecutes
+anaction𝑎basedonitscurrentcontextCtoproduceanoutput𝑦,expressedas𝑦 =𝑎(C).Afull
+reasoningprocesswillcontainseveralsuchreasoningsteps.
+Theoutputsandinsightsfromtheprecedingstepsarepreservedwithinthiscontext,enabling
+theagenttobuilduponitspriorwork[190].Weexplicitlydistinguishtheactionofgeneratingan
+output(𝑎)fromtheactionofupdatingthestate(𝑎′).Thisseparationiscrucialbecausetheobjective
+ofacontextupdate(e.g.,summarizinghistory,integratingatool’sresults)oftendiffersfromthatof
+producingafinalorintermediateanswer[190].
+Toexecutethesesteps,theagentselectsactionsfromageneralizedactionspaceA,whichwe
+defineforourpurposesasA = {𝑎 ,𝑎 ,𝑎 }.Tomaintainfocusonthereasoninglogic,our
+reason tool reflect
+frameworkabstractscomplexauxiliarycomponents,suchasmemorymodules[326],knowledge
+retrieval[331],sandboxedenvironments[60],andhumaninterruption[197]intoaunifiedexternal
+tool𝑡.Thisisbecausetheyaremainlyactasanexternalsourcethatcouldprovidesagentwith
+externalknowledgeandinformation.Theaction𝑎 isspecificallydesignedandusedtoinvoke
+tool
+thistool,providingtheagentwithnecessaryexternalinformationorcapabilities.Whilethisaction
+spaceissufficientforouranalysis,itcanbeextendedortailoredforspecificdomains[277].
+Consequently,acompletereasoningtaskismodeledasaniterativesequenceofactionsThe
+processisinitiatedbyauserquery𝑃 𝑈 andproceedsuntilapredefinedterminationcondition𝑄 is
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 6 =====
+
+111:6 Zhaoetal.
+met.Thisconditionisessentialforensuringcontrolledexecutionandconservingcomputational
+resources[258].BuildingonthenotationsinTable1,weformalizethismulti-stepreasoningprocess
+inAlgorithm1.Thecommentswithinthealgorithmserveasforwardreferences,indicatingwhich
+of the methodologies discussed in subsequent sections modify a particular step of the general
+procedure.
+Algorithm1GeneralAlgorithmforFramework-levelAgenticReasoning
+Require: UserQuery𝑃 𝑈;Goal𝑔;ExternalTool𝑡;ActionSpaceA;TerminateCondition𝑄
+Ensure: FinalOutput𝑦 𝑜𝑢𝑡
+1: InitializecontextC 0 ←Init(𝑃 𝑈) ⊲§3.2(eq.1,eq.3);§3.3(eq.11)
+2: Initializereasoningstep𝑘 ←0
+3:
+while¬𝑄(C𝑘 ,𝑘)do ⊲§3.3(eq.4)
+4: 𝑦 𝑘+1 =𝑎 𝑘(C𝑘 ,𝑔,𝑡), 𝑎 𝑘 ∈ A ⊲§3.3(eq.6,eq.7,eq.9)
+5: C𝑘+1 =𝑎 𝑘 ′(C𝑘 ,𝑦 𝑘+1 ,𝑔,𝑡),𝑎 𝑘 ′ ∈ A ⊲§3.2(eq.2);§3.3(eq.8,eq.10);§3.4(eq.12)
+6:
+𝑘 ←𝑘+1 ⊲§3.2(eq.5);§3.4(eq.13,eq.14,eq.15)
+7: returnFinaloutputderivedfromC𝑘
+3.2 Single-agentMethods
+Single-Agentmethodsfocusonenhancingthecognitiveanddecision-makingabilitiesofanin-
+dividualagent.Fromtheperspectivesofexternalguidanceandinternaloptimization,thispart
+categorizessingle-agentmethodsintotwomaintypes:promptengineeringandself-improvement.
+Promptengineeringemphasizesguidingtheagent’sreasoningprocessbyleveragingroles,environ-
+ments,tasks,andexamples,whileself-improvementfocusesonhowtheagentrefinesitsreasoning
+strategiesthroughreflection,iteration,andinteraction.
+3.2.1 PromptEngineering. Promptengineeringenhancestheagent’sperformancebyenrichingits
+initialcontext,whichcorrespondstothecontextinitializationstep(line1inAlg.1).[237].Instead
+ofrelyingsolelyontheuser’squery(𝑃 𝑈),thisapproachaugmentstheinitialcontext C
+0
+witha
+meticulouslycraftedprompt,denotedas𝑃∗.Thisconceptualshiftcanberepresentedas:
+C 0 ←Init(𝑃 𝑈) −− P − ro − m −− .E − n −→ g. C 0 ←Init(𝑃 𝑈 ,𝑃∗) (1)
+Equation 1 illustrates that the initialization process is transformed. Originally, the context C
+0
+is derived exclusively from the user query 𝑃 𝑈. With prompt engineering, it is initialized with
+both𝑃
+𝑈
+andtheengineeredprompt𝑃∗.Thisadditionalprompt𝑃∗isoftenacompositeofseveral
+components: a role-playing perspective (𝑃 ), an environment simulation (𝑃 ), a detailed task
+role env
+clarification(𝑃 𝑡𝑎𝑠𝑘),andasetofin-contextexamples(𝑃 𝑖𝑐𝑙).Unlikefine-tuningmethods,whichalters
+theLLM’sparameters,promptengineeringguidesthemodel’sbehaviornon-intrusively,steering
+theagenttowardsmoreaccurateandpredictablereasoningoutcomes[171].Eachcomponentof𝑃∗
+contributestothisguidanceinadistinctway,asdetailedbelowandillustratedinFig.3.
+Role-Playing. Toinstillarole-playingperspective(𝑃 𝑟𝑜𝑙𝑒),thepromptassignstheagentaspecific
+personaoridentity,suchas“Youareanexpertdatascientist”or“Actasaseasonedhistorian"[239].
+Thisencouragestheagenttoleveragetheexpertise,cognitiveframeworks,andlinguisticstyles
+associatedwiththatrole[229].Byadoptingapersona,themodelcanbetteractivatedomain-specific
+knowledgeandstructureitsresponsesfromamoreprofessionalviewpointduringreasoning[136].
+This technique has become a widely adopted method in the agentic frameworks discussed in
+chapter§4,owingtoitslowdeploymentcostandhighguidanceefficiency.Byassigningaclear
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 7 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:7
+Fig. 3. Prompt engineerng for agentic reasoning framework. We summarize four types of methods: a)
+Role-playing:anagentwillbedistributedwithaspecificrole,tostimulateitsspecificperformance;b)
+Environmental-simulation:anagentwillbetoldinacarefullydesignedenvironment,whereitcanreason
+withmulti-modalitiesorexternalabilities;c)Task-description:ataskwillbeclearlyreconstructedand
+expressedtoanagent;d)In-contextLearning:severalexampleswillbeprovidedtoanagentbeforeor
+duringitsmulti-stepreasoning.Foreachtypeofpromptingmethod,weprovideashortexampleprompt,
+withthethemeofconductingagenticresearch.
+role,itenablesagentstobetterfocusontheirspecificduties,therebyoptimizingtheirreasoning
+anddecision-makingprocessesincomplextasks.However,theefficiencyofroleassignmentcanbe
+sensitivetothegranularityofthepersonadesignandthespecificsofthetask[132].Furthermore,
+forfact-basedquestions,role-playingmayintroducebiasesinherenttothepersona,potentially
+leadingtofactuallyinaccurateoutputs[155].
+EnvironmentSimulation. Theenvironmentsimulationprompt(𝑃 𝑒𝑛𝑣)contextualizestheagent
+bydescribingthespecificsettinginwhichitoperates.Thisprovidestask-relevantbackground
+information,rules,andconstraints,enablingtheagenttomakedecisionsthatarebetteralignedwith
+thesimulatedworld.Theseenvironmentscanrangefrommimickingreal-worldscenarios,suchasa
+stockmarket[67]oramedicalclinic[64],toentirelyvirtualsettingslikeavideogameworld[277],
+oftenwithaactionspacethatarecarefullydesigned.Adetailedandtask-relevantenvironmental
+descriptioniscritical,asitpromptstheagenttogenerateactionsthatarecontextuallyappropriate
+andhighlycorrelatedwiththescenario’sobjectives.
+TaskDescription. Acleartaskdescription(𝑃 𝑡𝑎𝑠𝑘),whichoutlinestheprimarygoal𝑔,constraints,
+andexpectedoutputformat,isacornerstoneofvirtuallyeveryagentsystem.Awell-structuredtask
+descriptionguidestheagentindecomposingacomplexproblemintoasequenceofmanageable
+sub-tasks. By providing a precise description, agents can better comprehend the task’s intent
+andexecuteitinthespecifiedmanner,whicheffectivelyreducesambiguityduringthereasoning
+processandleadstomoreaccurateoutcomes[191].However,theverbosityandstructureofthe
+taskdescriptioncansignificantlyimpacttheperformanceoftheunderlyingLLM,oftenrequiring
+carefuloptimizationtailoredtothespecificmodelbeingused[147].
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 8 =====
+
+111:8 Zhaoetal.
+Fig.4. Paradigmsofself-improvementforanLLM-basedagent.Weintroducethreecoremechanisms.a)
+Reflection:Theagentanalyzesacompletedtrajectorytogenerateatextualsummary,storinginitscontext.
+Thissummarywillhelpsforthenextreasoningstep.b)IterativeOptimization:Withinasingletask,the
+agentgeneratesaninitialoutput,comparesitagainstadefinedstandardorfeedbackfromothers,and
+repeatedlyrefinesitinfollowingreasoningsteps,until𝑄ismet.c)InteractiveLearning:Theagentinteracts
+withadynamicenvironment,whereexperiences(e.g.,discoveringanewitem)cantriggeranupdatetoits
+high-levelgoals,fosteringcontinuous,open-endedlearning.
+In-contextLearning. In-contextlearning(ICL)providestheagentwithasetoffew-shotexamples,
+or demonstrations, within the prompt (𝑃 𝑖𝑐𝑙). These examples typically take the form of pairs
+{(𝑥 1 ,𝑧 1 ),(𝑥 2 ,𝑧 2 ),...,(𝑥 𝑛 ,𝑧 𝑛)},whereeachpair (𝑥 𝑗 ,𝑧 𝑗) consistsofanexemplaryinput𝑥 𝑗 andits
+correspondingdesiredoutput𝑧 𝑗 [25].Thisallowstheagenttodiscernpatternsandgeneralize
+tonewtaskinstanceswithoutanygradientupdates.Chain-ofthoughtprompting[282]further
+porvidesaparadigmsthattheintermediatereasoningstepscouldalsobebroughttoagent,teaching
+agentshowtoreason,planandbreakdownproblemswithoutinternaltuning[328].However,
+theperformanceofICLishighlysensitivetothequalityandrelevanceoftheprovidedexamples;
+low-qualityorirrelevantdemonstrationscansignificantlydegradetheagent’sreasoningcapabilities
+[156].
+3.2.2 Self-Improvement. Self-improvementmechanismsencourageanagenttoenhanceitsrea-
+soningcapabilitiesthroughintrospectionandautonomouslearning.Ratherthanrelyingonstatic,
+pre-definedprompts,thesemethodsenabletheagenttodynamicallyadaptitsstrategiesbasedon
+itsownexperiences.AssummarizedinFig.4,thisinternaloptimizationprocesscanbeunderstood
+throughthreecomplementaryparadigms:reflection,whichinvolveslearningfrompasttrajectories;
+iterative optimization, which focuses on refining outputs within a single reasoning cycle; and
+interactivelearning,whichallowsforthedynamicadjustmentofhigh-levelgoalsinresponseto
+environmentalfeedback.
+Reflection. Reflection enables an agent to perform post-hoc analysis on its past actions and
+outcomestoextractvaluablelessonsforfuturetasks.Thisprocessinvolvesgeneratingasummary
+ofitsreasoningprocess,identifyingflawsorinefficiencies,andarticulatinginsightsinnatural
+language[92].Thisprocessreferstoline5inAlg.1,wheretheaction𝑎′
+isspecificallyassignedas
+𝑘
+reflection𝑎 𝑟𝑒𝑓𝑙𝑒𝑐𝑡:
+𝐶 𝑘+1 =𝑎 𝑟 ′ 𝑒𝑓𝑙𝑒𝑐𝑡 (𝐶 𝑘 ,𝑦 𝑘+1 ,𝑔,𝑡) (2)
+Thescopeofreflectioncanvary.Forinstance,theReflexionframework[241]guidesagentsto
+verballyreflectontaskfailures,storingthesereflectionsinanepisodicmemorytorefineplansin
+subsequenttrials.Otherapproacheshaveexploredreflectingondifferentaspects,suchasinefficient
+reasoningpaths[335]orconflictinginformationfromexternaltools[204].Thisself-correction
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 9 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:9
+capabilityallowstheagenttolearnfromitsmistakesandcontinuouslyadaptitsstrategieswithout
+requiringexternalinterventionorparameterupdates.
+IterativeOptimization. Incontrasttothepost-hocnatureofreflection,iterativeoptimization
+utilize a whole reasoning process to complete a pre-defined standard or constraint, which we
+denoted as S. This mechanism introduces two key modifications to the agent’s fundamental
+operationdescribedinAlg.1.
+First,thestandardS isincorporatedintotheagent’sinitialcontext.Thismodificationofthe
+initializationstep(line1inAlg.1)ensuresthatagentisawareoftheoptimizationtargetfromthe
+outset:
+Iter.Opt.
+C 0 ←Init(𝑃 𝑈) −−−−−−→ C 0 ←Init(𝑃 𝑈 ,S) (3)
+Equation3showsthatthecontextinitializationisaugmentedtoincludenotjusttheuser’squery
+𝑃 𝑈,butalsotheexplicitstandardSthatthefinaloutputmustsatisfy.Second,theagent’sautonomy
+todecidewhentostopisreplacedbyS.ThegeneralterminationconditionQisnowprecisely
+definedbywhetherthecurrentoutputysatisfiesthestandardS.Thiscanbeexpressedasaformal
+redefinitionofQ(line3inAlg.1):
+𝑄 − I − te − r − . − O − p → t. 𝑄 ≜ (𝑦 ⊨S) (4)
+AsstatedinEquation4,theterminationcondition𝑄 isnowdefinedasthepredicatecheckingifthe
+currentoutput𝑦satisfiesthestandardS.Consequently,aftereachreasoningstepthatproducesan
+output,theagentchecksitagainstS,enteringaniterativeloopofrefinementuntiltheconditionis
+met.ThisiterativeloopiscentraltoframeworkslikeSelf-Refine[183],whereasingleLLMacts
+asitsowngenerator,critic,andrefinertoimproveitsoutputwithoutexternaltrainingdata.This
+approachisparticularlyeffectivefortasksrequiringhighprecision,suchascodegeneration[84]or
+mathematicalreasoning[3].However,itcanbecomputationallyintensiveandrisksconvergingon
+asuboptimalsolutionifthefeedbackmechanismisflawedorthesearchspaceistoocomplex[205].
+Interactive Learning. Representing the most advanced level of self-improvement, interactive
+learningallowsanagenttofundamentallyalteritshigh-levelgoals𝑔basedoncontinuousinteraction
+withadynamicenvironment.Thisparadigmmovesbeyondoptimizingafixedplantoenablingthe
+agenttodecidewhattodonextonastrategiclevel.Thiscorrespondstoanenhancementofthe
+goal-updatingmechanism(line6inAlg.1),wherethegoal𝑔isnolongerstaticbutisre-evaluated
+ateachstep:
+𝑔 𝑘+1 ←𝑎 𝑘({(C𝑖 ,𝑦 𝑖)}𝑘 𝑖=1 ,𝑔 𝑘 ,𝑡) (5)
+Equation5showsthatthenewgoal𝑔 𝑘+1 isderivedfromtheentirehistoryofcontextsandoutputs
+{(C𝑖 ,𝑦 𝑖)}𝑘
+𝑖=1
+, the current goal𝑔 𝑘, and available tools𝑡. Voyager [277] exemplify this, where an
+agentinMinecraftautonomouslyproposesnewgoalsbasedonitsdiscoveries,graduallybuildinga
+complexskilltreewithouthumanintervention.Similarly,ExpeL[329]enablesanagenttolearn
+fromtrial-and-errorexperiences,creatingamemoryofsuccessfulandfailedattemptsthatinforms
+thegenerationofmorepromisinggoalsinfuturetasks.Furthersystematizingthisprocess,Learn-
+by-Interact [103] introduces a data-centric framework where an agent autonomously collects
+interactiondataandthendistillsitintoareusableknowledgebase,therebyenablingstructured,
+self-adaptivebehaviorincomplexenvironments.Bydynamicallyadaptingitsobjectives,theagent
+demonstratesahigherformofautonomy,allowingittonavigatecomplex,evolvingenvironments
+inatrulyadaptivemanner[333].
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 10 =====
+
+111:10 Zhaoetal.
+Fig.5. Tool-basedreasoningframeworksofLLM-basedagent.a)Toolintegrationstudieshowtoincorporate
+toolsintotheagent’sreasoningprocess;b)ToolSelectionaddresseswhichtoolfromthetoolkitT ismost
+suitableforthecurrenttaskorsub-problem;c)ToolUtilizationconcernshowtoeffectivelyoperatethe
+chosentooltogeneratethedesiredoutput.
+3.3 Tool-basedMethods
+Whilethegeneralagenticreasoningframework(Alg.1)conceptualizestooluseviaasingleentity
+𝑡,thisabstractionisinsufficientforcomplexscenarioswherereasoningisdeeplyintertwinedwith
+specificenvironmentalcapabilities.Hereweexpandthissingleentity𝑡 intoacomprehensivetoolkit
+T = {𝑡 1 ,𝑡 2 ,...,𝑡 𝑛},whereeach𝑡 𝑖 representsadistincttoolavailabletotheagent.Asillustrated
+inFig.5,wedeconstructthetool-basedreasoningpipelineintothreefundamentalstages:Tool
+Integration,ToolSelection,andToolUtilization.Generally,theoutputfromtoolcallingwill
+be integrated into the context of agent by a specific action (line 5 in Alg. 1). These three steps
+togetherformthetool-basedmethodsforcomplexmulti-stepreasoning,helpingagentsbetter
+exploitexternalresourcestosolvecomplexreasoningproblems.
+3.3.1 ToolIntegration. Beforeanagentselectandutilizeatool,thetoolmustfirstbemadeaccessible
+withintheagent’soperationalenvironment.Thisarchitecturalintegrationdefinestheinterface
+andcommunicationprotocolbetweentheagentandthetool[61].Wecategorizetheseintegration
+patternsintothreeprimarymodels:API-basedIntegration,Plugin-basedIntegration,andMiddleware-
+based Integration. APIs enable agents to easily interact with various tools without needing to
+understandtheirinternalimplementations;pluginsdynamicallyextendthefunctionalityofthe
+agentsystem;whilemiddlewarefocusesonaligningtheinteractionsbetweentheagentandthe
+tools.
+API-basedIntegration. APIs(ApplicationProgrammingInterfaces)providestandardforintegrating
+external tools [311]. APIs provide a stable, well-documented contract that allows an agent to
+interactwithatool(e.g.,awebsearchengine[47])withoutneedingtounderstanditsinternal
+implementation.TheagentsimplylearnstoformulatearequestaccordingtotheAPIspecification
+andparsethereturneddata.
+EmergingAgentprotocolssuchasMCPfurtherdevelopthediversityofAPItools.Underthe
+corporationofserviceprovider,agentsnowcaneasilyusepreciseservicessuchasmapnavigation
+toprovidedetailedinformationfortheuser[105].Butsuchintegrationissubjecttonetworklatency,
+ratelimits,andpotentialserviceoutages.Italsorequirestheagenttomanageauthenticationand
+securitycredentials[105].
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 11 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:11
+Plugin-basedIntegration. Pluginsaresoftwarecomponentsthatareloadedandexecuteddirectly
+withintheagent’sownruntimeenvironment.UnlikeexternalAPIcalls,pluginsoperatewithlower
+latencyandhavedeeperaccesstotheagent’sinternalstate[181].
+Retrieval-AugmentedGeneration(RAG)[148]isatypicalcaseofplugin-basedintegration.A
+vectordatabaseisintegrateddirectlyintotheagentsystem,introducingdomain-specificknowledge
+totheagentintheformofatoolcall,therebyincreasingthecredibilityofitsanswers[77].Liu
+etal.[173]offersamorespecificapplicationofplugins.Byintegratinganinteractiveheatmap
+plugin and a scatter plot plugin, the agent system is enabled to dynamically process, analyze,
+andvisualizedomain-specificdataduringitsreasoningprocess.Thus,pluginsofferahigherlevel
+ofcustomization,extendingtheedgeofagenicframework’scoreabilities,butitmayintroduce
+complexitytotheoverallsystem[101].
+Middleware-basedIntegration. MiddlewareisasoftwarelayersituatedbetweentheAgentand
+tools [88]. This layer acts as a universal adapter or an “operating environment” for the agent,
+abstractingawaythecomplexitiesofdirecttoolinteraction,shieldingtheLLMfromenvironmental
+complexity [88]. A middleware layer could manage API keys, standardize data formats across
+differenttools,orprovideaunifiedfilesystemandexecutionenvironmentfortheagent[291].
+Therefore,middlewaresimplifiestheagent’slogicbyoffloadingcomplextasks,providingaconsis-
+tentinterfaceoveraheterogeneoussetoftools.Chenetal.[40]furtherproposeInternetofAgents,
+highlightingadvantagesofmiddlewareincomplexreasonoingprocess.However,itaddsanother
+layerofabstractionthatcancomplicatemaintenance.
+3.3.2 ToolSelection. Insteadofgenerallyusingtool𝑡 ineachreasoningstep(line4and5ofAlg.1),
+herewewanttohighlighttheimportanceoftheselectingactionoftoolwithinreasoningsteps.
+Effective tool selection is pivotal when an agent is presented with a large and diverse toolkit
+T.Thechallengeliesinaccuratelymappingtherequirementsofagivenproblemtothespecific
+choice of a tool 𝑡, where 𝑡 ∈ T. Based on the degree of agent autonomy, we categorize tool
+selectionstrategiesintothreeprimaryapproaches:AutonomousSelection,Ru-BasedSelection,and
+Learning-BasedSelection.
+AutonomousSelection. Thisparadigmhighlightstheautonomyofagenticsystems.Theagent
+autonomouslyselectsatoolbasedonitsintrinsicreasoningcapabilities,guidedsolelybythenatural
+languagedescriptionsoftheavailabletoolsandtheinputquery[321].Thisprocessisoftenframed
+asazero-shotreasoningtask,wheretheagentmust“think”toconnecttheproblemtotheright
+toolwithoutexplicitrules[304].
+Justlikeageneralreasoningstep,thetoolselectionstepwillletagentreason,reflect,oreven
+usetoolstodecidewhichtool𝑡 𝑘+1 issuitedforcurrentcondition,thistool𝑡 𝑘+1 canberegardedas
+theoutput𝑦withinthisreasoningstep:
+𝑦 𝑘+1 ←𝑡 𝑘+1 =𝑎 𝑘(𝐶 𝑘 ,𝑔,T),𝑎 𝑘 ∈ A (6)
+Followingline5inAlg.1,theselectedtool𝑡 𝑘+1 isupdatedintothecurrentcontextwindow,allowing
+theagenttouseitinsubsequentreasoningsteps.Thisselectionprocessmaysometimesberepeated
+multipletimestograduallyfilterforthebesttoolsfromalargetoolset[160].Sincethismethod
+requiresnotask-specificexamplesorfine-tuning,itenablestheagenttodynamicallyadaptto
+novelcombinationsoftools,tasksandscenarios.However,itsperformanceishighlydependenton
+thequalityoftooldescriptionsandtheagent’sinherentreasoningcapacity,whichchallengesthe
+robustnessandefficiencyoftheagentsystem.
+Rule-BasedSelection. Thisapproachgovernsagent’stoolselectionthroughasetofpredefined,
+explicitrulesR thatmapspecifictasks,intents,orstatestodesignatedtools[180].Theserules
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 12 =====
+
+111:12 Zhaoetal.
+provide a deterministic and reliable mechanism for tool choice. The selection process is thus
+conditionedontheserules:
+𝑡 𝑘+1 =𝑎 𝑘(𝐶 𝑘 ,𝑔,T,R),𝑎 𝑘 ∈ A (7)
+The rules in R can be implemented in various forms, from simple keyword matching [174] to
+structuredformatslikeprocessdescriptionlanguage(PDL)[339].
+Themainbenefitofrule-basedselectionisitshighreliabilityforwell-definedtasks.Itensures
+thattheagentconsistentlyusesthecorrecttoolforaknownsituation,minimizingerrors[154].
+However,manuallycraftingandmaintainingacomprehensivesetofrulesislabor-intensiveand
+scalespoorlyasthenumberoftoolsandthecomplexityoftasksgrow.Itstruggleswithunforeseen
+problemsthatdonotmatchanyexistingrules,forcingadefaultfailureorafallbacktoadifferent
+selectionmechanism.
+Learning-BasedSelection. Learning-basedselectioninthiscontextreferstoanexplicit,online
+processwheretheagentrefinesitstoolselectionstrategyduringinference[232].Thisadaptation
+occursthroughacycleofaction,feedback,andreflection,improvingitsconcurrenttoolactions.As
+demonstratedinfigure.5,theagentattemptsatoolfortask,receivesfeedbackonitsperformance
+(e.g.,fromexecutionresults,orhumanguidance),andthenexplicitlyreflectsonthisoutcometo
+updateitscontextCforsubsequentsteps:
+𝐶 𝑘+1 =𝑎
+r
+′
+eflection
+(𝐶 𝑘 ,𝑦 𝑘 ,𝑔) (8)
+This reflective step allows the agent to learn from its own context by storing experiences of
+successfultool-taskpairingsorbygeneratingexplicitstrategiestoavoidrepeatingpastmistakes
+[215].Thisapproachenablestheagenttoadapttonovelscenariosanduserpreferenceswithout
+requiringmodelretraining.Learn-By-Interact[103]achievesainteractivelearningbysynthesizing
+trajectoriesofagent-environmentinteractionsbasedondocumentations,andconstructsinstructions
+bysummarizingorabstractingtheinteractionhistories.However,agoodfeedbacklogicisnecessary,
+andsuchexploringprocesscanbecosted.
+3.3.3 ToolUtilization. Followingtheprevioussection,thissectionfocusonhowtomakethebest
+useoftheselectedtools[186].Herewedividetoolutilizationintothreemodes:sequentialuse,
+paralleluse,anditerativeuse.Sequentialuseinvolvesinvokingmultipletoolsinapredetermined
+order,parallelusefocusesonthebreadthoftoolcallswithinthesamereasoningstep,whileiterative
+useaimsatachievingtheoptimaltasksolutionwithincertainlimitsthroughrepeatedcycles.
+SequentialUtilization. Inthismode,theagentinvokestoolsinasequence,wheretheoutputof
+onetooloftenservesastheinputforthenext,formingacleartool-chain[154].Thisiswell-suited
+fortasksthatcanbedecomposedintoalinearworkflow.Theresultsoftoolcallingareintegrated
+intothecurrentcontext,influencingthenextcalling[15].CRITIC[85]improveitsoutputthrough
+asequentialuseofexternaltools,includingsearchengineandcodeinterpreter.MCP-Zero[68]
+furtherpromotetooldiscoverybasedonthetoolchain,whereagentsequentiallyusedifferenttool
+tosolvecomplexproblems.Itsprimarybenefitissimplicityandpredictability,makingworkflows
+easy to design, analyze and debug. But sometimes it’s inefficiency for tasks with independent
+sub-problemsandsusceptibilitytocascadingfailures,whereanerrorinanearlystephaltsthe
+entirechain.
+ParallelUtilization. Toenhanceefficiency,thismodeinvolvesinvokingmultipletoolsconcur-
+rentlywithinasinglereasoningstep.TheAgentinvokesmultipletoolssimultaneouslytoachieve
+synchronousprocessingofmultidimensionalinformation.ForaselectedtoolsetT′ = {𝑡
+1
+′,𝑡
+2
+′,...,𝑡
+𝑚
+′ }
+inanymiddlereasoningstep𝑘,theagentwillgenerateagroupofresultsinparallelusingeach
+toolwithinT′.Thatis,forline4inAlg.1,theoutputwillbecomesasetofoutput:
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 13 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:13
+Y𝑘+1 = {𝑦
+𝑘
+1
++1
+,𝑦
+𝑘
+2
++1
+,...,𝑦
+𝑘
+𝑚
++1
+}
+(9)
+where𝑦 𝑘 𝑖 +1 =𝑎 𝑘(C𝑘 ,𝑔,𝑡 𝑖 ′), 𝑎 𝑘 ∈ A, 𝑡 𝑖 ′ ∈ T′
+Afterthat,theupdateofcontextwillfurtherconsiderthisoutputsetY𝑘+1 [340],insteadofasingle
+outputlikebefore:
+𝐶 𝑘+1 =𝑎 𝑘 ′ (Y𝑘+1 ,𝐶 𝑘 ,𝑔),𝑎 𝑘 ′ ∈ A (10)
+Thekeyadvantageisasignificantreductioninlatency,asmultipletime-consumingtoolutilization
+canbeexecutedatonce.It’salsoefficiencytoexploreseveralpropertoolssimultaneously.For
+example,LLMCompiler[133]efficientlyorchestratesmultiplefunctioncallsbyexecutingthem
+in parallel during intermediate reasoning steps, while LLM-Tool Compiler [244] achieves tool
+parallelizationbyselectivelyfusingtoolswithsimilarfunctionalities.Butsuchtechniquesmayalso
+introducethechallengeofaggregatingpotentiallyconflictinginformationfromdiverseoutputs.
+IterativeUtilization. Iterativeutilizationinvolvesamicro-levelloopwhereanagentrepeatedly
+interactswithatooltoachieveafine-grainedobjectivewithinasinglestepofthebroaderreasoning
+process[184].Thiscontrastswithmacro-leveliterativeoptimizationoftheentiresolutionin§3.2.2.
+Thefocushereisonperfectingasingletool-useinstance.Aprimeexampleisanagentusingacode
+interpreter:ifthefirstexecutionfails,theagentinspectstheerror,refinesthecode,andre-executes
+ituntilitrunssuccessfully,allbeforemovingtothenextmacroreasoningstep[97].Thismethod
+enhances the robustness of tool execution, but may increase the latency of a single reasoning
+stepandcarriestheriskofgettingstuckinunproductiveloops[205].Thisnecessitatescarefully
+designedterminationconditionsorreflectionmechanisms[241].
+3.4 Multi-agentMethods
+Whilesingle-agentframeworksdemonstratesconsiderablecapabilities,theyinherentlyfacelimita-
+tionswhenconfrontedwithtasksdemandingdiverseexpertiseorcomplexproblemdecomposition.
+Multi-agentsystems(MAS)emergeasanaturalsolution,leveragingthecollectiveintelligenceof
+multipleagentstotacklethesechallenges.ThecentralprincipleofMASisto“divideandconquer”,
+butitscorechallengeliesinachievingeffectivecoordination[258].Thischallengebifurcatesinto
+twofundamentalquestions:(1)Howshouldtheagentsbeorganized? Thispertainstothesystem’s
+organizationalarchitecture,whichdictatesthepatternsofcontrolandinformationflow.(2)How
+shouldtheagentsinteractwithothers? Thisrelatestotheindividualinteractionprotocols,which
+definehowagentsaligntheirgoalsandbehaviors.
+AsillustratedinFigure6,weanalyzethemulti-agentreasoningframeworksalongthesetwo
+axes.Organizationalarchitecturesincludecentralized,distributed,andhierarchicalforms,which
+determinethestructuralbackboneofthesystem;whileindividualinteractionsinvolvecoopera-
+tion,competition,andnegotiation,governingthedynamicsbetweenagentsastheypursuetheir
+objectives.
+To formally discuss these paradigms, we represent a multi-agent system as a set of agents
+M = {𝐴𝑟 1 ,𝐴𝑟 2 ,...,𝐴𝑟𝑛},where𝑟 𝑖 denotesthespecializedroleofanagent𝐴𝑟𝑖.Whileeachagent
+adherestothegeneralreasoningloopoutlinedinAlg.1,itsbehaviorisindividuatedbyitsunique
+role,goal𝑔𝑖 ,availableactions𝑎𝑖 andtool𝑡𝑖 .TheyalsomaintaindifferentindividualcontextC𝑖
+.Itis
+thedistinctivenessofeachagent’scontextandrolethatdrivestheheterogeneityintheirreasoning,
+ultimatelyshapingthesystem’scollectiveoutput.
+3.4.1 OrganizationalArchitecture. Theorganizationalarchitecturedefinesthemacro-levelstructure
+forcoordinationandcontrol,whichisofteninstantiatedbyassigningaspecificrole𝑟 𝑖 toeach
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 14 =====
+
+111:14 Zhaoetal.
+Fig.6. AtaxonomyofMulti-agentreasoningframeworks,categorizedina)OrganizationalArchitectures:
+wesummarizethreeparadigmsofmulti-agentframeworkstoexplainhowsuchsystemcanbeorganizedto
+solvedifferentkindsofchallenges;b)IndividualInteractions:wedemonstratedthreetypesofinteraction
+betweendifferentagentswithinonemulti-agentsystem.
+agent’sinitialcontextC
+𝑟𝑖:
+0
+C 0 ←𝑃 𝑈 ⇒ C 0 𝑟𝑖 ← (𝑃 𝑈 ,𝑟 𝑖) (11)
+Extendfromline5inAlg.1,eachagent,nomatterunderwhatorganization,theirupdateofcontext
+mustconsiderallotheragents’output,withtheirpreviouscontext𝑦𝑟𝑖,whichwouldbeformalized
+𝑘
+as:
+C
+𝑘
+𝑟𝑖
++1
+=𝑎
+𝑘
+′ (𝐶
+𝑘
+𝑟𝑖,Y𝑘 ,𝑔𝑟𝑖,𝑡𝑟𝑖),𝑎
+𝑘
+′ ∈ A
+(12)
+whereY𝑘 = {𝑦
+𝑘
+𝑟 1,𝑦
+𝑘
+𝑟 2,...,𝑦
+𝑘
+𝑟𝑛}
+Here,Y𝑘 representsthecollectiveoutputsofallthe𝑛agentsatreasoningstep𝑘.Thespecificsubset
+ofY𝑘 thatanagent𝐴𝑟𝑖 considersisdeterminedbydifferentorganizationalarchitecture.Wefurther
+decompose the organization of multi-agent systems into three distinct paradigms: centralized,
+decentralized,andhierarchical.Acentralizedarchitectureissuitableforscenariosrequiringglobal
+optimizationandstrictcontrol;adistributedarchitectureoffersgreaterautonomyforeachagent;
+whileahierarchicalarchitectureisappropriatefortaskswithcleargoalsandwell-definedprocesses.
+These paradigms can be statically or dynamically integrated, reaching a flexible organization
+structureinspecificscenarios[166].
+Centralized.
+Ingeneral,acentralizedarchitecturesetacentralagent𝐴𝑐𝑒𝑛
+tomanageandcoordi-
+natethereasoningactivitiesforotheragents,𝐴𝑟𝑖 where𝑟 ≠𝑐𝑒𝑛[78].Buttheirisadifference.This
+centralagent𝐴𝑐𝑒𝑛
+typicallyperformsglobalplanning,taskdecomposition,andresultsynthesis,
+requiringittoprocesstheoutputsfromallotheragents,asinEq.12.Subordinateagents,however,
+mayonlyneedtoconsiderinstructionsfromthemanager,simplifyingtheircontextupdates.This
+architecture ensures high coordination and global optimization [78]. However, it introduces a
+potentialperformancebottleneckandasinglepointoffailureatthecentralnode[205].
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 15 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:15
+Decentralized. Inadecentralizedarchitecture,thereisnocentralauthority.Eachagentpossesses
+equalstatusandmakesdecisionsbasedonlocalinformationanddirectpeer-to-peercommunication
+[301].Consequently,thecontextupdateforeveryagenttypicallyfollowsthegeneralforminEq.
+12,whereeachagentmustprocesstheoutputsofallitsneighbors,orallotheragentsinafully
+connectedsystem.Thisdiscussion-likeprocessfostersemergentcollaborationandenhancessystem
+robustnessandfaulttolerance,asthefailureofoneagentdoesnotcrippletheentiresystem[301].
+However,itmayreducetheoverallefficiencyofresourceutilization[205].
+Hierarchical. A hierarchical architecture organizes agents into a structured tree or pyramid,
+decomposingacomplextaskintosub-problemsatdifferentlevelsofabstraction.Asillustratedin
+MetaGPT[102],agentsathigherlevelsareresponsibleforstrategicplanninganddelegatetasksto
+lower-levelagents,whichexecutemorespecificsub-tasks.Informationtypicallyflowsvertically:
+instructionspassdownfromuppertolowerlevels,andresultsarepassedbackup.Thisstructure
+excels at solving well-defined problems that can be clearly decomposed, promoting efficiency
+andconsistency[37].However,sucharchitecturescanberigidandmaystifletheflexibilityand
+creativityofindividualagents.
+3.4.2 Individual Interaction. The interaction protocol governs how an agent’s goals evolve in
+responsetoothers,directlyinfluencingthesystem’semergentbehavior.Thisintroducesadynamic
+updatetoanagent’sgoal𝑔𝑟𝑖,expandingthestaticgoalassumptioninthebasicreasoningloop(line
+6inAlg.1).Wefurthercategorizetheseinteractionsascooperation,competition,andnegotiation.
+Cooperationemphasizesmaximizingcollectiveinterests,competitionfocusesonmaximizingindi-
+vidualinterests,andnegotiationrepresentsacompromisebetweenthetwo.Thesethreedifferent
+paradigmscanalsobefurthercombinedtoachievespecificreasoningobjectives.
+Cooperation. Incooperationmechanism,theprimaryobjectiveforagentsistomaximizecollective
+interests.AcommongoalGisestablishedtoguideknowledgesharingandcollaborativeplanning
+[258].Thisgoalcanbepredefinedinthesystempromptordynamicallyformedduringdifferent
+reasoningsteps.
+Ateachstep,anagentwilldynamicallyupdateitsgoalbyreflectingonitsperformanceand
+alignsitsindividualgoal𝑔𝑟𝑖 withthecommongoalG.Theupdatedgoalwillfurtherinfluencethe
+next reasoningstep:
+𝑔𝑟𝑖 ←𝑎𝑟𝑖 (𝐶𝑟𝑖,𝑔𝑟𝑖,G,𝑡𝑟𝑖)
+(13)
+𝑟𝑒𝑓𝑙𝑒𝑐𝑡 𝑘
+Therefore,theachievementofindividualagenticgoalsoftenpromotesthegoalsofotheragents
+andtheentiresystem[89].
+Competition. Incompetitiveinteractions,agentspursuetheirindividualgoals,whichareoften
+inconflict.Theobjectiveistomaximizeindividualbenefit,whichmayinvolveoutperformingor
+strategicallyunderminingopponents[31].Anagentmustnotonlyadvanceitsownagendabutalso
+inferandcountertheintentionsofothersbasedontheirobservableoutputsY𝑘.Thegoalupdate
+processwillthereforebecomeadversarial:
+𝑔𝑟𝑖 ←𝑎𝑟 𝑟 𝑖 𝑒𝑓𝑙𝑒𝑐𝑡 (𝐶 𝑘 𝑟𝑖,𝑔𝑟𝑖,Y𝑘 ,𝑡𝑟𝑖),whereY𝑘 = {𝑦 𝑘 𝑟 1,𝑦 𝑘 𝑟 2,...,𝑦 𝑘 𝑟𝑛} (14)
+Thisdynamicisexemplifiedbyframeworksthatusemulti-agentdebate,suchasMAD[162],where
+agentstakeonadversarial“debater”rolestochallengeassumptionsanduncoverflawsinreasoning.
+Such adversarial interactions can significantly improve the robustness and quality of the final
+outputbyforcingathoroughexplorationoftheproblemspace[117].
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 16 =====
+
+111:16 Zhaoetal.
+Table2. Acomprehensivecomparisonofmainstreamagenticreasoningframeworks,illustratinghowmethods
+fromourtaxonomyareorganizedwithineachwork,alongsidetheirinspiration,evaluation,andcode.The
+legendfortheabbreviationsisasfollows.PE(PromptEngineering):Role(role-playing),Task(taskdescrip-
+tion).SI(Self-Improvement):R.F(reflection),I.O(iterativeoptimization),I.L(interactivelearning).Tools:
+T.I(toolintegration);T.S(toolselection:‘rule’forrule-based,‘auto’forautonomous);T.U(toolutilization:
+‘Seq’forsequential,‘Iter’foriterative).Multi-agent:M.O(organization:‘Dec’fordecentralized,‘Cen’for
+centralized,‘Hier’forhierarchical);M.I(interaction:‘Deb’fordebate,‘Coo’forcooperation).
+∗Mix:Theframeworkemploysmorethanoneorganizationmethod.
+†Promptengineeringtechniquesarewidelyused,sowelistonlythemostrepresentativesub-methodsem-
+ployedineachwork.
+‡Thiscolumnliststheprimaryinspirations(theoriesorpriorworks)statedineachpaper.
+Work Single-agent Tool-based Multi-agent Inspiration‡ Datasets Code
+PE† SI T.I T.S T.U M.O M.I
+GSM8k[50],BigBench[245],
+Duetal.[59] Role I.O. - - - Dec. Deb. SocietyofMind[192] §
+MMLU[98]
+Degeneration-of
+MAD[162] Role/Task - - - - Dec. Deb. Kongetal.[137],Website∗∗, §
+-Thought[22,130]
+SPP[278] Role I.O. - - - Cen. Coo./Deb. Pretendplay[209,210] Triviaqa[126],BigBench[245] §
+AutoGen[287] Task RF. API Rule Seq Mix∗ Coo. SocietyofMind[192] MATH[99],Kwiatkowskietal.[139], §
+Adlakhaetal.[2],ALFworld[242]
+FED[189],Commongen-Challenge[184],
+API/
+AgentVerse[39] Role I.L. Auto Seq Dec. Coo. Markovdecisionprocess MGSM[240],BigBench[245], §
+Plugin††
+HummanEval[38]
+AutoAgents[34] Role I.O. API Auto Seq Mix∗ Coo. ReAct[304],AutoGPT‡‡ MT-Bench[334],FairEvals[268], §
+HummanEval[38],Triviaqa[126]
+CAMEL[151] Role/Task I.O. API Auto Seq Dec. Coo. SocietyofMind[192] HummanEval[38],Humaneval+[169] §
+ChatDev[213] Role I.O. API Auto/Rule Seq Hier. Coo. LLMHallucination[323] SRDD[213] §
+HummanEval[38],MBPP[10],
+MetaGPT[102] Role I.O./I.L. API Auto Iter. Hier. Coo. ReAct[304],SOPs[17,54,185,286] §
+SoftwareDev[102]
+∗∗https://www.geeksforgeeks.org/puzzles/
+††https://github.com/OpenBMB/BMTools
+‡‡https://github.com/Significant-Gravitas/Auto-GPT
+Negotiation. Negotiation is a hybrid interaction that balances cooperation and competition.
+It enables agents with conflicting interests to reach a mutually acceptable consensus through
+communicationandcompromise[83].Duringnegotiation,agentsexchangeproposalsanditeratively
+adjusttheirgoalsbasedonboththecommonobjectiveGandtheproposalsfromotherscontained
+inY𝑘,asillustratedinFigure6:
+𝑔𝑟𝑖 ←𝑎𝑟
+𝑟
+𝑖
+𝑒𝑓𝑙𝑒𝑐𝑡
+(𝐶
+𝑘
+𝑟𝑖,𝑔𝑟𝑖,Y𝑘 ,G,𝑡𝑟𝑖)
+(15)
+𝑤ℎ𝑒𝑟𝑒Y𝑘 = {𝑦
+𝑘
+𝑟 1,𝑦
+𝑘
+𝑟 2,...,𝑦
+𝑘
+𝑟𝑛}
+This process compels agents to weigh their own objectives against collective constraints and
+theperspectivesofothers.Forinstance,ChatEval[31]utilizesanegotiation-likedebateamong
+multiple“referee”agentstoautonomouslyevaluatethequalityofAI-generatedtext,reachinga
+human-alignedjudgments.Thisapproachisparticularlyeffectiveforcomplexdecision-making
+taskswherethereisnosinglecorrectanswer,butratheraspectrumofacceptablesolutions.
+3.5 Discussion
+Inthischapter,weintroducedathree-level,progressivetaxonomytodemonstratehowmethods
+fromeachlevelenhancevariousfacetsofanagenticframework’sreasoningprocess.Thisclassifi-
+cationisgroundedinaunifiedformallanguageandageneralreasoningalgorithm(Alg.1).We
+contendthatbycombiningmethodsacrosstheselevels,thecapabilityboundariesandcollaborative
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 17 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:17
+LLM4ED[58],Optimus[3],MetaOpenFoam[45],OptimAI[257],Wang
+Math etal.[269],Kumarappanetal.[138],Babaetal.[12],MathSENSI[53]
+Astrophysics Saeedietal.[228],Moss[194],Lavericketal.[143]
+Lietal.[159],LiandNing[158],Wangetal.[265],Ningetal.[200],Pantiukhin
+ScientificDiscovery(§4.1) Geo-Science etal.[207],GeoAgent[108],GeoMap-Agent[113],GeoLLM-Squad[144]
+ChatDrug[172],LIDDIA[11],DrugAgent[114],PharmAgents[71],
+CLADD[145],ChatChemHTS[116],Biodiscoveryagent[224],Crispr-GPT[218],
+Biochemistry& Mehandruetal.[188],AutoBA[336],Suetal.[249],Chemist-X[36],Ruan
+MaterialScience etal.[226],Branetal.[24],Zouetal.[341],Yangetal.[302],Stewart
+andBuehler[246],ChatMoF[128],LLaMP[49],AtomAgents[79],ProtA-
+gents[78],Liuetal.[176],BioResearcher[180],CACTUS[187],ChemHTS[160]
+Autosurvey[276],SurveyX[163],Surveyforge[296],AgentLabo-
+ratory[234],Luetal.[178],Yamadaetal.[294],Tangetal.[253],
+GeneralResearch Ghareebetal.[81],Seoetal.[238],ResearchAgent[14],Suet
+al.[248],Gottweisetal.[83],GhafarollahiandBuehler[80]
+MedAgents[254],Wangetal.[270],Chenetal.[44],
+DiagnosisAssistant RareAgents[41],KG4Diagnosis[342],AI-HOPE[298],
+TxAgent[75],MMedAgent[149],Medagent-pro[279]
+Application Healthcare(§4.2) ClinicalManagement ClinicalAgent[309],Medaide[283],Pandeyet
+Scenarios al.[206],MDAgents[135],TAO[134],HIPAA[199]
+AIME[260],AgentClinic[235],Agenthospital[152],
+EnvironmentalSimulation AIHospital[64],Medco[281],MedAgentSim[5]
+Mapcoder[117],Almorsietal.[6],Agent-
+CodeGeneration coder[110],Cocost[97],CodeAgent[314]
+Repairagent[23],AgentFL[216],Intervenor[261],
+SoftwareEngi-
+ProgramRepair OrcaLoca[308],Agentless[289],LocAgent[48],VulDebug-
+neering(§4.3)
+ger[177],Magis[256],Autocoderover[325],Rondonetal.[223]
+Chatdev[213],MetaGPT[102],RepoAgent[179],DocAgent[297],
+Full-cycleDevelopment
+SWE-agent[300],Openhands[275],MAAD[322],SyncMind[91]
+GenerativeAgents[208],MetaAgents[157],GOVSIM[211],RecAgent[267],
+SocialandEconomic
+Simulation(§4.4) SocialSimulation ElectionSim[319],GenSim[252],SOTOPIA-S4[338],BASES[221],Mouet
+al.[195],BotSim[214],YSOCIAL[225],Oasis[303],SocioVerse[318],S3[72]
+FINMEM[306],EconAgent[153],FinVision[67],Zhangetal.[317],Fin-
+EconomicSimulation Con[307],Tradingagents[290],FinRobot[299],Stockagent[312],Gaoetal.[74]
+Fig.7. Theoverviewofourselectedpaperofagenticreasoningframeworksacrossdifferentapplication
+scenarios.
+patternsofagentsystemscanbesignificantlyexpanded.Forinstance,eachagentmemberofa
+multi-agentsystem(§3.4)oftenoptimizesitsindividualperformancethroughpromptengineering
+andself-reflection(§3.2),whileinvokingexternaltools(§3.3)toexecutespecificreasoningsteps
+basedonitsdesignatedrole.InTable2,weconsolidatemainstreamgeneral-purposeagenticframe-
+works,detailinghowtheyintegratemethodsfromthedifferentcategoriesofourtaxonomy,along
+withtheirproposedinspirationsandevaluationdatasets.
+Furthermore,whileourtaxonomyprovidesacomprehensivesummaryofthelogicalstructures
+andcollaborativepatternsattheframeworklevel,weacknowledgethatresearchersoftenincorpo-
+rateoptimizationtechniqueslikeSupervisedFine-Tuning[73]andReinforcementLearning[82]to
+achievesuperiorperformance[129].Tomaintainaclearfocusonthefoundationalnatureofthese
+reasoningframeworks,weexcludethesetechnicaldetailsfromourclassification.Inthesubsequent
+chapter,wewillfurthershowcasethevalueoftheseframeworksbyexaminingtheirapplications
+inspecificscenarios.
+4 Scenarios
+Buildinguponthepreviouschapter’sfoundationalconcepts,thischapteroffersapanoramicview
+of agentic reasoning capabilities across diverse application scenarios. Our primary goal is to
+systematicallycompareandcontrastthesimilaritiesanddifferencesamongtheseframeworks.We
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 18 =====
+
+111:18 Zhaoetal.
+alsoconductacomprehensivecollectionoftheevaluationmetrics,methodologies,anddatasets
+acrossthesedomains.Wecategorizetheapplicationscenariosintoscientificresearch,healthcare,
+softwareengineering,andsocial&economicsimulations,asillustratedinFig.7
+4.1 ScientificResearch
+Agentsystemsareincreasinglybecomingacornerstoneforautomatingvariousstagesofscientific
+inquiry.Throughtheimplementationofwell-designedreasoningpipelines,theseagentsenhancethe
+efficiencyoftheentirescientificworkflow.Wesystematicallyreviewthedesignofagentframeworks
+aimedatacceleratingresearch,withafocusontheirapplicationsinarangeofdisciplinesincluding
+mathematics,astrophysics,geoscience,biochemistry,materialsscience,aswellasgeneralscientific
+researchframeworks.
+4.1.1 Math. Byleveragingthesynergisticcombinationoftheirconstituentcomponents,agent
+systemsgobeyondtraditionalreasoningmethodstoachieveremarkableresultsinspecificmathe-
+maticaldomains,includingoptimizationandproofgeneration.
+Asanearlywork,LLM4ED[58]utilizesasymboliclibrarytoaidinequationdiscovery,where
+theLLMiterativelyproposesandrefinesnovelequationsbasedonnaturallanguageinstructionsto
+outperformpurelytext-basedmethods.Subsequentresearchhasgravitatedtowardsmulti-agent
+systemsthatemploystructuredcollaboration.Intherealmofmathematicaloptimization,Optimus
+[3]leveragesamulti-agentsystemtoautonomouslymanagetheentirepipelineformixed-integer
+linearprogramming,includingtaskassignment,modeling,andevaluation,whileusingacentral
+graphtotrackdependenciesforiterativerefinement.Asimilarhierarchicalorganizationisalso
+usedincomputatioalfluiddynamics(CFD)fieldbyMetaOpenFOAM[45],whererole-basedagents
+collaborativelyhandlesimulationdesign,setup,andreviewinaiterativeclosedloop.Theconcurrent
+workMetaOpenFOAM2.0[46]furtherenhancesrobustnessbyintroducingChainofThought(CoT)
+[282]anditerativeCoTstrategiesforcomplexsubtaskdecomposition.Thisorchestrationmethod
+alsoproveseffectiveinOptimAI[257],whichsolvesnaturallanguageoptimizationproblemsby
+hierarchicallydecomposinguserqueriesandautomatingthefullcycleofmodelformulation,coding,
+anddebuggingthroughiterativefeedback.
+Other related works focus on formal theorem proving. MA-LoT [269] employs multi-agent
+collaborationtodecouplethenaturallanguagecognitivetaskofproofgenerationfromsubsequent
+erroranalysis.Initsframework,oneagentgeneratesacompleteproof,whileanothercorrectsit,
+establishingastructuredinteractionbetweenanLLMandtheLean4verifierguidedbyaLongCoT.
+Addressingthechallengeofcontinuouslearning,LeanAgent[138]optimizesitslearningtrajectory
+basedonmathematicaldifficultyandmanagesevolvingknowledgethroughadynamicdatabase,
+enablingstableyetplasticlifelongmathematicallearningviaprogressivetraining.Besides,Prover
+Agent[12]usesaninformalreasoninglanguagemodelforhigh-levelthinkingandaseparateformal
+proofmodeltoexecutethetheorem-provingstepsinLean.Duringitsreasoningprocess,thesystem
+strategicallycreatesauxiliaryintermediatetheoremstoguidetheproofandleveragesfeedbackfrom
+Leantoreflectuponandadjustitsstrategy.Furthermore,MathSensei[53]emphasizestheauxiliary
+roleoftoolinvocationinmathematicalreasoning.Itequipsitsagentwithacomprehensivesuite
+oftools,includingaknowledgeretriever(poweredbyanLLMorBingWebSearch),aPython-
+basedprogramgeneratorandexecutor,andasymbolicproblemsolver(Wolfram-Alpha),thereby
+significantlyextendingtheboundariesofthesystem’sreasoningcapabilities.
+4.1.2 Astrophysics. In astrophysics, agent systems are being developed to assist the research
+process by managing vast, proprietary datasets through automated and scalable collaboration.
+AstroAgents[228]generateshypothesesfromspectraldata.Itemploysateamofeightspecialized
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 19 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:19
+agentsthatworkinsequencetointerpretthedata,performdeepanalysisonspecificsegments,for-
+mulatehypotheses,conductliteraturesearches,evaluatethehypotheses,andproposerefinements.
+Expandingthescopetotheentirescientificlifecycle,TheAICosmologist[194]implementsan
+end-to-endpipelineencompassingideation,experimentalevaluation,andresearchdissemination.
+It utilizes dedicated agents for planning, coding, execution, analysis, and synthesis, aiming to
+automatethecomplexworkflowsofdataanalysisandmachinelearningresearchincosmology
+andastronomy.Focusingonthecosmologicalparameteranalysis,Lavericketal.’swork[143]is
+builtuponAutoGenframework[287]andintegratesRetrieval-AugmentedGeneration(RAG)to
+facilitatetheauxiliaryanalysisofcosmologicaldata.
+4.1.3 Geo-science. TheintegrationofGeographicInformationSystems(GIS)withagenticrea-
+soningframeworkscansignificantlyenhanceasystem’sabilitytoautonomouslyreason,deduce,
+innovate,andadvancegeospatialsolutions[159].Asapioneeringwork,AutonomousGIS[158]
+introducesanagent-basedframeworkforgeospatialproblemanalysis.Thesystemdecomposesuser
+requirementsintoorderedoperationalsteps,constructsaflowchart,andgeneratesPythoncodeto
+sequentiallyexecutetaskssuchasdataloading,spatialjoins,statisticalanalysis,andplottingto
+producethefinaloutput.Concurrentworkshavespecializedinparticularaspectsoftheworkflow.
+Ning et al. [200] enhances the reasoning process by focusing on data retrieval. It performs au-
+tonomousdatadiscoverybasedontaskunderstandingandadata-sourcemanual,whilegenerating
+Pythonretrievalcodeviain-contextlearningthatisiterativelyexecuted,debugged,andrefinedby
+theframework.Moreover,Pantiukhinetal.[207]leveragesacentralizedMulti-AgentSystemanda
+suiteofearthsciencetoolsfordataprocessing,analysis,andvisualization.Crucially,itincorporates
+areflectionmoduletocontemplateevaluationoutcomesanddriveiterativeimprovementstoits
+plan.Besides,GeoLLM-Squad[144]targetsonRemoteSensing(RS)workflows.Builtuponthe
+AutoGen[287]andGeoLLM-Engine[243]frameworks,itmodularizesRSapplicationsbydecom-
+posingcomplextasksandassigningthemtospecializedsub-agents,coveringareassuchasurban
+monitoring,forestryconservation,climateanalysis,andagriculturalresearch.
+Further research has focused on improving the quality and scope of agent-based geospatial
+analysis. To mitigate subjective bias in domain-specific question answering, Wang et al. [265]
+utilizesRAGandonlinesearchtocomprehensivelygatherrelevantinformation.Thesystemthen
+employs a CoT [282] process to integrate and reflect upon this information, ensuring reliable
+geospatialanalysis.Pushingtheboundariesoftaskcomplexity,GeoAgent[108]buildsuponRAG
+byincorporatingMonteCarloTreeSearch(MCTS)toplanandexecutemulti-stepanalyses.Starting
+fromanaturallanguagedescription,ititerativelygenerates,runs,anddebugsmulti-stepcode.
+GeoAgent[108]alsointroducedtheGeocodeBenchmark,acomprehensivesuiteofsingleand
+multi-turntasksinvolvingdataacquisition,analysis,andvisualizationtoevaluateagentsindiverse
+geospatialcontexts.Venturingintomulti-modalunderstanding,GeoMap-Agent[113]pioneersthe
+useofaMulti-modalLargeLanguageModel(MLLM)tointerpretgeologicalmaps.Itperformshier-
+archicalinformationextractiontosegmentthemapandidentifysalientelements.Thisisfollowed
+byretrievingdomainknowledgefromanexpertdatabase,whichisintegratedintoanenhanced
+prompttoenableprecisequestionanswering.GeoMap-Agent[113]alsointroduceGeoMap-Bench,
+thefirstbenchmarkdesignedtoassessthegeologicalmapunderstandingcapabilitiesofMLLMs
+acrossafullspectrumofskills,includingextraction,referring,localization,reasoning,andanalysis.
+4.1.4 BiochemistryandMaterialScience. Theadventofdeeplearninghassignificantlyenhanced
+researchproductivityacrossthelifesciences[1],andtheriseofagenticsystemsisnowfurther
+pushing the boundaries of workflow automation. In this section, we survey the application of
+agenticreasoninginthisdomain,whichwecategorizeintofiveprimaryareas:(1)drugdiscovery
+anddesign,(2)geneticandbiologicalexperimentdesign,(3)chemicalsynthesis,(4)materialscience,
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 20 =====
+
+111:20 Zhaoetal.
+Fig.8. AsummarizationofpipelineproposedbyBioDiscovery-Agent[224],baseonourproposedtaxonomy.
+Suchframeworkcouldallowsaiterativeexperimentaldesignwithdynamiccontextupdate.Imageisedited
+from[224].
+and (5) research automation. These work across different sub-scenarios cover a wide range of
+targets,thustheirevaluationstrategiesareverydifferent.AsillustratedinTable3,wesummarize
+theirevaluationstrategiesinmetricslevel,benchmarkordatasetlevel,andcasestudymethods,
+respectively.Furthermore,asseveralapplicationsinbiochemistryhavedirectextensionstoclinical
+practice,theywillbediscussedingreaterdetailinSection§4.2.
+DrugDiscovery. Indrugdiscoveryanddesign,agenticsystemsmustbalanceuserrequirements
+withscientificprinciplestoachieveprecisemolecularengineering.Severalworkshaveexplored
+centralizedorsingle-agentarchitecturestothisend.ChatDrug[172]integratesretrievaltoolsto
+fetchsimilarmoleculeswithdesiredattributesfromknowledgebases,translatingeditingtasks
+intostructuredinstructionstocontextualizethereasoningprocess.Itfurtherleveragesadialogue
+moduletoiterativelyrefinemoleculesbasedonuserfeedback.Similarly,LIDDiA[11]employsa
+four-componentarchitecture–reasoner,executor,evaluator,andmemory–toguidemolecular
+design,extensivelyusingtoolcallstosimulatemoleculardocking,predictproperties,andopti-
+mizestructuresaccordingtopersonalizedspecifications.Moreover,DrugAgent[114]simulatesa
+collaborativeresearchteamusingCoT[282]andReActparadigms[304]topredictDrug-TargetIn-
+teractions(DTI).ItcanforecastDTIscores,computeinteractionmetrics,searchdomainknowledge,
+andgenerateafinalpredictionwithadetailedexplanation.
+OtherframeworksutilizehierarchicalMulti-AgentSystems(MAS)todecomposethecomplex
+drugdiscoverypipeline.PharmAgents[71]dividestheprocessintofourstages:targetdiscovery,
+leadidentificationandoptimization,andpreclinicalevaluation.Eachstageismanagedbydedicated
+agentsequippedwithdistincttools,whichcollaborateviastructuredknowledgeexchangeand
+self-improvebyreflectingonpastexperiences.CLADD[145]alsoadoptsahierarchicalstructurefor
+discoveryandquestion-answering,combiningitwithaRAGapproach.Itbreaksdownreasoning
+into planning, knowledge graph querying, molecular understanding, and prediction, and can
+dynamicallyselecttoolsbasedonaquerymolecule’sstructuralsimilaritytoknowndrugsina
+knowledgegraph.Specificallyfocusingonthehuman-agentinterface,ChatChemTS[116]enables
+users to design new molecules by automatically constructing a reward function for specified
+propertiespurelythroughnaturallanguageinteraction.
+Genomics and Biological Experiment Design. In genomics and biological experiment design,
+agenticsystemsaretaskedwithanalyzing,decomposing,andimplementinguserrequirements,
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 21 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:21
+therebyassistingresearcherstohandlecomplexexperimentalworkflows.Asarepresentativework,
+BioDiscovery-Agent[224]iterativelydesignsgeneperturbationexperimentsbyintegratingprior
+resultsandknowledgeintoitsreasoningcontext,asillustratedinFig.8.Ineachcycle,itconstructs
+prompts to guide the design of small-batch experiments, prioritizing genes likely to produce
+significantphenotypiceffects.Thisprocessinvolvesinvokingotheragentsforcriticalevaluation,
+literaturesearches,anddataanalysistoenableefficientidentificationofgenefunctions.Similarly,
+CRISPR-GPT[218]offersmultipleinteractionmodes,decomposesgeneeditingexperimentsinto
+manageablestepsforin-contextlearning,andintegratesexternaltoolstoachieveautomation.
+Otherapproachesfocusonmodelcustomiza-
+tionandworkflowrobustness.Bio-Agents[188] Table3. Anoverviewoftheevaluationstrategiesof
+isbuiltuponasmalllanguagemodel(SLM)fine- agenticreasoningframeworksinBiochemistryandMa-
+tuned on bioinformatics data and enhanced terialScience.Wesummarizethemfromthreelevels.
+with RAG, enabling personalized operations Inmetricslevel,thespecificresponseoftheframework
+isdirectlyevaluated.BenchmarkandDatasetlevelfur-
+andtheanalysisoflocalorproprietarydata.Au-
+therutilizesdomain-specificdataandstandardtoeval-
+toBA[336]concentratesonautomatingmulti-
+uatetheresponses.Incasestudy,theframeworkwill
+omicsanalysis,capableofself-designingthean-
+beevaluatedthroughseveralreal-worldtasks,gener-
+alyticalprocessinresponsetochangesininput
+allythegroundtruthisclear.
+dataandenhancingsystemrobustnessthrough
+automatedcoderepair.Tosimplifybioinformat-
+MetricsLevel
+ics workflows, BioMaster [249] uses a Multi-
+Focus RelatedWork Metrics
+AgentSystem(MAS)fortaskdecomposition, Biom La e b d - i e c n al vo R l e v s e e d arch BioResearcher[180] C L o o m g p ic le a t l e S n o e u s n s, d L n e e v s e s, l S o t f r D uc e t t u a r il a , l C S o o r u r n e d ct n n e e s s s s,
+execution,andvalidation.ItemploysRAGtody- H K ig n h o - w fi l d e e d l g it e y R M et a r t i e e r v i a a l ls LLAMP[49] Precis s i e o l n f- , c c o o n e s ffi is c t i e e n n c t y o o f f p r r e e s c p is o i n o s n e , , c M on A fi E dence,
+namicallyretrievedomain-specificknowledge DrugDiscovery Liddia[11] sy d n ru th g e - t li i k c e a n c e c s e s s [ s 2 ib 1 i ] l , it L y i [ p 6 in 2] s , k b i’ i s n R di u n l g e a o ffi fF n i i v t e ie [1 s[ 6 2 5 5 ] 9 , ]
+andintroducesinput-outputvalidationtoim-
+Benchmark/DatasetLevel
+proveadaptabilityandstabilitywhenhandling Focus RelatedWork Benchmark/Dataset
+newtoolsandnicheanalyses. Ex G p e e n r e im tic en P t e D rt e u s r i b g a n t a io ti n on BiodiscoveryAgent[224] Sc S H h c a h o r r m e l n b id b e t c e k r e g t e a e t l t a .[ a l 2 . l [ 3 . 1 [ 6 2 0 ] 3 4 , 1 ] C , ], O a S r p n a e n e n v c T a h a l e e r z g e e e t t t a s a l [ l . 2 [ .[ 2 0 2 7 1 3 ] ] 0 , ],
+QuantumChemistry ElAgente[341] Armstrongetal.[9]
+ChemicalSynthesisandDesign. Inchemical DrugDiscovery Liddia[11] pdb[20],CheMBL[19]
+synthesis,earlyagenticsystemsfocusedonop- Chemi O ca p l t T im oo iz l a I t n io v n ocation ChemHTS[160] Ch U em SP L T L O M - B M e I n T c [ h 1 [ 2 9 4 0 ] ] , , M Ch ol E e B cu I- l 2 e 0 N -M et[ M 28 [1 8 7 ] 0],
+timizing reaction conditions and automating Mol T e o cu o l l a -a r s d s i i s s c te o d very CACTUS[187] CACTUS[187]
+complexworkflows.Chemist-X[36]designeda MendelianDiseasesDiagnose MD2GPS[337] SCH[109],JN[337],DDD[69],RD[316]
+multi-stagereasoningsystemtooptimizereac- Automate A d n B al i y o s in is formatics BioMaster[249] Moreyetal.[193],[51],Raoetal.[220]
+MoleculeNet[288],Proposinghub[52],
+tionconditions.Itfirstretrievedreactioncon- RAG-basedDrugDiscovery CLADD[145] drugbank[285],STITCH[251],hERG[272],
+DILI[293],Skin[7],Laguninetal.[140]
+ditionsfromadatabaseviahierarchicalmatch- fulldrugdiscoveryworkflow PharmAgent[71] crossdocked[70],Pharmagent[71]
+ing,thenusedaCADtooltorecommendyield- Drug-t P ar r g ed et ic I t n io te n raction DrugAgent[114] Anastassiadisetal.[8]
+improving conditions, and finally translated DrugEditing Liuetal.[172] Raoetal.[219],MHCflurry2.0[202],ZINC[115]
+theserecommendationsintovalidatedexperi- Gene-Editing Crispr-GPT[218] Gene-editingbench[218]
+ChemicalHypothesisDiscovery Moose-Chem[302] Moose-chem[302]
+mentaloperations.Similarly,Ruanetal.[226]
+CaseStudy
+decomposeschemicalsynthesisdevelopment ProtAgents[78],Stewartetal.[246],PharmAgent[71],CLADD[145],TourSynbio-search[176],AutoBA[336],
+AI-HOPE[298],ChatMOF[128],Chemist-X[36],Ruanetal.[226],ChatChemTS[116],ElAgent[341],
+into six sub-stages: literature search, experi- ChemCrow[24],AtomAgents[79].
+mental design, hardware execution, spectral
+analysis,productseparation,andresultinter-
+pretation. Each stage is executed by a dedicated agent, sequentially accomplishing the entire
+workflow.Moreover,ChemCrow[24]incorporated18expert-designedchemistrytools,demon-
+stratingtheirefficacybysuccessfullyautomatingthedesignofanorganiccatalystsynthesis.
+Othersystemstacklemorespecializedorabstractchallengeswithinchemistry.ElAgenteQ[341]
+dynamicallygeneratesandexecutesquantumchemistryworkflowsfromnaturallanguageprompts,
+leveragingahierarchicalmulti-agentmemoryframeworkfortaskdecomposition,adaptivetool
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 22 =====
+
+111:22 Zhaoetal.
+selection, and autonomous post-analysis. Targeting the upstream process of scientific inquiry,
+MOOSE-Chem [302] focuses on autonomous chemical hypothesis discovery. It formalizes this
+process by decomposing a base hypothesis into a research context and a set of “inspirations”,
+whichthenguidethesub-tasksofretrieving,combining,andrankingnewhypotheses.Stewartet
+al.[246]sequentiallyidentifiesengineeringgoals,generatesalargepoolofcandidatemolecules
+throughrationalstepsandknowledgeextraction,andthenanalyzesthembystructureandcharge
+distributiontoachievemolecularoptimization.
+MaterialScience. Asoneoftheearlyworks,ChatMoF[128]constructedasystemforpredicting
+andgeneratingMetal-OrganicFrameworks(MOFs).Itcanautonomouslyselectandinvokespe-
+cializedtool-kitsbasedonuserrequirements,makingdecisionsiterativelybasedontooloutputs
+andinternalevaluations.Thisisachievedthroughfourdistinctfunctionalagentcomponentsre-
+sponsibleforMOFdatabasesearching,internetsearching,performanceprediction,andmaterial
+generation. Concurrently, LLaMP [49] combines a hierarchical ReAct framework [304] with a
+multi-modal,retrieval-augmentedonetodynamicallyandrecursivelyinteractwithcomputational
+andexperimentaldataontheMaterialsProject(MP)database,runningatomicsimulationsviaa
+high-throughputworkflowinterface.Furthermore,AtomAgents[79]proposesaphysics-aware
+approachtoalloydesign.Itsmulti-agentsystemautonomouslyimplementstheentirematerial
+designpipeline–fromknowledgeretrievalandmulti-modaldataintegrationtophysics-based
+simulationandcross-modalcomprehensiveresultanalysis.
+BiochemicalAutomatedResearch. Beyondoptimizingforspecializeddomains,severalworkshave
+proposedsystematicdesignsfromthebroaderperspectiveofautomatingbiochemicalresearch.
+These systems often focus on sophisticated agent orchestration and interaction. For instance,
+ProtAgents [78] is a task-centric multi-agent system that decomposes the protein design and
+analysisprocessintomultiplestages.Itemploysapredefinedchatmanagerasacentralhubto
+dynamicallyselectappropriateagentsandmanagetheircommunication.Basedondistinctrole
+andtoolassignments,theseagentscollaboratetoproposeproteindesigns,executephysicalsimula-
+tions,predictstructures,anditerativelyreflectupon,evaluate,andrefinethedesigns.Similarly,
+Toursynbio-search[176]implementsauser-drivenresearchsystemwhereeachspecializedagent
+hasanindependentkeywordlist.Itusesfuzzymatchingagainsttheclassifieduserintenttose-
+lecttherightagent,theninitiatesavalidationprocess,generatinganinteractivepageforuser
+verificationandsupplementationwhenparametersareambiguous.
+Othersystemsintroducespecificmechanismstoimprovetheresearchworkflow.BioResearcher
+[180]decomposesresearchtasks(retrieval,planning,analysis)andassignsthemwithinahierarchi-
+calagentarchitecture.Crucially,itintroducesarevieweragenttoensurequalitycontrolthroughout
+theprocessanditerativelyoptimizestheresearchplanviainternalevaluation.Focusingontooluse,
+CACTUS[187]utilizestheLangChainarchitectureforsequentialproblemanalysis,toolreview,and
+selection.Thisreasoningcyclerepeatsuntiltheproblemissolved,allowingthesystemtolearnthe
+characteristicsandapplicabilityofdifferenttoolsthroughiteration.ChemHTS[160]furtherrefines
+tool-callingstrategywithahierarchicaltoolstack.Itfirstconductsa“self-stackingwarm-up”phase
+toexploretoolcapabilitiesandlimitations,thenrecursivelycombinestoolstofindtheoptimal
+callingpath,usingselectiveinformationtransferandtoolencapsulationtokeepthefocusonthe
+primarytask.
+4.1.5 GeneralResearch. Theproblem-solvingcapabilitiesofagenticframeworkscanbegeneralized
+fromspecialized,domain-specifictaskstobroaderresearchinquiries.Thesesystemsaredesignedto
+operatefromaninitialprompttothefinaldeliverableofadetailedresearchreport.Hereweclassify
+thesescenariosintoliteraturesurvey,end-to-endresearchautomation,researchcollaborationand
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 23 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:23
+refinement.Table4summarizedifferentmetricsanddatasetsusedineachselectedwork,withtheir
+specificfocusaboutgeneralresearch.Wealsoconcludetheworkthatusecasestudyorsubjective
+methodstoevaluatetheirwork.
+LiteratureSurvey. Automatingliteraturesur-
+veys requires systems to process and orches- Table4. AnOverviewofEvaluationStrategiesofAgen-
+tratevastamountsofdomainliteraturetogen- ticFrameworksinGeneralResearch.Wesummarize
+eratecomprehensiveandcoherentreviews.Au- themfromfourlevels.Inmetricslevel,theoutputlit-
+tosurvey[276]firstretrievesrelevantliterature eraturefromframeworkisdirectlyevaluated.Bench-
+mark and Dataset level further provides and filters
+via semantic search and generates a prelimi-
+severalliteraturewithhighqualityanddiversethemes.
+naryoutline.Itthenemploysmultipleagentsto
+Incasestudy,theframeworkwillbeusedtocomplete
+concurrentlydrafteachsection,retrievingad-
+areal-worldresearchtask,andgenerallyevaluatedby
+ditionalliteraturetoproducetextwithaccurate
+domain-specificprofessionals.LLM-as-a-judgeorhu-
+citations.Afterdrafting,thesystemintegrates
+manevaluationtendtoevaluatetheoutputliterature
+and refines the content, using multi-LLM-as- offrameworkfromseveralsubjectivemetrics.
+judgesetuptoscorethesurvey’squalityand
+coverageforiterativeimprovement.Similarly,
+MetricsLevel
+SurveyX[163]automatesthisprocessintwo Focus RelatedWork Metrics
+phases: a preparation phase that uses an at- AutoSurvey[276] SurveyCreationSpeed,ContentQuality
+Gaoetal.[76] CitationQuality
+tributetreestructuretoacquireandpreprocess
+SurveyX[163] InsertionoverUnion,semantic-basedreferencerelevance
+literature,andagenerationphasethatperforms Paper Q G u e a n li e ty ration SurveyForge[296] Reference,Outline,andContentQuality(SAMMetrics)
+AgentLaboratory[234] Inferencecost,Inferencetime,SuccessRate
+bothcoarseandfine-grainedcontentcreation Suetal.[247] ProxyMSE,ProxyMAE
+fromaninitialplan.RAGisleveragedtoensure VirSci[248] HistoricalDissim Co il n a t r e it m y, p C or o a n r t y em Im p p o a ra ct ryDissimilarity,
+citationaccuracyduringrewritingandtosup- Benchmark/DatasetLevel
+Focus RelatedWork Type Benchmark/Dataset #Papers
+portmulti-mediacontentgeneration.Besides,
+IdeaGeneration ResearchAgent[14] ResearchAgent[14] 300
+Surveyforge[296]combinesalibraryofhuman- SurveyAutomation SurveyForge[296] SurveyBench[296] 100
+Off-
+ResearchAssistants AgentLaboratory[234] line Mle-bench[32] -
+writtenoutlineswithdomain-specificpapersto ResearchImprovement CycleResearcher[284] Review-5k/research-14k[284] ∼5k/∼14k
+generateanewoutlineviain-contextlearning. ScientificInnovation AI-Researcher[253] Scientist-Bench[253] 22
+ReserachAgent[14] SemanticScholarAcademicGraphAPI∗ -
+Itintroducesamemory-drivenframeworkwith IdeaGeneration VirSci[234] O lin n e - AMinerComputerSciencedataset† ∼2M
+multi-layersub-queryandretrievalmemories OpenAcademicGraph3.1‡ ∼131M
+CaseStudy
+torefinethesearchprocess,followedbyfilter-
+IdeaSynth[212],TheAIScientist[178],TowardsanAIco-scientist[83],Robin[81],SciAgents[80]
+ingandreconstructionstagesforcontentinte- LLM-as-a-Judge/HumanEvaluation
+ResearchAgent[14],AutoSurvey[276],SurveyX[163],AgentLaboratory[234],TheAIScientistv2[294],
+grationandparalleltextgeneration.Thiswork Cycleresearcher[284],AIco-scientist[83]
+∗https://www.semanticscholar.org/product/api
+alsocontributesSurveybench,abenchmarkfor
+†https://www.aminer.cn/aminernetwork
+quantitativelyevaluatingsurveyqualityacross ‡https://open.aminer.cn/open/article?id=65bf053091c938e5025a31e2
+multipledimensions.
+End-to-EndResearchAutomation. Movingbeyondknowledgesynthesis,end-to-endresearch
+automationaimstoemulatetheentirescientificlifecycleforagiventopic,oftenbymimicking
+real-world research workflows. As a representative work, Agent Laboratory [234] actualizes a
+user’sresearchideathroughamulti-stage,hierarchicalarchitecturecoveringliteratureretrieval,
+experimentalplanning,codegeneration,resultanalysis,andreportwriting,integratinghuman
+feedbackateachstageforqualityassurance.Manysimilarworksdecomposetheresearchprocess
+to achieve automation. The AI Scientist [178] decompose scientific discovery into five stages
+(ideation, experiment design, execution, paper writing, and peer review), guiding agents with
+structuredinstructions.AIScientist-v2[294]furtherintroducesanexperimentalparameterspace
+andatree-searchalgorithmtooptimizetheresearchprocess,incorporatingavision-languagemodel
+(VLM)toprovidefeedbackongeneratedfiguresandtext.Notably,papersgeneratedbythissystem
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 24 =====
+
+111:24 Zhaoetal.
+havepassedpeerreviewatICLRworkshop4.Moreover,AI-Reseracher[253]adoptafour-stage
+decompositionoftheresearchpipelinefromliteraturereview,hypothesisgeneration,algorithm
+implementationtomanuscriptwriting.AI-Reseracher[253]alsoproposeScientist-Bench,which
+comprisesrecentpapersspanningdiverseAIresearchareasandincludesbothguided-innovation
+andopen-endedexplorationtasks.Moreover,Robin[81]facilitatessemi-autonomousdiscoveryby
+progressingthroughfourstages:hypothesisgeneration,experimentaldesign,resultinterpretation,
+and hypothesis updating. Besides, Papercoder [238] automates the reproduction of code from
+machinelearningpapers.Itusesthreededicatedagentsforathree-stageprocess:aplanningstage
+tocreateahigh-levelroadmap,ananalysisstagetointerpretspecificimplementationdetails,anda
+generationstagetoproducemodular,dependency-awarecode.
+Research Collaboration and Refinement. There are some emergent research focuses on intro-
+ducingspecificmechanismsforcollaborationandrefinementtoenhancethequality,creativity,
+and efficiency of automated science. A significant direction is improving idea and hypothesis
+generationthroughmulti-agentinteraction.ResearchAgent[14]iterativelyrefinesresearchideas
+byintegratingcorepapers,theircitationnetwork,andfeedbackfromapanelof“revieweragents”
+tomimicpeerreviewandfosterinnovation.Similarly,VirSci[248]usesmulti-agentdialogue–
+spanningcollaboratorselection,topicdiscussion,andnoveltyassessment–togenerateideas,while
+AIco-scientist[83]employsahierarchicalagentteamforcriticaldebatetopropose,critique,and
+refinehypotheses.Notably,thissystemalsopresentsafully-automatedend-to-endresearchabilities
+basedonthewidelydebateanditerativelyrefinementbetweenagentwithdifferentroles.
+Another key direction is the refinement of the research process and agent capabilities. Cy-
+cleResearcher[284]proposesaniterativetrainingframeworkthatsimulatesthe“research-review-
+improve”academicclosedlooptoenhancegeneratedpaperquality,contributingtwolargedatasets
+forthispurpose.Furthermore,SciAgents[80]leveragesanontologyknowledgegraphforstructured
+reasoning,whileScimaster[29]usesadecentralized,stackedworkflowtoscalereasoningdepthand
+breadth.Attheecosystemlevel,Agentrxiv[233]constructsascientificecosystemwheremultiple
+AgentLaboratories[234]cancollaborateasynchronously.Byusingacentralizedpreprintserver,
+independentagentteamscanupload,share,andretrieveresearch,formingadynamicknowledge
+commonsthatenablescumulative,collaborativescientificdiscovery.
+4.2 Healthcare
+TheadventofpowerfulfoundationalLargeLanguageModelsisreshapingthelandscapeofhealth-
+carebyempoweringagenticsystemswithnewcapabilities.Thistransformationfacilitatesacritical
+shiftfromreactive,predictivefunctionstoproactive,interactiveengagementinclinicalworkflows.
+Theseadvancedagentsareincreasinglyleveragedtoresolvechronicissuessurroundingclinical
+efficiency,diagnosticprecision,andthequalityofpatientcare.AssummarizedinTable5,awide
+rangeofevaluationdatasetsaswellasmethodsareusedtoevaluatetheseframework.Accordingly,
+we survey these works through diagnostic assistance, clinical management, and environmental
+simulation.
+4.2.1 DiagnosisAssistance. Toaugmentdiagnosticcapabilities,oneprimaryresearchfocusinvolves
+creatingmulti-agentdialogueframeworksthatdeconstructthecomplexdiagnosticprocessinto
+manageable,collaborativephases.Asanearlywork,MedAgents[254]establishedarole-playing
+environmentwhereagentsrepresentingdifferentmedicalexpertsachieveaconsensusthrough
+independentanalysisanditerativediscussion.Concurrently,Wangetal.[270]designedavirtual
+medicalteamthatincludesaphysician,apatient,andanexaminerinordertomodeltheconsultation
+4https://github.com/SakanaAI/AI-Scientist-ICLR2025-Workshop-Experiment/
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 25 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:25
+flowacrossinquiry,examination,anddiagnosis,guidedbyahierarchicalactionsetfordynamic
+responses. Similarly, Chen et al. [44] employed an admin agent for user information, doctor
+agentsfordiagnosisviadialogue,andasupervisoragenttoensurediagnosticconsistency.Besides,
+RareAgents[41]focusesonrarediseases,featuringaprimaryphysicianagentthatcollaborates
+withmultiplespecialistagentsoverseveralroundsofdiscussion,integratingdynamiclong-term
+memoryandmedicaltoolsforpersonalizeddiagnostics.
+Beyond simulating dialogue, other frame-
+works enhance diagnostic reasoning by inte- Table5. AnOverviewofEvaluationStrategiesofAgen-
+grating external knowledge bases and data- ticFrameworksinHealthcare.Wesummarizethem
+drivendebatemechanisms.KG4Diagnosis[342] fromfourlevels.InbenchmarkanddatasetLevel,the
+utilizes a hierarchical multi-agent structure frameworkisevaluatethroughdomain-specificdata
+withspecificmetrics;Systemlevelwillevaluatethe
+where a general practitioner agent first con-
+frameworkasawhole,withspecifictechniques;Inen-
+ductstriagebeforecoordinatingwithspecialist
+vironmentallevel,theframeworkisevaluatedwithin
+agentswhoperformin-depthdiagnosisleverag-
+asimulatedhealthcareenvironment,whilethecase
+ingaknowledgegraph.Thisapproachfeatures
+studytendtoevaluatethesystemthroughreal-world
+anend-to-endpipelineforsemanticknowledge
+cases,withgroundtruthprovided.
+extractionandhuman-guidedreasoning,there-
+foreimprovingsystemextensibility.MD2GPS
+Benchmark/DatasetLevel
+[337]introducesamulti-agentdebatesystem Focus RelatedWork Benchmark/Dataset
+drivenbybothexistingliteratureandpatient ClinicalConsultationFlow Wangetal.[270] MVME[64]
+datatodiagnoseMendeliandiseaseseffectively. Zero-shotMedicalReasoning MedAgents[254] Jinetal.[121 H ], e P n a d l r e y t c a k l. s [2 e 0 t 3 a ] l , . P [9 u 8 b ] medqa[123],
+A parallel research direction empowers Auto H m e a a t l e th d c s a u re pe S r a v f i e s t i y onof TAO[134] Chan S g af e e t ty a b l. e [3 n 3 c ] h , [ H 32 u 7 e ], t M a e l. d [1 sa 0 f 6 e ] t ,W yb a e n n g ch e [ t 9 a 5 l ] .[ , 273]
+agents with tools for autonomous data anal- MedQA[121],PubMedQA[123],MedBullets[35],
+EvolvableMedicalAgents MDAgents[135] JAMA[35],DDXPlus[66],SymCat[4],
+ysis and evidence synthesis, transitioning
+Path-VQA[96],PMC-VQA[320],MedVidQA[93],MIMIC-CXR[13]
+themfromcommunicatorstoactors.AI-HOPE HealthcareIntentAwareness Medaide[283] Pre-Diagnosis,Diagnosis,Medicament,
+Post-DiagnosisBench[283]
+[298] can interpret natural language com-
+MultimodalTool-integrationDiagnosis MMedAgent[149] VQA-RAD[142],Slake[167],Pmc-vqa[320],Pathvqa[96]
+mandsintoexecutablecode,enablingittoau- Tool-assistTherapeuticReasoning TxAgent[75] DrugPC,BrandPC,GenericPC,
+DescriptionPC,TreatmentPC[75]
+tonomouslyanalyzelocallystoreddataforpre-
+RareDiseaseCuration RareAgent[41] RareBench[43],MIMIC-IV[125]
+cisionmedicineresearchthroughtaskslikeas- clinicaltrial ClinicalAgent[309] DrugBank5.0[285],Himmelstein[100]
+sociationstudiesandsurvivalanalysis.More- Multi-modalDiagnosis MedAgent-pro[279] Refuge2challen N g e e jm [65 i ] m ,M ag IT e E ch A a [ l 3 le 3 n 0] g , e M ∗ IMIC-IV[125],
+over,TxAgent[75]introducesToolUniverse,a MendelianDiseasesDiagnose MD2GPS[337] SCH[109],JN[337],DDD[69],RD[316]
+comprehensivesuiteof211specializedmedical clinicalenvironmentsimulation MedAgentSim[5] NEJM[235],MedQA[121],MIMIC-IV[125]
+SystemLevel
+tools. By invoking these tools, the agent can Focus RelatedWork Methods
+retrieveandsynthesizeevidencefrommultiple Know f l o e r d M ge e G di r c a a p l h D E ia n g h n a o n s c is ement KG4Diagnosis[342]
+Multi-modalMedicalDiagnosis MedAgent-pro[279] HumanEvaluation
+sources,considerdruginteractionsandpatient BenchmarkingmultimodalmedicalagentAgentclinic[235]
+history,anditerativelyrefinetreatmentrecom- Multimodaltool-integrationDiagnosis MmedAgent[149] Open-endedMedicalDialogue[150]
+mendations. MedicalNecessityJustification Pandeyetal.[206] Jud P g ar e e m n e t n a t n w d i L th ea a f c n c o u d ra e cy
+EnvironmentalLevel
+Addressingtheheterogeneousnatureofreal- Environment RelatedWork SimulationFocus
+EntireIllnessTreating AgentHospital[152] EvolvableMedicalAgents
+worldmedicaldata,recenteffortshavefocused
+Doctor-PatientInteraction AIHospital[64] MedicalInteractionSimulator
+ondevelopingmulti-modaldiagnosticagents. Multimodalclinicalinteraction AgentClinic[235] Multimodalagentbenchmark
+Mmedagent[149]constructsasystemwhere CaseStudy
+AIME[260],AI-HOPE[298],ClinicalAgent[309]
+aMulti-modalLargeLanguageModel(MLLM) ∗https://www.nejm.org/image-challenge
+actsasaplanner,orchestratingafour-steppro-
+cessofuserinputinterpretation,actionplanning,toolexecution,andresultaggregation,enhancing
+itstool-useproficiencyviain-contextlearning.Similarly,MedAgent-Pro[279]adoptsahierarchi-
+calagenticworkflow.ItfirstretrievesclinicalguidelinesusingRetrieval-AugmentedGeneration
+(RAG)toformulateadiagnosticplan.Itthenemployssequentialtoolcallstoanalyzethepatient’s
+multi-modaldata,generatingafinalreportthatincludesdiagnosticevidence.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 26 =====
+
+111:26 Zhaoetal.
+Fig.9. PipelineofAIME[260].Theframeworkisbuiltupontwoself-playloops.a)InnerLoop:adoctor
+agentcontinuouslyoptimizeitsbehaviorbasedonreal-timefeedbackfromaCriticmoduleduringsimulated
+dialogues.b)OuterLoop:theoptimizedsimulateddialoguesandotherdatawillbegatheredtoimprove
+(fine-tune)theReasoningSystem,usinganevaluation-feedbackprocesstodrivethemodel’scontinuous
+improvement.Forreal-timeuserinteraction(reasoningprocessshownontheright),thesystemusesmulti-
+stepCoTreasoningandconversationalcontexttoensureeachoutputisaccurateandwell-grounded.Image
+iseditedfromTuetal.[260]
+4.2.2 ClinicalManagementandAutomation. Recently,inordertoefficientlymanageandanalyze
+complexmedicalinformation,agrowingnumberofresearcharefocusingonadaptinggeneral-
+purposeagenticmanagementandautomationsystems.Forinstance,ClinicalAgent[309]utilizes
+ahierarchicalmulti-agentarchitecturetopredictclinicaltrialoutcomes,assessingdrugefficacy,
+safety, and patient recruitment feasibility based on external data sources and predictive mod-
+els.Othersystemstargettheautomationofhealthcareservices;Medaide[283],performsquery
+rewritingviaRAGandusescontextualencodingtoidentifyfine-graineduserintents.Thisprocess
+activatesrelevantagentstocollaboratebasedonroleassignments,deliveringpersonalizeddiagnos-
+ticsuggestionsanddepartmentrecommendations.Furthermore,Pandyetal.[206]exploresthe
+justificationofpriorauthorizationsbyfirstreasoningoverclinicalguidelinesandthenemploying
+atwo-stagecollaborativeframeworktodecomposetheproblemintosolvablesub-tasksforeach
+agent.
+However,directlyimplementingmulti-agentcollaborationcanleadtochallengessuchasincom-
+patiblemedicalinformationflowsandlowcomponentefficiency[16].Toenhanceadaptabilityand
+dynamism,MDAgents[135]introducesamoderatoragentthatdynamicallyassemblesappropriate
+multi-agentstructuresbasedonthecomplexityofthemedicalproblem.Thisframeworkcanconfig-
+urespecializedteams,suchasaPrimaryCareClinician,aMultidisciplinaryTeam,oranIntegrated
+CareTeam,andselectivelyemploysreflection,iterativeoptimization,andcollaborativemethodsto
+improveresponseaccuracy.Inordertofurtheraddresslimitationslikepotentialsinglepointsof
+failure,TAO[134]proposesatieredagenticoperatorframeworktobolstersystemsecurityand
+reliability.Inthishierarchicalstructure,an“AgentRecruiter”selectsmedicalagentsbasedonsafety
+benchmarks,whilean“AgentRouter”assessesandassignsthemtodifferentsecuritytiers.The
+recruitedagentsthenengageinhierarchicalcooperationunderstrictsafetyprotocols,enabling
+effectiveend-to-endsupervision,whichalsoincorporatespossibilitiesforhumanoversight.This
+trendtowardsstructuredandsecureworkflowsisunderscoredbythepushforsystemsthatcan
+navigatethecomplexitiesofsensitivedataandautomateddecisionswhileadheringtoregulatory
+standards[199].
+4.2.3 EnvironmentalSimulation. Giventhatthehealthcaredomainischaracterizedbyheteroge-
+neous data which could be hard to collect, a significant line of research focuses on simulating
+realisticmedicalenvironmentstoenableagentstocontinuouslyoptimizetheirperformancethrough
+interactivelearning.Asarepresentativework,AIME[260]simulatesadiagnosticenvironment
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 27 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:27
+withphysician,patient,andrefereeroles.Byleveragingrole-playingandCoT[282]strategies,it
+allowsanagenttoself-tuneitsdiagnosticcapabilitiesusingdialoguedatawithinanautomated
+feedbackloop,asillustratedinFig.9.
+Moreover,AgentClinic[235]constructsamorecomplexmulti-modalclinicalsimulation,focusing
+onpatientinteraction,datacollectionwithincompleteinformation,andmedicaltoolusage.The
+paradigmtakesamajorleapforwardwithAgentHospital[152],whichcreatesasimulatedhospital
+whereagentscanevolveautonomouslybasedontaskresolution,learningfrombothsuccessful
+treatmentsandfailedcaseswithoutrelianceonmanuallyannotateddata.
+Beyondagenttraining,thesesimulatedenvironmentsalsoserveassophisticatedtestbedsfor
+evaluationandasplatformsformedicaleducation.Forinstance,AIHospital[64]establishesa
+dynamicevaluationenvironmentbysimulatingfourdistinctroles(physician,patient,inspector,
+anddirector)andintroducesthecorrespondingMVMEbenchmark.Itsdecentralized,role-based
+setup allows for the assessment of an agent’s capabilities in symptom collection, examination
+recommendation,diagnosis,anddisputeresolution.Asformedicaleducation,Medco[281]buildsa
+collaborativelearningsystembysimulatingmulti-disciplinaryscenarioswherestudentagentscan
+interactwithpatientagents,expertphysicians,andradiologiststoproactivelygatherinformation
+andrefinetheirdiagnosticdecisions.Besides,MedAgentSim[5]presentsacomprehensivesim-
+ulationthatrequiresagentstoengageinmulti-round,multi-modalinteractions.Itincorporates
+aself-improvementmechanismbasedonhistoricalcontextand,notably,supportsdirecthuman
+interactionwiththeagentswithinthesimulatedenvironment.
+4.3 SoftwareEngineering
+IncontrasttoLargeLanguageModelsspecializedincodegeneration,agenticsystemsleveragea
+richecosystemofexternaltoolstoaddressabroaderspectrumofsoftwareengineeringtasks.This
+subsectionexaminestheapplicationoftheseagentsinthreekeyareas:codegenerationandtesting,
+programrepair,andfull-lifecyclesoftwaredevelopment.
+4.3.1 CodeGenerationandTesting. Inthedomainofcodegenerationandtesting,agenticsystems
+significantlyamplifythecapabilitiesofLLMsbeyondsimplefine-tuning.Thesesystemsintroduce
+structuredcollaborationandexternaltools,enhancingboththeefficiencyandreliabilityofcode
+generation.Table.6demonstratestheperformanceoftheselectedagenticcodingframeworkson
+popularbenchmarks.Aprimaryapproachinvolvesdecomposingthecodingprocessusingmulti-
+agentframeworksthatemulatehumanprogrammerworkflows.Mapcoder[117]decouplescode
+generationintofourcollaboratingLLMagentsforretrieval,planning,coding,anddebugging.The
+frameworkfeaturesadynamicagenttraversalmodelthatadaptsbasedonconfidencescoresfrom
+theplanningphase,alongsideplan-guideddebuggingandautonomousretrieval.Similarly,Almorsi
+etal.[6]implementsadeliberatelystructuredandfine-grainedapproach,utilizingLLMsasfuzzy
+searchersandapproximateinformationretrievers.Thismulti-agentsystemeffectivelycompensates
+fortheinherentlimitationsofLLMsinlong-sequencereasoningandlong-contextunderstanding.
+Moreover,Agentcoder[110]pioneersatest-drivendevelopment(TDD)approach.Itemploysthree
+distinctagentsresponsibleforinitialcodegeneration,testcasecreation,andtestexecutionwith
+feedback.Thistest-driveniterativerefinementloopenablesthegenerationofhigher-qualitycode
+withmoreefficienttokenusage.
+AnothermajorfocusesisaugmentingLLMswithexternaltoolstoimprovecodequalityand
+mitigatehallucination.CoCoST[97]introducesaframeworkwhereataskplannerdecomposes
+complexproblems,anonlinesearchmoduleacquiresexternalknowledge,andacodegeneratoriter-
+ateswithacorrectnesstestertofixlatentbugs.Moreover,CodeAgent[314]integratesfivedistinct
+programmingtoolsforrepository-levelcodegeneration.Throughrule-basedtoolusage,thesystem
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 28 =====
+
+111:28 Zhaoetal.
+Table6. PerformanceComparisonofDifferentCodeGenerationMethodsonPopularBenchmarkswith
+Pass@1.WefirstdemonstratestheperformanceofpopularfoundationLLMs,thencollectseveralpopular
+baselinepromptmethodswithGPT-3.5andGPT-4,respectively.Afterthat,weillustratetheperformanceof
+severalworkmentionedinthissurvey,withGPT-3.5andGPT-4,respectively.
+HumanEval-ET MBPP-ET
+Method Model HumanEval[38] MBPP[10] DS-1000[141] EvalPlus[169]
+[38] [56]
+- GPT-3.5 57.3 42.7 52.2 36.8 - 66.5
+- GPT-4 67.6 50.6 68.3 52.2 - -
+- GPT-4o 90.2 - - - - -
+- Claude-3.5Sonnet 92.0 - - - - -
+CoT[282] 44.6 37.2 46.1 34.8 - 65.2
+ReAct[304] 56.9 49.4 67.0 45.9 - 66.5
+Reflexion[241] GPT-3.5 68.1 50.6 70.0 47.5 - 62.2
+Self-planning[119] 65.2 48.8 58.6 41.5 - -
+Self-debugging[42] 61.6 45.8 60.1 52.3 - -
+CoT[282] 89.0 73.8 81.1 54.7 - 81.7
+Reflexion[241] GPT-4 91.0 78.7 78.3 51.9 - 81.7
+Self-debugging[42] - - 80.6 - - -
+AgentCoder[110] 79.9 77.4 89.9 84.1 - -
+Dongetal.
+GPT-3.5 74.4 56.1 68.2 49.5 - -
+[57]
+INTERVENOR[261] - - - - 39.7 -
+Mapcoder[117] 80.5 70.1 78.3 54.4 - 71.3
+CoCoST[97] - - - - 68.0 -
+Mapcoder[117] 93.9 82.9 83.1 57.7 - 83.5
+MetaGPT[102] 85.9 - 87.7 - - -
+AgentVerse[39] GPT-4 89.0 - 73.5 - - -
+ChatDev[213] 84.1 - 79.8 - - -
+Dongetal.[57] 90.2 70.7 78.9 62.1 - -
+AgentCoder[110] 96.3 86.0 91.8 91.8 - -
+interactswithvarioussoftwareartifacts,iterativelyperforminginformationretrieval,codesymbol
+navigation,andcodetesting.TheauthorsalsointroducedCodeBench,acomprehensivebenchmark
+forrepository-levelcodegeneration,featuringcoderepositoriesacrossmultipledomains.
+4.3.2 ProgramRepair. Complementarytocodegeneration,automatedprogramrepair(APR)is
+anothercornerstoneofAgentSysteminsoftwareengineering.Duringthemulti-stepreasoning
+process,theycouldsystematicallyunderstandingcode,localizingfaults,generatingpatches,and
+validatingfixes,oftenthroughsophisticatedtooluseandcollaborativestrategies.Table7shows
+theperformanceofselectedAPRagenticframeworksonpopularsoftwarerepairbenchmarks.
+Acommonstrategyistodecomposethecomplexrepairprocessintoastructuredworkflow.
+RepairAgent[23]formalizesthisintofourstages:defectinformationcollection,faultlocalization,
+patchgeneration,andvalidation,usingastatemachinetodynamicallyselecttoolsandadaptits
+strategy.Similarly,AgentFL[216]employsamulti-agentsystemtoinferdefectcauses,searchfor
+relevantcontextusingprograminstrumentation,andvalidatefixes,leveragingmulti-turndialogue
+tomanagecontextlength.Inventor[261]introducedaninteractive“repairchain”concept,wherea
+“codeteacher”agentanalyzescompilererrorstogeneratenaturallanguagesuggestions,guiding
+a“codelearner”agentinaniterativerepairprocess.Agentless[289]simplifiestheprocessinto
+three phases – locate, fix, and validate – using a hierarchical strategy that combines semantic
+understandingwithcodeembeddingretrievaltorapidlyidentifysuspiciouscodesnippets.
+Acriticalsub-taskwithinthisworkflowisprecisefaultlocalization.Severalspecializedagents
+havebeendevelopedforthispurpose.OrcaLoca[308]focusesonefficientlocalizationbyusing
+dynamicpriorityschedulingandrelevancescoringtoprioritizeactions,alongwithdistance-aware
+contextpruningtofilterirrelevantcode.LocAgent[48]introducesanovelgraph-basedapproach,
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 29 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:29
+parsingthecodebaseintoadirectedheterogeneousgraphthatcapturesstructuraldependencies,
+enablinganLLMagenttoperformeffectivemulti-hopreasoningforentitylocalization.Meanwhile,
+VulDebugger[177]utilizesbothstaticanddynamicprogramanalysis,continuouslycomparingthe
+actualprogramstate(observedviaadebugger)withtheexpectedstate(inferredfromconstraints)
+toidentifyandrectifyerrors.
+Buildingontheseprinciples,recentframe-
+worksaimtoprovideend-to-endsolutionsfor Table7. PerformanceComparisononPopularSoftware
+real-worldscenarioslikeresolvingGitHubis- RepairBenchmarkswithPass@1.Wefirstpresentthe
+sues.MAGIS[256]employsacentralizedarchi- performanceoffoundationLLMsonthesebenchmarks,
+tecturewithfouragentsorchestratedbyacen- then provide the performance of different methods
+mentionedinthissurveywithGPT-3.5,GPT-4,GPT-4o,
+tralcontrollertomanagetaskdecomposition,
+Claude-3.5Sonnet,respectively.
+file retrieval, code modification, and review.
+†AutoCoderRover-v2ismentionedinAgentless[289],
+Autocoderover [325] further tackles GitHub
+withthegivenreference∗
+issues by integrating structured code search
+withspectrum-basedfaultlocalization(SBFL)
+Defects4J(Top1) SWE-bench-lite
+topinpointbuggymethods.Ittheniteratively Method Model [127] SWE-bench[120] [120]
+retrievescontextviaAPIcallsandrefinesthe - GPT-3.5 121/395 0.84% -
+issuedescriptiontosynthesizeapatch,demon- - GPT-4 - 1.74% -
+AgentFL[216] 157/395 - -
+stratingarobustsolutioninapracticalsetting. GPT-3.5
+RepairAgent[23] 90/440 - -
+Besides,Rondonetal.[223]exploredthevia-
+MAGIS[256] - 13.94% -
+bilityofagent-basedprogramrepairinanen- AutoCodeRover[325] GPT-4 - 12.42% 19.0%
+terpriseenvironment,contributingavaluable SWE-Agent[300] - 12.74% 18.0%
+datasetofbothhumanandmachinereported Agentless[289] - - 32%
+SWE-Agent[300] GPT-4o - - 18.33%
+bugsandofferinginsightsintoreal-worldap-
+AutoCodeRover-v2† - - 30.67%
+plicability. Claude-3.5
+OrcaLoca[308] Sonnet - - 41.00%
+∗https://www.autocoderover.net/
+4.3.3 Full-cycleDevelopment. Beyonddiscrete
+tasks like generation and repair, agentic sys-
+temsareincreasinglyengineeredtoautomatetheentiresoftwaredevelopmentlifecycle(SDLC),
+frominitialrequirementsanalysistofinaltestinganddocumentation.Thesesystemsoftensimulate
+human software teams and adopt established development methodologies. Early explorations
+constructed virtual teams composed of agents with distinct roles. Dong et al. [57] organize a
+analyst,acoder,andatesteragentsmanagedbyawaterfallmodel,communicatingviaashared
+blackboard.Moreover,CHatdev[213]formalizestheprocessintodesign,coding,andtestingphases,
+enablingrole-specificagentstocollaboratethroughnaturallanguage.Itintroducesachatchainfor
+taskrefinementandacommunicativede-hallucinationmechanismtoensurerequirementclarity
+beforecoding.AsignificantadvancementcamewithMetaGPT[102],whichmimicstheStandard
+Operating Procedures (SOPs) of human software companies. By assigning roles and enforcing
+structuredworkflows,MetaGPTfacilitateshierarchicalmulti-agentcollaborationacrossthefull
+developmentpipeline,fromrequirementsanalysistosystemdesignandtesting,ensuringaccurate
+informationflowandreducingcommunicationoverhead.
+Furthermore,RepoAgent[179]specializesinautomatedcodedocumentation.Itanalyzesproject-
+levelhierarchyandcodedependenciestoenrichLLMpromptsandintegrateswithGittomaintain
+consistencybetweencodeanddocumentationinreal-time.Similarly,DocAgent[297]employs
+amulti-agentteam–comprisingareader,searcher,writer,validator,andcoordinator,anduses
+topologicalcodeprocessingtoautomatethegenerationofcomprehensivesoftwaredocumentation
+.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 30 =====
+
+111:30 Zhaoetal.
+Fig.10. ThefundamentalparadigmforsocialsimulationbasedonanAgenticReasoningFramework.Inthis
+framework,eachIndividualispoweredbyLLM-basedAgent.a)Individual(purpleatthemiddle):Eachagent
+possessesitsuniqueinitialprofile,personalgoal,availabletools,andadynamicallyupdatedpersonalcontext,
+engagingindynamiclearninganddecision-makingbasedoncontinuouscontextupdates.b)Individual
+withOthers(blueattheleft):Individualcontinuouslyupdatesitscognition,goals,andcontextbyobserving
+thebehaviorsofotherindividualsandreflectingontheIndividualEventsthatarisefrominteractions.c)
+Individual with Environments (green at the right): When individual executes an action in the Public
+ActionSpace,itcantriggerPublicEventsorleavemessagesintheMessagePool.Correspondingly,the
+environmentfeedsthesechangesbacktotheagentviaaStatusUpdate,thusformingacompleteinteraction
+loopthatinfluencesitssubsequentdecisions.Insummary,throughthedualloopsofsocialandenvironmental
+interaction,eachagentmaintainstheindependenceofitscontextandgoals,executesdistinctasynchronous
+socialbehaviors,andtherebycontributestotheemergenceofcomplexandrealisticsocialdynamicsatthe
+grouplevel.
+A more fundamental innovation focus on how could agents interact with their developing
+environment.SWE-Agent[300]pioneersanAgent-ComputerInterface(ACI)thatallowsanagent
+toperformoperationsdirectlyonacoderepository,suchascreatingandeditingfiles,navigating
+thefilesystem,andexecutingtestsuites.Concurrently,Openhands[275]imitateshumandeveloper
+interactionsbyprovidingagentswithasandboxedenvironmentwheretheycanwritecode,usea
+command-lineinterface,browsetheweb,andcoordinatecomplextasks,grantingthemahigher
+degreeofautonomy.Besides,atthelevelofsoftwaresystem,MAAD[322]tacklesthecomplex
+processofsoftwarearchitecturedesignbycreatingamulti-agentsystemthatlearnsfromexisting
+designknowledge,academicliterature,andexpertexperiencetogenerateandoptimizearchitectures.
+MeanwhileSyncMind[91]identifiesandaddressescorechallengeswithinthesesystems,suchas
+the“beliefinconsistency”problemincollaborativesoftwareengineering,andproposesSyncBench
+benchmarkstovalidatethesolutions.
+4.4 SocialandEconomicSimulation
+Apartfromprevioussetions,theadventandrapidadvancementofLargeLanguageModelshave
+alsoestablishedarevolutionaryparadigmforsimulatingsocialandeconomicbehaviors.LLM-based
+agents,endowedwithsophisticated,human-likecapacitiesforreasoning,perception,andaction,
+serve as the foundational elements of this new approach. Ranging from single-agent decision-
+makingmodelstocomplexmulti-agentsystems,theseframeworksaredesignedtoconstructand
+simulatecriticalsocioeconomicdynamicsatvariousscales.Consequently,theyprovideapowerful
+andversatilemethodologyforresearcherstoexplorecomplexphenomenawithinthesocialand
+economicsciences.
+4.4.1 SocialSimulation. LLM-basedsocialsimulationleveragestheautonomyofagentstomodela
+widespectrumofemergentsocialbehaviors.Theycouldinteractwithdifferentindividualswhich
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 31 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:31
+arealsopoweredbyLLMs,ordynamicallyact,learnandimprovethemselvesfromthesimulated
+environments,asdemonstratedinFig.10,Earlyandinfluentialresearchinthisareaoftenoperates
+withintext-basedsandboxenvironments,whereagentsareassignedspecificprofilesandaction
+spacestodriveinteraction.OneofthepioneerworkisGenerativeAgents[208],whichestablished
+thisparadigmbycreatinganinteractivesandboxwith25agents,eachpossessingthecapacityto
+observe,plan,andreflect,thusexhibitingdistinctpersonalities.Thissetupallowedforthequalitative
+assessmentofindividualandcollectivebehaviorsthroughnaturallanguageinteraction.Following
+thisparadigms,subsequentstudieshaveexploredcriticalsocialdynamics.Forinstance,MetaAgents
+[157]assessedcoordinationskillsinasimulatedjobfair,whileGOVSIM[211]investigatedwhether
+agents could negotiate sustainable equilibria in a commons dilemma. Other research has used
+similarframeworkstostudytheformationofinformationcocoons,conformity[267],andvoting
+behaviorsinelectionscenarios[319].
+Moreover,thefocusexpandedfromspecificsimulationstothedevelopmentofgeneralizableplat-
+formsandthemodelingofonlineinteractions.Toenhancereusabilityandextensibility,frameworks
+likeGenSim[252]andSotopia-S4[338]wereintroduced.Theseplatformsprovideconfigurable
+systemswhereresearcherscandefineroles,contextualinformation,andactionspacestocustomize
+diversemulti-agentscenariosandtesthypotheseswithtailoredevaluationmetrics.Besides,research
+begantoaddressthecomplexitiesofonlinesocialnetworks.BASES[221]modeledtheemergent
+websearchbehaviorsofdiverseuserprofiles,whileMouetal.[195]simulatedthepropagationof
+influenceinsocialmovementsbydifferentiatingbetweencoreagent-drivenusersandperipheral
+users.ThechallengeofsimulatingmaliciousonlineenvironmentswastackledbyBotSim[214],
+whichcreatedamixednetworkofagentsandhumanusers.Similarly,Y-Social[225]employed
+digitaltwintechnologytoreplicatethedynamicsofuserinteractionsonsocialmediaplatforms.
+Aprimarychallengeinsocialsimulationis
+achievingrealismatalargescale,whileRecent Table8. ACollectionofDifferentSocialSimulating
+systemshavemadesolidprogressinthisdirec- Methods.
+tion.Oasis[303]implementslarge-scaleuser
+simulationbyintegratingdynamiccontextup- #Agent
+SimulationFocus DataSource RelatedWork
+datesandaninterest-basedrecommendation /User
+systemmodeledafterreal-worldplatforms.So- SustainableCooperation Simulated GoverSim[211] -
+cioVerse[318]furtherenhancesscalabilityby JobFair Simulated MetaAgents[157] -
+introducingandrestructuringreal-worldinfor- Interactive Simulated GenerativeAgents[208] 25
+HumanBehavior
+mation to create distinct contextual environ-
+RecommendationSystem Simulated RecAgent[267] 20
+mentsthatdrivedivergentindividualbehaviors. Malicious
+Simulated BotSim[214] ∼3k
+In addition, S3 [72] simplifies the simulation SocialBotnet
+Population-level
+of large-scale social networks by employing Simulated S3[72] ∼10k
+Interaction
+group agents. It follows a hierarchical archi- MassivePopulation
+Real-world ElectionSim[319] 10k
+tecture where each group agent represents a Election
+WebSearch
+demographicpopulationratherthanasinglein- UserSimulation Real-world BASES[221] 200k
+dividual.Byassigningcharacteristics,emotions, WorldModel Real-world SocialVerse[318] 10M
+andattitudesbasedonroledistributions,the GeneralSocial Sotopia-S4[338] 150
+Simulated
+system can simulatemacro-level networkin- SimulationPlatform GenSim[252] ∼100k
+teractions,offeringacomputationallyefficient YSocial[225] -
+abstractionformassive-scalesocialdynamics. SocialMedia Real-world Mouetal.[195] 1k
+OASIS[303] 100k
+Asaconclusion,Table.8summarizethesesim-
+ulation work with their different simulation
+focus,datasourceandscale.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 32 =====
+
+111:32 Zhaoetal.
+4.4.2 EconomicPerceptionandSimulation. Agenticframeworksareincreasinglybeingleveraged
+toperceive,analyze,andsimulatecomplexeconomicmarkets,adomainwithimmensereal-world
+value[26].Theevolutionoftheseframeworkscanbeunderstoodthroughthreeadvancingfrontiers:
+enhancingagent-nativecognitiveabilities,optimizingcollaborativestructures,andcreatinglarge-
+scalemarketsimulations.
+Initially,effortsfocusedonequippingindividualagentswithsophisticatedcognitivemodules.
+EarlyworklikeFinmem[306]establishedafoundationalagentsystemwithanalysis,memory,
+anddecisionmodules,wherethememorycomponentutilizedreflectionandinteractivelearning
+toprocesshistoricalcontext.Similarly,EconAgent[153]situatedanLLM-basedagentwithina
+simulatedmacroeconomicenvironment,employingperception,memory,andreflectionmodulesto
+analyzeitsbehavior.Thisfocusonreflectionasacorecognitivefacultywasfurtheradvancedby
+subsequentsystems.Finvision[67]placessystematicreflectionatitscenter,usingamulti-agent
+systemtoanalyzehistoricaltradingsignalsandgeneratefeedbacktoimprovefuturedecisions.
+More recently, Zhang et al. [317] introduced a sophisticated two-level reflection module. This
+moduleprocessesmultimodalmarketinformationtoestablishdistinctcausallinksbetweenmarket
+dataandpricemovements,whilealsoreflectingonhistoricaltradingperformance.Itsmemory
+systemseparatelystoresparsedmarketinformationandtheinsightsfrombothlevelsofreflection
+toinformdecision-making.
+Buildinguponindividualagentcapabilities,anotherlineofresearchexplorestheoptimization
+ofcollaborativestructures.Asapioneerwork,Fincon[307]addressesstocktradingandportfolio
+managementusingahierarchicalmanager-analystmulti-agentsystem.Thisstructurefacilitates
+synchronous collaboration and employs self-criticism to monitor market risks and update in-
+vestmenttheses,therebyachievingrobustriskcontrol.Notably,conceptualizedbeliefsareonly
+selectivelycommunicatedamongagents,effectivelyreducingthecommunicationoverheadtypical
+inmulti-agentsystems.TheimportanceofstructuredcollaborationisalsohighlightedinTradin-
+gAgents[290],whichenhanceautomatedtradingperformancethroughexplicitroleandobjective
+allocationcombinedwithstreamlinedinformationintegration.
+Themostambitiousapplicationinthisdomaininvolvescreatingcomprehensive,closed-loop
+platformsandsimulatingentireeconomicenvironments.FinRobot[299]implementsafull-cycle
+financialanalysisplatform.Atitsagentlayer,itusesCoT[282]todeconstructcomplexfinancial
+problems,dynamicallyselectingorfine-tuningdifferentLLMsandapplyingvariedalgorithms
+basedonthetask,thusenablingrapidmarketresponse.Pushingtheboundariesfurther,large-scale
+simulationsnowaimtoreplicatereal-worldmarketdynamics.StockAgent[312]deploysamassive
+multi-agentsystemtosimulateastocktradingenvironment,allowinguserstoassesshowexternal
+factorsinfluenceinvestorbehaviorandprofitability.Similarly,Gaoetal.[74]simulatesthestock
+marketbycreatingagentsequippedwithuniqueprofiles,observationalcapabilities,andtool-based
+learning.Byintegratingtheseagentswitharealisticorder-matchingsystem,theseframeworks
+achieveahigh-fidelitysimulationofactualstockmarketoperations,openingnewavenuesfor
+economicresearchandpolicytesting.
+4.5 Others
+Beyondtheapplicationsinmainstreamscenarios,AgenticReasoningFrameworksalsodemonstrate
+distinctpotentialinseveralothersignificantdomains.Althoughagent-basedapproacheshavenot
+yetbecomemainstreaminthesefields,agrowingbodyofpioneeringworkhasbeguntoexplore
+thefrontiersoftheircapabilitiesincomplextaskslikeEmbodiedInteraction,GUIOperation,and
+StrategicReasoning.
+InEmbodiedInteraction,anagent’sreasoningprocesstypicallyfollowsaperceive-plan-execute-
+memorycycle.Theprimarygoalinthisfieldistoempoweragentstolearnandcompletetasks
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 33 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:33
+autonomouslythroughcontinuousinteractionwithavirtualorphysicalenvironment[175].For
+example,basedontraining-freeframework,Voyager[277]enablesanagenttoachievelifelong
+learninginthegameMinecraft bydesigningaspecializedactionspaceandareasoningframework
+thatintegratesiterativefeedbackandcontinuousevolution.However,existinggeneralfoundational
+MultimodalLargeLanguageModels(MLLMs)stillshowdeficienciesinhandlingcomplex,multi-
+leveltaskplanning.Consequently,aprevailingresearchdirectionistofine-tunebasemodelsfor
+specificembodiedscenariostoenhancetheagent’sperceptionandplanningcapabilitiesinatailored
+manner[175].
+GUI(GraphicalUserInterface)Operationaimstoenableagentstooperateapplicationsonphones,
+computers,andthewebwithhuman-likeproficiency[332].Researchersusuallybuildtheframe-
+workbaseonstate-of-the-artvision-languagemodelslikeGPT-4V[295].Theyenhancereasoning
+frameworks by integrating visual memory and knowledge bases and introducing multi-agent
+collaborationmechanisms[146,263,280,313].Thesearecombinedwithconventionalcomponents
+likereflectionandcontextupdatingtoeffectivelydecomposecomplexGUInavigationtasksand
+enablecontinuouslearning.However,astaskcomplexityincreases,theresearchfocusisshifting
+fromrelyingonthezero-shotcapabilitiesofmodelstowardsmoreintensive,specializedtraining
+viaSupervisedFine-Tuning(SFT)orReinforcementLearning(RL)[271].
+StrategicReasoningrequiresanagenttounderstandandpredictthebehaviorofopponentsand
+dynamicallyadaptitsownstrategy,withthecorechallengebeingthemanagementofdynamicsand
+uncertaintyinmulti-agentinteractions.Currently,theresearchfocusinthisareaisnotondesigning
+novelreasoningframeworksbutratheroncreatingdiversetestenvironmentstoaccuratelyevaluate
+andenhancethestrategiccapabilitiesofLLMs[324].Theseenvironmentsspanawiderange,as
+evidencedbythedevelopmentofbenchmarksbasedonreal-timestrategy(RTS)gameslikeStarCraft
+II [182];theuseofLLMstogenerateexpert-leveldecisionexplanationsforboardgames[131];and
+thesystematicanalysisoftheirbehavioralrationalitythroughclassicgametheorymodels[63].
+5 FutureProspects
+Asdiscussedinpreviouschapters,agenticreasoningframeworkshavemadesignificantprogress
+inboththeoryandapplication.However,thepathtoachievingatrulygeneral,trustworthy,and
+efficientagentsystemisstillfullofchallenges.Inthischapter,weproposesixpotentialdirections
+forfuturedevelopment.
+5.1 ScalabilityandEfficiencyofReasoning
+As task complexity increases, the scalability and efficiency of agent frameworks have become
+major bottlenecks for large-scale applications. For instance, in multi-agent systems, poor task
+decompositioncancausesystemperformancetodegradesharplyasthesystemscalesup[28].Simply
+increasingthenumberofagentsorextendingreasoningtimeisoftenunsustainable,leadingto
+spiralingcostsanddiminishingreturns.Futureworkscouldfocusoninnovationsattheframework
+level.Ononehand,itwillbecrucialtodesignmoreefficientcontextmanagementmechanisms
+forlarge-scaleexpansion.Ontheotherhand,frameworksshouldalsobeequippedwithdynamic
+taskallocationandadaptiveresourceschedulingcapabilitiestohandlecomplextasksflexiblyand
+efficiently.
+5.2 Open-endedAutonomousLearning
+Achievingopen-endedautonomouslearningisakeyvisioninagentresearch.Thegoalistoevolve
+agentsfrombeingmere“users”ofexistingknowledgeinto“creators”ofnewknowledgeandtools
+[73],breakingfreefromrelianceonspecificenvironmentslikegames[277].Wehaveobserved
+thatcurrentreasoningframeworkstypicallyrelyonstatictoolsets,fixedinteractionlogic,and
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 34 =====
+
+111:34 Zhaoetal.
+pre-defined prompts. This rigidity constrains an agent’s creativity, potentially leading to poor
+performanceoncomplex,zero-shotproblems.Therefore,futureframeworkdesignshouldfocuson
+equippingagentswiththeabilitytodynamicallygenerateandoptimizetools.Thiswouldallow
+themtoautonomouslycreateanditerateontheirownmethodsduringthereasoningprocess[68].
+Alongsidethis,thereisalsoaneedtoestablishaneffectiveandreasonableevaluationsystemto
+assessanagent’scapacityforlearningandcreationinanopen-endedworld.
+5.3 DynamicReasoningFramework
+Improvingaframework’sabilitytoadapttocomplextasksiscrucialfortheevolutionofagents.
+Currently, this adaptability mainly involves making high-level adjustments for different types
+oftasksbysettingupdifferentcollaborationarchitectures[134].However,withinthemulti-step
+reasoningprocessofasinglecomplextask,thecollaborationpatterninsidetheframeworkoften
+remainsstatic.Futureresearchshouldfocusonaframework’sabilitytoself-regulateduringthe
+reasoningprocessforasingletask.Thisrequirestheframeworktohaveadeepunderstandingof
+itsownreasoningprocess,enablingittoperceivethegoalofthecurrentstepanddynamically
+reconfiguretheinteractiontopologyandcollaborationprotocolsbetweenagents.Theframework
+shouldthenbeabletoselectandexecutetheoptimalreasoningpathtoachievethebestbalance
+betweenresourceefficiencyandreasoningquality.
+5.4 EthicsandFairnessinReasoning
+Buildingtrustworthyandresponsibleagentsystemsisanessentialprerequisitefortheirdeployment
+intherealworld.Asthesesystemsbecomemoreautonomousandcomplex,individualbiasesmay
+beamplified[262],anditwillbecomeincreasinglydifficulttoholdthemaccountableandcorrect
+flawed reasoning [196]. Future research should focus on enhancing the framework’s ability to
+proactivelymanagebias.Thismeansequippingittoanticipate,identify,andmitigatepotential
+biasesduringthereasoningprocessitself.Additionally,theframeworkshouldbeabletoprovide
+clear ethical justifications for every key decision, establishing a reliable pathway for external
+auditingandaccountability.
+5.5 RelianceandSafetyinReasoning
+Thesafetychallengesforagentframeworkshaveevolvedfromsecuringasinglelanguagemodelto
+protectingacomplex,dynamicsystemcomposedofmemory,planning,andtoolinterfaces.Thisshift
+introducesnewrisks:beyondtraditionalattacksonLLMs,everycoremoduleandexternalinterface
+ofanagentcanbecomeanewtarget.AttackerscanexploittheseentrypointsbypoisoningAPIdata
+tomanipulateanagent’s“perception”orbyhijackingitsreasoningchaintocontrolits“decisions”,
+leadingtodataleaksandmoresevereillicitoperations[264].Futureworkshouldapproachtheagent
+systemasawholeattheframeworklevel.Byimplementingdynamic,coordinateddefensesbetween
+components,thesystemcanquicklyrespondtoandpatchvulnerabilities,therebyenhancingits
+reliabilityandsecurity.
+5.6 ConfidenceEstimationandExplainableAgenticReasoning
+Whenanagentsystembecomesanautomateddecision-maker,itneedsaprecisewaytoevaluateand
+communicatethetrustworthinessofitsreasoningprocess.Futureworkshouldfocusonestablishing
+quantifiablemechanismsforuncertainty-awareconfidenceestimation.Forinstance,introspective
+reasoning could be conducted within an agentic framework to align internal uncertainty with
+inherenttaskambiguity[94,161].Whenfacedwithhighuncertainty,anagentcouldactivelyseek
+informationtoclarifyambiguity[107].Furthermore,calibratingtheagent’sconfidenceduringtool
+invocationisalsocrucial,sinceinteractionswithexternalenvironmentsandtoolsaremajorsources
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 35 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:35
+ofuncertaintyforagenticframeworks[168].Thiswouldtransformconfidenceevaluationfroman
+agent’sunreliableself-declarationintoacredible,objectiveproof,ensuringitssafedeploymentin
+criticalfields.
+6 Conclusion
+Withtheexplosivegrowthoflargelanguagemodel(LLM)basedagenticreasoningmethodsand
+applications,asystematicunderstandingoftheseapproachesandtheirscenarioshasbecomecrucial.
+Weproposeaunifiedtaxonomythatbreaksdownagenticsystemsintothreeprogressivelevels,
+fromsingle-agentmethods,tool-basedmethods,tomulti-agentsystems.Thisframeworkoffers
+aclearviewsthroughwhichtoanalyzethefield.Buildingonthis,wesystematicallyreviewed
+howtheseframeworksareputintopracticeacrossmajorapplicationdomains,coveringtheircore
+methodologies,keyfocuses,andevaluationapproaches.Finally,wepresentourinsightsonthe
+futuredirectionsofagenticreasoning,aimingtopromotethedevelopmentofagenticframeworks
+forthefuturegeneration.
+References
+[1] JoshAbramson,JonasAdler,JackDunger,RichardEvans,TimGreen,AlexanderPritzel,OlafRonneberger,Lindsay
+Willmore,AndrewJBallard,JoshuaBambrick,etal.2024.Accuratestructurepredictionofbiomolecularinteractions
+withAlphaFold3.Nature630,8016(2024),493–500.
+[2] VaibhavAdlakha,ParishadBehnamGhader,XingHanLu,NicholasMeade,andSivaReddy.2024. Evaluating
+correctnessandfaithfulnessofinstruction-followingmodelsforquestionanswering.TransactionsoftheAssociation
+forComputationalLinguistics12(2024),681–699.
+[3] AliAhmadiTeshnizi,WenzhiGao,andMadeleineUdell.2024.OptiMUS:scalableoptimizationmodelingwith(MI)LP
+solversandlargelanguagemodels.InProceedingsofthe41stInternationalConferenceonMachineLearning.577–596.
+[4] ZaidAl-Ars,ObinnaAgba,ZhuoranGuo,ChristiaanBoerkamp,ZiyaadJaber,andTareqJaber.2023.Nlice:Synthetic
+medicalrecordgenerationforeffectiveprimaryhealthcaredifferentialdiagnosis.In2023IEEE23rdInternational
+ConferenceonBioinformaticsandBioengineering(BIBE).IEEE,397–402.
+[5] MohammadAlmansoori,KomalKumar,andHishamCholakkal.2025. Self-EvolvingMulti-AgentSimulationsfor
+RealisticClinicalInteractions.arXivpreprintarXiv:2503.22678(2025).
+[6] AmrAlmorsi,MohannedAhmed,andWalidGomaa.2024. Guidedcodegenerationwithllms:Amulti-agent
+frameworkforcomplexcodetasks.In202412thInternationalJapan-AfricaConferenceonElectronics,Communications,
+andComputations(JAC-ECC).IEEE,215–218.
+[7] ViniciusMAlves,EugeneMuratov,DenisFourches,JudyStrickland,NicoleKleinstreuer,CarolinaHAndrade,and
+AlexanderTropsha.2015.Predictingchemically-inducedskinreactions.PartI:QSARmodelsofskinsensitizationand
+theirapplicationtoidentifypotentiallyhazardouscompounds.Toxicologyandappliedpharmacology284,2(2015),
+262–272.
+[8] TheonieAnastassiadis,SeanWDeacon,KarthikDevarajan,HaichingMa,andJeffreyRPeterson.2011.Comprehensive
+assayofkinasecatalyticactivityrevealsfeaturesofkinaseinhibitorselectivity.Naturebiotechnology29,11(2011),
+1039–1045.
+[9] DArmstrong.2024.Exercisesfrom“introductiontoComputationalChemistry”(CHM323),Universityoftoronto.
+Personalcommunication(2024).
+[10] JacobAustin,AugustusOdena,MaxwellNye,MaartenBosma,HenrykMichalewski,DavidDohan,EllenJiang,Carrie
+Cai,MichaelTerry,QuocLe,etal.2021.Programsynthesiswithlargelanguagemodels.arXivpreprintarXiv:2108.07732
+(2021).
+[11] RezaAverly,FrazierNBaker,andXiaNing.2025.Liddia:Language-basedintelligentdrugdiscoveryagent.arXiv
+preprintarXiv:2502.13959(2025).
+[12] KaitoBaba,ChaoranLiu,ShuheiKurita,andAkiyoshiSannai.2025.ProverAgent:AnAgent-basedFrameworkfor
+FormalMathematicalProofs.arXivpreprintarXiv:2506.19923(2025).
+[13] SeongsuBae,DaeunKyung,JaeheeRyu,EunbyeolCho,GyubokLee,SunjunKweon,JungwooOh,LeiJi,EricChang,
+TackeunKim,etal.2023.Ehrxqa:Amulti-modalquestionansweringdatasetforelectronichealthrecordswithchest
+x-rayimages.AdvancesinNeuralInformationProcessingSystems36(2023),3867–3880.
+[14] JinheonBaek,SujayKumarJauhar,SilviuCucerzan,andSungJuHwang.2025.ResearchAgent:IterativeResearch
+IdeaGenerationoverScientificLiteraturewithLargeLanguageModels.InProceedingsofthe2025Conferenceof
+theNationsoftheAmericasChapteroftheAssociationforComputationalLinguistics:HumanLanguageTechnologies
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 36 =====
+
+111:36 Zhaoetal.
+(Volume1:LongPapers).6709–6738.
+[15] KinjalBasu,IbrahimAbdelaziz,KiranKate,MayankAgarwal,MaxwellCrouse,YaraRizk,KelseyBradford,Asim
+Munawar,SadhanaKumaravel,SaurabhGoyal,etal.2024. Nestful:Abenchmarkforevaluatingllmsonnested
+sequencesofapicalls.arXivpreprintarXiv:2409.03797(2024).
+[16] SuhanaBedi,IddahMlauzi,DanielShin,SanmiKoyejo,andNigamHShah.2025. TheOptimizationParadoxin
+ClinicalAIMulti-AgentSystems.arXivpreprintarXiv:2506.06574(2025).
+[17] RMBelbinandVBrown.2012.Teamrolesatwork.Routledge(2012).
+[18] PeterBelcak,GregHeinrich,ShizheDiao,YongganFu,XinDong,SauravMuralidharan,YingyanCelineLin,and
+PavloMolchanov.2025.SmallLanguageModelsaretheFutureofAgenticAI.arXivpreprintarXiv:2506.02153(2025).
+[19] APatríciaBento,AnnaGaulton,AnneHersey,LouisaJBellis,JonChambers,MarkDavies,FelixAKrüger,Yvonne
+Light,LoraMak,ShaunMcGlinchey,etal.2014.TheChEMBLbioactivitydatabase:anupdate.Nucleicacidsresearch
+42,D1(2014),D1083–D1090.
+[20] HelenMBerman,JohnWestbrook,ZukangFeng,GaryGilliland,TalapadyNBhat,HelgeWeissig,IlyaNShindyalov,
+andPhilipEBourne.2000.Theproteindatabank.Nucleicacidsresearch28,1(2000),235–242.
+[21] GRichardBickerton,GaiaVPaolini,JérémyBesnard,SorelMuresan,andAndrewLHopkins.2012.Quantifyingthe
+chemicalbeautyofdrugs.Naturechemistry4,2(2012),90–98.
+[22] LisaBortolotti.2011.Doesreflectionleadtowisechoices?PhilosophicalExplorations14,3(2011),297–313.
+[23] IslemBouzenia,PremkumarDevanbu,andMichaelPradel.2025.RepairAgent:AnAutonomous,LLM-BasedAgent
+forProgramRepair.In2025IEEE/ACM47thInternationalConferenceonSoftwareEngineering(ICSE).IEEEComputer
+Society,694–694.
+[24] AndresMBran,SamCox,OliverSchilter,CarloBaldassari,AndrewDWhite,andPhilippeSchwaller.2023.Chemcrow:
+Augmentinglarge-languagemodelswithchemistrytools.arXivpreprintarXiv:2304.05376(2023).
+[25] TomBrown,BenjaminMann,NickRyder,MelanieSubbiah,JaredDKaplan,PrafullaDhariwal,ArvindNeelakantan,
+PranavShyam,GirishSastry,AmandaAskell,etal.2020.Languagemodelsarefew-shotlearners.Advancesinneural
+informationprocessingsystems33(2020),1877–1901.
+[26] BokaiCao,SaizhuoWang,XinyiLin,XiaojunWu,HaohanZhang,LionelMNi,andJianGuo.2025. Fromdeep
+learningtoLLMs:asurveyofAIinquantitativeinvestment.arXivpreprintarXiv:2503.21422(2025).
+[27] JuliaCarnevale,EricShifrut,NupuraKale,WilliamANyberg,FranziskaBlaeschke,YanYiChen,ZhongmeiLi,SagarP
+Bapat,MorganEDiolaiti,PatrickO’Leary,etal.2022. RASA2ablationinTcellsboostsantigensensitivityand
+long-termfunction.Nature609,7925(2022),174–182.
+[28] MertCemri,MelissaZPan,ShuyiYang,LakshyaAAgrawal,BhavyaChopra,RishabhTiwari,KurtKeutzer,Aditya
+Parameswaran,DanKlein,KannanRamchandran,etal.2025.Whydomulti-agentllmsystemsfail?arXivpreprint
+arXiv:2503.13657(2025).
+[29] JingyiChai,ShuoTang,RuiYe,YuwenDu,XinyuZhu,MengchengZhou,YanfengWang,SihengChen,etal.2025.
+SciMaster:TowardsGeneral-PurposeScientificAIAgents,PartI.X-MasterasFoundation:CanWeLeadonHumanity’s
+LastExam?arXivpreprintarXiv:2507.05241(2025).
+[30] JiajunChai,ZijieZhao,YuanhengZhu,andDongbinZhao.2025.ASurveyofCooperativeMulti-AgentReinforcement
+LearningforMulti-TaskScenarios.ArtificialIntelligenceScienceandEngineering1,2(2025),98–121.
+[31] Chi-MinChan,WeizeChen,YushengSu,JianxuanYu,WeiXue,ShanghangZhang,JieFu,andZhiyuanLiu.2024.
+ChatEval:TowardsBetterLLM-basedEvaluatorsthroughMulti-AgentDebate.InTheTwelfthInternationalConference
+onLearningRepresentations.
+[32] JunShernChan,NeilChowdhury,OliverJaffe,JamesAung,DaneSherburn,EvanMays,GiulioStarace,KevinLiu,
+LeonMaksin,TejalPatwardhan,etal.2025.MLE-bench:EvaluatingMachineLearningAgentsonMachineLearning
+Engineering.InTheThirteenthInternationalConferenceonLearningRepresentations.
+[33] CrystalTChang,HodanFarah,HaiwenGui,ShawheenJustinRezaei,CharbelBou-Khalil,Ye-JeanPark,Akshay
+Swaminathan,JesutofunmiAOmiye,AkaashKolluri,AkashChaurasia,etal.2024. Redteaminglargelanguage
+modelsinmedicine:real-worldinsightsonmodelbehavior.medRxiv(2024),2024–04.
+[34] GuangyaoChen,SiweiDong,YuShu,GeZhang,JawardSesay,BörjeKarlsson,JieFu,andYeminShi.2024.AutoAgents:
+aframeworkforautomaticagentgeneration.InProceedingsoftheThirty-ThirdInternationalJointConferenceon
+ArtificialIntelligence.22–30.
+[35] HanjieChen,ZhouxiangFang,YashSingla,andMarkDredze.2025. Benchmarkinglargelanguagemodelson
+answeringandexplainingchallengingmedicalquestions.InProceedingsofthe2025ConferenceoftheNationsofthe
+AmericasChapteroftheAssociationforComputationalLinguistics:HumanLanguageTechnologies(Volume1:Long
+Papers).3563–3599.
+[36] KexinChen,JunyouLi,KunyiWang,YuyangDu,JiahuiYu,JiaminLu,LanqingLi,JiezhongQiu,JianzhangPan,Yi
+Huang,etal.2023.Chemist-X:Largelanguagemodel-empoweredagentforreactionconditionrecommendationin
+chemicalsynthesis.arXivpreprintarXiv:2311.10776(2023).
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 37 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:37
+[37] KaiChen,XinfengLi,TianpeiYang,HeweiWang,WeiDong,andYangGao.2025.MDTeamGPT:ASelf-EvolvingLLM-
+basedMulti-AgentFrameworkforMulti-DisciplinaryTeamMedicalConsultation.arXivpreprintarXiv:2503.13856
+(2025).
+[38] MarkChen,JerryTworek,HeewooJun,QimingYuan,HenriquePondeDeOliveiraPinto,JaredKaplan,HarriEdwards,
+YuriBurda,NicholasJoseph,GregBrockman,etal.2021.Evaluatinglargelanguagemodelstrainedoncode.arXiv
+preprintarXiv:2107.03374(2021).
+[39] WeizeChen,YushengSu,JingweiZuo,ChengYang,ChenfeiYuan,Chi-MinChan,HeyangYu,YaxiLu,Yi-HsinHung,
+ChenQian,etal.2024.AgentVerse:FacilitatingMulti-AgentCollaborationandExploringEmergentBehaviors.In
+ICLR.
+[40] WeizeChen,ZimingYou,RanLi,ChenQian,ChenyangZhao,ChengYang,RuobingXie,ZhiyuanLiu,Maosong
+Sun,etal.2025.InternetofAgents:WeavingaWebofHeterogeneousAgentsforCollaborativeIntelligence.InThe
+ThirteenthInternationalConferenceonLearningRepresentations.
+[41] XuanzhongChen,YeJin,XiaohaoMao,LunWang,ShuyangZhang,andTingChen.2024.RareAgents:Autonomous
+Multi-disciplinaryTeamforRareDiseaseDiagnosisandTreatment.arXive-prints(2024),arXiv–2412.
+[42] XinyunChen,MaxwellLin,NathanaelSchärli,andDennyZhou.2024.TeachingLargeLanguageModelstoSelf-Debug.
+InTheTwelfthInternationalConferenceonLearningRepresentations.
+[43] XuanzhongChen,XiaohaoMao,QihanGuo,LunWang,ShuyangZhang,andTingChen.2024.RareBench:canLLMs
+serveasrarediseasesspecialists?.InProceedingsofthe30thACMSIGKDDconferenceonknowledgediscoveryanddata
+mining.4850–4861.
+[44] XiChen,HuahuiYi,MingkeYou,WeiZhiLiu,LiWang,HairuiLi,XueZhang,YingmanGuo,LeiFan,GangChen,
+etal.2025. Enhancingdiagnosticcapabilitywithmulti-agentsconversationallargelanguagemodels. NPJdigital
+medicine8,1(2025),159.
+[45] YuxuanChen,XuZhu,HuaZhou,andZhuyinRen.2024.MetaOpenFOAM:anLLM-basedmulti-agentframework
+forCFD.arXivpreprintarXiv:2407.21320(2024).
+[46] YuxuanChen,XuZhu,HuaZhou,andZhuyinRen.2025.Metaopenfoam2.0:Largelanguagemodeldrivenchainof
+thoughtforautomatingcfdsimulationandpost-processing.arXivpreprintarXiv:2502.00498(2025).
+[47] ZehuiChen,KuikunLiu,QiuchenWang,JiangningLiu,WenweiZhang,KaiChen,andFengZhao.2025. Mind-
+Search:MimickingHumanMindsElicitsDeepAISearcher.InTheThirteenthInternationalConferenceonLearning
+Representations.
+[48] ZhaolingChen,XiangruTang,GangdaDeng,FangWu,JialongWu,ZhiweiJiang,ViktorPrasanna,ArmanCohan,
+andXingyaoWang.2025.Locagent:Graph-guidedllmagentsforcodelocalization.arXivpreprintarXiv:2503.09089
+(2025).
+[49] YuanChiang,ElvisHsieh,Chia-HongChou,andJanoshRiebesell.2025. LLaMP:LargeLanguageModelMade
+PowerfulforHigh-fidelityMaterialsKnowledgeRetrieval.InAIforAcceleratedMaterialsDesign-ICLR.
+[50] KarlCobbe,VineetKosaraju,MohammadBavarian,MarkChen,HeewooJun,LukaszKaiser,MatthiasPlappert,Jerry
+Tworek,JacobHilton,ReiichiroNakano,etal.2021.Trainingverifierstosolvemathwordproblems.arXivpreprint
+arXiv:2110.14168(2021).
+[51] 1000GenomesProjectConsortiumetal.2012.Anintegratedmapofgeneticvariationfrom1,092humangenomes.
+Nature491,7422(2012),56.
+[52] StevenMCorsello,JoshuaABittker,ZihanLiu,JoshuaGould,PatrickMcCarren,JodiEHirschman,StephenE
+Johnston,AnitaVrcic,BangWong,MariyaKhan,etal.2017.TheDrugRepurposingHub:anext-generationdrug
+libraryandinformationresource.Naturemedicine23,4(2017),405–408.
+[53] DebrupDas,DebopriyoBanerjee,SomakAditya,andAshishKulkarni.2024.MATHSENSEI:ATool-AugmentedLarge
+LanguageModelforMathematicalReasoning.InProceedingsofthe2024ConferenceoftheNorthAmericanChapterof
+theAssociationforComputationalLinguistics:HumanLanguageTechnologies(Volume1:LongPapers).942–966.
+[54] TomDeMarcoandTimLister.2013.Peopleware:productiveprojectsandteams.Addison-Wesley.
+[55] HanDing,YinhengLi,JunhaoWang,andHangChen.2024. Largelanguagemodelagentinfinancialtrading:A
+survey.arXivpreprintarXiv:2408.06361(2024).
+[56] YihongDong,JiazhengDing,XueJiang,GeLi,ZhuoLi,andZhiJin.2025.Codescore:Evaluatingcodegenerationby
+learningcodeexecution.ACMTransactionsonSoftwareEngineeringandMethodology34,3(2025),1–22.
+[57] YihongDong,XueJiang,ZhiJin,andGeLi.2024.Self-collaborationcodegenerationviachatgpt.ACMTransactions
+onSoftwareEngineeringandMethodology33,7(2024),1–38.
+[58] MenggeDu,YuntianChen,ZhongzhengWang,LongfengNie,andDongxiaoZhang.2024.LLM4ED:LargeLanguage
+ModelsforAutomaticEquationDiscovery.CoRR(2024).
+[59] YilunDu,ShuangLi,AntonioTorralba,JoshuaBTenenbaum,andIgorMordatch.2024.Improvingfactualityand
+reasoninginlanguagemodelsthroughmultiagentdebate.InProceedingsofthe41stInternationalConferenceon
+MachineLearning.11733–11763.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 38 =====
+
+111:38 Zhaoetal.
+[60] ZaneDurante,QiuyuanHuang,NaokiWake,RanGong,JaeSungPark,BidiptaSarkar,RohanTaori,YusukeNoda,
+DemetriTerzopoulos,YejinChoi,etal.2024. Agentai:Surveyingthehorizonsofmultimodalinteraction. arXiv
+preprintarXiv:2401.03568(2024).
+[61] AbulEhtesham,AditiSingh,GauravKumarGupta,andSaketKumar.2025. Asurveyofagentinteroperability
+protocols:Modelcontextprotocol(mcp),agentcommunicationprotocol(acp),agent-to-agentprotocol(a2a),and
+agentnetworkprotocol(anp).arXivpreprintarXiv:2505.02279(2025).
+[62] PeterErtlandAnsgarSchuffenhauer.2009.Estimationofsyntheticaccessibilityscoreofdrug-likemoleculesbased
+onmolecularcomplexityandfragmentcontributions.Journalofcheminformatics1,1(2009),8.
+[63] CaoyunFan,JindouChen,YaohuiJin,andHaoHe.2024.Canlargelanguagemodelsserveasrationalplayersingame
+theory?asystematicanalysis.InProceedingsoftheAAAIConferenceonArtificialIntelligence,Vol.38.17960–17967.
+[64] ZhihaoFan,LaiWei,JialongTang,WeiChen,WangSiyuan,ZhongyuWei,andFeiHuang.2025. AIHospital:
+BenchmarkingLargeLanguageModelsinaMulti-agentMedicalInteractionSimulator.InProceedingsofthe31st
+InternationalConferenceonComputationalLinguistics.10183–10213.
+[65] HuihuiFang,FeiLi,JundeWu,HuazhuFu,XuSun,JaeminSon,ShuangYu,MengluZhang,ChenglangYuan,Cheng
+Bian,etal.2022. Refuge2challenge:Atreasuretroveformulti-dimensionanalysisandevaluationinglaucoma
+screening.arXivpreprintarXiv:2202.08994(2022).
+[66] ArseneFansiTchango,RishabGoel,ZhiWen,JulienMartel,andJoumanaGhosn.2022.Ddxplus:Anewdatasetfor
+automaticmedicaldiagnosis.Advancesinneuralinformationprocessingsystems35(2022),31306–31318.
+[67] SorouralsadatFatemiandYuhengHu.2024. FinVision:Amulti-agentframeworkforstockmarketprediction.In
+Proceedingsofthe5thACMInternationalConferenceonAIinFinance.582–590.
+[68] XiangFei,XiawuZheng,andHaoFeng.2025.MCP-Zero:ProactiveToolchainConstructionforLLMAgentsfrom
+Scratch.arXivpreprintarXiv:2506.01056(2025).
+[69] HelenVFirth,SholaMRichards,APaulBevan,StephenClayton,ManuelCorpas,DianaRajan,StevenVanVooren,
+YvesMoreau,RogerMPettett,andNigelPCarter.2009. DECIPHER:databaseofchromosomalimbalanceand
+phenotypeinhumansusingensemblresources.TheAmericanJournalofHumanGenetics84,4(2009),524–533.
+[70] PaulGFrancoeur,TomohideMasuda,JocelynSunseri,AndrewJia,RichardBIovanisci,IanSnyder,andDavidRKoes.
+2020.Three-dimensionalconvolutionalneuralnetworksandacross-dockeddatasetforstructure-baseddrugdesign.
+Journalofchemicalinformationandmodeling60,9(2020),4200–4215.
+[71] BowenGao,YanwenHuang,YiqiaoLiu,WenxuanXie,Wei-YingMa,Ya-QinZhang,andYanyanLan.2025.Pharma-
+gents:Buildingavirtualpharmawithlargelanguagemodelagents.arXivpreprintarXiv:2503.22164(2025).
+[72] ChenGao,XiaochongLan,ZhihongLu,JinzhuMao,JinghuaPiao,HuandongWang,DepengJin,andYongLi.2023.
+S3:Social-networkSimulationSystemwithLargeLanguageModel-EmpoweredAgents.CoRR(2023).
+[73] Huan-angGao,JiayiGeng,WenyueHua,MengkangHu,XinzheJuan,HongzhangLiu,ShilongLiu,JiahaoQiu,Xuan
+Qi,YiranWu,etal.2025. Asurveyofself-evolvingagents:Onpathtoartificialsuperintelligence. arXivpreprint
+arXiv:2507.21046(2025).
+[74] ShenGao,YuntaoWen,MinghangZhu,JianingWei,YuhanCheng,QunziZhang,andShuoShang.2024.Simulating
+financialmarketvialargelanguagemodelbasedagents.arXivpreprintarXiv:2406.19966(2024).
+[75] ShanghuaGao,RichardZhu,ZhenglunKong,AyushNoori,Xiao-RuiSu,CurtisGinder,TheodorosTsiligkaridis,and
+MarinkaZitnik.2025.TxAgent:AnAIAgentforTherapeuticReasoningAcrossaUniverseofTools.CoRR(2025).
+[76] TianyuGao,HowardYen,JiatongYu,andDanqiChen.2023.EnablingLargeLanguageModelstoGenerateTextwith
+Citations.InProceedingsofthe2023ConferenceonEmpiricalMethodsinNaturalLanguageProcessing.6465–6488.
+[77] YunfanGao,YunXiong,XinyuGao,KangxiangJia,JinliuPan,YuxiBi,YixinDai,JiaweiSun,HaofenWang,andHaofen
+Wang.2023.Retrieval-augmentedgenerationforlargelanguagemodels:Asurvey.arXivpreprintarXiv:2312.109972,
+1(2023).
+[78] AlirezaGhafarollahiandMarkusBuehler.2024.ProtAgents:Proteindiscoveryvialargelanguagemodelmulti-agent
+collaborationscombiningphysicsandmachinelearning.InICLRWorkshoponLargeLanguageModel(LLM)Agents.
+[79] AlirezaGhafarollahiandMarkusJBuehler.2025. Automatingalloydesignanddiscoverywithphysics-aware
+multimodalmultiagentAI.ProceedingsoftheNationalAcademyofSciences122,4(2025),e2414074122.
+[80] AlirezaGhafarollahiandMarkusJBuehler.2025. SciAgents:automatingscientificdiscoverythroughbioinspired
+multi-agentintelligentgraphreasoning.AdvancedMaterials37,22(2025),2413523.
+[81] AliEssamGhareeb,BenjaminChang,LudovicoMitchener,AngelaYiu,CaralynJSzostkiewicz,JonMLaurent,
+MuhammedTRazzak,AndrewDWhite,MichaelaMHinks,andSamuelGRodriques.2025.Robin:Amulti-agent
+systemforautomatingscientificdiscovery.arXivpreprintarXiv:2505.13400(2025).
+[82] MajidGhasemi,AmirHosseinMoosavi,andDariushEbrahimi.2024. Acomprehensivesurveyofreinforcement
+learning:Fromalgorithmstopracticalchallenges.arXivpreprintarXiv:2411.18892(2024).
+[83] JurajGottweis,Wei-HungWeng,AlexanderDaryin,TaoTu,AnilPalepu,PetarSirkovic,ArtiomMyaskovsky,Felix
+Weissenberger,KeranRong,RyutaroTanno,etal.2025.TowardsanAIco-scientist.arXivpreprintarXiv:2502.18864
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 39 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:39
+(2025).
+[84] ZhimingGou,ZiliLi,ZiliWang,MingLi,ZhenWang,andEnhongChen.2024.OLVERA:AFrameworkforOpen-
+endedCodeSnippetVerificationandRectificationusingLLMs.InInternationalConferenceonLearningRepresentations
+(ICLR).
+[85] ZhibinGou,ZhihongShao,YeyunGong,YujiuYang,NanDuan,WeizhuChen,etal.2024.CRITIC:LargeLanguage
+ModelsCanSelf-CorrectwithTool-InteractiveCritiquing.InTheTwelfthInternationalConferenceonLearning
+Representations.
+[86] MouradGridach,JayNanavati,KhaldounZineElAbidine,LenonMendes,andChristinaMack.2025.Agenticaifor
+scientificdiscovery:Asurveyofprogress,challenges,andfuturedirections.arXivpreprintarXiv:2503.08979(2025).
+[87] SvenGronauerandKlausDiepold.2022.Multi-agentdeepreinforcementlearning:asurvey.ArtificialIntelligence
+Review55,2(2022),895–943.
+[88] YuGu,YihengShu,HaoYu,XiaoLiu,YuxiaoDong,JieTang,JayanthSrinivasa,HugoLatapie,andYuSu.2024.
+MiddlewareforLLMs:ToolsAreInstrumentalforLanguageAgentsinComplexEnvironments.InProceedingsofthe
+2024ConferenceonEmpiricalMethodsinNaturalLanguageProcessing.7646–7663.
+[89] TGuo,XChen,YWang,RChang,SPei,NVChawla,OWiest,andXZhang.2024. LargeLanguageModelbased
+Multi-Agents:ASurveyofProgressandChallenges..In33rdInternationalJointConferenceonArtificialIntelligence
+(IJCAI2024).IJCAI;Cornellarxiv.
+[90] TaichengGuo,BozhaoNan,ZhenwenLiang,ZhichunGuo,NiteshChawla,OlafWiest,XiangliangZhang,etal.2023.
+Whatcanlargelanguagemodelsdoinchemistry?acomprehensivebenchmarkoneighttasks.AdvancesinNeural
+InformationProcessingSystems36(2023),59662–59688.
+[91] XuehangGuo,XingyaoWang,YangyiChen,ShaLi,ChiHan,ManlingLi,andHengJi.2025.SyncMind:Measuring
+AgentOut-of-SyncRecoveryinCollaborativeSoftwareEngineering.InForty-secondInternationalConferenceon
+MachineLearning.
+[92] ZikangGuo,BenfengXu,XiaoruiWang,andZhendongMao.2025.MIRROR:Multi-agentIntra-andInter-Reflection
+forOptimizedReasoninginToolLearning.arXivpreprintarXiv:2505.20670(2025).
+[93] DeepakGupta,KushAttal,andDinaDemner-Fushman.2023.Adatasetformedicalinstructionalvideoclassification
+andquestionanswering.ScientificData10,1(2023),158.
+[94] JiuzhouHan,WrayBuntine,andEhsanShareghi.2024.TowardsUncertainty-AwareLanguageAgent.InFindingsof
+theAssociationforComputationalLinguisticsACL2024.6662–6685.
+[95] TessaHan,AounonKumar,ChiragAgarwal,andHimabinduLakkaraju.2024. Medsafetybench:Evaluatingand
+improvingthemedicalsafetyoflargelanguagemodels.AdvancesinNeuralInformationProcessingSystems37(2024),
+33423–33454.
+[96] XuehaiHe,YichenZhang,LuntianMou,EricXing,andPengtaoXie.2020.Pathvqa:30000+questionsformedical
+visualquestionanswering.arXivpreprintarXiv:2003.10286(2020).
+[97] XinyiHe,JiaruZou,YunLin,MengyuZhou,ShiHan,ZejianYuan,andDongmeiZhang.2024.CoCoST:Automatic
+ComplexCodeGenerationwithOnlineSearchingandCorrectnessTesting.InProceedingsofthe2024Conferenceon
+EmpiricalMethodsinNaturalLanguageProcessing.19433–19451.
+[98] DanHendrycks,CollinBurns,StevenBasart,AndyZou,MantasMazeika,DawnSong,andJacobSteinhardt.2021.
+MeasuringMassiveMultitaskLanguageUnderstanding.InInternationalConferenceonLearningRepresentations.
+[99] DanHendrycks,CollinBurns,SauravKadavath,AkulArora,StevenBasart,EricTang,DawnSong,andJacob
+Steinhardt.2021.MeasuringMathematicalProblemSolvingWiththeMATHDataset.InThirty-fifthConferenceon
+NeuralInformationProcessingSystemsDatasetsandBenchmarksTrack(Round2).
+[100] DanielScottHimmelstein,AntoineLizee,ChristineHessler,LeoBrueggeman,SabrinaLChen,DexterHadley,Ari
+Green,PouyaKhankhanian,andSergioEBaranzini.2017.Systematicintegrationofbiomedicalknowledgeprioritizes
+drugsforrepurposing.elife6(2017),e26726.
+[101] SebastianHofstätter,JiecaoChen,KarthikRaman,andHamedZamani.2023.Fid-light:Efficientandeffectiveretrieval-
+augmentedtextgeneration.InProceedingsofthe46thInternationalACMSIGIRConferenceonResearchandDevelopment
+inInformationRetrieval.1437–1447.
+[102] SiruiHong,MingchenZhuge,JonathanChen,XiawuZheng,YuhengCheng,JinlinWang,CeyaoZhang,ZiliWang,
+StevenKaShingYau,ZijuanLin,etal.2024.MetaGPT:MetaProgrammingforAMulti-AgentCollaborativeFramework.
+InTheTwelfthInternationalConferenceonLearningRepresentations.
+[103] SUHongjin,RuoxiSun,JinsungYoon,PengchengYin,TaoYu,andSercanOArik.2025.Learn-by-interact:AData-
+CentricFrameworkForSelf-AdaptiveAgentsinRealisticEnvironments.InTheThirteenthInternationalConferenceon
+LearningRepresentations.
+[104] MaxAHorlbeck,AlbertXu,MinWang,NealKBennett,ChongYPark,DerekBogdanoff,BrittAdamson,EricD
+Chow,MartinKampmann,TimRPeterson,etal.2018.Mappingthegeneticlandscapeofhumancells.Cell174,4
+(2018),953–967.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 40 =====
+
+111:40 Zhaoetal.
+[105] XinyiHou,YanjieZhao,ShenaoWang,andHaoyuWang.2025.Modelcontextprotocol(mcp):Landscape,security
+threats,andfutureresearchdirections.arXivpreprintarXiv:2503.23278(2025).
+[106] BrianHu,BillRay,AliceLeung,AmySummerville,DavidJoy,ChristopherFunk,andArslanBasharat.2024.Language
+ModelsareAlignableDecision-Makers:DatasetandApplicationtotheMedicalTriageDomain.InProceedingsofthe
+2024ConferenceoftheNorthAmericanChapteroftheAssociationforComputationalLinguistics:HumanLanguage
+Technologies(Volume6:IndustryTrack).213–227.
+[107] ZhiyuanHu,ChuminLiu,XidongFeng,YilunZhao,See-KiongNg,AnhTuanLuu,JunxianHe,PangWeiKoh,and
+BryanHooi.2024.UncertaintyofThoughts:Uncertainty-AwarePlanningEnhancesInformationSeekinginLarge
+LanguageModels.InICLR2024WorkshoponLargeLanguageModel(LLM)Agents.
+[108] ChenghuaHuang,ShisongChen,ZhixuLi,JianfengQu,YanghuaXiao,JiaxinLiu,andZhigangChen.2024.Geoagent:
+Toempowerllmsusinggeospatialtoolsforaddressstandardization.InFindingsoftheAssociationforComputational
+LinguisticsACL2024.6048–6063.
+[109] DaoyiHuang,JianpingJiang,TingtingZhao,ShengnanWu,PinLi,YongfenLyu,JincaiFeng,MingyueWei,Zhixing
+Zhu,JianleiGu,etal.2023. diseaseGPS:auxiliarydiagnosticsystemforgeneticdisordersbasedongenotypeand
+phenotype.Bioinformatics39,9(2023),btad517.
+[110] DongHuang,JieMZhang,MichaelLuck,QingwenBu,YuhaoQing,andHemingCui.2023.Agentcoder:Multi-agent-
+basedcodegenerationwithiterativetestingandoptimisation.arXivpreprintarXiv:2312.13010(2023).
+[111] LeiHuang,WeijiangYu,WeitaoMa,WeihongZhong,ZhangyinFeng,HaotianWang,QianglongChen,WeihuaPeng,
+XiaochengFeng,BingQin,etal.2025.Asurveyonhallucinationinlargelanguagemodels:Principles,taxonomy,
+challenges,andopenquestions.ACMTransactionsonInformationSystems43,2(2025),1–55.
+[112] XuHuang,WeiwenLiu,XiaolongChen,XingmeiWang,HaoWang,DefuLian,YashengWang,RuimingTang,and
+EnhongChen.2024.UnderstandingtheplanningofLLMagents:Asurvey.arXivpreprintarXiv:2402.02716(2024).
+[113] YangyuHuang,TianyiGao,HaoranXu,QihaoZhao,YangSong,ZhipengGui,TengchaoLv,HaoChen,LeiCui,
+ScarlettLi,etal.2025. Peace:Empoweringgeologicmapholisticunderstandingwithmllms.InProceedingsofthe
+ComputerVisionandPatternRecognitionConference.3899–3908.
+[114] YoshitakaInoue,TianciSong,XinlingWang,AugustinLuna,andTianfanFu.2025.DrugAgent:Multi-AgentLarge
+LanguageModel-BasedReasoningforDrug-TargetInteractionPrediction.InICLRWorkshoponMachineLearningfor
+GenomicsExplorations.
+[115] JohnJIrwin,TeagueSterling,MichaelMMysinger,ErinSBolstad,andRyanGColeman.2012.ZINC:afreetoolto
+discoverchemistryforbiology.Journalofchemicalinformationandmodeling52,7(2012),1757–1768.
+[116] ShoichiIshida,TomohiroSato,TerukiHonma,andKeiTerayama.2025.Largelanguagemodelsopennewwayof
+AI-assistedmoleculedesignforchemists.JournalofCheminformatics17,1(2025),36.
+[117] MdAshrafulIslam,MohammedEunusAli,andMdRizwanParvez.2024.MapCoder:Multi-AgentCodeGeneration
+forCompetitiveProblemSolving.InProceedingsofthe62ndAnnualMeetingoftheAssociationforComputational
+Linguistics(Volume1:LongPapers).4912–4944.
+[118] JuyongJiang,FanWang,JiasiShen,SungjuKim,andSunghunKim.2024.Asurveyonlargelanguagemodelsfor
+codegeneration.arXivpreprintarXiv:2406.00515(2024).
+[119] XueJiang,YihongDong,LechengWang,ZhengFang,QiweiShang,GeLi,ZhiJin,andWenpinJiao.2024. Self-
+planningcodegenerationwithlargelanguagemodels.ACMTransactionsonSoftwareEngineeringandMethodology
+33,7(2024),1–30.
+[120] CarlosEJimenez,JohnYang,AlexanderWettig,ShunyuYao,KexinPei,OfirPress,andKarthikRNarasimhan.2024.
+SWE-bench:CanLanguageModelsResolveReal-worldGithubIssues?.InTheTwelfthInternationalConferenceon
+LearningRepresentations.
+[121] DiJin,EileenPan,NassimOufattole,Wei-HungWeng,HanyiFang,andPeterSzolovits.2021.Whatdiseasedoesthis
+patienthave?alarge-scaleopendomainquestionansweringdatasetfrommedicalexams. AppliedSciences11,14
+(2021),6421.
+[122] HaolinJin,LinghanHuang,HaipengCai,JunYan,BoLi,andHuamingChen.2024.Fromllmstollm-basedagentsfor
+softwareengineering:Asurveyofcurrent,challengesandfuture.arXivpreprintarXiv:2408.02479(2024).
+[123] QiaoJin,BhuwanDhingra,ZhengpingLiu,WilliamCohen,andXinghuaLu.2019. PubMedQA:ADatasetfor
+BiomedicalResearchQuestionAnswering.InProceedingsofthe2019ConferenceonEmpiricalMethodsinNatural
+LanguageProcessingandthe9thInternationalJointConferenceonNaturalLanguageProcessing(EMNLP-IJCNLP).
+2567–2577.
+[124] WengongJin,ConnorColey,ReginaBarzilay,andTommiJaakkola.2017.Predictingorganicreactionoutcomeswith
+weisfeiler-lehmannetwork.Advancesinneuralinformationprocessingsystems30(2017).
+[125] AlistairEWJohnson,LucasBulgarelli,LuShen,AlvinGayles,AyadShammout,StevenHorng,TomJPollard,Sicheng
+Hao,BenjaminMoody,BrianGow,etal.2023.MIMIC-IV,afreelyaccessibleelectronichealthrecorddataset.Scientific
+data10,1(2023),1.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 41 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:41
+[126] MandarJoshi,EunsolChoi,DanielSWeld,andLukeZettlemoyer.2017.TriviaQA:ALargeScaleDistantlySupervised
+ChallengeDatasetforReadingComprehension.InProceedingsofthe55thAnnualMeetingoftheAssociationfor
+ComputationalLinguistics(Volume1:LongPapers).1601–1611.
+[127] RenéJust,DarioushJalali,andMichaelDErnst.2014.Defects4J:Adatabaseofexistingfaultstoenablecontrolled
+testingstudiesforJavaprograms.InProceedingsofthe2014internationalsymposiumonsoftwaretestingandanalysis.
+437–440.
+[128] YeonghunKangandJihanKim.2024. ChatMOF:anartificialintelligencesystemforpredictingandgenerating
+metal-organicframeworksusinglargelanguagemodels.Naturecommunications15,1(2024),4705.
+[129] ZixuanKe,FangkaiJiao,YifeiMing,Xuan-PhiNguyen,AustinXu,DoXuanLong,MinzhiLi,ChengweiQin,Peifeng
+Wang,SilvioSavarese,etal.2025.Asurveyoffrontiersinllmreasoning:Inferencescaling,learningtoreason,and
+agenticsystems.arXivpreprintarXiv:2504.09037(2025).
+[130] MKeestraetal.2017.MetacognitionandReflectionbyInterdisciplinaryExperts:InsightsfromCognitiveScienceand
+Philosophy.IssuesinInterdisciplinaryStudies35(2017).
+[131] JaechangKim,JinminGoh,InseokHwang,JaewoongCho,andJungseulOk.2025.BridgingtheGapbetweenExpert
+andLanguageModels:Concept-guidedChessCommentaryGenerationandEvaluation.InProceedingsofthe2025
+ConferenceoftheNationsoftheAmericasChapteroftheAssociationforComputationalLinguistics:HumanLanguage
+Technologies(Volume1:LongPapers).9497–9516.
+[132] JunseokKim,NakyeongYang,andKyominJung.2024.PersonaisaDouble-edgedSword:MitigatingtheNegative
+ImpactofRole-playingPromptsinZero-shotReasoningTasks.arXivpreprintarxiv:2408.08631(2024).
+[133] SehoonKim,SuhongMoon,RyanTabrizi,NicholasLee,MichaelWMahoney,KurtKeutzer,andAmirGholami.2024.
+AnLLMcompilerforparallelfunctioncalling.InProceedingsofthe41stInternationalConferenceonMachineLearning.
+24370–24391.
+[134] YubinKim,HyewonJeong,ChanwooPark,EugenePark,HaipengZhang,XinLiu,HyeonhoonLee,DanielMcDuff,
+MarzyehGhassemi,CynthiaBreazeal,etal.2025.TieredAgenticOversight:AHierarchicalMulti-AgentSystemfor
+AISafetyinHealthcare.arXivpreprintarXiv:2506.12482(2025).
+[135] YubinKim,ChanwooPark,HyewonJeong,YikSChan,XuhaiXu,DanielMcDuff,HyeonhoonLee,MarzyehGhassemi,
+CynthiaBreazeal,andHaeWPark.2024.Mdagents:Anadaptivecollaborationofllmsformedicaldecision-making.
+AdvancesinNeuralInformationProcessingSystems37(2024),79410–79452.
+[136] AoboKong,ShiwanZhao,HaoChen,QichengLi,YongQin,RuiqiSun,XinZhou,EnzhiWang,andXiaohangDong.
+2024. BetterZero-ShotReasoningwithRole-PlayPrompting.InProceedingsofthe2024ConferenceoftheNorth
+AmericanChapteroftheAssociationforComputationalLinguistics:HumanLanguageTechnologies(Volume1:Long
+Papers).4099–4113.
+[137] YuqingKong,YunqiLi,YuboZhang,ZhihuanHuang,andJinzhaoWu.2022.Elicitingthinkinghierarchywithouta
+prior.AdvancesinNeuralInformationProcessingSystems35(2022),13329–13341.
+[138] AdarshKumarappan,MoTiwari,PeiyangSong,RobertJosephGeorge,ChaoweiXiao,andAnimaAnandkumar.2025.
+LeanAgent:LifelongLearningforFormalTheoremProving.InTheThirteenthInternationalConferenceonLearning
+Representations.
+[139] TomKwiatkowski,JennimariaPalomaki,OliviaRedfield,MichaelCollins,AnkurParikh,ChrisAlberti,Danielle
+Epstein,IlliaPolosukhin,JacobDevlin,KentonLee,etal.2019.Naturalquestions:abenchmarkforquestionanswering
+research.TransactionsoftheAssociationforComputationalLinguistics7(2019),453–466.
+[140] AlexeyLagunin,DmitriiFilimonov,AlexeyZakharov,WeiXie,YingHuang,FuchengZhu,TianxiangShen,Jianhua
+Yao,andVladimirPoroikov.2009.Computer-aidedpredictionofrodentcarcinogenicitybyPASSandCISOC-PSCT.
+QSAR&CombinatorialScience28,8(2009),806–810.
+[141] YuhangLai,ChengxiLi,YimingWang,TianyiZhang,RuiqiZhong,LukeZettlemoyer,Wen-tauYih,DanielFried,Sida
+Wang,andTaoYu.2023.DS-1000:Anaturalandreliablebenchmarkfordatasciencecodegeneration.InInternational
+ConferenceonMachineLearning.PMLR,18319–18345.
+[142] JasonJLau,SoumyaGayen,AsmaBenAbacha,andDinaDemner-Fushman.2018.Adatasetofclinicallygenerated
+visualquestionsandanswersaboutradiologyimages.Scientificdata5,1(2018),1–10.
+[143] AndrewLaverick,KristenSurrao,InigoZubeldia,BorisBolliet,MilesCranmer,AntonyLewis,BlakeSherwin,and
+JulienLesgourgues.2024.Multi-AgentSystemforCosmologicalParameterAnalysis.arXivpreprintarXiv:2412.00431
+(2024).
+[144] ChaehongLee,VaratheepanParamanayakam,AndreasKaratzas,YananJian,MichaelFore,HemingLiao,FuxunYu,
+RuopuLi,IraklisAnagnostopoulos,andDimitriosStamoulis.2025. Multi-AgentGeospatialCopilotsforRemote
+SensingWorkflows.arXivpreprintarXiv:2501.16254(2025).
+[145] NamkyeongLee,EdwardDeBrouwer,EhsanHajiramezanali,TommasoBiancalani,ChanyoungPark,andGabriele
+Scalia.2025.RAG-EnhancedCollaborativeLLMAgentsforDrugDiscovery.InICLRWorkshoponMachineLearning
+forGenomicsExplorations.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 42 =====
+
+111:42 Zhaoetal.
+[146] SunjaeLee,JunyoungChoi,JungjaeLee,MunimHasanWasi,HojunChoi,SteveKo,SangeunOh,andInsikShin.
+2024.Mobilegpt:Augmentingllmwithhuman-likeappmemoryformobiletaskautomation.InProceedingsofthe
+30thAnnualInternationalConferenceonMobileComputingandNetworking.1119–1133.
+[147] MoshLevy,AlonJacoby,andYoavGoldberg.2024. SameTask,MoreTokens:theImpactofInputLengthonthe
+ReasoningPerformanceofLargeLanguageModels.InProceedingsofthe62ndAnnualMeetingoftheAssociationfor
+ComputationalLinguistics(Volume1:LongPapers).15339–15353.
+[148] PatrickLewis,EthanPerez,AleksandraPiktus,FabioPetroni,VladimirKarpukhin,NamanGoyal,HeinrichKüttler,
+MikeLewis,Wen-tauYih,TimRocktäschel,etal.2020.Retrieval-augmentedgenerationforknowledge-intensivenlp
+tasks.Advancesinneuralinformationprocessingsystems33(2020),9459–9474.
+[149] BinxuLi,TiankaiYan,YuantingPan,JieLuo,RuiyangJi,JiayuanDing,ZheXu,ShilongLiu,HaoyuDong,ZihaoLin,
+etal.2024.MMedAgent:LearningtoUseMedicalToolswithMulti-modalAgent.InFindingsoftheAssociationfor
+ComputationalLinguistics:EMNLP2024.8745–8760.
+[150] ChunyuanLi,CliffWong,ShengZhang,NaotoUsuyama,HaotianLiu,JianweiYang,TristanNaumann,Hoifung
+Poon,andJianfengGao.2023.Llava-med:Trainingalargelanguage-and-visionassistantforbiomedicineinoneday.
+AdvancesinNeuralInformationProcessingSystems36(2023),28541–28564.
+[151] GuohaoLi,HasanHammoud,HaniItani,DmitriiKhizbullin,andBernardGhanem.2023.Camel:Communicative
+agentsfor"mind"explorationoflargelanguagemodelsociety.AdvancesinNeuralInformationProcessingSystems36
+(2023),51991–52008.
+[152] JunkaiLi,YunghweiLai,WeitaoLi,JingyiRen,MengZhang,XinhuiKang,SiyuWang,PengLi,Ya-QinZhang,
+WeizhiMa,etal.2024. Agenthospital:Asimulacrumofhospitalwithevolvablemedicalagents. arXivpreprint
+arXiv:2405.02957(2024).
+[153] NianLi,ChenGao,MingyuLi,YongLi,andQingminLiao.2024.EconAgent:LargeLanguageModel-Empowered
+AgentsforSimulatingMacroeconomicActivities.InProceedingsofthe62ndAnnualMeetingoftheAssociationfor
+ComputationalLinguistics(Volume1:LongPapers).15523–15536.
+[154] XinzheLi.2025. Areviewofprominentparadigmsforllm-basedagents:Tooluse,planning(includingrag),and
+feedbacklearning.InProceedingsofthe31stInternationalConferenceonComputationalLinguistics.9760–9779.
+[155] XinyueLi,ZhenpengChen,JieM.Zhang,YilingLou,TianlinLi,WeisongSun,YangLiu,andXuanzheLiu.2024.
+BenchmarkingBiasinLargeLanguageModelsduringRole-Playing.arXivpreprintarxiv:2411.00585(2024).
+[156] XiaonanLiandXipengQiu.2023.FindingSupportExamplesforIn-ContextLearning.InFindingsoftheAssociation
+forComputationalLinguistics:EMNLP2023.6219–6235.
+[157] YuanLi,YixuanZhang,andLichaoSun.2023.Metaagents:Simulatinginteractionsofhumanbehaviorsforllm-based
+task-orientedcoordinationviacollaborativegenerativeagents.arXivpreprintarXiv:2310.06500(2023).
+[158] ZhenlongLiandHuanNing.2023.AutonomousGIS:thenext-generationAI-poweredGIS.InternationalJournalof
+DigitalEarth16,2(2023),4668–4686.
+[159] ZhenlongLi,HuanNing,SongGao,KrzysztofJanowicz,WenwenLi,SamanthaTArundel,ChaoweiYang,Budhendra
+Bhaduri,ShaowenWang,AZhu,etal.2025.Giscienceintheeraofartificialintelligence:Aresearchagendatowards
+autonomousgis.arXivpreprintarXiv:2503.23633(2025).
+[160] ZhucongLi,JinXiao,BoweiZhang,ZhijianZhou,QianyuHe,FengleiCao,JiaqingLiang,andYuanQi.2025.ChemHTS:
+HierarchicalToolStackingforEnhancingChemicalAgents.arXivpreprintarXiv:2502.14327(2025).
+[161] KaiquLiang,ZixuZhang,andJaimeFFisac.2024.IntrospectivePlanning:AligningRobots’UncertaintywithInherent
+TaskAmbiguity.AdvancesinNeuralInformationProcessingSystems37(2024),71998–72031.
+[162] TianLiang,ZhiweiHe,WenxiangJiao,XingWang,YanWang,RuiWang,YujiuYang,ShumingShi,andZhaopeng
+Tu.2024.EncouragingDivergentThinkinginLargeLanguageModelsthroughMulti-AgentDebate.InProceedingsof
+the2024ConferenceonEmpiricalMethodsinNaturalLanguageProcessing.17889–17904.
+[163] XunLiang,JiaweiYang,YezhaohuiWang,ChenTang,ZifanZheng,ShichaoSong,ZehaoLin,YebinYang,Simin
+Niu,HanyuWang,etal.2025. Surveyx:Academicsurveyautomationvialargelanguagemodels. arXivpreprint
+arXiv:2502.14776(2025).
+[164] ZhehuiLiao,MariaAntoniak,InyoungCheong,EvieYu-YenCheng,Ai-HengLee,KyleLo,JosephCheeChang,and
+AmyXZhang.2024.LLMsasResearchTools:ALargeScaleSurveyofResearchers’UsageandPerceptions.arXiv
+preprintarXiv:2411.05025(2024).
+[165] ChristopherALipinski,FrancoLombardo,BerylWDominy,andPaulJFeeney.1997.Experimentalandcomputational
+approachestoestimatesolubilityandpermeabilityindrugdiscoveryanddevelopmentsettings. Advanceddrug
+deliveryreviews23,1-3(1997),3–25.
+[166] BangLiu,XinfengLi,JiayiZhang,JinlinWang,TanjinHe,SiruiHong,HongzhangLiu,ShaokunZhang,Kaitao
+Song,KunlunZhu,etal.2025.Advancesandchallengesinfoundationagents:Frombrain-inspiredintelligenceto
+evolutionary,collaborative,andsafesystems.arXivpreprintarXiv:2504.01990(2025).
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 43 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:43
+[167] BoLiu,Li-MingZhan,LiXu,LinMa,YanYang,andXiao-MingWu.2021.Slake:Asemantically-labeledknowledge-
+enhanceddatasetformedicalvisualquestionanswering.In2021IEEE18thinternationalsymposiumonbiomedical
+imaging(ISBI).IEEE,1650–1654.
+[168] HaoLiu,Zi-YiDou,YixinWang,NanyunPeng,andYisongYue.2024. UncertaintyCalibrationforTool-Using
+LanguageAgents.InFindingsoftheAssociationforComputationalLinguistics:EMNLP2024.16781–16805.
+[169] JiaweiLiu,ChunqiuStevenXia,YuyaoWang,andLingmingZhang.2023.Isyourcodegeneratedbychatgptreally
+correct?rigorousevaluationoflargelanguagemodelsforcodegeneration.AdvancesinNeuralInformationProcessing
+Systems36(2023),21558–21572.
+[170] PengfeiLiu,JunTao,andZhixiangRen.2025.Aquantitativeanalysisofknowledge-learningpreferencesinlarge
+languagemodelsinmolecularscience.NatureMachineIntelligence7,2(2025),315–327.
+[171] PengfeiLiu,WeizheYuan,JinlanFu,ZhengbaoJiang,HiroakiHayashi,andGrahamNeubig.2023.Pre-train,prompt,
+andpredict:Asystematicsurveyofpromptingmethodsinnaturallanguageprocessing.Comput.Surveys55,9(2023),
+1–35.
+[172] ShengchaoLiu,JiongxiaoWang,YijinYang,ChengpengWang,LingLiu,HongyuGuo,andChaoweiXiao.2024.
+Conversationaldrugeditingusingretrievalanddomainfeedback.InThetwelfthinternationalconferenceonlearning
+representations.
+[173] WeiLiu,JunLi,YitaoTang,YiningZhao,ChaozhongLiu,MeiyiSong,ZhenlinJu,ShwethaVKumar,YilingLu,
+RehanAkbani,etal.2025.DrBioRight2.0:anLLM-poweredbioinformaticschatbotforlarge-scalecancerfunctional
+proteomicsanalysis.Naturecommunications16,1(2025),2256.
+[174] XiaoLiu,HaoYu,HanchenZhang,YifanXu,XuanyuLei,HanyuLai,YuGu,HangliangDing,KaiwenMen,Kejuan
+Yang,etal.2024.AgentBench:EvaluatingLLMsasAgents.InICLR.
+[175] YangLiu,WeixingChen,YongjieBai,XiaodanLiang,GuanbinLi,WenGao,andLiangLin.2025. Aligningcyber
+spacewithphysicalworld:Acomprehensivesurveyonembodiedai.IEEE/ASMETransactionsonMechatronics(2025).
+[176] YungengLiu,ZanChen,YuGuangWang,andYiqingShen.2024. Toursynbio-search:Alargelanguagemodel
+drivenagentframeworkforunifiedsearchmethodforproteinengineering.In2024IEEEInternationalConferenceon
+BioinformaticsandBiomedicine(BIBM).IEEE,5395–5400.
+[177] ZhengyaoLiu,YunlongMa,JingxuanXu,JunchenAi,XiangGao,HailongSun,andAbhikRoychoudhury.2025.
+AgentThatDebugs:DynamicState-GuidedVulnerabilityRepair.arXivpreprintarXiv:2504.07634(2025).
+[178] ChrisLu,CongLu,RobertTjarkoLange,JakobFoerster,JeffClune,andDavidHa.2024.Theaiscientist:Towards
+fullyautomatedopen-endedscientificdiscovery.arXivpreprintarXiv:2408.06292(2024).
+[179] QinyuLuo,YiningYe,ShihaoLiang,ZhongZhang,YujiaQin,YaxiLu,YesaiWu,XinCong,YankaiLin,Yingli
+Zhang,etal.2024.RepoAgent:AnLLM-PoweredOpen-SourceFrameworkforRepository-levelCodeDocumentation
+Generation.InProceedingsofthe2024ConferenceonEmpiricalMethodsinNaturalLanguageProcessing:System
+Demonstrations.436–464.
+[180] YiLuo,LinghangShi,YihaoLi,AoboZhuang,YeyunGong,LingLiu,andChenLin.2025. Fromintentionto
+implementation:automatingbiomedicalresearchviaLLMs.ScienceChinaInformationSciences68,7(2025),1–18.
+[181] BohanLyu,XinCong,HeyangYu,PanYang,YujiaQin,YiningYe,YaxiLu,ZhongZhang,YukunYan,YankaiLin,
+ZhiyuanLiu,andMaosongSun.2023. GitAgent:FacilitatingAutonomousAgentwithGitHubbyToolExtension.
+arXivpreprintarxiv:2312.17294(2023).
+[182] WeiyuMa,QiruiMi,YongchengZeng,XueYan,RunjiLin,YuqiaoWu,JunWang,andHaifengZhang.2024.Large
+languagemodelsplaystarcraftii:Benchmarksandachainofsummarizationapproach.AdvancesinNeuralInformation
+ProcessingSystems37(2024),133386–133442.
+[183] AmanMadaan,NiketTandon,PrakharGupta,KevinHall,LuyuGao,RohanMajumder,JulianMcAuley,SrijanNarayan,
+andSeanWelleck.2023. Self-refine:Iterativerefinementwithself-feedback.InAdvancesinNeuralInformation
+ProcessingSystems,Vol.36.
+[184] AmanMadaan,NiketTandon,PrakharGupta,SkylerHallinan,LuyuGao,SarahWiegreffe,UriAlon,NouhaDziri,
+ShrimaiPrabhumoye,YimingYang,etal.2023. Self-refine:Iterativerefinementwithself-feedback. Advancesin
+NeuralInformationProcessingSystems36(2023),46534–46594.
+[185] AgileManifesto.2001.ManifestoforAgileSoftwareDevelopment.http://www.agilemanifesto.org/(2001).
+[186] TulaMasterman,SandiBesen,MasonSawtell,andAlexChao.2024.Thelandscapeofemergingaiagentarchitectures
+forreasoning,planning,andtoolcalling:Asurvey.arXivpreprintarXiv:2404.11584(2024).
+[187] AndrewDMcNaughton,GauthamKrishnaSankarRamalaxmi,AgustinKruel,CarterRKnutson,RohithAVarikoti,
+andNeerajKumar.2024. Cactus:Chemistryagentconnectingtoolusagetoscience. ACSomega9,46(2024),
+46563–46573.
+[188] NikitaMehandru,AmandaKHall,OlesyaMelnichenko,YuliaDubinina,DanielTsirulnikov,DavidBamman,Ahmed
+Alaa,ScottSaponas,andVenkatSMalladi.2025.BioAgents:Democratizingbioinformaticsanalysiswithmulti-agent
+systems.arXivpreprintarXiv:2501.06314(2025).
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 44 =====
+
+111:44 Zhaoetal.
+[189] ShikibMehriandMaxineEskenazi.2020.UnsupervisedEvaluationofInteractiveDialogwithDialoGPT.InProceedings
+ofthe21thAnnualMeetingoftheSpecialInterestGrouponDiscourseandDialogue.225–235.
+[190] LingruiMei,JiayuYao,YuyaoGe,YiweiWang,BaolongBi,YujunCai,JiazhiLiu,MingyuLi,Zhong-ZhiLi,Duzhen
+Zhang,etal.2025. ASurveyofContextEngineeringforLargeLanguageModels. arXivpreprintarXiv:2507.13334
+(2025).
+[191] SewonMin,XinxiLyu,AriHoltzman,MikelArtetxe,MikeLewis,HannanehHajishirzi,andLukeZettlemoyer.2022.
+RethinkingtheRoleofDemonstrations:WhatMakesIn-ContextLearningWork?.InProceedingsofthe2022Conference
+onEmpiricalMethodsinNaturalLanguageProcessing.11048–11064.
+[192] MarvinMinsky.1986.Societyofmind.SimonandSchuster.
+[193] LluisMorey,LuigiAloia,LucaCozzuto,SalvadorAznarBenitah,andLucianoDiCroce.2013.RYBPandCbx7define
+specificbiologicalfunctionsofpolycombcomplexesinmouseembryonicstemcells.Cellreports3,1(2013),60–69.
+[194] Adam Moss. 2025. The AI Cosmologist I: An Agentic System for Automated Data Analysis. arXiv preprint
+arXiv:2504.03424(2025).
+[195] XinyiMou,ZhongyuWei,andXuan-JingHuang.2024. UnveilingtheTruthandFacilitatingChange:Towards
+Agent-basedLarge-scaleSocialMovementSimulation.InFindingsoftheAssociationforComputationalLinguistics
+ACL2024.4789–4809.
+[196] ChunyanMu,MuhammadNajib,andNirOren.2025. Responsibility-awareStrategicReasoninginProbabilistic
+Multi-AgentSystems.InProceedingsoftheAAAIConferenceonArtificialIntelligence,Vol.39.23258–23266.
+[197] SriraamNatarajan,SaurabhMathur,SahilSidheekh,WolfgangStammer,andKristianKersting.2025.Human-in-the-
+looporAI-in-the-loop?AutomateorCollaborate?.InProceedingsoftheAAAIConferenceonArtificialIntelligence,
+Vol.39.28594–28600.
+[198] HumzaNaveed,AsadUllahKhan,ShiQiu,MuhammadSaqib,SaeedAnwar,MuhammadUsman,NaveedAkhtar,
+NickBarnes,andAjmalMian.2023. Acomprehensiveoverviewoflargelanguagemodels. ACMTransactionson
+IntelligentSystemsandTechnology(2023).
+[199] SubashNeupane,SudipMittal,andShahramRahimi.2025.Towardsahipaacompliantagenticaisysteminhealthcare.
+arXivpreprintarXiv:2504.17669(2025).
+[200] HuanNing,ZhenlongLi,TemitopeAkinboyewa,andMNaserLessani.2025.AnautonomousGISagentframework
+forgeospatialdataretrieval.InternationalJournalofDigitalEarth18,1(2025),2458688.
+[201] DavidOchoa,AndrewHercules,MiguelCarmona,DanielSuveges,JarrodBaker,CinziaMalangone,IreneLopez,
+AlfredoMiranda,CarlosCruz-Castillo,LucaFumis,etal.2023.Thenext-generationOpenTargetsPlatform:reimagined,
+redesigned,rebuilt.Nucleicacidsresearch51,D1(2023),D1353–D1359.
+[202] TimothyJO’Donnell,AlexRubinsteyn,andUriLaserson.2020.MHCflurry2.0:improvedpan-allelepredictionof
+MHCclassI-presentedpeptidesbyincorporatingantigenprocessing.Cellsystems11,1(2020),42–48.
+[203] AnkitPal,LogeshKumarUmapathi,andMalaikannanSankarasubbu.2022.Medmcqa:Alarge-scalemulti-subject
+multi-choicedatasetformedicaldomainquestionanswering.InConferenceonhealth,inference,andlearning.PMLR,
+248–260.
+[204] AosongPan,SameenAl-Azani,YifeiAn,ZhipengJiang,Wen-BinWang,XipengWan,andManLan.2023.LogicLM:
+EmpoweringLargeLanguageModelswithTool-EnhancedLogic-EvolvingReasoning.InFindingsoftheAssociation
+forComputationalLinguistics:EMNLP2023.8500–8518.
+[205] MelissaZPan,MertCemri,LakshyaAAgrawal,ShuyiYang,BhavyaChopra,RishabhTiwari,KurtKeutzer,Aditya
+Parameswaran,KannanRamchandran,DanKlein,etal.2025.Whydomultiagentsystemsfail?.InICLR2025Workshop
+onBuildingTrustinLanguageModelsandApplications.
+[206] HimanshuGautamPandey,AkhilAmod,andShivangKumar.2024.AdvancingHealthcareAutomation:Multi-Agent
+SystemforMedicalNecessityJustification.InProceedingsofthe23rdWorkshoponBiomedicalNaturalLanguage
+Processing.39–49.
+[207] DmitriiPantiukhin,BorisShapkin,IvanKuznetsov,AntoniaAnnaJost,andNikolayKoldunov.2025.Accelerating
+EarthScienceDiscoveryviaMulti-AgentLLMSystems.arXivpreprintarXiv:2503.05854(2025).
+[208] JoonSungPark,JosephO’Brien,CarrieJunCai,MeredithRingelMorris,PercyLiang,andMichaelSBernstein.2023.
+Generativeagents:Interactivesimulacraofhumanbehavior.InProceedingsofthe36thannualacmsymposiumonuser
+interfacesoftwareandtechnology.1–22.
+[209] AnthonyDPellegrini.2009.Theroleofplayinhumandevelopment.OxfordUniversityPress.
+[210] JeanPiaget.2013.Theconstructionofrealityinthechild.Routledge.
+[211] GiorgioPiatti,ZhijingJin,MaxKleiman-Weiner,BernhardSchölkopf,MrinmayaSachan,andRadaMihalcea.2024.
+Cooperateorcollapse:Emergenceofsustainablecooperationinasocietyofllmagents.AdvancesinNeuralInformation
+ProcessingSystems37(2024),111715–111759.
+[212] KevinPu,KJKevinFeng,ToviGrossman,TomHope,BhavanaDalviMishra,MattLatzke,JonathanBragg,JosephChee
+Chang,andPaoSiangliulue.2025.Ideasynth:Iterativeresearchideadevelopmentthroughevolvingandcomposing
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 45 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:45
+ideafacetswithliterature-groundedfeedback.InProceedingsofthe2025CHIConferenceonHumanFactorsinComputing
+Systems.1–31.
+[213] ChenQian,WeiLiu,HongzhangLiu,NuoChen,YufanDang,JiahaoLi,ChengYang,WeizeChen,YushengSu,Xin
+Cong,etal.2024.ChatDev:CommunicativeAgentsforSoftwareDevelopment.InProceedingsofthe62ndAnnual
+MeetingoftheAssociationforComputationalLinguistics(Volume1:LongPapers).15174–15186.
+[214] BoyuQiao,KunLi,WeiZhou,ShilongLi,QianqianLu,andSonglinHu.2025.BotSim:LLM-PoweredMaliciousSocial
+BotnetSimulation.InProceedingsoftheAAAIConferenceonArtificialIntelligence,Vol.39.14377–14385.
+[215] YujiaQin,ShengdingHu,YankaiLin,WeizeChen,NingDing,GanquCui,ZheniZeng,XuanheZhou,YufeiHuang,
+ChaojunXiao,etal.2024.Toollearningwithfoundationmodels.Comput.Surveys57,4(2024),1–40.
+[216] YihaoQin,ShangwenWang,YilingLou,JinhaoDong,KaixinWang,XiaolingLi,andXiaoguangMao.2024.AgentFL:
+ScalingLLM-basedFaultLocalizationtoProject-LevelContext.CoRR(2024).
+[217] HaoxuanQu,XiaofeiHui,YujunCai,andJunLiu.2023.LMC:largemodelcollaborationwithcross-assessmentfor
+training-freeopen-setobjectrecognition.InProceedingsofthe37thInternationalConferenceonNeuralInformation
+ProcessingSystems.RedHook,NY,USA,Article2016,14pages.
+[218] YuanhaoQu,KaixuanHuang,MingYin,KanghongZhan,DyllanLiu,DiYin,HenryCCousins,WilliamAJohnson,
+XiaotongWang,MihirShah,etal.2025.CRISPR-GPTforagenticautomationofgene-editingexperiments.Nature
+BiomedicalEngineering(2025),1–14.
+[219] RoshanRao,NicholasBhattacharya,NeilThomas,YanDuan,PeterChen,JohnCanny,PieterAbbeel,andYunSong.
+2019.EvaluatingproteintransferlearningwithTAPE.Advancesinneuralinformationprocessingsystems32(2019).
+[220] SuhasSPRao,MiriamHHuntley,NevaCDurand,ElenaKStamenova,IvanDBochkov,JamesTRobinson,AdrianL
+Sanborn,IdoMachol,ArinaDOmer,EricSLander,etal.2014.A3Dmapofthehumangenomeatkilobaseresolution
+revealsprinciplesofchromatinlooping.Cell159,7(2014),1665–1680.
+[221] RuiyangRen,PengQiu,YingqiQu,JingLiu,WayneXinZhao,HuaWu,Ji-RongWen,andHaifengWang.2024.BASES:
+Large-scaleWebSearchUserSimulationwithLargeLanguageModelbasedAgents.InFindingsoftheAssociationfor
+ComputationalLinguistics:EMNLP2024.902–917.
+[222] ShuoRen,PuJian,ZhenjiangRen,ChunlinLeng,CanXie,andJiajunZhang.2025.Towardsscientificintelligence:A
+surveyofllm-basedscientificagents.arXivpreprintarXiv:2503.24047(2025).
+[223] PatRondon,RenyaoWei,JoséCambronero,JürgenCito,AaronSun,SiddhantSanyam,MicheleTufano,andSatish
+Chandra.2025.EvaluatingAgent-basedProgramRepairatGoogle.CoRR(2025).
+[224] YusufHRoohani,AndrewHLee,QianHuang,JianVora,ZacharySteinhart,KexinHuang,AlexanderMarson,Percy
+Liang,andJureLeskovec.2025.BioDiscoveryAgent:AnAIAgentforDesigningGeneticPerturbationExperiments.
+InTheThirteenthInternationalConferenceonLearningRepresentations.
+[225] GiulioRossetti,MassimoStella,RémyCazabet,KatherineAbramski,EricaCau,SalvatoreCitraro,AndreaFailla,
+RiccardoImprota,VirginiaMorini,andValentinaPansanella.2024.Ysocial:anllm-poweredsocialmediadigitaltwin.
+arXivpreprintarXiv:2408.00818(2024).
+[226] YixiangRuan,ChenyinLu,NingXu,YuchenHe,YixinChen,JianZhang,JunXuan,JianzhangPan,QunFang,Hanyu
+Gao,etal.2024. Anautomaticend-to-endchemicalsynthesisdevelopmentplatformpoweredbylargelanguage
+models.Naturecommunications15,1(2024),10160.
+[227] StuartJRussellandPeterNorvig.2016.Artificialintelligence:amodernapproach.pearson.
+[228] DanielSaeedi,DeniseKBuckner,JoseCAponte,andAmiraliAghazadeh.2025. AstroAgents:AMulti-AgentAI
+forHypothesisGenerationfromMassSpectrometryData.InTowardsAgenticAIforScience:HypothesisGeneration,
+Comprehension,Quantification,andValidation.
+[229] LianeSalewski,ArianSafavi,andR.Groh.2024.CanLLMsLearntoReasonfromRole-Playing?.InProceedingsofthe
+2024ConferenceoftheNorthAmericanChapteroftheAssociationforComputationalLinguistics:HumanLanguage
+Technologies.
+[230] CarlosGSanchez,ChristopherMAcker,AudreyGray,MaliniVaradarajan,ChengSong,NadireRCochran,Steven
+Paula,AliciaLindeman,ShaojianAn,GregoryMcAllister,etal.2021.Genome-wideCRISPRscreenidentifiesprotein
+pathwaysmodulatingtauproteinlevelsinneurons.Communicationsbiology4,1(2021),736.
+[231] SamanthaGScharenberg,WentaoDong,AliGhoochani,KwaminaNyame,RoniLevin-Konigsberg,AswiniRKrishnan,
+EshaanSRawat,KaitlynSpees,MichaelCBassik,andMontherAbu-Remaileh.2023.AnSPNS1-dependentlysosomal
+lipidtransportpathwaythatenablescellsurvivalundercholinelimitation.ScienceAdvances9,16(2023),eadf8966.
+[232] TimoSchick,JaneDwivedi-Yu,RobertoDessì,RobertaRaileanu,MariaLomeli,EricHambro,LukeZettlemoyer,Nicola
+Cancedda,andThomasScialom.2023.Toolformer:Languagemodelscanteachthemselvestousetools.Advancesin
+NeuralInformationProcessingSystems36(2023),68539–68551.
+[233] SamuelSchmidgallandMichaelMoor.2025.Agentrxiv:Towardscollaborativeautonomousresearch.arXivpreprint
+arXiv:2503.18102(2025).
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 46 =====
+
+111:46 Zhaoetal.
+[234] SamuelSchmidgall,YushengSu,ZeWang,XimengSun,JialianWu,XiaodongYu,JiangLiu,MichaelMoor,ZichengLiu,
+andEmadBarsoum.2025.Agentlaboratory:Usingllmagentsasresearchassistants.arXivpreprintarXiv:2501.04227
+(2025).
+[235] SamuelSchmidgall,RojinZiaei,CarlHarris,EduardoPontesReis,JeffreyJopling,andMichaelMoor.2024.AgentClinic:
+amultimodalagentbenchmarktoevaluateAIinsimulatedclinicalenvironments.CoRR(2024).
+[236] RalfSchmidt,ZacharySteinhart,MadelineLayeghi,JacobWFreimer,RaymundBueno,VinhQNguyen,Franziska
+Blaeschke,ChunJimmieYe,andAlexanderMarson.2022. CRISPRactivationandinterferencescreensdecode
+stimulationresponsesinprimaryhumanTcells.Science375,6580(2022),eabj4008.
+[237] SanderSchulhoff,MichaelIlie,NishantBalepur,KonstantineKahadze,AmandaLiu,ChengleiSi,YinhengLi,Aayush
+Gupta,HyoJungHan,SevienSchulhoff,etal.2024.Thepromptreport:asystematicsurveyofpromptengineering
+techniques.arXivpreprintarXiv:2406.06608(2024).
+[238] MinjuSeo,JinheonBaek,SeongyunLee,andSungJuHwang.2025.Paper2code:Automatingcodegenerationfrom
+scientificpapersinmachinelearning.arXivpreprintarXiv:2504.17192(2025).
+[239] MurrayShanahan,KyleMcDonell,andLariaReynolds.2023.Roleplaywithlargelanguagemodels.Nature623,7987
+(2023),493–498.
+[240] FredaShi,MiracSuzgun,MarkusFreitag,XuezhiWang,SurajSrivats,SoroushVosoughi,HyungWonChung,Yi
+Tay,SebastianRuder,DennyZhou,etal.2023.Languagemodelsaremultilingualchain-of-thoughtreasoners.InThe
+EleventhInternationalConferenceonLearningRepresentations.
+[241] NoahShinn,FedericoCassano,AshwinGopinath,KarthikNarasimhan,andShunyuYao.2023.Reflexion:Language
+agentswithverbalreinforcementlearning.AdvancesinNeuralInformationProcessingSystems36(2023),8634–8652.
+[242] MohitShridhar,XingdiYuan,Marc-AlexandreCote,YonatanBisk,AdamTrischler,andMatthewHausknecht.2021.
+ALFWorld:AligningTextandEmbodiedEnvironmentsforInteractiveLearning.InInternationalConferenceon
+LearningRepresentations.
+[243] SimranjitSingh,MichaelFore,andDimitriosStamoulis.2024.Geollm-engine:Arealisticenvironmentforbuilding
+geospatialcopilots.InProceedingsoftheIEEE/CVFConferenceonComputerVisionandPatternRecognition.585–594.
+[244] SimranjitSingh,AndreasKaratzas,MichaelFore,IraklisAnagnostopoulos,andDimitriosStamoulis.2024.Anllm-tool
+compilerforfusedparallelfunctioncalling.arXivpreprintarXiv:2405.17438(2024).
+[245] AarohiSrivastava,AbhinavRastogi,AbhishekRao,AbuAwalShoeb,AbubakarAbid,AdamFisch,AdamRBrown,
+AdamSantoro,AdityaGupta,AdriGarriga-Alonso,etal.2023. Beyondtheimitationgame:Quantifyingand
+extrapolatingthecapabilitiesoflanguagemodels.Transactionsonmachinelearningresearch(2023).
+[246] IsabellaStewartandMarkusJBuehler.2025.Molecularanalysisanddesignusinggenerativeartificialintelligencevia
+multi-agentmodeling.MolecularSystemsDesign&Engineering10,4(2025),314–337.
+[247] BuxinSu,JiayaoZhang,NatalieCollina,YulingYan,DidongLi,KyunghyunCho,JianqingFan,AaronRoth,and
+WeijieSu.2025. TheICML2023rankingexperiment:Examiningauthorself-assessmentinML/AIpeerreview. J.
+Amer.Statist.Assoc.just-accepted(2025),1–16.
+[248] HaoyangSu,RenqiChen,ShixiangTang,ZhenfeiYin,XinzheZheng,JinzheLi,BiqingQi,QiWu,HuiLi,Wanli
+Ouyang,PhilipTorr,BowenZhou,andNanqingDong.2025.ManyHeadsAreBetterThanOne:ImprovedScientific
+IdeaGenerationbyALLM-BasedMulti-AgentSystem.InProceedingsofthe63rdAnnualMeetingoftheAssociationfor
+ComputationalLinguistics(Volume1:LongPapers).28201–28240.
+[249] HouchengSu,WeicaiLong,andYanlinZhang.2025.BioMaster:Multi-agentSystemforAutomatedBioinformatics
+AnalysisWorkflow.bioRxiv(2025),2025–01.
+[250] JiankaiSun,ChuanyangZheng,EnzeXie,ZhengyingLiu,RuihangChu,JianingQiu,JiaqiXu,MingyuDing,Hongyang
+Li,MengzheGeng,etal.2025.Asurveyofreasoningwithfoundationmodels:Concepts,methodologies,andoutlook.
+Comput.Surveys57,11(2025),1–43.
+[251] DamianSzklarczyk,AlbertoSantos,ChristianVonMering,LarsJuhlJensen,PeerBork,andMichaelKuhn.2016.
+STITCH5:augmentingprotein–chemicalinteractionnetworkswithtissueandaffinitydata.Nucleicacidsresearch44,
+D1(2016),D380–D384.
+[252] JiakaiTang,HeyangGao,XuchenPan,LeiWang,HaoranTan,DaweiGao,YushuoChen,XuChen,YankaiLin,
+YaliangLi,etal.2025. GenSim:AGeneralSocialSimulationPlatformwithLargeLanguageModelbasedAgents.
+InProceedingsofthe2025ConferenceoftheNationsoftheAmericasChapteroftheAssociationforComputational
+Linguistics:HumanLanguageTechnologies(SystemDemonstrations).143–150.
+[253] JiabinTang,LianghaoXia,ZhonghangLi,andChaoHuang.2025.AI-Researcher:AutonomousScientificInnovation.
+arXivpreprintarXiv:2505.18705(2025).
+[254] XiangruTang,AnniZou,ZhuoshengZhang,ZimingLi,YilunZhao,XingyaoZhang,ArmanCohan,andMark
+Gerstein.2024.MedAgents:LargeLanguageModelsasCollaboratorsforZero-shotMedicalReasoning.InFindingsof
+theAssociationforComputationalLinguisticsACL2024.599–621.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 47 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:47
+[255] YangTang,ChaoqiangZhao,JianruiWang,ChongzhenZhang,QiyuSun,WeiXingZheng,WenliDu,FengQian,
+andJuergenKurths.2022.Perceptionandnavigationinautonomoussystemsintheeraoflearning:Asurvey.IEEE
+TransactionsonNeuralNetworksandLearningSystems34,12(2022),9604–9624.
+[256] WeiTao,YuchengZhou,YanlinWang,WenqiangZhang,HongyuZhang,andYuCheng.2024. Magis:Llm-based
+multi-agentframeworkforgithubissueresolution. AdvancesinNeuralInformationProcessingSystems37(2024),
+51963–51993.
+[257] RaghavThind,YouranSun,LingLiang,andHaizhaoYang.2025. OptimAI:OptimizationfromNaturalLanguage
+UsingLLM-PoweredAIAgents.arXivpreprintarXiv:2504.16918(2025).
+[258] Khanh-TungTran,DungDao,Minh-DuongNguyen,Quoc-VietPham,BarryO’Sullivan,andHoangDNguyen.2025.
+Multi-agentcollaborationmechanisms:Asurveyofllms.arXivpreprintarXiv:2501.06322(2025).
+[259] OlegTrottandArthurJOlson.2010. AutoDockVina:improvingthespeedandaccuracyofdockingwithanew
+scoringfunction,efficientoptimization,andmultithreading.Journalofcomputationalchemistry31,2(2010),455–461.
+[260] TaoTu,MikeSchaekermann,AnilPalepu,KhaledSaab,JanFreyberg,RyutaroTanno,AmyWang,BrennaLi,Mohamed
+Amin,YongCheng,etal.2025.Towardsconversationaldiagnosticartificialintelligence.Nature(2025),1–9.
+[261] HanbinWang,ZhenghaoLiu,ShuoWang,GanquCui,NingDing,ZhiyuanLiu,andGeYu.2024. INTERVENOR:
+PromptingtheCodingAbilityofLargeLanguageModelswiththeInteractiveChainofRepair.InFindingsofthe
+AssociationforComputationalLinguisticsACL2024.2081–2107.
+[262] HanWang,AnZhang,NguyenDuyTai,JunSun,Tat-SengChua,etal.2024.Ali-agent:Assessingllms’alignmentwith
+humanvaluesviaagent-basedevaluation.AdvancesinNeuralInformationProcessingSystems37(2024),99040–99088.
+[263] JunyangWang,HaiyangXu,HaitaoJia,XiZhang,MingYan,WeizhouShen,JiZhang,FeiHuang,andJitaoSang.
+2024. Mobile-agent-v2:Mobiledeviceoperationassistantwitheffectivenavigationviamulti-agentcollaboration.
+AdvancesinNeuralInformationProcessingSystems37(2024),2686–2710.
+[264] KunWang,GuibinZhang,ZhenhongZhou,JiahaoWu,MiaoYu,ShiqianZhao,ChenlongYin,JinhuFu,YiboYan,
+HanjunLuo,etal.2025. Acomprehensivesurveyinllm(-agent)fullstacksafety:Data,traininganddeployment.
+arXivpreprintarXiv:2504.15585(2025).
+[265] LuoqiWang,HaipengLi,LinshuHu,JiaruiCai,andZhenhongDu.2024. MitigatingInterpretationBiasinRock
+RecordswithLargeLanguageModels:InsightsfromPaleoenvironmentalAnalysis.arXivpreprintarXiv:2407.09977
+(2024).
+[266] LeiWang,ChenMa,XueyangFeng,ZeyuZhang,HaoYang,JingsenZhang,ZhiyuanChen,JiakaiTang,XuChen,
+YankaiLin,etal.2024.Asurveyonlargelanguagemodelbasedautonomousagents.FrontiersofComputerScience18,
+6(2024),186345.
+[267] LeiWang,JingsenZhang,HaoYang,Zhi-YuanChen,JiakaiTang,ZeyuZhang,XuChen,YankaiLin,HaoSun,Ruihua
+Song,etal.2025.Userbehaviorsimulationwithlargelanguagemodel-basedagents.ACMTransactionsonInformation
+Systems43,2(2025),1–37.
+[268] PeiyiWang,LeiLi,LiangChen,ZefanCai,DaweiZhu,BinghuaiLin,YunboCao,LingpengKong,QiLiu,Tianyu
+Liu,etal.2024. LargeLanguageModelsarenotFairEvaluators.InProceedingsofthe62ndAnnualMeetingofthe
+AssociationforComputationalLinguistics(Volume1:LongPapers).9440–9450.
+[269] RuidaWang,RuiPan,YuxinLi,JipengZhang,YizhenJia,ShizheDiao,RenjiePi,JunjieHu,andTongZhang.2025.
+MA-LoT:Multi-AgentLean-basedLongChain-of-ThoughtReasoningenhancesFormalTheoremProving. arXiv
+e-prints(2025),arXiv–2503.
+[270] SihanWang,SuiyangJiang,YiboGao,BomingWang,ShangqiGao,andXiahaiZhuang.2025.EmpoweringMedical
+Multi-AgentswithClinicalConsultationFlowforDynamicDiagnosis.arXivpreprintarXiv:2503.16547(2025).
+[271] ShuaiWang,WeiwenLiu,JingxuanChen,YuqiZhou,WeinanGan,XingshanZeng,YuhanChe,ShuaiYu,XinlongHao,
+KunShao,etal.2024.Guiagentswithfoundationmodels:Acomprehensivesurvey.arXivpreprintarXiv:2411.04890
+(2024).
+[272] ShuangquanWang,HuiyongSun,HuiLiu,DanLi,YouyongLi,andTingjunHou.2016.ADMETevaluationindrug
+discovery.16.PredictinghERGblockersbycombiningmultiplepharmacophoresandmachinelearningapproaches.
+Molecularpharmaceutics13,8(2016),2855–2866.
+[273] WenxuanWang,XiaoyuanLiu,KuiyiGao,Jen-tseHuang,YouliangYuan,PinjiaHe,ShuaiWang,andZhaopengTu.
+2025.Can’tSeetheForestfortheTrees:BenchmarkingMultimodalSafetyAwarenessforMultimodalLLMs.CoRR
+(2025).
+[274] WenxuanWang,ZizhanMa,ZhengWang,ChenghanWu,JiamingJi,WentingChen,XiangLi,andYixuanYuan.2025.
+Asurveyofllm-basedagentsinmedicine:Howfararewefrombaymax?arXivpreprintarXiv:2502.11211(2025).
+[275] XingyaoWang,BoxuanLi,YufanSong,FrankFXu,XiangruTang,MingchenZhuge,JiayiPan,YueqiSong,BowenLi,
+JaskiratSingh,etal.2025.OpenHands:AnOpenPlatformforAISoftwareDevelopersasGeneralistAgents.InThe
+ThirteenthInternationalConferenceonLearningRepresentations.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 48 =====
+
+111:48 Zhaoetal.
+[276] YidongWang,QiGuo,WenjinYao,HongboZhang,XinZhang,ZhenWu,MeishanZhang,XinyuDai,Qingsong
+Wen,WeiYe,etal.2024.Autosurvey:Largelanguagemodelscanautomaticallywritesurveys.Advancesinneural
+informationprocessingsystems37(2024),115119–115145.
+[277] YuqiXieYunfanJiangAjayMandlekarChaoweiXiaoYukeZhuLinxiFanWang,GuanzhiandAnimaAnandkumar.
+2023.Voyager:AnOpen-EndedEmbodiedAgentwithLargeLanguageModels.Intrinsically-MotivatedandOpen-Ended
+LearningWorkshop@NeurIPS2023(2023).
+[278] ZhenhailongWang,ShaoguangMao,WenshanWu,TaoGe,FuruWei,andHengJi.2024.UnleashingtheEmergent
+CognitiveSynergyinLargeLanguageModels:ATask-SolvingAgentthroughMulti-PersonaSelf-Collaboration.In
+Proceedingsofthe2024ConferenceoftheNorthAmericanChapteroftheAssociationforComputationalLinguistics:
+HumanLanguageTechnologies(Volume1:LongPapers).257–279.
+[279] ZiyueWang,JundeWu,LinghanCai,ChangHanLow,XihongYang,QiaxuanLi,andYuemingJin.2025.MedAgent-
+Pro:TowardsEvidence-BasedMulti-ModalMedicalDiagnosisviaReasoningAgenticWorkflow. arXivpreprint
+arXiv:2503.18968(2025).
+[280] ZhenhailongWang,HaiyangXu,JunyangWang,XiZhang,MingYan,JiZhang,FeiHuang,andHengJi.2025.
+Mobile-agent-e:Self-evolvingmobileassistantforcomplextasks.arXivpreprintarXiv:2501.11733(2025).
+[281] HaoWei,JianingQiu,HaibaoYu,andWuYuan.2024.Medco:Medicaleducationcopilotsbasedonamulti-agent
+framework.InEuropeanConferenceonComputerVision.Springer,119–135.
+[282] JasonWei,XuezhiWang,DaleSchuurmans,MaartenBosma,FeiXia,EdChi,QuocVLe,DennyZhou,etal.2022.
+Chain-of-thoughtpromptingelicitsreasoninginlargelanguagemodels.Advancesinneuralinformationprocessing
+systems35(2022),24824–24837.
+[283] JinjieWei,DingkangYang,YanshuLi,QingyaoXu,ZhaoyuChen,MingchengLi,YueJiang,XiaoluHou,andLihua
+Zhang.2024. Medaide:Towardsanomnimedicalaideviaspecializedllm-basedmulti-agentcollaboration. arXiv
+preprintarXiv:2410.12532(2024).
+[284] YixuanWeng,MinjunZhu,GuangshengBao,HongboZhang,JindongWang,YueZhang,andLinyiYang.2025.
+CycleResearcher:ImprovingAutomatedResearchviaAutomatedReview.InTheThirteenthInternationalConference
+onLearningRepresentations.
+[285] DavidSWishart,YannickDFeunang,AnCGuo,ElvisJLo,AnaMarcu,JasonRGrant,TanvirSajed,DanielJohnson,
+CarinLi,ZinatSayeeda,etal.2018.DrugBank5.0:amajorupdatetotheDrugBankdatabasefor2018.Nucleicacids
+research46,D1(2018),D1074–D1082.
+[286] MichaelWooldridgeandNicholasRJennings.1998. Pitfallsofagent-orienteddevelopment.InProceedingsofthe
+secondinternationalconferenceonAutonomousagents.385–391.
+[287] QingyunWu,GaganBansal,JieyuZhang,YiranWu,BeibinLi,ErkangZhu,LiJiang,XiaoyunZhang,ShaokunZhang,
+JialeLiu,etal.2024.Autogen:Enablingnext-genLLMapplicationsviamulti-agentconversations.InFirstConference
+onLanguageModeling.
+[288] ZhenqinWu,BharathRamsundar,EvanNFeinberg,JosephGomes,CalebGeniesse,AneeshSPappu,KarlLeswing,
+andVijayPande.2018. MoleculeNet:abenchmarkformolecularmachinelearning. Chemicalscience9,2(2018),
+513–530.
+[289] ChunqiuStevenXia,YinlinDeng,SorenDunn,andLingmingZhang.2024. Agentless:DemystifyingLLM-based
+SoftwareEngineeringAgents.CoRR(2024).
+[290] YijiaXiao,EdwardSun,DiLuo,andWeiWang.2025.TradingAgents:Multi-AgentsLLMFinancialTradingFramework.
+InTheFirstMARW:Multi-AgentAIintheRealWorldWorkshopatAAAI.
+[291] TianbaoXie,DanyangZhang,JixuanChen,XiaochuanLi,SihengZhao,RuishengCao,TohJHua,ZhoujunCheng,
+DongchanShin,FangyuLei,etal.2024. Osworld:Benchmarkingmultimodalagentsforopen-endedtasksinreal
+computerenvironments.AdvancesinNeuralInformationProcessingSystems37(2024),52040–52094.
+[292] FengliXu,QianyueHao,ZefangZong,JingweiWang,YunkeZhang,JingyiWang,XiaochongLan,JiahuiGong,
+TianjianOuyang,FanjinMeng,etal.2025.Towardslargereasoningmodels:Asurveyofreinforcedreasoningwith
+largelanguagemodels.arXivpreprintarXiv:2501.09686(2025).
+[293] YoujunXu,ZiweiDai,FangjinChen,ShuaishiGao,JianfengPei,andLuhuaLai.2015.Deeplearningfordrug-induced
+liverinjury.Journalofchemicalinformationandmodeling55,10(2015),2085–2093.
+[294] YutaroYamada,RobertTjarkoLange,CongLu,ShengranHu,ChrisLu,JakobFoerster,JeffClune,andDavidHa.
+2025. Theaiscientist-v2:Workshop-levelautomatedscientificdiscoveryviaagentictreesearch. arXivpreprint
+arXiv:2504.08066(2025).
+[295] AnYan,ZhengyuanYang,WanrongZhu,KevinLin,LinjieLi,JianfengWang,JianweiYang,YiwuZhong,Julian
+McAuley,JianfengGao,etal.2023.Gpt-4vinwonderland:Largemultimodalmodelsforzero-shotsmartphonegui
+navigation.arXivpreprintarXiv:2311.07562(2023).
+[296] XiangchaoYan,ShiyangFeng,JiakangYuan,RenqiuXia,BinWang,BoZhang,andLeiBai.2025.Surveyforge:On
+theoutlineheuristics,memory-drivengeneration,andmulti-dimensionalevaluationforautomatedsurveywriting.
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 49 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:49
+arXivpreprintarXiv:2503.04629(2025).
+[297] DayuYang,AntoineSimoulin,XinQian,XiaoyiLiu,YuweiCao,ZhaopuTeng,andGreyYang.2025.DocAgent:A
+Multi-AgentSystemforAutomatedCodeDocumentationGeneration.arXivpreprintarXiv:2504.08725(2025).
+[298] Ei-WenYangandEnriqueVelazquez-Villarreal.2025.AI-HOPE:AnAI-Drivenconversationalagentforenhanced
+clinicalandgenomicdataintegrationinprecisionmedicineresearch.Bioinformatics41,7(2025),btaf359.
+[299] HongyangYang,BoyuZhang,NengWang,ChengGuo,XiaoliZhang,LikunLin,JunlinWang,TianyuZhou,Mao
+Guan,RunjiaZhang,etal.2024.Finrobot:Anopen-sourceaiagentplatformforfinancialapplicationsusinglarge
+languagemodels.arXivpreprintarXiv:2405.14767(2024).
+[300] JohnYang,CarlosEJimenez,AlexanderWettig,KilianLieret,ShunyuYao,KarthikNarasimhan,andOfirPress.2024.
+Swe-agent:Agent-computerinterfacesenableautomatedsoftwareengineering. AdvancesinNeuralInformation
+ProcessingSystems37(2024),50528–50652.
+[301] YingxuanYang,HuacanChai,ShuaiShao,YuanyiSong,SiyuanQi,RentingRui,andWeinanZhang.2025.Agentnet:
+Decentralizedevolutionarycoordinationforllm-basedmulti-agentsystems.arXivpreprintarXiv:2504.00587(2025).
+[302] ZonglinYang,WanhaoLiu,BenGao,TongXie,YuqiangLi,WanliOuyang,SoujanyaPoria,ErikCambria,and
+DongzhanZhou.2025. MOOSE-Chem:LargeLanguageModelsforRediscoveringUnseenChemistryScientific
+Hypotheses.InTheThirteenthInternationalConferenceonLearningRepresentations.
+[303] ZiyiYang,ZaibinZhang,ZiruiZheng,YuxianJiang,ZiyueGan,ZhiyuWang,ZijianLing,MartinMa,BowenDong,
+PrateekGupta,etal.2024.OASIS:OpenAgentsSocialInteractionSimulationsonOneMillionAgents.InNeurIPS
+WorkshoponOpen-WorldAgents.
+[304] ShunyuYao,JeffreyZhao,DianYu,NanDu,IzhakShafran,KarthikNarasimhan,andYuanCao.2023. React:
+Synergizingreasoningandactinginlanguagemodels.InInternationalConferenceonLearningRepresentations(ICLR).
+[305] AsafYehudai,LilachEden,AlanLi,GuyUziel,YilunZhao,RoyBar-Haim,ArmanCohan,andMichalShmueli-Scheuer.
+2025.Surveyonevaluationofllm-basedagents.arXivpreprintarXiv:2503.16416(2025).
+[306] YangyangYu,HaohangLi,ZhiChen,YuechenJiang,YangLi,DenghuiZhang,RongLiu,JordanWSuchow,and
+KhaldounKhashanah.2024.Finmem:Aperformance-enhancedllmtradingagentwithlayeredmemoryandcharacter
+design.InProceedingsoftheAAAISymposiumSeries,Vol.3.595–597.
+[307] YangyangYu,ZhiyuanYao,HaohangLi,ZhiyangDeng,YuechenJiang,YupengCao,ZhiChen,JordanSuchow,
+ZhenyuCui,RongLiu,etal.2024.Fincon:Asynthesizedllmmulti-agentsystemwithconceptualverbalreinforcement
+forenhancedfinancialdecisionmaking.AdvancesinNeuralInformationProcessingSystems37(2024),137010–137045.
+[308] ZhongmingYu,HejiaZhang,YujieZhao,HanxianHuang,MatrixYao,KeDing,andJishenZhao.2025.OrcaLoca:An
+LLMAgentFrameworkforSoftwareIssueLocalization.InForty-secondInternationalConferenceonMachineLearning.
+[309] LingYue,SixueXing,JintaiChen,andTianfanFu.2024. Clinicalagent:Clinicaltrialmulti-agentsystemwith
+largelanguagemodel-basedreasoning.InProceedingsofthe15thACMInternationalConferenceonBioinformatics,
+ComputationalBiologyandHealthInformatics.1–10.
+[310] MurongYue.2025.Asurveyoflargelanguagemodelagentsforquestionanswering.arXivpreprintarXiv:2503.19213
+(2025).
+[311] ChaoyunZhang,ShilinHe,LiqunLi,SiQin,YuKang,QingweiLin,SaravanRajmohan,andDongmeiZhang.2025.
+Apiagentsvs.guiagents:Divergenceandconvergence.arXivpreprintarXiv:2503.11069(2025).
+[312] ChongZhang,XinyiLiu,MingyuJin,ZhongmouZhang,LingyaoLi,ZhentingWang,WenyueHua,DongShu,
+SuiyuanZhu,XiaoboJin,etal.2024. WhenAIMeetsFinance(StockAgent):LargeLanguageModel-basedStock
+TradinginSimulatedReal-worldEnvironments.CoRR(2024).
+[313] ChiZhang,ZhaoYang,JiaxuanLiu,YandaLi,YuchengHan,XinChen,ZebiaoHuang,BinFu,andGangYu.2025.
+Appagent:Multimodalagentsassmartphoneusers.InProceedingsofthe2025CHIConferenceonHumanFactorsin
+ComputingSystems.1–20.
+[314] KechiZhang,JiaLi,GeLi,XianjieShi,andZhiJin.2024. CodeAgent:EnhancingCodeGenerationwithTool-
+IntegratedAgentSystemsforReal-WorldRepo-levelCodingChallenges.InProceedingsofthe62ndAnnualMeetingof
+theAssociationforComputationalLinguistics(Volume1:LongPapers).13643–13658.
+[315] RuiqiZhang,JingHou,FlorianWalter,ShangdingGu,JiayiGuan,FlorianRöhrbein,YaliDu,PanpanCai,Guang
+Chen,andAloisKnoll.2024.Multi-agentreinforcementlearningforautonomousdriving:Asurvey.arXivpreprint
+arXiv:2408.09675(2024).
+[316] SZhang.2018.CompendiumofChina’sFirstListofRareDisease.People’sMedicalPublishingHouse,Beijing,China
+(2018),6–503.
+[317] WentaoZhang,LingxuanZhao,HaochongXia,ShuoSun,JiazeSun,MoleiQin,XinyiLi,YuqingZhao,YileiZhao,
+XinyuCai,etal.2024.Amultimodalfoundationagentforfinancialtrading:Tool-augmented,diversified,andgeneralist.
+InProceedingsofthe30thacmsigkddconferenceonknowledgediscoveryanddatamining.4314–4325.
+[318] XinnongZhang,JiayuLin,XinyiMou,ShiyueYang,XiaweiLiu,LiboSun,HanjiaLyu,YihangYang,WeihongQi,Yue
+Chen,etal.2025.Socioverse:Aworldmodelforsocialsimulationpoweredbyllmagentsandapoolof10million
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 50 =====
+
+111:50 Zhaoetal.
+real-worldusers.arXivpreprintarXiv:2504.10157(2025).
+[319] XinnongZhang,JiayuLin,LiboSun,WeihongQi,YihangYang,YueChen,HanjiaLyu,XinyiMou,SimingChen,Jiebo
+Luo,etal.2024.ElectionSim:MassivePopulationElectionSimulationPoweredbyLargeLanguageModelDriven
+Agents.CoRR(2024).
+[320] XiaomanZhang,ChaoyiWu,ZihengZhao,WeixiongLin,YaZhang,YanfengWang,andWeidiXie.2023.Pmc-vqa:
+Visualinstructiontuningformedicalvisualquestionanswering.arXivpreprintarXiv:2305.10415(2023).
+[321] YifanZhang,ZhengtingHe,JingxuanLi,JianfengLin,QingfengGuan,andWenhaoYu.2024.MapGPT:anautonomous
+frameworkformappingbyintegratinglargelanguagemodelandcartographictools.CartographyandGeographic
+InformationScience51,6(2024),717–743.
+[322] YiranZhang,RuiyinLi,PengLiang,WeisongSun,andYangLiu.2025.Knowledge-BasedMulti-AgentFrameworkfor
+AutomatedSoftwareArchitectureDesign.InProceedingsofthe33rdACMInternationalConferenceontheFoundations
+ofSoftwareEngineering.530–534.
+[323] YueZhang,YafuLi,LeyangCui,DengCai,LemaoLiu,TingchenFu,XintingHuang,EnboZhao,YuZhang,Yulong
+Chen,etal.2025.Siren’ssongintheaiocean:Asurveyonhallucinationinlargelanguagemodels.Computational
+Linguistics(2025),1–45.
+[324] YadongZhang,ShaoguangMao,TaoGe,XunWang,YanXia,WenshanWu,TingSong,ManLan,andFuruWei.2024.
+LLMasaMastermind:ASurveyofStrategicReasoningwithLargeLanguageModels.InFirstConferenceonLanguage
+Modeling.
+[325] YuntongZhang,HaifengRuan,ZhiyuFan,andAbhikRoychoudhury.2024.Autocoderover:Autonomousprogram
+improvement.InProceedingsofthe33rdACMSIGSOFTInternationalSymposiumonSoftwareTestingandAnalysis.
+1592–1604.
+[326] ZeyuZhang,QuanyuDai,XiaoheBo,ChenMa,RuiLi,XuChen,JiemingZhu,ZhenhuaDong,andJi-RongWen.
+2024.Asurveyonthememorymechanismoflargelanguagemodelbasedagents.ACMTransactionsonInformation
+Systems(2024).
+[327] ZhexinZhang,LeqiLei,LindongWu,RuiSun,YongkangHuang,ChongLong,XiaoLiu,XuanyuLei,JieTang,and
+MinlieHuang.2024.SafetyBench:EvaluatingtheSafetyofLargeLanguageModels.InProceedingsofthe62ndAnnual
+MeetingoftheAssociationforComputationalLinguistics(Volume1:LongPapers).15537–15553.
+[328] ZhuoshengZhang,YaoYao,AstonZhang,XiangruTang,XinbeiMa,ZhiweiHe,YimingWang,MarkGerstein,
+RuiWang,GongshenLiu,etal.2025.Ignitinglanguageintelligence:Thehitchhiker’sguidefromchain-of-thought
+reasoningtolanguageagents.Comput.Surveys57,8(2025),1–39.
+[329] AndrewZhao,DanielHuang,QuentinXu,MatthieuLin,Yong-JinLiu,andGaoHuang.2024.Expel:Llmagentsare
+experientiallearners.InProceedingsoftheAAAIConferenceonArtificialIntelligence,Vol.38.19632–19642.
+[330] DebbieZhao,EdwardFerdian,GonzaloDMasoTalou,GinaMQuill,KathleenGilbert,VickyYWang,ThiranjaP
+BabarendaGamage,JoãoPedrosa,JanD’hooge,TimothyMSutton,etal.2023. MITEA:Adatasetformachine
+learningsegmentationoftheleftventriclein3Dechocardiographyusingsubject-specificlabelsfromcardiacmagnetic
+resonanceimaging.FrontiersinCardiovascularMedicine9(2023),1016703.
+[331] PenghaoZhao,HailinZhang,QinhanYu,ZhengrenWang,YuntengGeng,FangchengFu,LingYang,WentaoZhang,
+JieJiang,andBinCui.2024. Retrieval-augmentedgenerationforai-generatedcontent:Asurvey. arXivpreprint
+arXiv:2402.19473(2024).
+[332] BoyuanZheng,BoyuGou,JihyungKil,HuanSun,andYuSu.2024. GPT-4V(ision)isageneralistwebagent,if
+grounded.InProceedingsofthe41stInternationalConferenceonMachineLearning.61349–61385.
+[333] JunhaoZheng,ChengmingShi,XidiCai,QiukeLi,DuzhenZhang,ChenxingLi,DongYu,andQianliMa.2025.
+Lifelonglearningoflargelanguagemodelbasedagents:Aroadmap.arXivpreprintarXiv:2501.07278(2025).
+[334] LianminZheng,Wei-LinChiang,YingSheng,SiyuanZhuang,ZhanghaoWu,YonghaoZhuang,ZiLin,Zhuohan
+Li,DachengLi,EricXing,etal.2023.Judgingllm-as-a-judgewithmt-benchandchatbotarena.Advancesinneural
+informationprocessingsystems36(2023),46595–46623.
+[335] DennyZhou,NathanaelSchärli,LeHou,JasonWei,NathanScales,XuezhiWang,DaleSchuurmans,ClaireCui,
+OlivierBousquet,QuocLe,etal.2023.Least-to-mostpromptingenablescomplexreasoninginlargelanguagemodels.
+InInternationalConferenceonLearningRepresentations.
+[336] JuexiaoZhou,BinZhang,GuoweiLi,XiuyingChen,HaoyangLi,XiaopengXu,SiyuanChen,WenjiaHe,Chencheng
+Xu,LiweiLiu,etal.2024.AnAIAgentforFullyAutomatedMulti-OmicAnalyses.AdvancedScience11,44(2024),
+2407094.
+[337] XinyangZhou,YongyongRen,QianqianZhao,DaoyiHuang,XinboWang,TingtingZhao,ZhixingZhu,Wenyuan
+He,ShuyuanLi,YanXu,etal.2025. AnLLM-DrivenMulti-AgentDebateSystemforMendelianDiseases. arXiv
+preprintarXiv:2504.07881(2025).
+[338] XuhuiZhou,ZheSu,SophieFeng,JiaxuZhou,Jen-tseHuang,Hsien-TeKao,SpencerLynch,SvitlanaVolkova,
+TongshuangWu,AnitaWoolley,etal.2025. SOTOPIA-S4:auser-friendlysystemforflexible,customizable,and
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.
+
+===== PAGE 51 =====
+
+LLM-basedAgenticReasoningFrameworks:ASurveyfromMethodstoScenarios 111:51
+large-scalesocialsimulation.InProceedingsofthe2025ConferenceoftheNationsoftheAmericasChapterofthe
+AssociationforComputationalLinguistics:HumanLanguageTechnologies(SystemDemonstrations).350–360.
+[339] ZhehuaZhou,JiayangSong,KunpengYao,ZhanShu,andLeiMa.2024.Isr-llm:Iterativeself-refinedlargelanguage
+modelforlong-horizonsequentialtaskplanning.In2024IEEEInternationalConferenceonRoboticsandAutomation
+(ICRA).IEEE,2081–2088.
+[340] DongshengZhu,WeixianShi,ZhengliangShi,ZhaochunRen,ShuaiqiangWang,LingyongYan,andDaweiYin.
+2025. Divide-Then-Aggregate:AnEfficientToolLearningMethodviaParallelToolInvocation. arXivpreprint
+arxiv:2501.12432(2025).
+[341] YunhengZou,AustinHCheng,AbdulrahmanAldossary,JiaruBai,ShiXuanLeong,JorgeArturoCampos-Gonzalez-
+Angulo,ChanghyeokChoi,CherTianSer,GaryTom,AndrewWang,etal.2025.ElAgente:Anautonomousagentfor
+quantumchemistry.Matter8,7(2025).
+[342] KaiwenZuo,YiruiJiang,FanMo,andPietroLio.2025.Kg4diagnosis:Ahierarchicalmulti-agentllmframeworkwith
+knowledgegraphenhancementformedicaldiagnosis.InAAAIBridgeProgramonAIforMedicineandHealthcare.
+PMLR,195–204.
+Received24August2025
+J.ACM,Vol.37,No.4,Article111.Publicationdate:August2025.

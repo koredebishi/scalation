@@ -1,0 +1,2090 @@
+===== PAGE 1 =====
+
+TransportationResearchPartC128(2021)103165
+Contents lists available at ScienceDirect
+Transportation Research Part C
+journal homepage: www.elsevier.com/locate/trc
+About calibration of car-following dynamics of automated and
+human-driven vehicles: Methodology, guidelines and codes
+Vincenzo Punzoa,*, Zuduo Zhengb, Marcello Montaninoa
+aDepartment of Civil, Environmental and Architectural Engineering, Universita` degli Studi di Napoli Federico II, Napoli, Italy
+bSchool of Civil Engineering, University of Queensland, Brisbane, Australia
+A R T I C L E I N F O A B S T R A C T
+Keywords: A comprehensive literature review reveals that there exist lots of ambiguities, confusion and even
+Car-following contradictions in setting a car-following calibration problem. In particular, confusion arises in the
+Automated Vehicles selection of measure of performances and goodness-of-fit functions. In this study, a methodology
+Calibration
+to compare and rank objective functions is thus proposed, which is based on Pareto-efficiency and
+Pareto efficiency
+on indifference curves. The methodology has been applied to all objective functions used in the
+Vehicle trajectory
+Research reproducibility field literature so far (and to new ones), in a vast set of calibration experiments. The experiments
+involved two car-following models and two adaptive cruise control (ACC) algorithms, and four
+different datasets, including both automated and human-driven vehicles trajectories. Since results
+are consistent among all the calibration experiments, a sound and robust guideline to calibrate
+car-following dynamics has been proposed. It includes recommendation about what calibration
+settings should be avoided and what are to be adopted. On the one hand, a general agreement on
+a sound calibration setting for car-following models is deemed necessary for comparing results
+from different studies which use different models and datasets. On the other hand, any new car-
+following model or objective function being developed in the future shall be compared with
+existing ones in a fair and impartial manner. For these reasons, and to promote and enable
+transparent and reproducible research, codes and data from this study are shared with the
+community.
+1. Introduction
+Models are just approximations of reality, and car-following (CF) models are no exception. Thus, we will never have a CF model
+delivering a zero error, whatever goodness-of-fit function (GoF) and measure of performance (MoP), or combination of MoPs, are used.
+This simple fact has profound implications on the calibration of CF dynamics.
+As models are imperfect – and only because models are imperfect – it is not the same if we calibrate them on a different MoP and/or
+a different GoF. Consequentially, CF model calibration is prone to ambiguities, confusions, and even contradictions, as unfortunately
+confirmed by our state-of-the-art review, despite the fact that CF modelling is unarguably one of the oldest and most frequently studied
+topics in traffic flow theory. These problems lead to a subjectivity of CF modelling research and impedes its fast progress. Particularly,
+the wide spectrum of calibration settings in the literature makes it impossible to quantitatively compare and sift results from different
+studies using different models and datasets (e.g., exposing the bad while retaining the good), and hence undermines the transparency
+* Corresponding author.
+E-mail addresses: vincenzo.punzo@unina.it (V. Punzo), zuduo.zheng@uq.edu.au (Z. Zheng), marcello.montanino@unina.it (M. Montanino).
+https://doi.org/10.1016/j.trc.2021.103165
+Received 8 December 2020; Received in revised form 16 April 2021; Accepted 16 April 2021
+Availableonline28May2021
+0968-090X/© 2021 The Authors. Published by Elsevier Ltd. This is an open access article under the CC BY-NC-ND license
+(http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+===== PAGE 2 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+and reproducibility of research.
+This paper aims at changing this trend by providing a sound recommendation on calibration settings based on a vast experimental
+analysis and on previous theoretical results.
+Furthermore, the results of this study are reproducible. Methodology, codes and data underlying the study and its recommenda-
+tions, are shared with the scientific community. Thus, future developments – being them a new or different GoF, a new model or a new
+trajectory dataset – could be simply plugged-in in the study framework and compared in a fair and impartial manner.
+To inform the experimental analysis in this study, a comprehensive review of how CF dynamics have been calibrated in the recent
+literature has been carried out. A state of confusion, contradictions, and even malpractices emerged (Sections 2 and 3). We have then
+tested and ranked all the combinations of MoPs and GoFs used in the literature so far (Section 4). To this aim four different well-known
+car-following models/adaptive cruise control algorithms (ACC) have been calibrated on four trajectory datasets, including car-
+following dynamics of both human-driven vehicles and automated vehicles (i.e. vehicles equipped with ACC).
+Grounded on this experimental analysis and on previous theoretical results (see Punzo and Montanino, 2016), two types of
+recommendation are provided in the study (Section 5).
+First, a number of calibration settings, which are inappropriate but often used in the field literature, have been identified. In the
+epistemological framework we assume in this study, this result is deemed to be definitive. One sound refutation is sufficient to dismiss a
+general theory, indeed (see the essay by Popper, 1963, on conjectures and refutations). All the more so, if a calibration setting appears
+inappropriate in the vast majority of experimental scenarios (i.e. with different car-following models and datasets), it cannot have
+general validity. For instance, hereafter we will report that RMSE(v) is worse than RMSE(s) in 93.5% of cases. Therefore, in a future
+experiment, one should avoid using a setting that has repeatedly failed in the literature. Although there may exist some probability that
+such a setting worked in a specific experimental scenario, it would remain to be demonstrated that it was the most efficient in that
+scenario (see the next paragraph).
+Then a sound recommendation about what MoP and GoF should be used for CF dynamics calibration is given. Unlike the first
+recommendation, we are aware that this one is not definitive, since experimental results, though wide, will never be a proof. There may
+be other experiments carried out on different models or data, or simply proposing new calibration settings that may provide different
+or better results than those in this study. However, these new results would at most impact the optimality, but not the soundness of the
+recommendation in this study. Furthermore, the superiority of any new result can only be established by comparing it with previous
+efficient settings (like the recommended settings in this study) in an impartial and reproducible manner e.g., through the methodo-
+logical framework (and the codes) provided here.
+Although the main focus of the paper is on calibration settings, the experimental framework also allowed interesting comparisons
+of models and trajectory datasets of automated and human-driven vehicles to be made (see Section 5).
+What’s more, this paper is reproducible, and anyone who is interested in checking any part of it can generate the same content in
+the open source RStudio (RStudio, 2020).
+2. Confusion, contradictions and malpractices: the state of the art of CF model calibration
+A general formulation of the CF model calibration problem is as follows (Sharma et al., 2019a):
+MoPsim=F(cid:0) (β)
+)
+minimizef MoPobs,MoPsim (1)
+subjectto:LB ≤β≤UB ,G(β)≤0
+β β
+where β is a vector of CF model parameters (number of parameters can change depending on the CF model adopted) to be calibrated;
+F(⋅)is a car-following model, that is a function of β; LBβ and UBβ represent the lower and the upper bound for the parameters in β,
+respectively; G(⋅)is a vector of constraint functions; MoPobs and MoPsim represent observed and simulated MoP, respectively;f(⋅)is a
+GoF function; and f(MoPobs,MoPsim)is the optimization objective function. The aim of CF model calibration is to minimize f(MoPobs,
+MoPsim). In this general formulation, there are six important elements related to model calibration: the model itself, data and data/
+model integration scheme, the MoP, the GoF, and the optimization algorithm.
+Regarding the data and data/model integration scheme, a consensus has been reached in the field literature. First, error and bias in
+the data need to be checked (Punzo et al. 2011; Treiber and Kesting 2013). More specifically, when pre-processing data, care must be
+taken to avoid error amplification in the differentiation process (Punzo et al., 2011), and accumulation in the integration process
+(Punzo et al., 2011, Punzo and Montanino, 2016),1 e.g., several studies have pointed out errors in the NGSIM datasets (Duret et al.,
+2008; Thiemann et al., 2008; Punzo et al., 2011) and proposed methodologies to filter them out (Coifman and Li, 2017; Montanino and
+Punzo, 2013, 2015).
+Remark 1. If several measures are independently collected through separate devices (e.g. position from GPS, relative velocity from
+radar, acceleration from an inertial platform), these measurements need to be “internally consistent”. Specifically, spacing (speed)
+measurements need to be equal to the integral of speed (acceleration) measurements (see the formal definition of internal consistency
+1 Since differentiation amplifies high frequency signal components, noise is usually amplified in the differentiation process from spacing to speed
+to acceleration. Conversely, non-white noise in acceleration (speed) accumulates in speed (spacing) in the integration process.
+2
+
+===== PAGE 3 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Table 1
+State-of-the-art about objective functions in car-following model calibration (see Appendix B for some notes about papers classification).
+GoF(MoP) Literature Review
+2005–2011 2012–2015 2016–2020
+RMSE(s) Punzo and Simonelli (2005) Punzo et al. (2012) Punzo and Montanino (2016), Rhoades et al.
+(2016), Yu et al. (2016), Zhou et al. (2017), Hammit
+et al. (2018), Wang et al. (2018), Yu et al. (2018),
+Park et al. (2020), Xu and Laval (2020), Montanino
+and Punzo (2021), Montanino et al. (2021).
+RMSE(v) Punzo and Simonelli (2005), Punzo et al. (2012), Rahman et al. (2015), Gunter et al. (2020), Huang et al. (2018a), Li et al.
+Hoogendoorn and Hoogendoorn Montanino et al. (2012), Higgs and Abbas (2016, 2020), Ngoduy et al. (2019), Punzo and
+(2010a, 2010b), Chong et al. (2011), (2015), van Hinsbergen et al. (2015), Vieira da Montanino (2016), Ye et al. (2019), Zhao and Zhang
+Hoogendoorn et al. (2010) Rocha et al. (2015) (2020)
+RMSE(a) Kim et al. (2013) Hao et al. (2016), Pei et al. (2016), Li et al. (2018),
+James et al. (2019), Xu et al. (2019)
+RMSE(σ v ) Huang et al. (2018b), Tian et al. (2019)
+RMSPE(s) Kesting and Treiber (2008), Wang Yu and Shi (2014), Saifuzzaman et al. (2015) Saifuzzaman et al. (2017), Wang et al. (2017), Zhu
+et al. (2011) et al. (2018b), Sharma et al. (2019a, 2019b), Kurtc
+and Treiber (2020)
+RMSPE(v) Papathanasopoulou et al. (2016)
+RMSPE(a) Chong et al. (2013)
+RMSPE(σ v ) Tian et al. (2016)
+U(s) Ossen and Hoogendoorn (2008) Punzo et al. (2012), Jin et al. (2014) Cattin et al. (2019)
+U(v) Ossen and Hoogendoorn (2008) Punzo et al. (2012), Jin et al. (2014) Yang et al. (2016), Cattin et al. (2019)
+U(a) Jin et al. (2014)
+U(s,v)
+Ossen and Hoogendoorn (2009) with Sangster et al. (2013) with α=β Zhong et al. (2016) with α=β, Mamouei et al.
+α=β, Kim, and Mahmassani (2011) (2016) with α=β, Wang et al. (2019) with α=β,
+with α=β Zhang et al. (2019) with α=1,β=0.5, Chen et al.
+(2020) with α=1,β=0.5
+MAE(s) Punzo et al. (2012), Jin et al. (2014) He et al. (2016)
+MAE(v) Punzo et al. (2012), Milanes and Shladover
+(2014), Jin et al. (2014)
+MAE(a) Jin et al. (2014) Peng et al. (2020)
+MAPE(s) Zheng et al. (2016)
+MAPE(a) Chong et al. (2013)
+RM ̃ SPE(s) Kesting and Treiber (2008) Monteil et al. (2014) Kurtc and Treiber (2020), Hamdar et al. (2020)
+RM ̃ SPE(v) Hamdar et al. (2015) Schorr et al. (2017)
+NRMSE(s) Kesting and Treiber (2008) Zhu et al. (2018a, 2018b, 2020), Kurtc and Treiber
+(2020),
+NRMSE(v) Papathanasopoulou and Antoniou (2015))
+in Punzo et al., 2011, later reported in Treiber and Kesting, 2013). In case they are not internally consistent, an appropriate meth-
+odology to filter data needs to be employed (see Punzo et al., 2005; Montanino and Punzo, 2015).
+Remark 2. When either one or more measurements are available (e.g. only spacing from GPS, or spacing from GPS and relative speed
+from radar), the integration/differentiation scheme of data needs to be the same adopted in model simulation. Otherwise, the residuals
+given by f(MoPobs,MoPsim) would be caused by the CF model approximation, as well as by a different integration/differentiation
+scheme between model and data (for integration schemes in CF models, see Treiber and Kesting, 2013; and Treiber and Kanagaraj,
+2015. For a thorough introduction to errors and uncertainty in traffic simulation, see Punzo and Montanino, 2020).
+Regarding optimization algorithms, a systematic and unbiased assessment of different algorithms (and calibration settings) was
+performed in Punzo et al. (2012), in a laboratory experiment. Synthetic trajectories were generated through a CF model, by assuming a
+given set of model parameter values. Model calibrations were run with the objective of rediscovering these pre-determined parameter
+values. Only genetic algorithm (GA) and combined scatter-search and gradient-based NLP solver (LINDO OptQuest) were able to
+perform satisfactorily. Downhill simplex and other algorithms, which were not reported in that paper for the sake of brevity (i.e.
+Interior Point, Trust Region Reflective and Sequential Quadratic Programming solvers), failed to rediscover the predetermined
+parameter values. As claimed in the Introduction, we consider the proved inability of some algorithms to successfully calibrate a CF
+model – in a systematic and fair test environment – as a sufficient proof to dismiss these algorithms. Meanwhile, the good performances
+of GA and OptQuest suggest that choosing them as a general optimization tool for CF calibration is reasonable, though not necessarily
+optimal or valid in every circumstance, e.g., for CF calibration against macroscopic traffic data such as loop detector data or average
+travel times (e.g. Brockfeld et al., 2003; Ciuffo et al., 2008; Cascetta et al., 2011). For a review of optimization algorithms used in CF
+model calibration see Rafati Fard and Shariat Mohaymany (2019).
+3
+
+===== PAGE 4 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Table 2
+Formulas of possible combinations of the 7 GoFs and the 4 MoPs from Table 1.
+GoF(MoP)
+√̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+RMSE(s)= √T 1 ̅̅̅̅ ⋅ ̅̅ ∑ ̅̅̅̅̅̅̅ T t̅=̅̅̅1̅̅ [ ̅̅ s ̅̅ s ̅ i ̅ m ̅̅̅ ( ̅̅ t ̅̅ ) ̅̅̅ (cid:0) ̅̅̅̅ s ̅̅ o ̅̅ b ̅ s ̅̅ ( ̅̅ t ̅ ) ̅̅̅ ] ̅̅ 2 ̅̅̅̅
+RMSE(v)= √T 1 ̅̅̅̅ ⋅ ̅̅̅ ∑ ̅̅̅̅̅̅̅ T t̅=̅̅1̅̅ [ ̅̅ v ̅̅̅ s ̅ i ̅ m ̅̅̅ ( ̅̅ t ̅ ) ̅̅̅ (cid:0) ̅̅̅̅̅ v ̅̅ o ̅̅ b ̅ s ̅̅ ( ̅̅ t ̅ ) ̅̅̅ ] ̅̅ 2 ̅̅̅
+RMSE(a)= √T 1 ̅(cid:0)̅̅ ⋅ ̅̅ ∑ ̅̅̅̅̅̅̅ T t̅=̅̅1̅̅̅ [ ̅̅ a ̅̅ s ̅̅ i ) m ̅̅̅̅ (t)(cid:0) aobs(t) ] 2
+RMSE(σ v )= √̅̅̅ σ ̅̅ s v̅ i ̅ m ̅̅̅̅ (cid:0) ̅̅̅̅̅ σ ̅̅̅ o v̅ b ̅̅ s ̅̅̅̅ 2 ̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+RMSPE(s)=
+√T
+1
+̅̅̅̅
+⋅
+̅̅
+∑
+̅̅̅̅̅̅̅
+T
+t̅=̅̅̅1̅̅
+[
+̅̅̅
+s
+̅
+s
+̅̅
+i
+̅
+m
+̅̅̅
+(
+̅
+t
+̅s̅
+)
+o̅̅b̅
+(cid:0)
+̅s̅(̅̅t̅
+s
+̅)
+o
+̅̅
+b
+̅̅
+s
+̅
+(
+̅̅
+t
+̅̅
+)
+̅̅
+]
+̅̅̅̅
+2
+RMSPE(v)= √ √ √
+√ | ̅̅ D
+1
+̅̅̅ | ̅̅
+⋅
+̅̅̅
+∑
+t̅∈̅̅̅D̅̅̅
+[
+̅̅
+v
+̅̅
+s
+̅̅
+im
+̅̅̅
+(
+̅̅v
+t
+̅̅
+)
+̅ o ̅ b ̅
+(cid:0)
+̅ s ̅̅ ( ̅t̅
+v
+̅ ) ̅
+o
+̅
+b
+̅̅
+s
+̅̅
+(
+̅̅
+t
+̅
+)
+̅̅̅
+]
+̅̅
+2
+̅̅̅
+,D= { t∈[1,T]:vobs(t)≥vth }
+RMSPE(a)= √ √ √
+√ |D
+1
+̅[̅̅(cid:0) | ̅̅̅
+⋅
+̅̅
+∑
+̅t̅∈̅̅D̅̅̅
+[
+̅̅̅
+a
+̅̅
+s
+̅
+i
+̅
+m
+̅̅̅
+(
+̅)̅ a
+t
+̅/̅
+)
+̅ o ̅ b ̅
+(cid:0)
+̅ s ̅ ( ̅̅ t
+a
+̅̅ ) ̅
+o
+]̅̅
+b
+̅̅
+s(t) ] 2 ,D= { t∈[1,T]: ⃒ ⃒ aobs(t) ⃒ ⃒≥ath }
+RMSPE(σ v )= σs v im(cid:0) σo v bs σo v bs 2
+RMSPE(s,v)=α⋅RMSPE(s)+β⋅RMSPE(v)
+RMSPE(s,v,a)=α⋅RMSPE(s)+β⋅RMSPE(v)+γ⋅RMSPE(a)
+RMSPE(s,σ
+v
+)=α⋅RMSPE(s)+β⋅RMSPE(σ
+v
+)
+U(s)=√
+T
+̅
+1
+̅̅̅
+⋅
+̅̅̅
+∑
+̅̅̅̅̅̅̅
+T t
+̅
+=
+̅̅
+1
+̅̅̅
+[
+̅̅
+s
+̅̅
+s
+̅
+i
+̅
+m
+̅̅̅
+(
+̅̅
+t
+̅
+)
+̅R̅̅
+]
+̅M̅
+2
+̅̅
++
+SE√ (s) ̅
+T 1
+̅̅̅
+⋅
+̅̅̅
+∑
+̅̅̅̅̅̅̅
+T t
+̅
+=
+̅̅
+1
+̅̅̅
+[
+̅̅
+s
+̅̅
+o
+̅
+b
+̅̅
+s
+̅̅
+(
+̅
+t
+̅̅
+)
+̅̅̅
+]
+̅̅
+2
+̅̅
+U(v)=√̅
+T 1
+̅̅̅
+⋅
+̅̅̅
+∑
+̅̅̅̅̅̅̅
+T t
+̅
+=
+̅̅
+1
+̅̅̅
+[
+̅̅
+v
+̅̅
+s
+̅
+i
+̅
+m
+̅̅̅
+(
+̅̅
+t
+̅
+)
+̅R̅̅
+]
+̅M̅
+2
+̅̅S
++
+E√ (v) ̅
+T 1
+̅̅̅
+⋅
+̅̅̅
+∑
+̅̅̅̅̅̅̅
+T t
+̅
+=
+̅̅
+1
+̅̅̅
+[
+̅̅
+v
+̅̅
+o
+̅̅
+b
+̅
+s
+̅̅
+(
+̅̅
+t
+̅
+)
+̅̅̅
+]
+̅̅
+2
+̅̅
+U(a)=√̅
+T 1
+̅̅̅
+⋅
+̅̅̅
+∑
+̅̅̅̅̅̅̅
+T t
+̅
+=
+̅̅
+1
+̅̅̅
+[
+̅̅
+a
+̅̅
+s
+̅̅
+im
+̅̅̅
+(
+̅̅
+t
+̅̅
+)
+R̅̅
+]
+̅M̅
+2
+̅̅̅S
++
+E√ (a) ̅
+T 1
+̅̅̅
+⋅
+̅̅̅
+∑
+̅̅̅̅̅̅̅
+T t
+̅
+=
+̅̅
+1
+̅̅̅
+[
+̅̅
+a
+̅̅
+o
+̅̅
+b
+̅̅
+s
+̅
+(
+̅̅
+t
+̅̅
+)
+̅̅
+]
+̅̅
+2
+̅̅
+U(s,v)=α⋅U(s)+β⋅U(v)
+U(s,v,a)=α⋅U(s)+β⋅U(v)+γ⋅U(a)
+M M M A A A E E E ( ( ( s v a ) ) ) = = = T 1 T 1 T 1 ⋅ ⋅ ⋅ ∑ ∑ ∑ T t T t T t = = = 1 1 1 ⃒ ⃒ ⃒ ⃒ ⃒ ⃒ s v a ⃒ s s i s i m i m m ( ( ( t t ) t ) ) (cid:0) (cid:0) (cid:0) s v a o o b o b s b s ( s ( t ( t ) t ) ) ⃒ ⃒ ⃒ ⃒ ⃒ ⃒ ⃒
+MAPE(s)=
+T
+1 ⋅ ∑ T
+t=1
+⃒
+⃒
+ssim(t
+s
+)
+ob
+(cid:0)
+s(
+s
+t)
+obs(t)⃒
+⃒
+MAPE(v)=
+T
+1 ⋅ ∑ T
+t=1
+⃒
+⃒
+vsim(t
+v
+)
+ob
+(cid:0)
+s(
+v
+t)
+obs(t)⃒
+⃒
+,D= { t∈[1,T]:vobs(t)≥vth }
+MAPE(a)=
+T
+1 ⋅ ∑ T
+t=1
+⃒ asim(
+|a
+t)
+ob
+(cid:0)
+s(t
+a
+)
+o
+|
+bs(t)⃒ ,D= { t∈[1,T]: ⃒ ⃒ aobs(t) ⃒ ⃒≥ath }
+MAPE(s,v)=α⋅MAPE(s)+β⋅MAPE(v)
+MAPE(s,v,a)=α⋅MAPE(s)+β⋅MAPE(v)+γ⋅MAPE(a)
+√̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+√ [ ]
+R
+R
+M
+M
+̃
+̃
+S
+S
+P
+P
+E
+E
+(
+(
+s
+v
+)
+)
+=
+=
+√ √ √
+√ √ √
+∑
+|
+̅̅
+D
+̅̅̅
+|
+T t̅=̅
+⋅
+̅̅1̅
+∑
+1 ̅s̅̅o̅̅b
+T t T
+̅
+=
+s̅̅ (
+1
+̅̅t̅
+v
+) ̅̅
+o
+̅ ⋅ ̅
+b
+̅
+s
+̅ ∑ ̅
+(
+̅̅
+t
+̅
+)
+̅̅̅ T t
+⋅
+̅ = ̅̅
+∑
+1
+t
+̅
+∈
+̅̅̅
+D
+s ̅̅ s ̅
+[
+i ̅ m ̅
+v
+̅̅ ( ̅
+s
+̅
+i
+t ̅
+m
+̅ ) s̅̅
+(
+o ̅ (cid:0) b
+v t
+̅̅
+)
+s ̅
+o
+̅ (
+b
+s ̅
+(cid:0)
+̅t
+s
+o ̅ ) ̅
+(
+b ̅̅
+t
+s
+v
+̅
+)
+( ̅
+o
+̅ t ̅
+b
+) ̅
+s
+̅̅
+(
+̅̅
+t
+2 ̅
+)
+̅̅̅
+]
+̅̅
+2
+̅̅̅
+,D= { t∈[1,T]:vobs(t)≥vth }
+RM ̃ SPE(s,v)=α⋅RM ̃ SPE(s)+β⋅RM ̃ SPE(v)
+NRMSE(s)=√
+T
+̅
+1
+̅̅̅
+⋅
+̅̅̅
+∑
+̅R̅̅̅M̅̅̅
+T t
+̅
+=
+̅S̅
+1
+̅E̅̅
+[
+̅ ( ̅
+s
+̅s̅
+o
+) ̅
+b
+̅̅
+s
+̅
+(
+̅̅
+t
+̅̅
+)
+̅̅̅
+]
+̅̅
+2
+̅̅
+NRMSE(v)=√
+T
+̅
+1
+̅̅̅
+⋅
+̅̅̅
+∑
+̅R̅̅̅M̅̅̅
+T t
+̅
+=
+̅S̅
+1
+̅E̅̅
+[
+̅ ( ̅
+v
+̅v̅
+o
+̅ ) ̅
+b
+̅
+s
+̅̅
+(
+̅̅
+t
+̅
+)
+̅̅̅
+]
+̅̅
+2
+̅̅
+NRMSE(a)=√
+T
+̅
+1
+̅̅̅
+⋅
+̅̅̅
+∑
+̅R̅̅̅M̅̅̅
+T t
+̅
+=
+̅S̅
+1
+̅E̅̅
+[
+̅ ( ̅
+a
+̅a̅
+o
+̅ ) ̅
+b
+̅̅
+s
+̅
+(
+̅̅
+t
+̅̅
+)
+̅̅
+]
+̅̅
+2
+̅̅
+NRMSE(s,v)=α⋅NRMSE(s)+β⋅NRMSE(v)
+NRMSE(s,v,a)=α⋅NRMSE(s)+β⋅NRMSE(v)+γ⋅NRMSE(a)
+Therefore, as efficient optimization algorithms and consistent trajectory data and models are available – which makes a correct and
+unbiased analysis possible – in the rest of the paper we only focus on the problem of choosing a suitable objective function for cali-
+bration, i.e., an appropriate combination of GoF and MoPs. Thus, in the next section, we systematically and comprehensively review
+and then comment on the state of the art of the CF model calibration literature concerning MoPs and GoFs.
+4
+
+===== PAGE 5 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+2.1. Literature review
+Through Scopus®, we have implemented a comprehensive literature search on the calibration of CF dynamics, using “Car-
+following” and/or “adaptive cruise control” in combination with “calibration” as the search keywords (please see Appendix A for the
+Scopus® queries). The list of the target journals is presented in Appendix A.
+̃
+We found that 7 GOFs (RMSE, RMSPE, Theil’s U, MAE, MAPE, RMSPE, NRMSE) and 4 MoPs (i.e., s, v, a, σ v) were used in the
+literature on CF modelling. In total, 21 combinations of GoFs and MoPs, i.e., objective functions, were adopted as summarized in
+Table 1. In Table 2, the mathematical formulations of 32 possible GoFs and MoPs combinations, including those in Table 1, are
+reported.
+Literature review reported in Table 1 covers the period from 2005 to 2020. Papers are grouped in three different time periods, to
+bring the evolution of consensus about the calibration settings to light, through the whole period. Specifically, the extension of periods
+was chosen in order to show the acceptance in the field literature of some relevant papers on the topic.
+Remark 3. In the field literature, GoF functions applied to percentage errors (PE), such as RMSPE or MAPE, are also referred to as
+normalized error (NE) measures (i.e. RMSNE or MANE). In this study we prefer to adopt the “PE” notation, as a normalization can be
+also applied to a GoF function as a whole (see e.g., the NRMSE).
+It is worth noting that the NRMSE(⋅)in Tables 1 and 2 has been also referred to as an “absolute” error, as opposed to a “relative”
+̃
+error, i.e., as opposed to RMSPE(⋅)(see Kesting and Treiber, 2008). Moreover, RMSPE(⋅)in Tables 1 and 2 has been also referred to as
+a “mixed” error measure, since it is a combination of an “absolute” error and a “relative” error.
+2.2. Comments about the literature review
+Our comprehensive literature review reveals three unsettling points:
+• out of 994 articles we have collected and scrutinized from the target journals since 2005, only a small fraction (9%) attempted to
+calibrate CF models. Among these articles:
+• an array of MoPs was used:
+– 41% calibrated on spacing; 34% on speed, 13% on acceleration, 9% on spacing and speed, and 3% on speed standard deviation.
+– 91% calibrated on a single MoP, and 9% on multiple MoPs.
+̃
+• an array of GoFs was used: RMSE (42%), RMSPE (14%), Theil’s U (20%), MAE (9%), MAPE (2%), RMSPE (7%), and NRMSE (6%).
+The wide spectrum of calibration settings used in these recent studies, and reported in Table 1 and 2, indicates that the state-of-the-
+art of CF model calibration has been plagued with confusion and contradictions. Even worse, many of these calibration settings are
+wrong, as they are not structurally able to reproduce the observed car-following dynamics (see Punzo et al. 2012).
+Sometimes a CF model is calibrated on a traffic characteristic that is a nonlinear transformation of basic CF model outputs, i.e. of
+spacing, speed and acceleration (e.g., Tian et al., 2016). Calibrating a model on a nonlinear transformation of an output, e.g. the speed
+standard deviation, means calibrating a nonlinear transformation of the model itself. As a consequence, when a model is calibrated on
+such a measure transformation, though it will reproduce the intended characteristic at its best, resulting calibrated CF dynamics will be
+non-optimal.
+Remark 4. The only MoPs that shall be applied in the CF model calibration problem in Eq. (1) are s, v and a, or their linear
+combinations.
+Leaving aside unsuitable or sub-optimal calibration settings, the wide spectrum of settings emerging from the literature is in itself a
+hindrance to scientific advancements in the field. In fact, it undermines transparency and reproducibility, making it impossible to
+quantitatively compare results from different studies. In contrast, had all these studies adopted the same calibration setting, it would be
+possible to compare different models from studies using the same data, or compare performances of a model against different datasets.
+By doing so, weak or powerful models, and corresponding developments, would be easily identified and distinguished, which would
+enable researchers to easily reproduce results reported by other researchers, and choose the most promising research path while
+abandoning the misleading ones. Actually, the benefits of having the same calibration setting appear even before a study is published.
+At the paper review stage, the same calibration setting can help in achieving a fairer and impartial evaluation of studies, while saving
+the authors’ and reviewers’ time.
+In the next two sections, therefore, we will present theoretical and experimental bases to draw a sound guideline on what cali-
+bration settings shall or shall not be used.
+3. The solved case of MoP
+Looking at Table 1, one may conclude that there is still no consensus on what MoP should be used in a CF model calibration setting.
+In truth, this long-standing methodological problem in the car-following theory was solved in a recent paper, Punzo and Montanino
+(2016).
+5
+
+===== PAGE 6 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Depending on the MoP used in calibration, the resulting set of optimal parameter values for a CF model will be different (again,
+since we do not have a perfect CF model). If we calibrate on speed, we will reach optimality on speed, but resulting spacing will be non-
+optimal (optimality on spacing is reached when calibrating on spacing, of course). In other words, we have contrasting optimization
+objectives, which inevitably leads to the fact that the optimality on one MoP is detrimental to the optimality on another MoP. Thus, if
+we calibrate on speed, we cannot reduce the error on spacing without at the same time worsening the error on speed, and vice versa.
+This property is also known as Pareto-efficiency and the two optimal solutions are both Pareto-efficient (Iancu and Trichakis, 2014).
+Notwithstanding, the two optimal solutions are not equally desirable from a modelling point of view. In fact, we can quantify the
+degradation of one measure when the model is calibrated on the other, and vice versa. Between the two, preference will go to the
+measure producing the least error in the other measure, relative to the minimum obtainable. In fact, the modeler’s objective is to obtain
+a model which is able to consistently reproduce both speed and spacing.
+In Punzo and Montanino (2016), a sound physical interpretation of this issue was provided based on mathematical developments, i.
+e. why a calibration on spacing generally yields a relative error on speed which is smaller than the error on spacing caused by a
+calibration on speed.
+The interpretation is based on Eq. (2) and Eq. (3). In the equations, specifications of the objective functions are given for a model
+calibration on speed and spacing, respectively (the adopted GoF is the Sum of Squared Errors, SSE):
+{ }
+{ } ∑N (cid:0) )
+min SSEV =min ∊V k 2 (2)
+k=1
+{ } { }
+{ } ∑N (cid:0) ) ∑N (cid:0) ) ( (cid:0) ) ) ∑ ∑
+min SSES =min ∊S k 2 =min ∊V k 2+ k* εV k 2 [N]+2 N k= (cid:0) 1 1 εV k ⋅ N i=k+1 (N(cid:0) i+1)⋅εV i (3)
+k=1 k=1
+where ∊Vand ∊Sare, respectively, the speed and spacing error at time k, and are a function of model parameters.
+k k
+Eq. (3) clarifies that a minimization of spacing errors is equivalent to a simultaneous minimization and optimal time allocation of
+speed errors. Here “optimal time allocation” is intended as the allocation of speed errors producing the least error in spacing.
+Thus, a calibration on spacing is optimal in spacing and suboptimal in speed.
+On the contrary, a trajectory resulting from a calibration on speed is optimal in speed but indeterminate in spacing (i.e., we can have
+the same error in speeds with very different spacing profiles and very different spacing errors); see Eq. (2).
+To quantify the loss imposed by one measure on the other, Punzo and Montanino (2016) proposed a relative error measure, as in
+Punzo and Simonelli (2005). This relative error, REi, measures the degradation in a MoP “i” – relative to its optimum – of a model
+calibrated on a MoP “j”. For instance, in case a CF model is calibrated on speed, the performance degradation in spacing can be
+calculated as:
+(cid:0) (cid:0) )) (cid:0) (cid:0) ))
+(cid:0) (cid:0) )) RMSE F β* (cid:0) RMSE F β*
+RE s F β* RMSE(v) = s R R M M SE S (v E ) (F(β* ) s ) RMSE(s) (4)
+s RMSE(s)
+where:
+– β* RMSE(i)is the vector of optimal parameter values resulting from a calibration using RMSE(i)as objective function, with i = s,v, i.e.
+spacing or speed;
+(cid:0) )
+– F β* RMS(cid:0)E(i)(cid:0) is the ) o ) utput of a model simulation with the optimal parameter values β* RMSE(i), see Eq. (1);
+– RMSEs F β* RMSE(i) is the error on spacing given by a model calibrated on “i”.
+The application of Eq. (4) to thousands of calibrated trajectories allowed a quantification of the relative degradation. The two
+distributions of REs and REv confirmed that, in general, a calibration on spacing causes a sensibly smaller degradation in speed than the
+opposite.
+Since this result is due to the integral relationship between speed and spacing, as explained in Punzo and Montanino (2016), we can
+easily extend the result to acceleration and speed. We can therefore conclude that, when a single MoP is adopted in a CF calibration
+objective function (i.e., a single-objective optimisation), spacing is preferable to speed and acceleration.
+4. Solving the case of GoF
+Once the MoP case is solved as discussed above, the following questions still need an answer:
+1. Given that spacing is preferable as MoP in CF calibration, what is the best GoF function if a single-objective optimization is carried
+out?
+2. Can we improve calibration results through a multi-objective optimization?
+3. What is the best GoF in a multi-objective optimization setting?
+6
+
+===== PAGE 7 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Fig. 1. Results of a calibration experiment in terms of relative errors on spacing and speed. Magenta and green objective points represent the result
+of calibrations on the listed GoFs(MoPs). Blue points represent model errors corresponding to quasi-randomly generated parameter vectors. The red
+line is the Pareto frontier. The dashed black line is the indifference curve closest to the origin, i.e., to the utopic point (some GoF(MoP) points lie
+outside the plot limits). (For interpretation of the references to colour in this figure legend, the reader is referred to the web version of this article.)
+In this section we will address these crucial questions concerning CF calibration settings.
+A comprehensive study on the topic was Punzo et al. (2012). In that study, the problem of choosing a proper setting was inves-
+tigated using synthetic trajectories generated from a set of pre-defined parameter values. As mentioned in Section 2, the study objective
+was to verify what calibration setting was able to rediscover the pre-defined parameter values. On the one hand, this fair and un-
+equivocal testing environment allowed inappropriate settings to be identified, including ineffective algorithms and GoFs. On the other
+hand, since synthetic trajectories were used, it was impossible to provide a clear answer to what GoF/MoP combination is preferable.
+When using synthetic trajectories, a multi-objective problem does not arise. For the values of parameters used to generate the synthetic
+trajectories a model provides a zero error for all MoPs. Thus, there is no trade-off on calibration errors among different MoPs.
+Therefore, to answer the previous questions, we have calibrated models on real vehicle trajectories. Each combination of GoF and
+MoPs identified in the field literature has been tested (see Table 2),2 including two combinations never tested before i.e. NRMSE(s,v)
+and NRMSE(s,v,a)Four sets of trajectory data, which are significantly different from each other in terms of individual vehicle dy-
+namics and empirical/experimental contexts, have been applied. Specifically, three datasets contain human-driven vehicle trajec-
+tories, while one contains automated vehicle trajectories. Four car-following models, have been calibrated for each dataset and each
+GoF/MoP combination. These are the IDM (Treiber et al., 2000), the Gipps’ Model (Gipps, 1981), the FVDM (Jiang et al., 2001) with
+either a Constant Time Headway (CTH) or a nonlinear (SIGMOID) spacing policy (the last two are also widely applied as ACC
+algorithms).
+The four models have been selected since they are substantially different from each other in terms of their assumptions and
+dynamical behaviours (in the goal of ensuring the generality of our results).3 In addition, their properties have been deeply investi-
+gated in previous literature (see e.g., Wilson, 2001; Punzo and Tripodi, 2007; Ward and Wilson, 2011; Treiber and Kesting, 2011;
+Ciuffo et al., 2012; Punzo et al., 2015; Zhang and Orosz, 2016; Sun et al., 2018, 2020; Montanino et al., 2021; Montanino and Punzo,
+2 Since the response surfaces produced by NRMSE(s), NRMSE(v), and NRMSE(a) functions are linear transformations of the response surfaces
+produced by the corresponding RMSE function, they were not tested in the calibration experiments, i.e. 29 objective functions have been tested in
+this study.
+3 Stochastic CF models (i.e. models which have a stochastic term in the formulation, see e.g., Tian et al. 2021) have not been tested despite their
+expected higher quality, since their stochastic term might have injected noise into analysis. As mentioned, in the aim of comparing CF calibration
+settings, diversity of models has been considered as the main criterion for model selection. In addition, stochastic models are not best suited for
+simulating automated vehicles, whose algorithms are expected to be deterministic (see the AstaZero dataset in Section 4.2).
+7
+
+===== PAGE 8 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+2021).
+4.1. Methodology
+As discussed before, CF model calibration is a multi-objective optimization problem. Solutions β* to this problem, also known as
+Pareto-efficient, yields objective points z=f(β*)located on the so-called Pareto frontier. A solution yielding an objective point on the
+frontier is also called non-dominated, since it is not possible to find any other solution performing better in all objectives (see Fig. 1).
+As mentioned in Section 3, not all Pareto-efficient solutions are equivalent. Usually in micro-economics, “indifference curves” are
+introduced to compare solutions. In the objectives space f(β)⊆Rn, each curve is the locus of the objective points f(β)that share the same
+utility for a consumer.
+In our case, if we assume that all objectives have the same importance for the analyst (i.e. errors in spacing, speed and acceleration
+are equally weighed), an indifference curve is given by all objective points having the same distance from the so-called utopic point z*.
+This point is the ideal objective point obtained by adopting the minimum achievable error for each objective. In case of two objectives/
+MoPs, e.g., speed and spacing, an indifference curve is any circle in the objectives plane centred in the utopic point; in case of three
+objectives, i.e., s, v, a, we will have a sphere.
+All that said, the most preferable solution among the Pareto-efficient ones is the solution whose objective point lies on the
+indifference curve closest to the utopic point. That is, the Pareto-optimal solution β* whose objective point f(β*)has the minimum
+distance from the utopic point among all other Pareto-optimal solutions. See Fig. 1.
+In the figure, the utopic point coincides with the axes origin since each objective is a relative error i.e., normalized over the
+minimum. In general, in the calibration of a CF model, if we assume to measure the error on each objective “i” by the RMSE, i.e.
+f(β)=RMSE(F(β)), the coordinates of the utopic point, z*, are:
+z* i =m β in{RMSE i (F(β))}, withi=s,v,a (5)
+where:
+– β is a vector of model parameters values;
+– F(β)is the output of a CF model simulation using the parameter vector β, see Eq. (1).
+Thus, for every objective point f(β)we can calculate the relative error with respect to the utopic point (see points in Fig. 1).4 In
+particular, given the optimal parameter vector β* GoF(MoP) – resulting from a model calibration with an objective function GoF(MoP)in
+Table 2 – the errors of the optimal solution β* GoF(MoP)relative to the utopic point are:
+( ( ))
+( ( )) RMSE F β* (cid:0) z*
+i GoF(MoP) i
+RE i F β* GoF(MoP) = z* , withi=s,v,a (6)
+i
+Eq. (6) is a generalization of Eq. (4) to any objective function GoF(MoP). In Fig. 1, magenta points represent the relative errors on
+spacing and speed given by model calibrations on the 29 objective functions in Table 2. It is worth noting that only 10 out of the 29
+solutions are Pareto-efficient (i.e. lie on the frontier). Among those, the NRMSE(s,v,a)is identified as the most preferable since it lies
+on the indifference curve closest to the utopic point.
+(cid:0) (cid:0) (cid:0) ))) (cid:0) (cid:0) (cid:0) )) )
+Green points on the axes, that are points of coordinates 0,REv F β* RMSE(s) and REs F β* RMSE(v) ,0 , represent the relative
+errors of calibrations using, respectively, RMSE(s)and RMSE(v)as the objective functions. It is worth recalling here that, in Punzo and
+Montanino, 2016, a physical explanation, based on mathematical developments, was given about the reason why the relative error on
+speed of a model calibrated on spacing is almost always lower than the relative error on spacing of a model calibrated on speed. This
+condition is expressed by the following relationship (see Fig. 1):
+(cid:0) (cid:0) )) (cid:0) (cid:0) ))
+RE v F β* RMSE(s) <RE s F β* RMSE(v) (7)
+In the current framework, Eq. (7) means that the objective point of a calibration on spacing results closer to the utopic point than
+that of a calibration on speed. In this study, Eq. (7) is verified in 93.5% of calibrations.
+Objective points on the circle closest to the origin, are those with the shortest Euclidean distance from the origin. Sometimes,
+relative errors in an objective (typically acceleration), are one or more order of magnitude higher than those in the other objectives (see
+e.g., Table 3 in Section 4.4). In this case, the ranking based on the Euclidean distance is mainly driven by the objective with the highest
+errors (because of the error squaring), which is contrary to the goal of having a “fair” solution with respect to all objectives, i.e., that
+seeks a minimization of all objectives, consistently. For this reason, as a distance metric from the utopic point, we propose to use the
+sum of the three relative errors, that is the sum of the coordinates of the objective point. This metric is adopted hereafter in order to
+rank Pareto-efficient solutions.
+4 Relative (i.e., normalized) errors allow errors on different objectives (s, v, a) to be compared.
+8
+
+===== PAGE 9 =====
+
+TransportationResearchPartC128(2021)103165
+20
+15
+10
+5
+0
+0 20 40 60 80 100 120 140 160 180
+Time [s]
+4.2. Datasets
+Four different datasets, including both automated and human-driven vehicles trajectories, have been used in our CF calibration
+experiments, and all trajectories have been pre-processed in order to filter measurement errors. It is worth noting that measurement
+errors of the same magnitude of those in the adopted datasets, are not expected to impact on CF model calibration results (see
+Montanino and Punzo, 2015, where calibration results on raw and “reconstructed” NGSIM trajectories were compared). Thus, we
+expect that analysis results are not affected by residual measurement errors.
+The first set of trajectories applied here, was collected in three car-following experiments in Naples (Italy) (Punzo and Simonelli,
+2005). These experiments were performed with four human-driven vehicles, i.e. a leader and 3 followers, in a platoon along urban and
+extra-urban roads under different traffic conditions. Each vehicle was equipped with a kinematic differential GPS receiver that
+recorded the vehicle position at 10 Hz. More details on the dataset and filtering procedure applied to filter raw data, are reported in
+Punzo and Simonelli (2005) and Punzo et al. (2005). Vehicle speed profiles are depicted in Fig. 2.
+The second dataset is a selection of (human-driven) vehicle trajectories from the reconstructed NGSIM I80-1 dataset (Montanino
+and Punzo, 2015). The most complete trajectories were selected regarding acceleration, cruising, deceleration, following and standstill
+regimes (Sharma et al., 2019a). The twelve selected trajectories are depicted in Fig. 3.
+The third dataset is a selection of human-driven vehicle trajectories from 25-vehicle platooning experiments on a three-lane sub-
+urban road in Hefei City (Jiang et al., 2015). Each vehicle was equipped with a high-precision differential GPS receiver that recorded
+the vehicle position at 10 Hz. In each experiment, the leader vehicle was instructed to execute a pre-determined driving cycle. In
+9
+]s/m[
+deepS
+apo 30 00 Uba aCota
+Leader
+Follower 1
+Follower 2
+Follower 3
+20
+15
+10
+5
+0 50 100 150 200 250 300
+Time [s]
+]s/m[
+deepS
+Napoli301002PrCUrbanaLunga
+Leader
+Follower 1
+Follower 2
+Follower 3
+20
+15
+10
+5
+0
+0 50 100 150 200
+Time [s]
+]s/m[
+deepS
+V. Punzo et al.
+Naples-30-10-02-PrA (Short urban drive)
+Naples-30-10-02-PrB (Long urban drive)
+Naples-30-10-02-PrC (Extra-urban drive)
+Napoli301002PrBExtraurbana
+Leader
+Follower 1
+Follower 2
+Follower 3
+Fig. 2. Human-driven car-following trajectory data from the Naples’ field experiment (Punzo and Simonelli, 2005; Punzo et al., 2005).
+
+===== PAGE 10 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Selected NGSIM I80-1 trajectories
+Fig. 3. Selected human-driven car-following trajectory data from the NGSIM I80-1 “reconstructed” dataset (Montanino and Punzo, 2015). Jumps in
+the leader speed profiles are due to lane-changings (either of the leader or the follower).
+addition, at the beginning and at the end of the road, vehicles were forced to make a U-turn. Those trajectory portions were discarded,
+since their vehicles dynamics were not in car-following. Trajectories were selected according to completeness requirements (Sharma
+et al., 2019a), as in the second dataset, and filtered through steps 1 and 2 from the “reconstruction” procedure in Montanino and Punzo
+(2015). Resulting trajectories are shown in Fig. 4.
+The fourth dataset contains trajectories made by ACC vehicles collected by the European Commission Joint Research Centre from
+the field experiments carried out on the rural road of the AstaZero proving ground in Sweden (Makridis et al., 2020). The experiments
+involved five high-end vehicles (Audi A8, Tesla Model 3, BMW X5, Audi A6 and Mercedes-Benz A 250) driving in a platoon and
+longitudinally controlled by vehicle ACC systems. Data acquisition was accomplished by the RT-Range S multiple target ADAS
+measurements solution, which provided vehicle trajectory data at 10 Hz. Two experiments have been selected for this study, whose
+trajectories are shown in Fig. 5.
+4.3. Models
+Concerning the models applied, formulations of the IDM, Gipps’ model and FVDM are reported in Eqs. (8), (9) and (10),
+respectively:
+10
+
+===== PAGE 11 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Selected Hefei trajectories
+Fig. 4. Selected human-driven car-following trajectory data from the Hefei field experiment (Jiang et al., 2015).
+⎡ ⎛ ⎞ ⎤
+2
+a n (t)=a max,n ⋅ ⎢ ⎢ ⎢ ⎣ 1(cid:0) ( V v m n ( a t x ) ,n ) δn (cid:0) ⎜ ⎜ ⎜ ⎝ s 0,n +T n ⋅v n s ( n t ( ) t) (cid:0) 2⋅ v√n(t̅ a )̅ m ⋅̅Δ̅ a ̅ x v̅ , ̅n n ̅(̅ ⋅ t̅ b )̅ n ̅̅⎟ ⎟ ⎟ ⎠ ⎥ ⎥ ⎥ ⎦ (8)
+⎧ ( ) √̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅ ⎫
+⎪⎪⎪⎪⎪⎪⎨
+v n (t)+2.5⋅a max,n ⋅τ n ⋅ 1(cid:0) V
+v
+m n
+(
+a
+t
+x
+)
+,n ⋅ 0.025+ V
+v
+m n
+(
+a
+t
+x
+)
+,n ,
+⎪⎪⎪⎪⎪⎪⎬
+a n (t)=
+min ⎪⎪⎪⎪⎪⎪⎩ (cid:0) b n ⋅ ( τ 2 n+θ n ) + √ √ √ √ ̅ b ̅̅ n ̅̅ 2 ̅̅̅ ⋅ ̅̅ ( ̅̅̅ τ ̅ 2 ̅ n ̅̅̅̅ + ̅̅̅̅ θ ̅̅̅ n ̅̅ ) ̅̅̅ 2 ̅̅ + ̅̅̅̅̅ b ̅
+τ
+̅̅ n ̅̅̅ ⋅ ̅̅ [ ̅̅̅ 2 ̅̅̅ ⋅ ̅̅̅ (cid:0) ̅̅ s ̅̅ n ̅̅ ( ̅̅ t ̅ ) ̅̅̅ (cid:0) ̅̅̅̅̅ s ̅̅ 0 ̅ , ̅ n ̅̅̅ ) ̅̅̅ (cid:0) ̅̅̅̅̅ τ ̅̅ n ̅̅̅ ⋅ ̅̅̅ v ̅̅ n ̅̅ ( ̅̅ t ̅ ) ̅̅̅ + ̅̅̅̅̅ v ̅̅ n ̅ (cid:0) ̅̅ ̂b ̅ 1 ̅
+n
+̅ ( ̅̅ t ̅ ) ̅̅ 2 ̅̅̅ ] ̅̅̅ ⎪⎪⎪⎪⎪⎪⎭
+(cid:0) v n τ (t) (9)
+n n
+a n (t)=K 1,n ⋅[V(s n (t))(cid:0) v n (t)]+K 2,n ⋅Δv n (t) (10)
+where the function V(sn (t))for the CTH and SIGMOID spacing policies are defined in Eqs. (11a) and (11b), respectively. Formulations
+in Eqs. (11a) and (11b) have been widely adopted with Eq. (10) as spacing policies for ACC (e.g. Di Bernardo et al., 2015; Zhang and
+Orosz, 2016; Zhang et al., 2018; Di Vaio et al., 2019):
+11
+
+===== PAGE 12 =====
+
+TransportationResearchPartC128(2021)103165
+35
+30
+25
+20
+15
+10
+5
+0
+0 200 400 600 800 1000
+Time [s]
+⎧
+⎪⎪⎪⎨ 0 ifs n ≤s 0,n
+V(s n )= ⎪⎪⎪⎩ s n (cid:0) T
+n
+s 0,n ifs n ≤s 0,n +T n ⋅V max,n (11a)
+V max,n elsewhere
+⎧
+⎪⎪⎪⎪⎨ 0
+[ ( )]
+ifs n ≤s 0,n
+V(s n )= ⎪⎪⎪⎪⎩ V m 2 ax,n 1(cid:0) cos π T s n n ⋅ (cid:0) V s m 0 a ,n x,n ifs n ≤s 0,n +T n ⋅V max,n (11b)
+V max,n elsewhere
+In Eqs. (8)–(11), xn (t), vn (t)and an (t)are a follower vehicle position, speed and acceleration at time t, respectively; Δxn and Δvn (t)
+are the inter-vehicle spacing and speed difference from the leader vehicle; ln(cid:0)1 is the leader vehicle length; and sn (t)=Δxn (cid:0) ln(cid:0)1 is the
+net inter-vehicle spacing. Model parameters are in bold.
+A ballistic integration scheme, as shown in Eq. (12), with an integration step Δt of 0.1 s (the time-resolution of measured data) has
+been adopted to update vehicle speed and position (Treiber et al., 2006; Treiber and Kanagaraj, 2015).
+v n (t+Δt)=v n (t)+a n (t)⋅Δt (12a)
+v (t+Δt)+v (t)
+x n (t+Δt)=x n (t)+ n 2 n ⋅Δt (12b)
+The same integration scheme has been also adopted to obtain positions and accelerations from the measured speed profiles in
+Figs. 2–5 (see Remark 1).
+4.4. Experiments and results
+A total of 4524 calibration experiments (4 models × 39 vehicle trajectories × 29 objective functions) were run on the high-
+performance computing grid SCoPE of the University of Naples Federico II. The grid consists of 304 Dell blade M600 computing
+nodes, each one equipped with 4 dual-cores Xeon processors @ 2.33 GHz. The average computing time per calibration experiment was
+6.2 min.
+The genetic algorithm coded in Matlab 2019® was used in calibration. A population size equal to 100 allowed the algorithm to
+likely converge to the global optimum solution (Punzo et al., 2012). In addition, 100 replications of some calibration experiments (10
+12
+]s/m[
+deepS
+V. Punzo et al.
+040719-Platoon-6
+Leader
+Audi
+BMW
+Mercedes
+Tesla
+Fig. 5. ACC car-following trajectory data from the AstaZero field experiments (Makridis et al., 2020).
+
+===== PAGE 13 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Table 3
+Comparison of Gipps’ model calibration errors for the Naples and AstaZero datasets.
+13
+
+===== PAGE 14 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Table 4
+Comparison of FDVM-CTH model calibration errors for the Naples and AstaZero datasets.
+14
+
+===== PAGE 15 =====
+
+TransportationResearchPartC128(2021)103165
+randomly chosen experiments out of 4524) were performed to verify that the algorithm converged to the same solution at each
+calibration replication, both in terms of parameter values and objective function value (the recorded standard deviation among so-
+lutions at convergence is equal to 1e-10). For more details on the configuration of the experiments, please refer to the open-source
+RStudio codes provided with the paper.
+Results about Gipps’ model and the FVDM-CTH are presented, respectively, in Tables 3 and 4 for Naples’ and AstaZero datasets.
+15
+)a,v,s(ESMRN
+)a,v,s(ESMRN
+)a,v,s(ESMRN
+)a,v,s(U
+)a,v,s(U
+)a,v,s(U
+)v,s(ESMRN
+)v,s(ESMRN
+)v,s(ESMRN
+)v,s(U
+)v,s(U
+)v,s(U
+)v,s(EPAM
+)v,s(EPAM
+)v,s(EPAM
+)s(ESMR
+)s(ESMR
+)s(ESMR
+)s(U
+)s(U
+)s(U
+)a,v,s(EPAM
+)a,v,s(EPAM
+)a,v,s(EPAM
+)v,s(edlit_EPSMR
+)v,s(edlit_EPSMR
+)v,s(edlit_EPSMR
+)s(EAM
+)s(EAM
+)s(EAM
+)s(edlit_EPSMR
+)s(edlit_EPSMR
+)s(edlit_EPSMR
+)a,v,s(EPSMR
+)a,v,s(EPSMR
+)a,v,s(EPSMR
+)s(EPSMR
+)s(EPSMR
+)s(EPSMR
+)v(EPAM
+)v(EPAM
+)v(EPAM
+)v,s(EPSMR
+)v,s(EPSMR
+)v,s(EPSMR
+)s(EPAM
+)s(EPAM
+)s(EPAM
+)Vdts+s(EPSMR
+)Vdts+s(EPSMR
+)Vdts+s(EPSMR
+)v(edlit_EPSMR
+)v(edlit_EPSMR
+)v(edlit_EPSMR
+)v(EPSMR
+)v(EPSMR
+)v(EPSMR
+)v(EAM
+)v(EAM
+)v(EAM
+)v(U
+)v(U
+)v(U
+)v(ESMR
+)v(ESMR
+)v(ESMR
+)a(ESMR
+)a(ESMR
+)a(ESMR
+)a(EAM
+)a(EAM
+)a(EAM
+)a(U
+)a(U
+)a(U
+)Vdts(EPSMR
+)Vdts(EPSMR
+)Vdts(EPSMR
+)Vdts(ESMR
+)Vdts(ESMR
+)Vdts(ESMR
+)a(EPAM
+)a(EPAM
+)a(EPAM
+)a(EPSMR
+)a(EPSMR
+)a(EPSMR
+V. Punzo et al.
+Fig. 6. Relative calibration error box plots of Gipps’ model for Naples trajectories. The GoF(MoP) functions are sorted according to Table 3. Colours
+identify GoFs with the same MoP or combination of MoPs. (For interpretation of the references to colour in this figure legend, the reader is referred
+to the web version of this article.)
+
+===== PAGE 16 =====
+
+TransportationResearchPartC128(2021)103165
+These results are deemed to be the most representative as to the variability of results themselves. In fact, Gipps’s model and FVDM-CTH
+are, respectively, the best and the worst performing models over all datasets. Naples dataset is the one showing the least errors for all
+models among the human-driven vehicles datasets. AstaZero is the only automated vehicles dataset. Results for all the other models
+and datasets are reported in Appendix C.
+In the left half of the tables, calibration errors on spacing, speed and acceleration are shown in terms of RMSE(s), RMSE(v), and
+16
+)a,v,s(U
+)a,v,s(U
+)a,v,s(U
+)a,v,s(ESMRN
+)a,v,s(ESMRN
+)a,v,s(ESMRN
+)v,s(U
+)v,s(U
+)v,s(U
+)v,s(ESMRN
+)v,s(ESMRN
+)v,s(ESMRN
+)s(ESMR
+)s(ESMR
+)s(ESMR
+)s(U
+)s(U
+)s(U
+)v,s(edlit_EPSMR
+)v,s(edlit_EPSMR
+)v,s(edlit_EPSMR
+)s(EAM
+)s(EAM
+)s(EAM
+)s(edlit_EPSMR
+)s(edlit_EPSMR
+)s(edlit_EPSMR
+)v,s(EPSMR
+)v,s(EPSMR
+)v,s(EPSMR
+)v,s(EPAM
+)v,s(EPAM
+)v,s(EPAM
+)v(EPAM
+)v(EPAM
+)v(EPAM
+)v(EPSMR
+)v(EPSMR
+)v(EPSMR
+)v(edlit_EPSMR
+)v(edlit_EPSMR
+)v(edlit_EPSMR
+)s(EPAM
+)s(EPAM
+)s(EPAM
+)s(EPSMR
+)s(EPSMR
+)s(EPSMR
+)Vdts,s(EPSMR
+)Vdts,s(EPSMR
+)Vdts,s(EPSMR
+)v(EAM
+)v(EAM
+)v(EAM
+)v(U
+)v(U
+)v(U
+)v(ESMR
+)v(ESMR
+)v(ESMR
+)a,v,s(EPAM
+)a,v,s(EPAM
+)a,v,s(EPAM
+)a,v,s(EPSMR
+)a,v,s(EPSMR
+)a,v,s(EPSMR
+)Vdts(ESMR
+)Vdts(ESMR
+)Vdts(ESMR
+)Vdts(EPSMR
+)Vdts(EPSMR
+)Vdts(EPSMR
+)a(U
+)a(U
+)a(U
+)a(ESMR
+)a(ESMR
+)a(ESMR
+)a(EPSMR
+)a(EPSMR
+)a(EPSMR
+)a(EPAM
+)a(EPAM
+)a(EPAM
+)a(EAM
+)a(EAM
+)a(EAM
+V. Punzo et al.
+Fig. 7. Relative calibration error box plots of FVDM with CTH spacing policy for Naples trajectories. The GoF(MoP) functions are sorted according to
+Table 4. Colours identify GoFs with the same MoP or combination of MoPs. (For interpretation of the references to colour in this figure legend, the
+reader is referred to the web version of this article.)
+
+===== PAGE 17 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+NRMSE(s,v,a) U(s,v,a)
+IDM
+GIPPS
+FVDM-CTH
+FVDM-SIGMOID
+Fig. 8. Histograms of calibrated values of the time headway parameter, by means of NRMSE(s, v, a) and Theil’s U(s, v, a), for the four models and the
+four trajectory datasets. (For interpretation of the references to colour in this figure legend, the reader is referred to the web version of this article.)
+17
+
+===== PAGE 18 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+RMSE(a), for the 29 tested GoF(MoP) functions. The reported value is the average over N calibration experiments, where N is the
+number of trajectories in the dataset.
+In the right half of the tables, relative errors as defined in Eq. (6), averaged over the N experiments, are reported for the same
+objective functions:
+∑ ( ( ))
+( ( )) N RE F β*
+k=1 i GoF(MoP),k
+RE i F β* GoF(MoP) = N , withi=s,v,a (13)
+In the rightmost column, the sum of the three relative errors in Eq. (13) is reported:
+(cid:0) (cid:0) )) ∑ (cid:0) (cid:0) ))
+RE F β* GoF(MoP) = RE i F β* GoF(MoP) (14)
+i={s,v,a}
+The 29 tested GoF(MoP) are ranked according to the distance metric in Eq. (14), as anticipated in Section 4.1. Each table cell is
+coloured according to the percentile of the distribution of each column metric (where the green and red colours correspond to the 0th
+and 100th percentiles, respectively).
+Result analysis shows that these trajectory datasets are very different from each other, since errors in the three objectives sensibly
+vary across the datasets and it is not possible to identify a pattern of variation.
+Concerning the comparison of objective functions, several observations from the results in the tables are worth noting:
+• When a single MoP is applied:
+– Regardless of the GoF, the model and the dataset, spacing is preferable as MoP. In fact, inequality in Eq. (7), on average (i.e., see
+Eq. (13)), and the equivalent one between speed and acceleration hold for every GoF, model and dataset. This is a further
+experimental confirmation of the results in Punzo and Montanino (2016).
+– Focusing on spacing, regardless of the model and dataset, GoFs which are not based on percentage errors i.e., RMSE(s), Theil’s U
+(s) and MAE(s) are always more preferable than percentage-based GoFs i.e., RMSPE and MAPE (with the only exception of the
+IDM/Hefei scenario, shown in Appendix C).
+• When multiple MoPs are applied:
+– NRMSE(s, v, a) and Theil’s U(s, v, a) are the two most preferable Pareto-efficient objective functions in the vast majority of the
+calibration scenarios. NRMSE is the most robust between the two, since in the ACC dataset for the FVDM-CTH, U(s, v, a) is one of
+the worst performing objective functions among those containing s as MoP.
+– Percentage-based objective functions, i.e., RMSPE and MAPE are less preferable than non-percentage-based ones, i.e., NRMSE
+and Theil’s U, either with two MoPs, i.e., s, v (with the only exception of the IDM/Hefei scenario), or three MoPs, i.e., s, v, a. In
+addition, in many calibration experiments, percentage-based objective functions did not return Pareto-efficient solutions (in
+general, percentage-based objective functions are not recommended, since they require thresholds on speed and acceleration,
+and overweigh lower value measurements in calibration).
+It is also worth noting that NRMSE(s, v, a) and Theil’s U(s, v, a) have never been used in the literature, to the best of our knowledge.
+NRMSE was used with a single MoP, i.e. spacing or speed (see e.g., Kesting and Treiber, 2008; Papathanasopoulou and Antoniou, 2015)
+but, in such a case, it is easy to show that NRMSE is equivalent to RMSE or SSE.
+Results in Tables 3 and 4 (plus those in Appendix C) are also useful to compare the model performances, across these different
+trajectory datasets.
+Gipps’ model and the IDM turned out to be the best-performing models on human-driven vehicle datasets. In particular, Gipps’
+model has the lowest error on spacing across all datasets (speed and acceleration errors are comparable to the minimum calibration
+errors, which are achieved by the IDM). Focusing on the automated vehicles dataset, Gipps’ model turned out to have the lowest
+calibration error on spacing and speed, among the four tested models (the acceleration error is very close to the minimum value, which
+is achieved by the IDM). It is somewhat surprising that Gipps’ model, which is based on an idealized safe human driving behaviour, has
+been the best model to approximate automated vehicle control logics, outperforming controllers which are customarily applied to
+simulate ACC vehicles (i.e., FVDM with CTH and SIGMOID spacing policies).
+Variances of relative calibration errors across the population of vehicles in Naples’ dataset, are visualised using box plots in Figs. 6
+and 7, as an example. As shown in these box plots, the variances of the relative calibration errors are significantly different across
+different objective functions. In general, the objective functions that are based either on speed only, or on acceleration only, display
+very large variances in their relative errors on spacing. Conversely, the objective functions based on spacing are much more robust,
+showing small variances of relative errors on speed as well as on acceleration. NRMSE(s,v,a) and U(s,v,a) consistently show small
+relative calibration errors on all three measures.
+Eventually, a comparison of calibrated parameter distributions among the models and among the datasets is presented for the two
+most preferable Pareto-efficient GoFs (see Fig. 8). The presented distributions should be viewed as another tool to assist us in inspecting
+the objective functions and models behaviour, and should not be assumed as reference distributions, e.g., for traffic simulation5
+(concerning the link between microscopic parameters distributions and traffic simulation outputs, the reader can refer to Punzo and
+5 Reported parameters distributions are representative of each specific dataset and their transferability to other contexts is questionable.
+18
+
+===== PAGE 19 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Montanino, 2020).
+With the aim of comparing values across all models, the “time headway” parameter has been chosen, since it is the most influential
+parameter in calibration among those present in all models – the others being the distance at stop s0 ,and the desired speed Vmax (see
+Punzo and Ciuffo, 2011; Punzo et al., 2015 as to the IDM and Gipps’ model).
+As shown in Fig. 8, for human-driven vehicles, time headway histograms clearly vary among models.6 Of course, they vary also
+across the datasets. A lower average value and a smaller variance is observed for the Naples’ dataset, which was collected from an
+urban context in tight car-following conditions. Higher average values and larger variances are observed for the NGSIM and the Hefei
+datasets, which were collected from a highway or highway-like (i.e., no traffic lights) context.
+As to the differences between the two objective functions, Theil’s U(s,v,a) yields a high number of parameter values falling into a
+range close to the upper bound as well as more discontinuous histograms. On the contrary, NRMSE(s,v,a) returns more regular
+histograms.
+For automated vehicles, results significantly differ between the two objective functions. As to the NRMSE(s,v,a) two models return
+time headway values in one class only (i.e. between 0.75 and 1.125 s), with the only Gipps’ model returning values in more than two
+classes. On the contrary, for Theil’s U(s,v,a), histograms clearly vary across the models.
+5. A guideline on calibration settings
+In light of previous results and in the spirit of the present study, we provide two qualitatively different recommendations.
+The first one concerns those calibration settings which are clearly inadequate, and as such should be avoided. This recommendation
+is deemed to be definitive according to the epistemological assumptions of this study (see the Introduction).
+The second recommendation concerns the calibration settings which have shown to be the most preferable among the Pareto-
+efficient ones. Despite the fact that the study spans over four different models and four different datasets, this recommendation
+cannot be claimed to be final, since there might be other calibration settings that are not considered here but would perform better than
+those recommended (in these scenarios and in others).
+1) Unsuitable settings in CF model calibration:
+• If one single MoP is adopted in the objective function, speed and acceleration should be avoided. Spacing should be used instead, as it
+is more preferable (see Eq. (7)).
+• If two or more MoPs are adopted in the objective function, percentage-based GoFs (i.e., RMSPE and MAPE) should be avoided,
+since either they are not Pareto-efficient or they are less preferable than non-percentage-based objective functions like NRMSE
+and Theil’s U.
+2) Pareto-efficient settings for CF model calibration:
+• NRMSE(s,v,a) and Theil’s U(s,v,a) are the most preferable objective functions among those being Pareto-efficient.
+• Since both NRMSE(⋅) and Theil’s U(⋅) have similar performances whether two or three MoPs are considered (i.e. s,v or s,v,a), if
+acceleration data are noisy (which often is the case in practice), NRMSE(s,v) or Theil’s U(s,v) is preferred.
+Based on results about parameter distributions (see Fig. 8 concerning the time headway), we hold a certain preference for NRMSE
+(⋅) over Theil’s U(⋅).
+Note that a proper acquisition and treatment of data are preliminary to the identification of unsuitable and suitable calibration
+settings. The following three prerequisites need to be guaranteed (see Section 2 and Remarks 1 and 2):
+• when pre-processing trajectory data, care must be taken to avoid error amplification in the differentiation process (noise), and error
+accumulation in the integration process (bias);
+• if several measures are independently gathered through separate devices, these measurements need to be (made) “internally
+consistent”;
+• the integration/differentiation scheme of data needs to be the same as the one adopted in the model simulation.
+6. Implications on research transparency and reproducibility
+For traffic flow research in general, and CF modelling in particular, a widely agreed CF model calibration setting is a prerequisite for
+transparency and reproducibility of research. Without adopting the same setting in different studies, it would be impossible to
+quantitatively and objectively compare different CF models, eventually calibrated on different datasets. By adopting the same setting
+researchers would be helped in choosing the most promising research paths while abandoning the misleading ones, which could also
+save reviewers’ time.
+As the recommendation on the calibration setting provided herein cannot be final, we are happy to share our methodological
+6 This might sound weird or counterintuitive, as time headway has a clear physical interpretation. Thus, one might expect calibrated distributions
+to be similar among models and to the empirical distribution of the quantity, i.e., as directly measured from data. Since calibrated parameters
+account for the whole epistemic uncertainty (for instance, they also compensate for model inaccuracies or misspecifications), estimated distributions
+result is inevitably different from the measured one (see discussions in Punzo and Montanino, 2020, and Punzo et al., 2015).
+19
+
+===== PAGE 20 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+framework and corresponding computer codes with the scientific community. In this way, any researcher can compare any new
+calibration setting, or model or dataset in a fair and objective manner against several models, settings and datasets, thus substantially
+speeding up the scientific knowledge advancement.
+In fact, transparency and reproducibility are generally regarded to as the gold standard of validating a scientific study. Simply
+speaking, reproducible research is an extra (but very important) effort from the authors of a publication to share their data, codes, and
+instructions on how to piece them together for the purpose of enabling a third party to easily and conveniently obtain the identical
+results reported in the paper (Mesirov 2010; Peng, 2011). Catalyzed by powerful, user-friendly and freely-available tools, reproducible
+research has been gaining lots of momentum and is at the verge of fundamentally changing how scientific work related to compu-
+tational analysis should be conducted, documented, disseminated, and maintained (Donoho et al. 2008; Donoho, 2010; Gandrud,
+2016; Xie et al. 2018). However, to date the Transportation Research community has not paid much attention to this reproducible
+research movement (Zheng, 2020).
+For the reasons above we hope that reproducibility of research will become a standard also in the Transportation Research field.
+Meanwhile, this paper is totally reproducible. The source codes for generating the entire paper in RStudio can be downloaded at http://
+www.multitude-project.eu/ or http://www.connectedandautonomoustransport.com/reproducible-research.html. Introduction to and
+tools for reproducible research can be found in Zheng (2020).
+7. Concluding remarks
+We are at a crossroads where it has to be decided how academic work should be conducted, documented and disseminated. The
+belief that reproducible research is an unstoppable and inevitable future has been gaining a massive following in many disciplines (e.g.,
+biostatistics, signal processing, statistical analysis, etc.). Still, it is not widespread in the Transportation Research community.
+By providing clear guidelines for calibrating car-following models, and making this paper totally reproducible, it is the authors’
+hope that it could not only end the state of confusion and contradictions that has plagued the CF modelling literature for so long, but
+also inspire the start of a wide practice of transparent and reproducible research in CF dynamics modelling. A spark that could
+hopefully spread into other branches of Transportation Research.
+In order to provide a guideline on calibration setting we have made an extensive calibration exercise by comparing all the objective
+functions adopted in the field literature so far, and some new ones. The analysis has been based on four models of car-following
+dynamics – widely adopted in the fields of both traffic flow theory and control theory – and on four different datasets, including
+trajectories of human-driven and automated vehicles.
+A methodology to compare and rank objective functions in terms of Pareto-efficiency has been developed. The criterion proposed,
+in particular, gives preference to the objective function providing the least distance from the utopic point. In order to compare results
+from objective functions with different units of measurement, a relative error with respect to the minimum achievable error over each
+objective has been proposed.
+Based on the analysis of the extensive calibration experiments carried out, two qualitatively different recommendations have been
+provided.
+The first one discourages the use of the objective functions which have consistently shown to be either not Pareto-efficient, or not
+preferable according to the proposed criterion across all the models and datasets. This recommendation is deemed to be final based on
+the epistemological assumptions of this study. In fact, these objective functions have no general validity. If one still intends to use them
+in a specific case, their scenario-specific superiority must be demonstrated against all other objective functions, before use.
+The second recommendation is about calibration settings which have shown to be the most preferable according to the proposed
+criterion, among the Pareto-efficient ones. Despite the fact that the study spans over four different models and four different and
+diverse datasets, this recommendation cannot be claimed to be final, since there might be other calibration settings, which are not
+considered here, that could perform better than those recommended. However, aside from new objective functions, an upheaval of the
+provided ranking is not expected, given the robustness of presented results across the quite wide range of models and datasets used in
+this study.
+Any different model, calibration setting, or trajectory dataset could be plugged-in in the computer codes that we share with the
+community. Thus, it could be tested in a fair and impartial manner against models, settings and trajectories applied in this study or
+added by other researchers.
+CRediT authorship contribution statement
+Vincenzo Punzo: Conceptualization, Data curation, Formal analysis, Funding acquisition, Investigation, Methodology, Software,
+Supervision, Validation, Writing - original draft, Writing - review & editing. Zuduo Zheng: Conceptualization, Data curation, Formal
+analysis, Funding acquisition, Investigation, Methodology, Software, Supervision, Validation, Writing - original draft, Writing - review
+& editing. Marcello Montanino: Conceptualization, Data curation, Formal analysis, Investigation, Methodology, Software, Super-
+vision, Validation, Visualization, Writing - original draft, Writing - review & editing.
+20
+
+===== PAGE 21 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Table C1
+Comparison of calibration errors for the IDM and for the FVDM with SIGMOID spacing policy, calibrated against Naples trajectories.
+21
+
+===== PAGE 22 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Table C2
+Comparison of calibration error for the IDM and for the FVDM with SIGMOID spacing policy, calibrated against AstaZero trajectories.
+22
+
+===== PAGE 23 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Table C3
+Relative calibration errors for the four models, calibrated against NGSIM I80-1 trajectories.
+23
+
+===== PAGE 24 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Table C4
+Relative calibration errors for the four models, calibrated against Hefei trajectories.
+24
+
+===== PAGE 25 =====
+
+TransportationResearchPartC128(2021)103165
+IDM
+25
+)a,v,s(ESMRN
+)a,v,s(ESMRN
+)a,v,s(ESMRN
+)a,v,s(U
+)a,v,s(U
+)a,v,s(U
+)v,s(U
+)v,s(U
+)v,s(U
+)v,s(ESMRN
+)v,s(ESMRN
+)v,s(ESMRN
+)v,s(EPAM
+)v,s(EPAM
+)v,s(EPAM
+)a,v,s(EPAM
+)a,v,s(EPAM
+)a,v,s(EPAM
+)v,s(edlit_EPSMR
+)v,s(edlit_EPSMR
+)v,s(edlit_EPSMR
+)a,v,s(EPSMR
+)a,v,s(EPSMR
+)a,v,s(EPSMR
+)s(ESMR
+)s(ESMR
+)s(ESMR
+)s(U
+)s(U
+)s(U
+)s(EAM
+)s(EAM
+)s(EAM
+)s(edlit_EPSMR
+)s(edlit_EPSMR
+)s(edlit_EPSMR
+)v(EPAM
+)v(EPAM
+)v(EPAM
+)v,s(EPSMR
+)v,s(EPSMR
+)v,s(EPSMR
+)s(EPAM
+)s(EPAM
+)s(EPAM
+)v(EPSMR
+)v(EPSMR
+)v(EPSMR
+)s(EPSMR
+)s(EPSMR
+)s(EPSMR
+)Vdts,s(EPSMR
+)Vdts,s(EPSMR
+)Vdts,s(EPSMR
+)v(edlit_EPSMR
+)v(edlit_EPSMR
+)v(edlit_EPSMR
+)v(EAM
+)v(EAM
+)v(EAM
+)v(ESMR
+)v(ESMR
+)v(ESMR
+)v(U
+)v(U
+)v(U
+)a(ESMR
+)a(ESMR
+)a(ESMR
+)a(U
+)a(U
+)a(U
+)a(EAM
+)a(EAM
+)a(EAM
+)Vdts(ESMR
+)Vdts(ESMR
+)Vdts(ESMR
+)Vdts(EPSMR
+)Vdts(EPSMR
+)Vdts(EPSMR
+)a(EPAM
+)a(EPAM
+)a(EPAM
+)a(EPSMR
+)a(EPSMR
+)a(EPSMR
+V. Punzo et al.
+Fig. C1. IDM relative calibration error box plots for Naples trajectories. The GoF(MoP) functions are sorted according to Table C1. Colours identify
+GoFs with the same MoP or combination of MoPs.
+
+===== PAGE 26 =====
+
+TransportationResearchPartC128(2021)103165
+SIGMOID
+26
+)a,v,s(ESMRN
+)a,v,s(ESMRN
+)a,v,s(ESMRN
+)a,v,s(U
+)a,v,s(U
+)a,v,s(U
+)v,s(ESMRN
+)v,s(ESMRN
+)v,s(ESMRN
+)v,s(U
+)v,s(U
+)v,s(U
+)v,s(EPAM
+)v,s(EPAM
+)v,s(EPAM
+)s(ESMR
+)s(ESMR
+)s(ESMR
+)s(U
+)s(U
+)s(U
+)a,v,s(EPAM
+)a,v,s(EPAM
+)a,v,s(EPAM
+)v,s(edlit_EPSMR
+)v,s(edlit_EPSMR
+)v,s(edlit_EPSMR
+)s(EAM
+)s(EAM
+)s(EAM
+)s(edlit_EPSMR
+)s(edlit_EPSMR
+)s(edlit_EPSMR
+)a,v,s(EPSMR
+)a,v,s(EPSMR
+)a,v,s(EPSMR
+)s(EPSMR
+)s(EPSMR
+)s(EPSMR
+)v(EPAM
+)v(EPAM
+)v(EPAM
+)v,s(EPSMR
+)v,s(EPSMR
+)v,s(EPSMR
+)s(EPAM
+)s(EPAM
+)s(EPAM
+)Vdts+s(EPSMR
+)Vdts+s(EPSMR
+)Vdts+s(EPSMR
+)v(edlit_EPSMR
+)v(edlit_EPSMR
+)v(edlit_EPSMR
+)v(EPSMR
+)v(EPSMR
+)v(EPSMR
+)v(EAM
+)v(EAM
+)v(EAM
+)v(U
+)v(U
+)v(U
+)v(ESMR
+)v(ESMR
+)v(ESMR
+)a(ESMR
+)a(ESMR
+)a(ESMR
+)a(EAM
+)a(EAM
+)a(EAM
+)a(U
+)a(U
+)a(U
+)Vdts(EPSMR
+)Vdts(EPSMR
+)Vdts(EPSMR
+)Vdts(ESMR
+)Vdts(ESMR
+)Vdts(ESMR
+)a(EPAM
+)a(EPAM
+)a(EPAM
+)a(EPSMR
+)a(EPSMR
+)a(EPSMR
+V. Punzo et al.
+Fig. C2. FVDM with SIGMOID spacing policy relative calibration error box plots for Naples trajectories. The GoF(MoP) functions are sorted ac-
+cording to Table C1. Colours identify GoFs with the same MoP or combination of MoPs.
+
+===== PAGE 27 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Acknowledgements
+The authors are thankful to Dr. Biagio Ciuffo for providing the ACC trajectory dataset collected in the AstaZero proving ground, and
+to Prof. Rui Jiang for providing the vehicle trajectory dataset from Hefei field experiments.
+The authors are also grateful to the University of Naples Federico II for providing access to the high-performance computing grid
+SCoPE (http://www.scope.unina.it).
+This research was partially funded by the Italian program PON AIM - Attraction and International Mobility, Linea 1 (AIM1849341-
+2, CUP E61G18000540007) and the Australian Research Council (DP210102970).
+Appendix A
+Here follows the list of the target journals in the literature review (we regard these journals as the premier venues for researchers in
+the traffic flow community, thus representing the state-of-the-art):
+• Transportation Research series (e.g., Transportation Research Part B, Part C, etc.)
+• Transportation Science
+• Transportation Research Record
+• IEEE Transactions on Intelligent Transportation Systems
+• IEEE Transactions on Vehicular Technology
+• IEEE Transactions on Control System Technology
+• IEEE Transactions on Intelligent Vehicles
+• IEEE journal on Automatic Control
+• Vehicle system dynamics
+• IET Intelligent Transport Systems
+• Transportation Planning and Technology
+• Transportmetrica A, and B
+• Physica A
+• Physical Review E
+• Accident Analysis and Prevention
+• Nonlinear Dynamics
+• European Transport Research Review
+• Philosophical Transactions of the Royal Society A
+• Journal of Intelligent Transportation Systems
+• Journal of Traffic and Transportation Engineering
+Appendix B
+In the following, there are some notes about the classification of the selected papers in the GoF/MoP notation in Table 2.
+Hoogendoorn and Hoogendoorn (2010a, 2010b), Hoogendoorn et al. (2010), Kim et al. (2013), Rhoades et al. (2016), Xu and Laval
+(2020): The authors applied the MLE method. Under the assumption of Gaussian errors, the MLE method is equivalent to the GLS
+method.
+Zhu et al. (2018a, 2018b, 2020), Chen et al. (2020), Kurtc and Treiber (2020): The authors applied a normalized SSE(⋅) over the
+square of the observed measure. From an optimization viewpoint, such GoF function is identical to the NRMSE(⋅), being one of its linear
+transformations.
+Chong et al. (2011), Rahman et al., 2015, Li et al. (2016), Xu et al. (2019): The authors applied SSE(⋅) =
+∑ [ ] 2
+T t=1 (⋅)sim(t)(cid:0) (⋅)obs(t) . From an optimization viewpoint, such GoF function is identical to RMSE(⋅), being one of its linear
+transformations.
+van Hinsbergen et al. (2015), Huang et al. (2018a), Li et al. (2018, 2020), Wang et al. (2018), Yu et al. (2018), Zhou et al. (2017):
+The authors applied MSE(⋅). From an optimization viewpoint, such GoF function is identical to RMSE(⋅), being one of its linear
+transformations.
+Yu and Shi (2014): The authors applied MSPE(⋅). From an optimization viewpoint, such GoF function is identical to RMSPE(⋅),
+being one of its linear transformations.
+Sangster et al. (2013), Zhang et al. (2019): The authors applied the root operator to the squared terms, rather than to the mean
+squared terms. From an optimization viewpoint, such GoF function is identical to the Theil’s Inequality Coefficient U, being one of its
+linear transformations. ⃒ ⃒
+∑ ⃒ ⃒
+Milanes and Shladover (2014): The authors applied IAE(⋅) = T t=1 ⃒(⋅)sim(t)(cid:0) (⋅)obs(t)⃒. Such GoF function is identical to the MAE
+(⋅), being one of its linear transformations.
+27
+
+===== PAGE 28 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Appendix C
+See Tables C1–C4.
+See Figs. C1 and C2.
+References
+Brockfeld, E., Kühne, R.D., Skabardonis, A., Wagner, P., 2003. Toward benchmarking of microscopic traffic flow models. Transp. Res. Rec. 1852, 124–129.
+Cascetta, E., Punzo, V., Montanino, M., 2011. Empirical analysis of effects of automated section speed enforcement system on traffic flow at freeway bottlenecks.
+Transp. Res. Rec. 2260, 83–93.
+Cattin, J., Leclercq, L., Pereyron, F., El Faouzi, N.-E., 2019. Calibration of Gipps’ car-following model for trucks and the impacts on fuel consumption estimation. IET
+Intel. Transport Syst. 13 (2), 323–329.
+Chen, X., Sun, J., Ma, Z., Sun, J., Zheng, Z., 2020. Investigating the long- and short-term driving characteristics and incorporating them into car-following models.
+Transp. Res. Part C: Emerging Technol. 117, 102698.
+Chong, L., Abbas, M.M., Medina, A., 2011. Simulation of driver behavior with agent-based back-propagation neural network. Transp. Res. Rec. 2249, 44–51.
+Ciuffo, B., Punzo, V., Torrieri, V., 2008. Comparison of simulation-based and model-based calibrations of traffic-flow microsimulation models. Transp. Res. Rec. 2088,
+36–44.
+Chong, L., Abbas, M., Medina Flintsch, A., Higgs, B., 2013. A rule-based neural network approach to model driver naturalistic behavior in traffic. Transp. Res. Part C
+32, 207–223.
+Ciuffo, B., Punzo, V., Montanino, M., 2012. 30 years of the Gipps’ car-following model: applications, developments and new features. Transp. Res. Record: J. Transp.
+Res. Board 2315, 89–99.
+Coifman, B., Li, L., 2017. A critical evaluation of the Next Generation Simulation (NGSIM) vehicle trajectory dataset. Transp. Res. Part B 105, 362–377.
+Di Bernardo, M., Salvi, A., Santini, S., 2015. Distributed consensus strategy for platooning of vehicles in the presence of time-varying heterogeneous communication
+delays. IEEE Trans. Intell. Transp. Syst. 16 (1), 102–112.
+Di Vaio, M., Fiengo, G., Petrillo, A., Salvi, A., Santini, S., Tufo, M., 2019. Cooperative shock waves mitigation in mixed traffic flow environment. IEEE Trans. Intell.
+Transp. Syst. 20 (12), 4339–4353.
+Donoho, D.L., 2010. An invitation to reproducible computational research. Biostatistics 11(3), 385–88.
+Donoho, D.L., Maleki, A., Rahman, I.U., Shahram, M., Stodden, V., 2008. Reproducible research in computational harmonic analysis. Comput. Sci. Eng. 11 (1), IEEE.
+Duret, A., Buisson, C., Chiabaut, N., 2008. Estimating individual speed-spacing relationship and assessing ability of Newell’s car-following model to reproduce
+trajectories. Transp. Res. Rec. 2088, 188–197.
+Gandrud, C., 2016. Reproducible Research with R and R Studio. Hall/CRC, Chapman.
+Gunter, G., Janssen, C., Barbour, W., Stern, R.E., Work, D.B., 2020. Model-based string stability of adaptive cruise control systems using field data. IEEE Trans.
+Intelligent Vehicles 5 (1), 90–99 art. no. 8910461.
+Gipps, P.G., 1981. A behavioural car-following model for computer simulation. Transp. Res. Part B 15B (2), 105–111.
+Hamdar, S.H., Dixit, V.V., Talebpour, A., Treiber, M., 2020. A behavioral microeconomic foundation for car-following models. Transp. Res. Part C: Emerging Technol.
+113, 228–244.
+Hamdar, S.H., Mahmassani, H.S., Treiber, M., 2015. From behavioral psychology to acceleration modeling: Calibration, validation, and exploration of drivers’
+cognitive and safety parameters in a risk-taking environment. Transp. Res. Part B 78, 32–53.
+Hammit, B.E., Ghasemzadeh, A., James, R.M., Ahmed, M.M., Young, R.K., 2018. Evaluation of weather-related freeway car-following behavior using the SHRP2
+naturalistic driving study database. Transp. Res. Part F: Traffic Psychol. Behav. 59, 244–259.
+Hao, H., Ma, W., Xu, H., 2016. A fuzzy logic-based multi-agent car-following model. Transp. Res. Part C: Emerging Technol. 69, 477–496.
+He, Z.C., Wang, Y.M., Sun, W.B., Huang, P.Y., Zhang, L.C., Zhong, R.X., 2016. Modelling car-following behaviour with lateral separation and overtaking expectation.
+Transportmetrica B 4 (3), 223–239.
+Hoogendoorn, R., Hoogendoorn, S.P., Brookhuis, K., Daamen, W., 2010. Mental workload, longitudinal driving behavior, and adequacy of car-following models for
+incidents in other driving lane. Transp. Res. Rec. 2188, 64–73.
+Higgs, B., Abbas, M., 2015. Segmentation and clustering of car-following behavior: Recognition of driving patterns. IEEE Trans. Intell. Transp. Syst. 16 (1), 81–90.
+Article number: 6832510.
+Hoogendoorn, S., Hoogendoorn, R., 2010a. Calibration of microscopic traffic-flow models using multiple data sources. Philos. Trans. R. Soc. A: Math. Phys. Eng. Sci.
+368 (1928), 4497–4517.
+Hoogendoorn, S.P., Hoogendoorn, R., 2010b. Generic calibration framework for joint estimation of car-following models by using microscopic data. Transp. Res. Rec.
+2188, 37–45.
+Huang, X., Sun, J., Sun, J., 2018a. A car-following model considering asymmetric driving behavior based on long short-term memory neural networks. Transp. Res.
+Part C: Emerging Technol. 95, 346–362.
+Huang, Y.-X., Jiang, R., Zhang, H.M., Hu, M.-B., Tian, J.-F., Jia, B., Gao, Z.-Y., 2018b. Experimental study and modeling of car-following behavior under high speed
+situation. Transp. Res. Part C: Emerging Technol. 97, 194–215.
+Iancu, D.A., Trichakis, N., 2014. Pareto efficiency in robust optimization. Manage. Sci. 60 (1), 130–147.
+James, R.M., Melson, C., Hu, J., Bared, J., 2019. Characterizing the impact of production adaptive cruise control on traffic flow: an investigation. Transportmetrica B 7
+(1), 992–1012.
+Jiang, R., Wu, Q.S., Zhu, Z.J., 2001. Full velocity difference model for a car-following theory. Phys. Rev. E 64, 017101.
+Jiang, R., Hu, M.-B., Zhang, H.M., Gao, Z.-Y., Jia, B., Wu, Q.-S., 2015. On some experimental features of car-following behavior and how to model them. Transp. Res.
+Part B: Methodol. 80, 338–354.
+Jin, P.J., Yang, D., Ran, B., 2014. Reducing the error accumulation in car-following models calibrated with vehicle trajectory data. IEEE Trans. Intell. Transp. Syst. 15
+(1), 148–157. Article number: 6583947.
+Kesting, A., Treiber, M., 2008. Calibrating car-following models by using trajectory data methodological study. Transp. Res. Rec. 2088, 148–156.
+Kim, I., Kim, T., Sohn, K., 2013. Identifying driver heterogeneity in car-following based on a random coefficient model. Transp. Res. Part C 36, 35–44.
+Kim, J., Mahmassani, H.S., 2011. Correlated parameters in driving behavior models: Car-following example and implications for traffic microsimulation. Transp. Res.
+Rec. 2249, 62–77.
+Kurtc, V., Treiber, M., 2020. Simulating bicycle traffic by the intelligent-driver model-Reproducing the traffic-wave characteristics observed in a bicycle-following
+experiment. J. Traffic Transp. Eng. 7 (1), 19–29.
+Li, L., Chen, X.M., Zhang, L., 2016. A global optimization algorithm for trajectory data based car-following model calibration. Transp. Res. Part C: Emerging Technol.
+68, 311–332.
+Li, T., Ngoduy, D., Hui, F., Zhao, X., 2020. A car-following model to assess the impact of V2V messages on traffic dynamics. Transportmetrica B 8 (1), 150–165.
+Li, X., Luo, X., He, M., Chen, S., 2018. An improved car-following model considering the influence of space gap to the response. Physica A 509, 536–545.
+28
+
+===== PAGE 29 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Makridis, M., Mattas, K., Anesiadou, A., Ciuffo, B., 2020. openACC. An open database of car-following experiments to study the properties of commercial ACC systems,
+arXiv:2004.06342, http://arxiv.org/abs/2004.06342.
+Mamouei, M., Kaparias, I., Halikias, G., 2016. A quantitative approach to the behavioural analysis of drivers in highways using particle filtering. Transp. Plan.
+Technol. 39 (1), 78–96.
+Mesirov, J.P., 2010. Accessible reproducible research. Science 327 (5964).
+Montanino, M., Punzo, V., 2013. Making NGSIM data usable for studies on traffic flow theory: a multistep method for vehicle trajectory reconstruction. Transp. Res.
+Rec. 2390, 99–111.
+Montanino, M., Punzo, V., 2015. Trajectory data reconstruction and simulation-based validation against macroscopic traffic patterns. Transp. Res. Part B 80, 82–106.
+Montanino, M., Ciuffo, B., Punzo, V., 2012. Calibration of microscopic traffic flow models against time-series data. In: IEEE Conference on Intelligent Transportation
+Systems, pp. 108–114.
+Milanes, V., Shladover, S.E., 2014. Modeling cooperative and autonomous adaptive cruise control dynamic responses using experimental data. Transp. Res. Part C 48,
+285–300.
+Montanino, M., Monteil, J., Punzo, V., 2021. From homogeneous to heterogeneous traffic flows: Lp String stability under uncertain model parameters. Transp. Res.
+Part B: Methodol. 146, 136–154.
+Montanino, M., Punzo, V., 2021. On string stability of a mixed and heterogeneous traffic flow: A unifying modelling framework. Transp. Res. Part B: Methodol. 144,
+133–154.
+Monteil, J., Nantes, A., Billot, R., Sau, J., El Faouzi, N.-E., 2014. Microscopic cooperative traffic flow: Calibration and simulation based on a next generation
+simulation dataset. IET Intel. Transport Syst. 8 (6), 519–525.
+Ngoduy, D., Lee, S., Treiber, M., Keyvan-Ekbatani, M., Vu, H.L., 2019. Langevin method for a continuous stochastic car-following model and its stability conditions.
+Transp. Res. Part C: Emerging Technol. 105, 599–610.
+Ossen, S., Hoogendoorn, S.P., 2008. Validity of trajectory-based calibration approach of car-following models in presence of measurement errors. Transp. Res. Rec.
+2088, 117–125.
+Ossen, S., Hoogendoorn, S.P., 2009. Reliability of parameter values estimated using trajectory observations. Transp. Res. Rec. 2124, 36–44.
+Papathanasopoulou, V., Antoniou, C., 2015. Towards data-driven car-following models. Transp. Res. Part C 55, 496–509.
+Papathanasopoulou, V., Markou, I., Antoniou, C., 2016. Online calibration for microscopic traffic simulation and dynamic multi-step prediction of traffic speed.
+Transp. Res. Part C: Emerging Technol. 68, 144–159.
+Park, M., Kim, Y., Yeo, H., 2020. Development of an asymmetric car-following model and simulation validation. IEEE Trans. Intelligent Transp. Syst. 21 (8),
+3513–3524 art. no. 8791002.
+Pei, X., Pan, Y., Wang, H., Wong, S.C., Choi, K., 2016. Empirical evidence and stability analysis of the linear car-following model with gamma-distributed memory
+effect. Physica A 449, 311–323.
+Peng, R.D., 2011. Reproducible research in Computational Science. Science 334 (6060), 1226–1227.
+Peng, Y., Liu, S., Yu, D.Z., 2020. An improved car-following model with consideration of multiple preceding and following vehicles in a driver’s view. Physica A: Stat.
+Mech. Appl. 538, 122967.
+Popper, K., 1963. Conjectures and Refutations. The growth of Scientific Knowledge. Routledge & Kegan Paul.
+Punzo V., Ciuffo B., 2011. Sensitivity analysis of microscopic traffic flow models: methodology and application. In: Proceedings of the 90th TRB Annual Meeting, TRB,
+Washington D.C.
+Punzo, V., Montanino, M., Ciuffo, B., 2015. Do we really need to calibrate all the parameters? Variance-based sensitivity analysis to simplify microscopic traffic flow
+models. IEEE Trans. Intell. Transp. Syst. 16 (1), 184–193.
+Punzo, V., Borzacchiello, M.T., Ciuffo, B., 2011. On the assessment of vehicle trajectory data accuracy and application to the Next Generation SIMulation (NGSIM)
+program data. Transp. Res. Part C 19 (6), 1243–1262.
+Punzo, V., Ciuffo, B., Montanino, M., 2012. Can results of car-following model calibration based on trajectory data be trusted? Transp. Res. Rec. 2315, 11–24.
+Punzo, V., Montanino, M., 2016. Speed or spacing? Cumulative variables, and convolution of model errors and time in traffic flow models validation and calibration.
+Transp. Res. Part B 91, 21–33.
+Punzo, V., Simonelli, F., 2005. Analysis and comparison of microscopic traffic flow models with real traffic microscopic data. Transp. Res. Rec. 1934, 53–63.
+Punzo, V., Montanino, M., 2020. A two-level probabilistic approach for robust validation of stochastic traffic simulations: impact of drivers’ heterogeneity models.
+Transp. Res. Part C 121, 102843.
+Punzo, V., Formisano, D.J., Torrieri, V., 2005. Nonstationary Kalman filter for estimation of accurate and consistent car-following data. Transp. Res. Record: J. Transp.
+Res. Board 1934, 3–12.
+Rahman, M., Chowdhury, M., Khan, T., Bhavsar, P., 2015. Improving the efficacy of car-following models with a new stochastic parameter estimation and calibration
+method. IEEE Trans. Intell. Transp. Syst. 16 (5), 2687–2699. Article number: 7097035.
+Rhoades, C., Wang, X., Ouyang, Y., 2016. Calibration of nonlinear car-following laws for traffic oscillation prediction. Transp. Res. Part C: Emerging Technol. 69,
+328–342.
+Saifuzzaman, M., Zheng, Z., Haque, M.M., Washington, S., 2017. Understanding the mechanism of traffic hysteresis and traffic oscillations through the change in task
+difficulty level. Transp. Res. Part B: Methodol. 105, 523–538.
+Saifuzzaman, M., Zheng, Z., Mazharul Haque, M., Washington, S., 2015. Revisiting the Task-Capability Interface model for incorporating human factors into car-
+following models. Transp. Res. Part B 82, 1–19.
+Sangster, J., Rakha, H., Du, J., 2013. Application of naturalistic driving data to modeling of driver car-following behavior. Transp. Res. Rec. 2390, 20–33.
+Schorr, J., Hamdar, S.H., Silverstein, C., 2017. Measuring the safety impact of road infrastructure systems on driver behavior: Vehicle instrumentation and real world
+driving experiment. J. Intell. Transp. Syst. Technol. Plann. Oper. 21 (5), 364–374.
+Sharma, A., Zheng, Z., Bhaskar, A., 2019a. Is more always better? The impact of vehicular trajectory completeness on car-following model calibration and validation.
+Transp. Res. Part B: Methodol. 120, 49–75.
+Sharma, A., Zheng, Z., Bhaskar, A., Haque, M.M., 2019b. Modelling car-following behaviour of connected vehicles with a focus on driver compliance. Transp. Res. Part
+B: Methodol. 126, 256–279.
+Sun, J., Zheng, Z., Sun, J., 2020. The relationship between car following string instability and traffic oscillations in finite-sized platoons and its use in easing
+congestion via connected and automated vehicles with IDM based controller. Transp. Res. Part B 142, 58–83.
+Sun, J., Zheng, Z., Sun, J., 2018. Stability analysis methods and their applicability to car-following models in conventional and connected environments. Transp. Res.
+Part B 109, 212–237.
+Punzo, V., Tripodi, A., 2007. Steady-state solutions and multiclass calibration of gipps microscopic traffic flow model. Transp. Res. Rec. 1999, 104–114.
+Rafati Fard, M., Shariat Mohaymany, A., 2019. A copula-based estimation of distribution algorithm for calibration of microscopic traffic models. Transp. Res. Part C
+98, 449–470.
+RStudio, 2020. https://rstudio.com/.
+Tian, J., Li, G., Treiber, M., Jiang, R., Jia, N., Ma, S., 2016. Cellular automaton model simulating spatiotemporal patterns, phase transitions and concave growth
+pattern of oscillations in traffic flow. Transp. Res. Part B: Methodol. 93, 560–575.
+Tian, J., Zhang, H.M., Treiber, M., Jiang, R., Gao, Z.-Y., Jia, B., 2019. On the role of speed adaptation and spacing indifference in traffic instability: Evidence from car-
+following experiments and its stochastic model. Transp. Res. Part B: Methodol. 129, 334–350.
+Tian, J., Zhu, C., Chen, D., Jiang, R., Wang, G., Gao, Z., 2021. Car following behavioral stochasticity analysis and modeling: Perspective from wave travel time.
+Transp. Res. Part B 143, 160–176.
+Thiemann, C., Treiber, M., Kesting, A., 2008. Estimating acceleration and lane-changing dynamics from next generation simulation trajectory data. Transp. Res. Rec.
+2088, 90–101.
+29
+
+===== PAGE 30 =====
+
+V. Punzo et al. T r a n s p o r t a t i o n R e s e a r c h P a r t C 1 28(2021)103165
+Treiber, M., Kesting, A., 2011. Evidence of convective instability in congested traffic flow: A systematic empirical and theoretical investigation. Transp. Res. Part B 45
+(9), 1362–1377.
+Treiber, M., Kesting, A., 2013. Traffic Flow Dynamics. Data, Models and Simulation. Springer.
+Treiber, M., Kanagaraj, V., 2015. Comparing numerical integration schemes for time-continuous car-following models. Physica A 419, 183–195.
+Treiber, M., Kesting, A., Helbing, D., 2006. Delays, inaccuracies and anticipation in microscopic traffic models. Physica A 360 (1), 71–88.
+Treiber, M., Hennecke, A., Helbing, D., 2000. Congested traffic states in empirical observations and microscopic simulations. Phys. Rev. E 62 (2), 1805.
+van Hinsbergen, C.P.I.J., Schakel, W.J., Knoop, V.L., van Lint, J.W.C., Hoogendoorn, S.P., 2015. A general framework for calibrating and comparing car-following
+models. Transportmetrica A 11 (5), 420–440.
+Vieira da Rocha, T., Leclercq, L., Montanino, M., Parzani, C., Punzo, V., Ciuffo, B., Villegas, D., 2015. Does traffic-related calibration of car-following models provide
+accurate estimations of vehicle emissions? Transp. Res. Part D: Transport Environ. 34, 267–280.
+Wang, H., Li, Y., Wang, W., Fu, M., Huang, R., 2017. Optimal velocity model with dual boundary optimal velocity function. Transportmetrica B 5 (2), 211–227.
+Wang, H., Wang, W., Chen, J., 2011. General Newell model and related second-order expressions. Transp. Res. Rec. 2260, 42–49.
+Wang, H., Wang, W., Chen, J., Xu, C., Li, Y., 2019. Can we trust the speed–spacing relationship estimated by car-following model from non-stationary trajectory data?
+Transportmetrica A: Transport Sci. 15 (2), 263–284.
+Wang, X., Jiang, R., Li, L., Lin, Y., Zheng, X., Wang, F.-Y., 2018. Capturing car-following behaviors by deep learning. IEEE Trans. Intell. Transp. Syst. 19 (3), 910–920.
+Ward, J.A., Wilson, R.E., 2011. Criteria for convective versus absolute string instability in car-following models. Proc. R. Soc. A 467 (2132), 2185–2208.
+Wilson, R.E., 2001. An analysis of Gipps’ car-following model of highway traffic. IMA J. Appl. Math. 66 (5), 509–537.
+Xie, Y., Allaire, J.J., Grolemund, G., 2018. R Markdown: The Definitive Guide. CRC Press.
+Xu, D., Zhao, H., Guillemard, F., Geronimi, S., Aioun, F., 2019. Aware of scene vehicles - Probabilistic modeling of car-following behaviors in real-world traffic. IEEE
+Trans. Intelligent Transp. Syst. 20 (6), 2136–2148 art. no. 8463493.
+Xu, T., Laval, J., 2020. Statistical inference for two-regime stochastic car-following models. Transp. Res. Part B: Methodol. 134, 210–228.
+Yang, D., Zhu, L., Ran, B., Pu, Y., Hui, P., 2016. Modeling and analysis of the lane-changing execution in longitudinal direction. IEEE Trans. Intelligent Transp. Syst. 17
+(10), 2984–2992 art. no. 7457696.
+Ye, F., Hao, P., Qi, X., Wu, G., Boriboonsomsin, K., Barth, M.J., 2019. Prediction-based eco-approach and departure at signalized intersections with speed forecasting
+on preceding vehicles. IEEE Trans. Intelligent Transp. Syst. 20 (4), 1378–1389 art. no. 8464298.
+Yu, S., Shi, Z., 2014. An extended car-following model at signalized intersections. Physica A 407, 152–159.
+Yu, S., Tang, J., Xin, Q., 2018. Relative velocity difference model for the car-following theory. Nonlinear Dyn. 91 (3), 1415–1428.
+Yu, S., Zhao, X., Xu, Z., Shi, Z., 2016. An improved car-following model considering the immediately ahead car’s velocity difference. Physica A 461, 446–455.
+Zhang, L., Orosz, G., 2016. Motif-Based Design for Connected Vehicle Systems in Presence of Heterogeneous Connectivity Structures and Time Delays. IEEE Trans.
+Intell. Transp. Syst. 17 (6), 1638–1651.
+Zhang, L., Sun, J., Orosz, G., 2018. Hierarchical design of connected cruise control in the presence of information delays and uncertain vehicle dynamics. IEEE Trans.
+Control Syst. Technol. 26 (1), 139–150.
+Zhang, X., Sun, J., Qi, X., Sun, J., 2019. Simultaneous modeling of car-following and lane-changing behaviors using deep learning. Transp. Res. Part C: Emerging
+Technol. 104, 287–304.
+Zhao, S., Zhang, K., 2020. A distributionally robust stochastic optimization-based model predictive control with distributionally robust chance constraints for
+cooperative adaptive cruise control under uncertain traffic conditions. Transp. Res. Part B: Methodol. 138, 144–178.
+Zheng, L., Jin, P.J., Huang, H., Gao, M., Ran, B., 2016. A vehicle type-dependent visual imaging model for analysing the heterogeneous car-following dynamics.
+Transportmetrica B 4 (1), 68–85.
+Zhong, R.X., Fu, K.Y., Sumalee, A., Ngoduy, D., Lam, W.H.K., 2016. A cross-entropy method and probabilistic sensitivity analysis framework for calibrating
+microscopic traffic models. Transp. Res. Part C: Emerging Technol. 63, 147–169.
+Zhou, M., Qu, X., Li, X., 2017. A recurrent neural network based microscopic car following model to predict traffic oscillation. Transp. Res. Part C: Emerging Technol.
+84, 245–264.
+Zhu, M., Wang, X., Hu, J., 2020. Impact on car following behavior of a forward collision warning system with headway monitoring. Transp. Res. Part C: Emerging
+Technol. 111, 226–244.
+Zhu, M., Wang, X., Tarko, A., Fang, S., 2018a. Modeling car-following behavior on urban expressways in Shanghai: A naturalistic driving study. Transp. Res. Part C:
+Emerging Technol. 93, 425–445.
+Zhu, M., Wang, X., Wang, Y., 2018b. Human-like autonomous car-following model with deep reinforcement learning. Transp. Res. Part C: Emerging Technol. 97,
+348–368.
+Zheng, Z., 2020. Reasons, challenges and some tools for doing reproducible research in Transportation Research. arXiv:2105.06743v1 [cs.DL].
+30

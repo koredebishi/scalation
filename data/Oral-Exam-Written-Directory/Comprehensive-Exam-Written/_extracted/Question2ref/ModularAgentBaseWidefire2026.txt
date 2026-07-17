@@ -1,0 +1,1029 @@
+===== PAGE 1 =====
+
+Safety Science 199 (2026) 107200
+Contents lists available at ScienceDirect
+Safety Science
+journal homepage: www.elsevier.com/locate/safety
+A modular agent-based framework for wildfire evacuation: Integrating fire
+spread, multimodal transport, and dynamic routing
+Shahab Mohammad Beykia,* , Anne S. Patriciob, Anto ´ nio Gameiro Lopesc, Aldina Santiagod ,
+Luís Laímd
+aUniversity of Coimbra, Department of Mechanical Engineering, R. Luis Reis dos Santos, Coimbra 3030-788, Portugal
+bMaaSLab, 78 Spyrou Kyprianou, Limassol 4043, Cyprus
+cUniversity of Coimbra, Department of Mechanical Engineering, P´olo II da Universidade de Coimbra, R. Luis Reis dos Santos, Coimbra 3030-788, Portugal
+dUniversity of Coimbra, Department of Civil Engineering, R. Luis Reis dos Santos 290, Coimbra 3030-790, Portugal
+A R T I C L E I N F O A B S T R A C T
+Keywords: Wildfires increasingly threaten communities, especially in the Wildland–Urban Interface, where evacuation often
+Wildland-urban interface becomes the only viable life-safety measure. Planning effective evacuations is challenging due to interactions
+Wildfire among community behavior, road network capacity, and rapidly changing fire conditions. Despite advances in
+Evacuation
+wildfire evacuation modeling, significant gaps remain: limited dynamic rerouting when roads are compromised,
+Simulation
+insufficient representation of multimodal evacuation, weak integration of high-resolution fire spread data, and
+Agent-based modeling
+the lack of inbound traffic and rescue operations. We introduce a modular, agent-based evacuation framework
+that combines fire spread, pedestrian movement, and vehicle traffic in a single model. It supports dynamic
+routing responsive to advancing fires, enables both outbound self-evacuation and inbound rescue operations, and
+incorporates multimodal transportation modes. A high-resolution wildfire model is coupled with diverse human
+behaviors and route availability. The model was tested in a case study in Portugal and validated against an
+evacuation drill, showing strong agreement in evacuation times and demonstrating its capacity to replicate real-
+world processes. Owing to its modular design and use of publicly available datasets, the framework can be
+readily adapted to diverse settings. It improves evacuation planning by allowing scenario testing, “what-if“
+analyses, and data-driven decision-making to enhance community safety and resilience.
+1. Introduction Service, 2003). Continued development in fire‑prone landscapes, often
+coupled with flammable construction materials and limited road ca-
+Wildfires have become an increasing threat to human settlements as pacity, constrains shelter‑in‑place options and increases dependence on
+climate change and land‑use shifts intensify fire occurrence and severity evacuation as the primary life‑safety measure (Cova et al., 2013; Cova
+(Liu et al., 2010; Bowman, 2020; Jolly, 2015). While fire is a natural and Johnson, 2002; Dodson, 2010).
+ecological process, it becomes a societal hazard when it intersects with Recent wildfire disasters demonstrate that evacuation is usually the
+the wildland–urban interface (WUI), where residential development is only viable strategy for protecting civilians. Large wildfire events in
+directly exposed to flammable vegetation. Expansion of the WUI has North America and Australia have resulted in mass evacuations
+substantially increased human exposure to wildfire hazards, with a involving tens of thousands of residents and substantial loss of life when
+growing proportion of fires affecting populated areas and infrastructures evacuation processes failed or were delayed (Beverly and Bothwell,
+(Manzello et al., 2018; Radeloff, 2018). Climate‑driven increases in 2011; Teague et al., 2009; Wong et al., 2020a,b). Post‑event analyses
+temperature, drought, and fuel aridity accelerate fire spread and reduce show that fatalities often occur during late, uncoordinated, or self‑ini-
+suppression effectiveness (Liu et al., 2010; Jolly, 2015). At the same tiated evacuations, where individuals encounter fire on congested road
+time, legacy fire‑suppression practices have promoted fuel accumula- networks or underestimate fire dynamics (Haynes et al., 2010; Rodri-
+tion, contributing to larger and more severe events (USDA Forest gues et al., 2022). These findings indicate that evacuation timing and
+* Corresponding author.
+E-mail addresses: shahab@uc.pt (S.M. Beyki), anne.patricio@student.dec.uc.pt (A.S. Patricio), antonio.gameiro@dem.uc.pt (A.G. Lopes), aldina@dec.uc.pt
+(A. Santiago), luislaim@uc.pt(L. Laím).
+https://doi.org/10.1016/j.ssci.2026.107200
+Received 10 December 2025; Received in revised form 13 February 2026; Accepted 15 March 2026
+Available online 21 March 2026
+0925-7535/© 2026 The Author(s). Published by Elsevier Ltd. This is an open access article under the CC BY license ( http://creativecommons.org/licenses/by/4.0/ ).
+
+===== PAGE 2 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+coordination are as critical as the decision to evacuate itself. behavioral realism (Dennison et al., 2007; Li et al., 2019).
+Poorly managed evacuations can exacerbate risks. Simultaneous Agent‑based modeling (ABM) emerged to address these limitations
+departures without traffic control or phased evacuation strategies can by representing heterogeneous household behavior and adaptive deci-
+generate congestion, increasing exposure time and limiting access for sion‑making. Beloglazov et al. (2016)presented an early coupled fire-
+emergency responders. Empirical evidence shows that early but un- –traffic ABM, examining evacuation outcomes under different warning
+structured evacuations may lead to higher casualty rates than horizons. Although traffic congestion and fire‑induced network loss
+well‑planned, staged, and communicated strategies (Rodrigues et al., were represented, evacuation participation was predefined, transport
+2022). Effective evacuation, therefore, requires planning that explicitly was limited to private vehicles, routing followed shortest paths to a
+accounts for fire progression, human behavior, and transportation single shelter, and fire spread was modeled deterministically. Results
+constraints under rapidly evolving conditions. nevertheless demonstrated the dominant influence of warning timing on
+In this context, predictive modeling and simulation have become congestion, clearance, and entrapment risk. Similar assumptions appear
+essential tools for wildfire evacuation planning and emergency man- in later studies. Leo´n and March (2017)analyzed bushfire evacuation in
+agement. Simulation frameworks enable decision-makers to explore Victoria, Australia, assuming full compliance with evacuation orders
+how fire spread, pedestrian movement, and vehicle traffic interact and and exclusive reliance on private vehicles. Varying warning times
+to evaluate the effectiveness of alternative strategies, such as staged indicate that short‑notice evacuations sharply reduce the likelihood of
+evacuation and public transport deployment (Ronchi et al., 2019; clearance and challenge the practical implementation of “shared re-
+Gwynne et al., 2019; Intini et al., 2019). However, the operational value sponsibility” policies. Veeraswamy et al. (2018) focused instead on
+of these tools depends on the reliability of their assumptions and rep- pedestrian evacuation under restricted road access, using the Exodus
+resentations of both hazard and human response (Mitchell et al., 2023; ABM platform. By holding population and fire progression constant and
+Beyki et al., 2023). When appropriately applied, integrated evacuation varying route availability, they isolated the effect of network loss on
+models provide a systematic, evidence-based means of designing safer evacuation performance but excluded vehicular traffic and mixed‑mode
+and more effective evacuation strategies for WUI communities facing behavior.
+escalating wildfire risk. A major advance was the development of integrated, multi‑layer
+This work aims to develop an evacuation model that can support platforms that couple fire, pedestrian response, and traffic. Ronchi et al.
+wildfire evacuation planning and management. The model integrates a (2017, 2019)emphasized the need for consistent spatial and temporal
+high-resolution, wind-fire-coupled wildfire-propagation component resolution across these layers. Building on this, Wahlqvist et al. (2021)
+with multimodal transportation and dynamic rerouting capabilities that introduced the WUI‑NITY framework, integrating FARSITE fire spread,
+account for road availability as it changes under the influence of pedestrian response, and traffic evacuation within a modular Unity3D
+advancing fire, as well as explicit modeling of pedestrian decision- environment. The platform supports dynamic vulnerability mapping
+making and movement, and of vehicle–pedestrian interaction. By and evacuation trigger buffers via the PERIL algorithm, which compares
+combining these elements, the model seeks to provide a more realistic available safe egress time with required egress time. Pedestrian response
+and adaptive framework for evaluating evacuation strategies and is represented macroscopically through departure‑time distributions
+improving community safety. and network entry models, after which evacuees transition to vehi-
+The remainder of this paper is organized as follows: Chapter 2 re- cle‑based traffic simulation. While WUI‑NITY demonstrates the value of
+views the state of the art in wildfire evacuation simulation, outlining key modular coupling, individual pedestrian movement, mixed‑mode
+assumptions, limitations, and gaps in current knowledge, and then ex- households, and emergency extraction are not explicitly modeled.
+plains how this study seeks to bridge these gaps. Chapter 3 presents the Case‑specific ABMs have provided more detailed insights into
+methods and tools used to develop the proposed model. Chapter 4 re- household‑level decision‑making. Grajdura et al. (2022) modeled the
+ports the simulation results, while Chapter 5 interprets these findings in 2018 Camp Fire using NetLogo, parameterizing agent behavior from
+terms of their practical implications for decision-makers and stake- post‑event surveys. Routing was adaptive to fire‑induced blockages, but
+holders and outlines the study’s limitations and directions for future the simplified, tree‑like road network and reduced agent population
+research. Finally, Chapter 6 concludes the study by summarizing its key amplified congestion and entrapment effects. Results highlighted the
+contributions and implications. sensitivity of evacuation outcomes to awareness delays and vehicle
+availability. Similarly, Siam et al. (2022)developed a multimodal ABM
+2. State of the art for the 2018 Mati fire in Greece, coupling externally simulated fire
+spread with household decisions, pedestrian and vehicle flows, and
+Wildfire evacuation is a complex process shaped by fire dynamics, shelter capacity. Their results showed that staged evacuations reduce
+human decision‑making, and the transportation system. Early studies congestion, shelter availability influences survival, and modal choice
+primarily addressed road network capacity and clearance times under creates trade‑offs between speed and exposure. However, fire avoidance
+simplified assumptions about population response. Cova and Johnson during movement, car–pedestrian interactions, and mixed‑mode evac-
+(Cova and Johnson, 2002) showed that evacuation vulnerability is uation at the individual level were not represented.
+particularly acute in WUI communities with limited egress, where Overall, the literature shows a progression from macroscopic clear-
+fire‑induced road blockages can rapidly lead to entrapment. Wolshon ance‑time analyses to integrated platforms and empirically informed
+and Marchive (2007)conducted an early subdivision-scale analysis of ABMs. Persistent limitations remain. Fire progression is often imposed
+wildfire evacuation in the WUI using microscopic traffic simulation. deterministically or externally, with limited dynamic interaction be-
+Using CORSIM, they examined how evacuation clearance is constrained tween fire and evacuees. Population response is commonly simplified
+by the interaction between housing density, warning time, and egress through fixed participation rates or aggregate departure curves, omit-
+capacity. Their results showed that short-notice evacuations and ting behaviors such as delayed response, shadow evacuation, or refusal.
+increased development density rapidly lead to queue formation and Evacuation is typically modeled as outbound movement to predefined
+vehicle entrapment, while additional exits or longer lead times sub- shelters, with restricted representation of multimodal transport, emer-
+stantially improve clearance. This work provided early quantitative gency extraction, and car–pedestrian interactions. Traffic routing often
+evidence that subdivision road design and evacuation timing are critical relies on shortest‑path algorithms, with simplified handling of fire‑in-
+determinants of wildfire evacuation feasibility, anticipating later duced road loss. Pedestrian dynamics are often aggregated, and
+microsimulation and agent-based evacuation studies. Subsequent works computational constraints limit population scaling. Addressing these
+coupled wildfire spread with transportation models, but typically relied gaps requires models that tightly couple fire dynamics with multimodal
+on fixed participation rates, uniform vehicle access, and limited evacuation processes and dynamically adapt to evolving hazard and
+2
+
+===== PAGE 3 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+network conditions. Table 1 presents a summary of the reviewed higher accuracy, as fire spread predictions remain sensitive to uncertain
+models, their features, and identified limitations. inputs and modeling assumptions. Consequently, recent works empha-
+This study aims to address gaps in the literature by developing an size the value of high-resolution fire simulations when they are validated
+agent-based wildfire evacuation model that integrates several key ad- or corrected using observational data, such as satellite-derived active
+vancements. The model incorporates a high-resolution, wind-coupled fire detections, and when their limitations are explicitly acknowledged
+fire spread component, enabling a more realistic representation of in evacuation applications (Beyki et al., 2025a; 2025b). Unlike most
+hazard dynamics and their impact on evacuation processes. In this existing frameworks that limit evacuation to outbound movement, the
+context, high resolution refers to fire spread simulations conducted at proposed model also accounts for bidirectional flows, thereby repre-
+spatial and temporal scales capable of resolving fire–infrastructure in- senting scenarios in which protection services conduct extraction op-
+teractions at the community level, rather than at the coarse regional erations into the hazard zone. The dynamic impact of fire on the
+scale. Such resolution is critical for evacuation analysis, as it enables transportation network is explicitly modeled, whereby fire blocks indi-
+more accurate estimation of time-to-impact on road segments, dynamic vidual road segments rather than making entire destinations inacces-
+loss of egress options, and spatial variability in hazard exposure within sible, enabling more detailed interactions between fire spread and traffic
+settlements. However, higher resolution does not inherently imply flow. Pedestrian evacuation is modeled at the microscale, capturing
+detailed movement behaviors rather than relying on broad distributions.
+The model considers multiple transportation modes, i.e., on foot, private
+Table 1 vehicle, and public transit, to better reflect real-world evacuation stra-
+Summary of the Evacuation Models. tegies. Pedestrian-vehicle interactions, including boarding and dis-
+embarking, are explicitly represented. In addition to self-evacuation, the
+Work Features Limitations
+framework incorporates the possibility of resident extraction by emer-
+Cova and Johnson (cid:0) Road network capacity (cid:0) Simplified assumptions;
+gency forces, extending beyond individual households to include orga-
+(2002) and clearance times; –no behavioral modeling;
+(cid:0) focus on WUI (cid:0) static participation; nized response operations. To demonstrate the proof of concept, the
+communities with single (cid:0) only the route system design model is applied to a case study village at the wildland–urban interface,
+exits emphasized where local topography, demographics, and shelter locations are
+Dennison et al. (cid:0) Coupled wildfire spread (cid:0) Restrictive assumptions explicitly included. The results are assessed in terms of clearance times,
+(2007), Li et al. with transportation models (fixed participation rates,
+the number of residents who reach safety, and the number at higher risk,
+(2019) uniform vehicles, limited
+behavior) providing insights into both scientific understanding and practical
+Beloglazov et al. (cid:0) Coupled fire-traffic ABM; (cid:0) Fixed participation by planning.
+(2016) (cid:0) compared warning warning type;
+horizons; (cid:0) deterministic fire spread;
+3. Methodology
+(cid:0) private vehicles only; (cid:0) one shelter;
+(cid:0) shortest-path routing; –no multimodal transport
+(cid:0) congestion modeled 3.1. Overview
+Leo´n and March (cid:0) Private vehicle (cid:0) All agents evacuate once
+(2017) evacuation; warned; The model simulates real-time interactions among dynamic fire
+(cid:0) nearest shelter; –no behavioral heterogeneity;
+(cid:0) varied warning horizons; (cid:0) vehicle-only evacuation behavior, transportation systems, and individual evacuation choices,
+(cid:0) assumed full compliance allowing evacuation outcomes to emerge from the combined evolution
+Veeraswamy (cid:0) Exodus ABM; –No multimodality; of hazards and human responses. The framework integrates time-
+(2018) (cid:0) pedestrian-only (cid:0) population and fire dependent fire-spread predictions with multimodal evacuation dy-
+evacuation; progression fixed;
+namics, including private vehicles, pedestrian movement, and assisted
+(cid:0) roads reserved for –no car-pedestrian interaction
+emergency vehicles; (cid:0) outbound only evacuation by emergency services. Fire arrival information is used to
+(cid:0) single shelter dynamically update road availability and routing constraints, while
+Wahlqvist (2021) (cid:0) Integrated fire (FARSITE), (cid:0) pedestrians modeled resident agents determine departure timing and transport mode based
+pedestrian response, and macroscopically; on evolving conditions. Traffic and pedestrian flows are represented at
+traffic; (cid:0) assumed car use after entry;
+(cid:0) modular framework; –no mixed-mode households; micro- and mesoscales, allowing congestion, rerouting, and mode
+(cid:0) trigger buffers; (cid:0) outbound only switching to emerge during the simulation. Emergency services are
+(cid:0) dynamic vulnerability modeled as active agents capable of entering hazardous zones, collecting
+maps; evacuees, and transporting them to safe locations, enabling the con-
+(cid:0) Destinations made
+current simulation of self-evacuation and coordinated rescue operations.
+unavailable as well as roads
+All model components, assumptions, and methodological contributions
+(latest update);
+Grajdura et al. (cid:0) ABM of Camp Fire in (cid:0) Scaled-down population are described in detail and systematically evaluated in the following
+(2022) NetLogo; (200 agents); sections.
+(cid:0) survey-informed decision (cid:0) randomization instead of
+trees (awareness, departure, replication;
+travel); (cid:0) tree-like road network with 3.2. Agent-based modeling
+(cid:0) A* routing; no redundancy;
+(cid:0) six shelters; (cid:0) entrapment if rerouting fails The modeling environment adopted in this study is AnyLogic
+(cid:0) rerouting if fire blocks (cid:0) outbound only (Borshchev, 2013), a multi-method simulation platform that supports
+roads
+the integrated use of system dynamics, discrete-event simulation, and
+Siam et al. (2022) (cid:0) Interdisciplinary (cid:0) Outbound-only evacuation;
+multimodal ABM (cid:0) hazard treated as fatal if ABM. Built on JavaScript, models can be exported to be executed
+(NetLogo); reached; independently of the development environment on any Java-supported
+(cid:0) wildfire (FlamMap); –no avoidance; platform, facilitating portability and extensibility (Borshchev, 2013).
+(cid:0) household decision- –no car-pedestrian interaction; Therefore, the model is platform-independent, and the source code will
+making; –no mixed-mode households
+(cid:0) staged vs simultaneous (cid:0) outbound only be publicly available. Given the need to represent heterogeneous evac-
+evacuation; uees, dynamic hazards, and adaptive interactions, an agent-based
+(cid:0) shelters and capacity modeling approach was selected. Although built using AnyLogic as the
+modeled; simulation platform, the framework constitutes a fully developed
+(cid:0) car and foot modes
+modeling architecture in which agent definitions, statecharts, decision
+3
+
+===== PAGE 4 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+rules, functions, and inter-module interactions are fully developed by main outputs are the rate of spread, the evolving fire perimeter, fireline
+the authors rather than predefined features. intensity, flame length, and the time of ignition for each location. Within
+Within the ABM framework, the system is represented as a collection the software, these outputs are visualized through a graphical interface
+of autonomous agents, such as residents, vehicles, and fire, each that displays the spatio-temporal progression of the fire. To couple these
+endowed with individual states, attributes, and behavioral rules. This results with the evacuation model, the outputs are exported to.csv
+bottom-up representation enables complex evacuation dynamics to format, providing the calculated fire characteristics and corresponding
+emerge from local interactions rather than being imposed through coordinates for each cell of the simulation domain. This table is then
+aggregate assumptions (Borshchev, 2013; Grigoryev, 2024). Agents imported into AnyLogic, where it is used to initiate fire agents and to
+encapsulate both physical and decision-making components and may be dynamically model fire propagation in space and time, ensuring the
+static or mobile. Individual heterogeneity is represented through agent hazard evolution.
+attributes and memory, defined via parameters (static characteristics)
+and variables (dynamic states), allowing differences in demographics, 3.4. Evacuation model
+mobility, or risk perception to be explicitly captured (Grigoryev, 2024).
+A combination of functions, events, and statecharts governs agent The evacuation model is constructed as a set of interconnected
+behavior. Functions implement reusable logics, such as route selection, components that collectively represent the complexity of evacuation.
+risk assessment, or shelter choice, ensuring consistency across agents First, the area of interest (AOI) must be defined, as it determines the
+while maintaining modularity (Grigoryev, 2024). Events regulate peri- simulation's spatial boundaries and provides the geographic context for
+odic actions, such as hazard updates and re-routing checks, thereby hazard spread and population movement. Within this area, agents
+synchronizing agent actions with evolving environmental conditions. interact, each guided by its own behavioral rules, features, and con-
+Statecharts provide a formal structure for representing sequential and straints. The developed model consists of six agents: pedestrians, per-
+conditional behaviors, defining discrete behavioral states and transi- sonal vehicles, extraction vehicles, routes, waypoints, and fire, along
+tions triggered by timeouts, conditions, messages, or spatial arrivals with a hierarchical agent that facilitates interaction among all agents.
+(Grigoryev, 2024; Harel, 1987). This structure is particularly suited to Together, these components constitute the key elements of the evacua-
+evacuation modeling, where actions such as preparation, movement, tion system in response to a wildfire threat, enabling coherent simula-
+waiting, and boarding follow ordered yet adaptive sequences (Siam tion of their interactions.
+et al., 2022). An agent is created as the central environment, which acts as the
+Agents operate autonomously while remaining responsive to in- supervisory layer of the model. This environment contains the global
+teractions with other agents and infrastructures. Interactions may occur structures and data registries that coordinate the activities of the other
+directly, through message exchange between agents, or indirectly via agents. For instance, it holds the spatial representation of the road
+shared resources such as road networks, shelters, or queues. In Any- network, manages time-dependent information on fire-related closures,
+Logic, relations are represented through agent links, while global in- and maintains the registry of waypoints that vehicles must follow during
+formation and shared resources are managed at the environment level. their trips. It also provides the space in which agents interact. This
+Communication is supported through message passing and broadcast environment serves as the integrator that connects all subsystems,
+mechanisms, enabling both one-to-one and one-to-many exchanges and ensuring that agents' behaviors are synchronized. The remaining agents
+allowing coordinated responses to dynamic conditions (Grigoryev, are embedded within the central environment and interact with one
+2024). another according to their specific behavioral rules and environmental
+constraints. Their structure and function are detailed in the following
+3.3. Wildfire behavior prediction model sections.
+Wildfire dynamics in this study were simulated using FireStation 3.4.1. Area of interest
+(Lopes et al., 2002), a software designed to predict fire spread across To define the AOI, the model uses GIS map functionality integrated
+complex topography. FireStation integrates fire behavior with wind field into the main simulation environment. The base map is obtained directly
+simulations, and at its core, it applies Rothermel’s surface fire spread from OpenStreetMap (OSM) servers, allowing the user to search for and
+model (Rothermel, 1972), which estimates the rate of spread and fire select a specific location or region by name. Once the AOI is established,
+intensity as a function of fuel, slope, and wind. it is necessary to specify the spatial distribution of key elements within
+A distinctive feature of FireStation is the modeling of wind fields the community, including residential buildings; designated shelters,
+using two approaches: NUATMOS and CANYON. NUATMOS, developed either within the community for shelter-in-place strategies or at safer
+by Ross et al. (1988)is a linear model that solves the continuity equation external locations for refuge; and emergency services facilities, such as
+on a three-dimensional grid. It interpolates observational wind data onto civil protection or firefighting stations. When available, these data can
+a grid and refines the data using variational analysis to produce a be imported directly in shapefile format, ensuring accurate georefer-
+divergence-free flow field. Although it cannot account for buoyancy or enced placement of features. In the absence of such datasets, the
+separation effects, it yields realistic results at low computational cost, required elements can be defined manually. This configuration provides
+and its accuracy improves with additional meteorological data. the initial spatial distribution of agents, including residents, vehicles,
+CANYON, developed by Lopes et al. (1995) provides a more detailed and extraction units.
+representation by solving the three-dimensional Navier–Stokes equa- Rather than relying on the standard OSM road network, the model
+tions with a turbulence closure using the k–ε model. It accounts for uses road network data in.pbf file format specific to the study area.
+terrain and vegetation roughness as well as thermal feedback from the These files provide detailed road infrastructure data and can be
+fire on the flow field. Although computationally more demanding, it extracted at flexible resolutions, ranging from coarse representations
+yields more accurate wind fields under complex conditions. These that include only major roads to highly detailed networks that also cover
+coupled capabilities enable FireStation to simulate fire spread under small passageways, emergency routes, and pedestrian or hiking paths.
+dynamically evolving wind fields, thereby supporting realistic integra- They are freely accessible online and can be obtained for virtually any
+tion with evacuation modeling. region. Based on the selected road network and the locations of
+The required inputs for running FireStation include a digital eleva- importance, the model generates two additional agent types: routes and
+tion model to represent topography, a fuel map describing vegetation waypoints. Each route is defined by three parameters: its origin, desti-
+types and fuel model to present their associated fire behavior parame- nation, the link representing the road segment between them, and a
+ters, and weather conditions, primarily wind speed and direction. The variable that is its availability status. Waypoint agents, which represent
+4
+
+===== PAGE 5 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+(cid:0) )
+intermediate nodes between an origin and a destination, are defined by Here, DG xf ,x represents the distance along the road network between
+three parameters: the origin, the destination, and the sequence of the fire’s location and the road.
+intermediary locations that connect them. The rationale for using PBF In this way, the function progressively updates road availability by
+data instead of OSM, as well as the advantages of defining routes and evaluating the proximity of each new fire bucket to the network. This
+waypoints as agents, is discussed further in the navigation section. function is executed periodically at user-defined time intervals and
+dynamically updates the road availability throughout the simulation.
+3.4.2. Fire Importantly, if a route has already been flagged as unavailable in a
+The fire is represented as a list of ignited points, each defined by its previous check, it is not re-evaluated in later iterations. This prevents
+geographic coordinates (xf) and the corresponding time of ignition (τ f). redundant calculations and reduces runtime.
+In principle, fire agents can be generated individually at the exact
+moment their ignition time occurs in the simulation. However, this 3.4.4. Pedestrians
+approach increases computational runtime, as the model must repeat- To represent pedestrian behavior in the evacuation process, a dedi-
+edly access and process the fire dataset at each time step. To improve cated agent population (type) is created to model the residents of the
+efficiency, fire points can be grouped into temporal intervals (Δ)so that community under analysis. The characteristics of residents are defined
+all points within a given time range are activated simultaneously. The through a set of parameters that capture individual differences in
+current time bucket is calculated as k(t) =⌊t/Δ⌋. All fires are grouped evacuation behavior. These parameters include the walking speed, the
+into these buckets based on their ignition times, forming sets F k: time required to prepare before leaving, the probability of choosing to
+{ ⌊ ⌋ }
+F k = f∈F: tf /Δ =k evacuate or remain in place, the probability of self-evacuation, and
+whether they have a personal vehicle. These values are assigned
+At the start of each bucket, all fires belonging to that group become uniquely to each resident, allowing the model to reflect heterogeneity
+active according to: within the population.
+{ Each resident is treated as an autonomous agent capable of exhibit-
+α f (t +)= α f (t 1 (cid:0) , ) f ,O ∈ th F e k( r t w ) ise i r n e g sp i o n n d s i e v s id . u T a h l e b e d h y a n v a i m or i , c a s l l o o f w i t n h g is th b e e h m a o v d io e r l t a o r e ca p fo t r u m re a h li e z t e e d r o t g h e r n o e u i g ty h in a
+here, α f (t)indicates whether a fire f is active (1) or inactive (0). statechart that defines the sequence of actions and decisions taken by the
+resident. The actions undertaken by the resident depend on the state
+For example, by applying a 30-minute bucketing scheme, all fires
+they occupy in the statechart, with each state linked to specific coded
+with ignition times between 0 and 29.999 min are activated simulta-
+instructions that are executed automatically upon entry. At the evacu-
+neously, followed by those between 30 and 59.999 min, and so on,
+ation onset, agents may choose either to stay or to evacuate. Among
+thereby forming 30-minute burning isochrones. In this way, the model
+those who evacuate, some residents initiate self-evacuation once the
+reduces the number of database queries while maintaining temporal
+advancing fire front reaches a user-defined proximity threshold. This
+accuracy in the representation of fire spread. This procedure is imple-
+allows the simulation to model spontaneous departures triggered by
+mented through a periodic event that triggers every 30 min and con-
+perceived danger as the fire approaches, and the remainder to initiate
+tinues for as long as active fire points remain. Note that these values are
+evacuation following a mandatory evacuation order that the user can
+illustrative and can be defined by the user based on the desired level of
+issue at any time. For all residents who decide to leave, a preparation
+granularity.
+phase follows, during which they perform household-level tasks before
+departure. The duration of this phase is modeled stochastically within a
+3.4.3. Fire and route interaction
+user-defined time range. Once preparation is complete, residents pro-
+To evaluate the effect of fire on the road network, a function is
+ceed on foot at walking speeds, which vary with individual physical
+defined to check the proximity of active fire points to the routes. This
+ability, to a designated meeting point, where they remain until rescue
+function relies on the grouped fire points described earlier and calcu-
+vehicles arrive. Boarding introduces an additional delay, defined by a
+lates the Euclidean distance between each fire in a given time bucket and
+user-specified time range, that represents the process of entering and
+all route segments (e∈E). If a fire point is found to be closer than a
+securing a place in the vehicle. After boarding, the resident is trans-
+specified threshold (d*), the corresponding route is flagged as unavai-
+ported by vehicle to a designated refuge located in a safe area outside the
+lable and added to a list of blocked segments.
+hazard zone.
+{ }
+(cid:0) ) The number of residents (community population) can be generated
+Sk = e∈E:
+x∈
+m
+e,f
+i
+∈
+n
+F
+k
+d xf ,x ≤d*
+from a data table that specifies the number of occupants in each build-
+ing. This allows for a spatially accurate initialization of the population
+here, Sk is the set of roads that will be closed in time bucket k. Once the across the area of interest. In the absence of such data, population values
+simulation reaches that time, the availability of those roads (ae) changes can be assigned manually or generated by randomly distributing resi-
+according to: dents across buildings while ensuring that the total matches the ex-
+{ pected population of the community. This representation ensures that
+α e (t +)= α f (t 0 (cid:0) , ) e ,O ∈ th S e k( r t w ) ise d po ec rt is a i t o io n n -m a a re k i a n l g l , e p xp re li p c a it r l a y t i g o o n v , e w rn a e l d k i b n y g , th w e a r it e i s n i g d , e n b t o ’s a r c d u i r n r g e , n t a n st d a t t e r a a n n s d -
+The variable ae (t)represents the availability of a road segment (1 = its associated actions.
+open, 0 =closed).
+The same procedure is repeated for each successive set of fire buckets 3.4.5. Vehicles
+as the simulation advances and the fire propagates through the land- To model vehicle behavior during evacuation, two agent types are
+scape. The model performs real-time checks to close the roads that the created to represent personal vehicles and emergency extraction vehi-
+fire gets too close to them. At time t, let A(t)denote the set of all active cles. The characteristics of vehicles are represented by a set of param-
+fires. A road is closed if its Euclidean distance along the route to any eters that determine their operational behavior during the evacuation.
+active fire is less than or equal to d*: These include the time required before dispatch (for emergency vehi-
+(cid:0) ) cles), which reflects delays prior to departure; the maximum passenger
+Ifα e (t (cid:0) )=1and x∈ m e,f∈ in A(t) DG xf ,x ≤d*⟹α e (t +)=0 capacity, which limits how many residents can be transported at once;
+and the maximum attainable speed, which depends on the type and
+5
+
+===== PAGE 6 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+condition of the road segment being traversed. Each vehicle can be 3.4.7. Routes and navigation
+assigned distinct values for these parameters, ensuring variability in In most evacuation models, routing is handled through shortest-path
+performance and enabling the model to capture differences in transport or fastest-path algorithms commonly used in routing services, such as A*
+availability and efficiency across the evacuation system. Vehicle or Dijkstra (Grajdura, 2022; Siam et al., 2022). While effective in stan-
+movement is represented using a mesoscopic network-based approach. dard applications, these approaches present limitations when applied to
+Each vehicle is modeled as an individual agent that follows a dynami- wildfire evacuation. Specifically, disabling individual road segments as
+cally updated route through the road network. Travel times are assigned they become compromised by fire is difficult with these algorithms, as
+at the link level and remain fixed during the simulation; they are not the only practical method is to render the entire destination unreachable
+influenced by the number of vehicles on the same link. (Wahlqvist, 2021). This is unsuitable for the present study, as evacuation
+These agents operate within the road network using a routing algo- traffic flow is not solely outbound, and destinations are not limited to
+rithm that guides them toward their destinations, which may consist of shelters; rather, the endangered community itself can serve as a desti-
+multiple points connected through intermediate destinations or midway nation for emergency services extraction operations. Furthermore, the
+points. As with residents, vehicle agents are governed by statecharts that routing framework provided by OSM does not support the dynamic
+define their behaviors and decisions, with each state executing a specific removal of individual road segments during simulation, because road
+action during the evacuation process. Emergency vehicles are initially elements are instantiated before execution and cannot be deleted at
+positioned at civil protection or emergency service bases, and personal runtime (Borshchev, 2013; Grigoryev, 2024). To overcome these chal-
+vehicles are positioned at the WUI community. Upon receiving an lenges, a custom routing logic was developed that dynamically marks
+evacuation order, emergency vehicles transition from an idle or standby roads as available or unavailable during the simulation. This approach
+state to active deployment, following dynamically updated routes to- ensures that routing decisions adapt to the evolving hazard conditions
+ward the endangered community. Once there, they collect residents at while maintaining the flexibility required to represent both outbound
+designated meeting points and transport them to safe locations outside evacuations and inbound rescue operations.
+the hazard zone. For personal vehicles, they don’t use the customized Two functions were developed to provide navigation logic for vehi-
+routing function as they are assumed to be oblivious to the hazard cles, ensuring that they avoid roads located within the hazard zone while
+development and may use roads threatened by the growing fire. As they still reaching their designated destinations.
+follow their chosen route, their minimum proximity to the fire is The first function begins by checking whether a direct route exists
+measured to determine their risk level during the evacuation process. between the vehicle’s current location (o) and its intended destination
+This representation allows vehicle agents to capture both the logistical (d), and whether this route remains available, meaning(cid:0) it has not )been
+aspects of evacuation, such as routing and rerouting, and the operational compromised by the fire. If the direct route is available a(o,d) =1 , the
+dynamics of emergency services tasked with extracting and relocating vehicle proceeds along it.
+populations under wildfire threat, as well as risks associated with un-
+organized evacuation.
+a(o,d) (t)=1⟹choosepathP=[o,d]
+If not, the function consults the waypoint record, which contains
+3.4.6. Pedestrian and vehicle interaction chains of intermediate points (v1 ,v2 ,⋯,vm )linking the same origin and
+The boarding and disembarking of residents are managed through a destination. Each segment along the route must be open for the vehicle
+cyclic event that coordinates both the loading process and the departure to use that alternative path:
+of buses. Two conditions define residents waiting for evacuation: they
+must be at a meeting point (mi =1) and not yet boarded (qi =0). The set selectfirstchain(v1 ,v2 ,⋯,vm )wherealllegsareopen⟶Pb (t)
+of waiting residents is: =[o,v1 ,v2 ,⋯,vm ,d]
+W(t)={i∈R :mi (t)=1,qi (t)=0}
+Here, Pb (t) is the ordered list of intermediate points (waypoints) that
+When passengers are waiting at a meeting point, the event triggers a define the route for bus b.
+function that dispatches buses and assigns their destinations. Upon Each chain represents an ordered sequence of nodes that can serve as
+arrival, the bus sends a message indicating its presence, which is alternative routes, expressed as a series of legs from the starting point
+received by the waiting residents. The bus then transitions from a through midpoints (Origin → midpoint1 → midpoint2 → … → Desti-
+driving state to a loading state, during which residents begin boarding. nation). The function evaluates these chains in order and selects the first
+The boarding process is iterative: the model checks the bus's available chain for which all legs are available. Once a valid chain is found, the
+capacity, and for each resident who boards, one is removed from the vehicle is directed to start moving along this path, and its upcoming
+waiting list and added to the vehicle's passenger load. When a bus is waypoints are registered. This waypoint record is vital, as it serves as the
+loading and has free capacity, a subset of waiting residents, Ab (t)boards basis for the second function, which advances the vehicle step by step
+the vehicle. The number of passengers on the bus and the residents’ along its assigned chain until it reaches the final destination. In this way,
+boarding status are updated as follows: vehicles adaptively navigate around blocked segments while maintain-
+ing the continuity of evacuation operations.
+lb (t*)=lb (t)+|Ab (t)|;qi (t*)=1foralli∈Ab (t)
+The second function advances vehicles step by step along their
+Here, lb (t)is the number of passengers currently on the bus. a
+th
+ss
+e
+i g
+f
+n
+u
+e
+n
+d
+c t
+c
+i
+h
+o
+a
+n
+i n
+c
+o
+o
+f
+m
+m
+p
+i
+a
+d
+r
+p
+e
+o
+s
+in
+th
+ts
+e
+w
+v
+h
+e
+e
+h
+n
+i
+e
+cl
+v
+e
+e
+’
+r
+s
+a
+c
+v
+u
+e
+r
+h
+re
+ic
+n
+l
+t
+e i
+l
+s
+o
+i
+c
+d
+a
+l
+t
+e
+io
+. A
+n
+t
+w
+ea
+i
+c
+th
+h i
+t
+t
+h
+er
+e
+a t
+n
+io
+ex
+n
+t
+,
+This continues until either the bus reaches full capacity or no addi-
+midpoint in its route list. If the vehicle has not yet reached that
+tional passengers remain. Each resident who boards transitions to an in-
+midpoint, it is instructed to move there. Once the vehicle reaches the
+vehicle state, and once the bus is full, it receives a “loaded” message and
+final waypoint in the sequence, it sends an “arrived” message, signaling
+switches to the dispatch state, initiating movement toward safety. At this
+the start of the loading or unloading process for residents.
+point, the bus applies routing logic to reach its assigned destination. In
+The function stores the remaining route to the destination as an or-
+addition, a supporting function continuously updates the number of
+dered list of midpoints and continuously checks the vehicle’s progress
+residents still waiting. If this number is greater than zero, the function
+along this list. If the vehicle’s current location equals the next midpoint,
+either directs the same bus to return or assigns another vehicle (if
+the function determines whether additional midpoints remain. If no
+available) to complete the boarding process.
+further nodes exist, the vehicle is marked as having arrived; otherwise, it
+advances to the next node in sequence. To improve efficiency, the
+function also creates a temporary list of vehicles that have completed
+6
+
+===== PAGE 7 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+their routes, enabling their removal from the list of moving vehicles. and AOI, resident, vehicle, and integration, each responsible for a spe-
+During execution, the function iterates over all vehicles but acts only cific set of processes and data exchanges within the framework. The
+on those with an assigned route list and that are not currently in motion. interaction between them enables the model to capture the dynamic
+Vehicles already in motion are left unaffected and will be rechecked in coupling among fire propagation, human behavior, and traffic. Table 2
+subsequent iterations once they stop or reach their destination. This shows a summary of the components, their inputs, and outputs. The
+ensures that the stepwise advancement logic is applied consistently integration component serves as the control layer that synchronizes all
+without interrupting vehicles already in transit. other components. It receives and processes the outputs from the fire,
+routing, resident, and vehicle components to generate aggregated in-
+3.4.8. Integration and communication between model components dicators such as total evacuation timelines and the number of trapped or
+Fig. 1 presents a Unified Modeling Language (UML) sequence dia- endangered residents.
+gram illustrating the main interactions among the core components of Fig. 2presents the conceptual framework and overall workflow of
+the evacuation model: residents, vehicles, routing (dispatch), and the the model, illustrating the sequence of processes from model setup to
+fire component. UML is a standardized graphical notation for describing output generation. The setup phase defines the spatial and environ-
+the structure and dynamic behavior of complex systems. In simulation mental inputs, the fire behavior processed in FireStation, community
+modeling, UML diagrams are used to visualize the sequence of in- data, and the road network imported into the AnyLogic environment.
+teractions between components and the flow of information through During the simulation phase, the system operates through interacting
+time. agents. Each agent type follows a defined behavioral logic represented
+The diagram is arranged in a temporal sequence from top to bottom. through statecharts and decision points.
+The process begins when residents perceive the approaching fire and
+decide whether to evacuate. Those who decide to leave either self- 4. Results
+evacuate or wait for extraction by emergency vehicles. The routing
+module assigns routes to vehicles and residents and continuously re- 4.1. Case study
+ceives updates from the fire module on the evolution of the hazard zone.
+When a route becomes unsafe, a rerouting action is triggered to identify The case study selected to demonstrate the capabilities of the pre-
+an alternative safe path. Vehicles then travel to rendezvous points, sented model is the village of Cerdeira, located in the Serra da Lous˜a,
+collect residents, and transport them to shelters located outside the Coimbra District, central Portugal. This small settlement lies in a steep
+danger area. The sequence concludes when the residents arrive and valley at an altitude of approximately 700 m. It is characterized by
+disembark at a safe location, completing the evacuation. narrow access roads, dense vegetation, and a predominance of tourism-
+The model is structured upon five main components: fire, routing related activities. This socio-demographic profile of Cerdeira,
+Fig. 1. UML Sequence Diagram of the Model. This diagram shows how the model components interact and the chronological order of message and data flow.
+7
+
+===== PAGE 8 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+Table 2 exercises. Evacuation was only done through GNR as a convoy of cars,
+Summary of inputs and outputs of the model components. escorted by emergency vehicles (as an extraction). However, the simu-
+Component Inputs Outputs lated case includes self-evacuation to better reflect a more realistic
+situation.
+Fire (cid:0) Topography (cid:0) Rate of spread
+(cid:0) Fuel map and model (cid:0) Flame length In the model implementation, the geographic layout of Cerdeira was
+(cid:0) Meteorological data (cid:0) Fireline intensity recreated using the GIS feature, with base layers obtained from OSM.
+(cid:0) Ignition location and time (cid:0) The spatial and temporal The coordinates of residential buildings and roads were imported from
+evolution of the burning geospatial data (.pbf file for roads and.shp file for buildings) and
+area manually adjusted to match the village’s actual layout. Each building
+Routing and (cid:0) Road network; (cid:0) Route and waypoint
+AOI (cid:0) Coordinates of origins, agents was assigned a set of residents based on the observed demographic
+destinations, meeting points, (cid:0) Route assignments for composition during the drill. The location of the local shelter used in the
+shelters, and safe zones; vehicles evacuation drill was specified within the model as the designated refuge
+(cid:0) The spatial and temporal evolution (cid:0) Updated road availability point, and the surrounding road network was incorporated. This setup
+of the burning area (cid:0) Rerouting decisions
+(cid:0) Building locations ensured that the simulation environment accurately represented the
+(cid:0) Number of residents per dwelling community's physical and social structures. Fig. 4presents the AOI for
+Resident (cid:0) Departure time distribution (cid:0) Departure time the simulation in the software platform. The points and routes of interest
+(cid:0) Probability of evacuation (cid:0) Mode of evacuation (on for the simulation are marked on the GIS map layer.
+(cid:0) Walking speed foot or by vehicle);
+The simulation parameters were defined to represent the evacuation
+(cid:0) Preparation time (cid:0) Arrival time at meeting
+(cid:0) Car ownership points or shelters drill scenario with a heterogeneous population and behavior. A total of
+(cid:0) Waiting and boarding 30 resident agents were initialized, each characterized by distinct
+times mobility, preparation, and evacuation decision attributes. Walking
+(cid:0) Evacuation completion speed followed a normal distribution with a mean of 1.1 m/s, bounded
+status
+Vehicle (cid:0) Number and type of vehicles (cid:0) Vehicle trajectories; between 0.5 m/s and 1.7 m/s, reflecting documented typical pedestrian
+(cid:0) Capacity (cid:0) Boarding and unloading movement variability under emergency conditions, in hilled areas, and
+(cid:0) Speed; events; for people with less physical abilities (Giannoulaki and Christoforou,
+(cid:0) Travel times; 2024). Preparation time was modeled as a normally distributed variable
+(cid:0) Arrival time at shelters;
+with a mean of 20 min, ranging between 15 and 30 min, and a standard
+Integration (cid:0) All outputs from above (cid:0) Evacuation timelines
+(cid:0) Number of trapped or deviation of 5 min based on field studies done from prior evacuations in
+endangered residents Portugal (Santiago and Laím, 2025). Each agent was also assigned a
+probability of owning a private vehicle, where 20% of residents were
+considered to have access to a car. The decision to evacuate was
+characterized by a transient tourist population and an elderly, low-
+modeled as a Boolean function with a probability greater than 80%,
+density resident base, is representative of many fire-prone WUIs.
+representing the subset of agents who decide to evacuate. The risk
+Field inspections began in November 2022, with on-site assessments
+perception self-evacuation distance was set to 2000 m. Bus transport was
+of housing typologies, demographic characteristics, vulnerable in-
+available, with a maximum capacity of 40 passengers per vehicle, and
+habitants, and road conditions. Given the settlement's touristic char-
+fire progression was assessed at 30-minute intervals (time buckets).
+acter, an additional survey was conducted to inventory local
+accommodations and to understand visitor dynamics throughout the
+4.2. Simulation results
+year. These efforts facilitated direct engagement among the research
+team, the local government, and the community, enabling the design
+The simulation ran in 71.37 s on a PC equipped with a 3.4 GHz
+and testing of protection measures within the EVACUARFLORESTA
+processor and 32 GB of RAM, corresponding to a duration of 300 min. Of
+project framework (Santiago and Laím, 2025).
+30 residents, 25 (83.3%) chose to evacuate, while 5 (16.7%) remained.
+The evacuation exercise, held on 15 March 2023, simulated a fast-
+Among evacuees, 8 of them (32%) engaged in self-evacuation, triggered
+moving wildfire approaching from the southwest valley with the po-
+by proximity to the advancing fire, whereas 17 (68%) were extracted.
+tential to reach the nearby S˜ao Lourenço chapel (rendezvous point) and
+Table 4presents the total number of residents, the evacuation ratio, and
+threaten the village perimeter. The scenario assumed around 25 tourists
+the self-evacuation/extraction ratio.
+and 5 residents in the area. Participants were instructed to gather at the
+Self-evacuated residents, activated by immediate fire proximity,
+designated refuge point located in the village square (shown as the
+showed shorter overall waiting and travel durations, reflecting direct,
+rendezvous point in Fig. 3) before an organized evacuation by road was
+pedestrian movement to their cars and then to the shelter. Their mean
+executed towards the Lousa˜ Fire Station (can be seen in Fig. 4). The
+total time to safety was 11.35 min.
+entire operation was coordinated by the project’s research team in
+Extracted agents, in contrast, were subject to formal coordination
+collaboration with the Lousa˜ and Serpins Fire Brigades, National
+and vehicle staging, resulting in longer overall clearance times.
+Republican Guard (GNR), and Municipality of Lousa˜.
+Although they arrived at the rendezvous point at similar times (3.33
+The exercise populated the village to near full occupancy (30 in-
+min), their mean waiting time was 30.61 min, largely due to delays
+dividuals) using volunteers who acted as tourists, supported by multiple
+associated with waiting for the emergency vehicle, dispatch, travel to
+observers strategically positioned across the site. Evacuation began at
+the village, assembly, and boarding before departure. The uniform 44-
+10:35 a.m., following a briefing at the Lousa˜ Fire Station, and concluded
+minute travel time to safety corresponds to the collective bus evacua-
+at 12:15 p.m., when all vehicles had arrived at the designated safe zone.
+tion phase. Table 5presents the mean
+The time log shows that evacuation from alert to the refuge took
+Fig. 5 illustrates the cumulative arrival of residents at safety over
+approximately 22 min, and the total evacuation duration from initiation
+time. The x-axis indicates the time at which each agent reaches safety (in
+to arrival at the fire station was 1 h and 35 min. The exercise successfully
+minutes, measured from the first risk perception or the start of the
+tested communication, coordination, and the capacity of narrow road
+evacuation), while the y-axis shows the cumulative number of evacuees
+networks to support organized evacuation under pressure. The evacua-
+who have completed their evacuation. The plot reveals a two-phase
+tion times reported by the evacuation conductors are presented in
+evacuation pattern: an initial period of gradual arrivals between 30
+Table 3. The exercise did not include self-evacuation by private car due
+and 45 min, corresponding to self-evacuated residents who reached the
+to ethical considerations and government restrictions on safety
+safety zone independently, followed by a long plateau during which no
+8
+
+===== PAGE 9 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+Fig. 2. Conceptual framework and workflow of the wildfire evacuation simulation model.
+additional arrivals occur. The second phase begins around 100 min, evaluates safety from a trajectory-based exposure perspective, quanti-
+when the remaining evacuees, those extracted, arrive collectively at the fying the proximity of evacuees and the evolving fire front along the
+safety area. evacuation. The approaches are complementary: WUI-NITY addresses
+Because self-evacuations occur spontaneously and are not coordi- situations in which evacuation becomes infeasible, whereas the pro-
+nated by authorities, self-evacuating residents do not follow the routing posed method assesses the safety of evacuation under dynamic wildfire
+logic implemented in the model to avoid endangered areas. Conse- conditions.
+quently, their chosen paths may intersect roads or zones that are The results from this metric are presented in Table 6, which indicates
+compromised by the fire. To quantify hazard exposure, the model re- a clear pattern: as residents evacuate later, the advancing fire front
+cords the minimum distance between each self-evacuated agent and the progressively reduces the buffer of safe distance available to them,
+fire agents at each time step. This metric indicates the extent to which leading to smaller minimum distances between their vehicles and the
+evacuees approach hazardous zones during their journey. Existing active fire perimeter during their travel to the shelter. This reflects the
+frameworks, such as WUI-NITY (Wahlqvist, 2021), assess evacuation consequence of fire propagation over time and demonstrates how
+safety primarily through a time-based feasibility lens, comparing delaying departure increases potential exposure to hazardous zones.
+Available Safe Egress Time (WASET) and Required Safe Egress Time Despite departing significantly later than all self-evacuated residents,
+(WRSET) to determine whether evacuation can be completed in time at the extraction vehicle recorded the largest minimum distance to the fire.
+the community level. In contrast, the methodology proposed here This outcome occurs because the extraction vehicle was guided by the
+9
+
+===== PAGE 10 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+Fig. 3. Aerial photos and a map of Cerdeira.
+Fig. 4. Simulation AOI.
+model’s routing system, which actively avoids roads threatened or time to the village, loading time, and travel time to safety. Table 7shows
+already compromised by the fire, thereby ensuring a safer trajectory the extraction vehicle’s performance.
+even when evacuation begins at a later stage. Fig. 6illustrates the simulation sequence. As the flames approach the
+The extraction phase of the simulation was supported by a dedicated settlement, residents with a higher perceived risk of harm initiate self-
+bus convoy that transported evacuees from the rendezvous point in evacuation using their private vehicles once the fire front is within 2
+Cerdeira to the designated shelter. The operational performance of the km of their location. When the wildfire continues to propagate toward
+bus was evaluated using four temporal indicators: dispatch time, travel the village, the authorities issue a formal evacuation order, which can be
+10
+
+===== PAGE 11 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+Table 3 4.3. Comparison of the results
+Evacuation exercise times.
+From alert to all occupants arrive at the rendezvous (preparation + 22 The comparison between the evacuation drill and the simulation
+walking) min results indicates overall consistency in the evacuation process, with
+Wait time at the rendezvous until extraction from the village 18 differences in specific temporal components. In the simulation, the
+min preparation and walking time for self-evacuation was 25.8 min (21.8 +
+Travel time from the village to the shelter (with Vehicle, through the 50
+4.0), while in the drill, the total time from alert to arrival at the
+alternative route) min
+rendezvous point (representing the preparation and walk time) was 22
+min, representing a 3.8-minute difference. In the extraction scenario, the
+simulation recorded 23.9 min (20.56 +3.33), compared with 22 min in
+Table 4
+the drill, indicating a 1.9-minute difference in the sum of preparation
+Count and percentage of evacuated residents simulated.
+and walking time. These values are relatively close, and the deviation
+Category Count Percentage remains within a reasonable range, which may be attributable to vari-
+Total agents 30 100% ability in walking speeds and preparation durations across residents and
+Evacuated 25 83.3% cases.
+Self-evacuated 8 32.0% of evacuees
+The waiting time for self-evacuation in the simulation was 0.93 min,
+Extracted (by bus) 17 68.0% of evacuees
+Did not evacuate 5 16.7% representing the time required to enter their car. For extraction, the
+simulation recorded a waiting time of 30.61 min, compared to 18 min
+during the drill. In the self-evacuation scenario, the short waiting time
+Table 5
+Residents mean performance indicators. Table 6
+Parameter Self-evacuation Extraction Minimum distance to fire of self-evacuated residents.
+Walking speed (m/s) 1.02 1.17 Car number (in the order of evacuation) Minimum distance to fire (m)
+Preparation time (min) 21.8 20.56 1st 1037.58
+Time to Rendezvous point (min) 4 3.33 2nd 836.88
+Waiting time (min) 0.93 30.61 3rd 692.99
+Time to shelter (min) 11.3 44 4th 563.67
+5th 468.35
+6th 466.13
+activated through a control button integrated into the simulation model. 7th 290.01
+According to this order, an extraction vehicle serving as an emergency 8th 161.29
+transport unit selects the safest available route to reach the affected Extraction vehicle 1296.63
+area. Simultaneously, residents without vehicles begin walking toward
+the designated rendezvous point, where they wait for the extraction bus.
+Upon arrival, evacuees board the bus, which then departs toward the Table 7
+shelter. However, instead of taking the main road, which becomes Extraction vehicle performance indicators.
+hazardous as the fire approaches, the vehicle dynamically reroutes Parameter Value
+through an alternative, longer but safer path to reach the shelter without
+Dispatch time (min) 9.52
+exposure to the advancing flames. Time to reach the village (min) 43
+Loading time (min) 3.4
+Time to safety (min) 44
+Total operation time (min) 100.9
+Fig. 5. Number of evacuees reaching safety over time.
+11
+
+===== PAGE 12 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+Fig. 6. Model at run-time.
+indicates a lack of coordination needs, as residents immediately left in testing these plans, enabling authorities to anticipate challenges, assess
+their private vehicles. Conversely, the longer waiting time in the strategies, and adapt responses to the specific characteristics and needs
+extraction scenario is because, in the simulation, this period includes not of each community (Ronchi et al., 2019; Beyki et al., 2023; Lovreglio
+only the coordination and loading of passengers but also the time for et al., 2020).
+emergency vehicles to arrive at the village and the dispatch time spec- The model presented in this work is not intended to perfectly repli-
+ified in the simulation, which were not accounted for in the drill. If the cate real-world behavior. Wildfires are complex physical phenomena
+bus dispatch time is excluded, the waiting time drops to 21 min, showing influenced by countless interacting factors, which even advanced fire
+a 3-minute difference from the drill. models cannot fully capture, and efforts are aiming to improve the
+Regarding travel time to shelter, self-evacuating residents reached wildfire simulation accuracy (Beyki et al., 2025a,b). When human
+safety in 11.3 min in the simulation, using a direct route that was shorter behavior under risk is incorporated into this system, uncertainty in-
+and faster but exposed to a higher risk due to fire propagation along the creases. As George Box stated, “All models are wrong, but some are
+main road. For the extraction scenario, the simulated travel time was 44 useful.” (Box, 1976), and our model is no exception. It offers a practical
+min, while the drill recorded 50 min, corresponding to a 6-minute dif- and adaptable framework to explore evacuation processes under wild-
+ference. The difference between the drill and the simulation in this phase fire threat, rather than an exact reproduction of reality.
+primarily results from differences in travel speeds: the model employs a The model integrates the three main layers of the evacuation process,
+higher average velocity than that observed during the actual exercise (i. fire propagation, pedestrian movement, and vehicle traffic into a single,
+e., a lower convoy velocity in the drill due to ethical and safety dynamically coupled environment. It directly addresses key gaps iden-
+measures). tified in the literature, including: (i) the lack of dynamic rerouting
+mechanisms that adapt to fire-induced road closures rather than desti-
+5. Discussion nation omission, (ii) limited consideration of multimodal evacuation,
+(iii) inadequate coupling of high-resolution fire spread with agent-level
+As wildfires become more frequent and severe, their impacts on decision-making, and (iv) insufficient representation of inbound evac-
+human settlements and ecosystems intensify, causing significant losses uation and extraction operations. These improvements enable the model
+of life, property, and natural resources. While evacuation cannot prevent to simulate both self-evacuation and organized extraction scenarios,
+the destruction caused by the fire itself, it remains the most effective capturing realistic interactions among evacuees, vehicles, and
+measure to safeguard human life when properly planned and executed. advancing fires.
+Evacuation simulation models are essential tools for designing and The results from the case study demonstrate the model’s feasibility
+12
+
+===== PAGE 13 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+and its ability to reproduce realistic evacuation dynamics. The simulated settlement with a controlled population and limited network
+evacuation closely matched the timings observed during the real-world complexity. While this was suitable for validation, larger-scale or more
+drill, validating the consistency of the model’s behavioral and opera- urbanized WUI areas may require higher computational power and
+tional components. This alignment supports its applicability for both additional calibration to maintain runtime efficiency and accuracy.
+research and operational use. Future work will include testing the model Finally, the validation process was based on a single evacuation drill
+on real wildfire events to evaluate its performance under more complex, under ideal conditions. Real wildfire events often involve uncertainty,
+time-critical conditions. infrastructure degradation, and unpredictable environmental changes
+The model is proposed for two main applications. The first is stra- that are difficult to replicate in controlled exercises. Therefore, while the
+tegic planning, where emergency managers can use it to develop evac- model demonstrates good agreement with observed data, further vali-
+uation strategies and protocols without time pressure. In this mode, the dation with empirical data from real incidents is necessary to fully
+user can run multiple scenarios with different input parameters, such as establish its predictive reliability.
+varying self-evacuation rates, compliance levels, or walking speeds, and Future work will focus on expanding the model’s capabilities and
+analyze their impact on evacuation time and exposure risk. The model improving its realism and applicability across different contexts. One
+allows for numerous simulations with different values for one or more key direction is to strengthen the behavioral component by incorpo-
+parameters or variables to be run simultaneously, with the results rating data from real evacuation events, surveys, or experiments to
+compared. This approach enables sensitivity testing and strategy opti- better capture human decision-making, hesitation, and compliance
+mization before an actual event occurs. under stress. This would allow the model to move beyond probabilistic
+The second application is real-time incident management. In this behavior and reflect more realistic individual and collective responses.
+context, time becomes critical. The simulation must run efficiently and The model should also be tested in larger, more complex WUI areas
+rely on quickly accessible data. The model setup for a specific area of to evaluate its scalability and performance under high population den-
+interest can generally be completed within 30 min, including the sity and extensive transportation networks, as well as to conduct
+acquisition of essential inputs such as fuel maps, topography, meteoro- sensitivity analyses of the inputs. Such applications would help assess its
+logical data, road networks, and population distribution, all of which are ability to support regional evacuation planning and coordination among
+freely available for most regions worldwide. The case file for each area multiple agencies.
+can be saved and made ready to run simulations, saving time in the event The current implementation does not incorporate density-dependent
+of an incident. Authorities can have files prepared for their respective traffic dynamics. Because link travel times are parameterized and in-
+jurisdictions. The simulation itself can be executed in under five minutes dependent of traffic volume, the model does not simulate congestion,
+on a standard workstation. For instance, the case study simulation ran queue propagation, or intersection delays. As a result, evacuation
+on a computer with a 3.4 GHz processor and 32 GB of RAM in about one clearance times may be underestimated in scenarios involving large
+minute. This level of efficiency supports the model's potential use in populations or constrained urban networks where traffic interactions
+operational decision-making during unfolding emergencies. become a dominant factor. Future work will integrate congestion-aware
+Finally, the reliability of any model-based decision depends on how traffic modeling, either through mesoscopic speed–density formulations
+well its assumptions and inputs reflect reality. Evacuation plans and or microscopic car-following approaches in the future model updates, to
+decisions derived from simulation outputs must therefore be verified, enhance applicability to larger-scale or high-density wildland–urban
+tested, and revised before being applied in real situations. Effective interface settings.
+planning and rapid, well-coordinated responses can significantly reduce Additionally, incorporating communication networks, warning
+fatalities and improve community safety. The proposed model serves as dissemination systems, and infrastructure disruptions would enhance
+a step toward integrating scientific modeling and operational practice, the model’s capacity to represent realistic operational conditions.
+providing a flexible and accessible tool for understanding, testing, and Finally, validation with data from real-world wildfire evacuations will
+managing evacuation under the growing threat of wildfires. be essential to confirm the model's robustness and refine its predictive
+This work has limitations that should be acknowledged. First, while accuracy. These future developments will help transition the framework
+the model integrates wildfire spread, pedestrian, and vehicle dynamics from a research-oriented tool to an operational platform that supports
+in a unified framework, each layer remains a simplification of the real- decision-making in both planning and emergency management.
+world processes it represents. The fire spread component, although
+based on high-resolution wind–fire coupling, relies on simulated outputs 6. Conclusion
+from FireStation and therefore does not allow full real-time feedback
+between fire behavior, suppression efforts, and evacuation actions. This The increasing frequency and severity of wildfires pose a growing
+limits the capacity to capture mutual interactions, such as the influence threat to communities located in the wildland–urban interface, where
+of human-made firebreaks on hazard progression during the evacuation traditional response measures often prove insufficient to protect human
+simulation. life. This work presents an integrated agent-based model that simulates
+Second, human behavior is represented through parameterized the evacuation process under wildfire threat, combining fire spread
+probabilities and stochastic distributions rather than empirically dynamics, pedestrian movement, and vehicular traffic within a single
+derived behavioral data. Factors such as risk perception, decision adaptive framework. By addressing several of the key gaps identified in
+timing, preparation time, and compliance with evacuation orders are previous research, such as the lack of dynamic rerouting, limited treat-
+modeled probabilistically, which means that the variability of real ment of multimodal evacuation, and the absence of inbound extraction
+human responses cannot be fully captured. The measurement and operations, the model provides a more complete representation of how
+acquisition of such data from real wildfire incidents remain a major people and emergency services interact during a wildfire evacuation.
+challenge in evacuation simulation under wildfire threat, and extensive The application of the model to a real case study demonstrated its
+research is required to address this gap. More data from actual wildfire capacity to reproduce observed evacuation patterns and timings with
+evacuation cases are required to better reflect human behavior under reasonable accuracy, confirming the feasibility of the approach. The
+threat in models. results highlight its potential to serve as both a planning tool for
+Third, the model assumes a static communication structure and developing evacuation strategies and a real-time decision-support sys-
+perfect information transfer between agents and authorities. In practice, tem during ongoing emergencies. Its modular structure, reliance on
+communication delays, misinformation, or technological failures can freely available input data, and fast computation make it accessible for a
+critically affect evacuation outcomes. Another limitation concerns the wide range of communities and authorities.
+case study's scale and calibration. The model was tested on a small Although the model simplifies several aspects of human behavior
+13
+
+===== PAGE 14 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+and hazard dynamics, it represents a significant step toward integrating Borchers, N., Cifuentes, L.A., Abatzoglou, J.T., Johnston, F.H., 2017.
+detailed fire simulations with realistic evacuation processes. The Human–environmental drivers and impacts of the globally extreme 2017 Chilean
+fires. Ambio 48 (4), 350362. https://doi.org/10.1007/s13280-018-1084-1.
+framework can support emergency planners and researchers in evalu- Box, G.E.P., 1976. Science and statistics. J. Am. Stat. Assoc. 71 (356), 791–799. https://
+ating different strategies, testing “what-if” scenarios, and improving doi.org/10.1080/01621459.1976.10480949.
+preparedness for wildfire emergencies. Cova, T.J., Johnson, J.P., 2002. Microsimulation of neighborhood evacuations in the
+urban–wildland interface. Environ. Plan. A 34 (12), 2211–2229. https://doi.org/
+Future developments should focus on enhancing the model's
+10.1068/a34251.
+behavioral realism, integrating real-time data streams from active fires, Cova, T.J., Theobald, D.M., Norman, J.B., Siebeneck, L.K., 2013. Mapping wildfire
+and extending its application to larger and more complex urban areas. evacuation vulnerability in the western US: the limits of infrastructure. GeoJournal
+78, 273–285. https://doi.org/10.1007/s10708-011-9419-5.
+Continued validation using empirical data from actual wildfire events Dennison, P.E., Cova, T.J., Moritz, M.A., Apr. 2007. WUIVAC: a wildland–urban interface
+will further strengthen its reliability. Ultimately, the model aims to evacuation trigger model applied in strategic wildfire scenarios. Nat. Hazards 41 (1),
+support the design of safer evacuation protocols, contribute to evidence- 181–199. https://doi.org/10.1007/s11069-006-9032-y.
+Dodson, J., 2010. Changing climates, earth systems and society.
+based decision-making, and improve community resilience against the
+Giannoulaki, M., Christoforou, Z., Jun. 2024. Pedestrian walking speed analysis: a
+escalating threat of wildfires. systematic review. Sustainability 16 (11), 4813. https://doi.org/10.3390/
+su16114813.
+Grajdura, S.A., Borjigin, S., Niemeier, D., 2022. Fast-moving dire wildfire evacuation
+CRediT authorship contribution statement
+simulation. Transport. Res. Part D: Transport Environ. 104, 103190. https://doi.org/
+10.1016/j.trd.2022.103190.
+Shahab Mohammad Beyki: Writing – original draft, Visualization, Grigoryev, I., 2024. AnyLogic in three days: modeling and simulation of complex
+systems, 8th ed. The AnyLogic Company, Chicago, IL.
+Software, Project administration, Methodology, Investigation, Funding Gwynne, S., Ronchi, E., B´enichou, N., Kinateder, M., Kuligowski, E., Gomaa, I.,
+acquisition, Formal analysis, Conceptualization. Anne S. Patricio: Adelzadeh, M., 2019. Modeling and mapping dynamic vulnerability to better assess
+Writing – review & editing, Software. Anto´nio Gameiro Lopes: . Aldina WUI evacuation performance. Fire Mater. 43 (6), 644660. https://doi.org/10.1002/
+Santiago: Writing – review & editing, Supervision. Luís Laím: Writing – fam.2708.
+Harel, D., 1987. Statecharts: a visual formalism for complex systems. Sci. Comput.
+review & editing. Program. 8 (3), 231–274. https://doi.org/10.1016/0167-6423(87)90035-9.
+Haynes, K., Tibbits, A., Coates, L., Handmer, J., McAneney, J., McAneney, D., 2010. 100
+years of Australian civilian bushfire fatalities: exploring the trends in relation to the
+Declaration of competing interest ‘Stay or Go’ policy. Environ. Sci. Policy 13 (3), 185–194. https://doi.org/10.1016/j.
+envsci.2010.03.006.
+Intini, P., Ronchi, E., Gwynne, S.M.V., Pel, A.J., 2019. Traffic modeling for
+The authors declare that they have no known competing financial
+wildlandUrban interface fire evacuation. J. Transport. Eng., Part A: Syst. 145 (3).
+interests or personal relationships that could have appeared to influence https://doi.org/10.1061/JTEPBS.0000221.
+the work reported in this paper. Jolly, W.M., Cochrane, M.A., Freeborn, P.H., Holden, Z.A., Brown, T.J., Williamson, G.J.,
+Bowman, D.M.J.S., 2015. Climate-induced variations in global wildfire danger from
+1979 to 2013. Nat. Commun. 6, 7537. https://doi.org/10.1038/ncomms8537.
+Acknowledgment Leo´n, J., March, A., 2017. Taking responsibility for ‘shared responsibility’: urban
+planning for disaster risk reduction across different phases: examining bushfire
+This work is financed by national funds through FCT – Foundation evacuation in Victoria, Australia. Impact Assess. Project App. 35 (4), 289–304.
+https://doi.org/10.1080/13563475.2016.1234368.
+for Science and Technology through the research project PCIF/AGT/ Li, D., Cova, T.J., Dennison, P.E., 2019. Setting wildfire evacuation triggers by coupling
+0061/2019 (EVACUARFLORESTA) and the grant agreement[DPA–22- fire and traffic simulation models: a spatiotemporal GIS approach. Fire Technol. 55
+140]attributed toShahab Mohammad Beyki. (5), 1619–1652. https://doi.org/10.1007/s10694-018-0771-6.
+Liu, Y., Stanturf, J., Goodrick, S., 2010. Trends in global wildfire potential in a changing
+This work was also partly financed by FCT/MCTES through national climate. For. Ecol. Manage. 259 (4), 685–697. https://doi.org/10.1016/j.
+funds (PIDDAC) under the R&D Unit Institute for Sustainability and foreco.2009.09.002.
+Innovation in Structural Engineering (ISISE), under reference UIDB / Lopes, A.M.G., Sousa, A.C.M., Viegas, D.X., Feb. 1995. Numerical simulation of turbulent
+flow and fire propagation in complex topography. Numeri. Heat Transf. A Appl. 27
+04029/2020 (doi.org/10.54499/UIDB/04029/2020), and under the (2), 229–253. https://doi.org/10.1080/10407789508913698.
+Associate Laboratory Advanced Production and Intelligent Systems Lopes, A.M.G., Cruz, M.G., Viegas, D.X., Jan. 2002. FireStation — an integrated software
+ARISE under reference LA/P/0112/2020. system for the numerical simulation of fire spread on complex topography. Environ.
+This work is financed by national funds through FCT – Foundation Model. Software 17 (3), 269–285. https://doi.org/10.1016/S1364-8152(01)00072-
+X.
+for Science and Technology, under a grant agreement[2023.00658.BD] Lovreglio, R., Ronchi, E., Kinsey, M.J., 2020. An online survey of pedestrian evacuation
+attributed to thefirstauthor. model usage and users. Fire Technol. 56 (3), 11331153. https://doi.org/10.1007/
+s10694-019-00923-8.
+Manzello, S.L., Almand, K., Guillaume, E., Vallerent, S., Hameury, S., Hakkarainen, T.,
+Data availability 2018. FORUM position paper: The growing global wildland urban interface (WUI)
+fire Dilemma: Priority needs for research. Fire Safety J. 100, 6466. https://doi.org/
+10.1016/j.firesaf.2018.07.003.
+Data will be made available on request.
+Mitchell, H., Gwynne, S., Ronchi, E., Kalogeropoulos, N., Rein, G., 2023. Integrating
+wildfire spread and evacuation times to design safe triggers: Application to two rural
+References communities using PERIL model. Safety Sci. 157, 105914. https://doi.org/10.1016/
+j.ssci.2022.105914.
+Radeloff, V.C., et al., 2018. Rapid growth of the US wildland–urban interface raises
+Beloglazov, A., Almashor, M., Abebe, E., Richter, J., Steer, K., 2016. Simulation of wildfire risk. Proc. Natl. Acad. Sci. 115 (13), 3314–3319. https://doi.org/10.1073/
+wildfire evacuation with dynamic factors and model composition. Simul. Model.
+pnas.1718850115.
+Beve P r r ly a , c t J . . L T . h , e B o o r t y h w 60 e , l l 1 , 4 P 4 ., 1 2 5 0 9 1 . 1 h . t t W ps i : l / d / fi d r o e i . e o v r a g c / u 1 a 0 t . i 1 o 0 n 1 s 6 i / n j . C si a m n p a a d t a . 2 1 0 9 1 8 5 0 .1 –2 0 0 .0 0 0 7 2 . . Nat. Rodr fi ig re u s e — s, c A a . u , s S e a s n o t f i a h g u o m , a A n ., l o L s a s í e m s , i n L . t , h V e i 2 eg 0 a 1 s 7 , fi D r . e X s . , i n Z ˆe P z o e r r t e u , g J a . l L . . A , p D p e l c . . S 2 c 0 i. 2 1 2 2 . ( R 2 u 4 r ) a , l 1 2561.
+Hazard. 59 (1), 571596. https://doi.org/10.1007/s11069-011-9777-9.
+https://doi.org/10.3390/app122412561.
+Beyki, S.M., Santiago, A., Laím, L., Craveiro, H.D., Aug. 2023. Evacuation simulation
+under threat of wildfire—an overview of research, development, and knowledge Ronchi, E., Gwynne, S.M.V., Rein, G., Wadhwani, R., Intini, P., Bergstedt, A., 2017. e-
+Sanctuary: Open Multi-Physics Framework for Modelling Wildfire Urban Evacuation,
+gaps. Appl. Sci. 13 (17), 9587. https://doi.org/10.3390/app13179587.
+Quincy, MA, 2017. [Online]. Available: https://portal.research.lu.se/files/8200860
+Beyki, S., Gameiro, A., Santiago, A., Laím, L., 2025a. Wildfire simulation using satellite
+4/e_Sanctuary_Open_Multi_Physics_Framework_for_Modelling_Wildfire_Urban_Eva
+active fire data interval reinitialization and rate of spread adjustment. Remote Sens.
+cuation.pdf.
+Appl.: Soc. Environ. https://doi.org/10.2139/ssrn.5041284.
+Ronchi, E., Gwynne, S.M.V., Rein, G., Wadhwani, R., Intini, P., 2019. An open multi-
+Beyki, S., Lopes, A.G., Laím, L., Santiago, A., 2025. Comparative analysis of wildfire physics framework for modeling wildland–urban interface fire evacuation dynamics.
+simulation tools: discrepancies in rothermel model-based software under varying
+Saf. Sci. 118, 102826. https://doi.org/10.1016/j.ssci.2019.06.009.
+wind and slope conditions. Int. J. Disaster Risk Reduct., 105431 https://doi.org/
+Ross, D.G., Smith, I.N., Fox, D.G., 1988. Diagnostic wind field modeling for complex
+10.1016/j.ijdrr.2025.105431. terrain: model development and testing. J. Appl. Meteorol. 27 (7), 785–796.
+Borshchev, A., 2013. The Big Book of Simulation Modeling: Multimethod Modeling with
+Rothermel, R.C., 1972. A mathematical model for predicting fire spread in wildland
+Bow A m n a y n L , o D g . i M c . 6 J . . S A ., n y M L o o r g e i i c r a N -M or u th n˜ o A z m , A e . r , i c K a o , l C d h en ic , a C g . o A , . I ., L . C h´avez, R.O., Mun˜oz, A.A., fuels. Intermountain Forest & Range Experiment Station, Forest Service, US
+Salinas, F., Gonz´alez-Reyes, A ´ ., Rocco, R., de la Barrera, F., Williamson, G.J., Department of Agriculture, vol. 115, Jan. 1972.
+14
+
+===== PAGE 15 =====
+
+S.M. Beyki et al. S a f e t y S c i e n c e 199 (2026) 107200
+Santiago, A., Laím, L., 2025. Evacuarfloresta Project - Evacuation Decisions and Plans in Wahlqvist, J., et al., 2021. The simulation of wildland–urban interface fire evacuation:
+Wildfire Scenarios, vol. 7. RISCOS - Associaça˜o Portuguesa de Riscos, Prevença˜o e the WUI-NITY platform. Saf. Sci. 136, 105145. https://doi.org/10.1016/j.
+Segurança, 2025. https://doi.org/10.34037/978-989-9053-29-8_07. ssci.2020.105145.
+Siam, M.R.K., Wang, H., Lindell, M.K., Chen, C., Vlahogianni, E.I., Axhausen, K.W., 2022. Wolshon, B., Marchive, E., Mar. 2007. Emergency Planning in the Urban-Wildland
+An interdisciplinary agent-based multimodal wildfire evacuation model: critical Interface: subdivision-Level Analysis of Wildfire Evacuations. J. Urban Plan. Dev.
+decisions and life safety. Transp. Res. D Transp. Environ. 103, 103147. https://doi. 133 (1), 73–81. https://doi.org/10.1061/(ASCE)0733-9488(2007)133:1(73).
+org/10.1016/j.trd.2021.103147. Wong, S.D., Broader, J.C., Shaheen, S.A., 2020a. Review of California Wildfire
+Teague, B., McLeod, R., Pascoe, S., 2009. 2009 Victorian Bushfires Royal Commission Evacuations from 2017 to 2019. UC Office of the President: University of California
+Final Report. Institute of Transportation Studies.
+USDA Forest Service, 2003. The Healthy Forests Initiative and Healthy Forests Wong, S.D., Chorus, C.G., Shaheen, S.A., Walker, J.L., 2020b. A revealed preference
+Restoration Act. methodology to evaluate regret minimization with challenging choice sets: A
+Veeraswamy, A., et al., 2018. The simulation of urban-scale evacuation scenarios with wildfire evacuation case study. Travel Behav. Soc. 20, 331347. https://doi.org/
+application to the Swinley forest fire. Saf. Sci. 102, 178–193. https://doi.org/ 10.1016/j.tbs.2020.04.003.
+10.1016/j.ssci.2017.07.015.
+15

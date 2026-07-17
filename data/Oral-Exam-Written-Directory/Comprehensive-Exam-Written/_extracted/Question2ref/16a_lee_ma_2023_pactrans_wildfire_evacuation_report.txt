@@ -1,0 +1,1718 @@
+===== PAGE 1 =====
+
+AGENT-BASED MODELING FRAMEWORK FOR
+WILDFIRE EVACUATION IN DAMAGED
+TRANSPORTATION SETTINGS
+FINAL PROJECT REPORT
+by
+Ji Yun Lee, Fangjiao Ma
+Washington State University
+Sponsorship
+PacTrans
+for
+Pacific Northwest Transportation Consortium (PacTrans)
+USDOT University Transportation Center for Federal Region
+10 University of Washington
+More Hall 112, Box 352700
+Seattle, WA 98195-2700
+In cooperation with U.S. Department of Transportation,
+Office of the Assistant Secretary for Research and Technology (OST-R)
+
+===== PAGE 2 =====
+
+DISCLAIMER
+The contents of this report reflect the views of the authors, who are responsible for the
+facts and the accuracy of the information presented herein. This document is disseminated under
+the sponsorship of the U.S. Department of Transportation’s University Transportation Centers
+Program, in the interest of information exchange. The Pacific Northwest Transportation
+Consortium, the U.S. Government and matching sponsor assume no liability for the contents or
+use thereof
+.
+ii
+
+===== PAGE 3 =====
+
+TECHNICAL REPORT DOCUMENTATION PAGE
+1. Report No. 2. Government Accession No. 3. Recipient’s Catalog No.
+01784880
+4. Title and Subtitle 5. Report Date
+Agent-based Modeling Framework for Wildfire Evacuation in Damaged September 30, 2022
+Transportation Settings
+6. Performing Organization Code
+7. Author(s) and Affiliations 8. Performing Organization Report No.
+Ji Yun Lee, 0000-0003-2313-8371 2021-S-WSU-1
+Fangjiao Ma, 0000-0002-5627-4292
+Department of Civil & Environmental Engineering
+Washington State University
+9. Performing Organization Name and Address 10. Work Unit No. (TRAIS)
+PacTrans
+Pacific Northwest Transportation Consortium 11. Contract or Grant No.
+University Transportation Center for Federal Region 10 69A355174110
+University of Washington More Hall 112 Seattle, WA 98195-2700
+12. Sponsoring Organization Name and Address 13. Type of Report and Period Covered
+United States Department of Transportation Final Report (Sep 2021 – Sep 2022)
+Research and Innovative Technology Administration
+14. Sponsoring Agency Code
+1200 New Jersey Avenue, SE
+Washington, DC 20590
+15. Supplementary Notes
+Report uploaded to: www.pactrans.org
+16. Abstract
+The main goal of this project was to support effective evacuation planning by developing an agent-based modeling (ABM)
+framework for wildfire evacuation in damaged transportation settings. More specifically, the framework integrates
+wildfire simulation and vulnerability assessment with ABM to adequately represent both human behaviors during an
+evacuation and time-dependent network functionality in microscopic traffic simulation. The framework predicts traffic
+conditions during an evacuation and identifies the critical parts of the transportation network for pre-fire risk mitigation
+actions aimed at improving mobility during a wildfire evacuation. The proposed framework is illustrated with the City of
+Santa Clarita, affected by the Rye Fire, to demonstrate its applicability to a real community. The contribution of this
+project is twofold: (a) The framework incorporates an advanced wildfire hazard modeling and vulnerability assessment to
+improve the accuracy of wildfire evacuation in damaged transportation settings; and (b) This project
+constructs an evacuee response model based on a stated preference survey to predict individual evacuees’ behaviors as a
+firefront approaches.
+17. Key Words 18. Distribution Statement
+Wildfire; Evacuation; Agent-based model; Transportation; Simulation; Survey
+19. Security Classification (of this report) 20. Security Classification (of this page) 21. No. of Pages 22. Price
+Unclassified. Unclassified. 44 N/A
+Form DOT F 1700.7 (8-72) Reproduction of completed page authorized.
+iii
+
+===== PAGE 4 =====
+
+SI* (Modern Metric) Conversion Factors
+iv
+
+===== PAGE 5 =====
+
+TABLE OF CONTENTS
+List of Abbreviations .............................................................................................................viii
+Executive Summary ................................................................................................................ ix
+CHAPTER 1. INTRODUCTION .............................................................................................. 1
+1.1. Background and Motivation ...................................................................................... 1
+1.2. Literature Review ...................................................................................................... 2
+1.3. Goal ........................................................................................................................... 4
+1.4. Report Overview ....................................................................................................... 5
+CHAPTER 2. FRAMEWORK DEVELOPMENT.................................................................... 7
+2.1. Wildfire Simulation ................................................................................................... 8
+2.2. Bridge Vulnerability Assessment ............................................................................ 12
+2.3. Evacuee Response Model ........................................................................................ 15
+2.4. Traffic Simulation .................................................................................................... 16
+CHAPTER 3. DATA COLLECTION AND ANALYSES ..................................................... 19
+3.1. Data Collection ........................................................................................................ 19
+3.2. Data Analyses .......................................................................................................... 20
+3.3. Survey Results and Discussion ................................................................................ 21
+CHAPTER 4. CASE STUDY ................................................................................................. 21
+4.1. Introduction ............................................................................................................. 27
+4.2. Procedure ................................................................................................................. 27
+4.2.1. Module 1. Wildfire Simulation ........................................................................ 28
+4.2.2. Module 2. Bridge Vulnerability Assessment .................................................... 30
+4.2.3. Module 3. Evacuee Response Model ............................................................... 32
+4.2.4. Module 4. Traffic Simulation ........................................................................... 35
+4.3. Results and Discussions ........................................................................................... 36
+CHAPTER 5. CONCLUSIONS .............................................................................................. 43
+CHAPTER 6. REFERENCES ................................................................................................. 45
+Appendix A .......................................................................................................................... A-1
+v
+
+===== PAGE 6 =====
+
+LIST OF FIGURES
+Figure 2.1 The proposed ABM framework for wildfire evacuation in damaged transportation
+settings ............................................................................................................................ 7
+Figure 2.2 Relationship between type of deck material and bridge damage level (adapted from
+Perios-Sayol et al., 2017) ............................................................................................. 14
+Figure 4.1 The City of Santa Clarita: the Rye Fire perimeter and the location of the bridge
+within the perimeter ...................................................................................................... 27
+Figure 4.2 Comparison between the simulated fire perimeter (only during the first burning day)
+and the Rye Fire perimeter ........................................................................................... 30
+Figure 4.3 The locations of bridge within the simulated fire perimeter ......................................... 31
+Figure 4.4 Final destination locations ............................................................................................ 35
+Figure 4.5 Vehicle-only transportation network in the City of Santa Clarita ................................. 36
+Figure 4.6 The cumulative number of vehicles that departed and evacuated and the number of
+vehicles currently in the transportation network .......................................................... 38
+Figure 4.7 The number of vehicles stuck in traffic ......................................................................... 39
+Figure 4.8 Time series of average speed ........................................................................................ 39
+Figure 4.9 Traffic map at 10:36 am (average speed of 15.6 mph).................................................. 40
+Figure 4.10 Traffic map at 8:11 pm (average speed of 56.3 mph) ................................................. 41
+vi
+
+===== PAGE 7 =====
+
+LIST OF TABLES
+Table 2.1 Link damage state and the associated traffic carrying capacity (adapted from Shiraki
+et al., 2007) .................................................................................................................... 15
+Table 3.1 Demographic characteristics and census data ................................................................ 20
+Table 3.2 Frequency distribution of evacuation trigger ................................................................. 22
+Table 3.3 Logistic regression results of evacuation timing ............................................................ 23
+Table 3.4 Frequency distribution of evacuation preparation time .................................................. 24
+Table 3.5 Frequency distribution of evacuation destination ........................................................... 24
+Table 3.6 Logistic regression results of real-time navigation use during an evacuation ................ 25
+Table 4.1 Bridge deck materials and damage levels ...................................................................... 31
+vii
+
+===== PAGE 8 =====
+
+LIST OF ABBREVIATIONS
+ABM: Agent-based modeling
+ACS: American Community Survey
+AIC: Akaike Information Criterion
+BDL: Bridge damage level
+BI: Burning index
+BIC: Bayesian Information Criterion
+DL: Damage level
+FARSITE: Fire Area Simulator
+FBFM40: 40 Scott and Burgan Fire Behavior Fuel Models
+gridMET: Gridded Surface Meteorological Dataset
+HC: Hill climbing
+LDL: Link damage level
+MCS: Monte Carlo Simulation
+MTT: Minimum Travel Time
+MTurk: Mechanical Turk
+PNW: Pacific Northwest
+PUMS: Public Use Microdata Sample
+RAWS: Remote Automatic Weather Station
+SR: Synthetic reconstruction
+SUMO: Simulation of Urban Mobility
+TRANSIMS: Transportation Analysis and Simulation System
+WUI: Wildland-urban interface
+viii
+
+===== PAGE 9 =====
+
+EXECUTIVE SUMMARY
+Wildfires pose an increasing threat to residents in the Pacific Northwest (PNW) region as
+more people are moving to the wildland-urban interface. In addition, increasing frequency and
+magnitude of wildfires induced by climate change will greatly intensify wildfire threat to
+humans, the built environment, and ecosystem in the PNW region. While many state- and local-
+level initiatives are under way to mitigate wildfire risks, it is not possible to completely remove
+such risks because of substantial inherent uncertainties. In this case, evacuation is the most
+important and effective method to reduce human losses during a wildfire event. While it seems
+easy to achieve the main goal of evacuation (i.e., moving people at risk to safer places), human
+behaviors during an evacuation are highly unpredictable, and the elevated travel demand due to
+simultaneous evacuation may lead to traffic congestion, both of which endanger human lives.
+Bridge damage induced by fires and the associated reduction in traffic carrying capacities
+further complicate this problem. Therefore, wildfire evacuation simulation can be an effective
+experimental means for emergency management and evacuation planning because its costs are
+low and it identifies bottlenecks and critical points for traffic congestion during an evacuation.
+The main goal of this project was to support effective evacuation planning by developing
+an agent-based modeling (ABM) framework for wildfire evacuation in damaged transportation
+settings. More specifically, the framework integrates wildfire simulation and vulnerability
+assessment with ABM to adequately represent both human behaviors during an evacuation and
+time-dependent network functionality in microscopic traffic simulation. The framework predicts
+traffic conditions during an evacuation and identifies the critical parts of the transportation
+network for pre-fire risk mitigation actions aimed at improving mobility during a wildfire
+evacuation.
+This goal is well aligned with the PacTrans theme of “providing data driven solutions for
+the diverse mobility challenges in the Pacific Northwest.” To achieve the goal, the project
+performed an online survey of residents in wildfire-prone communities in the United States to
+collect information on human behaviors during a wildfire evacuation, which was subsequently
+used to characterize individual evacuees’ decision sequences in the ABM. Other types of data
+(e.g., weather and vegetation patterns, topography, transportation network, and building/
+population distribution) were also collected to perform wildfire simulation, vulnerability
+assessment, and traffic simulation. In this context, the project contributed to one of the PacTrans
+ix
+
+===== PAGE 10 =====
+
+special topic areas, “data-driven solutions in transportation.” The proposed framework was
+illustrated with the City of Santa Clarita, affected by the Rye Fire, to demonstrate its
+applicability to a real community. In summary, the contribution of this project is twofold:
+a) The framework incorporates an advanced wildfire hazard modeling and vulnerability
+assessment to improve the accuracy of wildfire evacuation in damaged transportation
+settings; and
+b) This project constructed an evacuee response model based on a stated preference
+survey to predict individual evacuees’ behaviors as a firefront approaches.
+x
+
+===== PAGE 11 =====
+
+CHAPTER 1. INTRODUCTION
+1.1. Background and Motivation
+Recent wildfires in the Western United States have highlighted the destructive effects of
+wildfires on property, people, and the environment. The 2018 Camp Fire was the deadliest and
+most destructive wildfire in California’s history, resulting in 85 fatalities and more than 18,000
+buildings destroyed (Syphard et al., 2022). In 2020, the Western United States experienced more
+than 100 fires, which affected approximately 8.2 million acres of land (Keeley and Syphard,
+2021). Moreover, according to the U.S. Forest Service, a billion acres of land across the United
+States are at risk of catastrophic wildfires. A recent increase in the frequency and severity of
+wildfires in the United States is partly attributed to global climate change, which may induce an
+increase in heatwaves and prolonged dry periods (Cova et al., 2005). Coupled with climate
+change effects, rapid population growth and residential development at the wildland-urban
+interface (WUI) have greatly exacerbated property destruction and human/economic losses
+induced by wildfires (Lee et al., 2022; Ma et al., 2022).
+Having seen the enormous economic and human losses that wildfires have caused over
+the past decades, the federal and local governments, researchers, engineers, and the public have
+paid increasing attention to wildfire risk management. As part of this effort, a variety of
+community-level wildfire protection plans have been proposed and implemented by federal,
+state, and local government agencies. The plans include zoning regulation, fire department
+support, adequate water supply and flow for firefighting, road improvement for facilitated
+access, and public education and outreach (Communities Committee, 2004). In WUI areas,
+individual homeowners adopt wildfire risk mitigation actions, including the use of nonflammable
+or ignition-resistant materials, the installation of dual-pane windows or fire sprinklers, vegetation
+fuel treatment, etc. While wildfire risks can be mitigated through these proactive actions, residual
+risks always exist because of substantial uncertainties in wildfire risk assessment. In this case,
+evacuation is the most important and effective method to reduce human losses during a wildfire
+event. For example, while most tsunami risk reduction measures were destroyed during the 2011
+Great East Japan Earthquake/Tsunami, rapid evacuation saved approximately 90 percent of the
+total population at risk from the tsunami (Mas et al., 2012). However, in the real world, mass
+panic and traffic jams caused by exit route shortages under simultaneous evacuation orders may
+complicate the simple and straightforward goal of evacuation that moves people at risk to safer
+1
+
+===== PAGE 12 =====
+
+places, thereby jeopardizing human lives (Cova et al., 2005). The fact that the residents in
+Paradise, California, who tried to escape the 2018 Camp Fire got caught in a deadly traffic jam
+revealed that road systems were not designed for such an urgent evacuation during a hazard
+event. This problem can be extended to other communities at great risk of wildfires in the United
+States. Therefore, effective community-based transportation evacuation planning has become a
+critical issue in disaster emergency and risk management.
+1.2. Literature Review
+A considerable amount of research has been carried out to develop transportation
+evacuation simulation models during various types of natural hazard events. Early works of
+emergency evacuation utilized macroscopic traffic simulations to capture dynamic network flows
+during the evacuation process (e.g., Kisko and Francis, 1985; Burkard et al., 1993). However,
+most of them assumed homogenous behaviors among evacuees because of the high
+computational cost and estimated evacuation time at the macro or meso scale.
+Since the mid-1990s, advanced computer technology has enabled the utilization of
+microscopic traffic simulations in emergency evacuation models so as to simulate traffic flows at
+the individual vehicle level (Benjaafar et al., 1997; Hamacher and Tjandra, 2001). Moreover,
+several studies have incorporated individual evacuees’ behaviors during disasters into
+behavioral-based microscopic traffic simulation models. During an evacuation, individual
+behavior plays a critical role in evacuation process because it significantly affects pre-movement
+phases, reaction time, decisions to evacuate, and evacuation phases, thus affecting total
+evacuation time (D’Orazio et al., 2014). Using the parameters describing each evacuee’s
+characteristics (e.g., start location, physical ability, reaction time, transportation mode, route
+choice mechanism, vehicle speed, etc.), individual and collective behaviors can be captured in
+dynamic traffic simulations at the micro scale (Sinuany-Stern and Stern, 1993).
+In recent years, agent-based modeling (ABM) has received great attention because of its
+advantages in capturing individual and collective behaviors in a dynamic complex system
+(Epstein, 1999; Mas et al., 2012; D’Orazio et al., 2014; Cimellaro et al., 2017; Feng et al., 2020).
+ABM is one of the heuristic computational models that can simulate the actions and interactions
+of individual agents for the purpose of finding system movement trends. In ABM, each evacuee
+(or vehicle) is modeled as an autonomous agent who has his/her own characteristics and follows
+specific decision rules. Individual agents make decisions based on interactions with other agents
+2
+
+===== PAGE 13 =====
+
+and the environment, as well as on localized knowledge (Chen and Zhan, 2014). Thus, ABM can
+model individual agents’ behaviors simultaneously and capture their collective behavior
+subsequently in a dynamic system. A large number of studies have employed ABM in modeling
+evacuation. Pan (2006) investigated human behaviors during an earthquake event by using basic
+concepts of psychology and sociology and incorporated them into multi-ABM for the egress
+analysis of a multi-story university building. Chen and Zhan (2014) utilized ABM to incorporate
+the effects of individual drivers’ behaviors on traffic flow in three different road structures.
+D’Orazio et al. (2014) modeled the post-earthquake evacuation patterns of building occupants by
+using videotape analysis.
+Many other studies have applied ABM to community-based transportation evacuation
+planning during various types of natural hazards, as it is straightforward to formulate decision
+rules in driving (e.g., acceleration, deceleration, land change, etc.) and the traffic environment
+(Chen and Zhan, 2014).
+Specifically, hurricane evacuation has been well studied, due in part to advanced pre-
+event warning and relatively accurate hurricane trajectory prediction. On the other hand, wildfire
+evacuation has been much less studied (Grajdura et l., 2020; McCaffrey et al., 2018). Because of
+rapidly changing microenvironmental conditions (e.g., wind speed and direction) during
+wildfires, people are often forced to evacuate with short or no notice, and unnecessary evacuation
+occurs frequently. Therefore, weather analysis and wildfire propagation prediction should be
+incorporated into the evacuation simulation to improve its accuracy. However, most existing
+studies have not accounted for hazard analysis (or have utilized very elementary hazard
+modeling) in their evacuation models (Kuligowski et al., 2022; McCaffrey et al., 2018;
+Mozumder et al., 2008; Stasiewicz and Paveglio, 2021). Rather, they have constructed regression
+models based on survey data or have developed ABM-based evacuation models based on the
+assumption that all residents have already been forced to evacuate their community.
+Several researchers have combined hazard models with ABM to represent more realistic
+evacuation situations. Mas et al. (2012) proposed an integrated ABM to estimate
+tsunami/earthquake evacuation patterns and validated this model by using the 2011 Great East
+Japan earthquake event with a magnitude of 9.0 Mw. The proposed evacuation model was
+integrated with a numerical simulation of a tsunami to estimate tsunami propagation and the
+associated start time of evacuation. While this model had a hazard modeling component, it did
+3
+
+===== PAGE 14 =====
+
+not perform the vulnerability assessment of a transportation system under earthquake/tsunami
+loading. Cimellaro et al. (2017) utilized ABM to simulate building evacuation during an
+earthquake event. The model first performed a numerical structural analysis of a building to
+estimate structural responses to a wide range of possible earthquake ground motion intensities
+and incorporated human anxiety and behavior in an emergency. However, the vulnerability
+analysis in this study was limited to a single building and therefore cannot be used to simulate a
+community-based evacuation process. Beloglazov et al. (2016) developed a wildfire evacuation
+model combining a spatiotemporal firefront with evacuation trigger modeling and ABM.
+Although this model is one of the most comprehensive wildfire evacuation models, it still lacks a
+vulnerability component. In addition, the data and parameters used in the trigger and behavioral
+modeling were assumed or determined on the basis of expert opinions, which made them hardly
+reproducible. Given that many parts of a transportation system are vulnerable to natural hazards,
+their physical damage and the associated reduction in traffic carrying capacity due to a hazard
+event should be considered in a community-based evacuation model so as to better represent
+traffic conditions and the evacuation process during the event. To this end, the conventional
+ABM should be integrated with hazard analysis and vulnerability assessment of a transportation
+system while being supported by reproducible, quantitative data.
+1.3. Goal
+The main goal of this project was to support effective evacuation planning by developing
+an ABM framework for wildfire evacuation in damaged transportation settings. To fill the
+research gaps in the literature, this project developed an integrated framework that incorporates
+hazard modeling, vulnerability assessment, evacuee response modeling, and traffic simulation to
+predict traffic conditions during an evacuation and to identify critical parts of the transportation
+network for pre-fire risk mitigation actions. The contribution of this project is twofold:
+a) The framework incorporates an advanced wildfire hazard modeling and vulnerability
+assessment to improve the accuracy of wildfire evacuation in damaged transportation
+settings; and
+b) This project constructed an evacuee response model based on a stated preference
+survey to predict individual evacuees’ behavior as a firefront approaches.
+Effective community-based transportation evacuation planning is an important issue for
+state and local policy makers in communities at great risk of wildfires in the United States.
+4
+
+===== PAGE 15 =====
+
+Evacuation is considered to be the second line of defense if the first course of defense (i.e.,
+wildfire countermeasures) cannot prevent wildfire risks to communities. Underestimation of this
+issue and ineffective planning could result in catastrophic human losses during a wildfire. The
+evacuation simulation model may assist a well-developed evacuation plan and ultimately could
+save lives.
+1.4. Report Overview
+The remainder of this report is organized as follows. Chapter 2 describes an ABM-based
+framework for wildfire evacuation in damaged transportation settings and explains the modules
+in the framework in more detail. In Chapter 3, online survey data collection and analyses are
+introduced and used to support an evacuee response model, which is one of the modules of the
+proposed framework. The fourth chapter illustrates the proposed framework with the City of
+Santa Clarita, California, affected by the 2017 Rye Fire, and the case study results are presented.
+Finally, we conclude with a general discussion of the findings and limitations of this project.
+5
+
+===== PAGE 16 =====
+
+6
+
+===== PAGE 17 =====
+
+CHAPTER 2. FRAMEWORK DEVELOPMENT
+The project developed an ABM framework for wildfire evacuation in damaged
+transportation settings aimed at predicting traffic conditions during an evacuation and identifying
+the critical parts of transportation network for pre-fire risk mitigation actions. The framework
+integrates wildfire simulation and vulnerability assessment with ABM to adequately represent
+both human behavior during an evacuation and time-dependent network functionality in
+microscopic traffic simulation. More specifically, as illustrated in figure 2.1, the framework
+consists of four modules: wildfire simulation, vulnerability assessment, evacuee response
+modeling, and traffic simulation. The first module evaluates the spatiotemporal probability of
+wildfire occurrence and generates representative wildfire scenarios in probability space.
+FARSITE simulates a time-dependent fire-front movement for each scenario and feeds that
+information into the subsequent modules. The second module performs a bridge vulnerability
+assessment to evaluate wildfire-induced changes in traffic capacity. The third module constructs
+an evacuee response model based on a stated preference survey to predict individual evacuees’
+behaviors in response to fire propagation. The fourth module simulates traffic conditions by
+updating traffic demand and capacity at every time step.
+Figure 2.1 The proposed ABM framework for wildfire evacuation in damaged transportation
+settings
+7
+
+===== PAGE 18 =====
+
+All the variables considered in the framework are updated at a fixed time step: each
+bridge’s damage state and traffic carrying capacity are updated on the basis of fire propagation
+measured at every time step; each agent updates its state during an evacuation; and microscopic
+traffic simulation coupled with ABM is performed on the basis of the time-dependent network
+functionality and the updated locations of all agents. Private vehicles are the primary form of
+mobility for people living in wildfire-prone areas (Beloglazov et al., 2016). Therefore, the
+framework focuses on capturing vehicle use and vehicular traffic without considering pedestrian
+behaviors. The final results are time-dependent traffic maps to identify the critical parts of
+transportation network that are the most vulnerable to wildfires and that have the greatest
+potential for causing traffic congestion during an evacuation. Moreover, the total number of
+evacuating vehicles during a given time period is also obtained as a final result, which could be
+used to determine the bridges that need to be strengthened to minimize human losses during
+wildfire evacuation.
+2.1. Wildfire Simulation
+The wildfire simulation module consists of two stages: wildfire probability estimation
+and growth modeling. The first stage estimates spatiotemporally varying fire probabilities in the
+study region and generates representative wildfire scenarios. The second stage simulates wildfire
+growth for each scenario and records the time-dependent firefront, which will be fed into the
+subsequent modules. In the first stage, a community of interest and its surrounding areas are
+defined and divided into small grids (e.g., 1km x 1km) to find the probabilities of fire that can be
+propagated into the community. A model for estimating fire probability should consider two
+main causes of wildfire: human causes (e.g., power lines, equipment failure and accidental
+ignitions, smoking, fireworks, campfires, arson) and natural causes. Population density, urban
+development, distance to a freeway, railway or power lines, etc. can be used to estimate the
+occurrence rate of human-caused fires (Massada et al., 2012; Rodrigues and De la Riva, 2014),
+whereas weather and topographic factors (e.g., wind, temperature, relative humidity, landcover,
+elevation, slope) may affect the occurrence rate of nature-caused wildfires (Finney et al., 2011;
+Massada et al., 2013). To simplify the wildfire occurrence probability model, all the grid-specific
+human factors are encapsulated into a single location factor, for example in equations 1-3.
+The model also includes temporally varying factors such as the day of year, relative humidity,
+(𝑥𝑥, 𝑦𝑦)
+8
+
+===== PAGE 19 =====
+
+temperature, wind speed, and burning index (BI). BI is used to indicate the difficultly of
+containing a fire and provides a good seasonal profile (Preisler et al., 2004).
+A generalized additive logistic regression is employed to construct a wildfire probability
+estimation model to account for spatiotemporal dependence and the non-linear relationship
+between independent and dependent variables (Preisler et al., 2004). Since the wildfire
+probability estimation models are used to generate representative wildfire scenarios that trigger
+mass evacuation, the unconditional probability of a fire occurring and turning into a “large fire”
+should be estimated. In this report, a large fire is defined as a fire that has burned areas greater
+than 100 acres (Preisler et al., 2004). Fire ignition is an important factor in wildfire simulation,
+but fire cannot propagate and develop into a large fire without appropriate environmental and
+weather conditions, such as a burning fuel bed, convective heating influenced by wind, moisture
+content, etc. Thus, the unconditional probability that a large fire occurs at a given cell and on a
+given day of year, , is the product of the ignition probability, , and the conditional
+probability of an ignitio𝑓𝑓n turning into a large fire, . The logistic regression models for
+𝑃𝑃(𝐿𝐿 ) 𝑃𝑃(𝑓𝑓)
+estimating these probabilities are expressed mathemati𝑓𝑓cally as follows:
+𝑃𝑃(𝐿𝐿 |𝑓𝑓)
+(1)
+𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙(𝑃𝑃(𝑓𝑓)) = 𝑓𝑓1(𝑙𝑙) + 𝑓𝑓2(𝑥𝑥, 𝑦𝑦) + 𝑓𝑓3(𝑟𝑟𝑚𝑚𝑚𝑚𝑥𝑥 , 𝑟𝑟𝑚𝑚𝑙𝑙𝑚𝑚 ) + 𝑓𝑓4(𝑙𝑙𝑚𝑚𝑚𝑚𝑥𝑥 , 𝑙𝑙𝑚𝑚𝑙𝑙𝑚𝑚) + 𝑓𝑓5(𝑤𝑤𝑤𝑤) + 𝑓𝑓6(𝑏𝑏𝑙𝑙) (2)
+𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙(𝑃𝑃(𝐿𝐿𝑓𝑓|𝑓𝑓)) = 𝑓𝑓7(𝑙𝑙) + 𝑓𝑓8(𝑥𝑥, 𝑦𝑦) + 𝑓𝑓9(𝑟𝑟𝑚𝑚𝑚𝑚𝑥𝑥 , 𝑟𝑟𝑚𝑚𝑙𝑙𝑚𝑚 ) + 𝑓𝑓10(𝑙𝑙𝑚𝑚𝑚𝑚𝑥𝑥 , 𝑙𝑙𝑚𝑚𝑙𝑙𝑚𝑚) + 𝑓𝑓11(𝑤𝑤𝑤𝑤) + 𝑓𝑓12(𝑏𝑏𝑙𝑙) (3)
+𝑃𝑃 (𝐿𝐿𝑓𝑓) = 𝑃𝑃(𝐿𝐿𝑓𝑓|𝑓𝑓) ∗ 𝑃𝑃(𝑓𝑓)
+where
+= the non-parametric smooth function;
+= the day of year;
+𝑓𝑓(∙)
+= the latitude;
+𝑙𝑙
+= the longitude;
+𝑥𝑥
+and = the maximum and minimum relative humidity;
+𝑦𝑦
+𝑚𝑚𝑚𝑚𝑥𝑥 and 𝑚𝑚𝑙𝑙𝑚𝑚 = the maximum and minimum temperature;
+𝑟𝑟 𝑟𝑟
+𝑚𝑚𝑚𝑚𝑥𝑥= the a𝑚𝑚ve𝑙𝑙𝑚𝑚r age wind speed; and
+𝑙𝑙 𝑙𝑙
+= the burning index.
+𝑤𝑤𝑤𝑤 𝑏𝑏
+𝑙𝑙
+9
+
+===== PAGE 20 =====
+
+As shown in equations 1 and 2, all the weather-related variables and the burning index are
+spatiotemporally varying factors, which means that the probabilities are spatially and temporally
+explicit.
+To estimate the models shown in equations 1 and 2, historical wildfire data should be
+utilized. However, most of the voxels (i.e., each grid on a given day) do not have any historical
+fires because of the fine spatiotemporal scale. For example, it is highly probable that there has
+been no fire in a specific square-kilometer grid on a given day (say September 1st). Therefore, a
+subsampling method can be used to solve the issue and create a balanced subset by randomly
+sampling a ratio, of no-fire voxels (Brillinger et al., 2003; Preisler et al. 2004). The probability
+that a fire occurred at voxel ( ) conditioned on the event that voxel was selected in the
+𝑟𝑟,
+subset ( ) can be expressed as 𝐴𝐴
+𝑘𝑘 𝐸𝐸 𝑘𝑘
+𝐵𝐵
+𝐸𝐸
+(4)
+where = the wildfire occurrence probability predicted by the balanced subset,
+which can 𝐴𝐴also𝐵𝐵 be expressed by :
+𝑃𝑃(𝐸𝐸 |𝐸𝐸 )
+𝑟𝑟
+𝑝𝑝
+(5)
+where = the probability that a fire occurred at voxel . Equation 5 can be then written as
+Equation𝑚𝑚 6 through elementary algebra transformation.
+𝑝𝑝 𝑘𝑘
+(6)
+𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙(𝑝𝑝𝑟𝑟) = 𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙(𝑝𝑝𝑚𝑚) − log (𝑟𝑟)
+To generate a set of representative wildfire scenarios, traditional clustering algorithms
+(e.g., k-means) can be used to cover a wide range of plausible scenarios based on historical data.
+Specifically, the k- means clustering algorithm divides a data set into a number of clusters and
+selects a representative scenario from each cluster by utilizing Euclidean distance between the
+time series.
+In the second stage, for each representative wildfire scenario with a specific ignition
+location and time, wildfire growth is simulated to generate a spatiotemporal firefront and time-
+dependent fire map. Wildfire growth is mostly dependent on topography, as well as
+environmental and weather conditions. In this study, the Fire Area Simulator (FARSITE), a
+10
+
+===== PAGE 21 =====
+
+widely used wildfire simulation program now included in FlamMap 6, was used. FARSITE
+utilizes the Huygens principal (Richards, 1990), in which small elliptical wavelets are formed
+around the perimeter of the fire (i.e., firefront) at the current time step, and the outer edge of
+these wavelets becomes a new firefront at the next time step. Because an iterative simulation
+structure allows time-dependent inputs, FARSITE has the ability to model wildfire growth under
+heterogeneous weather, fuel, and topography conditions, which produces more accurate
+simulation results than the other software programs. However, FARSITE is computationally
+inefficient: FARSITE simulation times can be over 10 times longer than those of the other
+programs, which limits its use when a large and complex wildfire is simulated or a large suite of
+fires is generated.
+On the other hand, other widely used wildfire simulation software programs, such as
+FlamMap, FSPro, and FSim, model wildfire growth on the basis of the Minimum Travel Time
+(MTT) method developed by Finney (2002). MTT is a simplified, raster-based fire growth model
+that searches for the minimum travel time among the nodes of a grid. Fire shape is created by
+contouring the nodes with the same minimum travel time. Because this method holds weather
+and fuel conditions constant over time, its simulation results are not as precise as those of
+FARSITE. However, MTT greatly reduces simulation time. Because the prediction accuracy of
+fire growth at every time step is key to effective wildfire evacuation modeling, FARSITE was
+used in the fire growth modeling of this study despite its relatively high computational costs.
+The major weather inputs for FARSITE include temperature, relative humidity,
+precipitation, wind speed, and wind direction. Hourly weather data are collected for all grids in
+the study region to capture spatiotemporal characteristics. Additionally, a set of grid-specific,
+raster-based topographic inputs (e.g., elevation, slope, and aspect) and fuel property inputs (e.g.,
+canopy cover, fuel mode, canopy stand height, canopy base height, and canopy bulk density) are
+collected and used as inputs for wildfire growth modeling. For each representative wildfire
+scenario, the spatiotemporal firefront and fireline intensity are generated and fed into a
+vulnerability assessment (Module 2) and evacuee response model (Module 3). In the
+vulnerability assessment, both firefront and fireline intensity are useful in identifying the
+locations and severity of damaged bridges, while the spatiotemporal firefront is used in the
+evacuee response model to estimate the timing of evacuation trigger and departure time.
+11
+
+===== PAGE 22 =====
+
+2.2. Bridge Vulnerability Assessment
+Bridges are one of the most critical but vulnerable components in a transportation
+network during a wildfire event. Because of structural damage, the post-fire safety of bridges
+may be reduced significantly, and in order to maintain their safety, the allowable traffic flows of
+bridges are often controlled or regulated. Because the post-fire traffic flow capacities of bridges
+play an integral role in assessing the flow capacity of a transportation network and subsequently
+evaluating the movement of people and vehicles during an evacuation, it is imperative to
+understand the post-fire functionalities of bridges in evacuation planning and management.
+Therefore, in this module, the vulnerability of bridges should be assessed to estimate the reduced
+flow capacity of a transportation system during a wildfire event.
+Bridge vulnerability is often assessed using a fragility curve. A fragility curve represents
+the conditional probability that the damage state of an element or an entire bridge will exceed a
+specific damage state given a hazard intensity level (e.g., peak ground acceleration for
+earthquakes, wind speed for hurricanes and tornadoes) (Masoomi and van de Lindt, 2016;
+Rosowsky and Ellingwood, 2002). A fragility curve is often constructed analytically on the basis
+of structural analyses and evaluations, experimentally on the basis of testing results, or
+empirically on the basis of post-disaster reconnaissance data. In some cases, multiple approaches
+are combined to develop a fragility curve. Extensive studies have been conducted to develop
+seismic and hurricane fragility curves, whereas fire fragility curves have been much less studied.
+Peris-Sayol et al. (2017) collected information on 154 bridge fire cases from existing literature,
+news, and bridge management authorities and concluded that the bridge deck material, structural
+system, and the causes of the fire (e.g., cars, trucks, wildfires) had statistically significant
+impacts on bridge damage level.
+Specifically, timber bridges were the most vulnerable to fires, and tanker truck collisions
+caused the most severe damage to bridges. Naser (2021) used machine learning algorithms to
+predict the vulnerability and damage states of bridges when they were subjected to extreme
+loading events. However, limited data availability was a major issue that hindered the
+performance of the algorithms. Moreover, fire intensity was not included as an explanatory
+variable in either model, which is necessary information in constructing a fire fragility curve
+(Naser, 2021; Peris-Sayol et al., 2017).
+12
+
+===== PAGE 23 =====
+
+Fire intensity induced by wildfire is usually less than that caused by a truck collision. The
+collision of a fuel tanker results in hydrocarbon fires (burning of fuel). If fuel spillages are
+involved, the temperature may reach up to 1000°C within the first few minutes of ignition, thus
+causing substantial structural damage (Kodur et al., 2017; Sobanjo and Thompson, 2013). While
+such a car or truck collision resulting in significant damage to a bridge may be caused by smoke-
+induced visibility issues during wildfire evacuation, this cause of bridge fire was not considered
+in this project because of a lack of information about the quantitative causal relationship between
+visibility issues due to wildfires and such collisions. The probabilistic relationship between fire
+intensity and bridge state has yet to be explored in any depth.
+Chan et al. (2000) conducted experiments and showed that the compressive strength of
+concrete may decrease up to 50 percent and 80 percent when the concrete is exposed to 600°C
+and 800°C, respectively. Although other researchers have also demonstrated that the structural
+capacity of a bridge decreases by increasing fire temperature and exposure time, the experimental
+results have not been sufficient to construct a fire fragility curve because of different laboratory
+settings and limited results. Therefore, this project assumed that bridge damage level depends
+only on bridge material and used a simple relationship between them, as shown in figure 2.2.
+Five damage levels (DLs) were considered, including superficial damage (DL2), slight damage
+(DL3), partial damage (DL4), massive damage (DL5), and structural collapse (DL6), in addition
+to no damage (DL1). The mean damage levels are 2.3, 2.6, 2.0, and 4.8 for concrete, composite,
+steel, and timber bridge, respect;tively (Peris-Sayol et al., 2007). This simple relationship should
+be replaced with a bridge fire fragility curve once it becomes available.
+13
+
+===== PAGE 24 =====
+
+Figure 2.2 Relationship between type of deck material and bridge damage level (adapted from
+Perios-Sayol et al., 2017)
+After each representative wildfire scenario is simulated in FARSITE, the time-dependent
+wildfire perimeter is overlaid with a bridge map to identify the bridges affected by wildfire at
+every time step. The bridge map includes the locations of all bridges ( ) in the study region as
+well as their structural systems, deck materials, number of lanes, traffic flow capacities, etc. A
+𝐵𝐵
+specific set of bridges ( ) located in the current wildfire perimeter experiences a certain
+′
+damage level. The DL of each bridge in the subset is determined on the basis of the
+𝐵𝐵 ⊂ 𝐵𝐵
+′
+relationship between deck material and DL (cf., figure 2.2).
+𝐵𝐵
+This relationship is not deterministic because of uncertainties; see the range of DL
+associated with each type of deck material. Therefore, the DL of a bridge in the subset is a
+′
+random variable and is determined through a Monte Carlo simulation (MCS).
+𝐵𝐵
+Bridge damage will result in reduced traffic flow capacity and subsequently will affect
+the flow capacity of the link where the bridge is located. The bridge damage levels (BDL)
+realized from the previous step are used to estimate the link damage level (LDL) through the
+empirical equation below (Shiraki et al., 2007):
+(7)
+where = the total number of bridges located in the link and = the damage level for the ith
+bridge. The values of LDL are translated into the estimates of link𝑙𝑙 traffic flow capacities, as
+𝑚𝑚 𝐵𝐵𝐵𝐵𝐿𝐿
+shown in table 2.1.
+The reduced flow capacities of the links attacked by wildfires will be incorporated into
+the traffic simulation in Module 4 to simulate evacuation process in damaged transportation
+settings. While vehicle re-routing due to blocked roads or smoke-induced visibility can be
+another obstacle that reduces the flow capacity of the transportation network, these factors were
+not considered in this project.
+Table 2.1 Link damage state and the associated traffic carrying capacity (adapted from Shiraki et
+al., 2007)
+Link Damage Level LDL Lower Bound LDL Upper Bound Capacity (%) Free Flow Speed (%)
+Superficial damage 0.00 0.50 100 100
+Slight damage 0.50 1.00 100 75
+Partial damage 1.00 1.50 75 50
+14
+
+===== PAGE 25 =====
+
+Massive damage 1.50 3.00 50 50
+Structural collapse 3.00 ꝏ 0 0
+2.3. Evacuee Response Model
+In the fourth module, traffic demand is estimated at the individual evacuee, household, or
+vehicle level. Thus, in this module, individual responses and behaviors during evacuation are
+modeled and simulated. Similar to the classic four-step transportation planning model consisting
+of demand estimation, destination choice, mode choice, and trip assignment, evacuation
+modeling generally includes evacuation decision, traffic mode split, destination choice, departure
+time estimation, and an information update procedure. Individual evacuees start to evacuate at
+different points in time even when they are exposed to the same level of a wildfire threat.
+Evacuation behavior is a key factor in realistically simulating evacuation at the community level
+and can be defined by a set of actions of individuals and external stimuli during an evacuation
+(D’Orazio et al., 2014).
+To mathematically model an individual’s evacuation behavior, a series of three events
+was considered in this project: evacuation trigger, decision time delay, and preparation time
+(Mas et al., 2012). First, four types of external stimuli serve as evacuation triggers for evacuees.
+An evacuation alert (Level I) lets people know that a wildfire threat is in their area and suggests
+that they consider evacuation in the event that it becomes necessary. An evacuation warning
+(Level II) indicates the high probability of a need to evacuate. An evacuation order (Level III)
+asks people to evacuate within a specified time period. A large portion of people may respond to
+these three levels of evacuation, but some people may wait until a firefront is within visible
+range of their initial locations (Mas et al., 2012). As such, evacuation triggers, events that
+actually induce an individual evacuee’s response, may depend on his or her risk-averse attitude
+and other characteristics and should be identified and explicitly incorporated into evacuation
+modeling. The timing of each evacuation trigger can be estimated by using the spatiotemporal
+firefront obtained from Module 1. For example, if the distance between the firefront and the
+initial location of an evacuee is within a specific threshold, then one of the stimuli is activated,
+and the evacuee’s response is simulated on the basis of his/her risk attitudes and characteristics
+through an MCS. The departure time is not immediately after the timing of the evacuation trigger
+but may be delayed because of decision delay and preparation. Decision delay may occur if
+household members (or a group of people who plan to evacuate together) need to make a
+15
+
+===== PAGE 26 =====
+
+collaborative decision to evacuate. Decision delay may also depend on an evacuee’s awareness,
+beliefs, and priorities (Beloglazov et al., 2015). Preparation time is also an evacuee-specific
+parameter.
+We conducted an online survey of residents in wildfire-prone areas in the United States to
+investigate their evacuation behavior and to develop the quantitative relationship between
+individual characteristics and their responses during evacuation. These models will have a
+significant impact on traffic congestion and bottlenecks in Module 4. More detailed information
+on survey data collection and analyses is introduced in Chapter 3.
+2.4. Traffic Simulation
+The reduced functionality of a transportation network (Module 2) can endanger human
+lives when combined with elevated travel demand patterns (Module 3) during an evacuation.
+Module 4 performs traffic simulation by combining Module 2 results with Module 3 results to
+predict traffic conditions during an evacuation and identify the critical parts of the transportation
+network for pre-fire risk mitigation actions. Travel demand modeling for wildfire evacuation can
+be generally classified into trip-based and activity-based approaches (Intini et al., 2009). The
+reference unit for the trip-based approach is origin-destination pairs, and the total demand is
+estimated at the aggregated level. This approach is usually adopted in macroscopic traffic
+simulation and is more suitable for evacuations involving large geographic areas. On the other
+hand, the activity-based approach that models each evacuee as an agent is often adopted in
+microscopic traffic simulation and is more appropriate for regional evacuation modeling because
+of its high computational burden. Given that wildfire evacuation is often limited to the
+community or county level, activity-based microscopic traffic simulation has been widely used
+in previous wildfire evacuation studies (Cova and Johnson, 2002; Grajdura et al., 2020;
+Mancheva et al., 2019).
+In this study, the activity-based microscopic traffic simulation was performed within
+ABM. Various ABM software programs have been used in evacuation studies. NetLogo, a java-
+based program, was used by Grajdura et al. (2020) to model wildfire evacuations. Cova and
+Johnson (2002) used Paramics, which is a commercial traffic simulation software, in simulating
+wildfire evacuation. Transportation Analysis and Simulation System (TRANSIMS) and
+Simulation of Urban Mobility (SUMO) are also widely used software programs in evacuation
+planning and simulation (Beloglazov et al., 2016; Lopez et al., 2018; Yin et al., 2014). SUMO
+16
+
+===== PAGE 27 =====
+
+was chosen to perform traffic simulation in the fourth module of this framework because of its
+accessibility and flexibility.
+Each evacuee in the community is modeled as an agent, and based on the survey results
+obtained from Module 3, individual characteristics and decision rules are assigned to each agent
+and considered in ABM. In the ABM, individual agents determine their actual departure time,
+evacuation route, and destination prior to departure. After the agents depart from their point of
+origin (i.e., the results from Module 3), they enter the transportation network and choose their
+evacuation routes using their routing selection method (i.e., the results from Module 3). Some
+agents who do not use real-time maps may not be able to select the optimal evacuation routes
+because they will not have any real-time information, such as the locations of damaged bridges,
+traffic congestion, etc. Therefore, the spatiotemporal movements of individual agents are
+recorded at every time step.
+The traffic carrying capacities of the links (i.e., the results from Module 2) are also
+dynamically updated as fire propagates over time. Dynamic updates on link capacity and
+individual agents’ locations are incorporated into the microscopic traffic simulation to predict
+traffic flows at the level of individual agents and to capture traffic dynamics that consider
+collective actions among the agents. The ABM framework for wildfire evacuation in damaged
+transportation settings provides time-dependent traffic maps to identify the critical parts of the
+transportation network that are the most vulnerable to wildfires and have the greatest potential
+for causing traffic congestion during an evacuation. Moreover, the total number of evacuating
+agents during a given period are also obtained as a final result, which could be used to determine
+the bridges that need to be strengthened to minimize human losses during a wildfire evacuation.
+17
+
+===== PAGE 28 =====
+
+CHAPTER 3. DATA COLLECTION AND ANALYSES
+3.1. Data Collection
+The project team conducted an online survey of residents in wildfire-prone areas,
+specifically in California, Oregon, and Colorado, that have experienced major wildfire events and
+evacuations in the past several years to capture their diverse behaviors before and during a
+wildfire evacuation.
+Participants were recruited through Amazon Mechanical Turk (MTurk) between April
+and May 2022. MTurk, a platform where crowdworkers can be recruited, was used in this project
+because of its high- quality data at a reasonable cost (Owens and Hawkins, 2019). The inclusion
+criteria for participating in the survey were residents living at the study site who were at least 18
+years of age. A total of 1,312 participants responded to the survey, but 459 responses were
+considered invalid because they did not meet the following criteria: (a) participants should pass
+all attention checks; (b) participants should provide the same answers to two identical questions
+during the survey; and (c) the combined number of elder people and children in a household
+should be less than or equal to the total number of people in the household.
+In the final sample of 853 participants, 47 percent of the respondents were female, and 53
+percent of the respondents were male. The age group between 30 and 39 years old comprised the
+highest proportion in the sample, whereas only 19.5 percent of the population at the study site
+was in this age group according to the Census data (U.S. Census Bureau, 2021). The percentage
+of the respondents whose annual household income was less than $100,000 was greater than the
+percentage from the Census data. Such differences were observed because younger and lower-
+income people generally use MTurk as a means of earning extra money. The demographic
+characteristics of the sample and the Census data are presented in table 3.1.
+The online survey consisted of a set of closed-ended quantitative and qualitative
+questions, including demographic information, property location, car ownership, mobility issues,
+risk perception, previous experience with wildfire and other natural hazards, and the series of
+their evacuation actions. The survey also asked a question about the method that participants
+would utilize in selecting an evacuation route (e.g., familiar route, conventional map, real-time
+map, etc.) to investigate their routing selection in Module 4. All study protocols were approved
+by the Washington State University Institutional Review Board before the survey commenced.
+18
+
+===== PAGE 29 =====
+
+Table 3.1 Demographic characteristics and census data
+Characteristics Classes Sample (%) Census (%) p-value
+Female 47% 50.2% 0.0770*
+Gender
+Male 53% 49.8% 0.1245
+18 – 29 24.6% 19.9% 0.0014**
+30 – 39 36.2% 19.5% <0.0001***
+40 – 49 19.6% 17.9% 0.2174
+Age (years)
+50 – 59 12.3% 17.6% <0.0001***
+60 – 69 6.2% 14.7% 0.0340**
+>= 70 1.1% 10.4% 0.0902*
+Less than a high school diploma 0.2% 15.1% <0.0001***
+Education High school diploma or equivalent 14.9% 42.2% <0.0001***
+Associate degree 8.8% 8.0% 0.2871
+Bachelor’s degree 59.3% 21.7% <0.0001***
+Graduate degree 15.8% 13.1% 0.0052***
+66.5% 64.6% 0.0689*
+Caucasian
+12.5% 12.3% 0.7708
+Asian
+5.5% 5.3% 0.5457
+African American
+1.5% 1.2% 0.5938
+American Indian, Alaska Native,
+Ethnicity
+Native Hawaiian or Other Pacific
+Islander
+5.9% 4.7% 0.1380
+Two or more races
+8.1% 11.9% <0.0001***
+Other races
+Annual household Less than $49,999 28.7% 33.2% <0.0001***
+income before $50,000 to $99,999 49.4% 28.4% <0.0001***
+taxes $100,000 to $199,999 17.0% 26.2% <0.0001***
+Over $200,000 5.9% 12.2% <0.0001***
+*p < 0.1; **p < 0.05; *** p < 0.01
+3.2 Data Analyses
+To identify statistically significant explanatory variables that influence individual
+decisions about evacuation and peoples’ preference as to whether to use real-time navigation
+during an evacuation, we performed binary logistic regression analyses based on the survey data.
+A logistic regression model is a special type of generalized linear model and projects a linear
+function to a value between 0 and 1. Because the output bounded between 0 and 1 is used to
+estimate the probability of an event occurring, binary logistic regression has been widely used for
+estimating discrete choice preferences, such as insurance purchases (Lee and Li, 2021; Lee et al.,
+2022) and evacuation decisions (Kuligowski et al., 2022). For example, in this project, an
+19
+
+===== PAGE 30 =====
+
+individual could decide whether to evacuate, and a decision variable would take two values, 1
+(evacuate) or 0 (do not evacuate), which were mutually exclusive and collectively exhaustive.
+The independent variables considered at the initial step of estimating the regression
+models were the variables describing the characteristics of individual participants and their
+households, and these are summarized in Appendix A. We first considered all independent
+variables that are shown in Table 3.1 and Appendix A. Then the regression model was estimated
+by using a stepwise backward regression approach. It began with all the independent variables,
+and at each step the least significant variables were eliminated from the regression model until
+only statistically significant variables were left in the model. At each step, the Wald Chi-Square
+Test was used to select the variable that should be eliminated: the variable with a p-value of
+greater than a 5 percent level of significance was eliminated. This process was repeated until all
+the remaining variables did not meet the specified level for elimination. The final model obtained
+from this approach was compared with the models with more independent variables (obtained
+from the previous steps) and was found to be the optimal one based on the Akaike Information
+Criterion (AIC) and Bayesian Information Criterion (BIC).
+3.3 Survey Results and Discussion
+During a wildfire, individual evacuation can be triggered by various external stimuli,
+such as an official announcement (e.g., mandatory or voluntary evacuation order) or physical
+cues (e.g., smoke, flames, or embers). Understanding the responses of evacuees to various
+evacuation triggers is important in estimating evacuation time and traffic demand in the proposed
+ABM framework. Table 3.2 shows the frequency distribution of the main external stimuli that
+could trigger evacuation during a wildfire. As shown in table 3.2, 38.8 percent of respondents
+said they would evacuate after either a Level 1 (i.e., evacuation alert that a wildfire threat is in the
+area) or Level 2 (i.e., evacuation warning that there is a high probability of a need to evacuate)
+announcement. These were followed by “evacuation without any official announcement but after
+knowing that there would be a wildfire threat from news and/or neighbors” (29.8 percent), and
+“evacuation with a mandatory evacuation order (Level 3)” (27.8 percent). Only 3.6 percent of
+respondents said they would wait until smoke or flames/embers were observed or would stay and
+defend.
+Table 3.2 Frequency distribution of evacuation trigger
+20
+
+===== PAGE 31 =====
+
+Evacuation Trigger Count Percentage
+Evacuate without any official announcement 254 29.8%
+Evacuate with a voluntary evacuation order 331 38.8%
+Evacuate with a mandatory evacuation order 237 27.8%
+Evacuate after smoke is observed 11 1.3%
+Evacuate after flames/embers are observed 5 0.6%
+Stay and defend 15 1.8%
+For illustration purposes, this study categorized respondents into two groups based on
+their evacuation triggers. Respondents who said they would evacuate without official
+announcement or in response to a voluntary evacuation order were categorized as early evacuees.
+The delayed evacuation group included the respondents who would evacuate after receiving a
+mandatory evacuation order, evacuate after observing physical cues, or choose not to evacuate.
+Thus, 68.6 percent of respondents were classified in the early evacuation group, while the rest
+(31.4 percent) were in the delayed evacuation group.
+Table 3.3 summarizes the binary logistic regression results of evacuation timing, where
+the dependent variable takes values between 0 (the delayed evacuation group) and 1 (the early
+evacuation group). The survey results indicated that the respondents with higher incomes would
+prefer to wait or stay and defend. This may be explained by the findings of McCaffrey et al.
+(2018), that staying and protecting peoples’ properties during a wildfire could actually reduce
+economic losses, and that there could be a trade-off between personal safety and the desire to
+protect their properties. The positive effect of past wildfire evacuation experiences on early
+evacuation may indicate that these respondents lived in high wildfire-prone areas and could be
+more aware of the importance of early evacuation. The tendency to use real-time navigation
+routinely may indicate the respondents' level of familiarity with their community: the positive
+coefficient of this variable can be interpreted that the respondents with a lower level of
+familiarity with their community would prefer evacuating early because of the fear of having to
+take a detour as a result of road closures or severe congestions. The respondents who owned
+three or more personal automobiles, owned both pets and livestock, or lived alone said they
+would be less likely to evacuate in advance.
+Table 3.3 Logistic regression results of evacuation timing
+21
+
+===== PAGE 32 =====
+
+Variable Estimated Wald chi- p-value
+coefficient square
+Intercept 0.6906 3.3195 0.0009
+Education: High school diploma or equivalent -0.5674 -2.7181 0.0066
+Household income: 100k - 200k -0.3681 -2.0209 0.0433
+Household income: over 200k -0.5024 -2.0589 0.0395
+Household size: 1 person -0.7043 -3.2263 0.0013
+The number of cars per household: 3 or more -0.8329 -3.3490 0.0008
+Animals: both pets and livestock -0.8279 -2.3767 0.0175
+Real-time navigation: use under normal conditions 0.3840 2.1103 0.0348
+Homeowners insurance: fully insured 0.4884 2.9268 0.0034
+Wildfire evacuation: more than once in the past 10 years 0.6992 3.2844 0.0010
+These results are consistent with Toledo et al. (2018), who found that household size, the
+presence of animals, income, and fire risk have a significant impact on individual evacuation
+decisions. However, their findings regarding the positive impact of age and the presence of
+children on early evacuation were not significant in our case. The negative effect of the presence
+of animals was also supported by Mozumder et al. (2008). Moreover, the respondents who had
+full coverage homeowners’ insurance said they would be more likely to be early evacuees. This
+is partly because people who fully insure their properties generally have a higher risk-averse
+attitude and thus tend to evacuate early.
+Actual departure time may be delayed because of decision delay and preparation for
+evacuation. Because decision delay time was hard to know through the stated preference survey,
+only evacuation preparation time was considered in this project. As presented in table 3.4, about
+two-thirds of the respondents said they expected that evacuation preparation time would be less
+than 30 minutes. Only 5 percent of the respondents said they would spend more than two hours
+preparing for evacuation, partly because they might need extra time to move their livestock to
+shelter, evacuate with elderly or disabled family members, or find a ride (when the household did
+not have a car). Another uncertain factor in the evacuation decision process is destination choice.
+As summarized in the frequency distribution of evacuation destinations shown in table 3.5,
+individuals may have a number of destination choices. About half of the respondents said they
+would choose to stay at someone else’s house (e.g., friends, family members, and relatives) after
+a wildfire evacuation, which was quite close to the survey results (i.e., 57 percent of the 446
+respondents) of Toledo et al. (2018). More than one-quarter of the respondents said they would
+prefer to stay at hotels, and only about 10 percent of the respondents would chose public shelters
+22
+
+===== PAGE 33 =====
+
+as their destinations. These findings were not consistent with the findings of Sorensen and
+Sorensen (2009), that the final destinations of the residents in the evacuation zones for the 2007
+San Diego Fire were a relative’s home (43.6 percent), friend’s home (27.6 percent), hotel/motel
+(11 percent), and public shelter (4.9 percent). While the percentages were different, the levels of
+preference found in these two studies were consistent.
+Table 3.4 Frequency distribution of evacuation preparation time
+Preparation time Count Percentage
+< 10 mins 132 15.5%
+11 mins - 20 mins 174 20.4%
+21 mins - 30 mins 230 27.0%
+31 mins - 45 mins 97 11.4%
+46 mins - 60 mins 87 10.2%
+1h - 2h 90 10.6%
+> 2h 43 5.0%
+Table 3.5 Frequency distribution of evacuation destination
+Destination Count Percentage
+Friend or family member's house 437 51.2%
+Hotel 244 28.6%
+Public shelter 84 9.8%
+Secondary residence 35 4.1%
+Portable vehicle 20 2.3%
+Rental house 21 2.5%
+Others 12 1.4%
+Evacuees may use real-time navigation as a route-optimization tool during an evacuation,
+which could potentially improve evacuation efficiency. However, to the best of the authors'
+knowledge, few studies have investigated the key factors that influence the use of real-time
+navigation during an evacuation and how its use affects the evacuation process. Table 3.6
+presents the binary logistic regression results of real-time navigation use during an evacuation.
+As expected, the respondents who used real-time navigation routinely said they would be more
+likely to use it in determining evacuation routes. The respondents who owned their properties or
+had experienced wildfire damage to their properties over the past decade would be less likely to
+use real-time navigation during an evacuation. This may be partly because they may have lived
+23
+
+===== PAGE 34 =====
+
+in their communities longer than the rest of the respondents and were more familiar with the
+neighborhood and local region, which would allow them to determine evacuation routes by
+themselves rather than relying on navigation. This interpretation aligns with the finding that the
+respondents who had full-time jobs would prefer using real-time navigation during an
+evacuation, as they would be relatively less likely to spend time outside or be familiar with their
+communities. Risk-seeking respondents said they would be less likely to utilize real-time
+navigation, which was consistent with our expectation that the people having risk-averse
+attitudes would not be willing to take a risk (e.g., unexpected delay due to road closure or traffic
+congestion) during an evacuation.
+Table 3.6 Logistic regression results of real-time navigation use during an evacuation
+Variable Estimated Wald chi-square p-value
+coefficient
+Intercept -0.9563 -4.4295 <0.0001
+Employment: full time 0.4029 2.2211 0.0263
+Homeownership: with mortgage -0.6373 -3.6248 0.0003
+Homeownership: free and clear -0.6938 -3.4582 0.0005
+Navigation use: routinely 0.8897 4.6480 <0.0001
+Property damage due to past wildfires: yes -0.9340 -4.2415 <0.0001
+Safety risk attitude: risk-averse -0.2163 -2.4418 0.0144
+24
+
+===== PAGE 35 =====
+
+25
+
+===== PAGE 36 =====
+
+CHAPTER 4. CASE STUDY: THE CITY OF SANTA CLARITA, CALIFORNIA
+4.1. Introduction
+To illustrate the application of the proposed ABM framework to a real-world community,
+the City of Santa Clarita, California, was selected as an illustrative example. The City of Santa
+Clarita is located in northwestern Los Angeles County in California, and its 2020 population was
+228,673. This city was selected because many homes in Santa Clarita were in the WUI and at
+high wildfire risk, and thus it had a high potential for a mass wildfire evacuation. One of the
+recent fires affecting the City of Santa Clarita was the Rye Fire, which broke out on December 5,
+2017, and endangered over 1,000 homes in the city.
+During the fire, about 1,300 homes were affected by the evacuation order, and both
+directions of Highway 5 were closed.
+While the ABM framework can adopt both scenario-based and probabilistic approaches,
+in this case study, we specifically took a scenario-based approach for illustration purposes.
+Although the scenario- based approach was adopted in this case study, uncertainties in all four
+modules were still considered and propagated throughout the framework to simulate evacuation
+during the Rye Fire.
+Figure 4.1 The City of Santa Clarita affected by the Rye Fire
+26
+
+===== PAGE 37 =====
+
+4.2. Procedure
+4.2.1. Module 1. Wildfire Simulation
+To estimate spatiotemporally varying fire probabilities in the study region, potential fires
+that ignited outside the City of Santa Clarita but could propagate into the city were considered.
+Given that the largest wildfire in California history scorched more than 1 million acres, a total of
+31 zip codes around the city were defined as the study region for estimating wildfire ignition
+probabilities. Once the wildfire occurrence probability map was constructed, representative
+wildfire scenarios were generated to simulate wildfire growth. Since a scenario-based approach
+was taken in this case study, we present only the procedure for generating a wildfire occurrence
+probability map and simulating wildfire growth from the known ignition location and time.
+The required inputs to the wildfire occurrence probability estimation models (see
+equations 1 -3) included gridded daily climate data (i.e., the maximum and minimum
+temperature, the maximum and minimum relative humidity, average wind speed, and burning
+index) and gridded topographic and fuel layers. The University of Idaho Gridded Surface
+Meteorological Dataset (gridMET) (Abatzoglou, 2012), daily high-spatial resolution (~4 km)
+climate data collected since 1979, was used for the climate data. The gridded topographic and
+fuel data available from the LANDFIRE program had a spatial resolution of 30 meters and were
+used as the input in constructing the wildfire occurrence probability estimation model. During
+the period between 2002 and 2021, there were 5,288,820 voxels. Among them, only 435 voxels
+had historical fire events that burned areas greater than 100 acres, while the remaining 5,288,385
+voxels did not have any large fires. As described in Section 2.1, to address the issues with
+imbalanced data, 435 no-fire voxels were first randomly sampled, which was a subsampling
+method. Then, the subset consisting of 435 fire voxels and 435 no-fire voxels was divided into
+training and testing sets to construct the wildfire occurrence probability estimation model.
+Although the accuracy of the current model was 74.4 percent, there are multiple ways to improve
+its accuracy: (a) a longer climate data period (e.g., collected during the period between 1979 and
+2021) could be used; and (b) additional gridded human factors such as population density, urban
+development, and distance to the freeway could be included in the estimation model rather being
+encapsulated into a single location factor.
+While the wildfire occurrence probability map constructed through the estimation model
+could be used to generate a set of representative scenarios through the k-means clustering
+27
+
+===== PAGE 38 =====
+
+algorithm, this case study adopted a scenario-based approach. Therefore, the ignition time and
+location of the Rye Fire were used as the starting point for wildfire growth simulation. The
+required inputs to FARSITE included hourly weather data and a set of raster files (elevation,
+slope, aspect, fuel model, canopy cover, stand height, canopy base height, and canopy bulk
+density). The hourly weather data were available from the Remote Automatic Weather Station
+(RAWS) system located throughout the United States, while all raster files were downloaded
+from the LANDFIRE program. The 40 Scott and Burgan Fire Behavior Fuel Models (FBFM40)
+does not support fire spread into urban and suburban areas, which was not the case during the
+Rye Fire.
+Therefore, in the case study, we replaced urban and suburban development (NB1) with
+low load, dry climate timber-grass-shrub (TU1) to allow the fire to propagate into urban and
+suburban areas.
+The simulated fire perimeter during the first burning day (December 5, 2017) was
+compared with the Rye Fire perimeter, which is shown in figure 4.2. Only the first-day simulated
+fire perimeter was considered herein because the evacuation order was lifted the evening of the
+first burning day, and further wildfire growth simulation was unnecessary for estimating
+evacuation. Moreover, a lack of a suppression model in FARSITE required additional
+assumptions about human suppression efforts in order to stop the fire. While FARSITE had
+limitations in simulating the Rye Fire from its ignition to full containment, the similar
+propagation direction of both simulated and actual fires (see figure 4.2) indicated that the model
+had the capability to simulate fire growth successfully until human intervention.
+28
+
+===== PAGE 39 =====
+
+Figure 4.2 Comparison between the simulated fire perimeter (only during the first burning day)
+and the Rye Fire perimeter
+4.2.2. Module 2. Bridge Vulnerability Assessment
+As shown in figure 4.3, 11 bridges were located within the simulated fire perimeter. The
+deck materials of all these bridges are summarized in table 4.1. The relationship presented in
+figure 2.2 was used to estimate each bridge’s damage level. It was assumed that the damage level
+of a bridge was normally distributed with a mean value as shown in figure 2.2 and a coefficient
+of variation of 0.3. Using MCS, the damage level of each bridge was randomly sampled from the
+respective normal distribution. To highlight the impacts of damaged bridges on traffic disruption
+during a wildfire evacuation, one of the extreme scenarios among infinitely many possible ones
+was considered in this case study: five bridges experienced massive wildfire damages (DL5).
+Based on table 2.1, wildfire damage subsequently reduced the traffic capacities of massively
+damaged bridges by 50 percent. Such reduced traffic capacities were fed into Module 4 and
+combined with increased traffic demand at each time step. For example, between 1:00 pm and
+3:00 pm on December 5th, Bridge 10 was severely damaged and lost its capacity by 50 percent.
+Then the reduced capacity of this bridge was incorporated into traffic simulation in Module 4.
+29
+
+===== PAGE 40 =====
+
+Figure 4.3 The locations of bridges within the simulated fire perimeter
+Table 4.1 Bridge deck materials and damage levels
+Bridge ID Number Deck Material Damage Level
+1 Prestressed concrete continuous DL1
+2 Prestressed concrete continuous DL5
+3 Concrete continuous DL1
+4 Concrete continuous DL1
+5 Concrete continuous DL1
+6 Concrete continuous DL5
+7 Steel DL5
+8f Prestressed concrete continuous DL1
+9 Prestressed concrete continuous DL5
+10 Concrete DL5
+11 Concrete DL1
+30
+
+===== PAGE 41 =====
+
+4.2.3. Module 3. Evacuee Response Model
+In the third module of the proposed framework, the evacuee response model was
+simulated to reflect diverse individual behaviors and responses during an evacuation. To apply
+the evacuee response model developed from the survey data to the case study, detailed
+information about the properties and characteristics of individual residents and households in the
+community was required. Whereas demographic information is available from the Census
+dataset, some of the key explanatory variables needed to estimate evacuation timing or the use of
+real-time navigation (e.g., risk attitude, wildfire evacuation experience) are often not available.
+Thus, in this case study, we generated a synthetic population for the City of Santa Clarita.
+Two standard approaches to generating a synthetic population are synthetic
+reconstruction (SR) and hill climbing (HC) (Namazi-Rad et al., 2014). The SR approach is a
+traditional method for generating a synthetic population based on both disaggregated- and
+aggregated-level data. By assuming that disaggregated-level data (i.e., seed data) can fully
+represent the target population, this approach samples individuals with the required
+sociodemographic characteristics from the true population in the study area, which is typically
+extracted from Census data, by using a weighting technique. The HC approach is an optimization
+algorithm that maximizes an objective function. It starts with a random selection of units from
+the seed population and iteratively replaces them until improvement becomes negligible
+(Namazi-Rad et al. 2014). While both approaches are capable of generating reliable synthetic
+populations relative to the true population's marginal distributions (Jain et al. 2016), the SR
+approach was adopted in this study because user-friendly and well-developed software programs
+are available.
+First, we used PopGen to generate a synthetic population in the City of Santa Clarita at
+the census-tract level. PopGen is a software program that produces synthetic populations while
+controlling and matching both individual- and household-level attribute distributions (Bar-Gera
+et al. 2009; Konduri et al., 2016; Ye et al. 2009). The seed population was adopted from the
+Public Use Microdata Sample (PUMS) produced by the U.S. Census Bureau, which was a small
+portion of the true population (including both households and individuals) without identification.
+The marginal distributions of the control population characteristics in the study area were
+available from the Census Bureau’s American Community Survey (ACS). The generated
+synthetic population consisted of 83,558 households and 246,830 residents, with no significant
+31
+
+===== PAGE 42 =====
+
+difference from the marginal distributions of the true population’s key characteristics (e.g.,
+household size, household income, the presence of children, age, gender, race, education, and
+employment status). All individuals in the synthetic population were given a unique ID number
+so that the individuals having the same ID number were assumed to be in the same household.
+To relate each household to its home, the locations, shapes, and dimensions of all
+buildings in the City of Santa Clarita were obtained from the OpenStreetMap database. Buildings
+were classified into residential buildings and commercial buildings. The residential buildings
+having the top 30 percent shape length were labeled as multifamily residential buildings. The
+ratio of 30 percent was determined on the basis of the 2019 U.S Census Bureau American
+Housing Survey, which found that 31.4 percent of housing in the U.S. was multifamily housing.
+For each census tract, all synthetic households in the census tract were randomly assigned to
+residential buildings in the same census tract. Similarly, all individuals who worked full-time or
+part-time were randomly assigned to workplaces (i.e., commercial buildings).
+After allocating individuals to their households, homes, and workplaces, it was assumed
+that each household formed a decision group and shared the same evacuation decision during the
+evacuation process. Then the evacuee response modeling for each household was constructed on
+the basis of the survey data and results described in Chapter 3. First, the evacuation timings of all
+synthetic households in the city were determined on the basis of the binary logistic regression
+model summarized in table 3.3.
+Explanatory variables in the logistic regression model for evacuation timing included
+education level, household income, household size, the number of vehicles, homeowners’
+insurance status, navigation use, the presence of animals, and past evacuation experience.
+Whereas the first five characteristics of synthetic households had already been realized during
+the synthetic population generation, the last three properties of each household were not known
+because these properties are often not available from the U.S. Census data. Therefore, using
+MCS, these properties of each household were randomly sampled from the histograms of the
+survey results (see Appendix A). Additionally, some of these explanatory variables were
+individual-level variables (e.g., education and the use of real-time navigation). This study
+assumed that the survey respondent was representative of his or her household or primary
+decision- maker and used the individual-level variables to predict household-level evacuation
+decisions. However, note that this assumption may have introduced bias due to representative
+32
+
+===== PAGE 43 =====
+
+issues (Hung and Wang, 2022; Seebauer et al., 2017). The regression model predicted that
+57,879 households would be in the early evacuation group, categorizing 69.3 percent of the
+synthetic households as early evacuees. This rate was consistent with the survey results that 68.6
+percent of the respondents would be willing to evacuate before receiving a mandatory evacuation
+order.
+By combining the wildfire growth simulation results from Module 1, the evacuation
+times of all households were determined. At every time step, once a new firefront was updated,
+two buffer zones were created to generate two types of evacuation triggers: a 2-mile buffer
+around the updated firefront was used to trigger the evacuation of the early evacuation group,
+and a 0.5-mile buffer was used to initiate the evacuation of the delayed evacuation group. The
+actual departure time could be delayed because of decision delay and preparation. While the time
+associated with evacuation delay is affected by various evacuee- and household-specific
+parameters (e.g., awareness, risk attitudes, priorities, and beliefs), it is difficult to identify key
+independent factors that affect the delay time and their statistical relationship because of the
+abstract nature of major parameters. Therefore, in this study, the delay time of each household
+mainly due to evacuation preparation was randomly sampled from the histogram of preparation
+time shown in table 3.4.
+The evacuation destinations of the synthetic households are also uncertain. As presented
+in table 3.5, households may have a number of destination choices, including someone else’s
+house, hotel, public shelter, secondary residence, portable vehicle, and rental house. In this case
+study, it was assumed that public shelters were located in the City of Santa Clarita, while other
+destinations were located outside the city. Figure 4.4 shows the three schools that were located
+within the city but outside the fire perimeter. These schools were considered public shelters in
+the case study. In the survey (c.f., table 3.5), 9.8 percent of the respondents reported that public
+shelters would be their final destinations. Therefore, 9.8 percent of the households that decided
+to evacuate were randomly selected, and their final destinations were randomly assigned to one
+of the three public shelters. Three major community exits, shown in figure 4.4, were assigned to
+the households whose final destinations were not public shelters. As such, this case study used
+only the histogram of destination choices in determining the final destinations of the synthetic
+households. In future studies, a regression model will be developed to relate household
+characteristics to destination choices. Moreover, future studies will allow the households to
+33
+
+===== PAGE 44 =====
+
+choose the closest shelter or exit rather than randomly assigning final destinations to the
+households.
+Figure 4.4 Final destination locations
+This module generated the evacuation timing, decision delay and preparation time, and
+final destination of all synthetic households based on the survey results and ultimately
+determined their actual departure times. However, public transportation and returning traffic
+(e.g., the vehicles that would return to home) were not considered in this module. Thus, the
+following additional assumptions were made: (a) the households that did not own a vehicle but
+still would like to evacuate, used hypothetical vehicles to evacuate; and (b) if some of the
+household members at the workplace brought cars and no vehicles were available for the
+remaining household members at home, hypothetical vehicles were assigned to the household
+members at home. These hypothetical vehicles can be replaced by public transportation and ride-
+sharing in future studies. Finally, a total of 162,705 vehicles (both actual and hypothetical
+vehicles) were used during a wildfire evacuation. At every time step, the vehicles that were about
+to depart were recorded and considered in estimating traffic demand in the fourth module.
+4.2.4. Module 4. Traffic Simulation
+The agent-based traffic simulation was performed by using SUMO. The vehicle-only
+transportation network in the City of Santa Clarita is illustrated in figure 4.5. At every time step,
+the network capacity (i.e., the output from Module 2) and traffic demand (i.e., the output from
+Module 3) were updated and used as input data in SUMO. In SUMO, vehicles were considered
+34
+
+===== PAGE 45 =====
+
+autonomous agents, and their actions and interaction were simulated during a wildfire
+evacuation. Moreover, by using the binary logistic regression model of the use of real-time
+navigation, some evacuees were classified as navigation users and others were classified as non-
+navigation users. In the traffic simulation, only navigation users took the fastest routes. Non-
+navigation users took the shortest (but not the fastest) routes because they chose familiar routes
+or relied on conventional maps during an evacuation without having real-time information. The
+results from this module were the locations of all vehicles at every second during the evacuation
+process, the time series of the number of vehicles in the transportation network, the numbers of
+vehicles that successfully evacuated, average speed, etc.
+Figure 4.5 Vehicle-only transportation network in the City of Santa Clarita
+4.3. Results and Discussion
+The proposed framework was illustrated with the Rye Fire, which affected the City of
+Santa Clarita in December 2017. The procedure and results from each module are summarized as
+follows. The first module generated a wildfire occurrence probability map for the study region
+and simulated the growth of the Rye Fire from its ignition point at 9:32 am on December 5,
+2017. Fire perimeters were recorded at 10:00 am, 1:00 pm, 3:00 pm, 5:00 pm, and 7:00 pm on
+the same day. The fire perimeter at 7:00 pm was 3,187 acres. The fire growth simulation was
+terminated at 7:00 pm because all evacuation orders were lifted the evening of December 5th.
+35
+
+===== PAGE 46 =====
+
+Because of the limited capability of FARSITE to model suppression and barrier effects, the
+simulated fire perimeter was a bit different from the actual one, while the propagation directions
+of both actual and simulated fires were similar. The second module estimated the locations,
+timing, and severity levels of damaged bridges within the evacuation zones. Among infinitely
+many plausible scenarios, we considered a specific scenario where five out of 11 bridges were
+massively damaged. Although concrete and steel bridges are generally not extremely vulnerable
+to fires, it is highly possible that these types of bridges might have reduced capacity due to
+blockage resulting from fire-induced landslides or fallen trees/rocks, smoke-induced limited
+visibility, etc. Because of safety concerns and visibility issues, road or bridge closures can be
+announced by authorities. For example, during the actual Rye Fire, both directions of Highway 5
+near Magic Mountain in Valencia were closed on December 5th. Therefore, the bridge damage
+scenario considered in the case study was one of the worst-case scenarios but was still plausible.
+The third module generated a synthetic population in the City of Santa Clarita. On the basis of
+the survey results and the binary logistic regression models, the evacuation triggers and final
+destinations of all households in the affected region were determined. Combined with the time-
+dependent fire-front movement obtained from the first module, the evacuation timings of all
+households were determined, which were subsequently used as time-dependent traffic demand in
+the traffic simulation. Finally, in the last module, traffic simulation was implemented during the
+evacuation process (from 9:30 am to 11:00 pm on December 5, 2017) to capture the locations of
+all vehicles at every second.
+Figure 4.6 presents the cumulative number of vehicles that had departed, the cumulative
+number of vehicles that had evacuated, and the number of vehicles currently in the transportation
+network at every second during the entire evacuation period from wildfire ignition (9:30 am) to
+the time after all evacuation orders had been lifted (11:00 pm). Because the fire perimeters were
+recorded at discrete time points (i.e., 10:00 am, 1:00 pm, 3:00 pm, 5:00 pm, and 7:00 pm), the
+black curve in figure 4.6 has a series of steps, which indicates the timings of evacuation triggers.
+About three-quarters of vehicles that were triggered by the updated fire perimeter entered the
+network within 45 minutes, which aligned with the survey, in which about 75 percent of the
+respondents reported that their evacuation preparation time would be less than 45 minutes.
+Similarly, the number of vehicles in the transportation network (i.e., the red curve in figure 4.6)
+increased in the first 45 minutes of each step but gradually decreased after some of the vehicles
+36
+
+===== PAGE 47 =====
+
+had arrived at the final destinations and were out of the network. Generally, most of the vehicles
+triggered by the previous fire perimeter had evacuated successfully before the fire perimeter was
+updated at the next time step. However, given that a relatively higher number of vehicles
+evacuated between 1:00 pm and 3:00 pm, some vehicles still remained in the network even after
+the next fire perimeter had been updated. Consequently, by being combined with the vehicles
+just departing, the vehicles remaining in the network caused severe traffic congestion. This can
+also be observed in figures 4.7 and 4.8. Finally, a smooth blue curve in figure 4.6 indicates that
+the evacuation rate was stable throughout the simulation.
+Figure 4.6 The cumulative number of vehicles that have departed and evacuated and the number
+of vehicles currently in the transportation network
+In the SUMO traffic simulation, a vehicle that was trapped at same location for a certain
+amount of time was teleported to the next available edge on its route. Thus, the teleported vehicle
+could be treated as one that was stuck in severe traffic congestion. As shown in figure 4.7, the
+cumulative number of teleported vehicles increased drastically between 10:00 am and 12:00 pm
+and between 3:00 pm and 5:00 pm, which implies severe congestion in the network. Similar
+results can be observed in the time series of average speed displayed in figure 4.8. Congestion
+first appeared when residents were informed of the outbreak of the Rye Fire and started the
+evacuation. Initial traffic congestion decreased once most of the residents who were triggered by
+the first fire perimeter had evacuated successfully. Whenever an updated fire perimeter triggered
+the evacuation of some of the remaining residents, the average speed decreased dramatically in
+the first 45 minutes of each step, which is consistent with figure 4.5. Severe congestion was
+observed specifically between 1:00 pm and 5:00 pm because of elevated travel demand and
+37
+
+===== PAGE 48 =====
+
+massive bridge damages. Although two bridges (bridges 2 and 9) were severely damaged after
+5:00 pm, their impact was minimal, possibly because the previously damaged bridges located on
+I-5 had already created congestion.
+Figure 4.7 The cumulative number of vehicles stuck in traffic
+Figure 4.8 Time series of average speed
+One advantage of using the ABM framework is to track the locations and travel speeds of
+individual vehicles at every second to help identify when and where severe traffic congestion
+will occur and provide quantitative data to support risk-informed decision-making. Figures 4.9
+and 4.10 show traffic maps at 10:36 am (i.e., the time when severe traffic was first observed) and
+at 8:11 pm (i.e., the time when high average speed was observed), respectively. In figure 4.9 the
+network segments in red experienced heavy traffic and should be considered in pre-fire risk
+mitigation efforts to facilitate wildfire evacuations in the future. Most congestion problems were
+38
+
+===== PAGE 49 =====
+
+resolved, as shown in figure 4.10, where all major highways and arterial roads have blue colors.
+The results from this framework can be further used in identifying the critical parts of the
+transportation network during a wildfire evacuation. For example, figures 4.7 and 4.8 show the
+periods when severe congestion occurred. By observing a series of traffic maps (e.g., figures 4.9
+and 4.10) during these time periods, the network segments that would experience or cause severe
+congestion can be identified. Additionally, through the vulnerability assessment, the bridges that
+would have the highest chance of being severely damaged can be identified. Such information
+will provide useful guidance for transportation risk managers or local government officials about
+which parts of the transportation network are vulnerable to fires or would cause (or experience)
+severe congestion during a wildfire evacuation. As pre-fire mitigation actions, the identified
+network components and segments can be retrofitted or expanded, while alternative routes are
+constructed, aimed at facilitating evacuation during a wildfire event. Since the results of this case
+study were generated only under the effect of the Rye Fire, such information on pre-fire
+mitigation actions may not be comprehensive. By taking a fully probabilistic approach, however,
+the framework can provide quantitative data to support more effective pre-fire mitigation actions
+that can be applicable to a wide range of plausible wildfire scenarios
+Figure 4.9 Traffic map at 10:36 am (average speed of 15.6 mph)
+39
+
+===== PAGE 50 =====
+
+Figure 4.10 Traffic map at 8:11 pm (average speed of 56.3 mph)
+40
+
+===== PAGE 51 =====
+
+41
+
+===== PAGE 52 =====
+
+CHAPTER 5. CONCLUSIONS, LIMITATIONS, AND FUTURE RESEARCH
+DIRECTION
+Effective community-based transportation evacuation planning is an important issue for
+state and local policy makers at great risk of wildfires in the United States. Evacuation is
+considered to be the second line of defense if the first course of defense (i.e., wildfire
+countermeasures) cannot prevent wildfire risks to communities. Underestimation of this issue
+and ineffective planning could result in catastrophic human losses during a wildfire. An
+evacuation simulation model may assist a well-developed evacuation plan and ultimately could
+save human lives.
+This project proposed an ABM framework for wildfire evacuation in damaged
+transportation settings by integrating wildfire simulation, vulnerability assessment, evacuee
+response modeling, and traffic simulation to predict traffic conditions during an evacuation and
+identify the critical parts of the transportation network for pre-fire risk mitigation actions. As part
+of the project, we conducted an online survey of residents in wildfire-prone areas in California,
+Colorado, and Oregon to understand highly unpredictable human behaviors during an
+evacuation. The survey results were used as a basis for determining key characteristics of the
+synthetic population so that the ABM framework could capture individual behaviors during a
+wildfire evacuation. ABM allows the framework to generate both disaggregated-level outputs
+(e.g., the location and speed of individual vehicles at every second) and aggregated- level outputs
+(e.g., the cumulative number of vehicles that have departed or evacuated, the number of vehicles
+that are currently in the network or stuck in traffic, time series of average travel speed). By
+combining the aggregated-level outputs with the disaggregated-level ones, we can assess overall
+network performance during an evacuation while identifying bottlenecks and the critical network
+segments that may experience heavy congestion. The proposed framework also introduces
+damaged traffic settings to the evacuation process and showcases how the reduced network
+capacity impacts evacuation efficiency, especially when combined with elevated travel demand.
+The main contributions of this project include (a) the incorporation of an advanced
+wildfire hazard modeling and vulnerability assessment to improve the accuracy of wildfire
+evacuation in damaged transportation settings, and (b) the development of a more comprehensive
+evacuee response model based on a stated preference survey to predict individual evacuees’
+42
+
+===== PAGE 53 =====
+
+behavior as a firefront approaches. However, the project has a number of limitations that may
+hinder its accuracy or wide applicability.
+First, public transportation and returning traffic were not considered. Second, the
+evacuation zone was determined by using two buffers (2-mile and 0.5-mile buffers herein)
+estimated from the simulated fire perimeters, which may not reflect real-world situations. Third,
+the scenario-based approach only shows the estimated traffic demand and capacity under a
+specific what-if scenario. To account for uncertainties throughout the entire framework and
+generate an expected network functionality, a fully probabilistic approach is necessary. Finally,
+the evacuation destination was randomly assigned on the basis of the survey results, whereas in
+the real world, evacuees may choose the closest shelter or exit.
+To improve the accuracy of the model estimation and broaden its applicability, we will
+release most of the restrictive assumptions and address the current limitations listed above.
+Future work will include (a) introducing public transportation and returning traffic, (b) modeling
+carpool behavior to remove hypothetical vehicles, (c) determining evacuation zones based on the
+combined effect of wind and fire propagation directions, (d) modeling vehicle detours due to
+road closures, and (e) taking a fully probabilistic approach.
+.
+43
+
+===== PAGE 54 =====
+
+CHAPTER 6. REFERENCES
+Abatzoglou, J.T., 2012. Development of gridded surface meteorological data for ecological
+applications and modeling. International Journal of Climatology. doi:10.1002/joc.3413
+Bar-Gera, H., Konduri, K., Sana, B., Ye, X. and Pendyala, R.M., 2009, January. Estimating
+survey weights with multiple constraints using entropy optimization methods. In 88th
+annual meeting of the Transportation Research Board, Washington, DC.
+Beloglazov, A., Almashor, M., Abebe, E., Richter, J. and Steer, K.C.B., 2016. Simulation of
+wildfire evacuation with dynamic factors and model composition. Simulation Modelling
+Practice and Theory, 60, pp.144-159.
+Benjaafar, S., Dooley, K. and Setyawan, W., 1997. Cellular automata for traffic flow modeling.
+University of Minnesota. Retrieved from the University of Minnesota Digital
+Conservancy, http://hdl.handle.net/11299/155096.
+Brillinger, D. R., Preisler, H. K., & Benoit, J. W. (2003). Risk assessment: a forest fire
+example. Lecture Notes-Monograph Series, 177-196.
+Burkard, R.E., Dlaska, K. and Klinz, B., 1993. The quickest flow problem. Zeitschrift für
+Operations Research, 37(1), pp.31-58.
+Chan, Y.N., Luo, X. and Sun, W., 2000. Compressive strength and pore structure of high-
+performance concrete after exposure to high temperature up to 800 C. Cement and
+Concrete Research, 30(2), pp.247-251.
+Chen, X. and Zhan, F.B., 2014. Agent-based modeling and simulation of urban evacuation:
+relative effectiveness of simultaneous and staged evacuation strategies. In Agent-based
+modeling and simulation (pp. 78-96). Palgrave Macmillan, London.
+Cimellaro, G.P., Ozzello, F., Vallero, A., Mahin, S. and Shao, B., 2017. Simulating earthquake
+evacuation using human behavior models. Earthquake Engineering & Structural
+Dynamics, 46(6), pp.985-1002.
+Communities Committee, 2004. Preparing a community wildfire protection plan: a handbook for
+wildland urban interface communities. Communities Committee, et al. Available at:
+chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/
+https://www.forestsandrangelands.gov/documents/resources/communities/cwpphandbook.p
+df
+Cova, T.J. and Johnson, J.P., 2002. Microsimulation of neighborhood evacuations in the urban–
+wildland interface. Environment and Planning A, 34(12), pp.2211-2229.
+Cova, T.J., Dennison, P.E., Kim, T.H. and Moritz, M.A., 2005. Setting wildfire evacuation
+trigger points using fire spread modeling and GIS. Transactions in GIS, 9(4), pp.603-617.
+44
+
+===== PAGE 55 =====
+
+D’Orazio, M., Spalazzi, L., Quagliarini, E. and Bernardini, G., 2014. Agent-based model for
+earthquake pedestrians’ evacuation in urban outdoor scenarios: Behavioural patterns
+definition and evacuation paths choice. Safety science, 62, pp.450-465.
+Epstein, J.M., 1999. Agent‐based computational models and generative social science.
+Complexity, 4(5), pp.41-60.
+Feng, K., Li, Q. and Ellingwood, B.R., 2020. Post-earthquake modelling of transportation
+networks using an agent-based model. Structure and Infrastructure Engineering, 16(11),
+pp.1578-1592.
+Finney, M.A., 2002. Fire growth using minimum travel time methods. Canadian Journal of
+Forest Research, 32(8), pp.1420-1424.
+Finney, M.A., McHugh, C.W., Grenfell, I.C., Riley, K.L. and Short, K.C., 2011. A simulation of
+probabilistic wildfire risk components for the continental United States. Stochastic
+Environmental Research and Risk Assessment, 25(7), pp.973-1000.
+Grajdura, S.A., Borjigin, S.G. and Niemeier, D.A., 2020, November. Agent-based wildfire
+evacuation with spatial simulation: a case study. In Proceedings of the 3rd ACM
+SIGSPATIAL International Workshop on GeoSpatial Simulation (pp. 56-59).
+Hamacher, H.W. and Tjandra, S.A., 2001. Mathematical modelling of evacuation problems: A state
+of art. In: Pedestrian and evacuation dynamics (pp 227-266). Springer, Berlin.
+Hung, L.S. and Wang, C., 2022. Integrating an intrahousehold perspective into climate change
+adaptation research. Environmental Science & Policy, 131, pp.143-148.
+Intini, P., Ronchi, E., Gwynne, S. and Pel, A., 2019. Traffic modeling for wildland–urban
+interface fire evacuation. Journal of Transportation Engineering, Part A: Systems,
+145(3), p.04019002.
+Jain, S., Ronald, N. and Winter, S., 2015, December. Creating a synthetic population: A
+comparison of tools. In Proceedings of the 3rd Conference Transportation Reserch
+Group, Kolkata, India (pp. 17-20).
+Keeley, J.E. and Syphard, A.D., 2021. Large California wildfires: 2020 fires in historical context.
+Fire Ecology, 17(1), pp.1-11.
+Kisko, T.M. and Francis, R.L., 1985. EVACNET+: a computer program to determine optimal
+building evacuation plans. Fire Safety Journal, 9(2), pp.211-220.
+Kodur, V.K., Aziz, E.M. and Naser, M.Z., 2017. Strategies for enhancing fire performance of
+steel bridges. Engineering Structures, 131, pp.446-458.
+Konduri, K.C., You, D., Garikapati, V.M. and Pendyala, R., 2016, January. Application of an
+enhanced population synthesis model that accommodates controls at multiple geographic
+45
+
+===== PAGE 56 =====
+
+resolutions. In Proceedings of the 95th annual meeting of the transportation research
+board, washington, dc, usa (pp. 10-14).
+Kuligowski, E.D., Zhao, X., Lovreglio, R., Xu, N., Yang, K., Westbury, A., Nilsson, D. and
+Brown, N., 2022. Modeling evacuation decisions in the 2019 Kincade fire in California.
+Safety science, 146, p.105541.
+Lee, J. Y., & Li, Y., 2021. A First Step Towards Longitudinal Study on Homeowners’ Proactive
+Actions for Managing Wildfire Risks. Natural Hazards Center Quick Response Grant
+Report Series, 328. Boulder, CO: Natural Hazards Center, University of Colorado
+Boulder. Available at: https://hazards.colorado.edu/quick-response-report/a-first-step-
+towards-longitudinal-study-on- homeowners-proactive-actions-for-managing-wildfire-
+risks
+Lee, J.Y., Ma, F. and Li, Y., 2022. Understanding homeowner proactive actions for managing
+wildfire risks. Natural Hazards, pp.1-23.
+Lopez, P.A., Behrisch, M., Bieker-Walz, L., Erdmann, J., Flötteröd, Y.P., Hilbrich, R., Lücken,
+L., Rummel, J., Wagner, P. and Wießner, E., 2018, November. Microscopic traffic
+simulation using sumo. In 2018 21st international conference on intelligent
+transportation systems (ITSC) (pp. 2575-2582). IEEE.
+Ma, F., Lee, J.Y. Camenzind, D. and Wolcott, M.P., 2022. Probabilistic Wildfire Risk
+Assessment Methodology and Evaluation of a Supply Chain Network. International
+Journal of Disaster Risk Reduction. httpsL//doi.org/10.1016/j.ijdrr.2022.103340
+Mancheva, L., Adam, C. and Dugdale, J., 2019, May. Multi-agent geospatial simulation of
+human interactions and behaviour in bushfires. In International Conference on
+Information Systems for Crisis Response and Management.
+Mas, E., Suppasri, A., Imamura, F. and Koshimura, S., 2012. Agent-based simulation of the 2011
+great east Japan earthquake/tsunami evacuation: An integrated model of tsunami
+inundation and evacuation. Journal of Natural Disaster Science, 34(1), pp.41-57.
+Masoomi, H. and van de Lindt, J.W., 2016. Tornado fragility and risk assessment of an archetype
+masonry school building. Engineering Structures, 128, pp.26-43.
+Massada, A.B., Syphard, A.D., Stewart, S.I. and Radeloff, V.C., 2012. Wildfire ignition-
+distribution modelling: a comparative study in the Huron–Manistee National Forest,
+Michigan, USA. International journal of wildland fire, 22(2), pp.174-183.
+McCaffrey, S., Wilson, R. and Konar, A., 2018. Should I stay or should I go now? Or should I
+wait and see? Influences on wildfire evacuation decisions. Risk analysis, 38(7), pp.1390-
+1404.
+Mozumder, P., Raheem, N., Talberth, J. and Berrens, R.P., 2008. Investigating intended
+evacuation from wildfires in the wildland–urban interface: application of a bivariate
+probit model. Forest Policy and Economics, 10(6), pp.415-423.
+46
+
+===== PAGE 57 =====
+
+Namazi-Rad, M.R., Mokhtarian, P. and Perez, P., 2014. Generating a dynamic synthetic
+population–using an age-structured two-sex model for household dynamics. PloS one,
+9(4), p.e94761.
+Naser, M.Z., 2021. Can past failures help identify vulnerable bridges to extreme events? A
+biomimetical machine learning approach. Engineering with Computers, 37(2), pp.1099-
+1131.
+Owens, J. and Hawkins, E.M., 2019. Using online labor market participants for nonprofessional
+investor research: A comparison of MTurk and Qualtrics samples. Journal of Information
+Systems, 33(1), pp.113-128.
+Pan, X., 2006. Computational modeling of human and social behaviors for emergency egress
+analysis. Stanford University.
+Peris-Sayol, G., Paya-Zaforteza, I., Balasch Parisi, S. and Alós-Moya, J., 2017. Detailed analysis
+of the causes of bridge fires and their associated damage levels. Journal of Performance
+of Constructed Facilities, 31(3).
+Preisler, H.K., Brillinger, D.R., Burgan, R.E. and Benoit, J.W., 2004. Probability based models
+for estimation of wildfire risk. International Journal of wildland fire, 13(2), pp.133-142.
+Richards, G.D., 1990. An elliptical growth model of forest fire fronts and its numerical solution.
+International journal for numerical methods in engineering, 30(6), pp.1163-1179.
+Rodrigues, M. and De la Riva, J., 2014. An insight into machine-learning algorithms to model
+human- caused wildfire occurrence. Environmental Modelling & Software, 57, pp.192-
+201.
+Rosowsky, D.V. and Ellingwood, B.R., 2002. Performance-based engineering of wood frame
+housing: Fragility analysis methodology. Journal of Structural Engineering, 128(1),
+pp.32-38.
+Seebauer, S., Fleiß, J. and Schweighart, M., 2017. A household is not a person: Consistency
+of pro- environmental behavior in adult couples and the accuracy of proxy-reports.
+Environment and Behavior, 49(6), pp.603-637.
+Shiraki, N., Shinozuka, M., Moore, J.E., Chang, S.E., Kameda, H. and Tanaka, S., 2007. System
+risk curves: Probabilistic performance scenarios for highway networks subject to
+earthquake damage. Journal of Infrastructure systems, 13(1), pp.43-54.
+Sinuany-Stern, Z. and Stern, E., 1993. Simulating the evacuation of a small city: the effects of
+traffic factors. Socio-Economic Planning Sciences, 27(2), pp.97-108.
+Sobanjo, J.O. and Thompson, P.D., 2013. Development of risk models for Florida's bridge
+management system (No. BDK83 977-11). Florida. Dept. of Transportation. Research
+Center.
+47
+
+===== PAGE 58 =====
+
+Sorensen, J.H. and Sorensen, B.V., 2009. The Effectiveness of Reverse Telephon Emergency
+Warning Systems in the October 2007 San Diego Wildfires. Oak Ridge National
+Lab.(ORNL), Oak Ridge, TN (United States).
+Stasiewicz, A.M. and Paveglio, T.B., 2021. Preparing for wildfire evacuation and alternatives:
+Exploring influences on residents’ intended evacuation behaviors and mitigations.
+International Journal of Disaster Risk Reduction, 58, p.102177.
+Syphard, A.D., Keeley, J.E., Gough, M., Lazarz, M. and Rogan, J., 2022. What Makes Wildfires
+Destructive in California?. Fire, 5(5), p.133.
+Toledo, T., Marom, I., Grimberg, E. and Bekhor, S., 2018. Analysis of evacuation behavior in a
+wildfire event. International journal of disaster risk reduction, 31, pp.1366-1373.
+U.S. Census Bureau., 2021. American Community Survey. Retrieved from
+https://www.census.gov/programs-surveys/acs
+Ye, X., Konduri, K., Pendyala, R.M., Sana, B. and Waddell, P., 2009, January. A methodology to
+match distributions of both household and person attributes in the generation of synthetic
+populations. In 88th Annual Meeting of the transportation research Board, Washington,
+DC.
+Yin, W., Murray-Tuite, P., Ukkusuri, S.V. and Gladwin, H., 2014. An agent-based modeling
+system for travel demand simulation for hurricane evacuation. Transportation research
+part C: emerging technologies, 42, pp.44-59.
+48
+
+===== PAGE 59 =====
+
+49
+
+===== PAGE 60 =====
+
+APPENDIX A:
+SURVEY DATA ON INDIVIDUAL AND HOUSEHOLD CHARACTERISTICS
+Characteristics Cla Frequency
+sse
+s
+Employed, working 40 or more hours per week 70.0%
+Employed, working less than 40 hours per week 16.6%
+Employment Not employed 6.1%
+Retired 2.6%
+Disabled, not able to work 0.9%
+Others 3.8%
+Personally owned car, truck, or van 60.8%
+Personally owned motorcycle 11.0%
+Public transportation (e.g., bus, streetcar subway) 6.2%
+Carpool 0.8%
+Mode of commuting Shared ride (e.g., Uber, Lyft) 1.6%
+Taxicab 1.6%
+Personally owned bicycle 1.8%
+Walk
+2.1%
+Work from home 10.9%
+Other 3.2%
+Primary decision-maker 22.6%
+Sole decision-maker 42.1%
+Decision-making role Share decision-making roles equally with others 30.8%
+Providing input to another decision-maker 3.6%
+Other 0.9%
+1 14.5%
+2 18.3%
+Family Size 3 22.2%
+4 34.2%
+5 or more 10.8%
+Own without mortgage 26.4%
+Property ownership Own with mortgage 36.0%
+Rent 34.6%
+Other 3.0%
+Y 55.5%
+Presence of children
+N 44.5%
+Yes 27.7%
+Presence of elderly
+No 72.3%
+Yes 26.0%
+Special need required
+No 74.0%
+None 9.8%
+Number of vehicles owned 1 57.0%
+2-3 23.2%
+3 or more 10.0%
+A-1
+
+===== PAGE 61 =====
+
+Characteristics Cla Frequency
+sse
+s
+Less than 1 4.6%
+year 1 – 3 19.8%
+years 22.3%
+Homeownership duration 3 – 5 years
+5 – 10 years 24.7%
+10 – 15 years 10.6%
+More than 15 years 18.1%
+None 24.5%
+Animal ownership Pet only 66.4%
+Livestock only 3.9%
+Both pet and livestock 5.3%
+Yes 1.2%
+Internet access No 98.8%
+Yes 2.1%
+Smartphone access No 97.9%
+Use of real-time navigation Yes 76.3%
+routinely No 23.7%
+Homeowners insurance status Not insured 20.8%
+Under insured 24.5%
+Fully insured 54.7%
+None 51.6%
+Once 19.0%
+Past evacuation experience 2-3 times 21.9%
+4-5 times 5.6%
+More than 5 times 1.9%
+Past wildfire-induced property Yes 27.9%
+damage No 72.1%
+No plan 44.9%
+Disaster plan Have a plant but not written 34.8%
+Written plan 20.3%
+A-2
+
+===== PAGE 62 =====
+
+A-3

@@ -1,0 +1,499 @@
+% =============================================================================
+%  Q1 — Verification and Validation of LLM-Generated DES Experiments
+%  References for this question live in refQ1.bib
+%
+%  GROUNDED WORKFLOW FOR THIS ANSWER:
+%    1. Start from verified V&V, runtime-verification, traffic-simulation, and
+%       scientific-agent sources in:
+%         assets/Candidacy-Paper-reference/Question1ref/
+%    2. Use extracted text only as a search aid:
+%         assets/Candidacy-Paper-reference/_extracted/Question1ref/
+%    3. Final claims must be grounded in:
+%         (a) PDF-verified literature,
+%         (b) AutoTrafficSim architecture,
+%         (c) Korede's real ScalaTion/traffic-simulation experience, or
+%         (d) clearly marked proposal language.
+%
+%  MAIN ANSWER LOGIC:
+%    - Classical simulation V&V assumes a human-controlled modeling process.
+%    - AutoTrafficSim changes the V&V problem because the agent proposes,
+%      revises, and justifies experiments.
+%    - The answer must show how invalid traces are rejected, how valid
+%      surprises are preserved, what evidence makes an agent-generated
+%      experiment scientifically sound, how metric overfitting is controlled,
+%      and why this differs from coverage-style scenario generation.
+%
+%  STYLE AND DEFENSIBILITY:
+%    - Use first-person technical reflection for Korede's real experience.
+%    - Use proposal voice for unfinished AutoTrafficSim components.
+%    - Do not claim that AutoTrafficSim has already produced results.
+%    - Do not overstate what AgentGuard, AIVV, DURA-CPS, or scientific-agent
+%      surveys support; keep comparisons narrow and citation-grounded.
+% =============================================================================
+\begin{bibunit}[plainnat]
+
+\section{Q1.\ Verification and Validation of LLM-Generated DES Experiments}
+
+\begin{quote}\itshape
+When an LLM autonomously generates and refines discrete-event simulation experiments, part of the human researcher's traditional role as guarantor of experimental validity is transferred to the agent. Discuss the verification and validation challenges this introduces for your proposed AutoTrafficSim architecture. Specifically: Explain how your runtime invariant monitor can distinguish between a physically invalid scenario and a valid but unexpected emergent behavior worth scientific investigation. Describe what formal, empirical, and methodological evidence would be required to establish that an agent-generated experiment is scientifically sound. Discuss how the adaptive feedback loop can be prevented from overfitting to calibration metrics rather than producing genuine scientific insight. Explain what fundamentally separates your framework from large-scale automated scenario generation systems, and support your discussion with relevant literature.
+\end{quote}
+
+\subsection{Q1.1\ V\&V challenges for AutoTrafficSim}
+
+\textit{Discuss the verification and validation challenges this introduces for your proposed AutoTrafficSim architecture.}
+
+\citet{sargent2013introduction} and \citet{balci1998vv} describe classical
+Verification and Validation (V\&V) for discrete-event simulation as a
+human-organized modeling process where objectives are specified in advance, changes
+are deliberate, and validity judgments are made at identifiable review points.
+\citet{law1991simulation} identify manual tracing as one of the most powerful
+debugging tools because it makes causality visible to the researcher. An LLM
+agent may change this setting because it proposes, revises, and justifies
+experiments faster than a researcher can inspect them manually.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{assets/AutoTrafficSim.png}
+    \caption{Proposed AutoTrafficSim architecture. Four layers: Knowledge,
+    Agent, Simulation, and Evaluation: are coupled through an Adaptive
+    Feedback Loop. The Formal Validator sits inside the Simulation Layer
+    (pre-simulation verification); the Runtime Invariant Monitor sits inside
+    the Evaluation Layer (safety and liveness checking on the executed
+    trace).}
+    \label{fig:autotrafficsim}
+\end{figure}
+
+\citet{koohestani2025agentguard} identify four factors that make agentic systems
+hard to verify. Each one may appears in AutoTrafficSim due to the Agentic LLM leg.
+
+\begin{itemize}
+    \item \textbf{Stochasticity and unpredictability} may be in the Agent Layer.
+    \item \textbf{Hallucinations} in the Knowledge Layer and Scenario DSL.
+    \item \textbf{Emergent unintended behaviors} in the Simulation Layer trace.
+    \item \textbf{Susceptibility to new vulnerabilities} at pipeline boundaries.
+\end{itemize}
+
+\textbf{Stochasticity and unpredictability.}
+\citet{koohestani2025agentguard} flag stochasticity as the first reason
+agentic systems are hard to verify, and the same scenario prompt may produces
+different runs in our own setting, so the agent becomes another source of variation sitting on top of the simulator's own randomness. When I was building my models in ScalaTion I could do manual tracing: I would open the logs, watch the animation, and walk the time-ordered \texttt{agenda} entry by entry whenever something looked off, because I was the one who set the inputs. That working style does not survive an autonomous agent that generates scenarios faster than any researcher can read them.
+
+\textbf{Hallucinations.}
+\citet{koohestani2025agentguard} place hallucinations alongside
+stochasticity as a core agentic failure mode, and in AutoTrafficSim that
+may appear at two specific layers: the Knowledge Layer, where the agent can
+pull a parameter from the wrong context, and the Scenario DSL, where it
+can quietly rewrite that parameter into something the simulator will
+happily execute. AutoTrafficSim will check each proposal against the
+GraphRAG retrieval source that produced it. Secondly, the agent never writes executable code on its own. It writes the Scenario DSL, and the DSL is the only thing the engine reads, similar to the same wall \citet{lopez2018sumo} put between SUMO's XML scenario format and the TraCI runtime interface so that one side cannot reach into the other.
+
+\textbf{Emergent unintended behaviors.}
+\citet{koohestani2025agentguard} treat emergent behavior as a third agentic
+failure mode, and the problem in our setting is that a clean DSL check
+may not protect against it. The trace may pass the gate and then produce
+something that looks like a finding but is really a modeling artifact.
+The proposed \textit{Runtime Invariant Monitor} will watch physical and
+event-ordering invariants while the run is happening and will push
+structured corrective signals back through the \textit{Adaptive Feedback
+Loop}. Q1.2 carries the harder half of that question forward.
+
+\textbf{Susceptibility to new vulnerabilities.}
+\citet{koohestani2025agentguard} list new attack and failure surfaces as
+the fourth agentic factor, and in AutoTrafficSim it would show up as a
+pipeline problem where the output of one component becomes the input to the
+next, so a small scenario-generation error could pass into the
+simulator, distort the trace, skew the metric, and then be reinforced
+by the feedback loop on the next iteration. \citet{rabanser2026towards}
+frame the broader gap as a missing science the relaibility of AI agents.
+
+AutoTrafficSim is not meant to remove the human researcher entirely from the
+scientific process. I propose it as a way to speed up scientific knowledge
+discovery in microscopic traffic simulation while leaving the harder
+interpretation decisions visible. Table~\ref{tab:q11-failuremap} maps the
+proposed components to the failure modes and V\&V mechanisms intended to
+contain them.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\caption{AutoTrafficSim failure modes and proposed V\&V responses.}
+\label{tab:q11-failuremap}
+\begin{tabularx}{\textwidth}{
+  >{\raggedright\arraybackslash}p{3.0cm}
+  >{\raggedright\arraybackslash}p{3.4cm}
+  >{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Component} &
+\textbf{Failure mode} &
+\textbf{Proposed response} \\
+\midrule
+Knowledge Layer
+& Wrong or unsupported retrieval
+& Log the GraphRAG sources and check that they support the scenario
+\citep{edge2024local}. \\
+\midrule
+Agent Layer
+& Hypothesis drift
+& Use multiple metrics and check physical invariants before accepting an
+update. \\
+\midrule
+Scenario DSL
+& Translation error
+& Validate the scenario schema before it reaches the simulator. \\
+\midrule
+Simulation Layer
+& Invalid vehicle behavior or event ordering
+& Use the Runtime Invariant Monitor to reject physically invalid traces. \\
+\midrule
+Evaluation Layer
+& Metric overfitting
+& Report multiple metrics so that no single value drives refinement
+\citep{manheim2019categorizing}. \\
+\midrule
+Adaptive Feedback Loop
+& Reinforcement of a bad assumption
+& Return a structured reason code when a check fails
+\citep{yan2025guiding}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+% \begin{table}[H]
+% \centering
+% \renewcommand{\arraystretch}{1.25}
+% \caption{AutoTrafficSim components, expected failure modes, and proposed V\&V checks.}
+% \label{tab:q11-failuremap}
+% \begin{tabularx}{\textwidth}{
+%   >{\raggedright\arraybackslash}p{3.1cm}
+%   >{\raggedright\arraybackslash}p{3.3cm}
+%   >{\raggedright\arraybackslash}X}
+% \toprule
+% \textbf{Component and agentic challenge} &
+% \textbf{Failure mode} &
+% \textbf{Proposed V\&V response} \\
+% \midrule
+% Knowledge Layer\\\textit{Hallucinations}
+% & Retrieval inconsistency and vocabulary mismatch
+% & Log GraphRAG sources and check whether the retrieved subgraph supports the
+% scenario. The Formal Validator separately checks physical plausibility
+% \citep{edge2024local}. \\
+% \midrule
+% Agent Layer\\\textit{Stochasticity and unpredictability}
+% & Hypothesis drift and objective hacking
+% & Use multi-metric feedback and invariant checks before a parameter update is
+% accepted. \\
+% \midrule
+% Scenario DSL\\\textit{Hallucinations}
+% & Semantic translation errors
+% & Use a schema-checked Scenario DSL to isolate agent intent from simulator
+% internals \citep{balci1998vv,lopez2018sumo}. \\
+% \midrule
+% Simulation Layer\\\textit{Emergent unintended behaviors}
+% & Scheduling-semantic mismatch
+% & Check event ordering and kinematic bounds with the Runtime Invariant Monitor
+% at each activation step. \\
+% \midrule
+% Evaluation Layer\\\textit{New vulnerabilities}
+% & Metric overfitting
+% & Use a multi-metric bundle so that no single metric drives refinement
+% \citep{manheim2019categorizing}. \\
+% \midrule
+% Adaptive Feedback Loop\\\textit{New vulnerabilities}
+% & Reinforcement of bad assumptions
+% & Return a structured reason code when an invariant fails instead of asking the
+% agent to regenerate freely \citep{yan2025guiding}. \\
+% \bottomrule
+% \end{tabularx}
+% \end{table}
+
+
+If the LLM agent proposes an invalid arrival pattern, the simulator may produce
+an artificial queue. If the Evaluation Layer rewards the resulting metric, the
+Adaptive Feedback Loop may reinforce the original mistake. An anomaly detector
+can flag the unusual trace, but it cannot decide whether the queue is a real
+traffic finding or a modeling error. This is why AutoTrafficSim needs both
+runtime checks and a researcher for interpretation. This is consistent with
+\citet{kwon2026aivv}, who show that flagging an anomaly is not the same as
+interpreting it.
+
+\subsection{Q1.2\ Distinguishing invalid traces from emergent behavior}
+
+\textit{Explain how your runtime invariant monitor can distinguish between a physically invalid scenario and a valid but unexpected emergent behavior worth scientific investigation.}
+
+For me, the invalid-versus-emergent distinction is first a physical
+admissibility question, not a classification problem. If a trace violates
+kinematics, it is invalid no matter how interesting it looks. If the trace
+preserves the physical invariants and still produces unexpected collective
+behavior, then it may be a scientific observation. Stop-and-go waves,
+bottleneck breakdowns, and merge-induced oscillations can be surprising
+without being invalid.
+
+The proposed Runtime Invariant Monitor turns that distinction into a three-way
+verdict:
+
+\begin{itemize}
+    \item \textbf{Reject as invalid.} The Formal Validator or the Runtime
+    Invariant Monitor rejects the trace when a hard invariant fails.
+    \item \textbf{Quarantine as a possible artifact.} The Runtime Invariant
+    Monitor quarantines a trace whose invariants hold but whose behavior
+    disappears under different random seeds, smaller time steps, or
+    boundary-condition changes.
+    \item \textbf{Escalate as a candidate observation.} When the invariants
+    hold and the behavior is stable across those checks, the Runtime
+    Invariant Monitor surfaces the trace. The researcher, not the agent, decides whether
+    the result is a discovery, a known artifact, or a model defect.
+\end{itemize}
+
+The Monitor watches five invariant families:
+
+\begin{itemize}
+    \item \textbf{Flow conservation.} Vehicles entering a corridor segment
+    equal vehicles exiting plus those remaining inside the segment.
+    \item \textbf{Collision exclusion.}
+    $x_j(t)-x_i(t)-\ell_i > 0$ for every leader $j$ and follower $i$, where
+    $x$ is rear-bumper position and $\ell_i$ is the follower's length.
+    \item \textbf{Kinematic bounds.}
+    $0 \leq v_i(t) \leq v_{\max}$ and
+    $-b_{\max} \leq a_i(t) \leq a_{\max}$
+    \citep{treiber2013book}.
+    \item \textbf{Lane integrity.} Vehicles do not teleport across
+    non-adjacent lanes, and merge order remains consistent with queuing
+    discipline.
+    \item \textbf{Event ordering.} Activations are processed in timestamp order
+    through ScalaTion's time-ordered \texttt{agenda}
+    \citep{law1991simulation}.
+\end{itemize}
+
+\subsubsection{Why the distinction matters}
+
+Our first lane-level validation paper showed me why both sides of this
+distinction matter. We started with the Gipps model, but it could not reproduce
+the acceleration profile of a steep stop-and-go regime. We moved to the
+Intelligent Driver Model (IDM). The same pattern appeared with arrivals. A
+Poisson process allowed two vehicles to enter the engine at the same discrete
+schedule time, so we moved to a two-stage Shifted Erlang with a $\tau$
+parameter enforcing a minimum inter-arrival gap. Those were invalid-scenario
+catches. Later, lane-level results diverged from corridor-level results. That
+mismatch was not invalid. It became the finding.
+
+\subsubsection{Where the checks live}
+
+The Formal Validator rejects scenarios that are already wrong before the
+simulation starts. Examples include malformed DSL, densities above jam
+density, arrival schedules that place two vehicles on the same discrete tick,
+and lane assignments that do not match the road topology. Failed scenarios
+return to the agent with a structured reason code
+\citep{balci1997verification,yan2025guiding}.
+
+The Runtime Invariant Monitor catches problems that appear only during
+execution. Because simulations are stochastic, checking one run is not enough.
+My proposal is to check whether the invariants continue to hold across repeated
+runs and perturbations. AgentGuard provides a practical implementation
+direction for threshold-based runtime checking
+\citep{koohestani2025agentguard}. Zhou et al.\ provide a formal precedent for
+probabilistic runtime verification under uncertainty
+\citep{zhou2022runtime}. The underlying formalism is developed further in Q1.3
+as part of the formal evidence pillar.
+
+The Adaptive Feedback Loop returns failed checks to the agent for revision. It
+does not decide whether an invariant-preserving anomaly is a scientific
+discovery. That interpretation remains with the researcher
+\citep{zanzotto2019human}. AIVV uses the same two-stage pattern: a mathematical
+gate flags an anomaly, then a role-specialized council decides whether it is a
+genuine fault or nuisance behavior \citep{kwon2026aivv}. Without that
+researcher step, the system could suppress physically valid but surprising
+traffic behavior and become a confirmation engine
+\citep{treiber2013book,sugiyama2008traffic}.
+
+\subsection{Q1.3\ Evidence for scientific soundness}
+
+\textit{Describe what formal, empirical, and methodological evidence would be required to establish that an agent-generated experiment is scientifically sound.}
+
+For an agent-generated experiment in AutoTrafficSim, low RMSE on a clean run
+is not evidence the experiment is sound. Soundness requires three kinds of
+evidence, and in the agent case all three have to be machine-checkable,
+because the methodological reasoning that used to live in the researcher's
+head now has nowhere to live unless the architecture writes it down.
+
+The three pillars, mapped onto the AutoTrafficSim components in
+Figure~\ref{fig:autotrafficsim}, are:
+
+\begin{itemize}
+    \item \textbf{Formal evidence.} The Formal Validator in the Simulation
+    Layer confirms each scenario satisfies its DSL contract before the run,
+    and the Runtime Invariant Monitor in the Evaluation Layer confirms the
+    trace preserves the five physical invariants from Q1.2 during the run.
+    \item \textbf{Empirical evidence.} Metrics computation in the Evaluation
+    Layer compares simulated flow, speed, occupancy, and travel time against
+    external ground truth such as PeMS, and reports whether the conclusion
+    still holds across the scenario sensitivity sweep driven by the Agent
+    Layer.
+    \item \textbf{Methodological evidence.} The Knowledge Layer records the
+    GraphRAG retrieval trace behind each assumption, and the Agent Layer
+    records the hypothesis and revision lineage that produced each scenario.
+\end{itemize}
+
+The three-pillar framing is not new. It is my translation of standard
+simulation V\&V into the agent setting. \citet{sargent2010verification}
+separates conceptual validity, operational validity, and computerized-model
+verification. Computerized-model verification becomes the formal pillar.
+Operational validity becomes the empirical pillar. Conceptual validity
+becomes the methodological pillar, because the agent has to record why each
+modeling choice was made. \citet{law1991simulation} adds a constraint I need
+to respect across all three: simulation validation is usually about closeness
+for a stated purpose, not proving that simulated and real outputs are
+identical.
+
+The pillars cut across the six layers of Table~\ref{tab:q11-failuremap}
+rather than lining up one-to-one with them. The Adaptive Feedback Loop
+threads all three together by carrying diagnostic signal back into the next
+iteration.
+
+Verifying code, objectives, and runtime behavior in ScalaTion by hand made
+this concrete for me. I was asking formal questions, such as whether an event
+fired in causal order. I was asking empirical questions, such as whether the
+flow profile matched what IDM should produce at that demand level. I was also
+asking methodological questions, such as why we chose the Shifted Erlang
+$\tau$ for the arrival process. The formal and empirical questions left
+traces in logs and metrics. The methodological questions often lived in my
+head. Once the agent generates scenarios at machine speed, that reasoning
+disappears unless AutoTrafficSim records it. Surveys of scientific agents
+make the same point in broader terms: reproducibility and procedural
+traceability cannot be treated as afterthoughts
+\citep{zhou2025autonomous,ren2503towards}.
+
+\subsubsection{Where each pillar is produced}
+
+\textbf{Formal evidence.} The Formal Validator and the Runtime Invariant
+Monitor would produce records that can be inspected after each experiment.
+These include a DSL contract-satisfaction log from the Formal Validator,
+invariant-preservation and flow-conservation records from the Runtime
+Invariant Monitor, and timestamp-ordered event-activation records from the
+ScalaTion simulation engine's agenda. The monitor is still a proposal. My
+first step is simple. The simulator records whether the physical invariants
+hold across repeated runs. One clean run is not enough because random seeds,
+the Shifted Erlang arrival process, and probabilistic lane-change decisions
+can produce different traces from the same scenario. AgentGuard gives me a
+practical direction for the next step. It observes agent traces, learns an
+Agentic Markov Decision Process (AMDP) online, and uses Probabilistic Model
+Checking (PMC) to trigger alerts or automated responses when a threshold is
+breached \citep{koohestani2025agentguard}. I am not claiming that
+AutoTrafficSim already has this backend. My proposal is to adapt the
+AgentGuard pattern so the workflow can also monitor the agent's revisions
+and identify when intervention is needed.
+
+\textbf{Empirical evidence.} The empirical checks depend on the experiment.
+For ordinary freeway validation, AutoTrafficSim would compare simulated
+flow, speed, occupancy, and travel time against observed traffic data such
+as PeMS. My earlier lane-level work showed why aggregate fit is not enough.
+A corridor-level match can still hide a lane-level problem. For the wildfire
+evacuation case in Q2, the evaluation has to go beyond ordinary traffic fit.
+The framework would report evacuation clearance time, exposed vehicles,
+queue duration, bottleneck location, and variation across repeated runs.
+Those outcomes would be compared across the scenario matrix of fire spread,
+departure timing, route choice, contraflow, phased evacuation, and household
+vehicle demand. I am not trying to find one best evacuation trace. I want to
+know which assumptions change the decision, and whether the conclusion still
+holds when those assumptions change. Parameter sensitivity analysis
+completes the pillar \citep{sargent2010verification,law1991simulation}. A
+result is more useful when the conclusion holds across reasonable
+assumptions, and more honest when the framework shows where it does not.
+
+\textbf{Methodological evidence.} AutoTrafficSim would record where each
+experiment came from and why it changed. The GraphRAG retrieval trace would
+show which knowledge-graph sources the agent consulted
+\citep{edge2024local}. The hypothesis lineage would show how a candidate
+came from earlier results. Parameter-change records would connect each
+revision to the invariant violation, metric shift, or anomaly that triggered
+it. Reproducibility logs would preserve seeds, DSL versions, validator
+commit hashes, and metric outputs so another researcher can reconstruct the
+run. Without these records, an autonomous experiment cannot be distinguished
+from a search process that happened to find a good metric value
+\citep{rabanser2026towards}. Without them, the researcher who has to
+interpret an escalated trace from Q1.2 has nothing to work from.
+
+\subsection{Q1.4\ Anti-overfitting in the Adaptive Feedback Loop}
+
+\textit{Discuss how the adaptive feedback loop can be prevented from overfitting to calibration metrics rather than producing genuine scientific insight.}
+
+To keep the Adaptive Feedback Loop from overfitting to calibration metrics,
+AutoTrafficSim relies on three components already shown in
+Figure~\ref{fig:autotrafficsim}:
+
+\begin{itemize}
+    \item Metrics Computation will report more than one metric.
+    \item The Runtime Invariant Monitor will reject parameter sets that
+    violate physical constraints.
+    \item The Adaptive Feedback Loop will return the failed check to the
+    agent rather than reward an RMSE improvement alone.
+\end{itemize}
+
+This keeps a low aggregate error from hiding an invalid microscopic run. I saw the underlying problem during manual calibration of the ScalaTion
+microscopic traffic simulator, before the AutoTrafficSim Agent Layer
+existed. Using Simultaneous Perturbation Stochastic Approximation (SPSA) on
+IDM parameters, the optimizer returned parameter sets with a good RMSE
+while the microscopic vehicle trajectories were still physically
+inadmissible. Vehicles were spaced closer than physically possible or
+accelerated beyond kinematic limits. Optimizing the metric alone is
+therefore not enough. \citet{manheim2019categorizing} formalize this as
+Goodhart's Law. A GraphRAG-driven Agent Layer proposing parameter
+revisions at machine speed would reproduce that failure faster than I did
+by hand.
+
+A later extension could add clone-and-promote gating from AIVV, where an
+update is tested on a temporary clone before promotion
+\citep{kwon2026aivv}. I would treat that as an extension, not as a
+completed part of the current architecture.
+
+\subsection{Q1.5\ Differentiation from automated scenario generation}
+
+\textit{Explain what fundamentally separates your framework from large-scale automated scenario generation systems, and support your discussion with relevant literature.}
+
+I can already run the ScalaTion engine on hundreds of parameter
+combinations. That gives coverage. It does not tell me whether any run
+answered a useful scientific question, whether a result is physically
+admissible, whether the conclusion depends on one fragile assumption, or
+why the next experiment should be run.
+
+What separates AutoTrafficSim from a large-scale automated scenario
+generator is therefore not throughput but a checked and traceable path
+from an assumption, to an experiment, to a result a researcher can
+defend. Before the run, the Knowledge Layer records where the assumption
+came from, the Agent Layer turns it into an experiment, and the Formal
+Validator rejects a scenario that is already physically inadmissible.
+After the run, the Runtime Invariant Monitor checks the trace, Metrics
+Computation reports what changed, and the Adaptive Feedback Loop returns
+that evidence to the agent before another experiment is proposed. If the
+trace is physically valid but still surprising, the result is sent to
+the researcher for interpretation rather than silently discarded.
+
+Existing tools such as SUMO, Scenic, CARLA, and OpenSCENARIO are useful
+for defining and executing scenarios
+\citep{lopez2018sumo,fremont2019scenic,dosovitskiy2017carla,asam2024openscenario}.
+I am not proposing AutoTrafficSim as a replacement for those tools or
+for ScalaTion. The simulation engine remains the engine. AutoTrafficSim
+is the agentic layer around it.
+
+This matters for the wildfire evacuation case in Q2. A large scenario
+generator can vary fire spread, departure timing, rerouting, phased
+evacuation, household vehicle demand, and contraflow. AutoTrafficSim
+goes beyond enumerating those combinations: it shows which assumption
+caused the conclusion to change and whether the result still holds when
+reasonable assumptions change.
+
+Recent surveys treat agentic scientific experimentation as an emerging
+direction because it connects hypothesis generation, experiment
+execution, and result refinement in one system
+\citep{ren2503towards,zhao2025llm,zhou2025autonomous}.
+\citet{zhou2025autonomous} describe autonomous scientific discovery as a
+loop of hypothesis discovery, experimental design and execution, and
+result analysis and refinement. That is the idea I am trying to make
+concrete for traffic simulation.
+
+
+\bigskip
+\phantomsection
+\addcontentsline{toc}{subsection}{References}
+\putbib[refQ1]
+\end{bibunit}

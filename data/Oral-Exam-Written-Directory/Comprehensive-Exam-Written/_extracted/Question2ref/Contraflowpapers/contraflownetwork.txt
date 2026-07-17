@@ -1,0 +1,1001 @@
+===== PAGE 1 =====
+
+PDF Download
+1097064.1097099.pdf
+24 February 2026
+Total Citations: 44
+. Total Downloads: 772
+.
+Latest updates: hps://dl.acm.org/doi/10.1145/1097064.1097099 .
+.
+Published: 04 November 2005
+.
+. .
+ARTICLE .
+Citation in BibTeX format
+Contraflow network reconfiguration for evacuation planning: a
+.
+.
+summary of results CIKM05: Conference on Information and
+Knowledge Management
+November 4 - 5, 2005
+SANGHO KIM, University of Minnesota Twin Cities, Minneapolis, MN, United States Bremen, Germany
+.
+. .
+SHASHI SHEKHAR, University of Minnesota Twin Cities, Minneapolis, MN, United States Conference Sponsors:
+SIGIR
+.
+.
+.
+Open Access Support provided by:
+.
+University of Minnesota Twin Cities
+.
+GIS '05: Proceedings of the 13th annual ACM international workshop on Geographic information systems (November 2005)
+hps://doi.org/10.1145/1097064.1097099
+ISBN: 1595931465
+.
+
+===== PAGE 2 =====
+
+Contraflow Network Reconfiguration
+for Evacuation Planning: A Summary of Results
+Sangho Kim Shashi Shekhar
+DepartmentofComputerScience DepartmentofComputerScience
+UniversityofMinnesota UniversityofMinnesota
+sangho@cs.umn.edu shekhar@cs.umn.edu
+ABSTRACT and natural disasters. From the perspective of transporta-
+tion system, colossal traffic jams during evacuation process
+Contraflow,orlanereversal,isawayofincreasingoutbound
+have been the main issue. In the aftermath of hurricanes
+capacity of a real network by reversing the direction of in-
+George in 1998 and Floyd in 1999, the transportation com-
+bound roads during evacuations. The contraflow is consid-
+munity observed the need for increased evacuation route
+eredapotentialremedytosolvecongestionsduringevacua-
+capacity as well as more accurate estimate of evacuation
+tions in context of homeland security and natural disasters
+time[22].
+(e.g.,hurricanes). Currentlyavailablecontraflowalgorithms
+Contraflow,orlanereversals,has been discussedasa po-
+only tackle a single-source and multiple-destinations situa-
+tential remedy to solve such tremendous congestion by in-
+tion. These approaches cannot handle a multiple-sources
+creasingoutboundevacuationroutecapacity. Today,eleven
+problem which is harder due to conflicts across the optimal
+of the 18 coastal states threatened by hurricanes consider
+paths from different sources.
+theuseofcontraflowaspartoftheirevacuationstrategy[21].
+We formally define the evacuation situations using graph
+Althoughcontraflowisprimarilyimportantforevacuations,
+and flow theory and show the NP-completeness of the con-
+its applications are not limited. The two center lanes of
+traflowproblem. Weproposetwocapacity-awareglobalcon-
+thehighwaysysteminWashington,D.C.areusedinreverse
+traflow heuristics that produce contraflow configuration in
+laningfashiontoefficientlycontrolcapacityformorningand
+thepresenceofconflictsamongroutespreferredbydifferent
+evening peak time. The utilization of contraflow after foot-
+source nodes. We evaluate proposed heuristics experimen-
+ball games is another typical example of a source, multiple
+tallyusingsyntheticnetworksaswellasrealworlddatasets.
+destinations situation.
+In addition, we provide algebraic cost model. Experimen-
+In spite of its importance and various applications, re-
+tal results show that our contraflow heuristics can reduce
+searchers have yet to address the contraflow problem from
+evacuation time by 30% or more.
+a computational perspective. Computerized contraflow de-
+sign may help not only developing the optimized network
+Categories andSubject Descriptors
+configuration but also quantifying the evacuation time of
+F.2.0 [Theory of Computation]: Analysis of Algorithms the result network.
+and Problem Complexity—General Thus,weformulatethecontraflowproblemwiththehelp
+of graph and flow theory. With a given evacuation situa-
+General Terms tion using a directed and capacitated graph with multiple
+sources and multiple destinations, we want to find a recon-
+Algorithms,Experimentation figured network by contraflow with the objective of mini-
+mizing evacuation time. In addition to the problem formu-
+Keywords lation, we conjecture that the contraflow problem is NP-
+complete and provide proof outline. The understanding of
+contraflow,lanereversal,evacuationplanning,timeexpanded
+NP-completeness on the problem is a stepping stone to the
+graph, combinatorial optimization,simulated annealing
+application of combinatorial optimizationtechniques to the
+contraflow problem.
+1. INTRODUCTION
+To our knowledge, algorithms described in [14] are the
+Evacuationplanningiscurrentlyanissueofmajorimpor- only ones tackling the contraflow problem. In their evacua-
+tanceduetotheincreasingrisksbothfromterroristattacks tion modeling, an evacuation zone consists of a source and
+multiple destinations. Their solution is reduced to finding
+theoptimalpathsfromthesinglesourcetothedestinations
+and overlaying them. This approach is not effective when
+Permissiontomake digitalorhard copiesofallorpart ofthisworkfor thereareoneormorespecificdestinationsforevacuees,who
+personalorclassroomuseisgrantedwithoutfeeprovidedthatcopiesare arelocatedatmultiplenodesinthetransportationnetwork.
+notmadeordistributedforprofitorcommercialadvantageandthatcopies
+The approach breaks down due to conflicts across the opti-
+bearthisnoticeandthefullcitationonthefirstpage.Tocopyotherwise,to
+republish,topostonserversortoredistributetolists,requirespriorspecific mal paths from different sources.
+permissionand/orafee. Ontheotherhand,wepresentcapacity-awareglobalcon-
+GIS’05,NNoovveemmbbeerr 44,-52,0 20050,5B, rBemreemne,nG, eGrmeramnya.ny. traflowplanningheuristicsthatcanproducecontraflownet-
+Copyright2005ACM1-59593-146-5/05/0011...$5.00.
+250
+
+===== PAGE 3 =====
+
+{40,40} {0,10}
+work configuration in the presence of multiple sources with (1,3)
+A B
+conflicting paths to destinations. Our first approach is Flip
+(1,4)
+High Flow Edge (FHFE) which flips edges with priorities (1,2)
+(1,3)
+and produces an appropriate level of result quality with
+fast running time. Our second approach is based on Sim- (1,2) (1,2) E {0,−}
+ulated Annealing (SA) which aggressively improves evacu-
+ation time by escaping local minima in an iterative way. (4,1)
+Each approach is evaluated and examined with both syn- (1,2) (4,1)
+C D
+thetictransportationnetworksforscalabilitytestaswellas
+(1,3)
+a nuclear power plant failure scenario in Monticello, Min- {20,20} {0,10}
+nesota, U.S.. Both real and synthetic datasets show that
+{initial occupancy, vertex capacity}
+the evacuation time of our FHFE is close to that of the SA (travel time, edge capacity)
+in spite of its fast running time. In addition, our heuristics Evacuation Time: 22
+can reduce evacuation time by a third.
+Therestofthepaperisorganizedasfollows. Section2for- Figure 1: Graph Representation of an Evacuation
+mulatesthecontraflowproblemandshowsNP-completeness Situation
+of the contraflow problem. Section 3 presents related work.
+In Section 4, we describe the two heuristics. Section 5 {4 A 0,40} (1,7) {0 B ,10} {4 A 0,40} (1,7) {0 B ,10}
+presentsexperimentsetupinformationandevaluationofthe (1,5) (1,5)
+approaches. Section6discussesrelatedknowledgetounder-
+standthecontraflowproblem. Finally,section7summarizes (1,4) E {0,−} (1,4) E {0,−}
+and concludes with a discussionabout future work. (4,2) (4,2)
+C (1,5) D C (1,5) D
+{20,20} {0,10} {20,20} {0,10}
+2. PROBLEMDEFINITION
+Network Configuration 1 Network Configuration 2
+Section 2 consists of two subsections. The first subsec- Evacuation Time: 11 Evacuation Time: 14
+tion formulates the contraflow problem and gives an illus-
+trative example. The second subsection discusses the NP- Figure 2: Two Possible Contraflow Configurations
+completeness of the contraflow problem. from Figure 1
+2.1 Problem Formulation
+Weunderstandtheevacuationplanningasaprocesstore- highway segment between cities A and B has travel time 1
+moveresidentsinadangerousareatosafeplacesasquickly and capacity3. If we assumethat a timeunit is 5 minutes,
+as possible. It is necessary to represent the situation with it takes 5 minutes for evacuees to travel from A to B and
+amathematicalgraphstructure. Let G(V,E)be adirected maximum3evacueescansimultaneouslytravelthroughthe
+network with V, the set of vertices and E, the set of edges. edge. Vertices B and D have no initial occupancy and only
+Eachvertexhasaninitialoccupancyvalue,thatis,thenum- workastransshipmentvertices. Ifweapplyaminimumcost
+ber ofresidents to evacuate andvertex capacity. Eachedge flow algorithmto this configuration, evacuation time is 22.
+also has an edge capacity and constant travel time. The Figure2showstwopossiblecontraflowconfigurationsbased
+evacuation situation can have multiple source vertices and onthegraphinFigure1. Allthetwo-wayedgesusedinthe
+destinationvertices. Evacuation time is defined as a period original configuration are merged by capacity and directed
+fromthemomentwhenafirstevacueeleavesasourcevertex in favor of increasing outbound evacuation capacity. There
+to the moment when a last evacuee arrives at a destination aretwocandidateconfigurationsthatdifferinthedirection
+vertex. We want to find a reconfigured network by con- ofedgesbetweenverticesBandD.Ifweapplytheminimum
+traflow with the objective of minimizing evacuation time. cost flow algorithm to both configurations, the left configu-
+The following is the summary of our contraflow problem. rationhasevacuationtime11,whiletherightconfiguration
+has evacuation time 14. We can observe that both config-
+Given: 1. Transportation network, directed graph G(V, E) urations not only reduce but also differ in evacuation time.
+2. Each vertex has initial occupancy and capacity. Eventhoughthetimedifferenceisjust3inthisexample,the
+3. Each edge has capacity and travel time. difference maybe significantlydifferent in caseof a compli-
+4. Source and destination vertices. catedrealnetwork. Thisexampleillustratestheimportance
+Find: Contraflow network configuration ofchoiceamongpossiblenetworkconfigurations. Moreover,
+Objective: Minimize evacuation time. we have to know that there are critical edges affecting the
+Constraint: evacuation time such as edge (B, D) in Figure 2.
+1. Travel time and capacity are constant. In addition, we can identify some drawbacks of existing
+2. Flipping a portion of the lanes is not allowed. approach with this example. Suppose that the graph in
+Figure 1 is solved by overlaying Dijkstra’s shortest paths.
+Figure 1 illustrates a simple evacuation situation on a One path is A, B, and E and the other path is C, D, B
+transportation network. Each vertex represents a city with andE.Thus,theresultingpathsdonotutilizealltheedges
+initial occupancy and its capacity. City A has 40 people effectively because the solution does not consider flow and
+and also capacity 40. Vertices A and C are modeled as capacityofthegivengraph. Ifweassumethatthisexample
+source vertices, while vertex E is modeled as a destination isamultiple-sourcesandmultiple-destinations(e.g.,E’,E”)
+vertex (e.g., shelter). Each edge represents a road between problem, it is possible that two paths, A-B-D-E’ and C-D-
+two cities with travel time and its capacity. For example, a B-E”, may conflict on the edge (B, D).
+251
+
+===== PAGE 4 =====
+
+{0,−} {0,−} {0,−} {0,−}
+We made two assumptions in our evacuation modeling.
+First,weassumethatedgetraveltimeandcapacityarecon- L
+2n
+a
+d
+yer
+u1 u1 u2 u2 u3 u3 u4 u4
+stant. In reality, travel time of an edge is not fixed as con- C D o es m ti p n o a n ti e o n n t (1,1) (1,1) (1,1) (1,1) (1,1) (1,1) (1,1) (1,1)
+stant, but may be density dependent. Incorporating micro- L
+1s
+a
+t
+yer
+u1 u1 u2 u2 u3 u3 u4 u4
+scopictrafficmodelsintoourheuristicshastradeoffbetween
+Flipping (0,1) (0,1) (0,1) (0,1) (0,1) (0,1)
+performance and model realism. Second, we only consider Component
+reversingwholelanesforsimplicity. Inanactualimplemen- C So o u m rc p e onent s1 {1,1} s2 {1,1}
+tationofcontraflow,itispossibletoreversesomeportionof
+lanes.
+Figure 3: CONTRAFLOW instance resulting from
+2.2 HowHard IsTheContraflowProblem? 3SAT instance in which U =
+As of the editing time of this paper, we conjecture that
+thecontraflowproblemisNP-complete. Thesketchofproof
+outline is described in this section. In general, the process
+ofdevisinganNP-completenessproofforadecisionproblem
+Π consists of the following four steps[8].
+1. Showing that Π is in NP,
+2. Selecting a known NP-complete problem Π′,
+3. Constructing a transformation f from Π′ to Π, and
+4. Proving that f is a (polynomial) transformation.
+Inourprocessofproof,weselecttheknownNP-complete
+problem as 3-SATISFIABILITY (3SAT) problem which is
+almost the root of other NP-complete problems and is de-
+rivedfromSATISFIABILITYproblemwhoseNP-completeness
+isprovenbyCook[8]. The3SATproblemisspecifiedasfol-
+lows:
+3SAT
+INSTANCE: Collection C = c ,c ,...,c of clauses on a
+1 2 m
+finite set U of variables such that |c | = 3 for 1 ≤ i ≤ m.
+i
+QUESTION: Is there a truth assignment for U that
+satisfiesall the clauses in C?
+TheEVAC-TIME usedinthedefinitionofCONTRAFLOW
+isa polynomialfunction thatcan calculateevacuation time
+ofagivengraph. Forsimplicity,eachedgeinanundirected
+graph G should be flipped in either way.
+CONTRAFLOW
+INSTANCE: An undirected graph G = (V, E) with
+initialoccupancy o(v) ∈ Z+ (where Z+ denotes the positive
+integers) for some v ∈ V, destinationvertices for some v ∈ V,
+capacityc(e) ∈ Z+ and travel time t(e) ∈ Z+ for each e ∈ E,
+a directed graph G’ = (V, E’) and evacuation time bound
+B ∈ Z+.
+QUESTION: Is there a function f: e → [{u,v}, {v,u}]
+for each e ∈ E where {u,v} or {v,u} is a directed edge in E’
+such that EVAC-TIME(G’)≤ B?
+Conjecture 1. CONTRAFLOW is NP-complete.
+Proof: ItiseasytoseethatCONTRAFLOW∈NP,since
+anondeterministicalgorithmneedonlyguessanewdirected
+graph G’ by flipping all edges randomly and check in poly-
+nomial time that G’ has evacuation time B or less.
+Wetransform3SATtoCONTRAFLOW.LetU={u ,u ,
+1 2
+...,u } and C = {c ,c ,...,c } be any instance of 3SAT. We
+n 1 2 m
+must construct a graph G’ = (V, E’) and a positive integer
+BsuchthatG’hasanevacuationtimeBorlessifandonly
+if C is satisfiable.
+The construction consists of a source component, a des-
+tination component and a flipping component between the
+sourceand destinationcomponents. The source component
+f
+u ,u ,u ,u 1 2 3 4
+g
+and C =
+f f
+u ,u ,u
+1 3 4
+g
+,
+f
+u ,u ,u
+1 2 4
+g g
+.
+consists of vertices s ,s ,...,s with o(s) = 1. The desti-
+1 2 m
+nation component consists of two layers. First layer con-
+sists of each literals and their negated literals in U (i.e.,
+u ,u ,u ,u ,...,u ,u ). SecondlayerconsistsofXORofeach
+1 1 2 2 n n
+pair of literals (i.e., u ⊕u ,u ⊕u ,...,u ⊕u ). This XOR 1 1 2 2 n n
+layerservesasadestinationnodesetintheCONTRAFLOW
+problem. The two nodes in a pair (u and u ) in the first
+i i
+layer are connected to each XOR node (u ⊕u ) in the sec-
+i i
+ond layer with edges each of whose t(e) = 1 and c(e) =
+1. Finally, a flipping component consists of edges with the
+followingdefinition. Foreachclausec ∈C,letthethreelit-
+j
+eralsinc bedenotedbyx ,y ,andz . Then,theedgesare
+j j j j
+{s ,x }, {s ,y }, {s ,z } each of whose t(e)=0 and c(e)=1.
+j j j j j j
+Figure3showsanexampleofthecontraflowgraphobtained
+when U = {u ,u ,u ,u } and C = {{u ,u ,u },{u ,u ,u }}.
+1 2 3 4 1 3 4 1 2 4
+Itiseasytoseehowtheconstructioncanbeaccomplished
+inpolynomialtime. Allthatremains tobe shownisthatC
+issatisfiableifandonlyifEVAC-TIME(G’)≤Bbyflipping
+edges inG to prove that theabove constructionis indeed a
+transformation.
+→: SupposethatCissatisfiable. Ifwedefinethefunction
+f ase={u,v}ifvisTRUEore={v,u}ifvisFALSE(i.e.,
+draw arrow head on the TRUE node and arrow tail on the
+FALSEnode). WeassumethatBisequaltothenumberof
+sourcenodes. IfCissatisfiable,atleastoneedgefromeach
+source node willbe directed towardthe destinationcompo-
+nent. This guarantees that one occupancy in each source
+node can evacuate to the destination nodes (second layer
+in the destination component) with at most B evacuation
+time. The worst case evacuation time B happens when all
+the source nodes are pointed to one node in the first layer
+of destination component.
+←: Suppose that EVAC-TIME(G’) ≤ B by using the
+same flipping function f described above. For each occu-
+pancyineachsourcenodetoevacuatetoadestinationnode,
+at least one edge from the source node should be directed
+toward the first layer of destination component. This guar-
+antees that C is satisfiable.
+3. RELATEDWORK
+Thematerialandliteratureonevacuationsingeneraland
+the contraflow problem in particular have been published
+from various domains including social and behavioral sci-
+ences, transportation, and mathematics[5, 4]. A survey by
+[22] of evacuation issues and contraflow revealed that plan-
+ners have no recognized standards or guidelines for the de-
+sign, operation, and location of contraflow segments. Many
+states threatened by hurricanes and considering contraflow
+plans were dependent on past evacuation experiences.
+252
+
+===== PAGE 5 =====
+
+time 0 1 2 3
+PastpapersandDepartmentofTransportationreports[22,
+21, 20, 6] have mainly tackled the managerial and opera- {60}
+(0,2/40) (0,40) (0,40) (0,40)
+tional aspects of contraflow such as signal control, merging S A0 A1 A2 A3
+and cost. When planners design network configuration for (0,4) (0,4) (0,4)
+evacuation scenarios, they mainly depend on past experi- (0,2/3) (0,3) (0,3)
+ences and guesses. Such approaches may be effective to de-
+cidethedirectionofmainhighwaycontraflows. However,it
+(0,10) (0,10) (0,10)
+is almost impossible to depend on past experience alone to (0,20) B0 B1 B2 B3
+deal with a large transportationnetwork with changing de-
+mographic data and temporal factors such as construction (0,2) (0,2) (0,2)
+zones. (0,2) (0,2/2) (0,2)
+[14] introduced two different contraflow algorithms from
+(0,20) (0,20) (0,20)
+a computer science perspective. One is based on a multi- C0 C1 C2 C3
+castroutingproblemandtheotherisbasedonbreadth-first
+(0,2) (0,3) (0,2) (0,3)(0,2) (0,3)
+graphtraversal. Thesealgorithmscanhandleonlyasingle-
+coordinated incident due to conflicts of multiple optimal (0,2) (0,2) (0,2)
+pathspreferredbydifferentsourcenodesincaseofmultiple-
+(0,10) (0,10) (0,10)
+sources and multiple-destinations evacuation model. They D0 D1 D2 D3
+did not clearly describe the use of different link capacities
+in the construction of optimal routes. On the other hand,
+(0,3) (0,3) (0,3)
+ourheuristicscanhandlethemultiple-sourcesandmultiple-
+destinations evacuation situation which has inherently con-
+flicting edges by more than a path from different sources. E0 E1 E2 E3
+Our heuristics also explicitly use capacity as an important
+factortodecideroaddirections. Ourproposedheuristicscan (1,−) (2,2/−) (3,−)
+consistently reduce evacuation time by more than a third.
+[cost, (flow /) edge capacity]
+In addition, each heuristic has its own set of properties. {supply>0 or demand<0}
+D
+4. PROPOSEDHEURISTICS
+{−60}
+In this section, we introduce two different approaches to
+generate contraflow network configurations. The first ap- Figure 4: Time Expanded Version of the Graph in
+proach is tailored to the properties of contraflow and flow Figure 1
+theory using a greedy algorithm, while the other approach
+exploits combinatorial optimizationtechnique.
+In the above definition, the (V , V ) edge is called
+4.1 Flip High FlowEdge(FHFE): id,t id,t+1
+aholdoveredgebecausewhenaflowrunsthroughV and
+id,t
+A Greedy Approach
+V itmeansthatevacueescorrespondingtotheflowsize
+id,t+1
+are staying in the same vertex V during the time period
+id
+4.1.1 TimeExpandedGraphand t and t+1. On the other hand, the (V , V ) edge is
+id1,t1 id2,t2
+MinimumCostFlowTheory called a movement edge because evacuees corresponding to
+To understand the details of FHFE algorithm, it is nec- thesizeofflowrunningthroughthetwoverticesaremoving
+essary to have related background knowledge. Thus, two from V id1 to V id2 in original network G. In Figure 4, edge
+important concepts are described in this subsection: time A0-A1 is an example of a holdover edge while edge A0-B1
+expanded graph and minimum cost flow theory. is an example of a movement edge.
+We can consider the time expanded graph as a discrete ThetimehorizonT shouldbegreaterthanthefinalevac-
+time expansion of a staticnetwork flow problem[12]. Given uation time. Thus we need to set an arbitrary great value
+adirectednetworkG(V,E),wecandefinethetimeexpanded to T when we run a case the first time. After the first run,
+graph G in the followingway. weshouldreduceT asclosetotheevacuationtimeaspossi-
+T
+ble to reduce system memory and run time. The unit time
+Definition 1. Let G(V,E) be a directed network with V should not necessarilybe 1 second. The choice of unit time
+the set of vertices with initial occupancy V and vertex depends on the model realismand complexity.
+occ
+capacityV andEthesetofedgeswithtraveltimeλ It would be easy to understand if we follow the steps of
+cap id1,id2
+and edge capacity. The time expanded graph G (V ,E ) constructing the time expanded graph shown in Figure 4
+T T T
+associatedwithG(V,E)overatimehorizonT isdefinedas: derived fromFigure 1. ThegraphinFigure1 willbecalled
+S is super source and D is super destination. ’originalgraph’inthisdescription. Letusstartwithshowing
+V := {V | id ∈ vertex id of V and t = 0, 1, ···, T} hownodesaregeneratedintimeexpandedgraph. Eachcol-
+T id,t
+E := umnnodes(e.g.,A0,B0,...,E0)inthetimeexpandedgraph
+T
+{(V , V ) | id ∈ vertex id of V and t = 0, ···, T-1} inFigure4correspondtotheoriginalgraphatthegiventime
+id,t id,t+1
+∪ {(V , V ) | id1, id2 ∈ vertex id of E and t2 (e.g., time 0). Thus each node id in time expanded graph
+id1,t1 id2,t2 id1,id2
+= t1 + λ } (e.g.,’A0’)representsthecombinationofnodeidinoriginal
+id1,id2
+∪ {(S, V ) | id ∈ vertex id of V with V > 0} graph(e.g.,’A’)andtime(e.g.,time’0’). Weduplicateorig-
+id,0 occ
+∪ {(V , D) | id ∈ vertex id of V with V = ∞ and t = inal graph over time period from 0 to T (time horizon). At
+id,t occ
+1, ···, T} first,Tshouldbesetthevaluelargeenoughtoexceedevac-
+253
+
+===== PAGE 6 =====
+
+uation time. If we get approximate evacuation time later, Edge Flow Edge Flow
+the T should reduce to slightlygreater than the evacuation A-B 59 D-B 17
+time to save memory and reduce running time. In the next B-E 42 B-D 15
+step we add super source(id ’S’) with supply corresponding C-D 26 D-C 6
+tothetotalnumberofevacueesinoriginalgraph(e.g.,40+ B-A 19 E-B 0
+20 = 60) and super destination(id ’D’) with demand of the D-E 18 E-D 0
+samevalue of supplyinnegative. Now wegenerated allthe
+necessary nodes in time expanded graph. Table 1: Flow History of the Simple Network in
+Edges are constructed in the following way. Edges from Figure 1 used for FHFE
+super source ’S’ go to the nodes with initial occupancy at
+{40,40} {0,10}
+time 0 (e.g., A0 and C0). Edges to super destination ’D’
+A (1,7) B
+come from the destinations in original graph at time > 0.
+Edgesconnectingtwonodeswithsamenodeidareholdover (1,5)
+edges. Ifflowgoesthroughtheholdoveredge,itcorresponds
+toevacueesstayingfromtimettotimet+1(e.g.,flowfrom (1,4) E {0,−}
+A0 to A1 means that evacuees stay at node A from time
+0 to 1). Edges connecting two nodes with different node
+ids are movement edges. If flow goes through the move- (4,2)
+C (1,5) D
+ment edge, it corresponds to evacuees running between the
+nodes (e.g., flow from A0 to B1 means that evacuees run {20,20} {0,10}
+from A to B from time 0 to 1). Especially, all the holdover
+{initial occupancy, vertex capacity}
+edges and movement edges have 0 travel time. Only edges (travel time, edge capacity)
+between destination vertices and super destination D have Evacuation Time: 11
+travel time corresponding to their time. This special travel
+time assignment is the key point of a time expanded graph Figure 5: Contraflowed Configuration of the Simple
+and enables minimum cost flow theory. Network in Figure 1 using FHFE
+Afterconstructingthegraphstructure,wesendflowfrom
+S to D through time expanded graph. One example flow is
+thethickedgesonthefigure. Themaximumcapacityalong 4. For the first m% of edges in the sorted edge set,
+the path is 2. Thus, only two evacuees can escape through change the direction of each edge toward the direction
+the path. The travel times of edges (A,B) and (B,E) in of larger flow;
+original graph are respectively 1. Thus, the two evacuees 5. Apply minimum cost static flow network algorithm
+shouldgothroughnodeE2ontimeexpandedgraphbecause to the configuration from step4 to get the final
+it takes two time units in original graph. If we find a set of evacuation time;
+shortestpathsbasedonavailablecapacity,thesetnaturally
+IfweuseanexistingminimumflowprogramsuchasNET-
+becomes evacuation plan because each flow amount in the
+FLO[15]orRelaxIV[1],theprogramproducesaflowhistory
+flowsetcorrespondstoagroupofevacueesescapinginmin-
+ofeachedgeaswellasatotalcostvalue. Instep3,theflow
+imal evacuation time. The description in this paragraph is
+historyvalueisassignedtoeachedgeintheoriginalnetwork
+basedonminimumcostflowtheory. Thesolutionproduced
+configurationandedgesaresortedbyflowvaluesintheedge
+by minimum cost flow algorithm is always optimal in the
+set. Edgeswithmoreflowvalues tendtobemoremeaning-
+sense that we can acquire the minimum evacuation time.
+ful in the context of contraflow. Thus, we select only the
+4.1.2 FHFE first m% of suchmeaningful edges and flipthem infavorof
+increasing outbound capacity. The selection percentage m
+ThebasicassumptionofFHFEheuristicisthattheedges
+isadegreeofcontraflowparameter. Theeffectofparameter
+more frequently used in the original network configuration
+m will be examined in the evaluation section.
+for an evacuation plan help determine the selection of edge
+Thetimeexpandedgraphforoursimplecaseintheprob-
+flippings. Therefore, we need to know the flow history of
+lem definition section is illustrated in Figure 4. Table 1
+theoriginalnetworkconfigurationinadvancebyapplyinga
+shows the flow history generated by applying the minimum
+minimum cost flow algorithm on the time expanded graph
+cost flow algorithm to the time expanded graph and sorted
+oftheoriginalnetworkconfiguration. Ifaflowhistoryvalue
+by flow values in descending order. If we send flow through
+isassignedtoeachedge,wecanchoosethedirectionoftwo-
+(A,B)severaltimeinoriginalgraph(e.g.,flow2throughA-
+way edges in favor of increasing outbound capacity in the
+B-Eandflow1throughA-B-D-E,etc.),thecumulativevalue
+following way. If one of the two-way edges in the original
+will be 40 until the initial occupancy 40 empties. Someone
+networkconfigurationisusedwhiletheoppositeedgeisnot
+may wonder why flow between A and B is 59, not 40 in
+used, wefliptheoppositeedge toincrease capacity. If both
+Table 1. It is because some portion of flows oscillated be-
+edgesareusedintheoriginalnetworkconfiguration,weflip
+tween A and B. The flow 19 of edges (B-A) offsets flow 59
+the edge which has less flow history.
+of edges (A-B). Suppose m is 70%. Then, we can flip the
+Algorithm FHFE; firstsevenedgesA-B,B-E,C-D,B-A,D-E,D-BandB-Din
+1. Generate a time expanded graph from the given network; supportofincreasingcapacity. Especiallyforedgesbetween
+2. Apply minimum cost static flow network algorithm on BandD,theflowfromDtoBisgreaterthanfromBtoD.
+the time expanded graph; Thus,wefixtheedgefromDtoB.Theresultingconfigura-
+3. Set flow history value from step2 to each edge and tion is shown in Figure 5. With the new configuration, the
+sort edges by flow values in descending order; evacuation time is reduced from 22 to 11.
+254
+
+===== PAGE 7 =====
+
+emit
+noitaucave
+25
+evacuation time
+20
+15
+local minimum
+global minimum 10
+5
+network configurations
+Figure 6: State Space Landscape of A Contraflow
+Figure 7: Possible Iterations of the SA for the Sim-
+Problem
+ple Network used in Figure 1
+For the run time analysis, suppose that there are n ver- functionvalueimprovesorthegapbetweentheoldobjective
+tices and m edges in the original network G with initial functionandnewobjectivefunctionofinferiorperturbation
+occupancy p. The run time of step 1 and 4 in the FHFE iswithintheformulatedprobability. Byaccepting somein-
+is trivial. The step 3 takes O(mlogm) if we use well-known feriorperturbations,SAopensthepathtoaglobaloptimum.
+sortingalgorithmslikeheap,mergeorquicksort. Thus,the The SA algorithmhas the following structure[18].
+dominant run timepart of the FHFE is step2 and 5 where
+we apply minimum cost maximum flow algorithm to the procedure SimulatedAnnealing;
+time expanded network G T . Let T be the time horizon, or 1. S := S 0 ; {initialsolution}
+maximumevacuationtime. Then,theupperboundofnodes 2. T := T 0 ; {initial temperature}
+inG T isN =n(T +1). TheupperboundofedgesinG T is 3. iterations := i 0 ; {initial# of iterationsof inner loop, ≥ 1}
+M =(n+m)T +m-Σ (i,j)∈m λ ij whereλ ij denotestravel 4. repeat
+time of edge (i,j)[12]. The asymptotically fastest method 5. repeat
+forfindingamin-costmax-flowisdesignedby[19]andruns 6. NewS := perturb(S);
+in O(MlogN(M + NlogN)) in G . 7. if (h(NewS)<h(S)) or (random<e(h(S)−h(NewS))/T)
+T
+If we assume that the transportation network is sparse 8. then accept := true;
+with the average degree of vertices 3, we can consider that 9. else accept := false;
+m=(3*n)/2=1.5n. Wecanalsoassumethatthemaximum 10. until inner loop has been repeated iterations times;
+evacuationtimeT isproportionaltotheoccupancyvaluep. 11. T := α*T; iterations := β*iterations;
+Then, we can assume that N is proportional to np and M 12.until out of time;
+isalsoproportionaltonp. Thus,theaboveruntimecanbe
+reduced in the followingway. (h: objective function, S: current state,
+O(MlogN(M + NlogN)) NewS: new perturbation,
+= O(nplognp(np+ nplognp)) random: pseudo-random number in the range [0,1],
+= O(n2p2log2(np)) T: cooling temperature)
+To apply SA to our contraflow problem, weconfigure the
+4.2 Simulated Annealing (SA)
+following factors. First, the initial state is the original net-
+IfwecaninterpretthecontraflowproblemasNP-complete, work configuration for evacuation planning. Second, our
+wecanfocusonfindinga”good”solutionratherthantrying perturbation is based on flipping an edge (↑↑, ↓↑ and ↓↓).
+tofindanoptimalsolution. Ifweassigntheevacuationtime Third, the objective function is evacuation time. Fourth,
+toagivensystemasacostfunctionorobjectivefunction,the the cooling schedule and termination condition can be con-
+”goodness”ofacontraflowednetworkcanbequantitatively figured with experiment parameters. Finally, the order of
+measured. Thus, if we draw a state space landscape with flipping is another random factor during simulation.
+evacuation times, our problem is equivalent to the search It is known that SA is not always able to find the global
+problemoffindingthelowestvalley(seeFigure6). Inother optimum,butcanfindminimumvaluesthatareclosetothe
+words,wecaninterpret thecontraflow problemasa combi- global minimum. In addition, the search landscape should
+natorialoptimizationproblemduetoitsNP-completechar- nothaveanoverlysteepcurve. Thatis,thewidthofvalleys
+acteristic. should be approximately proportional to their depth. We
+Simulated annealing (SA) is a general purpose combina- will consider these elements in the evaluation section and
+torial optimization technique formulated by Kirkpatrick et examine how the contraflow search problem is suitable to
+al. in 1983[18]. The SA method was created as an analogy the SA method.
+toannealingprocessofliquidcoolingwiththegoalofescap- Figure7isanillustrativeexampletoshowhowtheSAcan
+ingfromlocalminimaonacombinatorialsearchlandscape. behave as each edge is flipped in the graph used in Figure
+Many applications have been reported to utilize SA as a 1. First two flips do not change evacuation time and draw
+tool to solve large-scale combinatorial optimization prob- a plateau. A change from the third to the fourth configu-
+lems, from a typical traveling salesman problem to compli- ration causes inferior movement which is allowed in the SA
+cated chip layout design. algorithm. In the fifth configuration, the evacuation time
+Thenewperturbationisacceptedwhenthenewobjective finally reaches the optimal state.
+255
+
+===== PAGE 8 =====
+
+Original Evacuation Network
+* Time horizon T
+* Source Vertices
+with Occuapncy Data Network Perturbed Network
+7 11 23 * Destination Vertices Transform
+Tool
+47 Simulated Annealing
+Time Expanded Evacuation Network
+5 18 24 Flow History Minimum Cost No
+12
+2 8 10 FHFE C N o et n w tr o a r f k lowed F R l e o l w ax S IV olver: E T v im ac e u a a s tion Ter C m o i n n S d a a t i t i t i o i s o n f n ied?
+4 13 19 O Fu b n je c c ti t o iv n e Yes
+14 25 Final Evacuation Time
+15 20 26
+1 9 27 Figure 9: Experiment Design
+3 16 21 31
+46 28 45
+22 38
+6 17 29 39 300
+30 32
+34
+41
+33 35 40
+42 250
+36 43
+37 44
+200
+Figure 8: Nuclear Power Plant Case Map
+150
+5. EVALUATION 100
+5.1 Experiment Setup 50
+We implemented and evaluated the algorithms presented
+inthispaper. The languageusedwasC++ andtheexperi- 0
+0 20 40 60 80 100
+mentswereperformed onadual CPUPentiumIII 650MHz
+workstation with 2GB of memory, running Linux. A pro-
+gram representing graph structure was implemented with
+Java.
+Figure8showsavirtualscenarioofanuclearpowerplant
+failure in Monticello, Minnesota. There are fourteen cities
+around the facility and one destination shelter. The demo-
+graphicdataarebasedontheCensus2000populationdata.
+The total number of evacuees is about 42,000. If the given
+situation is converted to a graph representation, the graph
+has47verticeswith148edges. Thisdatasetseemstobetriv-
+ialsizecomparedwithlargetransportationnetworkwehave
+seen. However, we need to select adequate size of dataset
+tohandleiterativeexperimentsofsimulatedannealing. The
+interstate highway (path 2,4,15,21,45,29,33,36 and 43) has
+larger capacity than other edges. The destination is vertex
+40 on the bottom right corner of the map. The evacuation
+time with the original network configuration is 272 min (4
+hr 32 min).
+WealsoimplementedanetworkgeneratorinJavatocon-
+duct scalability experiments. The input file format to gen-
+erate a network is similar to that of NETGEN[16] which
+generates transportation network with capacity constraints
+and initial supplies based on input parameters. When we
+changed a network size, the proportion between the num-
+ber of nodes and edges was maintained according to the
+Monticello network. Edge lengths and capacity values were
+randomlygeneratedwithintherangeofMonticellonetwork.
+Therefore,theresultingsyntheticnetworkswereclosetoreal
+networks.
+Figure9describes theexperiment designtoapplyoural-
+)nim(
+emiT
+noitaucavE
+evacuation time
+Percentage of Edges Contraflowed (%)
+Figure 10: Evacuation Time with respect to Degree
+of Contraflow using FHFE
+gorithms to the Monticello nuclear power plant case. First,
+the original evacuation network is given with source and
+destination vertices. The network transform tool converts
+theinput networkintoa timeexpanded graphwithagiven
+time horizon T[12]. Second, we use RelaxIV as a minimum
+cost flow solver. We can acquire flow history and evacua-
+tion time from the solver. The FHFE algorithm takes the
+flowhistoryasinputandgeneratesacontraflowednetwork.
+In the simulated annealing algorithm, the original network
+configuration is used as an initial solution. The perturbed
+networkmeansanewlygeneratednetworkconfigurationby
+flippinganedgeateachiterationstep. Theevacuationtime
+fromRelaxIVisusedastheobjectivefunctionvaluetoassess
+theperturbed network. Whentheiterativeprocess satisfies
+a certain terminationcondition, it generates a final evacua-
+tion time.
+5.2 Flip HighFlow Edge(FHFE)
+Figure 10 shows the results of applying the FHFE algo-
+rithm. Thexaxisrepresentsthedegreeofcontraflowandthe
+y axis indicates evacuation time. The degree of contraflow
+parameter mdescribed inthealgorithmdescription section
+selects the first m% of total edges. The best result is 170
+minutes at 40% and 60% degree of contraflow. When the
+percentage of edges contraflowed is 0%, it is equivalent to
+256
+
+===== PAGE 9 =====
+
+7 11
+23
+50
+47
+40
+5 18 24
+2 12 30
+8
+10
+4 20
+13
+19
+14
+25 10
+15 20 26
+1
+9 27
+3 16 21 31 0 10000 20000 30000 40000 50000 60000 70000
+46 28 45 17 22 29 35 38
+6 39
+30 32
+34
+41
+33 40
+42
+36 43
+37 44
+Figure 11: Configuration of 20% Contraflow Degree
+using FHFE
+the evacuation of the given original network configuration.
+We observe that there is a steep improvement at 20% of
+contraflowededges. The FHFE algorithmchooses the most
+promisingedgesandthencontraflowsthemfirst. Therefore,
+it is natural to observe such an improvement with a small
+percentage of contraflow degree. Another interesting obser-
+vation is that a high percentage of contraflow degree does
+notalwaysleadtobetterevacuationtime. Thismeansthat
+someedgesshouldbeusedwithbothdirectionsratherthan
+contraflowing them.
+Figure 11 is a snapshot of network configuration when
+thedegree of contraflow is20%. Wecan observethat edges
+with high capacity and edges close to the destination are
+contraflowed.
+5.3 Simulated Annealing (SA)
+Experiments were performed with three different initial
+temperatures 20, 10 and 5. In all cases, the temperature
+update constant α was set to 0.9. The iteration increasing
+factor β was set to 1.1 and the inner loop started from 50
+and the outer loop terminated at 10. For each initial tem-
+perature, 30 different random seeds were applied to change
+the order of flippings.
+Tworandomseedsatinitialtemperature5generatedevac-
+uation time 166 minutes, which is better than that of the
+FHFEalgorithm. Theseresultscanbeinterpreted asbeing
+close to a global minimum by escaping from several local
+minimawiththehelpofthesimulatedannealingcharacter-
+istic. Interestingly, the lowest initial temperature produced
+thebest result,whichisnot thecasegenerallyinsimulated
+annealing. Thesearchspacelandscapeofcontraflowconfig-
+urationsconsistedofwideplateausandsuddenjumpsofthe
+objective function. Therefore, a significant level of stochas-
+tic factors prevented the experiment from configuring ap-
+propriate parameters.
+5.4 Scalability
+Inthescalabilityexperiment,wegeneratedsynthetictrans-
+portation networks with sizes proportional to the Monti-
+cello case. When we increased a network size, the propor-
+)emit
+tinu(
+emit
+noitaucave
+FHFE
+SA
+No Contraflow
+number of evacuees
+Figure12: EvacuationTimeWithRespectToNum-
+ber of Evacuees
+tionbetweentheverticesandedgescorrespondedtothatof
+the Monticello case. In addition, randomly generated edge
+lengthandcapacityvalueswerealsowithintherangeofthe
+Monticello case. Thus, we were able to generate networks
+close to a real situation. In this experiment, we wanted to
+tackle two scalabilityissues.
+• EffectsofNumberofEvacueesThepurposeofthis
+experiment was to evaluate how the number of evac-
+uees affects evacuation time. We fixed the total num-
+berofverticesaswellasthenumberofsourceandsink
+vertices. Onlythenumberofevacueeswasvariedfrom
+5,000to70,000. Figure12presentstheresultsregard-
+ing evacuation time. The evacuation time linearly in-
+creasesforboththeoriginalnetworkandcontraflowed
+network. Although the SA approach produced better
+evacuationtimes,theFHFEalsoproducedevacuation
+times close to those of the SA.
+• Running Time with respect to Network SizeIn
+thisexperiment,weevaluatedhowthenetworksizeaf-
+fects the performance of the algorithm. The elements
+including vertices, edges and the number of evacuees
+changed proportionally with the number of vertices.
+Figure 13 presents the results. The iterative property
+ofSApreventedusfromtryingbignetworks. Onlynet-
+works with vertices from 50 to 150 were tested. Our
+FHFE algorithm showed almost zero run time with
+small networks while the SA showed rapidly increas-
+ing run time. However, FHFE also showed quadratic
+run time with respect to number of vertices when we
+increased the size of networks to 3000. This result
+corresponds to the run time analysis of the FHFE.
+6. DISCUSSION
+In this section, we discuss related knowledge to under-
+stand our analysis of the contraflow problem. Specifically,
+ourworkisrelatedtotworesearchproblems. Oneismathe-
+maticalanalysisofevacuationplanning. Theotherisanaly-
+sisofcombinatorialoptimization. Previousworksonmath-
+ematical analysis of evacuation planning have focused on
+macroscopicapproaches usingflow models[7,13]. [12]stud-
+ied a discrete time dynamic network flow model with algo-
+rithms for evacuation planning in general. [17] proposed a
+257
+
+===== PAGE 10 =====
+
+25
+20
+15
+10
+5
+0
+50 100 150
+)etunim(
+emit
+gninnur
+FHFE SA
+number of vertices
+20
+15
+10
+5
+0
+100 500 1000 2000 3000
+)etunim(
+emit
+gninnur
+Algorithm Evacuation Time
+Original Configuration 272 min
+FHFE 170 min
+Simulated Annealing 166 min
+Table 2: Evacuation Time Comparison on Monti-
+cello Nuclear Power Plant Case
+7. CONCLUSIONAND FUTUREWORK
+Currentevacuationproceduresheavilydependontheuse
+of surface traffic through the limited capacity of road net-
+works. Fromthisperspective,contraflowbecomesoneofthe
+FHFE
+key solutions of evacuations on the existing transportation
+infrastructure. Due to the nature of transportation net-
+works, we modeled evacuation situation using graph data
+structure and analyze it with flow theory. In our model,
+one or more source nodes can be added, whereas existing
+algorithmsonlycoverthesinglesourcesituationduetocon-
+flictsofoptimalpathsfromdifferentsourcenodes. Multiple-
+sources and multiple-destinations contraflow problem be-
+longstoacategoryofNP-completenessproblems. Ourmain
+contribution lies in the fact that our proposed approaches
+number of vertices
+efficientlyaddresstheNP-completecontraflowproblemwith
+the cost model and experimental validations. In this paper
+Figure13: RunningTimeWithRespectToNetwork
+we presented two contraflow approaches and their evalua-
+Size
+tionswithboth realand syntheticnetworks. Hereisa brief
+summary of the approaches.
+• FHFE generates promising results in spite of its fast
+run time. Evacuation planning software needs to be
+close-to-optimal solution for evacuation planning while sig- interactive due to various combinations of input pa-
+nificantlyreducingcomputationalcost. Theirfastalgorithm rameters (e.g., daytime v.s. night time population)
+canbecombinedwithoursinthefuturework. NETFLO[15] andchangingdatasets(e.g.,constructionzone). Thus,
+and Relax4[1] are famous solvers for linear minimum-cost running time is a critical factor when we implement
+flow problems. Especially, Relax4 contributed to the con- planning software for clients. A well designed heuris-
+struction of our algorithms by quickly calculating the evac- tic algorithm that is tailored to contraflow problems
+uation time of a given network using dual ascent methods has some advantages over general iterative methods.
+and auction algorithm. The number of contraflowed edges is adjustable. The
+To utilize general combinatorial optimization heuristics scalability of FHFE is superior to that of the SA ap-
+tosolveaspecificproblemrequires muchexperience. Thus, proach.
+it is necessary to read various applications in the domain.
+• Simulated Annealing reveals the possibility of the
+[18] formulated a class of adaptive heuristics for combina-
+existence of a global minimum. In addition, the ap-
+torial optimization including probabilistic hill-climbing and
+plication of SA to the contraflow problem has never
+simulated annealing. [8] provides a broad overview of NP-
+beenobservedinoptimizationresearcharea. Selecting
+completeproblemsandtheirproofs. [3]studiedtheapplica-
+theappropriateperturbationandparametervaluesfor
+tionofsimulatedannealingtothedrawingofgraphsnicely.
+experiments is of critical importance in simulated an-
+The paper gave valuable information from their trial and
+nealing.
+error. [10, 11] presented a broad overview in the domain of
+annealing. Ourworkappliestheinsightsfromtheseprevious Table2summarizestheevacuationtimeofourapproaches
+studies to solve contraflow problem using general combina- for the Monticello case. We can observe that both ap-
+torial techniques. proaches significantly reduce evacuation time and that the
+With the discussion of related knowledge, it is worth ex- FHFE can generate a contraflow networkwhose evacuation
+ploring possible solutions of contraflow problem. General time is competitive withthat of the SA.
+search algorithms such as A* have difficulty in defining the Eventhoughcontraflowoperationonurbanarterialroad-
+goal state of contraflow problem because the optimal net- waysandlongsectionsofinterstatefreewaysforevacuations
+workconfigurations leadingtominimalevacuation timeex- is accompanied by complicated issues of safety, accessibil-
+istinasetofcombinatorialpossibilitieswithunknownmin- ity and cost, our proposed algorithms for simplified situa-
+imal evacuation time. Dynamic programming algorithms tions would be considerably helpful to planners designing
+such as branch and bound approach cannot be applied be- contraflow plans because the objective of our research is to
+causecontraflowproblemdoesnotguaranteesub-optimality minimizeevacuationtime,whichisanessentialpartofplan-
+betweenthegivenstageanditssub-problems. Generalsearch ning.
+techniquessuchashillclimbingcanimprovethegivenstate, More in-depth research is required for contraflow algo-
+but mostlylead to the local minima. rithms. First, other possible methods should be examined.
+258
+
+===== PAGE 11 =====
+
+Forexample,wecanflipapathinsteadofanedge. Second, [8] M. R. Garey and D. S. Johnson. Computers and
+in-bound traffic demand should be considered. Emergency Intractability: A Guide to the Theory of NP
+vehicles for traffic officers or fire fighters should have pre- Completeness. Freeman, 1979.
+empted network capacity. Third, partial lane reversal and [9] R. Greiner. Probabilistichill-climbing: Theory and
+capacity varying edge need to be incorporated in the mod- applications. Proceedings of the Ninth Canadian
+eling. Finally, a more extensive parameter set of simulated Conference on Artificial Intelligence, pages 60–67,
+annealing needs to be tested for in-depth knowledge of its 1992.
+applicabilityto contraflow problems. [10] B. Hajek. A tutorialsurvey of theory and applications
+of simulatedannealing. 24th IEEE Conference on
+8. ACKNOWLEDGMENTS Decision and Control, pages 755–760,1985.
+We are particularly grateful to members of the Spatial [11] B. Hajek. Cooling schedules for optimal annealing.
+DatabaseResearchGroupattheUniversityofMinnesotafor Mathematics of Operations Research, 13(2):311–329,
+theirhelpfulcommentsandvaluablediscussions. Especially, 1988.
+ourevacuationresearchmembersincludingQingsongLuand [12] H. W. Hamacher and S. A. Tjandra. Mathematical
+BetsyGeorgegaveusvaluablecomments. KimberlyKoffolt modeling of evacuation problems: State of the art.
+increasedthereadabilityofourpaperbyproofreadingit. We Pedestrian and Evacuation Dynamics, pages 227–266,
+arealsothankful foruseof theprogramRelaxIVdeveloped 2001.
+by the CRIFOR research group. [13] H. W. Hamacher and S. Tufekci. On the use of
+Thisworkissupportedbyagrant(contractnumber81655) lexicographic min cost flows in evacuation modeling.
+from the Minnesota Department of Transportation. Naval Research Logistics, 34:487–503,1987.
+[14] G. Hamza-Lup, K. A. Hua, M. Le, and R. Peng.
+9. REFERENCES Enhancing intelligent transportationsystems to
+improveand support homeland security. In In Proc. of
+[1] D. Bertsekas and P. Tseng. Relax-iv: A faster version
+IEEE International Conference on Intelligent
+of the relax code for solving minimum cost flow
+Transportation Systems, 2004.
+problems. In LIDS(Laboratory for Information and
+[15] J. L. Kennington and R. V. Helgason. Algorithm for
+Decision Systems)-P-2276. M.I.T., Cambridge, MA,
+Network Programming. Wiley and Sons, 1980.
+1994.
+[16] D. Klingman. A program for generating largescale
+[2] B. V. Cherkassky, A. V. Goldberg, and T. Radzik.
+capacited assignment,transportation, and minimum
+Shortest paths algorithms: theory and experimental
+cost flow network problems. In Management Science,
+evaluation. In SODA(Symposium on Discrete
+pages 20:814–822,1974.
+Algorithms) ’94: Proceedings of the fifth annual
+[17] Q. Lu, Y. Huang, and S. Shekhar. Evacuation
+ACM-SIAM(Society for Industrial and Applied
+planning: A capacity constrained routing approach.
+Mathematics) symposium on Discrete algorithms,
+ISI(International Symposium on Isotopomers) 2003,
+pages 516–525. Society for Industrial and Applied
+pages 111–125,2003.
+Mathematics, 1994.
+[18] S. Nahar, S. Sahni, and E. Shragowitz. Simulated
+[3] R. Davidson and D. Harel. Drawing graphs nicely
+annealing and combinatorial optimization.In 23rd
+using simulatedannealing. ACM Transactions on
+IEEE Design Automation Conference, pages 293–299,
+Graphics, 15(4):301–331,October 1996.
+1986.
+[4] J. G. Doheny and J. L. Fraser. Mobedic - a decision
+[19] J. Orlin. A faster stronglypolynomial minimum cost
+modeling tool for emergency situations.Expert
+flow algorithm. In STOC ’88: Proceedings of the
+Systems With Applications, 10:17–27,1996.
+twentieth annual ACM symposium on Theory of
+[5] M. Ebihara, A. Ohtsuki, and H. Iwaki. A model for
+computing, pages 377–387.ACM Press, 1988.
+simulating human behavior during emergency
+[20] G. Theodoulou. Contraflow evacuation on the
+evacuation based on classificatoryreasoning and
+westbound i-10 out of the city of New Orleans.
+certainty value handling. Microcomputers in Civil
+Master’s thesis, Louisiana State University, 2003.
+Engineering, 7:63–71,1992.
+[21] B. Wolshon. One-way-out: Contraflow freeway
+[6] G. Ford, R. Henk, and P. Barricklow.Interstate
+operation for hurricane evacuation. Natural Hazards
+highway 37 reverse flow analysis - technical
+Review,2(3):105–112,2001.
+memorandum. Technical report, Texas Transportation
+Institute, 2000. [22] B. Wolshon, E. Urbina, and M. Levitan. National
+review of hurricane evacuation plans and policies.
+[7] L. R. Ford and D. R. Fulkerson. Flows in Network.
+Technical report, LSU Hurricane Center, Louisiana
+Princeton University Press, 1962.
+State University, Baton Rouge, Louisiana, 2002.
+259

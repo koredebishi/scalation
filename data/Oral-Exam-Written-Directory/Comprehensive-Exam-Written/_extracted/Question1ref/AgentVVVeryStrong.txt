@@ -1,0 +1,967 @@
+===== PAGE 1 =====
+
+Preprint. Underreview.
+AIVV: Neuro-Symbolic LLM Agent-Integrated Verification
+and Validation for Trustworthy Autonomous Systems
+JiyongKwon1 UjinJeon2 SoojiLee3 GuangLin1,4
+1SchoolofMechanicalEngineering,PurdueUniversity
+2SchoolofElectricalandComputerEngineering,PurdueUniversity
+3DepartmentofComputerScience,PurdueUniversity
+4DepartmentofMathematics,PurdueUniversity
+WestLafayette,IN47907,USA
+{kwon165, ujeon, lee5264, guanglin}@purdue.edu
+Abstract
+Deeplearningmodelsexcelatdetectinganomalypatternsinnormaldata.
+However, they do not provide a direct solution for anomaly classifica-
+tion and scalability across diverse control systems, frequently failing to
+distinguish genuine faults from nuisance faults caused by noise or the
+controlsystem’slargetransientresponse. Consequently,becausealgorith-
+mic fault validation remains unscalable, full Verification and Validation
+(V&V)operationsarestillmanagedbyHuman-in-the-Loop(HITL)analysis,
+resultinginanunsustainablemanualworkload. Toautomatethisessen-
+tial oversight, we propose Agent-Integrated Verification and Validation
+(AIVV),ahybridframeworkthatdeploysLargeLanguageModels(LLMs)
+asadeliberativeouterloop. Becauserigoroussystemverificationstrictly
+dependsonaccuratevalidation,AIVVescalatesmathematicallyflagged
+anomaliestoarole-specializedLLMcouncil. Thecouncilagentsperform
+collaborativevalidationbysemanticallyvalidatingnuisanceandtruefail-
+uresbasedonnatural-language(NL)requirementstosecureahigh-fidelity
+system-verificationbaseline. Buildingonthisfoundation,thecouncilthen
+performssystemverificationbyassessingpost-faultresponsesagainstNL
+operationaltolerances,ultimatelygeneratingactionableV&Vartifacts,such
+asgain-tuningproposals. Experimentsonatime-seriessimulatorforUn-
+mannedUnderwaterVehicles(UUVs)demonstratethatAIVVsuccessfully
+digitizestheHITLV&Vprocess,overcomingthelimitationsofrule-based
+fault classification and offering a scalable blueprint for LLM-mediated
+oversightintime-seriesdatadomains.
+1 Introduction
+Inmission-criticaldomainssuchasUnmannedUnderwaterVehicles(UUVs),automated
+anomaly detection systems must process telemetry that is noisy, highly stochastic, and
+sparseingenuinefaultevents(Pangetal.,2021). Contemporaryresearchreliesheavilyon
+deeplearningarchitectures(e.g., RNNs, Transformers)coupledwithrobustuncertainty
+quantification to establish rigorous residual bounds and control the marginal error rate
+(Hundmanetal.,2018;Tulietal.,2022;Angelopoulos&Bates,2021). Whilethesemathemat-
+icalmodelsarehighlyefficientcomputationallyandexcelatdetectingextreme,catastrophic
+failures,theydonotprovideadirectsolutionforfaultclassificationinsystemredesignand
+development. Consequently,theyfrequentlyfailtodistinguishgenuinefaultsfromnui-
+sancefaultscausedbynominalenvironmentalnoiseorthecontrolsystem’slargetransient
+responses.AlthoughJeonetal.(2025)proposedasolutiontoensurepropercoverageinfault
+detectionandidentification,theproposedalgorithmdoesnotdemonstrateclearscalability
+across diverse systems. To detect anomalies such as gradual sensor drift, mathematical
+safetyboundsmustbetightened,whichinevitablytriggersacascadeoffalse-positivealarms.
+1
+6202
+rpA
+2
+]IA.sc[
+1v87420.4062:viXra
+
+===== PAGE 2 =====
+
+Preprint. Underreview.
+Furthermore,thesepurelymathematicalsystemsarelimitedtobinarydetection;theycannot
+assessdownstreamsystemimpactorproposecorrectivecontrolre-designs.
+Because algorithmic fault validation remains unscalable, managing these false-positive
+anomaliesandperformingrigorousVerificationandValidation(V&V)hasheavilyrelied
+on the Human-in-the-Loop (HITL) paradigm, in which human domain experts provide
+thesemanticreasoning(Zanzotto,2019). However,humanoperatorsintroducesignificant
+latencyandcannotscaletomonitorthousandsofsensorstreamssimultaneously(Cummings,
+2014). Whileamathematicalsensorflagsafaultinmilliseconds,ahumanengineeringteam
+mayrequireseveralminutestohourstomanuallytriagethealert,analyzethetelemetry,and
+safelyvalidateacontrollerretuningtoverifythesystem. Thisresultsinanunsustainable
+manualworkload,highlightingtheurgentneedtoautomatethisessentialoversight.
+Toautomateandreducethedelayofthisoversight,LargeLanguageModels(LLMs)offera
+compellingalternativeforrapidsemanticreasoning. Theindustryincreasinglyseeksthe
+reasoningcapabilitiesofLLMstointerpretcomplexphysicalenvironments;however,their
+deploymentinmission-criticalautomatedsystemsremainsaformidablesystemsengineer-
+ingchallenge. WhileLLMsexcelatzero-shotdiagnosis,theirpropensityforhallucination
+andlackofdeterministicmathematicalrigorprecludetheirdirectintegrationintoreliable,
+real-worldapplications(Jietal.,2023). Hypersensitivitytoshort-livedenvironmentalfluc-
+tuations without strict mathematical bounding can lead to unwarranted mission aborts
+or costly vehicle retrieval operations, ultimately eroding operator trust (Van de Merwe
+etal.,2024). Tomitigatethehallucinationsofstandalonemodels(Duetal.,2023),recent
+researchhasleveragedLLM-basedMulti-AgentSystems(MAS)(Xietal.,2023)todigitize
+thecollaborativecross-validationprocessofahumanengineeringteam. Yet,placingaMAS
+directlyinthecontinuous-timeinferenceloopwouldintroduceprohibitivelatencydueto
+thesequentialnatureofLLMAPIcallsandgenerationtimes.
+Tobridgethegapbetweenmathematicalrigorandsemanticreasoning,andtosafelyauto-
+matetheHITLprocess,weproposeAgent-IntegratedVerificationandValidation(AIVV).
+Itoperatesasatwo-layerhybridneuro-symbolicarchitecturethatstructurallybifurcates
+theworkload: ahigh-speedmathematicalfrontlinerapidlyflagspotentialanomalies,es-
+calatingmathematicallyverifiedlimitbreachestoadeliberativeouterloopmanagedbya
+role-specializedLLMcouncil. Becauserigoroussystemverificationdependsonaccurate
+validation,thecouncilagentsperformcollaborativevalidationbysemanticallyvalidating
+nuisanceandtruefailuresagainstnatural-language(NL)requirementstoestablishahigh-
+fidelitysystemverificationbaseline. Builtonthisfoundation,thecouncilthenperforms
+systemverificationbyassessingpost-faultresponsesagainstnatural-languageoperational
+tolerances,therebygeneratingactionableV&Vartifacts,suchasgain-tuningproposals.
+Contributions. 1) Role-based LLM agents automate V&V processes, resolving fault di-
+agnosesviacollaborativevalidationagainstnatural-languageoperationaltolerancesand
+amajorityvotingsystemtofilterfalsealarms. 2)Weintroduceaneuro-symbolicgating
+mechanismthatcouplesanMCDropoutLSTMandconformalpredictionwithanLLM
+council,ensuringmathematicallyflaggedanomaliesaresemanticallyvalidatedaseither
+nuisanceortruefailureswithnatural-languagerequirements. 3)AIVVtranslatesanomaly
+flagsintostructuredengineeringartifacts(e.g.,gain-tuningproposals),andensuressafe
+onlineadaptationbyexecutingcandidatemodelupdatesonatemporarilyclonedengine
+beforelivepromotion.
+2 RelatedWork
+LLM-Based MAS. LLM-based multi-agent systems (MAS) enable groups of intelligent
+agents to coordinate on complex reasoning and intensive workloads (Chen et al., 2025;
+Tran et al., 2025). In the context of mission-critical verification, a MAS offers significant
+robustnessadvantagesoveramonolithicLLM,notingthatstandalonemodelsactasasingle
+pointoffailureandremainhighlysusceptibletohallucinations(Duetal.,2023).
+HITLandV&V.Theparadigmofoperatorsactingwithinaclosedcontrolloopisdeeply
+establishedviaHuman-in-the-Loop(HITL)frameworks(Licklider,1960;Zanzotto,2019).
+2
+
+===== PAGE 3 =====
+
+Preprint. Underreview.
+Within these environments, Verification and Validation (V&V) is an active process that
+requires analyzing telemetry to safely validate system responses and provide feedback
+on system failure modes. However, Cummings (2014) highlights that as the volume of
+high-frequency sensor streams grows, manual HITL oversight introduces significant la-
+tencyandbecomesaworkloadbottleneck. IncontemporaryagenticAIandruntimever-
+ification research, V&V is typically treated as a static, post hoc procedure that relies on
+offlineverification(Koohestani,2025), renderingstandardLLMevaluationmethodsun-
+suitableforcontinuousoperationaltasks. Unlike(Srinivasanetal.,2025),whichfocuses
+onbroadsimulator-leveldependabilityassurance,AIVVfocusesonmathematicalgating
+andrequirements-groundedengineeringV&Vforhigh-frequencycontrol-systemtelemetry,
+includingsafeguardedadaptationandacontrollergain-tuningproposalforsystemdesign.
+MathematicalParadigmsinLSTM-BasedAnomalyDetection. Data-drivenLongShort-
+Term Memory (LSTM) architectures are standard for anomaly detection in continuous
+controlsystems,mappingcomplextemporaldependencieswithoutexplicitphysicalmodels
+(Malhotraetal.,2015). Recenthybridizedframeworksimproverobustnesstocorrupted
+telemetry,utilizingmechanismssuchasBiLSTM-AttentionforAutonomousUnderwater
+Vehicles(Dong&Huo,2025)andchannel-spatialattentionforindustrialmanufacturing
+(Lobo et al., 2026). To mitigate overconfident predictions, recent approaches integrate
+Uncertainty Quantification (UQ), such as LSTMAE-UQ, which uses Monte Carlo (MC)
+DropouttoapproximateBayesianinferenceandcaptureepistemicuncertainty(Wiessner
+etal.,2024;Gal&Ghahramani,2016). Similarly,aredundancy-basedalgorithmforaccurate
+fault detection was introduced; However, LSTM-based fault detection frameworks still
+facescalabilitylimitationsandoftenrequiredomain-specificdesignstoachieveaccurate
+faultclassification(Jeonetal.,2025). Totranslatethisuncertaintyintostrictoperational
+bounds,ConformalPrediction(CP)isfrequentlyappliedtoprovidefinite-samplemarginal
+coverageguarantees(Angelopoulos&Bates,2021). However,indynamicenvironments,
+suddenshiftsindistributionduringtransientmaneuversviolateCP’sstrictexchangeability
+assumption,leadingtofalsealarms(Barberetal.,2023). Consequently,whilethesemathe-
+maticallyboundedautoencodersexcelatidentifyingstatisticaloutliers(MbakobNdagoua&
+Hasnaoui,2025),theysufferfromcriticallimitations. Furthermore,theirinherentsemantic
+blindnesspreventsthemfromreliablydifferentiatinggenuinefaultsfrommathematically
+identicaltransientresponsescausedbyintentionalmaneuvers. Thisinabilitytoscaleand
+contextually filter nuisance faults establishes the strict requirement for the higher-level,
+reasoning-basedvalidationintroducedbyourframework.
+3 Methodology
+TheAIVVframeworkisdesignedforonlinefailurevalidationandsystemresponsever-
+ificationondynamicUUVyawangletime-seriesdataunderenvironmentalnoise. Each
+incomingsampleisprocessedasasliding-windowsequencethroughamathematicalengine
+andahighlystructured,role-basedMulti-AgentSystem(MAS)poweredbyLLMs.
+Thearchitectureisexplicitlydesignedtogroundlanguagemodelreasoninginstatistical
+reality. The Mathematical Engine Layer provides the computational core by employing
+anLSTMutilizingMonteCarlodropoutforBayesianapproximationtoproduceapoint
+predictionandanepistemicuncertaintyestimate,whileaconformalpredictionmaintainsa
+statisticallyguaranteedconformalboundC .
+α
+Whenthismathematicalboundisbreached,thedecisionlogicandadaptationstrategyare
+controlledbyMAS.Forrigorous,hallucination-resistantexecution,theagentpipelineis
+dividedintothreesequentialphases: deterministicgating,deliberativeadjudication,and
+adaptivefine-tuningwithsafeguards. Thisensuresthatnormaloperationalfluctuationsare
+resolvedatthedeterministiclevel,whiledetectedfaultcasesareescalatedtothecouncilfor
+investigationandavoteontheunderlyingsystem-levelanomaly.
+3
+
+===== PAGE 4 =====
+
+Preprint. Underreview.
+Figure1: AIVVframework,illustratingthesequentialflowofthesystem.
+3.1 MathematicalEngineLayer
+ThisLayerprovidesmathematicalproposalsforpredictiveuncertaintythatdeliverastatisti-
+calcontextfordownstreamLLMs. ItisimplementedasanMCDropoutLSTM f ,which
+θ
+enablesuncertaintyestimationatinferencetime. Foragiveninputsamplex ,themodel
+t
+performsstochasticforwardpassestocomputeapredictivemeanyˆ andstandarddeviation
+t
+σ.
+t
+To establish a strict confidence interval, we integrate a conformal prediction. Using a
+held-outcalibrationset,thepredictorcomputesaconformalboundC thatguaranteesa
+α
+user-defined coverage rate 1−α. The algorithm for the predictive mean yˆ , uncertainty
+t
+quantification,andtheofflineconformalcalibrationprocedurearedetailedinAppendix A.
+3.2 TheMulti-AgentSystemPipeline
+Themulti-agentescalationpathservesasatruefailurevalidationandtrustworthyverifica-
+tionforsystemdevelopment. Thepipelineoperatesinthreedistinctphases:
+3.2.1 Phase1: DeterministicConformalGating(TheSentry)
+The Sentry serves as a deterministic, non-LLM hard gate that bridges the mathematical
+engineandtheCouncil. Itevaluatestheabsoluteresiduale sample-by-sample:
+t
+e = |yˆ −y | (1)
+t t t
+againstthecalibratedconformalboundC . Itsdecisionruled is:
+α t
+(cid:26)FAIL,
+ife >C ,
+d = t α (2)
+t PASS, otherwise.
+A sample is forwarded to the LLM council agents only when this conformal bound is
+violated. Thisensuresthattheboundsaretightenedtodetectevengradualfailurebefore
+deliberativereasoningisinvoked,therebypreservingcomputationalefficiency.
+3.2.2 Phase2: DeliberativeAdjudication(TheCouncil)
+When the Sentry flags a sample as anomalous (d = FAIL), it is escalated directly to the
+t
+Council. ThreeindependentLLM-basedagentsevaluatethestatisticalcontextandcastone
+equalvote(PASSorFAIL).Thesystemappliesa2-of-3majorityrule: ifatleasttwoagents
+4
+
+===== PAGE 5 =====
+
+Preprint. Underreview.
+Algorithm1AIVVPipeline
+Require: Streamsamplex ,baseengine f ,significancelevelα
+t θ
+Ensure: Finallabeld ∈ {PASS,FAIL}andupdatedenginestate(ifpromotionoccurs)
+t
+1: foreachsamplex t do
+2: d t ←Sentry(x t , f θ ,α)
+3: ifd t =FAILthen
+4: fork =1to2do
+5: ifMajorityVote(Council(context)) =FAILthen
+6: d t ←FAIL;break
+7: endif
+8: ifk =2then
+9: d t ←PASS;break
+10: endif
+11: TuningAction: a t ←Inspector(context)
+12: f θ tmp ←clone(f θ )
+13: f θ tmp ←Tuner(a t , f θ tmp)
+14: ifSentry(x t , f θ tmp ,α) =PASSthen
+1 1 5 6 : : p d t ro ← mo P t A e SS f ; θ b ← rea f k θ tmp
+17: else
+18: keep f θ ;discard f θ tmp {Looptok =2forfinaldeliberation}
+19: endif
+20: endfor
+21: endif
+22: outputd t
+23: endfor
+voteFAIL,thesampleisconfirmedasatruefailure. IfatleasttwovotesarePASS,thesample
+isdeemedanabruptmaneuver,andthepipelineproceedstoPhase3forsystemadaptation.
+• RequirementsEngineer: AnLLM-basedcouncilmember(LLaMA-4-17B)thateval-
+uateswhetherthecurrentsystembehaviorsatisfiesoperationalrequirementsat
+thespecificsampleflaggedbythemathematicalmodel. Giventhesystem’ssensor
+telemetrydata,trainingconstraints,andanatural-language-focusedrequirements
+set,itreturnsacompliancevote,thecitedrequirementsection,andananalytical
+justificationforanyidentifiedviolations.
+• FailureManager: AnLLM-basedcouncilmember(GPT-OSS-120B)designedtoeval-
+uatethesysteminfailuremodeandeffectanalysiswithgivenfailuremanagement
+requirements. Bymonitoringitsevaluationintherecenttelemetrywindow,this
+agentassessestheseverityofthetrajectorydeviation. Itreturnsacompliancevote,
+acategoricalfailure-modelevel,andarequirement-groundedrationale.
+• System Engineer: An LLM-based council member (LLaMA-3.3-70B) possessing
+explicitdomainknowledgeofboththeUUVdynamics(e.g.,Nomotomodelpa-
+rameters,PIDcontrollerparameters)andthemathematicaldetectionmechanism
+(e.g.,MCdropoutuncertainty,conformalboundarycalibration). Thisagentreturns
+acompliancevotefromatechnicalperspective,basedonthevulnerabilityofthe
+puremathematicalmodel. Evaluatingthesemetricsdistinguishesgenuinefailures
+fromFPRinducedbyenvironmentalnoiseanddynamicmaneuvering. Further-
+more,uponconfirmingatruefault,theagentconductsverificationandvalidation
+(V&V) and generates a control-system gain-tuning proposal conditioned on the
+failure-modeoperationtostabilizethesystem.
+5
+
+===== PAGE 6 =====
+
+Preprint. Underreview.
+3.2.3 Phase3: TheAdaptationPipeline(Inspector&Tuner)
+When the Councils decide that an anomaly flagged by the Sentry is actually a nuisance
+failure,thesystemusesthisasafine-tuningtriggertoretrain/recalibratethemathengine.
+• Inspector Agent: An LLM-based strategy translator (Qwen3-32B). It receives the
+currentresidual,conformalbound,andtheCouncil’svotesummaries(including
+reasoningandconfidence). Itsynthesizesthistooutputadiscretetuningaction:
+RECALIBRATE(suggestinganewconformalsignificancelevelα),FINE TUNE(suggest-
+ingnetworktraininghyperparameters),orTRY BOTH.
+• TunerAgent: AnLLM-basedexecutor(GPT-OSS-20B)thatappliestheInspector’s
+selectedactiontoatemporaryclonedengineratherthanthedeployedmodel. It
+returnsareevaluatedcandidatestate(updatedprediction,bound,anderror)along
+withadetailedlogofthemodel’sreasoningandkeystatistics.
+To close the loop, the Sentry (Phase 1) is invoked a second time. It tests the Tuner’s
+candidate model against the updated conformal bound. If the candidate resolves the
+conformalviolation,thetemporarycloneispromotedtothenewupdatedmodel. Ifitfails,
+thedeployedengineremainsunchangedtopreventdegradationofthemathematicalmodel
+andprotectagainstcatastrophicforgetting. TheCouncilisthenre-invokedforasecond
+deliberationround: amajorityFAILconfirmsatruefault,whileamajorityPASSoverrides
+theSentryflagandlabelsthesampleasnominal.DetailedpromptsandrepresentativeJSON
+executiontracesforeachLLMagentareprovidedinAppendicesCandD,respectively.
+3.3 V&VFeedbackandCorrective-ActionInterface
+Thisframeworkintroducesacomprehensiveverificationandvalidation(V&V)loopfor
+system-leveldesignandtesting. Duringthisphase,thecouncilagentsassumetherolesof
+systemV&Vengineers,operatingbasedonspecifiedsystemrequirements,failuremanage-
+mentprotocols,andsystemdescriptions. Eachagentcontinuouslymonitorsthepredicted
+sensoroutputtodeterminewhetherthesystem’strajectoriessatisfytheprescribedrequire-
+mentsunderbothnormaloperatingconditionsandfailuremodes.
+Followingthemonitoringphase,eachagentevaluatesthetestresults. Therequirements
+engineer specifically monitors whether the predicted trajectory falls within the normal
+operatingrangeforthegivensystemrequirements. Thefailuremanagerstrictlydiagnoses
+thefailuremodesofthepredictedoutputdata. TheSystemEngineeragentthenaggregates
+thefindingsfromtheRequirementEngineerandtheFailureManagerandtransitionsinto
+gain-tuning mode. Based on the specified system engineering requirements, this agent
+proposesadjustedgain-tuningparametersfortheUUVcontrolsystem. Detailsareprovided
+inAppendixI.
+4 ExperimentalSetup
+4.1 DatasetGeneration
+WeevaluatedtheAIVVusingaSimulinkmodel(Cybergalactic,2023)oftheREMUS100
+UUVwithanIMUsensorfusionmodelprovidedbyMathWorks(TheMathWorks, Inc.,
+2023). To evaluate the robustness and scalability of the proposed framework under a
+(a)Dataset1. (b)Dataset2. (c)Dataset3.
+Figure2: (a)Hovering,(b)LawnmowerMappingPattern,and(c)ComplexMission.
+6
+
+===== PAGE 7 =====
+
+Preprint. Underreview.
+challenging environment, we added sensor-drift bias and environmental non-Gaussian
+noise,andgeneratedthreemaneuvercases(Dataset1: Hovering;Dataset2: Lawnmower
+Mapping Pattern; Dataset 3: Complex Mission). Details of the datasets are provided in
+AppendixE.
+Fortheseexperiments,theyawangledataweresampledat20msintervals,andtheinitial
+1,400rawtime-seriesdatapointsweresplitina70/30ratio. Generatingsequence-target
+pairsfromthesesplitswithaslidingwindowsizeofW =10andapredictionhorizonof
+H =2yieldedexactly969trainingphaseand409independenttestingphase.
+4.2 FailureModeGeneration
+Tosimulatetheyaw-anglefailurescenariooftheREMUS100invariousmaneuvers,we
+injectedfailuresintotheIMUsensorduringthetestphase. At1200timestep,weinjectedan
+electricalsensorfailureintoDatasets1and2andamechanicaldamperfailureintoDataset3.
+AsshowninFigures2(a)and2(b),high-spikefaultsoccurexactlyat1200timestep,butthe
+REMUS100controlsystemstabilizestheyaw-angleresponsetothenormaloperatinglevel.
+However,inFigure2(c),becausethemechanicaldamperfailurecannotbestabilizedbythe
+innercontrolsystem,theyawangleshowsahardoverfailureresponseafter1200timestep.
+4.3 AdaptiveEngineConfiguration
+Toensurethemathematicalenginemaintainsappropriatelycalibratedsensitivity,thehy-
+perparametersaredynamicallychangedbytheadaptationpipelineratherthanremaining
+static. Whilethebaselineconformalpredictionthresholdisinitializedatα =0.05,whenthe
+Tuneragentiscalled,itadjuststhissignificancelevelwithinaboundedrangeof[0.01,0.10]
+(between90%to99%confidence). Thisdynamicboundingallowsthesystemtoeffectively
+adapttoevendramatictransientresponsesandunexpectedenvironmentalnoise,andto
+prevent nuisance faults from overwhelming the multi-agent reasoning loop. Details of
+hyperparametersareprovidedinAppendixB.
+WhentheCounciloverridesamathematicalSentryflagbyvotingPASSonanuisancefault,
+theinspectoragentperformsfine-tuningorrecalibrationanddynamicallyformulatesthe
+strategybasedonthecouncil’sJSONlog. TheInspectorgeneratesaconservativeadaptation
+strategywithinanepochrangeof50to200epochs,usingalearningratebetween0.00001and
+0.001.Thisadaptiveepochscalingallowsthemodeltoincorporateanupdatedmathematical
+modelfollowingaconfirmedstructuralchangewithoutcatastrophicforgettingprevious
+normalbehaviors.
+5 ExperimentResults
+This section presents the empirical evaluation of the AIVV framework across the three
+maneuvercases. First, weevaluatethesystem’sabilitytovalidatetrueversusnuisance
+failuresandanalyzetheresultingefficiencyoftheadaptationpipeline. Next,wepresenta
+structuralablationstudytodemonstratetheimportanceofeachlayer. Finally,wediscuss
+ourrole-specificmodelalignment.
+AlltheexperimentswereconductedinIntelDataCenterGPUMaxSeriesaccelerators,and
+forLLMinference,weusedGroq’scustomLanguageProcessingUnits(LPUs). Forfurther
+hardwaredetails,seeAppendixH.
+5.1 ValidationPerformance
+Becauserigoroussystemverificationreliesonaccuratefailurevalidation,weevaluatehow
+effectivelytheLLMCouncilmodulesdistinguishtruesystem-levelfaults(e.g.,mechanical
+orelectricalfailures)usingnatural-languagerequirements. Toquantifythiscapability,we
+define the Fault Validation Rate (FVR) as a seed-level success metric. Based on the full
+distributionofexperimentalruns,theFVRdenotesthepercentageofseedsinwhichthe
+Councilsuccessfullyvalidatedthefailurescenario.
+7
+
+===== PAGE 8 =====
+
+Preprint. Underreview.
+Dataset Accuracy Accuracy Improvement(%)
+initial tuned
+Dataset1(Hovering) 0.954 1.000 +4.82%
+Dataset2(Lawnmower) 0.994 0.997 +0.30%
+Dataset3(Complex) 0.688 0.847 +23.11%
+Table1: CouncilLoopAccuracybeforeandaftertheAdaptationPipeline.
+Weevaluatedandtestedacross75independentseeds. Eachseedincludes409testpoints
+with sensor drift bias and environmental noise, which may make fault validation chal-
+lenging. Specifically,thisevaluationtestswhetherthecouncilcanvalidate(i)thedetected
+anomaliesinenvironmentalnoisethatviolateconformalboundsasnuisancefailures. (ii)
+thedetectedanomaliesbydynamicmaneuveringduringnormaloperation. (iii)truefaults
+withrequirement-basedreasoning.
+TheAIVVCouncilachievedanoutstandingFVRof100%fortheHoveringManeuver,89.33%
+fortheLawnmowerMappingPattern,and93.33%fortheComplexMission. Theseresults
+mitigatethevulnerabilityofthepuremathematicalmodelandguaranteethereliabilityfor
+systemverificationandredesign.
+5.2 AdaptationPerformance
+Inthissection,weevaluatetheperformanceofmathematicalmodeladaptationwithgeneral
+anomalydetectionmetrics. Sinceweuseafundamentalmathematicalmodel,MCdropout
+LSTMwithconformalcalibration,westatisticallyextractedTruePositives(TP),TrueNega-
+tives(TN),FalsePositives(FP),andFalseNegatives(FN)tocomparetheaccuracyofthe
+fine-tunedmodelwiththeinitialmathematicalmodel. Accuracymetricscanbedescribed
+asfollows:
+TP+TN
+Accuracy= (3)
+TP+TN+FP+FN
+In section 4.1, we demonstrated our total data points of the test term and described the
+exactfaultinjectionpointinsection4.2. Thus,wesetthedenominatorofthemetricsto409
+andcomputetheaverageaccuracybasedonexperimentalresultsfrom75seeds. Evaluated
+accuracyisdemonstratedinTable1.
+InTable1,Dataset3showssignificantperformanceimprovementcomparedtoDataset1
+andDataset2. SinceDatasets1and2showrepeatedsimplepatternsthroughouttheentire
+timeseries,themathematicalmodelhassufficientcapacityforprediction. However,for
+Dataset3,whichshowsacomplexandrealisticmissionpattern,adaptationshowsdramatic
+improvement23.11%.Withthisresult,weemphasizemathematicalmodelrequiressufficient
+fine-tuningfortrustworthyV&Vbeforemissiondeployment.
+5.3 AblationStudy
+Because the AIVV framework fundamentally verifies and validates anomaly detection
+monitors at the system level and is designed to overcome the contextual blindness and
+false-positive susceptibility of pure mathematical detectors, direct latency comparisons
+Method Dataset1 Dataset2 Dataset3
+MathEngine+Sentry(Baseline) 45.33% 0% 0%
++TheCouncil 98.67% 80% 73.33%
++Adaptation(AIVV) 100% 89.33% 93.33%
+Table2: FailureValidationRate(FVR)acrossframeworkphase.
+8
+
+===== PAGE 9 =====
+
+Preprint. Underreview.
+Figure3:Ablationstudycomparingthreeframeworkstages(rows)acrossthreetestscenarios
+(columns). Themathematicalbaselineexhibitsahighfalse-positiverate(FPR),whichis
+visiblyreducedwhentheLLMcouncilisintroduced. ThefullAIVVframeworkintegrates
+theadaptationpipelinetoachieveoptimalvalidation.
+with purely mathematical classifiers are structurally misaligned. Instead, we conduct a
+progressiveablationstudytoisolatethenecessityofourarchitectureinallcases.
+Figure3andTable2showthatpuremathematicalgatingresultsinahighfalsepositiverate
+(FPR),showingalackofabilitytofilteroutnoiseordynamicmaneuver-inducedanomaly
+flagsinDatasets2and3. ByaddingtheLLMCouncil,whichachievesaFailureValidation
+Rate(FVR)ofatleast70%,thefinalinclusionoftheAdaptationPipelinesuppressesFPR
+andenablesanFVRofatleast89.33%,achievingtrustworthyvalidationacrossallevaluated
+conditions.
+5.4 Role-SpecificModelAlignment
+ToevaluatetheimpactofemployingheterogeneousLLMagents,Table3showsthecycli-
+cally shifted model assignments across AIVV roles. While the optimal configuration
+achieved100%FailureValidationRate(FVR),arbitraryshiftscausedperformancetoplum-
+met(44.0%–56.0%)andtriggeredfrequentJSONgenerationfailure. Forinstance,Config2
+maintained93.33%FVRbyretainingaGPT-OSSmodelfortheFailureManager,leveraging
+itssuperiorlogicalreasoningfortrajectoryanalysis.
+Conversely,assigninghigh-capacitysynthesistaskstosmallermodelsconsistentlyledto
+cognitiveoverloadandstructuralerrors. Theseresultsunderscorethenecessityofmatching
+specificmodelstrengthstocognitivetasksratherthanrelyingonhomogeneousorpurely
+parameter-scaled deployments. For a detailed analysis of the resulting computational
+efficiency,systemlatency,andtokenconsumption,refertoAppendixG.
+DeliberativeCouncil AdaptationPipeline Validation
+Configuration
+Req.Eng. Fail.Mgr. Sys.Eng. Inspector Tuner FVR
+Optimal LLaMA-17B GPT-120B LLaMA-70B Qwen-32B GPT-20B 100%
+Config1 GPT-20B LLaMA-17B GPT-120B LLaMA-70B Qwen-32B 56.0%
+Config2 Qwen-32B GPT-20B LLaMA-17B GPT-120B LLaMA-70B 93.33%
+Config3 LLaMA-70B Qwen-32B GPT-20B LLaMA-17B GPT-120B 44.0%
+Config4 GPT-120B LLaMA-70B Qwen-32B GPT-20B LLaMA-17B 48.0%
+Table3: SystematiccyclicshiftofLLMassignmentsacrossAIVVphases.
+9
+
+===== PAGE 10 =====
+
+Preprint. Underreview.
+6 Conclusion
+TheAIVVarchitectureprovidesahybridneuro-symbolicapproachtoautonomousV&Vfor
+trustworthycontrolsystemdesign.Byanchoringmulti-agentLLMreasoningwithcalibrated
+conformalbounds,AIVVsuccessfullydigitizestheverificationandvalidationinherentin
+theHuman-in-the-Loopparadigm. Iteliminatesfalsepositivealertswhileensuringaccurate
+faultvalidation. Furthermore,theframework’sclone-and-promotemethodologyallowsfor
+safe,dynamicmodelrecalibrationintheloop.
+Futureworkwillinvestigateclosed-loopexecutionoftheSystemEngineer’sgain-tuning
+proposalswithintheinnercontrolloop,enablingfullyautonomousfault-tolerantsystem
+redesignwithouthumanintervention.
+10
+
+===== PAGE 11 =====
+
+Preprint. Underreview.
+References
+AnastasiosNAngelopoulosandStephenBates. Agentleintroductiontoconformalpre-
+dictionanddistribution-freeuncertaintyquantification. arXivpreprintarXiv:2107.07511,
+2021.
+RinaFoygelBarber,EmmanuelJ.Candes,AadityaRamdas,andRyanJ.Tibshirani. Confor-
+malpredictionbeyondexchangeability. TheAnnalsofStatistics,51(2),2023.
+Yongqiang Chen, Gang Niu, James Cheng, Bo Han, and Masashi Sugiyama. Towards
+scalableoversightwithcollaborativemulti-agentdebateinerrordetection,2025. URL
+https://arxiv.org/abs/2510.20963.
+MaryLCummings. Manversusmachineorman+machine? IEEEIntelligentSystems,29(5):
+62–69,2014.
+Cybergalactic. Marine systems simulator (MSS) simulink demos. https://github.com/
+cybergalactic/MSS,2023. Accessed: 2023-10-25.
+LingyanDongandYanHuo. Researchonfaultdiagnosismethodforautonomousunderwa-
+tervehiclesbasedonimprovedlstmunderdatamissingconditions. AppliedSciences,15
+(21):11570,2025. doi: 10.3390/app152111570.
+YilunDu,ShuangLi,AntonioTorralba,JoshuaB.Tenenbaum,andIgorMordatch. Improv-
+ingfactualityandreasoninginlanguagemodelsthroughmultiagentdebate,2023. URL
+https://arxiv.org/abs/2305.14325.
+YarinGalandZoubinGhahramani. Dropoutasabayesianapproximation: Representing
+modeluncertaintyindeeplearning. InMariaFlorinaBalcanandKilianQ.Weinberger
+(eds.),ProceedingsofThe33rdInternationalConferenceonMachineLearning,volume48of
+ProceedingsofMachineLearningResearch,pp.1050–1059,NewYork,NewYork,USA,20–22
+Jun2016.PMLR. URLhttps://proceedings.mlr.press/v48/gal16.html.
+KyleHundman,ValentinoConstantinou,ChristopherLaporte,IanColwell,andTomSoder-
+strom. Detectingspacecraftanomaliesusinglstmsandnonparametricdynamicthreshold-
+ing. InProceedingsofthe24thACMSIGKDDinternationalconferenceonknowledgediscovery
+&datamining,pp.387–395,2018.
+UjinJeon,ChristopherHixenbaugh,MichaelFilimon,BenjaminPelletier,andVijayGupta.
+Earlyfaultdetectionandidentificationinuuvsusingdropoutlstmandcnn. InOCEANS
+2025-GreatLakes,pp.1–7,2025. doi: 10.23919/OCEANS59106.2025.11245166.
+Ziwei Ji et al. Survey of hallucination in natural language generation. ACM Computing
+Surveys,2023.
+Roham Koohestani. Agentguard: Runtime verification of ai agents, 2025. URL https:
+//arxiv.org/abs/2509.23864.
+J.C.R.Licklider. Man-computersymbiosis. IRETransactionsonHumanFactorsinElectronics,
+HFE-1(1):4–11,1960. doi: 10.1109/THFE2.1960.4503259.
+Natasha Chrissane Lobo, Himani H. Poojary, Lubna Katapady, Prerana Rao Adyapady,
+ArockiarajSimiyon,andThirunavukkarasuIndiran. Onlinesensorfaultdetectionusing
+machinelearningalgorithmsonalaboratory-scalebatchreactor: Lstmapproach. ACS
+Omega,11(7):12038–12051,2026. doi: 10.1021/acsomega.5c11180. URLhttps://doi.org/
+10.1021/acsomega.5c11180.
+Pankaj Malhotra, Lovekesh Vig, Gautam Shroff, and Puneet Agarwal. Long short term
+memorynetworksforanomalydetectionintimeseries. InProceedingsofthe23rdEuropean
+SymposiumonArtificialNeuralNetworks(ESANN),pp. 89,2015.
+PolsterKaderMbakobNdagouaandSlaouiFouadHasnaoui. Real-timedetectionofshort-
+circuitfaultsinpowersystemsusinglstmautoencoder. E3SWebofConferences,680:00054,
+2025.
+11
+
+===== PAGE 12 =====
+
+Preprint. Underreview.
+GuansongPang,ChunhuaShen,LongbingCao,andAntonVanDenHengel. Deeplearning
+foranomalydetection: Areview. ACMComputingSurveys(CSUR),54(2):1–38,2021.
+TrisanthSrinivasan,SantoshPatapati,HimaniMusku,IdhantGode,AdityaArora,Samvit
+Bhattacharya,AbubakrNazriev,SanikaHirave,ZaryabKanjiani,andSrinjoyGhose.Dura-
+cps: Amulti-roleorchestratorfordependabilityassuranceinllm-enabledcyber-physical
+systems. In202555thAnnualIEEE/IFIPInternationalConferenceonDependableSystemsand
+NetworksWorkshops(DSN-W),pp.63–70,2025. doi: 10.1109/DSN-W65791.2025.00040.
+The MathWorks, Inc. IMU Sensor Fusion with Simulink. The MathWorks,
+Inc., Natick, MA, USA, 2023. URL https://www.mathworks.com/help/fusion/ug/
+imu-sensor-fusion-with-simulink.html. Accessed: 2023-10-25.
+Khanh-TungTran,DungDao,Minh-DuongNguyen,Quoc-VietPham,BarryO’Sullivan,
+andHoangD.Nguyen. Multi-agentcollaborationmechanisms: Asurveyofllms,2025.
+URLhttps://arxiv.org/abs/2501.06322.
+ShreshthTuli,GiulianoCasale,andNicholasRJennings.Tranad:deeptransformernetworks
+foranomalydetectioninmultivariatetimeseriesdata. ProceedingsoftheVLDBEndowment,
+15(6):1201–1214,2022.
+StianVandeMerwe,StevenCMallam,andSalmanNazir. Trustinautomation(tia): Empiri-
+calfindingsinsupervisorycontrolofmaritimeautonomoussurfaceships. International
+JournalofHuman–ComputerInteraction,pp.1–22,2024.
+PaulWiessner,GrigorBezirganyan,SanaSellami,RichardChbeir,andHans-JoachimBun-
+gartz.Uncertainty-awaretimeseriesanomalydetection.FutureInternet,16(11),2024.ISSN
+1999-5903. doi: 10.3390/fi16110403. URLhttps://www.mdpi.com/1999-5903/16/11/403.
+ZhihengXietal. Theriseandpotentialoflargelanguagemodelbasedagents: Asurvey.
+arXivpreprintarXiv:2309.07864,2023.
+Fabio Massimo Zanzotto. Human-in-the-loop artificial intelligence. Journal of Artificial
+IntelligenceResearch,64:243–252,2019.
+12
+
+===== PAGE 13 =====
+
+Preprint. Underreview.
+A MathematicalLayerAlgorithm
+Thisappendixdetailstheformalmathematicaldefinitionsandtheofflinecalibrationproce-
+durefortheMathematicalEngineLayerreferencedinSection3. Thefoundationalanomaly
+detectionmethodisgeneratedusingaMonteCarlo(MC)DropoutLSTM,denotedas f . To
+θ
+quantifyepistemicuncertaintyatinferencetimewithoutalteringthenetworkarchitecture,
+dropoutisappliedtoboththeinternalLSTMlayersandtheoutputprojectionlayerduring
+stochasticforwardpasses. Foragiveninputsamplex ,withkiterationindex,themodel
+t
+performsNforwardpassestocomputethepredictivemeanµ andthepredictivestandard
+t
+deviationσ (whichservesastheempiricaluncertainty):
+t
+µ =
+1 ∑ N
+yˆ
+(k)
+t N t
+k=1
+(cid:118)
+σ =
+(cid:117) (cid:117)
+(cid:116)
+1 ∑ N (cid:0)
+yˆ
+(k)
+−µ
+(cid:1)2
+t N t t
+k=1
+To translate these point predictions into statistically guaranteed boundaries, we apply
+conformalprediction. Algorithm2outlinesthecompleteofflineprocedurefortrainingthe
+model and establishing the conformal bound C alongside the uncertainty threshold τ
+α α
+usingaheld-outcalibrationset.
+Algorithm2MathematicalEngineLayer: TrainingandConformalCalibration
+Require: PreprocessedtrainingdataD ,MCsamplesN,significancelevelα,calibration
+train
+ratioγ
+Ensure: TrainedMCDropoutLSTM f ,conformalboundC ,uncertaintythresholdτ
+θ α α
+1: SplitD train intofitsetD fit andcalibrationsetD cal basedonratioγ
+2: TrainMCDropoutLSTM f θ onD fit usingMSEloss
+3: foreachcalibrationsamplex t ∈ D cal do
+4: PerformNstochasticforwardpasseswithdropoutactive: {yˆ ( t k) } k N =1 ← f θ (x t )
+5: Computepredictivemeanµ t andepistemicuncertaintyσ i
+6: Calculateabsoluteresidual: e t = |µ t −y t |
+7: endfor
+8: ConstructcalibrationsetsR = {r i }andΣ = {σ t }
+9: Computefinite-samplecorrectedquantilelevel:
+(cid:18) ⌈(|D |+1)(1−α)⌉(cid:19)
+q =min 1, cal
+|D |
+cal
+10: Calculatebounds: C α =Quantile(R, q), τ α =Quantile(Σ, q)
+11: return f θ ,C α ,τ α
+B MathematicalLayerModelConfiguration
+Data Processing and Feature: The telemetry data is processed via a sliding-window
+approachbeforebeingfedintothenetwork. Afterapplyinga70/30splitfortrainingand
+testingonthe1400totalrawtime-seriespoints,thenetworkisconfiguredwithaninput
+dimensiond =1,focusingspecificallyontheyaw-angledynamicsoftheREMUS100.
+RecurrentNeuralNetwork: Theneuralnetworkarchitecturecomprisesamulti-layered
+MCdropoutLSTMfollowedbyamulti-layeredperceptron(MLP)head. Weimplemented
+twoLSTMlayersandasingledenseoutputlayerwithahiddenstatesizeof32dimensions.
+Forepistemicuncertaintyestimation,theMCdropoutmethodisappliedwithaprobability
+rateof p =0.2duringbothtrainingandinference. Duringinference,thenetworksamples
+N = 30 Monte Carlo forward passes for each LSTM layer. The mean of these N = 30
+passesistakenasthepredictedobservation,whilethestandarddeviationisextractedasthe
+structuraluncertaintyoftheLSTM.
+13
+
+===== PAGE 14 =====
+
+Preprint. Underreview.
+TrainingandCalibration: ThenetworkisoptimizedusingtheAdamoptimizerwitha
+MeanSquaredError(MSE)losscomputation. Priortoonlineinference,theLSTMgenerates
+itsinitialconfidenceboundsbyconstructingabaselinefornormalUUVdynamicsduring
+training. Thebaselinesignificancelevelfortheconformalpredictionissettoα = 0.05to
+ensurea95%confidenceintervalfornormaloperationuncertaintyboundariesbeforeany
+agent-drivendynamicadaptationoccurs.
+C PromptDefinitions
+ThissectiondetailsthefunctionallogicandrequirementsforeachofthefiveLLMagents.
+Toensurereadabilitywithinthismanuscript,wepresentdistilledversionsoftheprompts
+thathighlighttheuniqueV&Vlogic,votingcriteria,andtechnicalresponsibilitiesofeach
+role. ToensureconsistentJSONformattingacrossallagents,weunifiedtheinstructions
+intoaCommonFormattingBlock(CFB),asdetailedinSectionC.1. Forreproducibility,the
+full, uneditedpromptstringswillbeprovidedinoursupplementarymaterialandcode
+repository.
+C.1 CommonFormattingBlock(CFB)
+Allagentsarestrictlyinstructedtofollowtheseconstraints:
+• ResponseFormat: RespondONLYwithavalid,rawJSONobject. DoNOTinclude
+introductorytext,concludingremarks,ormarkdowncodeblocks(e.g.,no‘‘‘json).
+• Constraint: DonotoutputreasoningoutsidetheJSONstructure.
+• DataTypes: Theconfidenceandalphafieldsmustbenumericdecimals(floats).
+C.2 PromptforeachLLMagent
+FailureManager
+Role:SystemValidationinFAILUREMODE.
+CoreTask:“Giventhatafaultmaybepresent,isthesystem’sresponsewithinfailuremanagement
+requirements?”
+Responsibilities:
+1. FailureEffect:Doesmaxdeviationexceedlimitsinrequirements?
+2. Recovery/Damping:Isframe valuesconvergingordiverging?
+3. BaselineContext:Comparecurrentdeviationagainstframe baseline summary.
+VotingLogic:
+• FAIL:TruedataisoutsideboundswithsignificantgradientchangeORpredicteddatais
+significantlyoutsidetrainingbounds.
+• PASS:Truedataisoutsidebounds,butpredicteddataisdifferent;failureiscontained,
+andthesystemisrecovering.
+[CFBApplied]
+Schema:{vote, risk level, confidence, failure management assessment, reasoning}
+14
+
+===== PAGE 15 =====
+
+Preprint. Underreview.
+RequirementsEngineer
+Role:SystemValidationinNORMALMODE.
+CoreTask:“Evenassumingapotentialfaultexists,doesthesystem’scurrentbehaviorviolate
+anyoperationalrequirement?”
+Responsibilities:
+1. NormalOperation:VerifyYawraterange(−180to180)andper-steprange(−10to10).
+2. OperationalLimits:Ensuredampingstayswithintrainingenvelopes.
+3. MaskingRisk:Failifbound multiplier>2.0.
+VotingLogic:
+• FAIL:Defaultstateifrequirementsareviolatedorpredictedvaluesshiftmorethannoise
+levels.
+• PASS:Predictedvalueisinper-steprangedespitetruevaluebeingoutsidebounds.
+[CFBApplied]
+Schema:{vote, confidence, requirement section, reasoning, veto reason}
+SystemEngineer
+Role:AutopilotGain-TuningExpert.
+VotingLogic: Usefailure manager findingsastheprimarysignal. FAILifhighuncertainty+
+largeerrororpoorLSTMprediction.PASSifsuddenmaneuvercausesdriftinguncertainty.
+Gain-TuningProtocol:AdjustparametersONLYifFMorREvoteFAIL.
+• Stale/HighUncertainty:IncreaseKpandT
+d
+.
+• Low-FreqOscillation:DecreaseKp,increaseT
+i
+.
+• Divergence:DecreaseT ,increaseT.
+d i
+[CFBApplied]
+Schema: {vote, risk level, confidence, technical assessment, reasoning,
+tuning proposal, tuning reasoning}
+Inspector
+Role:ParameterOptimizationforTuner.
+Actions:
+1.RECALIBRATE:Fortransientnoise(Setnew alpha).
+2.FINE TUNE:Forpersistentdrift(Setepochs,learning rate).
+3.TRY BOTH:Mixedevidence.
+Constraints:α∈[0.01,0.10],epochs∈[50,200],LR∈[10−5,10−3].
+[CFBApplied]
+Schema: {majority decision, pass votes, fail votes, action, new alpha, epochs,
+learning rate, reasoning}
+Tuner
+Role:ConformalPredictionAnalysis.
+Task:Recommendoperatingα∈{0.01,...,0.10}basedonwhethernewerrorspassboundsat
+95%,98%,and99%.
+[CFBApplied]
+Schema:{recommended alpha, reasoning, would pass at recommended, confidence}
+D RepresentativeExecutionTracesoftheAIVVPipeline
+ThissectionprovidesstructuredJSONpayloadsgeneratedbytheLLMCouncilandAdap-
+tationPipeline.
+15
+
+===== PAGE 16 =====
+
+Preprint. Underreview.
+council to inspector.json
+{
+"timestamp": "2026-03-19T16:31:08.005585",
+"sample_id": 212, "from_agent": "council", "to_agent": "inspector",
+"payload": {
+"loop": 2,
+"votes": [
+{
+"agent": "req_eng",
+"vote": "PASS", "confidence": 0.7,
+"reasoning": "The error magnitude (1.6831555366516113) is slightly above..."
+},
+{
+"agent": "fail_mgr",
+"vote": "PASS", "confidence": 0.92,
+"reasoning": "Peak deviation 16.81\u202f<\u202f37.57, range 17.47\u202f<..."
+},
+{
+"agent": "sys_eng",
+"vote": "PASS", "confidence": 0.9,
+"reasoning": "The failure manager findings indicate a PASS vote with the..."
+}
+]
+}
+}
+inspector to tuner.json
+{
+"timestamp": "2026-03-19T16:31:00.123319",
+"sample_id": 212, "from_agent": "inspector", "to_agent": "tuner",
+"payload": {
+"majority_decision": "PASS",
+"pass_votes": 3, "fail_votes": 0,
+"vote_details": [
+{
+"agent": "req_eng",
+"vote": "PASS", "confidence": 0.8,
+"reasoning": "The current error magnitude is 1.6453118324279785, which...",
+"risk_level": null
+},
+{
+"agent": "fail_mgr",
+"vote": "PASS", "confidence": 0.92,
+"reasoning": "The observed peak deviation, overall range, and oscillati...",
+"risk_level": "LOW"
+},
+{
+"agent": "sys_eng",
+"vote": "PASS", "confidence": 0.95,
+"reasoning": "The failure manager findings indicate a PASS vote with th...",
+"risk_level": "LOW"
+}
+],
+"action": "RECALIBRATE",
+"reasoning": "The error (1.645) slightly exceeds the bound (1.445) with low...",
+"new_alpha": 0.05
+}
+}
+16
+
+===== PAGE 17 =====
+
+Preprint. Underreview.
+tuner to sentry.json
+{
+"timestamp": "2026-03-19T16:31:02.631120",
+"sample_id": 212, "from_agent": "tuner", "to_agent": "sentry",
+"payload": {
+"new_prediction": -0.4726104736328125,
+"new_bound": 1.220279983597098,
+"new_error": 1.6831555366516113,
+"new_uncertainty": 0.12548138201236725,
+"applied_alpha": 0.1,
+"passes_reevaluation": false
+}
+}
+E DetailedDatasetExplanation
+Dataset1(Hovering). Alow-dynamicoperationalscenarioinwhichtheUUVattempts
+to maintain a fixed position and heading through small, damped corrective control ac-
+tions. This case is designed to evaluate the fundamental anomaly detection capability
+understation-keepingconditions,wherenormalcontrol-inducedoscillationsmustbedis-
+tinguishedfromgenuinefaultsignatures.
+Dataset2(LawnmowerMappingPattern). Ahighlystructured,repetitivegrid-mapping
+operationdesignedbydynamic,periodicturningmaneuvers. Thiscaseteststheabilityof
+thesystemtodistinguishbetweenaggressivecontrolinputsandmechanicalfaults
+Dataset3(ComplexMission). Amissionoperativemaneuverinvolvingcontinuous,aperi-
+odiccoursecorrectionsandvaryingoperationalspeeds,designedtoevaluatetheadvantage
+ofcalibrateduncertaintyboundaryandadaptivethresholdingcapabilities.
+F DetailedAnalysisofRole-SpecificModelAlignment
+AsintroducedinSection5.4,theperformancedisparitiesacrossthemodelallocationsweep
+aredirectlyrelatedtohowwelleachmodelfamilyhandlesitsassignedtask. Theoptimal
+AIVVconfigurationreliesonthefollowingstructuralalignments:
+GPT-OSS Family (Mathematical & Sequential Logic). The GPT architecture excels at
+sequentiallogicalreasoningandcomplextrajectorydeduction.Thismakesituniquelysuited
+fortheFailureManager,whichmustcalculatepost-faultdivergenceandtrackoscillation
+sequences. Whenasmaller20BGPTmodelwasassignedtothisrole(Config2),accuracy
+remainedhighlyrobust(93.33%). Conversely,assigningLLaMAorQwentothisrolecaused
+criticalevaluationfailures,evenatthemassive70B-parametercount.
+LLaMA-4-17B(DeterministicCompliance). Highlyinstruction-tunedmodelsatthispa-
+rameterscaleareoptimizedforrigid,low-latencyruleadherence. Thisperfectlymatches
+theRequirementsEngineer,whichperformsstrict,staticnumericallimitchecks. Itexecutes
+thesedeterministictasksefficientlywithoutthecomputationaloverheadofmassivecontext
+windows.
+High-CapacityModels(70B+DomainSynthesis). TheSystemEngineerrequiresdeepdo-
+mainsynthesistoevaluateLSTMvulnerabilitymetricsalongsidegeneratingcomplexJSON
+payloadsforthePIDgain-tuningproposal. Onlyhigh-capacitymodels(LLaMA-3.3-70Bor
+GPT-OSS-120B)possessedtherepresentationalbandwidthforthistask. Relegatingsmaller
+modelstothisroleconsistentlycausedcognitiveoverload,resultinginbrokenJSONstruc-
+tures.
+17
+
+===== PAGE 18 =====
+
+Preprint. Underreview.
+Scenario AgentRole AvgCalls/Seed AvgLatency(s) AvgInputTokens AvgOutputTokens
+RequirementsEngineer 27.16 0.54 1394.8 135.4
+FailureManager 27.16 1.66 1188.3 493.5
+Dataset1(Hovering) SystemEngineer 27.16 1.02 1954.7 242.0
+Inspector 1.25 1.69 1014.7 682.0
+Tuner 1.25 1.24 465.9 579.1
+RequirementsEngineer 15.29 0.52 1398.0 148.2
+FailureManager 15.29 2.05 1190.6 549.1
+Dataset2(Lawnmower) SystemEngineer 15.29 0.93 1974.3 216.4
+Inspector 3.11 1.68 1018.6 678.0
+Tuner 3.11 1.13 465.9 549.2
+RequirementsEngineer 227.03 0.59 1403.5 157.4
+FailureManager 227.03 1.47 1189.5 482.2
+Dataset3(Complex) SystemEngineer 227.03 0.84 1999.5 201.0
+Inspector 87.00 1.83 1012.0 749.6
+Tuner 87.00 1.30 466.4 632.3
+Table4: AverageAPIcalls,latency,andtokenconsumptionperseed.
+G AnalysisofEfficiency,Latency,andTokenConsumption
+LLM Agent Call Efficiency Sentry escalated only about 5% of the samples to the LLM
+councilinnormalcases(averaging∼20callsperseedforDatasets1and2),androughly
+50%duringthehighlydynamiccomplexmission(∼230callsperseed). Thisdemonstrates
+theefficiencyofthemathematicalbounds.
+Asthedatawasfilteredfornuisancefaultswithgroundrulesbasedonnaturallanguage
+requirementsinthePhase2LLMcouncil,thecomputationallyexpensivePhase3Adaptation
+Pipelinewasinvokedanaverageofonly2timesperseedforthesimplermaneuvers,scaling
+to87timesforthecomplexmodel. DuringtheTuner’sclone-and-verifyprotocol,thesystem
+achievedaveragesuccessfulmodelpromotionsof1.08,1.31,and10.72perseedforDatasets
+1, 2, and 3, respectively. This demonstrates that triggering a fine-tuning cycle does not
+guaranteealivemodelupdate;promotionstrictlyrequiresthecandidatemodeltosatisfy
+theconformalmathematicalbounds.Furthermore,theincreasedpromotionrateinDataset3
+illustratesthatasoperationaldynamicsbecomemorecomplex,theAIVVframeworksafely
+andproportionallyincreasesitsupdatefrequencytomaintainperformance.
+TokenConsumptionandContextStability.Inputtokensremainstable(∼1200–2000)across
+allmissionsbecausepromptsrelyonfixed-sizeslidingwindows,preventingcontextbloat.
+Output tokens vary predictably by role: analytical agents produce concise JSON (∼150
+tokens),whilesynthesisagentsgenerateupto∼750tokensforparameteradjustments.
+SystemLatencyandExecutionDynamics. Individuallatenciesrangefrom∼0.5to∼2.0
+seconds.Whileindividuallatenciesarelow,afullescalationthroughtheadaptationpipeline
+yieldsaworst-caseend-to-endlatencyofapproximately6.0secondspersample.
+H HardwareandInferenceInfrastructure
+TheAIVVframeworkwasexecutedontheIntelDataCenterGPUMaxSeriesaccelerators.
+Thisensureshighcapacityandhighbandwidth,withupto408MBofL2cache(Rambo)
+basedondiscreteSRAMtechnology,64MBofL1cache,andupto128GBofhigh-bandwidth
+memory. WeusedtheGroqCloudAPIviaOpenAI-compatibleendpoints,leveragingGroq’s
+customLanguageProcessingUnits(LPUs).
+I AIVVGain-tuningresultsverification
+Inthissection,weimplementthegain-tuningproposalinourtestbedREMUS100Simulink
+modeltoverifythereliabilityofthesystemengineerLLMmodel. BasedontheV&Vresults
+fromtheRequirementsEngineerandFailureManager,thesystemengineerproposesanew
+gainparameterfortheREMUS100controller. Specifically,weprovided3rd-orderLPfilter
+parameters(Maxvelocity,Relativedampingratio,Naturalfrequency)andPIDcontroller
+18
+
+===== PAGE 19 =====
+
+Preprint. Underreview.
+(a)Beforegain-tuning (b)Aftergain-tuning
+Figure4: Effectofgain-tuningonREMUS100hovering(Dataset1)yawresponse
+parameters(NomotoTimeConstantT,NomotoGainK,ProportionalGainKp,Derivative
+TimeTd,IntegralTimeTi).
+V&Vsummary
+V&V Summary (Agentic System Verification & Validation)
+[Requirements Engineer -- Normal Mode V&V]
+Num of agent calls : 24 | Num of FAIL : 23
+Test result : FAIL -- 23/24 sampled windows violated operational requirements.
+First violation at sample 221: Error magnitude exceeds max allowable error
+(cid:44)→
+Violation details (up to 5):
+- Sample 221 | Operational Limits | Error magnitude exceeds max allowable error
+...
+- Sample 225 | Operational Limits | Error exceeds max allowable error
+[Failure Manager -- Failure Mode V&V]
+Num of agent calls : 24 | Num of FAIL : 11
+Test result : FAIL -- 11/24 fault-suspect windows violated failure management
+requirements. First violation at sample 225: peak_deviation=77.00,
+(cid:44)→
+response=DIVERGING, oscillation_count=0. peak_deviation=77.00 exceeds
+(cid:44)→
+max_failure_effect=72.95
+(cid:44)→
+Violation details (up to 5):
+- Sample 225 | peak=77.00 | DIVERGING | osc=0 | peak_deviation=77.00 exceeds
+max_failure_effect=72.95
+(cid:44)→
+...
+- Sample 229 | peak=88.81 | DIVERGING | osc=1 | peak_deviation=88.81 exceeds
+max_failure_effect=72.95
+(cid:44)→
+[System Engineer -- Active Optimizer]
+Num of agent calls : 24 | Fail Votes : 23
+Gain-Tuning Proposals (23 unique samples, triggered by FM/RE FAIL, showing up to 5):
+- Sample 221 | Triggered by: RE | SE Vote=FAIL | Params: {'Kp': 0.6, 'Ti': 19.0,
+'Td': 1.0, 'Reference_Max_Velocity': 9.5}
+(cid:44)→
+Reason: Since the requirements engineer voted FAIL due to an operational limit
+violation, the tuning proposal aims to reduce the error magnitude. The
+(cid:44)→
+proportional gain (Kp) is increased to
+(cid:44)→
+...
+- Sample 225 | Triggered by: FM+RE | SE Vote=FAIL | Params: {'Kp': 0.7, 'Ti':
+15.0, 'Td': 1.2, 'Reference_Max_Velocity': 9.0}
+(cid:44)→
+Reason: Since both failure manager and requirements engineer voted FAIL,
+adjusted parameters are proposed. Increased Kp to 0.7 to reduce error,
+(cid:44)→
+decreased Ti to 15.0 to reduce oscillations,
+(cid:44)→
+Withthegivensystemengineer’sgain-tuningproposal,weimplementedthelastproposal
+(Kp: 0.5→0.7,Ti: 20→15,Td: 1.0→1.2,MaxVelocity10.0→9.0).
+Figure4comparestheyawangleresponsesbeforeandafterapplyingtheproposedparam-
+eters. Thegain-tuningverificationservesasaproofofconceptdemonstratingthatAIVV
+canautomaticallytranslatefailure-modeanalysisintostructured,systemicallyreasoned
+correctiveactionproposals. Whilefull-controloptimizationremainsanopenengineering
+challenge,thesystemicallycoherentparameteradjustmentsconfirmthattheSystemEngi-
+19
+
+===== PAGE 20 =====
+
+Preprint. Underreview.
+neersuccessfullybridgestheV&Vgapbetweenfaultidentificationandactionablesystem
+redesignguidance,acapabilitythatpreviouslyrequiredhumandomainexpertise.
+20

@@ -1,0 +1,946 @@
+===== PAGE 1 =====
+
+APRIL2020 PHAM ET AL. 235
+Evacuation Departure Timing during Hurricane Matthew
+ERIKAO.PHAM
+HazardsandVulnerabilityResearchInstitute,DepartmentofGeography,UniversityofSouthCarolina,Columbia,
+SouthCarolina
+CHRISTOPHERT.EMRICH
+NationalCenterforIntegratedCoastalResearch,SchoolofPublicAdministration,UniversityofCentralFlorida,
+Orlando,Florida
+ZHENLONGLI
+HazardsandVulnerabilityResearchInstitute,DepartmentofGeography,UniversityofSouthCarolina,Columbia,
+SouthCarolina
+JAMIEMITCHEM
+InstituteforEnvironmentalandSpatialAnalysis,UniversityofNorthGeorgia,Oakwood,Georgia
+SUSANL.CUTTER
+HazardsandVulnerabilityResearchInstitute,DepartmentofGeography,UniversityofSouthCarolina,Columbia,
+SouthCarolina
+(Manuscriptreceived15February2019,infinalform26November2019)
+ABSTRACT
+ThisstudyinvestigatesevacuationbehaviorsassociatedwithHurricaneMatthewinOctoberof2016.It
+assessesfactorsinfluencingevacuationdecisionsandevacuationdeparturetimesforFlorida,Georgia,and
+SouthCarolinafromanonlinesurveyofrespondents.Approximately62%oftheFloridasample,77%ofthe
+Georgiasample,and67%oftheSouthCarolinasampleevacuated.Logisticregressionanalysisofthede-
+parturesintheoveralltimeperiodidentifiedvariabilityinevacuationtiming,primarilydependentonprior
+experience,receiptofanevacuationorder,andtalkingwithothersabouttheevacuationorder.However,
+usingfourlogisticregressionstoanalyzedifferencesindeparturetimesbydayshowsthattheonlysignificant
+variable across the three main days of evacuation was our proxy variable for evacuation-order times.
+Dependingontheday,othervariablesofinterestincludenumberofhouseholdvehicles,previoushurricane
+experience,andreceiptofanevacuationorder.Descriptiveresultsshowthatmanyvariablesareconsideredin
+thedecisiontoevacuate,butresultsfromsubsequentanalyses,andrespondents’commentsabouttheirex-
+periences,highlightthatevacuationordersaretheprimarytriggeringvariableforwhenresidentsleft.
+1. Introduction strongestAtlanticOceanstormofthe2016seasonand
+alsothedeadliest(Stewart2016).Thestorm’sU.S.path
+Hurricane Matthew (28 September–9 October 2016)
+severelyaffectedtheeasterncoastsofFlorida,Georgia,
+wasthelaststormofthe2016hurricaneseasonforthe
+and South and North Carolina while heavy rain and
+southeastern coastal regions of the United States.
+windbroughtfloodingandwinddamageintheinterior
+Matthew became a tropical storm on 28 September,
+parts of these states. Matthew tracked northward,
+west-northwest of Barbados; it developed into a
+parallel to the coastline for over 560 mi ( 900km),
+category-5 storm in the Caribbean Sea, making it the
+witha shiftingtrackanduncertainlandfall locations.
+It ultimately weakened and made U.S. landfall as a
+Correspondingauthor:ErikaO.Pham,epham@email.sc.edu category-1hurricanenearMcClellanville,SouthCarolina
+DOI:10.1175/WCAS-D-19-0030.1
+(cid:1)2020AmericanMeteorologicalSociety.Forinformationregardingreuseofthiscontentandgeneralcopyrightinformation,consulttheAMSCopyright
+Policy(www.ametsoc.org/PUBSReuseLicenses).
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 2 =====
+
+236 WEATHER, CLIMATE, AND SOCIETY VOLUME12
+(Stewart 2016), near where Hurricane Hugo made at the household level, and that an official order is
+landfallin1989,andcontinuedmovingparalleltothe consistentlypositivelycorrelatedwithevacuations.
+coastline for another 300 miles (480km) or more. A number of other variables are consistent in terms
+Approximately1–4daysbeforethehurricane’sprojected of their significance on evacuation outcomes, such as
+landfall, the governors of Florida, Georgia, and South private vehicle ownership for traveling to a variety of
+Carolinaorderedevacuationsformultiplecountiesalong shelteringoptions,thetypeofhousingofaresident,or
+thecoasts. petownership.However,bearingweak,inconsistent,or
+There are numerous variables involved in a house- nodirectsignificanceonevacuationoutcomesaresome
+hold’s evacuation decision-making process, with many demographicfactors,likeage,gender,orrace;previ-
+identifiedinpreviousresearch.Theongoingcoverageof ous hurricane experience; exposure to previous false
+Matthew’s continually shifting track meant individual alarms; and previous participation in shadow evacu-
+andhouseholddecisionstoevacuateorremainwerealso ations(Baker1991;DowandCutter1998;Whitehead
+being continuously updated, thereby affecting evacua- et al. 2000; Whitehead 2003; Arlikatti et al. 2006;
+tiondeparturetimes.Thus,HurricaneMatthewpresents Smithand McCarty 2009; Lindell et al. 2011; Bowser
+an interesting case for analyzing the spatiotemporal and Cutter 2015; Huang et al. 2016). It is important
+stagesandvariablesaffecting thehurricaneevacuation tonote,however,thatsimplybecausethesevariables
+decision-makingprocess. havebeenshowntohaveweakornoeffectsonevacu-
+This paper examines spatial/temporal differences, ationaccording to past research, itdoes not meanthat
+their interactions with other factors, and their in- theywillbeinsignificantvariablesinnewcasestudies.
+fluences on evacuation behaviors along the eastern Information-seeking,knowledge-confirmationprocesses
+coasts of Florida, Georgia, and South Carolina in re- andthesubsequenttranslationintoactionornonaction
+sponsetoHurricaneMatthew.Specifically,thepaper arealsoimportanttoconsiderwhenstudyingevacuation
+addresses household-level variables that might ex- behaviors.Anevolvingfacetofevacuationprocessesis
+plain such variations in the amount of time between information seeking and ‘‘milling’’ (Mileti and Peek
+warningissuanceandtheinitiationoftheevacuation 2000; Eiser et al. 2012); that is, more information on
+responsebylocalresidents. the hurricane is both disseminated and sought out,
+with confirmation sought from family and friends.
+However,sometimestheinterpretationoftheinforma-
+2. Background
+tion is faulty, and an individual may not take the most
+Thereisextensiveliteratureonhurricaneevacuation appropriateactions,eventhoughforecasts,watches,and
+behaviors dating back decades. In Baker’s (1991) ana- warningsareprovidedwellinadvanceoflandfall(Broad
+lyses of hurricane evacuation behaviors and variables etal.2007;Paschetal.2004;NationalWeatherService
+of survey respondents for 12 hurricanes in a variety of 2006). In other cases, an individual’s social situation,
+geographic locations within the southeastern United suchastheperceiveddependability,density,ordiversity
+States, he found that, among numerous other factors, oftheirsocialnetworks(Collinsetal.2017;Collinsetal.
+the differences in evacuation behaviors were generally 2018), or psychosocial factors such as self-sufficiency
+explained by the individual’s perception of risk (held or strong social networks (Wong-Parodi and Feygina
+beliefs). Later research confirmed the importance of 2018),mayframethedecisiontoevacuateorremain.
+storm-specific physical factors in an individual’s de- While much of the hurricane evacuation literature
+cision to evacuate or remain (e.g., Dow and Cutter addresses the variables that influence the decision-
+1998;Whiteheadetal.2000;SmithandMcCarty2009; makingprocessandthesubsequentchoicetoevacuate
+Stein et al. 2010; Bowser and Cutter 2015). Much of orremain,thereseemstobelesscertaintyintermsof
+theliteratureconfirmsthesignificanceofrecommen- the behavioral drivers that influence the variability
+dationsofprotectiveactionsfrompublicofficials(e.g., in hurricane evacuation departure times. Studies on
+mandatory/voluntary evacuation orders) in prompt- evacuation timing with a technological or modeling
+ing evacuations (Dow and Cutter 1998; Whitehead focusoften,forexample,assumefullcompliancewith
+etal.2000;SmithandMcCarty2009;Steinetal.2010; warnings,noprocessesofshadowevacuation,various
+Bowser and Cutter 2015; Huang et al. 2016). Huang vehicle occupancies (Lindell and Prater 2007), or si-
+et al.’s (2016) statistical meta-analysis of over 49 ac- multaneousevacuations(SbaytiandMahmassani2006).
+tualandhypotheticalevacuationstudiessinceBaker’s Others focus on infrastructural or network problems
+(1991) analyses enhanced the current understanding with little regard to the behavioral aspects that play a
+that local officials are indeed vital and influential significant role in the departure timing and evacuation
+sourcesofinformationinevacuationdecision-making preferencesofanindividualorhousehold(Peletal.2010).
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 3 =====
+
+APRIL2020 PHAM ET AL. 237
+The common assumptions in many evacuation timing with respect to compliance, but also evacuation prefer-
+studiesoftenruncountertoactualoccurrences,suchas encesanddeparturetiming.
+the evacuation during Hurricane Floyd in 1999: There Wedonotattempttofullymodelevacuationbehav-
+wasintenseevacuationtrafficcongestionasaresultof iors, but we build on the existing hurricane evacuation
+one-half of the evacuees departing in the same 6-h literaturebyconsideringsomevariablesdiscussedinthis
+window, about one-quarter of the evacuees taking review,knowntoinfluenceoverallevacuationoutcomes
+morethanonevehicle,andmosttravelingfartherthan anddecision-making.Wealsoincludesomeofthevar-
+wasnecessarytoensuresafety(DowandCutter2002). iablestypicallyfoundtobeinconsistentintheircontri-
+These findings support Mileti and Sorensen’s (2019) butionstoevacuation,butthoughttoaffectbehaviorsin
+‘‘protective action initiation time’’—the lag between someway.Thevariablesofmostinterestinassessingthe
+whenwarningsareissuedandwhenresidentsbeginto evacuationresponseinclude:approximatetimeofeither
+take protective actions such as evacuation. The lag mandatory or voluntary evacuation order (using the
+time exists because of the need to take preparatory respondent’sstateasaproxyvariable);priorhurricane
+actions, such as making accommodations elsewhere, experience; perceived receipt of an evacuation order;
+compounded by, for instance, the presence of pets, number of information sources used in the decision-
+children,elderlyfamilymembers,orthosewithphysical making;numberofdifferentinformationchannelsused;
+ailments, but some of it is also a function of residents milling behavior (number of different consultations
+seeking confirmatory information on the nature of the used,e.g.,neighbor,friends);perceivedresidencewithin
+threat(milling),clarityofthewarnings,thetimeofday anevacuationzone;perceivedresidencewithinaFederal
+atwhichthewarningisreceived,orlengthofresidency Emergency Management Agency (FEMA)-designated
+in the area (Mileti and Peek 2000; Lindell and Prater flood zone; number of occupants in the household;
+2007; Dixit et al. 2012; Mileti and Sorensen 2019). number of pets in the household; number of auto-
+However,thedelaydoesnotoccurforallresidentsbe- mobilesowned;andhouseholdincome.
+cause some may choose to leave prior to an official
+mandated order for their area or because of their in- 3. Method
+terpretation of storm threats or expectation of compli-
+a. Studyarea
+catingissuesintravel,suchastrafficcongestion.
+There are exceptions that have investigated phys- Our study area is the Atlantic coast of Florida,
+ical and/or demographic variables contributing to Georgia, and South Carolina, based on the extent of
+household decisions to evacuate, and decisions on watches and warnings issued as Hurricane Matthew
+when to leave [e.g., Lindell et al. 2005 (Hurricane advancednorthward.Inourstudyarea,thefirsthurricane
+Lili);Fuetal.2007(HurricanesFloydandAndrew); watch and warning issued by the National Hurricane
+Koshute 2013 (Hurricanes Hugo, Andrew, Opal, Fran, Center occurred in Florida on Tuesday 4 October, and
+Ivan,andJeanne);Hasanetal.2013(HurricaneIvan); Wednesday5October,respectively[atableofallofthe
+Sarwaretal.2016(HurricaneIvan)].Thesestudieshave timesthatwatchesandwarningswereissuedorupdated
+looked at different combinations of chosen variables, canbeaccessedinStewart(2016)].Thegovernorsofthe
+suchastimeofday,evacuationnotice/type,stormchar- threestatesdeclaredstatesofemergencieswithevacua-
+acteristics(e.g., windspeed,timetolandfall,movement tions(voluntaryormandatory)orderedbystateorlocal
+speed, and predicted surge height), evacuation char- officialsalongthecoasts.Whilethereweresomecounty
+acteristics(e.g.,destination,durationbetweendecision differences in evacuation-order times, a general pattern
+and evacuation, travel time, and vehicle ownership), emerged:ofthethreestates,SouthCarolinacoastalres-
+household/housing characteristics (e.g., housing type idents received the first notice for a mandatory evac-
+and location, distance to water bodies, children, and uation on Tuesday 4 October, to begin Wednesday
+pets), and demographics (e.g., marital status, age, in- 5 October (Table 1). Florida coastal residents began
+come, education, and race/ethnicity). A number of receiving orders on Wednesday 5 October, with some
+these variables have been found to be either incon- countiesstartingwithvoluntaryorders,andescalating
+sistently significant or insignificant altogether, with tomandatory orders by Thursday 6 October. Georgia
+the exception of time of day, evacuation notice type coastal residents began receiving orders on the morn-
+(mandatory/voluntary),andsomeofthestorm-specific ingofThursday6October.
+characteristics.AsHurricaneMatthewpresentsanew
+b. Surveymethod
+casewithpotentiallydifferentcircumstances,itisthere-
+fore valuable to examine whether household character- Over 45000 postcard invitations were mailed to a
+isticspartiallyexplaindifferencesinevacuation,notonly randomcoastalresidentsampleinFlorida,Georgia,and
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 4 =====
+
+238 WEATHER, CLIMATE, AND SOCIETY VOLUME12
+TABLE1.Evacuationrecommendations/ordersandtimesforFlorida(FL),Georgia(GA),andSouthCarolina(SC)coastalcounties.See
+Fig.1foramapofthecounties.SourcesmayhavetobeaccessedviaanInternetarchiveorasupplementarysource.
+State County Locations/zones Type Dateordered(notes)
+FL Brevarda,b Barrierislands Mandatory 5Oct2016(tobegin1500LT5Oct)
+FL Duvala,c A,B,andC Mandatory 5Oct2016(beganasvoluntary)
+FL Flaglera AandB Mandatory 5Oct2016(beganasvoluntaryon
+5Oct;mandatoryby6Oct)
+FL IndianRiverb Barrierislands,mobilehomes,and Mandatory 6Oct2016(beganasvoluntary5Oct;
+low-lyingareas mandatoryby0800LT6Oct)
+FL Martinb Sewall’sPoint,HutchinsonIsland, Mandatory 5Oct2016(tohavebegun)
+JupiterIsland,andmobilehomes
+FL Nassaub A,C,andF Mandatory 6Oct2016(tobeginat0600LT)
+FL PalmBeachb AandB Mandatory 5Oct2016(tobegin5Oct)
+FL StJohnsb A,B,andF Mandatory 6Oct2016(beganasvoluntary5Oct;
+mandatoryby0600LT6Oct)
+FL StLuciea,b Barrierislandsandlow-lyingareas Mandatory 6Oct2016(beganasvoluntary5Oct;
+mandatoryby6Oct)
+FL StLuciea EastofU.S.Rte.1 Voluntary 5Oct2016(tohavebegun)
+FL Volusiab Beachside,low-lyingareas, Mandatory 6Oct2016(beganasvoluntary5Oct;
+recreationalvehicles,and mandatoryby0600LT6Oct)
+mobilehomes
+GA Bryan,Camden,Chatham, EastofInterstateHwy95(I-95) Mandatory 6Oct2016(morning)
+Glynn,Liberty,andMcIntoshd
+GA Abovecountiesd WestofI-95 Voluntary 6Oct2016(morning)
+SC Beaufort,Colleton,andJaspere A Mandatory Announced4Oct2016(tobegin
+1500LT5Oct)
+SC Berkeleye BandG Mandatory Announced4Oct2016(tobegin
+1500LT5Oct)
+SC Charlestone A,B,andC Mandatory Announced4Oct2016(tobegin
+1500LT5Oct)
+SC ColletonandJasperg B Mandatory 6Oct2016(‘‘effectiveimmediately’’
+on6Oct)
+SC Dorchestere B,D,E,andF Mandatory Announced4Oct2016(tobegin
+1500LT5Oct)
+SC GeorgetownandHorryf A Mandatory 6Oct2016(tobegin1200LT)
+ahttps://qa.flgov.com/2016/10/05/47411/.
+bhttps://web.archive.org/web/20161111062238/https://www.flgov.com/2016/10/05/gov-scott-issues-updates-on-hurricane-matthew-preparedness-
+efforts-as-storm-approaches-florida-3/.
+chttps://www.wokv.com/news/local/county-county-evacuations/EZPRnwk5crlzzmXQRVIsjJ/.
+dhttps://www.ajc.com/blog/politics/georgia-orders-evacuation-residents-six-coastal-counties-ahead-hurricane-matthew/Mua9aSGtAFb99j3kjqju4J/.
+ehttps://web.archive.org/web/20161220090450/http://scemd.org/component/content/article/11-home-page/news/240-matthew-news-release-4.
+fhttps://web.archive.org/web/20161230085832/http://scemd.org/component/content/article/11-home-page/news/245-matthew-news-release-8.
+ghttps://web.archive.org/web/20180330131242/http://www.scemd.org/component/content/article/11-home-page/news/247-matthew-
+news-release-9.
+SouthCarolinacoastalcountiesorderedtoevacuatefrom from this question, the respondent could skip any
+Matthew (Fig. 1). North Carolina was omitted from the questionstheydidnot want toanswer. Therewere 46
+study area because of storm track, strength, and lack of questions on topics like prior experience, risk area
+resources for additional surveys. Infogroup, a data ana- awareness, information sources, influences on behav-
+lytics services firm, provided the addresses for our sam- ior, and demographic questions. However, depending
+plingframeofhouseholdsinpotentialstorm-surgezones on certain responses, questions were automatically
+alongthecoast.Thepostcardsprovidedalinktoanonline skipped.Forinstance,ifsomeoneansweredthatthey
+surveyplatformmadeavailablebySurveyMonkey. didnotevacuate,thesurveyskippedablockofquestions
+Thesurveyinstrumentconsistedofatotalof49fixed- askingthemaboutevacuation(e.g.,wheredidtheygo,
+formatandopen-endedquestions.Thefirstquestionwas when they left, how much they spent, or how many
+requiredandaskedtherespondenttoentertheunique vehicles they took), and immediately led them to a
+code provided on their postcard, which allowed us to question about what factors influenced their decision
+match the mailing address to their responses. Aside to remain. The evacuee group could answer at most
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 5 =====
+
+APRIL2020 PHAM ET AL. 239
+TABLE2.Responseratesandconfidence.
+South
+Overall Florida Georgia Carolina
+Postcardsdelivered 48347 18240 10278 19829
+Responsesreceived 735 238 168 329
+Responserate(%) 1.52 1.30 1.63 1.66
+Responsesused 697 225 159 313
+Totalpopulationin 3814112 2375637 465135 973340
+studycounties
+Confidenceintervalsof 63.61 66.35 67.56 65.40
+responsesreceived
+survey deploymentand responsetime frame may have
+contributedtothelowresponserate.
+Thetotalsamplesizeofn5697breaksdownasfol-
+lows across the study area: Florida n 5 225, Georgia
+n5159,andSouthCarolinan5313.Table2provides
+an overview of the total responses received and the re-
+sponse rates, with corresponding confidence intervals.
+Thosewhosuppliedadeparturetimesumtoann5465
+outofatotalevacuationgroupofn5472(inotherwords,
+several respondents evacuated but did not provide us
+FIG.1.Florida,Georgia,andSouthCarolinacoastalcounties withatimeofdeparture).Someresponseswereunusable
+thatreceivedthehurricaneevacuationsurvey.Ourrandomse-
+as they were duplicates; a possible explanation for some
+lectionwasbasedonthespatialextentofhurricaneevacuation
+duplicates is that a respondent could have exited the
+zones and also included some residents living just outside the
+zonestopotentiallycapturedifferencesinbehavioronthebasis website(intentionallyorunintentionally)partwaythrough
+ofzonal/nonzonaloccupancy. the survey, returned, and took the survey again. Other
+responseswereomittedbecauseoftheirlargenumbersof
+48questions,whilethenonevacueegroupcouldanswerat skippedquestions(e.g.,answeringonlythreequestions,or
+most 35. One question provided the respondent an op- notansweringwhethertheyevacuated,whichwascentral
+portunitytosharetheirexperiencesandconcernsaboutthe to the analysis). Returned survey data were coded, stan-
+evacuationprocessorstate/localmanagementoftheevent dardized,andconsolidatedforuseintheanalyses.
+(freeresponse).Anotherquestionprovidedtherespondent
+c. Samplerepresentativeness
+an opportunity to enter into a drawing for a 16-GByte
+digitaltablet($399manufacturer’ssuggestedretailprice). Table 3 shows the demographic breakdown of our
+Respondentsweretoldthesurveywouldtakenomorethan sampleandthe24studyareacounties,usingdatafrom
+15min,andtheaveragesurveytakertook12min. the2015five-yearAmericanCommunitySurvey(ACS).
+TheInternet-baseddeliverywasdesignedtospeedup Whilemostofthesevaluesaresignificantlydifferent,we
+the deployment, response, and assessment of the re- onlyselectedtwoofthevariablesshownbelowforuse
+sponses. However, this survey method contributed to in the analysis (among other variables), household in-
+thelowresponserate(lessthan2%),becauseInternet- comeandnumberofvehiclesavailableatthehousehold.
+based surveys consistently provide low numbers of re- Further, the values from the ACS are at county-level
+spondents (Leece et al. 2004; Fan and Yan 2010; Guo scale, whereas our survey respondents live in coastal
+etal.2016),andontopofthis,overallsurveyresponse areas (i.e., evacuation zones), and this may result in
+ratesappeartobedecreasingovertime(Culletal.2005; someofthediscrepanciesshown.Weemphasizethatthe
+JohnsonandWislar2012).Additionally,lackofInternet sampleinthisstudyisnotasrepresentativeofthegen-
+accessorinabilitytouseInternet-basedserviceswould eralpopulationaswewouldlike,butprovidesauseful
+impacttheresponserate.Anumberofreasons,suchas casestudyofhurricaneevacuees.
+hurricanedamage,noInternetservice,rurality,age,or
+income, could skew the responses toward privileged
+4. Descriptiveresults
+populations. Further, the survey was accessible from
+Novembertomid-December2016,andinfluencessuch The survey found 68% of the 697 survey respon-
+asthenationalelectionsandholidayseasonduringthe dentsevacuated,withthefollowingstatebreakdown:
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 6 =====
+
+240 WEATHER, CLIMATE, AND SOCIETY VOLUME12
+TABLE3.Samplerepresentativeness. 73%), but a secondary motivator for South Carolina
+(57%). The difference may be due to the shift in clas-
+2015ACS Survey
+sificationfrom‘‘majorhurricane’’tosimply‘‘hurricane’’
+Demographicvariables (countylevel) (coastalareas)
+alongtheGeorgiacoast. However, it isunclearwhether
+Male 48.6% 49.5%
+theinterpretationsof‘‘hurricanestrength’’wereinregard
+Female 51.4% 50.5%
+Medianagea 41.3 63 toflood/surgepotential,windpotential,orboth.Athird
+White 73.3% 91.2% motivatingfactorinevacuatingwasreceivingamandatory
+BlackorAfricanAmerican 19.8% 4.6% evacuationorder(56%,66%,and56%,respectively).
+Atleastonevehicleavailable 93.5% 98.3%
+Medianhouseholdincomeb $48,676 $69,956 Departuretimes
+aAveragemedianagewascalculatedfrommedianagesprovided
+Given our primary interest in evacuation departure
+bytheACS,whereasmedianagewasusedforthesurvey.
+timing, the 472 respondents who said they evacuated
+bAveragehouseholdincomewasusedforthesurvey,becauseincome
+were asked the day and time of departure and were
+rangeswereprovidedtorespondents;midpointsofeachrangewere
+calculated,andthosemidpointswereusedtocalculatetheaverage. provided with 35 possibletime intervals,or time steps,
+tochoosefrom.464oftheserespondentsprovidedus
+62%oftheFloridasample(totaln5225),77%ofthe with a departure time. Admittedly, memory decay
+Georgiasample(totaln5159),and67%oftheSouth presentsaconcern,particularlytwomonthsafterthe
+Carolina sample (total n 5 313) evacuated. More event. We attempted to reduce these effects by pro-
+than 70% of the respondents said they received an vidinginthesurveybroadtimestepsthatcorrespond
+evacuationorderbutthisrangedfromalowof70%in toearlymorning,latemorning,earlyafternoon,lateaf-
+Florida, 72% in South Carolina, to 91% in Georgia. ternoon,evening,andlatenight.The35possiblechoices
+Interestingly,although89%,100%,and84%ofFlorida, consistofthe5-dayspanbetweenTuesday4October
+Georgia, and South Carolina respondents actually live and Saturday 8 October, with seven time segments
+inanyevacuationzone,respectively,only68%,65%,and [0000–0600, 0600–0900, 0900–1200, 1200–1500, 1500–
+71%answeredthattheirresidenceislocatedwithinone. 1800,1800–2100,and2100–0000localtime(LT)].
+Amongtheevacuees,thesurveyaskedwhatfactors For South Carolina, the initial peak of evacuee
+influenced the decision to evacuate (Fig. 2). For departures essentially falls between 0000 and 1800
+Florida,Georgia,andSouthCarolina,thehurricane’s Wednesday 5 October, which was the day South
+track was the primary motivator (79%, 75%, 71%, Carolina Governor Haley mandated most evacua-
+respectively),withmarginaltonosignificantdifferences tions to begin (Fig. 3). Voluntary and mandatory
+between the groups. The hurricane’s strength was an evacuationorders for coastal Florida residents came
+additional motivator for Florida and Georgia (79%, on5and6October,andthedeparturesforthesedays
+FIG.2.Factorsinfluencingthedecisiontoevacuate.
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 7 =====
+
+APRIL2020 PHAM ET AL. 241
+FIG.3.PercentofdeparturesfromTuesday4Octbetween0000and0600localtimetoFriday7Octbetween1800and2100localtime.The
+graphrepresentsonlythoseevacueeswhosuppliedadeparturetime(totaln5464;Floridan5139;Georgian5118;SouthCarolinan5207).
+are also visible in the plot, primarily between 0600 variability within a day, but we also aim to ameliorate
+and2100Thursday6October.Amoregradual,initial the effects of memory decay pertaining to the general
+peak can be seen on Wednesday 5 October. The timearespondentleft(e.g.,morning,afternoon,evening).
+mandatory evacuation order for Georgia was given Additionally, we briefly discuss some open-ended re-
+Thursday 6 October, showing a significant evacua- sponses,asstatisticalresultscannotcapturethecomplete
+tion response, followed by additional departures on evacuation experience or reveal factors contributing to
+Friday 7 October between 0900 and 1200. While a evacuation beliefs and behaviors that we may not have
+number of variables influenced a household’s deci- considered. Therefore it is also important to consider
+sion to evacuate (see Fig. 2), and some residents other factors like perceptions, past and current experi-
+do evacuate earlier (before an evacuation order), ences,andsocialfactorswhenanalyzinghumanbehavior.
+the sample data here highlight that an authorita-
+a. Logisticregressionanalysis
+tive evacuation order may be the primary triggering
+variable in the timing of departures. Although the Toexaminedifferencesinevacuationbehaviorand
+respondent-citedinfluencesinevacuationwereprimarily departure times as a function of household-level
+thetrackandstrengthofthehurricane,themoresignifi- characteristics five logistic regression models were
+cantresponsesintheplotforeachstateinFig.3areas- specified—one for the overall time period, and the
+sociatedwiththeevacuationordersgivenbythosestates. otherfourrepresentingeachdayofevacuation—and
+Thisfindingemphasizesthenecessityoftimelyactionin estimated using SAS/STAT software. While there are
+orderforsuccessfulevacuationprocedurestotakeplace multiplewaystodealwithmissingvalues(LittleandRubin
+and, in the event of another hurricane and evacuation, 2002; Kang 2013), they were only dealt with using the
+couldpromoteincreasedcompliance. defaultmethodoflistwisedeletion,thedefaultprocedure.
+The first regression models the probability of a
+household evacuating over the entire study period.
+5. Evacuationanddeparturetimeanalysis
+Fromthequestionsaskedinthesurvey,andbasedon
+Using logistic regression, we analyzed differences in existingliterature,wepareddownthevariablestothe
+behavioralresponses and their correlates for the4-day onesthoughttobeofimportancetotheanalysis;there
+period, and break down the analyses by day to assess were 12 variables (Table 4) selected for inclusion in
+which variables significantly contribute to departure the first regression (called ALLDAYS) because of
+timing.Inaggregatingthedeparturetimeresponsesby their potential to change the probability of a house-
+day, we understand that we are losing finer temporal holdevacuation.Forthefirstregression(ALLDAYS),
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 8 =====
+
+242 WEATHER, CLIMATE, AND SOCIETY VOLUME12
+TABLE4.Variablesselectedforinclusionintheregressions(ALLDAYSincludedall12,andDAY1–4excludedWHOSCORE,
+HOWSCORE,andTELLSCORE,foratotalof9).
+Variable Description Response Category
+STATE Dummyvariable:proxyfortimeofevacuationorder SC 1
+FL 2
+GA 3
+PREEXP Dummyvariable:whethertherespondenthasexperiencedahurricaneprior No 0
+toMatthew Yes 1
+EVACORDER Dummyvariable:whethertherespondentthinkstheyreceivedanorderto No 0
+evacuatefromMatthew Yes 1
+WHOSCORE Sumoftheno.oftypesofevacuation-informationsourcestherespondent 0–9
+used(police,media,governor,coworker,employer,etc.)
+HOWSCORE Sumoftheno.oftypesofevacuation-informationmodestherespondentused 0–9
+(socialmedia,radio,television,newspaper,face-to-facecommunication,etc.)
+TELLSCORE Sumoftheno.oftypesofpeopletherespondenttoldabouttheevacuationorder 0–6
+(neighbor,friend,coworker,employer,etc.)
+EVACZONE Dummyvariable:whethertherespondentthinkstheyliveinanevacuationzone No 0
+Yes 1
+Donotknow 2
+FEMAZONE Dummyvariable:whethertherespondentthinkstheyliveinaFEMA-designated No 0
+floodzone Yes 1
+Donotknow 2
+NLIVHH No.ofoccupantsinhousehold Freeresponse
+NAUTOHH No.ofautomobilesownedbyhousehold Freeresponse
+NPETS No.ofpetsinhousehold Freeresponse
+HHINC2015 Householdincomein2015asordinalvariable(fivelevels) Lessthan$22,000 1
+$22,001–$43,999 2
+$44,000–$65,999 3
+$66,000–$87,999 4
+$88,000ormore 5
+136 observations were deleted because of missing theirremovalwouldsignificantlychangethemeaningof
+values and 561 of the 697 observations were used. A the analysis. Of the 465 evacuee observations with de-
+correlationmatrixofourselectedvariablesisprovided parture times, 383 were used in each of the four regres-
+inTable5. sions.Forwardselectionwasusedtoidentifytheeffects
+The other four regressions model the relationship contributingtoevacuation.Thesignificancelevelselected
+between evacuation and multiple variables for each for entry into the model was 0.10, to not only capture
+of the four1 days of evacuation. In this way, we can significantvariablesata50.05,butalsotoidentifyvari-
+begintounderstandwhichvariablessignificantlyaffected ablesofinterestthatcouldbenefitfromfurtherstudy.We
+evacuation timing during Hurricane Matthew, for this want to emphasize that we selected a nonstandard sig-
+sample.Thedatausedwerestratifiedbyday(theregres- nificance level because of the exploratory, rather than
+sionsare labeled DAY1–DAY4), andvariables were se- definitive,natureofthestudy.
+lectedonthebasisofexistingliterature.Ofthequestions
+b. Resultsanddiscussionforoverallevacuation
+asked in the survey, there were nine regressors (see
+response
+Table4)selectedforinclusioninthemodelbecauseof
+theirpotentialtochangetheprobabilityofahousehold Theresultsofthefirstmodel(Table6)providesome
+evacuationintimeintervalt.Themillingvariableswere insighttowhyahouseholdevacuatedduringtheentire
+removedfromthevariablelistinthesefourregressions studyperiod.Overthedurationoftheevacuationforall
+because they increased the number of listwise-deleted three states, an evacuation response from this sample
+observationsduetomissingvalues,andwedidnotthink dependsonpriorexperiencewithhurricanes(p,0.01),
+receipt of an evacuation order (p , 0.01), and how
+manyotherstherespondenttoldabouttheevacuation
+(p,0.01).Whethertheybelievedtheyliveinanevacu-
+1BecauseonlyonerespondentneededtoevacuateonSaturday
+ationzone(p5 0.07),thenumberofpetsinthehouse-
+8OctoberbecauseoffloodingassociatedwithMatthew,themax-
+hold(p50.06),andhouseholdincome(p50.06)are
+imumlikelihoodestimatedoesnotexistforthefifthday’sregres-
+sionmodelandisthusinvalid.
+variablesofinterestwithpvaluesjustabovea50.05.
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 9 =====
+
+The results show there is strong evidence that the
+odds of evacuating for those without prior hurricane
+experienceareabouttwicetheoddsofevacuatingfor
+those with prior experience (Table 7), which contra-
+dicts the nonsignificant effect found in Baker (1991)
+and Huang et al. (2016). The importance of evacua-
+tionordersagreeswithpriorstudies(e.g.,Baker1991;
+Huang et al. 2016) since the odds of evacuating for
+thosewhothoughttheyreceivedanevacuationorder
+are about 4.8 times higher than those who thought
+they did not receive one. Similarly, for a one unit
+increase in the number of subjects the respondent
+told about the evacuation order, the odds of evacu-
+ating increased by a factor of about 1.2. This rela-
+tionshipbetweenmillingandevacuationhasnotbeen
+addressed in prior hurricane evacuation studies with
+theexceptionoftherecentLindelletal.(2019)flood
+evacuationstudy.
+Some prior research shows evidence that pet own-
+ership decreases the chance of evacuation for that
+household (Whitehead 2003; Edmonds and Cutter
+2008;BowserandCutter2015).Withahardcutoffat
+a50.05,ourresultscontradictsuchfindings;however,
+wearguethatitremainsavariableofinterestinthiscase
+study(p50.06),andthatwefindmarginalevidenceof
+howpetownershipmayconstrainevacuation.Incontrast,
+householdincomeplaysaninconsistentornonsignificant
+roleinevacuationbehavior(Huangetal.2016).Inour
+study,incomeisalsoavariableofinterest.However,
+one must acknowledge that income is often confounded
+withothervariablessuchasriskarea(Baker1991)and
+exercise caution with interpretation. Believing one’s
+residence is located in an evacuation zone has been
+showntobeinfluentialbutisinsignificanthere,although
+itisstillavariableofinterest(p50.07)andwefindit
+reasonabletoconcludethatwefoundmarginalevidence
+forriskareaawarenessaffectingevacuation.Toclarify,
+.snoitinfiedelbairavrof4elbaTeeS.)stneicfifeocnoitalerrocnosraeP(snoissergerehtnidesuselbairavehtfoxirtamnoitalerroC.5ELBAT
+5102CNIHH
+STEPN
+HHOTUAN
+HHVILN
+ENOZAMEF
+ENOZCAVE
+EROCSLLET
+EROCSWOH
+EROCSOHW
+REDROCAVE
+PXEERP
+ETATS
+veddtS
+naeM
+97.0
+87.1
+ETATS
+20.0
+54.0
+17.0
+PXEERP
+21.02
+51.0
+34.0
+57.0
+REDROCAVE
+80.0
+90.02
+90.0
+75.1
+52.1
+EROCSOHW
+74.0
+21.0
+30.02
+20.02
+27.1
+28.2
+EROCSWOH
+24.0
+93.0
+71.0
+30.0
+10.0
+85.1
+02.2
+EROCSLLET
+20.0
+10.0
+80.0
+71.0
+30.02
+90.0
+35.0
+31.1
+ENOZCAVE
+91.0
+10.0
+30.0
+10.0
+01.0
+10.02
+20.0
+77.0
+58.0
+ENOZAMEF
+00.0
+00.0
+01.0
+90.0
+11.0
+70.0
+70.02
+30.0
+51.1
+42.2
+HHVILN
+24.0
+70.02
+10.02
+00.0
+60.0
+60.0
+20.0
+20.0
+90.0
+98.0
+2
+HHOTUAN
+03.0
+63.0
+20.02
+20.02
+01.0
+70.0
+60.0
+10.02
+70.0
+21.0
+98.1
+93.1
+STEPN
+70.0
+62.0
+41.0
+01.02
+30.0
+30.0
+21.0
+50.0
+41.0
+60.02
+10.02
+82.1
+58.3
+5102CNIHH
+APRIL2020 PHAM ET AL. 243
+TABLE6.Analysisofeffectsandsignificance.SeeTable4for
+variabledefinitions.Variablesthataresignificantata50.05are
+indicatedbyanasterisk.Here,DFisdegreesoffreedom.
+Effect DF Waldchi-square pvalue
+STATE 1 0.03 0.87
+PREEXP* 1 10.31 0.00
+EVACORDER* 1 37.94 0.00
+WHOSCORE 1 0.13 0.72
+HOWSCORE 1 0.08 0.78
+TELLSCORE* 1 7.49 0.00
+EVACZONE 2 5.32 0.07
+FEMAZONE 2 2.55 0.28
+NLIVHH 1 0.08 0.78
+NAUTOHH 1 0.38 0.54
+NPETS 1 3.68 0.06
+HHINC2015 1 3.50 0.06
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 10 =====
+
+244 WEATHER, CLIMATE, AND SOCIETY VOLUME12
+TABLE7.Oddsratioestimatesforevacuation,andWaldcon- future evacuation decisions. A sampling of such re-
+fidence intervals for the odds ratio estimates. See Table 4 for sponsesisinTable8.
+variabledefinitions.Variablesthataresignificantata50.05are
+indicatedbyanasterisk. c. Resultsanddiscussionforanalysesbyday
+90% The model results for each day allow us to assess
+confidence the potential reasons for the departure timing of
+Oddsratio Estimate limits
+evacuations (Table 9). The results for the first day
+STATE 0.98 0.78 1.22 (DAY1—Tuesday 4 October) show that only the
+PREEXPnovsyes* 2.23 1.48 3.35 STATE variable was found to significantly affect
+EVACORDERnovsyes* 0.21 0.14 0.32
+evacuation,withnumberofautomobiles(NAUTOHH)
+WHOSCORE 0.97 0.86 1.1
+HOWSCORE 0.98 0.87 1.1 as a variable of interest. The regression results for
+TELLSCORE* 1.23 1.08 1.38 both the second and third days (DAY2—Wednesday
+EVACZONEnovsyes 0.43 0.21 0.89 5October;DAY3—Thursday6October)revealvery
+EVACZONEnovsdonotknow 0.34 0.16 0.73 strong evidence that the chance a household evacu-
+EVACZONEyesvsdonotknow 0.79 0.51 1.22
+ates changes only with the state/time of evacuation
+FEMAZONEnovsyes 0.71 0.48 1.06
+FEMAZONEnovsdonotknow 0.72 0.47 1.11 order,holdingallothervariablesconstant.Onday4of
+FEMAZONEyesvsdonotknow 1.01 0.64 1.60 theevacuation—Friday7October—HurricaneMatthew
+NLIVHH 0.97 0.83 1.14 was just off the east coast of Florida as a category-4
+NAUTOHH 0.92 0.74 1.14 hurricane (downgraded to a 3 on the same day). The
+NPETS 0.90 0.82 0.99
+results for the fourth day (DAY4) reveal strong evi-
+HHINC2015 1.17 1.02 1.35
+dence that the chance a household evacuates changes
+bystate(STATE)andpreviousevacuationexperience
+anyinaccuraciesintherespondents’knowledgeoftheir (PREEXP),whilethereceiptofanevacuationorderis
+risk area (see section 4, descriptive results) do not in- onlywhatweconsideravariableofinterest.Noother
+validatetheseresults,astheresultsdonotnecessarily variables met the 0.10 significance criteria for entry
+rely on the actual knowledge of living in an evacua- intothemodels.
+tionzone,butratherthebelieforperceptionthatone While Table 9 shows that STATE significantly af-
+does/does not live in a zone. In other words, regard- fected evacuation on DAY1, Table 10 shows that this
+lessofwhethertheyareactuallylocatedinazone,if effect disappears with the addition of the variable for
+they believe that they do or do not, it may have an number of automobiles (we acknowledge that this is a
+impact on their evacuation behavior. In this case, drawback of the selection method). Effectively, there
+surprisingly, it appears to not have had a strong arenosignificantvariablesonDAY1.Becausethefirst
+significanteffect. evacuation orders were announced on day 1 (Tuesday
+There are inconsistencies in previous research re- 4October)inSouthCarolina(tobeginofficiallyonday2),
+sultsontheinfluenceofpasthurricaneexperienceon people were still making the necessary preparations for
+evacuation response. Based on our results, there is evacuation.Inotherwords,intermsofofficialevacuation
+strongevidencethatthelackofpriorhurricaneexpe- procedures, relatively little had happened on day 1 for
+rience increased the chance of an evacuation, com- residentsexceptforreceivinga‘‘headsup’’topreparefor
+pared to those who had past hurricane experience. evacuatingthefollowingdays.Somerespondentssaidthat
+There are many potential explanations for this phe- they left on day 1, but not many. The number of auto-
+nomenon.Forexample,moreexperiencedindividuals mobilesdoesnothaveasignificanteffectata50.05,butit
+or households feel better prepared to weather a hur- maybeworthnotingthattherewasmarginalevidencethat
+ricane,orthatpasthurricaneswerenotsevereenough morecarsinahouseholddecreasedthechanceofevacu-
+towarrantanevacuation.Anotherreasoncouldbethat ation on day 1. This could be reflective of a household
+past hurricanes were regarded as inconvenient experi- decidingwhatvehicle(s)totake,decidingwhethertosplita
+ences(Demuthetal.2016)compoundedbyfactorssuch householdintomultipledepartures,oralargerhousehold
+as traffic concerns or not being able to return home withmoreassetstoconsiderintheevacuationprocess.
+promptly (e.g., Dash and Morrow 2000). Open-ended Incontrast,forthesecondday(Wednesday5October),
+responsesfromoursurveyofferadditionalinsights.For thereisstrongevidencethatthetimeofevacuationorder
+example,somerespondentsnotonlycomplainedabout was a key indicator because the odds of evacuation for
+the delay in returning home, but also were incredibly South Carolina respondents were about 7 times those
+frustrated with the lack of communication about the ofGeorgiarespondents,andtheoddsofevacuationfor
+delay, with some stating that these would be factors in Florida respondents were about 4.7 times those of
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 11 =====
+
+APRIL2020 PHAM ET AL. 245
+TABLE8.Selectedquotationsfromrespondentsreflectingfrustrationsthatmayimpactfutureevacuationdecisions.
+Georgia
+‘‘AfterhurricaneFloyddidnot[want]togetinthemassivetrafficjam.’’
+‘‘ThecityofBrunswickhadauniqueexperiencewithre-entry.Thecityannouncedthateveryonewasallowedtoreturnwithno
+limitations/exceptions,butthestatetroopersblockedtheon/offrampsandrefusedre-entrytoanyone,includingresidents.Foranentire
+day,theyre-directedpeopleattemptingtore-enterBrunswickaroundandaroundaloop.Thetrooperswerenothelpfulinproviding
+information,andevenprohibitedourlocalnewsreporters(whostayedtokeeplocalsinformedaboutthesituation)fromenteringthe
+city.Thisexperiencewilldefinitelynegativelyfactorintoanyfuturedecisiontoevacuate.’’
+‘‘Wouldprobablyleaveforastrongerhurricaneormoredirecthit.Neighborshadtroublereturninghome,whichdiscouragessomefrom
+evacuating.’’
+‘‘Onemajorconcernofevacuatingwasthedifficultyofreturninghome.Westayedandwouldhavehadtowaitseveraldaystoreturnhome
+tocheckonourhouse.’’
+Florida
+‘‘Governoroverplayedevacuationrequirements.’’
+‘‘Iwouldevacuateasalastchoice.Beingonapeninsula,youstandagoodchanceofbeingstuckontheroad.Also,thehurricaneschange
+directionandunlessit’sacat5,I’dstayput.’’
+‘‘Ourgatedcommunityis.4milefromtheAtlantic.Alimbhitourdeckrailingcausinglightdamageotherwiseweweretotallyuntouched.
+NexttimeI’llstay.’’
+‘‘Iwillbebetter[prepared]thenexttime.[And]leaveearlyorstayontheislandlikemostofmyfamilythiswasnotagoodexperiencejust
+likeFloyd,ormoveoutofthisstate.’’
+SouthCarolina
+‘‘Theyneededtolettheresidentsbackinsoonerthantheydid.Thiswill[affect]mydecisiontostayorgoforthenextHurricane.’’
+‘‘We’dconsiderevacuationforfutureanticipatedhurricanestrikestotheLowcountry,aswe’llneverforgetexperiencingHurricaneHugo
+atafriend’snewhomeinGooseCreek.However,thestategovernment’snever-failinginterminabledelayinallowingpropertyowners
+toreturnhomeandsecuretheirstructure(s)andbelongingsprohibitsusingoodconsciencefromseriouslyconsideringactuallymaking
+anevacuationunlessthere’sa901%probabilityofabsolutetotaldestructioninthesouthernDorchesterCountyarea.’’
+‘‘TheGovernorwastotallyhystericalandraisedtoomuchpublicalarmforaminorhurricane.IwillnotevacuatenexttimeunlessIam
+convincedbymyownevaluationthatthehurricaneistrulydangerous.Iwastedover$900intravelandhotelexpensesforatotally
+unnecessaryevacuation.Theevacuationordershouldhavebeenrestrictedstrictlytocoastalareas/islands.Toomanypeoplewere
+evacuatedcausingchaosandtoomanypeopleontheroads.’’
+‘‘Duetoreturnprocessdelayof3days,notsurewewillevacuatenexttime.’’
+Georgiarespondents.Onday3ofevacuation,wefound respondentswereabout6timesthoseforpeopleliving
+that the odds of evacuation for Georgia respondents in Florida on day 4 (1/0.161). Evacuations ordered for
+were almost 5 times the odds of evacuation for South coastalGeorgiabeganonThursday(day3),andmostof
+Carolina respondents (1/0.206), whereas there was no theFloridaresidentswhocouldevacuateorwhowanted
+significant difference in evacuation between Georgia toevacuatemayhavedonesobythistime,resultingin
+andFloridarespondents.Weframetheseresultsinthe this difference. We find marginal evidence that the re-
+contextofevacuationorderorannouncementtimes—in ceipt of an evacuation order affected evacuation on
+general, 4 October for South Carolina, 5 October for DAY4,wherebythosewhodidnotreceiveanordermay
+Florida,and6OctoberforGeorgia. havebeenmorelikelytoevacuate.Weinferthatpoten-
+For the fourth day, there is strong evidence that the tiallymostofthosewhodidreceiveanorderhadalready
+oddsofevacuatingforthosewithpriorhurricaneexpe- evacuated, so the only people who could still evacuate
+rience were almost 2.5 times the odds of evacuating wouldbethosewhodidnotreceiveanevacuationorder.
+for those without prior hurricane experience (1/0.404), Overall,weseethattherearechangesintheevacuation
+which contrasts the results for the overall period patternsofeachstateovertime.Weessentiallyfindthat
+(see Table 7). The odds of evacuation for Georgia the chance a household evacuates changes with the
+TABLE9.Variablesmeetingthecriteriatoenterthemodelsviaforwardselection.SeeTable4forvariabledefinitions.
+Modeldayno.: 1 1 2 3 4 4 4
+Effectentered STATE NAUTOHH STATE STATE STATE PREEXP EVACORDER
+DF 2 1 2 2 2 1 1
+No.in 1 2 1 1 1 2 3
+Scorechi-square 7.07 3.48 31.58 41.86 11.60 7.46 3.22
+pvalue 0.03 0.06 0 0 0 0 0.07
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 12 =====
+
+246 WEATHER, CLIMATE, AND SOCIETY VOLUME12
+TABLE10.Analysisofmaximumlikelihoodestimates—DAY1–DAY4.SeeTable4forvariabledefinitions.Variablesthataresignificant
+ata50.05areindicatedbyanasterisk.Here,‘‘Exp(est)’’referstotheexponentiatedparameterestimates.
+Parameter DF Estimate Stderror Waldchi-square pvalue Exp(est)
+DAY1 Intercept 1 22.50 0.97 6.72 0 0.082
+STATE SC 1 1.24 0.77 2.56 0.11 3.445
+STATE FL 1 0.05 0.93 0.00 0.96 1.053
+NAUTOHH 1 20.64 0.34 3.57 0.06 0.525
+DAY2 Intercept 1 22.25 0.35 41.03 0 0.106
+STATE* SC 1 1.96 0.38 26.35 0 7.107
+STATE* FL 1 1.54 0.40 14.50 0 4.659
+DAY3 Intercept 1 0.81 0.22 13.06 0 2.241
+STATE* SC 1 21.58 0.28 32.75 0 0.206
+STATE FL 1 20.41 0.30 1.92 0.17 0.664
+DAY4 Intercept 1 21.75 0.19 84.67 0 0.173
+STATE SC 1 20.33 0.35 0.92 0.34 0.718
+STATE* FL 1 21.83 0.54 11.62 0 0.161
+PREEXP* no 1 20.91 0.37 6.10 0.01 0.404
+EVACORDER no 1 0.72 0.41 3.14 0.08 2.052
+time or day of the evacuation order/announcement, initial insight into how or why the nature of the offi-
+controlling for all other variables. Respondent com- cialorderscanchangetheprobabilitiesofevacuation.
+ments buttress these results—a few comments from In this sample, overall, the residents who evacuated
+Georgia residents were positive with regard to the duringHurricaneMatthewlackedpriorhurricaneevacu-
+evacuation experience, but many mentioned difficul- ation experience, received an evacuation order, solicited
+tieswiththeevacuationorder(s)beingissuedtoolate more information and communicated more with others
+to evacuate (Table 11). In other words, such com- regarding the order. Not only do our empirical results
+mentsillustratethetriggeringnatureofanevacuation confirm past research on the significance of evacuation
+order, and imply that some were waiting for an au- ordersfrompublicofficialsontheevacuationbehaviorof
+thoritativeorder,andotherswouldhaveevacuatedif residents, they highlight that official recommendations
+theordercamesooner. mayinitiallybethemoreinfluentialdriverfortakingthe
+first steps to make the decision to leave. Moreover, the
+state variable, a proxy for time of evacuation order, was
+6. Conclusions
+the only significant variable for each of the three main
+This research set out to assess spatial and temporal days of evacuation. The relative differences between
+differences in evacuation behaviors during Hurricane the states (e.g., odds ratios) generally matches the
+Matthew, taking into account selected household-level times/daysoftheofficialrecommendations.
+variablesthatcouldexplainsuchdifferencesindecisions Thecoastlinewascontainedintheconeofuncertainty
+toevacuateandtimeofdeparture.Throughasurveyof fromNationalHurricaneCenteradvisories22–43based
+coastalresidents,descriptivestatistics,regressionresults, on the strength of the storm and its path. Many prior
+andrespondentcommentsweshowthattherearemany studies on departure time have found storm-specific
+smalldifferencesinevacuationbehaviorsanddrivers,but characteristicstobesignificantintheireffectsonde-
+therewere significant differences inthe timing between parture time. We did not include such variables.
+South Carolina and Georgia, and between Florida and However, we can infer that the announcement and
+Georgiaresidentsingeneral.Priorstudieshaveindicated implementation of mandatory evacuation orders was
+that official evacuation orders significantly and consis- themajorfactorinfluencingstatedifferencesandthe
+tently affect whether households evacuate, but as this timingofdeparturesinthissample,ratherthansimply
+studythoroughlydemonstrates,officialevacuationorders the proximity to the storm or physical dynamic hur-
+also affect the timing of household evacuation. We ricane properties. Our results support many of the
+benefitedfromtheforecasttrackofthehurricane,which conclusions drawn by Fu et al. (2007) regarding the
+elicitedalargeandvariedresponsefromauthoritiesand influenceofevacuationordertimingonthedistribution
+residents in three states as the storm moved north. of evacuees over multiple days. Based on Matthew’s
+Further, while our statisticalresults add to the plethora forecast path and wind speeds, if proximity, time to
+of research on the correlates of evacuation behaviors, landfall, projected storm surge, or strength were as
+the open-responsecomments fromrespondents provide influential as evacuation orders, we would have seen
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 13 =====
+
+APRIL2020 PHAM ET AL. 247
+TABLE11.SelectedquotationsfromGeorgiarespondentsreflectingonthetimingoftheevacuationorder.
+‘‘Georgiawaitedtoolongtoissuetheevacuation.’’
+‘‘Itappearedthatthestatewastheonlyoneconsideringallsurroundingstatesthatdidnotknowwhattodoandwhen(...).’’
+‘‘IthoughtthegovernorshouldhavebeenonTVearliergivingGAresidentsinformation.MostofourinformationwasfromtheFL
+governor.WeliveclosetoJAXsowejustfollowedhisinstructions.’’
+‘‘TheEMAdidapoorjobatkeepingthepublicinformed.TheEMAofCamdenCountydidn’tissueanevacuationorderuntillate
+Thursdayafternoon.’’
+‘‘ItappearedtomeandsomeneighborsthatGovDealwasforcedto‘‘uphisgame’’duetotheexcellentresponseofGovHaleyinSC.He
+appeareduninteresteduntilthestormwasclosing-inontheGAcoast.’’
+‘‘MostoftheinformationavailablewasfromSouthCarolina.WehadlittleinformationavailablefromGeorgia(...)Thiswasnotjustmy
+opinion,itwastheopinionofmany.Wecalledeachotherbyphone(...)tocompareinformation.Mosthadlittle.Thiswasoneofthe
+worstevacuationsthatIhaveexperienced,andbecauseoflackofinformation,andtimely,evacuationnotice.’’
+‘‘NoteveryonehasFacebooksootherinformationoutputmethodswouldbehelpful.’’
+‘‘Makethemandatoryevacuationsoonerandmakeemployeesnotdemandthatemployeesreturntoworkthedayafterthehurricane.’’
+‘‘SCwassogood,andtheGeorgiastategovernmentwaswaybehindthe8-ball.’’
+‘‘Thestateofficewaited[too]longtocalltheevac(...)Reentrywashandledpoorly,localauthoritiesdidnotcommunicatewith
+eachother.’’
+‘‘Ifeltthestateshouldhavegotteninvolvedalittlequickerthanwhattheydid,knowingthatthehurricanewasheadinginourdirection.’’
+‘‘WeshouldfollowSCleadnexttime.TheyhandleditmoreeffectivelythanGA.’’
+‘‘Wedependedonalocalradiogroupthathadnonstopcoverageduringthestormandaftermath(...)Theevacuationnoticeswerenot
+clearandseemedtocomeverylate.’’
+evacuationshappeningaslateaspossibleintermsoftime Acknowledgments. We thank the surveyed residents
+tolandfall(e.g.,Sarwaretal.2016),andgenerallyinorder of Florida, Georgia, and South Carolina for taking the
+fromFlorida,thenGeorgia,thenSouthCarolina.Wedid timetorespondtoourquestionnaire.Thisstudywould
+not observe that spatial pattern. Whether the orders re- not bepossible without them. We also thank thethree
+sulted directly in a household’s evacuation response or anonymousreviewersfortheirhelpfulcomments.
+resulted in a household researching the storm-specific
+variables that then convinced them to leave, or they re-
+REFERENCES
+sulted in a household discussing possible options with
+friendsorneighbors,clearlytheinfluenceoftheauthori- Arlikatti,S.,M.K.Lindell,C.S.Prater,andY.Zhang,2006:Risk
+areaaccuracyandhurricaneevacuationexpectationsofcoastal
+tativerecommendationwasthemotivatorformanyresi-
+residents. Environ. Behav., 38, 226–247, https://doi.org/10.1177/
+dents to take protective action. Such findings clearly
+0013916505277603.
+emphasizethesignificanceofatimelyevacuationorder. Baker, E. J., 1991: Hurricane evacuation behavior. Int. J. Mass
+The aim of this paper was to contribute an addi- Emerg.Disasters,9,287–310.
+tional dimension to the wealth of hurricane evacua- Bowser,G.C.,andS.L.Cutter,2015:Stayorgo?Examining
+decision making and behavior in hurricane evacuations.
+tion literature through an analysis of the timing of
+Environment, 57, 28–41, https://doi.org/10.1080/00139157.
+evacuation departures. The limitations discovered in
+2015.1089145.
+thisstudy—decreasingsurveyresponseratesovertime, Broad, K., A. Leiserowitz, J. Weinkle, and M. Steketee, 2007:
+missingresponses,ortimeandmonetaryconstraintsof Misinterpretations of the ‘‘cone of uncertainty’’ in Florida
+conductingsurveyresearch—presentopportunitiesfor duringthe2004hurricaneseason.Bull.Amer.Meteor.Soc.,88,
+651–668,https://doi.org/10.1175/BAMS-88-5-651.
+more methodological improvements and should push
+Collins, J., R. Ersing, and A. Polen, 2017: Evacuation decision-
+ustoconsiderothercomplementarysourcesofdatafor
+makingduringHurricaneMatthew:Anassessmentoftheef-
+hurricaneevacuationresearch.Othernovelmethodsof fects of social connections. Wea. Climate Soc., 9, 769–776,
+assessing evacuation responses, while critical in time- https://doi.org/10.1175/WCAS-D-17-0047.1.
+linessofresults,maynotaddressthequestionofwhyan ——,——,——,M.Saunders,andJ.Senkbeil,2018:Theeffectsof
+social connections on evacuation decision making during
+individualorhouseholddidordidnotevacuate,orhow
+HurricaneIrma.Wea.ClimateSoc.,10,459–469,https://doi.org/
+one evacuation can affect a future evacuation (e.g.,
+10.1175/WCAS-D-17-0119.1.
+Martínetal.2017).Yet,withmoredataandcomplete
+Cull, W. L., K. G. O’Connor, S. Sharp, and S.-f. S. Tang, 2005:
+data, possibly aggregated from multiple sources (e.g., Responseratesandresponsebiasfor50surveysofpediatri-
+obtaining from a survey a higher response rate with cians.HealthServ.Res.,40,213–226,https://doi.org/10.1111/
+fewer skipped questions, combined with tracking and j.1475-6773.2005.00350.x.
+Dash,N.,andB.H.Morrow,2000:Returndelaysandevacuation
+transportation data), better results could come from
+order compliance: The case of Hurricane Georges and the
+similaranalyses,withamorecompletepictureof var- Florida Keys. Global Environ. Change, 2, 119–128, https://
+iablesthatcontributetoevacuationbehaviors. doi.org/10.1016/S1464-2867(01)00008-0.
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC
+
+===== PAGE 14 =====
+
+248 WEATHER, CLIMATE, AND SOCIETY VOLUME12
+Demuth,J.L.,R.E.Morss,J.K.Lazo,andC.Trumbo,2016:The ——,J.E.Kang,andC.S.Prater,2011:Thelogisticsofhousehold
+effectsofpasthurricaneexperiencesonevacuationintentions hurricane evacuation. Nat. Hazards, 58, 1093–1109, https://
+through risk perception and efficacy beliefs: A mediation doi.org/10.1007/s11069-011-9715-x.
+analysis.Wea.ClimateSoc.,8,327–344,https://doi.org/10.1175/ ——,S.Arlikatti,andS.K.Huang,2019:Immediatebehavioral
+WCAS-D-15-0074.1. response to the June 17, 2013 flash floods in Uttarakhand,
+Dixit,V.,C.Wilmot,andB.Wolshon,2012:Modelingriskattitudes NorthIndia.Int.J.DisasterRiskReduct.,34,129–146,https://
+inevacuationdeparturechoices.Transp.Res.Rec.,2312,159– doi.org/10.1016/j.ijdrr.2018.11.011.
+163,https://doi.org/10.3141/2312-17. Little, R. J. A., and D. B. Rubin, 2002: Statistical Analysis with
+Dow,K.,andS.L.Cutter,1998:Cryingwolf:Repeatresponsesto MissingData.JohnWileyandSons,408pp.
+hurricane evacuation orders. Coastal Manage., 26, 237–252, Martín, Y., Z. Li, and S. L. Cutter, 2017: LeveragingTwitterto
+https://doi.org/10.1080/08920759809362356. gauge evacuation compliance: Spatiotemporal analysis of
+——,and——,2002:Emerginghurricaneevacuationissues:Hurricane HurricaneMatthew.PLOSONE,12,e0181701,https://doi.org/
+FloydandSouthCarolina.Nat.HazardsRev.,3,12–18,https:// 10.1371/journal.pone.0181701.
+doi.org/10.1061/(ASCE)1527-6988(2002)3:1(12). Mileti,D.S.,andL.Peek,2000:Thesocialpsychologyofpublic
+Edmonds,A.S.,andS.L.Cutter,2008:Planningforpetevacua- response to warnings of a nuclear power plant accident.
+tions during disasters. J. Homel. Secur. Emerg. Manage., 5, J.Hazard.Mater.,75,181–194,https://doi.org/10.1016/S0304-
+1547–7355,https://doi.org/10.2202/1547-7355.1445. 3894(00)00179-5.
+Eiser,J.R.,A.Bostrom,I.Burton,D.M.Johnston,J.McClure, ——, and J. H. Sorensen, 2019: A guide to public alerts
+D.Paton,J.vanderPligt,andM.P.White,2012:Riskinter- and warnings for dam and levee emergencies. U.S.
+pretationandaction:Aconceptualframeworkforresponses ArmyCorpsofEngineersPamphletEP1110-2-17,30pp.,https://
+tonaturalhazards.Int.J.DisasterRiskReduct.,1,5–16,https:// www.publications.usace.army.mil/Portals/76/Users/182/86/2486/
+doi.org/10.1016/j.ijdrr.2012.05.002. EP%201110-2-17.pdf?ver52019-06-20-152050-550.
+Fan,W.,andZ.Yan,2010:Factorsaffectingresponseratesofthe NationalWeatherService,2006:HurricaneCharley,August9–15,
+websurvey:Asystematicreview.Comput.Hum.Behav.,26, 2004,NOAA/NationalWeatherServiceServiceAssessment,
+132–139,https://doi.org/10.1016/j.chb.2009.10.015. 29pp.,https://www.weather.gov/media/publications/assessments/
+Fu,H.,C.G.Wilmot,H.Zhang,andE.J.Baker,2007:Modeling Charley06.pdf.
+thehurricaneevacuationresponsecurve.Transp.Res. Rec., Pasch, R. J., D. P. Brown, and E. S. Blake, 2004: Hurricane
+2022,94–102,https://doi.org/10.3141/2022-11. Charley(9–14August2004).NationalHurricanCenterTropical
+Guo,Y.,J.A.Kopec,J.Cibere,L.C.Li,andC.H.Goldsmith, Cyclone Rep., 23 pp., https://www.nhc.noaa.gov/data/tcr/
+2016:Populationsurveyfeaturesandresponserates:Aran- AL032004_Charley.pdf.
+domizedexperiment.Amer.J.PublicHealth,106,1422–1426, Pel, A. J., S. P. Hoogendoorn, and M. C. J. Bliemer, 2010:
+https://doi.org/10.2105/AJPH.2016.303198. Evacuation modeling including traveler information and com-
+Hasan, S., R. Mesa-Arango, and S. Ukkusuri, 2013: A random- pliance behavior. Procedia Eng., 3, 101–111, https://doi.org/
+parameter hazard-based model to understand household 10.1016/J.PROENG.2010.07.011.
+evacuationtimingbehavior.Transp.Res.,27C,108–116,https:// Sarwar,M.T.,P.C.Anastasopoulos,S.V.Ukkusuri,P.Murray-Tuite,
+doi.org/10.1016/j.trc.2011.06.005. andF.L.Mannering,2016:Astatisticalanalysisofthedynamics
+Huang,S.K.,M.K.Lindell,andC.S.Prater,2016:Wholeavesand ofhouseholdhurricane-evacuationdecisions.Transportation,
+whostays?Areviewandstatisticalmeta-analysisofhurricane 45,51–70,https://doi.org/10.1007/s11116-016-9722-6.
+evacuation studies. Environ. Behav., 48, 991–1029, https:// Sbayti, H., and H. Mahmassani, 2006: Optimal scheduling of
+doi.org/10.1177/0013916515578485. evacuation operations. Transp. Res. Rec., 1964, 238–246,
+Johnson,T.P.,andJ.S.Wislar,2012:Responseratesandnonre- https://doi.org/10.1177/0361198106196400126.
+sponse errors in surveys. J. Amer. Med. Assoc., 307, 1805– Smith, S. K., and C. McCarty, 2009: Fleeing the storm(s): An
+1806,https://doi.org/10.1001/jama.2012.3532. examination of evacuation behavior during Florida’s 2004
+Kang, H., 2013: The prevention and handling of the missing hurricaneseason.Demography,46,127–145,https://doi.org/
+data.KoreanJ.Anesthesiol.,64,402,https://doi.org/10.4097/ 10.1353/dem.0.0048.
+kjae.2013.64.5.402. Stein, R. M., L. Dueñas-Osorio, and D. Subramanian, 2010:
+Koshute, P., 2013: Evaluation of existing models for prediction of Whoevacuateswhenhurricanesapproach?Theroleofrisk,
+hurricaneevacuationresponsecurves.Nat.HazardsRev.,14,175– information,andlocation.Soc.Sci.Q.,91,816–834,https://
+181,https://doi.org/10.1061/(ASCE)NH.1527-6996.0000108. doi.org/10.1111/j.1540-6237.2010.00721.x.
+Leece, P., M. Bhandari, S. Sprague, M. F. Swiontkowski, E. H. Stewart, S. R., 2016: Hurricane Matthew (AL142016). National
+Schemitsch,P.Tornetta,P.J.Devereaux,andG.H.Guyatt, Hurricanes Center Tropical Cyclone Rep., 96 pp., https://
+2004: Internet versus mailed questionnaires: A controlled www.nhc.noaa.gov/data/tcr/AL142016_Matthew.pdf.
+comparison(2).J.Med.InternetRes.,6,e39,https://doi.org/ Whitehead,J.C.,2003:Onemilliondollarspermile?Theopportu-
+10.2196/jmir.6.4.e39. nitycostsofhurricaneevacuation.OceanCoastalManage.,46,
+Lindell, M. K., and C. S. Prater, 2007: Critical behavioral as- 1069–1083,https://doi.org/10.1016/j.ocecoaman.2003.11.001.
+sumptions in evacuation time estimate analysis for private ——,B.Edwards,M.VanWilligen,J.R.Maiolo,K.Wilson,andK.T.
+vehicles: Examples from hurricane research and planning. Smith,2000:Headingforhigherground:Factorsaffectingrealand
+J. Urban Plann. Dev., 133, 18–29, https://doi.org/10.1061/ hypotheticalhurricaneevacuationbehavior.Environ.Hazards,2,
+(ASCE)0733-9488(2007)133:1(18). 133–142,https://doi.org/10.1016/S1464-2867(01)00013-4.
+——, J. C. Lu, and C. S. Prater, 2005: Household decision Wong-Parodi,G.,andI.Feygina,2018:Factorsinfluencing(mal)
+makingandevacuationinresponsetoHurricaneLili.Nat. adaptiveresponsestonaturaldisasters:ThecaseofHurricane
+Hazards Rev., 6, 171–179, https://doi.org/10.1061/(ASCE) Matthew. Wea. Climate Soc., 10, 747–768, https://doi.org/
+1527-6988(2005)6:4(171). 10.1175/WCAS-D-17-0138.1.
+Unauthenticated | Downloaded 05/19/26 07:20 AM UTC

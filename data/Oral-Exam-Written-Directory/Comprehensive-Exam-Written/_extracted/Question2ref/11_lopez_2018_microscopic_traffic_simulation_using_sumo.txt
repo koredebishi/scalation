@@ -1,0 +1,676 @@
+===== PAGE 1 =====
+
+2018 21st International Conference on Intelligent Transportation Systems (ITSC)
+Maui, Hawaii, USA, November 4-7, 2018
+Microscopic Traffic Simulation using SUMO
+Pablo Alvarez Lopez, Michael Behrisch, Laura Bieker-Walz, Jakob Erdmann, Yun-Pang Flo¨ttero¨d,
+Robert Hilbrich, Leonhard Lu¨cken, Johannes Rummel, Peter Wagner and Evamarie Wießner
+Abstract—Microscopic traffic simulation is an in- lot of model extensions, simulation enhancements and
+valuabletoolfortrafficresearch.Inrecentyears,both improvementshavebeenmade.Thispublicationpresents
+the scope of research and the capabilities of the tools
+an overview of the functionality and the used simula-
+havebeenextendedconsiderably.Thisarticlepresents
+tion models in SUMO. First, a general introduction of
+thelatestdevelopmentsconcerningintermodaltraffic
+solutions, simulator coupling and model development the work flow with traffic simulations is given. Second,
+and validation on the example of the open source example scenarios are presented which are also freely
+traffic simulator SUMO. available to give researchers the chance to start with
+their research without the need to setup a complex
+I. Introduction
+scenario first. Next, different models, concepts and tools
+For the implementation of traffic management solu- are explained to support the work of traffic researchers.
+tions accurate knowledge of the traffic conditions and Finally, an outlook of the works with SUMO is stated.
+dynamicsisnecessary.Trafficsimulationframeworkspro-
+II. Workflow
+videahelpfultooltoanswercomplexresearchquestions,
+to evaluate or to test traffic management strategies and
+In order to simulate traffic, a number of elements are
+their impacts. The traffic simulation tools can mainly be
+needed. The most important ones are the following
+divided into four different groups [17]:
+• Network data (e.g. roads and footpaths)
+1) Macroscopic: average vehicle dynamics like traffic
+• Additional traffic infrastructure (e.g. traffic lights)
+density are simulated
+• Traffic demand
+2) Microscopic: each vehicle and its dynamics are
+Together these elements form a simulation scenario.
+modeled individually
+Since traffic simulation models are typically used for
+3) Mesoscopic: a mixture of macroscopic and micro-
+stochastic behavior, it makes sense to simulate such a
+scopic model
+scenario a number of times and draw statistical conclu-
+4) Submicroscopic: each vehicle and also functions
+sions.
+inside the vehicle are explicitly simulated e.g. gear
+It is often a time-consuming process to prepare a
+shift
+simulation scenario based on real-world data. SUMO
+Theadvantageofmacroscopicmodelsarenormallyits
+providesalargepackageofapplicationstohelpwiththis
+fast execution speed. However the detailed simulation of
+task. The process for preparing the road network data
+microscopic or submicroscopic models are more precise
+and traffic lights is described in section IV. Preparing
+especially when emissions or individual routes should be
+traffic demand is explained in Sections V. Section VI
+simulated. Therefore, this paper focuses on microscopic
+deals with multi- and intermodal traffic while Section
+traffic simulation.
+VII focuses on simulation validation. Moreover, sections
+There are several microscopic simulation tools avail-
+VIII and IX describe pedestrian simulation and model
+able to support the evaluation of research questions. For
+enhancements respectively. After that, model coupling
+example, the Simulation PTV Vissim is a commercial
+work will be explained in Section IX.
+softwarepackage,whichiswellknownandused[7].PTV
+After defining a scenario it is immensely useful to
+Vissim is well supported and provides a user friendly
+observe the simulation objects (vehicles, pedestrians,
+interface with also 3D visualization. In contrast to the
+traffic lights) in a visual representation for qualitative
+commercial PTV Vissim software, the activity-based
+validation. To this end, SUMO provides the SUMO-
+traffic simulation MATSim is open source and freely
+GUI application, which allows observing the simulation
+available over the internet [14] 1.
+at different speeds and with various coloring options to
+Furthermore, SUMO is also freely available and pub-
+highlightvariousaspectssuchasspeeds,trafficdensities,
+lished under the Eclipse Public License V2 2. SUMO
+road elevation or right-of-way rules.
+is used worldwide and is downloaded over 35.000 times
+To evaluate a simulation scenario quantitatively, the
+everyyear.AreferencepublicationofSUMOwasalready
+simulation provides a wide array of output files that can
+published and highly referenced in [15]. Since then a
+be enabled selectively, such as:
+1https://www.matsim.org/ • Vehicle trajectories (positions and speeds)
+2http://sumo.dlr.de/ • Traffic data collected from modeled detectors
+978-1-7281-0323-5/18/$31.00 ©2018 IEEE 2575
+
+===== PAGE 2 =====
+
+Fig. 1. Street Network of the Real-World Bologna Scenario in
+SUMO’sWebWizard
+Fig.2. ExampleTrafficFlowofanInductionLoop
+• Traffic data aggregated over network elements
+(edges or lanes)
+• Traffic data aggregated over the whole trip of a observeddays.Thedataismeasuredevery5minutesand
+vehicle or person
+are smoothed with the Savitzky-Golay filter. Similar to
+• Protocols of traffic light switching other cities, only few vehicles were driving during the
+• Traffic data aggregated for the whole simulation night, while the traffic demands increased during the
+• Emissions, energy consumption, and so on. rush hours in the morning and in the afternoon. Based
+TheseoutputfilescanbevisualizedusingSUMOtools
+on these raw data, a one-hour time span, representing a
+or imported into other applications. To help with this,
+typical 8am-9am rush hour, was created and used as the
+SUMOalsoprovidestoolsforconvertingoutputfilesinto
+traffic demand in the “Real-World Bologna” scenario.
+other formats and for importing them with python or
+Different types of personal vehicles are modeled in
+matlab.
+order, to simulate a more realistic distribution of differ-
+III. Example: Bologna Scenario entvehiclesconsideringproducedemissions,acceleration
+and deceleration behaviors. In addition to the vehicular
+A scenario is used throughout this entire paper to
+traffic, the scenario includes public transport, bus stops
+illustrate the concepts and work flow of SUMO. The
+and special lanes. To show the functionality of inter-
+scenario is called “Real-World Bologna” as it is based
+modal traffic, the Acosta scenario was extended with
+on a part of the inner city of Bologna (Italy). It focuses
+some fictional person trips.
+on the area between the two main streets Andrea Costa
+Furthermore, the vehicles in the simulation have all
+and Pasubio and it includes the football stadium as well
+different types of emission classes which are defined
+as the hospital, see Figure 1.
+in the vehicle types. For the emission simulation, the
+The “Real-World Bologna” scenario is publicly avail-
+database of HBEFA (Handbook Emission Factors for
+able3aspartofSUMOtoprovideaquickstart.However,
+RoadTransport)hasbeenused.Itispossibletosimulate
+for more complex or larger evaluations the scenario may
+the produced emissions of CO, CO2, NOx, PMx, HC,
+be too small or the traffic demand could be too less.
+as well as the fuel consumption of every single vehicle
+Figure 1 shows the street network that is modeled in
+[16]. In addition to the HBEFA model the produced
+the scenario. It is large enough to develop and to eval-
+emissions can be also simulated by the PHEM model
+uate complex traffic management strategies, while still
+(Passenger car and Heavy duty emission Model) of the
+executing quickly on regular desktop computers.
+TechnicalUniversityGraz.PHEMandHEBEFAinclude
+Thepositionsofthetrafficlightsweregivenasteleme-
+both emission data from real world vehicle. From this
+trydatafilesbythemunicipalofBolognaandhavebeen
+data different emission classes for vehicles types have
+imported in the SUMO scenario. In addition, the signal
+been extracted which could be used in SUMO for the
+time plans of the traffic lights were also included in the
+emission simulation.
+simulation scenario.
+The traffic demand for the scenario is based on induc- IV. Network Setup
+tion loop data from real-world detectors in the city of
+SUMO networks consist of nodes and unidirectional
+Bologna.Thevehiclecountsoftheinductionloopsduring
+edges representing street, waterways, tracks, bike lanes
+11 and 13 November 2008 were provided by the city
+and walkways. Each edge has a geometry described by
+administration.Asanexample,Figure2showsthetraffic
+a series of line segments and consists of one or more
+flows detected by a single induction loop for the three
+lanes running in parallel. Attributes such as width,
+speed limit and access permissions (e.g. bus only) are
+3https://sourceforge.net/projects/sumo/files/traffic_
+data/scenarios/Bologna_small/ modeled as constant along a lane. As a consequence a
+2576
+
+===== PAGE 3 =====
+
+stretch of road must be modeled as a sequence of edges An example of the tool and the Bologna scenario can
+when either of these attributes changes along its length. be seen in Figure 1.
+SUMO networks include detailed information regarding
+B. Development of the Real-World Bologna scenario
+possible movements at intersections and corresponding
+right of way rules which are used to determine the ThemunicipalofBolognaprovidedthetrafficdemand
+dynamic simulation behavior. To ensure consistent net- and the information about the traffic network for the
+work representation, SUMO networks are created using Real-World Bologna scenario as a Vissim scenario [7]
+the NETCONVERT and NETEDIT applications. NET- which could be converted to a SUMO scenario and was
+CONVERT is a command-line tool which can be used extendedandcorrectedautomaticallyandmanually.One
+to import road networks from different data sources e.g. major extension of the traffic network was to include
+OpenStreetMap (OSM), OpenDRIVE, Shapefile or from lanes which are explicitly restricted for buses only. The
+other simulators such as MATSim and Vissim. A key positions of the traffic lights and their signal time plans
+feature of NETCONVERT is the heuristic refinement of could also be provided from the municipal of Bologna as
+missing network data to achieve the necessary level of telemetry data.
+detail for microscopic simulation (i.e. synthesizing traffic
+V. Demand Modeling and Adaption
+lightplans,right-of-wayrulesandintersectiongeometries
+for OSM networks). One of the premises to be able to simulate traveling
+NETEDIT is a graphical network editor which can be activitiesinagivennetworkistoprovidetrafficdemand.
+usedtocreate,analyzeandeditnetworkfiles.Thisserves In SUMO, traffic demand can be defined as individual
+to complement the network generation heuristics with trips, flows or as routes. The basic information should
+manualrefinementsandalsosupportsdefiningadditional includedeparturetime,origin,destinationandtransport
+traffic infrastructure which could not be imported by mode where transport mode can be different kind of
+NETCONVERT. Among the support features are defin- vehiclesorpedestrian.Whentrafficdemandisdefinedas
+ing: routes, information about origin and destination is not
+mandatory necessary. Instead of that additional route
+• Basic network elements (junctions, edges and lanes)
+information, defined as a sequence of edges, is required.
+• Advanced network elements (e.g. traffic lights)
+Once traffic demand is generated, traffic assignment in
+• Additional infrastructure (e.g. bus stops)
+SUMO, i.e., DUAROUTER, MAROUTER or Oneshot,
+• Polygons and points of interest (POI)
+can be executed for understanding the traffic state of
+Duetothefrequentmismatchbetweenavailableinput
+the investigated network. The aforementioned assign-
+dataandthenecessarylevelofdetailformicroscopicsim-
+ment methods are mainly different in their assignment
+ulation,networkandinfrastructurepreparationisoftena
+principles(UserEquilibrium(UE),StochasticUserEqui-
+challenging task. For this reason, NETCONVERT is un-
+librium (SUE) or the fastest route at a given departure
+der constant development to improve it’s heuristics and
+time). In the following, different ways to generate or to
+reduce the required amount of manual editing. Recent
+import traffic demand in SUMO will be firstly intro-
+years have seen a number of improvements in regard to:
+duced. The possibilities to modify traffic demand will
+• Easy of use (OSM wizard) then be explained.
+• Importing new data formats (i.e. OpenDRIVE)
+• Modeling networks with left-hand traffic A. Demand importing and generation
+• Importing public transport information Originanddestination(O-D)matrix,asoneoftheout-
+• Modeling 3D Topology puts inthe traditional 4-steps transportationforecasting
+• Generating multi-modal networks for vehicles, bikes model, is the typical way to describe traffic demand
+and pedestrians between given traffic analysis zones since decades. Each
+O-D matrix cell describes the respective traffic demand
+A. Generation of scenario with OSM
+as theamountof transport mode, such as passenger cars
+A useful tool for initial scenario preparation is the andtrucks.SuchdatacannotbedirectlyusedinSUMO.
+osmWebwizard application which is part of the SUMO ThetoolOD2TRIPSprovidesawaytoconvertsuchO-D
+python tools. This tool allows generating a simulation matrices into individual trips. In order to generate the
+scenariousingafewclicksininabrowser-basedinterface. departure time for each vehicle/person either uniform
+The user selects an area from a map display along with or random distribution with in a given time period can
+a set of parametrized traffic modes. The tool uses this be chosen. Currently, O-D matrices either in Vissim or
+information to download and import the network data Visum format can be processed.
+from OpenStreetMap with parameters corresponding to It is also possible to import and generate traffic
+the selected traffic modes. Random traffic is then gener- demand from an agent-based demand model. SUMO
+ated to populate the network. This moves through the can already couple with the agent-based demand model
+network according to a dynamic route assignment which TAPAS [25], also developed by DLR. Through iterative
+includes public transport routing for individual persons. computation the data about simulated people’s routes,
+2577
+
+===== PAGE 4 =====
+
+departure times and chosen transport mode can be de- rently, there are known deficiencies when applying
+rived.Suchroutedatacanbethendirectlyusedastraffic this tool with highly meshed networks, such as city
+demand in SUMO. networks. Flowrouter is suggested to use as alterna-
+Moreover, SUMO has four tools to generate demand tive.
+with use of different data sources. • JTRROUTER
+The purpose of JTRROUTER is to generate routes
+• ACTIVITYGEN
+with the given traffic volumes and turning ratios at
+This tool was contributed by the SUMO users from
+intersections, on ramps or at interchanges. When
+the University of Munich and was a part of the
+using JTRROUTER for intersections in a city area,
+project Fidens [5]. This tool aims at generating
+it is possible that some vehicles may run in circle
+demand for a synthetic population in a large net-
+since traffic volumes will be split only according to
+work.ItrequiresaroadnetworkgeneratedbyNET-
+turning ratios. The edges, already used by vehicles,
+CONVERT or NETGENERATE, and a population
+are not taken into consideration.
+definition. The latter one is done by using a sim-
+• randomTrips.py
+ple activity-based traffic model where the activities
+This is the simplest way to generate trips as syn-
+related to work, school, leisure, and work and the
+thetic traffic demand for a given network. Edges
+four transport modes, i.e. walk, bicycle, car and
+selectedassourcesor/destinationsaredecidedeither
+bus, are considered. The required input statistics
+uniformly at random or with a modified distribu-
+datashouldincludegeneralinformation,suchasthe
+tion. The probabilities to select an edge as source
+number of inhabitants, the number of households,
+or/destination can be basically weighted by edge
+the age to retire, probability to be unemployed, the
+length,edgespeedand/orthenumberoflanes.Trips
+special context or state of the city, population’s age
+are generated according to the defined repetition
+brackets, work hours, population and work position
+rate and will be distributed evenly in an interval
+distribution, city boundaries, schools and bus lines.
+between the defined begin and end time. Different
+More detail information can be found in [22]. AC-
+transportmodescanbeconsideredaswell.Ifagiven
+TIVITYGEN’s output will be a route file, which
+network is not fully connected, it may happen that
+contains start edge, end edge and optionally some
+no routes between certain sources and destinations
+stopovers only. Complete routes need to be gener-
+can be found. Such trips will be discarded during
+ated by traffic assignment models, such generated
+simulation. It may be necessary to increase the
+by SUMO’s DUAROUTER.
+numberoftripstoensurethenumberofusabletrips.
+• Flowrouter
+When using the option “route-file”, a respective
+The main concept of Flowrouter is to solve a max-
+route file will be automatically generated with use
+imum flow problem in a given network where avail-
+of DUAROUTER.
+abledetectordataareusedasroadcapacities.When
+no type information in the input detector file or B. Demand adaptation
+the option revalidate-detectors is set, all edges are
+Due to limited demand data availability, changes in
+classified into the following three types:
+daily activities or unexpected events either imported or
+– Source: any edge without incoming edges
+generated traffic demands may not correspond to actual
+– Sink: any edge without outgoing edges
+trafficsituations.Toaddressthisissue,threemethodsare
+– In-between:anyedgewhichisneithersourcenor
+available and explained below, where the first two meth-
+sink
+ods are mainly for daily traffic demand while the last
+Both routes and flows with respective routes can be method mainly deals with unexpected situations, which
+generated as outputs. To increase route plausibility, result in road or area closure, and traffic guidance, such
+two options: limit and edge restriction can be set. as guidance to alternative parking lots or to alternative
+Theformeronehelpstodistributeflowsmoreevenly routes.
+on possible routes while the latter one specifies the The first method is to apply the open source program
+maximumflowforaroutewhichconsistsofthegiven Cadyts (Calibration of Dynamic Traffic Simulations),
+edges. which is Bayesian-based route choice calibration model
+• DFROUTER [9]. This program aims at the correspondence between
+The main concept of DFROUTER is to generate estimated and measured flows by adjusting a prior dis-
+routes on each detector with the detected flows tribution of route choices given traffic flow measure-
+on highways and the respective ramps and inter- ments. A coupling between SUMO and Cadyts has been
+changes,sincesuchdatahasbecomemoreandmore established and applied. In addition to flow measure-
+available due to the extensive usage of detectors. It ments, an initial route set needs to be given, e.g. from
+is possible to generate routes only between source DUAROUTER. Cadyts and SUMO will then interplay
+detectors and destination detector or between all with each other until the convergence or the maximum
+detectors,bysettingtheoption“routes-for-all”.Cur- number of the iterations is reached. In each iteration,
+2578
+
+===== PAGE 5 =====
+
+SUMO provides the updated traffic state to Cadyts for SUMO does not separate the different individual vehicle
+adjusting route distribution. According to the updated types by default, it just gives every person a list of
+route distribution, SUMO delivers the corresponding available vehicles and it is up to the user to define the
+traffic state. Traffic demand and departure times can be typesofthosevehicles.Soeverypersoncanhavemultiple
+also scaled and adjusted respectively. carsand/orbikestotheiravailability.Everyvehiclehasa
+The second method is to use the calibrators imple- defined capacity and can as such transport multiple per-
+mented within SUMO package. These calibrators allow sons.Thefeaturewhichseparatespublicfromindividual
+thedynamicadaptionoftrafficflowsandspeeds.Accord- transport in SUMO is that public transport consists of
+ingtothegiveninductionloopmeasurements,i.e.speeds a set of vehicles (line) serving a given sequence of stops
+and flows, the calibrator will remove or insert vehicles (not necessarily on a fixed schedule) where the person
+so that the simulated flows comply with the measured is free to choose a different vehicle of the same line to
+flows.Moreover,roadspeedswillbealsoadjustedaccord- fulfillthemobilityrequest.Definingthepublictransport
+ingly. The respective adjustment is similar to the way inSUMOisnotdifferentfromdefiningindividualtraffic.
+a variable speed sign works. With the consideration of All vehicles can have stops with predefined leave times
+measured flows and speeds invalid jams will be avoided which can be used to model the schedule of a public
+by removing jammed vehicles so that jams will not spill transport vehicle.
+back to a calibrator. When inserting new vehicles, the The list of stops for a public transport line can be ex-
+applied routes area based on the route distributions on tracted automatically from sources like OpenStreetMap,
+the respective road sections. Such route distributions a feature which is available with OSMWebWizard de-
+can be either defined by users or based on the route scribed in Section IV. Using this as an input one can
+distributionforallvehiclesthatpassedthecorresponding define a schedule for vehicles using this route and so
+road sections in a given interval. More details about the provide a scheduled public transport. With the web
+applied algorithm can be found in [6]. wizard a schedule of one vehicle every ten minutes is
+The last method is to use the REROUTER, imple- used. To allow the transfer between the road and the
+mentedwithinSUMOpackage.WithuseofREROUTER rail network it is possible to introduce access facilities
+vehicles’ routes and even destinations can be modified at stopping positions which model the transfer with a
+when they travel over the predefined roads, on which fixedtimepenaltyfortheindividualperson.Theseaccess
+they can make a favorable choice, i.e. route, parking lot pointscanalsobegeneratedautomaticallywithinafixed
+or destination, according to the given choice set and the range around a rail station.
+current traffic state, i.e. travel time. When choosing new Having individual vehicles and public transport at
+routes,itisalsopossibletoterminateroutes.Therespec- theirdisposal,personscanfindtheirfastestwaythrough
+tive vehicles will then immediately leave the simulation the network using all available modes. To facilitate
+and counted as arrived at their current positions on the this, SUMO can calculate intermodal routes with the
+rerouting roads. While choosing new destinations, the included DUAROUTER for the process of calculating
+fastest routes from vehicle’s current positions to the new routes before the simulation as well as directly within
+destinations will be computed accordingly. When choos- the simulation. This way it suffices for the user to define
+ing parking lots, the available parking capacities in the depart and end position as well as the available modes
+available parking plots are considered. If vehicle’s final and the depart time and SUMO will find the fastest
+destinationsarenottherespectiveparkinglots,vehicles, routes for walking driving and using public transport
+which reroute to a new parking area, will continue to (andcombinationsthereof).Togetherwitharandomized
+their original destinations after finishing the stops. In demandasinthefictionalBolognascenariothiscangive
+addition, REROUTER can also be used to define closed a very fast pseudo-realistic scenario with walking and
+roadswiththeconsiderationofvehicletypes.Researches riding persons.
+with the REROUTER application can be found in [12]. Independently, it is also possible to give a fine grained
+individual route to persons and also model the transfer
+VI. Multi- and Intermodal Traffic
+of goods (containers) in a similar way. Containers can
+The central element in modeling mobility with dif- currentlynotbeusedwiththeautomaticroutingsystem
+ferent modes of transport is the person. Every person and need a hand crafted route to use different modes of
+in SUMO can have an individual plan when and with transport.
+which means she wants to travel. Therefore she has an
+VII. Validation
+availability of transport modes which can change from
+triptotrip.TheavailablemodesandactivitiesinSUMO Microsimulationtoolsseektodescriberealityonmany
+are: different levels, which raises questions of the validity of
+• Walking the results obtained. To name but a few of these levels,
+• Riding an individual vehicle (car, bike, etc.) this is the input itself (which is often coming from a
+• Public transport digital network), the demand for transport which is also
+• Stopping or other non-mobility related activities not intern to SUMO but stems from some outside tools,
+2579
+
+===== PAGE 6 =====
+
+the modeling of the dynamics and behavior of the traffic
+objects, up to the computation of emissions and other
+side-effects of traffic.
+Unfortunately,thereisnoone-stop-shopwhenitcomes
+totheseissues,instead,permanentvigilanceandscrutiny
+is needed. Whenever there is an opportunity to check
+for the correctness of your model, then this should be
+done. Any piece of real data is of help here, the data are
+often not too far away. It sometimes helps to position
+yourself near the intersection you want to model and
+simply compare real-life with simulation-life on a visual
+basis.
+On a more quantitative level, which is always recom-
+mendable, this is called calibration and validation [4],
+[8]. The output of the simulation should be as close
+Fig.3. Simulationdatainrelationtomeasuredtrafficdatafrom
+as possible to real data (validation), and in order to inductionloops
+reach this goal it might be necessary to adapt some of
+the parameters of SUMO (calibration). Which raises the
+question how to quantify ”closeness”, and here many parison on the network level has been performed, which
+different measures have been proposed [4]. In the experi- is presented in Fig. 3. This presentation is typical for
+ence of these authors, there is not much to be gained by a network validation; it displays the simulated counts
+usingsomethingmorecomplexastheRMSE(root-mean on the y-axis with the measured ones on the x-axis.
+squared error). Perfect agreement would need the results to lay on the
+To give some ideas about the size: when truly micro- diagonal,andfromtheparametersofalinearfittothese
+scopicbehaviorisanalyzed(i.e.thegaps,thespeeds,and data additional metrics can be computed to compare
+the accelerations), typical validation errors for different simulation with reality.
+microscopic models are between 10 and 20 % for trying VIII. Pedestrians
+topredictthegapbetweentwovehicles[3].Fornetworks,
+SUMO allows the simulation of pedestrians using
+a typical metric used tells that more than 85 % of the
+configurable pedestrian models. This can be used to
+counts measured in the simulation should deviate less
+model the itineraries of persons which alternate between
+than 15 % from the measured ones [8].
+walking and riding in vehicles. It can also be used to
+Obviously, the data {x } do not need to come from
+i i model the interactions between vehicles and pedestrians
+realdata,itmightbeaskedhowcloselysuchasimulation
+whenever their paths intersect in the road network.
+came to reproduce e.g. the data that have been written
+SUMO defines an abstract interface to describe the
+into handbooks such as the HCM (Highway Capacity
+interaction between pedestrians and other simulation
+Manual)[18]oritGermancounter-part,theHBS[2].The
+objects.Thisinterfaceiscurrentlyimplementedbythree
+results [19] indicate, that a SUMO simulation can come
+pedestrian models.
+fairly close to the curves in such handbooks representing
+thefundamentaldiagram.Whilethisisquitereasonable, A. The Non-Interacting Model
+the question of the break-down of traffic flow is a much
+The simplest pedestrian model in SUMO does not
+more complicated one, and here one can see differences
+consider the interactions among pedestrians nor those
+between different models.
+between pedestrians and vehicles. It is only useful to
+A very nice example is also present in the examples
+track itineraries across the network (i.e. to model the
+that come with any SUMO installation: the San Pablo
+effect of public transport delays) or to generate rough
+Dam Road data that have been provided by Carlos
+trajectories.
+Daganzo will be used as the standard example for this.
+Given these data, and given a model from SUMO which B. The Striping Model
+has a bunch of free parameters, the job of a calibration This model is the default model in SUMO and it
+is to find parameters so that the difference between the does model all the interactions listed above. Pedestrians
+measured data and the simulated parameters becomes occupyspacealongfootpaths,sidewalks,andpedestrian
+minimal. Often, people do this minimization by hand, crossings and may impede the movements of vehicles or
+which is not wrong. However, we strongly advise against other pedestrians. To make use of this, pedestrian cross-
+doingthis,sincethoseby-handresultsarealmostimpos- ings must be modeled as part of the road network either
+sible to reproduce. It is much better to use numerical by generating them heuristically with NETCONVERT
+tools like a non-linear minimization routine to perform or editing them manually in NETEDIT.
+this stunt. Themodelachieveshighexecutionspeed(linearinthe
+For the above introduced Bologna scenario, a com- number of pedestrians) by only considering close-range
+2580
+
+===== PAGE 7 =====
+
+interactionsalongpiecewiselinearpaths.Thisisdoneby a constant acceleration, while the calculations for the
+separating the available space into narrow stripes along execution of an action step include the whole logic for
+the walking direction and only interacting with at most evaluationanddecisionlogiccorrespondingtotheactual
+one other traffic object per stripe. traffic situation in the vehicle’s surroundings.
+IX. Modeling enhancements C. Sublane Model
+A. Numerical Integration Scheme By default, SUMO models traffic where each vehicle
+drives at the center of its lane and overtaking only takes
+This subsection takes a short glance at some in-
+place using an additional lane. Where this behavior is
+ner workings of the simulation process in SUMO. The
+insufficient, the Sublane Model within SUMO may be
+simulation updates the vehicles’ positions in temporal
+used to model heterogeneous traffic and reduced lane
+steps of a user specified duration ∆t moving them by
+discipline. When using this model, lane widths and ve-
+a positional increment ∆x(t). By default, SUMO uses a
+hicle widths are taken into account with a configurable
+first order Euler scheme ∆x(t) = ∆t·v(t+∆t), where
+lateral resolution. This allows overtaking within a single
+v(t+∆t) = v(t)+∆t·a(t) and a(t) is the acceleration
+laneandalsomodelslateraldynamicssuchasovertaking
+chosenbytheunderlyingcar-followingmodel.Physically,
+speed, lateral distance keeping and virtual lane forma-
+this may be interpreted as the vehicle traveling at a
+tion.
+fixed speed within a time step and changing this speed
+instantaneously in between two steps.
+D. Overtaking through the oncoming lane
+SinceSUMO0.28theusercanchoosetousetheballis-
+By default SUMO models lane-changing only with
+tic scheme ∆x(t)=∆t·(v(t)+∆ta(t)/2), corresponding
+lanes that go in the same direction. This implies that
+to a movement with constant acceleration for each time
+overtaking cannot take place where there is only one
+step and therefore yielding smoother vehicle trajectories
+lane per direction. To overcome this limitation, SUMO
+[24]. As the Euler scheme allows vehicles to change their
+includes an optional model for overtaking through the
+speedmoreabruptlythantheballisticscheme,themodel
+opposite direction lane. To enable this model it is suf-
+calibration depends on the chosen scheme. This may
+ficient to include additional information regarding the
+becomeespeciallyapparentforrelativelylargevalues∆t
+oppositionality of lanes when preparing the network.
+of the integration time step, which are frequently chosen
+ThismodelisnotyetcompatiblewiththeSublaneModel
+for speeding up computations of large scenarios.
+described above.
+B. Action Points
+X. Simulator Coupling
+Per default the effective reaction time for a simulated
+With SUMO it is possible to simulate many features
+vehicle in SUMO equals the simulation step length ∆t.
+aroundtraffic,buttherearealsolimitations.Forexample
+This means that a vehicle’s behavior is affected by the
+in the field of vehicular communication normally the ex-
+simulation state at time t not before t + ∆t (some
+pertiseoftwofieldsareneeded.First,thecommunication
+exceptions apply to the lane changing process, but this
+from the vehicles needs to be modeled. Second, the ve-
+out of the scope of this work).
+hicles and its trajectories have to be generated. Further-
+Since SUMO version 0.32 the simulation step length
+more,theapplicationsofvehicularcommunicationsoften
+can be decoupled from the effective reaction time. This
+have to influence the traffic situation and therefore the
+was realized by allowing to schedule action points at
+impactoftheapplicationhastobeevaluated.Therefore,
+intervals, which are multiples of the simulation step
+it is necessary to couple SUMO with other simulators to
+length [23]. When the action step length (the temporal
+produce reliable results.
+interval between two successive action points) is set to
+For the coupling of two or more simulators an inter-
+a different value than the simulation step length, the
+face for in-line communication must be provided. This
+effective reaction time for a vehicle at a specific point
+interface is given in SUMO via TraCI (Traffic Control
+in time equals the time until the next scheduled action
+Interface) [26]. The user can write a program (e.g. using
+point. In particular, the effective reaction time is not
+Python) or use a software to retrieve data, start, stop or
+constantandboundedfrombelowbythesimulationstep
+modify the simulation via a socket connection to TraCI.
+lengthandfromabovebythespecifiedactionsteplength.
+TraCI has been used for several projects to couple
+The actionpoint mechanismlends itselfto twoimpor-
+differentsimulatorsandevaluatetheirsimulationresults.
+tantapplications.Firstly,itgivesamechanismtocontrol
+For example the iTETRIS 4 and COLOMBO 5 projects
+driving performance by an individual configuration of
+used the iCS (iTETRIS Control System) to couple
+the drivers’ maximal effective reaction times. Secondly,
+SUMOwithns3andanapplicationforvehicle-to-vehicle
+it can be employed to speed up simulations, which use
+(V2V) and vehicle-to-infrastructure (V2I) communica-
+a short simulation step length. This is due to the fact
+tion. Another program is Veins which uses OMNeT++
+that a vehicle’s positional update in a simulation step,
+which does not correspond to an action point, is merely 4http://www.ict-itetris.eu/
+a uniform increment of speed and position according to 5http://www.colombo-fp7.eu/
+2581
+
+===== PAGE 8 =====
+
+and SUMO to simulate vehicular communication [21]. [12] Fl¨ottero¨d,Y.P.,Erdmann,J.:Experimentstudyontheevacu-
+Furthermore,thereisalsoanextensionofVeinsavailable ationofbombalertwithsumo. In:ProceedingsoftheSUMO
+UserConference-Traffic,Mobility,andLogistics,pp.39–50.
+which is called Plexe [20]. Plexe allows for example to
+Berlin,Germany(2016)
+simulate platooning for autonomous vehicles and cruise [13] Fl¨ottero¨d, Y.P., Fl¨otter¨od, G.: Route choice calibration from
+control models. multi-point vehicle stream measurements. In: 2nd Interna-
+tional Conference on Models and Technologies for Intelligent
+XI. Outlook TransportationSystems.Leuven,Belgium(2011)
+[14] Horni,A.,Nagel,K.,Axhausen,K.(eds.):Multi-AgentTrans-
+This paper showed that SUMO already provides a
+port Simulation MATSim. Ubiquity Press, London (2016).
+large framework with helpful tools for the generation, DOI10.5334/baw
+validation and evaluation of large traffic scenarios. But [15] Krajzewicz,D.,Erdmann,J.,Behrisch,M.,Bieker,L.:Recent
+developmentandapplicationsofSUMO-SimulationofUrban
+there are still more features and extensions, which are
+MObility. InternationalJournalOnAdvancesinSystemsand
+planned for enhancing and extending SUMO. For ex- Measurements5(3&4),128–138(2012)
+ample a fictional Bologna scenario to show the SUMO [16] Krajzewicz, D., Hausberger, S., Wagner, P., Behrisch, M.,
+Krumnow,M.:Secondgenerationofpollutantemissionmodels
+features, which are not used in the real world scenario,
+for sumo. In: SUMO2014 - Second SUMO User Confer-
+was prepared, but not presented here due to the page ence,ReportsoftheDLR-InstituteofTransportationSystems
+limitation. (2014). URLhttp://elib.dlr.de/89398/
+[17] Krauss,S.:Microscopicmodelingoftrafficflow:Investigation
+SUMO already supports a number of features related
+ofcollisionfreevehicledynamics. Ph.D.thesis,Universit¨atzu
+to intermodal railway simulation such as time tables, K¨oln(1998)
+railway crossings, railway signals and train dynamic [18] Manual, H.C.: Hcm2010. Transportation Research Board,
+NationalResearchCouncil,Washington,DC(2010)
+models. To expand the capabilities for railway simula-
+[19] Rummel,J.:Replicationofthehbsautobahnwithsumo. In:
+tion a number of extensions are planned for the future. SUMO2017–TowardsSimulationforAutonomousMobility,
+Among these are: pp.171–178(2017). URLhttp://elib.dlr.de/114523/
+[20] Segata, M., Joerer, S., Bloessl, B., Sommer, C., Dressler, F.,
+• Network and time table import from public transit Lo Cigno, R.: PLEXE: A Platooning Extension for Veins.
+• Improved support for bidirectional track usage In: 6th IEEE Vehicular Networking Conference (VNC 2014),
+pp.53–60.IEEE,Paderborn,Germany(2014). DOI10.1109/
+• Modeling individual rail cars and their couplings
+VNC.2014.7013309
+• Further dynamic models [21] Sommer, C., German, R., Dressler, F.: Bidirectionally Cou-
+• Adding graphical tools for defining traffic demand pledNetworkandRoadTrafficSimulationforImprovedIVC
+Analysis. IEEETransactionsonMobileComputing10(1),3–
+References 15(2011). DOI10.1109/TMC.2010.133
+[22] SUMO: Demand/Activity-based Demand Generation web
+[1] Bieker, L., Krajzewicz, D., Morra, A.P., Michelacci, C., Car- site. Accessed2018(2018)
+tolano, F.: Traffic simulation for all: a real world traffic sce- [23] Todosiev, E.P.: The action point model of the driver-vehicle
+nariofromthecityofbologna. In:SUMO2014(2014). URL system. Ph.D.thesis,TheOhioStateUniversity(1963)
+http://elib.dlr.de/89354/ [24] Treiber,M.,Kanagaraj,V.:Comparingnumericalintegration
+[2] Brilon,W.,REICHARDT,G.,WEISER,F.,WESTPHAL,S., schemes for time-continuous car-following models. Physica
+WU,N.:Handbuchfu¨rdiebemessungvonstraßenverkehrsan- A: Statistical Mechanics and its Applications 419, 183–195
+lagen. Schlussbericht zum Forschungsauftrag FE 2, R96A (2015)
+(2001) [25] Varschen, C., Wagner, P.: Mikroskopische modellierung
+[3] Brockfeld,E.,Ku¨hne,R.D.,Wagner,P.:Calibrationandval- der personenverkehrsnachfrage auf basis von zeitverwen-
+idation of microscopic traffic flow models. Transportation dungstagebu¨chern. In: Stadt Region Land - Heft 81 -
+ResearchRecords1876,62–70(2004) Tagungsband AMUS 2006, vol. 81, pp. 63–69. Aachen, Ger-
+[4] Daamen, W., Buisson, C., Hoogendoorn, S.P. (eds.): Traffic many (2006). URL http://elib.dlr.de/45058/2/SRL_81_-
+SimulationandData–ValidationMethodsandApplications.
+_Beitrag_Varschen.pdf
+Taylor and Francis, CRC Press (2014). URL http://www. [26] Wegener,A.,Pio´rkowski,M.,Raya,M.,Hellbru¨ck,H.,Fischer,
+taylorandfrancis.com/books/details/9781482228700/ S.,Hubaux,J.P.:Traci:Aninterfaceforcouplingroadtraffic
+[5] DepartmentofElectricalandComputerEngineering,Techni- andnetworksimulators. In:Proceedingsofthe11thCommu-
+calUniversityofMunich:Fidens-TrustbetweenCooperative nications and Networking Simulation Symposium, CNS ’08,
+Systems in Application to VANETs web site. Accessed 2018 pp. 155–163. ACM, New York, NY, USA (2008). DOI 10.
+(2018).URLhttps://www.ldv.ei.tum.de/forschung/fidens 1145/1400713.1400740. URL http://doi.acm.org/10.1145/
+[6] Erdmann, J.: Online-kalibrierung einer mikroskopischen
+1400713.1400740
+verkehrssimulation.In:ProceedingsofVIMOS2012.Dresden,
+Germany(2012)
+[7] Fellendorf,M.:Vissim:Amicroscopicsimulationtooltoeval-
+uate actuated signal control including bus priority. In: 64th
+InstituteofTransportationEngineersAnnualMeeting,pp.1–
+9.Springer(1994)
+[8] FHWA: Traffic Analysis Tools. FHWA (2018).
+Https://ops.fhwa.dot.gov/trafficanalysistools/index.htm
+[9] Fl¨ottero¨d,G.:Trafficstateestimationwithmulti-agentsimu-
+lations. Ph.D. thesis, Technical University of Berlin, Berlin,
+Germany(2008)
+[10] Fl¨ottero¨d, G., Bierlaire, M., Nagel, K.: Bayesian demand
+calibration for dynamic traffic simulations. Transportation
+Science(45(4)),541–561(2011)
+[11] Fl¨ottero¨d, Y.P.: Sumo-cadyts calibration with limited data
+quality. In: Proceedings of the SUMO User Conference -
+Towards Simulation for Autonomous Mobility, pp. 155–162.
+Berlin,Germany(2006)
+2582

@@ -1,0 +1,427 @@
+===== PAGE 1 =====
+
+A F S T D H
+IRST TEP OWARDS YNAMIC YBRID
+T M
+RAFFIC ODELING
+Najia Bouha(cid:63)(cid:63) , Gildas Morvan(cid:63), Hassane Aboua¨ıssa(cid:63), Yoann Kubera(cid:63)
+(cid:63) Univ. Lille Nord France, 59000 Lille, France,
+U-Artois, LGI2A (EA 3926),
+Technoparc Futura, 62400 Be´thune, France
+Email: (hassane.abouaissa, gildas.morvan, yoann.kubera)@univ-artois.fr
+(cid:63)(cid:63) Universite´ Ibn Zohr, Faculte´ des Sciences,
+Agadir, Morocco,
+Email: najia.bouha@gmail.com
+KEYWORDS and forecasting, the repercussion of the construction of new
+parts on infrastructure onto the global behavior of the traffic
+Agent-based modeling; Multi-level modeling; Intelligent
+flow, ... According to the defined objective, several models
+transportation systems; Simulation; Traffic flow
+have been developed and can be classified into microscopic,
+ABSTRACT mesoscopic and macroscopic models. However, to simulate
+Hybridtrafficmodelingandsimulationprovideanimportant large-scale road networks, it can be interesting to integrate
+way to represent and evaluate large-scale traffic networks at different representations in the same framework which leads
+differentlevels ofdetails. Thefirstlevel, called“microscopic” to the so-called “hybrid modeling” as shown on fig. 1. Note
+allows the description of individual vehicles and their inter- that the concept of hybrid modeling has different meanings
+actions as well as the study of driver’s individual behavior. accordingtothestudieddomain.Here,hybridmodelingmeans
+The second, based on the analogy with fluidic dynamic, is the the coupling of different models.
+“macroscopic” one and provides an efficient way to represent In this paper, the first step is devoted to the integration of
+trafficflowbehaviorinlargetrafficinfrastructures,usingthree microscopicandmacroscopicmodelsintoasingleframework.
+aggregated variables: traffic density, mean speed and traffic Theconceptofhybridmodelinghasbeendevelopedbyseveral
+volume. An intermediate level called “mesoscopic” considers authors. Hence, some existing hybrid micro-macro traffic
+a group of vehicles sharing common properties such as a models are shown in Table I.
+same origin and destination. The work conducted in this
+paper presents a first step allowing simulation of wide area simulated entities control strategies
+traffic network on the basis of dynamic hybrid modeling,
+where the representation associated to a network section can
+macro flow of vehicles ramp metering
+change at runtime. The proposed approach is implemented in
+a simulation platform, called JAM-FREE.
+meso group of vehicles variable-message panels
+INTRODUCTION
+Severe congestion is a daily problem which leads to a con-
+micro vehicle vehicle instrumentation
+tinuouslygrowthofdirectandindirectcost.Trafficcongestion
+which can be recurrent typical to rush hours or non recurrent Fig.1. Hybridtrafficsimulationandcontrolapproach
+due to accidents, works, ... represents a major preoccupation
+of many transportation institutions and practitioners, calls for
+anefficientandintelligentdynamicmanagement.Accordingly, The models presented in Table I share the same limitation:
+severalworkswereundertakentostudythetrafficphenomena, connections between levels are fixed a priori and cannot be
+to implement effective strategies for an optimal use of the changed at runtime. Therefore, to be able to observe some
+existing infrastructure and to minimize the congestion effects emerging phenomena such as congestion formation or to find
+as well as a high quality of service. Nevertheless, the im- theexactlocationofajaminalargemacrosection,adynamic
+plementation of traffic measurement and control algorithms hybrid modeling approach is needed.
+calls for a deep understanding of the traffic phenomena. The work presented in this paper is devoted to overcome
+In this context, traffic flow modeling and simulation play these shortcomings and proposes the first step towards the
+an important role and constitute efficient tools to perform development and implementation of dynamic hybrid models.
+tasks such as traffic prediction and monitoring, traffic control Such a new approach provides an efficient way to change the
+5102
+yaM
+72
+]AM.sc[
+1v75270.5051:viXra
+
+===== PAGE 2 =====
+
+model micromodel macromodel
+Use cases examples
+Magneetal.(2000) SITRA-B+ SIMRES
+Poschingeretal.(2002) IDM Payne Inordertoassesstherelevanceofourapproachfordynamic
+BourrelandLesort(2003) LWR
+optimalvelocity hybrid simulation, use cases demonstrating the limits of the
+MammarandHaj-Salem(2006) ARZ
+Espie´ etal.(2006) ARCHISM SSMT existing solutions depicted in Table I are presented in this
+Elhmam(2006) genericABM LWR,ARZ,Payne section.
+Joueiaietal.(2013) IDM LWR
+ReducetheCPUloadduringpeakhours: Thehybridmodel
+TABLEI
+can change the traffic representation of a portion of the road
+STATICMICRO-MACROTRAFFICFLOWMODELSPROPOSEDINTHE
+LITERATURE network dynamically. This feature can be used to switch from
+a microscopic representation to a macroscopic one, when the
+CPU is overused in order to reduce its load. Such situations
+includecaseswherethenumberofsimulatedvehiclesbecomes
+levelofrepresentationdynamically.Asaresultofthesedevel- too high to be managed satisfyingly by the CPU (for instance
+opment, a platform called JAM-FREE has been implemented. during peak hours). This case is illustrated in figure 2.
+Inthefollowingsections,weidentifythemainissuesrelated BalancetheCPUloadbetweenclusters: Thehybridmodel
+to dynamic hybrid traffic modeling and then propose some can change the traffic representation of a portion of the road
+generic solutions to them. Then, the JAM-FREE simulator is networkdynamically.Thisfeaturecanbeusedtoswitchfrom:
+presented, as well as some simulation results. Finally, we • a microscopic representation to a macroscopic one when
+conclude and suggest some research perspectives. the CPU is overused in order to reduce its load,
+• inversely (from macroscopic to microscopic), in order to
+DYNAMICHYBRIDTRAFFICMODELING:MOTIVATIONSAND
+detect the reason for the occurrence of traffic congestion.
+EXISTINGSOLUTIONS
+These features can be used jointly to balance the CPU load
+Motivations
+between two clusters.
+Traffic simulation is generally used to:
+Such situations include cases where a traffic jam (or con-
+1) simulatetheroadtrafficflowonverylargeandcomplex gestion) appears in a cluster using a macroscopic model and
+infrastructures including both city and highways while where the number of simulated vehicles in another cluster
+2) being able to test the effects of different traffic signs, is significantly reduced (for instance during off-peak hours).
+for example, or traffic assignment and dynamic routing Such situations also include cases where a traffic jam appears
+strategies. It provides also a simple way to evaluate in a cluster using a microscopic model and where the number
+the impact of dynamic traffic control (ramp-metering, ofsimulatedvehiclesinanotherclusterissignificantlyreduced
+dynamic speed limit, ...) on the whole behavior of the (for instance during fluidic period of the flow) as illustrated
+traffic, in figure 3.
+3) assess their precise influence on the traffic flow and Findoutthereasonoftheoccurenceofthe trafficjam: Fig-
+4) understand how and why traffic perturbations leading to
+ure4showsanexampleoftheoccurenceoftrafficcongestions.
+appearance of congestions do occur.
+It demonstrates the relevance of dynamic hybrid simulations
+The first goal is easily achieved using macroscopic simula- toswitchbetweentwolevelsofrepresentationinordertofind
+tion models at the expense of the fourth goal. Conversely, the out the causes of the appearance of these phenomena.
+fourth goal is easily carried-out using microscopic simulation Followmovingmacroscopicphenomena: Thestaticdivision
+models at the expense of the first goal. To deal with this of the road network into clusters that can be found in most
+paradox, and benefit from both approaches, a dynamic hybrid of the existing approaches causes precision losses. Indeed, a
+model can be used. traffic flow simulator has to be able to reproduce macroscopic
+The advantages of this hybrid approach include the ability: phenomena such as shockwaves, capacity drop, ...Yet, the
+• To obtain both quantitative and qualitative information static decomposition found in static hybrid models will cause
+abouttheroadtraffic,usingrespectivelymacroscopicand eventually a loss of quantitative information. To avoid this
+microscopic representations in the same simulation using issue,adynamichybridmodelgivestheabilitytomove,resize,
+the clusters principle. splitandmergetheclustersoftheroadnetwork(seefigure5).
+• to switch between these different levels of representation
+locally depending: Limits of the existing solutions
+– on the simulation needs; for instance understanding
+To the best of our knowledge, the only other work describ-
+the source of a traffic congestion,
+ing a dynamic hybrid model is Sewall et al. (2011). However,
+– on the computation constraints; for instance manag-
+authors focus on the visualization of data rather than accurate
+ing the CPU load,
+simulation of traffic flow: zooming in a part of the network
+• to experiment both macroscopic and microscopic dy- triggers a micro representation on this area. Thus, there is no
+namic routing strategies, i.e. road load balancing strate- bi-directional information exchange between the micro and
+gies, and others dynamic trafic control. macro representations.
+
+===== PAGE 3 =====
+
+Fig.2. Illustrationoftheusecase”ReducetheCPUloadduringpeakhours”.
+Fig.3. Illustrationoftheusecase”BalancetheCPUloadbetweenclusters”.
+Fig.4. Illustrationoftheusecase”Findoutthereasonofatrafficjam”.
+Fig.5. Dynamichybridmodelofashockwavephenomenon.
+
+===== PAGE 4 =====
+
+DYNAMICHYBRIDTRAFFICMODELING:ISSUESAND On the other hand, switching from macro to micro requires
+PROPOSEDSOLUTIONS to perform a local warm-up so the speed, density and flow of
+Main issues vehicles can be accurate.
+Formalmulti-levelagent-basedmeta-model: Regularmulti-
+First, we identify the main issues to address in order to
+agent based simulation meta-models lack the structure to
+simulate dynamic hybrid traffic models accurately.
+manage such hybrid approaches: their representation of the
+1) How can the simulated network be structured to switch
+agents, the environment and the temporal dynamics of the
+between different models at runtime?
+system is designed to support a single viewpoint. Multi-level
+2) How to switch between different models (particularly
+agent-based modeling is an interesting approach to simulate
+from macro to micro)?
+such systems. Indeed it offers a large range of techniques to
+3) Howthetemporalitiesofthedifferentinteractingmodels
+dynamically adapt the level of detail of simulations, couple
+can be managed to avoid bias?
+heterogenous models or detect and reify emergent phenom-
+In the next section, we present possible generic solutions to ena (Gaud et al., 2008; Gil-Quijano et al., 2012; Picault and
+these issues. Mathieu, 2011).
+Many meta-models and simulation engines dedicated to
+Proposed solutions
+multi-level agent-based modeling have been proposed in the
+Dynamic decomposition of the network into autonomous
+literature.Seee.g.Morvan(2013)foracompletereview.Man-
+clusters: The network can be dynamically decomposed into
+aging multiple viewpoints on the same phenomenon induces
+autonomous clusters. Each cluster operates autonomously and
+the use of heterogeneous time models, thus raising issues
+simulates the traffic flow using a model of its own. However,
+related to time and consistency. However, simulation bias can
+cutting the road network is not arbitrary, to avoid incoherent
+be controlled by rules that constraint perceptions, influence
+situation like having an area of a few square meters. To
+production and reaction computation, according to causality
+ensure the integrity of the simulation, a minimum cut is
+and coherence principles (Morvan et al., 2011). To deal with
+deducted from sensors: the entry and exit points of a cluster
+thisissue,wedevelopedagenericapproachcalledSIMILARto
+arenecessarilysensors.Thus,theroadnetworkcanbeviewed
+design simulations (see Morvan and Kubera (2014) for more
+as a directed graph of interconnected sensors. Each arc of the
+detailed information about the main principles of SIMILAR).
+graph represents a path joining two sensors directly, without
+Indeed,thisapproachreliesonamulti-level,influence-reaction
+going through an intermediate sensor.
+and agent-based knowledge representation, more fitting to
+A cluster is then characterized by input and output sensors
+multiple viewpoints (Ferber and Mu¨ller, 1996; Michel, 2007;
+and eventually sensors situated inside the cluster. The mini-
+Soyez et al., 2013).
+mum cutting of the road network is then defined by:
+• a cluster representing the outside of the simulated net-
+THEJAM-FREESIMULATOR
+work, Architecture
+• clustersrepresentingminimalsubsetsintheroadnetwork; JAM-FREE is based on a multi-level architecture (see e.g.,
+aclusterisminimalifthereisnosensorinsidethecluster. figure 7):
+Clustersofasimulationarenecessarilydisjointcombination • the infrastructure level models the components of the
+of minimum contiguous clusters. An example of minimal road network; the naming and identification of road
+cutting is depicted in figure 6. Each cluster transmits mean network components follow the Se´tra (Service d’e´tudes
+speed and flow information from its bounding sensors to the sur les transports, les routes et leurs am’enagements, is a
+upstream and downstream clusters. In the case of a macro French technical service of the Ministe`re de l’E´cologie,
+cluster, this information is integrated using flow conservation du De´veloppement Durable et de l’E´nergie dedicated to
+and prediction formulas to compute the flow at next time. transportation issues) specification (Se´tra, 2010).
+In the case of a micro cluster, it consists in changing the • the control level is the core of the dynamic hybrid
+frequency of generation of vehicles and their speed based on approach: it manages the dynamic decomposition of the
+data from the sensors, and measuring the number of vehicles network into clusters.
+passing the sensors and their speed, for a given time interval • thesimulationdependentlevelsmodelthetrafficdynamic
+to deduct the sensor data. using a dedicated representation; by default, three traffic
+Aggregation and disaggregation of traffic variables: When levelsareconsidered:microscopic,macroscopicanddata-
+runningthesimulation,anagentmanagesthedecompositionof driven (i.e., using real data).
+theclusternetwork.Thisagentencapsulatesrules,determining
+whether the model used in a cluster must be changed (for
+Models used in JAM-FREE
+example from micro to macro) and determining whether the Roadnetworkstructure: Weconsiderthattheroadnetwork
+area of a cluster must be enlarged or reduced according to the can be divided dynamically into subsets called clusters. The
+needs of the simulation (see the previous section). Switching trafficissimulatedoneachclusterusingvariousheterogeneous
+from micro to macro is straightforward: the mean speed and modelsdependingonthesituation:eitheramicroscopicmodel
+flowinsidetheclustercanbedirectlycomputedfromsensors. or a macroscopic model. For computation time efficiency
+
+===== PAGE 5 =====
+
+Fig.6. Minimalcuttingofanetwork
+• Highway extraction node
+Microscopic level models: The behavior of a vehicle can
+be seen as the sum of three different parts:
+• A navigation behavior when the current lane of the
+vehicle does not lead to the desired destination of the
+vehicle. This behavior consists in changing the lane of
+the vehicle until the current lane of the vehicle leads to
+the desired destination.
+• An overtaking behavior when the vehicle either wants
+to increase its speed by changing its lane, or when the
+vehicle has to swerve because a faster vehicle is tailing
+it.
+• Abehaviorwhennolanechangeisrequired(acceleration
+model).
+Fig.7. Multi-levelarchitectureofJAM-FREE JAM-FREE implements the highly used Intelligent-Driver
+Model (IDM) to model the acceleration behavior of vehi-
+cles (Kesting et al., 2010).
+reasons,wechoosenottomodeltheroadnetworkataphysical IDM is a microscopic traffic flow model, i.e., each vehicle-
+level.Indeed,suchamodelrequiresthevehiclestointerpreta driver combination constitutes an active ”particle” in the sim-
+large continuous zone of asphalt with blank lines as separated ulation.Suchmodelscharacterizethetrafficstateatanygiven
+lanes. Such computations are unnecessary complex, since in time by the positions and speeds of all simulated vehicles. In
+our use case (France) rational drivers usually never drive over caseofmulti-lanetraffic,thelaneindexcomplementsthestate
+the blank lines separating the lanes if they are not overtaking. description. More specifically, IDM is a car-following model.
+To keep the model simple, the road network is only modeled In such models, the decision of any driver to accelerate or
+at a semantic level. to brake depends only on his or her own speed, and on the
+The road network is modeled as a set of interconnected positionandspeedofthe”leadingvehicle”immediatelyahead.
+roads. Each road contains a set of lanes (usually from 1 to 5). The model structure of IDM can be described as follows:
+Roads also contain vertical signs (e.g. stop sign, speed limit
+• the influencing factors (model input) are the own speed
+sign) that are bond either to all the lanes or to specific lanes
+v,thebumper-to-bumpergapstotheleadingvehicle,and
+(e.g. extraction lane in the highway, slow vehicles lane). In
+the relative speed (speed difference) of the two vehicles
+our model, we support a specific subset of the french vertical
+(positive when approaching),
+signs.Theconnectionpointsoftheroadsarecallednodes.We
+• the model output is the acceleration chosen by the driver
+distinguish different types of nodes:
+for this situation,
+• Crossroads nodes • the model parameters describe the driving style, i.e.,
+• Roundabout nodes whether the simulated driver drives slow or fast, careful
+• Highway insertion node or reckless.
+
+===== PAGE 6 =====
+
+Lane changes takes place, if: Traffic generation: In our model, each input point is a
+• the potential new target lane is more attractive, i.e., the special connector that will generate traffic on the road it is
+”incentive criterion” is satisfied, attached to. Note that such a connector has to be created and
+• and the change can be performed safely, i.e., the ”safety put on each lane where the traffic appears. The creation of
+criterion” is satisfied. vehicles is managed by a traffic input point agent. Various
+implementation of this agent currently exist:
+JAM-FREEimplementsthelanechangingmodelMOBIL(Kest-
+ing et al., 2007). • ”Flow-mass traffic input point” agents, generating the
+traffic flow using a flow-mass parameter
+Chosenaccelerationandlanechangingmodelsarepresented
+in detail in the JAM-FREE documentation. • ”Scriptedtrafficinputpoint”agents,generatingthetraffic
+flow using user-defined events. The created vehicles and
+Macroscopic level model: Any macroscopic traffic flow
+the creation dates are manually specified by the users.
+model can be used in JAM-FREE since it defines generic
+connectorstoconvertmicro/macrorepresentations.Bydefault, A first experimentation
+a generic implementation of the METANET model is pro-
+To validate the models implemented in JAM-FREE, as well
+vided (Messner and Papageorgiou, 1990). METANET is based
+as the flow (dis)aggregation algorithms, we performed a first
+on a second order macroscopic model and uses the following
+hybrid simulation using real data from of the A25 highway
+traffic flow equations:
+in France. We simulate a 4780m portion of the highway, de-
+T composedinto11clusters(seefig.8).Theclusterscontaining
+s
+ρ(k+1)=ρ(k)+ [q (k)−q(k)] (1)
+i i L i−1 i insertion or extraction lanes are simulated with a microscopic
+i
+model, the others with a macroscopic model.
+where, ρ, defines the traffic density in (veh/km/lane). L, k
+i i
+and T represent, the segment length (km), the simulation step
+s
+and its duration, respectively. q in (vehicles/h) defines the
+i
+traffic flow in the segment i:
+q =ρv (2)
+i i i
+The speed v in (km/h) represents the velocity of vehicles in
+i
+segment i at time kT.
+s
+v =V (ρ) (3)
+i e i
+where V (ρ) is the static speed-density characteristic called
+e i
+a fundamental diagram. The momentum equation is obtained
+by introducing two small constant parameters in (3). Such
+equation reads:
+T Tη
+s s
+v(k+1)= [V (ρ)−v(k)]+ v(k)[v (k)−v (k)]
+i e i i i i−1 i+1
+τ L
+i Fig.8. Descriptionofthesimulatednetwork
+(cid:124) (cid:123)(cid:122) (cid:125) (cid:124) (cid:123)(cid:122) (cid:125)
+relaxation convection
+The obtained results permit to validate the performance
+−
+T s ν ρ i+1 (k)−ρ i (k)
+(4)
+of JAM-FREE as well as its microscopic and macroscopic
+τL i ρ i (k)+κ models. We cannot present them all in this paper for an
+(cid:124) (cid:123)(cid:122) (cid:125) evidentquestionofspace.Thefigure9showssomesimulation
+anticipation
+results in cluster R8 (i.e., after (dis)aggregation processes),
+The first term of equation (4) represents relaxation to the using typical model parameter values (i.e., without specific
+equilibrium. This is the most dominant term in the equation calibration).
+since the other terms manifest their effects only when there
+are (occasional) fluctuations in the traffic speed and density
+CONCLUSIONANDPERSPECTIVES
+upstream or downstream. This relaxation term describes the In this paper a first step towards the implementation of a
+fact that the drivers adjust their speeds to the equilibrium dynamic hybrid model was proposed. The main objectives of
+speed-density characteristic V (ρ) according to the reaction this step were to identify use-cases, propose generic solutions
+e i
+time τ. The second term, represents the convection, i.e., to the dynamic hybrid simulation problem and study the core
+the influence of the upstream traffic mean speed. The third aspects of the multi-level simulation approach. These ideas
+term, called ”anticipation”, translates the effect of drivers have then been implemented in a simulator called JAM-FREE.
+reacting to downstream traffic density variations. Drivers tend The first experiments using real data allow us to validate
+todecelerateifthedownstreamdensityishigherandaccelerate several issues addressed in the paper and the implemented
+if it is lower. ν, κ are a model parameters. models.Furtherworkswillfocusontheintroductionofseveral
+
+===== PAGE 7 =====
+
+0.8 agent-basedmodels,PrinciplesandPracticeofMulti-Agent
+0.7 real Systems, Vol. 7057 of LNCS, Springer, pp. 620–635.
+simulated
+Joueiai,M.,vanLint,H.andHoogendoorn,S.(2013),Generic
+0.6
+solutions for consistency problems in multi-scale traffic
+0.5
+flow models - analysis and preliminary results, 16th Int.
+0.4
+IEEE Conf. on Intelligent Transportation Systems (ITSC),
+0.3
+pp. 310–315.
+0.2 Kesting,A.,Treiber,M.andHelbing,D.(2007),Generallane-
+2000 4000 6000 8000
+changing model MOBIL for car-following models, Trans-
+(a) density(vehicle/m) portation Research Record: Journal of the Transportation
+Research Board 1999(1), 86–94.
+32 Kesting, A., Treiber, M. and Helbing, D. (2010), Enhanced
+real intelligent driver model to access the impact of driving
+30 simulated
+strategies on traffic capacity, Philosophical Transactions of
+28 theRoyalSocietyA:Mathematical,PhysicalandEngineer-
+ing Sciences 368(1928), 4585–4605.
+26
+Magne,L.,Rabut,S.andGabard,J.(2000),Towardsanhybrid
+24 macro-micro traffic flow simulation model, Proceedings of
+2000 4000 6000 8000
+the INFORMS Salt Lake City String 2000 Conference .
+time (s) Mammar, S.and Lebacque, J. and Haj-Salem, H. (2006),
+Hybrid model based on second-order traffic model, 85th
+(b) speed(m/s)
+Annual Meeting of the Transportation Research Board.
+Fig.9. SimulationresultsinclusterR8 Messner,A.andPapageorgiou,M.(1990),Metanet:Amacro-
+scopic simulation program for motorway networks, Traffic
+Engineering & Control 31(8-9), 466–470.
+trafficmodelsallowingtothepractitionersmultiplechoicesin Michel, F. (2007), The IRM4S model: the influence/reaction
+functionoftheirsimulationobjectiveandthevalidationofthe principle for multiagent based simulation, Proc. of 6th
+identified use-cases. Moreover, a more accurate macro/micro Int. Conf. on Autonomous Agents and Multiagent Systems
+switching algorithm is being developed using a sophisticated (AAMAS), pp. 1–3.
+continuous warm-up process. In addition, some control strate- Morvan, G. (2013), Multi-level agent-based modeling - a
+gies will be added to JAM-FREE in order to evaluate their literature survey, CoRR abs/1205.0561.
+impact on the global behavior of the networks. Morvan, G. and Kubera, Y. (2014), SIMILAR documentation.
+http://www.lgi2a.univ-artois.fr/∼morvan/similar.html.
+REFERENCES Morvan,G.,Veremme,A.andDupont,D.(2011),IRM4MLS:
+the influence reaction model for multi-level simulation,
+Bourrel, E. and Lesort, J. (2003), Mixing micro and macro Multi-Agent-Based Simulation XI, Vol. 6532 of LNCS,
+representations of traffic flow: a hybrid model based on the Springer, pp. 16–27.
+LWR theory, 82th Annual Meeting of the Transportation Picault, S. and Mathieu, P. (2011), An interaction-oriented
+Research Board . modelformulti-scalesimulation,Procofthe22ndInt.Joint
+El hmam, M. (2006), Contribution a` la mode´lisation et a` la Conf. on Artificial Intelligence, AAAI Press, pp. 332–337.
+simulation hybride du flux de trafic, PhD thesis, Universite´ Poschinger, A., Kates, R. and Keller, H. (2002), Coupling of
+d’Artois. concurrentmacroscopicandmicroscopictrafficflowmodels
+Espie´, S., Gattuso, D. and Galante, F. (2006), Hybrid traffic using hybrid stochastic and deterministic disaggregation,
+model coupling macro- and behavioral microsimulation, Transportation and Traffic Theory for the 21st century .
+85th Annual Meeting of Transportation Research Board. Se´tra(2010),Identificationetlocalisationsurlereseauroutier
+Ferber, J. and Mu¨ller, J.-P. (1996), Influences and reaction: national, Technical report, Se´tra, 110 rue de Paris 77171
+a model of situated multiagent systems, 2nd International Sourdun - France. http://dtrf.setra.fr/pdf/pj/Dtrf/0005/Dtrf-
+Conference on Multi-agent systems (ICMAS’96), pp. 72– 0005792/DT5792.pdf
+79. Sewall, J., Wilkie, D. and Lin, M. C. (2011), Interactive
+Gaud, N., Galland, S., Gechter, F., Hilaire, V. and Koukam, hybrid simulation of large-scale traffic, ACM Transaction
+A. (2008), Holonic multilevel simulation of complex sys- on Graphics (Proceedings of SIGGRAPH Asia) 30(6).
+tems : Application to real-time pedestrians simulation in Soyez,J.-B.,Morvan,G.,Dupont,D.andMerzouki,R.(2013),
+virtual urban environment, Simulation Modelling Practice A methodology to engineer and validate dynamic multi-
+and Theory 16, 1659–1676. level multi-agent based simulations, Multi-Agent-Based
+Gil-Quijano, J., Louail, T. and Hutzler, G. (2012), From SimulationXIII,Vol.7838ofLNCS,Springer,pp.130–142.
+biological to urban cells: Lessons from three multilevel

@@ -1,0 +1,441 @@
+===== PAGE 1 =====
+
+Shock Waves on the Highway 
+Author(s): Paul I. Richards 
+Source: Operations Research , Feb., 1956, Vol. 4, No. 1 (Feb., 1956), pp. 42-51 
+Published by: INFORMS 
+Stable URL: https://www.jstor.org/stable/167515
+JSTOR is a not-for-profit service that helps scholars, researchers, and students discover, use, and build upon a wide 
+range of content in a trusted digital archive. We use information technology and tools to increase productivity and 
+facilitate new forms of scholarship. For more information about JSTOR, please contact support@jstor.org. 
+ 
+Your use of the JSTOR archive indicates your acceptance of the Terms & Conditions of Use, available at 
+https://about.jstor.org/terms
+INFORMS is collaborating with JSTOR to digitize, preserve and extend access to Operations 
+Research
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 2 =====
+
+SHOCK WAVES ON THE HIGHWAY* 
+ PAUL I. RICHARDS 
+ Technical Operations, Inc., Arlington, Massachusetts 
+ (Received July 1, 1955) 
+ A simple theory of traffic flow is developed by replacing individual vehicles 
+ with a continuous 'fluid' density and applying an empirical relation between 
+ speed and density. Characteristic features of the resulting theory are a 
+ simple 'graph-shearing' process for following the development of traffic 
+ waves in time and the frequent appearance of shock waves. The effect of 
+ a traffic signal on traffic streams is studied and found to exhibit a threshold 
+ effect wherein the disturbances are minor for light traffic but suddenly build 
+ to large values when a critical density is exceeded. 
+ T HE THEORY OF TRAFFIC FLOW to be presented below rests on an 
+ idealized picture wherein many individual cars are replaced by a simple 
+ continuous distribution. In this way a number of interesting results can 
+ be obtained which exhibit many familiar features. 
+ It is not claimed, however, that this simple picture is an accurate repre- 
+ sentation of the facts under all circumstances. One problem which it will 
+ not handle adequately, for example, is the length of waiting-lines at a toll 
+ booth. This quantity depends primarily on statistical fluctuations in 
+ traffic volume. The simple picture below gives only the result that a 
+ waiting-line must have a certain density of cars, but its length is inde- 
+ terminate. Thus the simple theory fails in this case, but at least does not 
+ give an incorrect answer. 
+ Previous analyses of problems of this nature have been reported by 
+ Reuschel," 2 Pipes,3' 4 Prager,5 and Newell.6 The first two authors con- 
+ sider a number of vehicles each of which is constrained to follow its prede- 
+ cessor according to some assumed 'rule' that relates its velocity and ac- 
+ celeration to the motions of its predecessors. These relations lead to 
+ coupled differential equations that, given initial conditions and the motion 
+ of the lead vehicle, can be solved by various methods to predict the motion 
+ of all vehicles. In practice, these theories have necessarily been applied 
+ to a relatively small number of vehicles. On the other hand, the present 
+ theory is valid only for a very large number of vehicles since the basic step 
+ of replacing traffic by a continuous distribution-function certainly loses 
+ validity for relatively few vehicles. Likewise the present theory, instead 
+ of proceeding from detailed assumptions concernring driver-behavior, eln- 
+ deavors to derive results with a minimum of hypotheses. As a result, it 
+ complements the earlier work by supplying broad over-all results but, be- 
+ * This work was supported by the Operations Research Office of The Johns 
+ Hopkins University. 
+ 42
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 3 =====
+
+Shock Waves on the Highway 43 
+ cause of its economy, is unable to yield detailed precise results for very low- 
+ density traffic. 
+ Newell6 reports on a kinetic theory model of traffic in which a collision 
+ is analogous to the passing of one car by another. This theory, as its author 
+ emphasizes, is primarily applicable to multi-lane high-speed highways under 
+ light traffic conditions. Specifically, the possibility of 'many-body colli- 
+ sions' analogous to 'traveling queues' is not included. These results, 
+ therefore, also complement the theory treated here, which, by contrast, 
+ applies primarily to heavy traffic where passing would be greatly impeded 
+ and indeed treats only the 'density waves' that develop under such condi- 
+ tions. 
+ The work of Prager' treats a somewhat different problem. In its present 
+ form his theory concerns an essentially steady state on a road network and 
+ provides a model for the distribution of such steady streams among alterna- 
+ tive routes. The theory presented here concerns essentially a single route 
+ under nonsteady conditions, but it might be of use in extending Prager's 
+ analysis to the dynamic case. 
+ ANALYSIS 
+ WE SHALL USE only two assumptions in what follows. The first might more 
+ properly be called a statement of the method. The second can be sup- 
+ ported by empirical data.' The two assumptions are: 
+ (a) Any distribution of cars can be replaced by a 'continuous' density function, 
+ D (x, t) cars per mile say (where x measures position along the road and t is time). 
+ (b) The velocity of individual cars depends on car-spacing in such a manner 
+ that, at any instant and at every point, cars in that vicinity have a velocity given 
+ by
+ V =a (b-D), (1) 
+ where a and b are suitable constants depending on the roadway. (Actually many 
+ of the results below can be generalized for arbitrary dependence of V on D, but 
+ relation (1) leads to especially simple results and is as well supported by data7 as 
+ any other.) 
+ Equation (1) will be simplified somewhat. First we note that V= 0 
+ when D = b. Thus b has the significance of a maximum possible density. 
+ It is approximately the density in a line of stalled traffic: 
+ b = Dmax. (2) 
+ If we now introduce a fractional density, d, and maximum velocity, c, 
+ which are defined by 
+ d(x,t) = D(x,t)/Dmax, c = ab, (3) 
+ then we may rewrite (1) in the form 
+ V=cc(1-d). (4) 
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 4 =====
+
+44 Paul I. Richards 
+ Now these assumptions will be manipulated to obtain the results which 
+ they imply. If we think of the traffic as a compressible fluid of density 
+ d and fluid-velocity V, then we may write the fundamental equation of 
+ conservation of matter 
+ ad/at+a(Vd)/ax=o. (5) 
+ Our 'traffic-fluid,' however, is unlike any fluid ever seen in nature in 
+ that there is a direct relation between density and velocity. The velocity 
+ was assumed to be given by (4) independent of all other considerations, 
+ and we shall see that (4) in a sense replaces Newton's law since the motions 
+ are completely determined by (4) and (5) alone. 
+ Substituting (4) into (5), we obtain 
+ ad/at+c (1-2d) Ad/8x-=0. 
+ The general solution* of this equation may be found by standard 
+ methods and can be written 
+ d-f[x+(2d-1) ct], (6) 
+ where f is an arbitrary function of the argument indicated. To be ap- 
+ plicable to our problem, however, f must take only values lying between 
+ 0 and 1 as these are the only meaningful values for the fractional car- 
+ density d. 
+ Equation (6) is an implicit relation for d and obviously cannot be solved 
+ in general terms to give an explicit expression. Fortunately this is not 
+ necessary. First, let t = 0 in (6): 
+ f(x) = d(x,O); (7) 
+ that is, f(x) is the spatial distribution of fractional car density at zero time. 
+ Now consider a fixed value of d in (6). If we thus concentrate on 
+ the motion of a point where d has a given fixed value do we see that x+ 
+ (2do- 1) ct must have a fixed value or in other words: The points where d = 
+ do = constant travel with the velocity (1- 2do) c. This may be stated in another 
+ way as also follows directly from (6) and (7). The graph of d(x,t) versus x for 
+ any instant t can be derived from the graph of d(x,O) by shearing the d,x-plane 
+ (uniformly) in such a manner that the line d =0 moves a distance ct to the 
+ right and the line d= 1 an equal distance to the left, the line d = 12 remaining 
+ fixed. A simple example is shown in Fig. 1, which represents cars pulling 
+ away from their fellows on a clear road. 
+ It must not be thought that this shearing motion of the graph in any 
+ way represents the motion of individual cars. We are studying the mo- 
+ * In checking this solution by substitution, note that d appears on both sides 
+ of (6). 
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 5 =====
+
+Shock Waves on the Highway 45 
+ tions of waves; the individual cars at each point are traveling with velocity 
+ c (1 -d) and may either pass through a wave-crest or pile up behind it de- 
+ pending on the relative velocities involved. 
+ The reader has probably noticed that the 'shearing rule' can lead to 
+ graphs which display physically impossible situations with multiple values 
+ 00 ....a, . 
+ / ~~~~~~~~~~N, 
+ A~-t>O 
+ N,
+ Figure 1 
+ of d for a given x. One example of this is shown in Fig. 2, which represents 
+ a fast-moving line coming up behind a slow-moving line. This result is 
+ certainly incorrect as it stands, but we shall see that it is easily converted 
+ to the correct picture. 
+ As is well-known in fluid mechanics, the end result of one volume of 
+ fluid overtaking another must be the formation of a shock wave. This is 
+ simply a density-discontinuity, which travels through the fluid in a manner 
+ / d2 
+ d~~~~~~~~~t "stx 
+ 0 X~ ~ 
+ Figure 2 
+ that is well determined by the laws of motion. If U is the velocity of the 
+ shock, conservation of matter (cars) gives the result: 
+ di (V1-U)=d2 (V2-U), (8) 
+ where the subscripts denote the values of quantities immediately on either 
+ side of the shock-discontinuity.* Substituting for V1 and V2 from (4), 
+ the relation expressing the peculiar property of 'traffic fluid,' we find 
+ U=c (1-d-2). (9) 
+ A fairly straightforward geometric argument will show that (9) is also 
+ equivalent to the following extension of the 'shearing rule': If the graph- 
+ * To prove (8), transform coordinates to those of an observer moving with the 
+ shock-wave at velocity U. He sees cars traveling with velocities VI'=t VI-U and 
+ V2'= V2- U on the two sides of the shock. The number of cars entering the shock 
+ from the one side, d1V1', per unit time must equal the number leaving the other side, 
+ d2V2', per unit time. Sincetherelation (8) is symmetric in the subscripts, it does not 
+ matter which side is denoted as '1.L 
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 6 =====
+
+46 Paul I. Richards 
+ shearing process leads to multiple values of d for any x, the correct graph is 
+ obtained by connecting the top branch of the curve to the bottom branch by a 
+ vertical straight-line (shock-wave) so located that the areas of the loops cut off 
+ on either side of the line are equal (see Fig. 3). This rule also holds when the 
+ curve becomes multiply folded so that a shock line cuts off several loops on 
+ either side. It is usually simpler, however, actually to draw in the shocks 
+ Figure 3 
+ Figure 3 
+ before this situation develops and erase the loops before continuing the 
+ shearing process. 
+ These shock waves are perhaps the most characteristic feature of the 
+ model under discussion. Anyone who has driven on a high-speed road or 
+ parkway in heavy traffic has been made dramatically aware of existence 
+ of shocks in fact, as well as in theory. Whenever screeching tires and 
+ brakes bring us to a halt inches away from the car ahead, we have just 
+ L----, -SHOCK VILL APPEARe r rH1/ 
+ '*-LocFqr/oNv wH,ENA tz to * #/C 
+ Figure 4 
+ witnessed the passage of an especially strong shock. Examination of a few 
+ typical graphs of d versus x and their development in time by the shearing 
+ rules above will show that shock-waves always develop whenever the slope 
+ of the graph is positive (Od/&x>0). In fact, as may be seen by some ele- 
+ mentary geometric arguments using the 'shear rule,' the place and time 
+ where shocks will first appear can be predicted from the original graph by 
+ drawing tangents at points of maximum positive slope and noting the ab- 
+ scissae at which they cross the line d }- (see Fig. 4). 
+ Before considering some special examples in detail, a few further words 
+ on interpretation of the graphs may be in order. First, as already noted, 
+ the velocity of the cars is given by (4) and is not directly related to the 
+ shearing motion by which the waves develop. Examination of (4) wi]l 
+ show that the graph of d at any instant is at the same time an inverted 
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 7 =====
+
+Shock Waves on the Highway 47 
+ graph of V, the local car velocity. In fact, the distance of the wave below 
+ the line d = 1 gives directly V/c, the ratio of the actual local velocity to the 
+ 'speed limit.' 
+ Secondly, the slope of the graph is related to another quantity of in- 
+ terest, the acceleration of a car at a given place and time. In fact from 
+ (4) and (5) one finds 
+ acceleration = dV/dt = dV/dt+ V aV/dx - c2d ad/dx. 
+ Note that this relation can be interpreted as saying that a driver changes 
+ his speed at any instant in accord with conditions which he sees ahead 
+ (and behind?) as expressed by ad/dx. This result would not have been 
+ anticipated from our original assumption (4) alone (which says merely 
+ that he does not stop completely until D-Dmax), but it is a consequence of 
+ (4) when combined with the conservation of cars, equation (5). 
+ cl
+ , i1
+ Jr /
+ I , , , I 
+ _n-~~~~~~~~~~~~~- 
+ -ace 0 
+ Figure 5 
+ Finally, the number of cars passing a given point per unit time is often 
+ of interest. This traffic flow, F, is analogous to the current in hydro- 
+ dynamics and is given by (DV) or 
+ F=cDmax d (1-d). (10) 
+ If c is in miles/hr and Dmax in cars/mile, F will be in cars per hour. This 
+ flow varies with position even at any one instant of time, and it also can be 
+ discontinuous at a (moving) shock front. Note that the flow is the same 
+ for a density 1- do as it is for density do. This does not mean that the 
+ traffic conditions are the same in the two cases; in fact, the velocities are 
+ different and to the motorist the distinction is marked indeed, but to a 
+ robot traffic-counter the two cases are identical. 
+ The first example we wish to consider is that due to a sudden interrup- 
+ tion of an originally uniform stream of traffic. Let the density be initially 
+ given by d = a at all points. This situation will continue until some con- 
+ straint is imposed from without. Suppose something (an accident perhaps) 
+ forces the traffic at x = 0 to stop for a time 0. During this time, the local 
+ velocity at x =0 must become zero. The density d therefore becomes 
+ unity and a shock develops and travels [backwards, see (9)] at a speed 
+ U - ac, with the result that at the end of the stopping interval 0 the 
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 8 =====
+
+48 Paul I. Richards 
+ situation will be that shown by the solid graph in Fig. 5. Let us choose 
+ the instant illustrated in Fig. 5 as zero time (i.e., the original interruption 
+ occurred at time- 0). At the instant t 0, the stalled traffic in Fig. 5 is 
+ suddenly released again. The development can now be followed by the 
+ 'shearing rule' (which also shows that neglect of the traffic which has pulled 
+ on ahead will not affect our results as long as we are interested only in the 
+ region x<O). 
+ During the initial moments after traffic flow resumes, the graph takes 
+ a form shown by the dotted curve in Fig. 5. Cars are still coming to a stop 
+ at the back edge where the original shock wave is still traveling up the line, 
+ but a 'starting wave' is rapidly overtaking it. In fact, the shock is travel- 
+ ing at a speed (- ac) as given by (9) while the 'shear rule' shows that the 
+ Ai
+ y \ 
+ i - L x Ct 4 
+ Figure 6 
+ starting wave is traveling back at velocity (-c). Since the former has a 
+ head start of (-acO), the latter overtakes it at the time 
+ to= ac6/(c-ac) = aO/(1-a). (11) 
+ The graph at this instant resembles an arrowhead with the peak of the 
+ 'barb' at d = 1, x = -cto. 
+ Further development could be followed by the 'shear rule,' but may also 
+ be followed quantitatively. Introducing the notation shown in Fig. 6 
+ (where L> 0, and the shear rule has been used to locate the leading edge) 
+ we find from (9) 
+ U= -dL/dt=c (1-y-a), 
+ and by similar triangles (yi- 12)/L = 1/2ct. (12) 
+ Elimination of y gives a differential equation for L 
+ (I 1c) dL/dt = (a-2) +L/2ct. (13) 
+ The solution of this is (where C is an integration constant) 
+ L=C Vct+2c (a-) t. 
+ To evaluate the integration constant, we note that when t -to given in (11), 
+ L ct. The result is 
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 9 =====
+
+Shock Waves on the Highway 49 
+ L = 2c [(a-s) t+ vaot (1-a)], (14) 
+ and from (12) the peak density d(- L,t) y is 
+ d(-L,t)=a+ V/oa (1-a)/t. (15) 
+ First note that if a> 12 (original density)> ?fi (maximum density), or 
+ traffic so heavy that V </ c, then (14) shows that the shock never re- 
+ turns to the point of disturbance (x = 0) but travels backwards indefinitely 
+ though its 'strength,' as measured by the height of the discontinuity, con- 
+ tinually decreases. If we say, rather arbitrarily, that the shock is neg- 
+ ligible when it causes a velocity change of less than 10 per cent, then it 
+ may be said to disappear when c [1- d(-L,t)]=0.9 (1-a) c which, using 
+ (15), will ocur at a time 
+ tf = 100 Oa/ (I-a). 
+ Since a> ?2 in the case we are discussing, the shock wave 'lasts' for a period 
+ at least 100 times as long as the original delay. We note also that the 
+ density at x 0 is equal to M for all t>0 so that an observer stationed 
+ there would see the traffic become steady almost immediately after the 
+ delay. 
+ Secondly, if a< ? 3, the 't' term in equation (14) will be negative and 
+ will eventually dominate the '-\-' term. Therefore the shock wave will 
+ eventually reverse its motion and return to the origin at a time determined 
+ by L = 0 which gives 
+ time of return-=tr=Oa (1-a)/(2 -a)2. (16) 
+ At this moment, the fractional density at x = 0 suddenly drops from the 
+ value 1 to the original value a as the shock passes with the traffic. An 
+ observer at the origin would mark this as the time when the traffic-jam 
+ finally clears away. This time can be quite long if the traffic is at all 
+ heavy. For example, if a=Y corresponding to an original density suf- 
+ ficient to hold the speed down to (X8) c, then the time required to clear 
+ the traffic is t,= 15 0. Thus an accident which halted traffic five minutes 
+ would, under these conditions, produce a jam requiring an hour and a 
+ quarter to clear. (Under conditions of large density >?2 the jam might 
+ be said to be so great already that a delay could hardly pile traffic up much 
+ more.) 
+ We can use the equations already developed to study the effect of a 
+ traffic light on an otherwise steady stream of traffic. Suppose the cycle 
+ of the light is that shown in Fig. 7; here we have shifted the origin of time 
+ to correspond to the start of a red light. In our previous formulas, we 
+ merely replace I by 1-0. Consider first the case in which a is small enough 
+ so that the shock wave passes the light (x = 0) while it is still green. Then 
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 10 =====
+
+50 Paul I. Richards 
+ the second red light, like the first, will produce the situations shown in 
+ Fig. 5, the wave will again clear during the following green light, and the 
+ cycle will repeat indefinitely. 
+ Now the largest value of a for which this tidy situation can prevail is 
+ that which causes the tail of the shock to cross the light (x = 0) at the instant 
+ t= T when the second red light comes on. This critical value of a is given 
+ by setting L= 0 and (recalling the shift in time-origin) ''= T- 0 in (14). 
+ The result found is that the shock-wave will clear the light if 
+ a<12 (1- 6/T). (17) 
+ If a is larger than this critical value, each successive shock will leave a 
+ 'residue' which wvas caught by the red light. We can show that these resi- 
+ dues build up indefinitely until (as t- ca) the entire region behind the light 
+ has become blocked up to a certain level. To show this, we note that the 
+ 'shear rule' shows that during a green light the density at the light is /4 
+ (or less after the shock-wave clears), and the traffic flow through the light 
+ is therefore, equation (10), no more than (4i cDlmax) at any instant. The 
+ number of cars which can get through during each light cycle is therefore 
+ RED FEEA RtED REfCN ED 
+ e - I 
+ 0 a T T*r? 2 T 2T*4 
+ Figure 7 
+ no greater than 14 cDmax (T- 6). The average current which can pass 
+ through the light is thus no greater than 
+ F0o = 4 Dmax c (T-6)/T. (18) 
+ This may be seen to be precisely the average flow when the shock wave just 
+ fails to clear the light. Thus whenever a is greater than the critical value 
+ given in (17), the average current through the light is limited by the value 
+ Fo given in (18). Now although the instantaneous current (or flow) can 
+ vary from place to place, the average current over long times must be the 
+ same at all points on the road. Therefore, for large a, the current behind 
+ the light is limited by (18) and the average density behind the light must 
+ shift sufficiently to limit the average current to this value. Combining 
+ (10) and (18) we find that if a> 12 (1- VO/T), the density will change 
+ from the value a to an average value /A (1 + /O/T). 
+ Recapitulating, the light has only a momentary effect on traffic flow 
+ as long as the fractional density is less than the critical value _(1-/ V- T) 
+ but causes a sudden 'back up' to the average value 12 (1+ V\/T) as soon 
+ as the critical density is exceeded. 
+ For a light with equal lengths of red and green phases, the critical 
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms
+
+===== PAGE 11 =====
+
+Shock Waves on the Highway 51 
+ fractional car-density is only about 17 (corresponding to V =67 c), and 
+ as soon as this value 34 is exceeded the light backs traffic up to a density 
+ of 67 thereby reducing the speed of individual cars by a factor of 6! Even 
+ with a light favoring the 'main' road by 9-to-i the corresponding values 
+ are /% (or V= c) and 23 (or V=13 c). 
+ REFERENCES 
+ 1. A. REUSCHEL, Zeits. d. Oesterreich. Ing. u. Arch. Vereines 95, 59 and 73 (1950). 
+ 2. A. REUSCHEL, Oesterreich. Ing. Archiv 4, 193 (1950). 
+ 3. L. A. PIPES, A Proposed Dynamic Analogy of Traffic, Special Study, Institute 
+ of Transportation and Traffic Engineering, University of California, July 11, 
+ 1950. 
+ 4. L. A. PIPEs, An Operational Analysis of Traffic Dynamics, Institute of Trans- 
+ portation and Traffic Engineering, University of California (no date). 
+ 5. W. PRAGER, Proceedings of the Symposium on Operations Research in Business 
+ and Industry, Midwest Research Institute, April 1954. 
+ 6. G. F. NEWELL, J. Opns. Res. Soc. Am. 3, 176 (1955). 
+ 7. E. S. OLCOTT, J. Opns. Res. Soc. Am. 3, 147 (1955), especially Figs. 1-3. 
+This content downloaded from 
+198.137.18.60 on Wed, 20 May 2026 02:06:07 UTC 
+All use subject to https://about.jstor.org/terms

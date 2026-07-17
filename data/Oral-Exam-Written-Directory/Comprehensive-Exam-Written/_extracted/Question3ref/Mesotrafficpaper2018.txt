@@ -1,0 +1,772 @@
+===== PAGE 1 =====
+
+Availableonlineatwww.sciencedirect.com
+Availableonlineatwww.sciencedirect.com
+Available online at www.sciencedirect.com
+2 Authors/ProcediaComputerScience00(2018)000–000
+ScienceDirect realistic. For example, estimating fuel consumption requires higher level of detail in vehicle-level trajectories such
+ProcediaComputerScience00(2018)000–000 asspeed,acceleration,deceleration,idlingetc..Inthatregard,microscopicsimulationwouldbeanaturalchoice.On
+ProcPerdoicae dCioamCpoumtepru StecrieSncciee n1c5e10 (020(21091) 88)5080–08–60300 www.elsevier.com/locate/procedia theotherhand,thesimulationmodelshouldbecomputationallyefficientinordertobeapplicableinlargenetworks.
+www.elsevier.com/locate/procedia
+Inthatcasemacroscopicmodelswouldbepreferredovermicroscopicmodelsasthelatterrequiresdetailednetwork
+The7thInternationalWorkshoponAgent-basedMobility,TrafficandTransportationModels, representation,variousparameterstobecalibratedandiscomputationallyintensive.
+The7thInternationalWorkshoponAgent-basedMobility,TrafficandTransportationModels, Here we present the traffic simulation model developed for the POLARIS tool. The model is mesoscopic in an
+MethodologiesandApplications(ABMTrans2018)
+MethodologiesandApplications(ABMTrans2018) attempt to obtain enough for applications that requires microscopic data while still inheriting the computational ef-
+Mesoscopic Traffic Flow Model for Agent-Based Simulation ficiencyofmacroscopictrafficflowmodels.Themodelismacroscopicatthelink-levelwithdynamicsbasedonthe
+Mesoscopic Traffic Flow Model for Agent-Based Simulation
+NewellsModel[7]andmicroscopicatthenodelevelwithflowcomputationbasedontheunderlyingintersectiontype.
+Felipe de Souzaa, , Omer Verbasa, Joshua Aulda Thispaperisorganizedasfollows.InSection2wepresentabriefreviewofrelatedliteratureandPOLARIS.In
+Felipe de Souzaa,∗ ∗ , Omer Verbasa, Joshua Aulda Section 3 the POLARIS traffic flow model is presented. In Section 4 we present the results of the POLARIS traffic
+aArgonneNationalLaboratory,Lemont,IL,60439,UnitedStates
+simulation.Finally,westateourconclusionsandfutureworkinSection5.
+aArgonneNationalLaboratory,Lemont,IL,60439,UnitedStates
+2. RelatedLiterature
+Abstract
+Abstract
+Trafficsimulationisakeyelementofagentbasedmodelsasthevariousagentsdecisionsimpactandareimpactedbytherealized
+Recentlyseveralpackageshavebeendevelopedforintegratedagent-basedmodeling.OPUS[8]isaPython-based
+tTrraav ffi elctsimimeuslaatniodndieslaaykseyineltehmeetrnatffiofcangeetnwtobraks.eHdemreodwelesparsetsheentvathrieoumseasgoesnctospdicectirsaioffincsiflmopwacmtoanddelairmepimlepmaecntetdedbyinthPeOrLeaAliRzeISd
+ttrraavnesplotirmtaetisonansydstdeemlasyssiminultahteort.rTaffi hecmnoedtweloirskm. eHseorsecowpeicpinreasnenatttethmepmtteosoobsctaoipnicentorau ffi ghcfoflroawppmliocadteilonimstphlaetmreeqnuteirdesinmPicOroLsAcoRpIiSc open-sourcelibrarydesignedtobeeasilyextensibleallowingresearcherstointegratespecificmodelsfortheirneeds
+dtraatnaspwohritlaetisotnillsyinstheemristisnigmtuhleatcoor.mTphuetamtioodnealliesffimceiseonsccyopoifcminaacnroastctoempipctttroaffiobctaflionwenmouogdhelfso.rTahpeplmicoadtieolnisstmhaatcrreoqsuciorpesicmaitctrhoescloinpkic- suchasdemandmodelinganddynamictrafficassignment.TRANSIMS[6]isanearlyattempttointegratedifferent
+ldeavtealwwhiitlhedstyilnlaimnhicesritbinasgedtheoncotmhepuNtaetwioenllaslMeffi ocdieelncayndofmmicarcorsocsocpoipcicattrtah ffi ecnflodoewlmevoedl.elWs.eTphreemseondtelliniks-mleavcerloasncodpnicetawtothrke-lleinvke-l transportationdatainformation,suchasland-useanddemographicwithhumandecisionmaking.Eachagenthasaset
+rleevsuelltswfiothrodnyenmamidic-ssizbeadsetrdaffioncntheetwNoerwk.eTllhseMreosdueltlsasnhdowmtihcarotsthceopmicodaetltchaenncoodmeblienveeal.ccWueracpyr,esleevnetlloinfkd-eletavielslaannddcnoemtwpourtkat-iloenveall ofplanthatisadaptedbasedontheresultingcongestionofagivenplan.
+ereffisuclitesnfcoyr.onemid-sizedtrafficnetwork.Theresultsshowthatthemodelcancombineaccuracy,levelofdetailsandcomputational TheconceptofplancreationandadaptationisalsopresentinMATSIM[5],anopen-sourcetoolforagent-based
+efficiency.
+modeling.Eachpersonismodeledasanagentthatadaptsitsitineraryiterativelybasedonscorescomputedbasedon
+© c 22001198 TThhee AAuutthhoorrss.. PPuubblliisshheedd bbyy EEllsseevviieerr BB..VV.. realized travel times at each iteration. The traffic flow model in MATSIM is very similar to (bounded) point-queue
+T (cid:30) T (cid:30) c hhi2 iss 0 ii 1ss 8 aa Tnn hoo eppee Ann u aa thcc occer e sss .ss P aa urrtb tii lcc ill see h ue u dnndd bee yrr Etthh les e e CC viCC er BB BYY .-V -NN .CC--NNDD lliicceennssee ((hhttttpp::////ccrreeaattiivveeccoommmmoonnss..oorrgg//lliicceennsseess//bbyy--nncc--nndd//44..00//)) models in which a vehicles join the link queue after elapsed the free-flow travel time. The queue spill back (i.e.,
+PPT eeh eeis rr--i rrs eevva iin eewwop uue nnn dda eec rr c rre ees sss ppo aon rnt s isi cibbl i eilli uitty ny d ooe ff r tth thh eee CCC ooC nnffe Ber Y eren -nN cce Ce P -PN rorDoggra lriam cme C nCs h ehaia( r hisrt .stp.://creativecommons.org/licenses/by-nc-nd/4.0/) blockingofupstreamlinksduetocongestion)occurswhennumberofvehiclesinaqueuereachesitsmaximum.
+Peer-reviewunderresponsibilityoftheConferenceProgramChairs.
+Like MATSIM, POLARIS is an open-source platform for agent-based-modeling for transportation analysis. It is
+Keywords: TrafficSimulation;Mesoscopic;LinkTransmissionModel
+Keywords: TrafficSimulation;Mesoscopic;LinkTransmissionModel designedspecificallyforcomputationalefficiencywithaparalleldiscreteeventengineandalsoaspecializeddynamic
+memoryallocation.Theactivity-basedtravelmodelisbasedonADAPTS(Agent-basedDynamicActivityPlanning
+andTravelScheduling[2])whichwasdesignedspecificallytobeimpactedbydifferenttime-dependenttraveltimesin
+thetrafficnetwork.Eachagentalsoundertakesroutingdecisionsincludingen-routeswitching.Inthenetworkside,all
+1. Introduction variousaspectsarealsomodeledasindependentagentssuchasrampmeters,trafficlightsandotherITScomponents
+1. Introduction thatcaninteractwitheachother.Formoredetailssee[1].
+Theevolvingcomplexityoftransportationnetworkshadleadtotheintegratedmodelingoftraveldemandandnet-
+Theevolvingcomplexityoftransportationnetworkshadleadtotheintegratedmodelingoftraveldemandandnet-
+worksupplyasopposedtoasequentialprocess.Inparticular,Agent-Based-Models(ABM)capturetheseinteractions
+worksupplyasopposedtoasequentialprocess.Inparticular,Agent-Based-Models(ABM)capturetheseinteractions 3. POLARISMesoscopicTrafficFlowModel
+ontheperspectiveofaparticularagentthatengageonactivities(demand)basedontime-dependenttraveltimesfor
+ontheperspectiveofaparticularagentthatengageonactivities(demand)basedontime-dependenttraveltimesfor
+thedifferentmodesavailable(supply)insuchawaythatdemandandsupplyaremutuallydependent.Insuchtools,the
+t
+t
+r
+h
+a
+e
+ffi
+d
+c
+iff
+s
+e
+im
+re
+u
+n
+l
+t
+a
+m
+tio
+o
+n
+de
+m
+s
+o
+av
+d
+a
+e
+i
+l
+l
+s
+a
+h
+b
+o
+le
+ul
+(
+d
+su
+b
+p
+e
+p
+r
+ly
+ea
+)
+s
+i
+o
+n
+n
+s
+a
+u
+b
+c
+l
+h
+y
+a
+ac
+w
+c
+a
+u
+y
+ra
+t
+t
+h
+e
+a
+t
+t
+o
+d
+p
+em
+ro
+a
+v
+n
+id
+d
+e
+a
+r
+n
+e
+d
+al
+s
+i
+u
+st
+p
+i
+p
+c
+l
+t
+y
+ra
+a
+v
+r
+e
+e
+l
+m
+ti
+u
+m
+tu
+es
+al
+w
+ly
+h
+d
+il
+e
+e
+p
+c
+e
+o
+n
+m
+de
+p
+n
+u
+t
+t
+.
+a
+I
+t
+n
+io
+s
+n
+u
+a
+c
+l
+h
+ly
+to
+e
+o
+ffi
+ls
+c
+,
+ie
+th
+n
+e
+t
+POLARIStrafficflowmodelisbasedonamacroscopictrafficflowmodelonthelink-level,butflowsatthebound-
+trafficsimulationmodelshouldbereasonablyaccuratetoproviderealistictraveltimeswhilecomputationallyefficient ariesarecomputedatdiscretelevelsallowingtravelerstobetrackedalongtheirjourney.Asmacroscopicandmicro-
+sothatitcanbeappliedinlargescalenetworks.
+sothatitcanbeappliedinlargescalenetworks. scopicfeaturescoexistinthesamesimulationsetting,werefertoitasmesoscopictrafficsimulation[3].Eachofthese
+In ABM, each agent is represented by multiple models that ultimately define several decisions, from long-term,
+In ABM, each agent is represented by multiple models that ultimately define several decisions, from long-term, componentsaredetailedinthefollowingsub-sections.
+suchascar-ownership,toshort-term,suchasactivitylocation,departuretime,mode,androutefortheforthcoming
+suchascar-ownership,toshort-term,suchasactivitylocation,departuretime,mode,androutefortheforthcoming
+trip.
+trip.
+Twoconflictingrequirementsmaketheimplementationofasuitablemodelchallenging.Ononehand,itisdesirable 3.1. MacroscopicLinkModel
+Twoconflictingrequirementsmaketheimplementationofasuitablemodelchallenging.Ononehand,itisdesirable
+to have as much detail as possible so that the outputs are more useful for further decisions of the agents and more
+to have as much detail as possible so that the outputs are more useful for further decisions of the agents and more
+InPOLARISthelinkdynamicsisbasedonNewell’smodel[7]usingdemandandsupplyequivalenttotheLink
+Transmission Model [9]. Figure 1 depicts a POLARIS link. The geometric parameters are length, L, and number
+∗ Correspondingauthor.Tel.:+1-630-252-8153 of lanes, n. A given link may contain left and right pockets in the downstream end with number of lanes denoted
+∗
+CE-omrraeislpaodnddriensgs:afudthesoor.uTzeal@.:a+n1l.-g6o3v0-252-8153
+as n and n , respectively. The traffic flow characteristics are defined through the three parameters of the triangular
+E-mailaddress:fdesouza@anl.gov l r
+fundamentaldiagramwithV denotingthefree-flowspeed,W theshock-wavespeed,and K thejamdensity(forone
+1877-0509 c 2018TheAuthors.PublishedbyElsevierB.V.
+T1 1 8 8 h7 7 is7 7 - - is0 0 5 5 a0 0 n9 9 o (cid:30) (cid:30) p © ce n2 2 0 0 a1 1 c8 9 ce T T ssh h e e a r A Ati u cul t te h h o ou r rn s sd . . e P Pr u ut b bh l le i i s sC h h e eC d d B b bY y y - E EN l l s Cs e e-v v Ni i e e Dr r B B lic. . V V e.n . se(http://creativecommons.org/licenses/by-nc-nd/4.0/) lane). The fundamental diagram leads to the per-lane capacity C = K V V + W W . For multiple lanes, the jam spacing is
+PT Teh hei i srs- iri sesva ainenwo p oue pnn edn ae cra crc eec sse sps aos rn t a isc ribl t e iicluilte ny d uoe nfr dtthh eee r CC thoC en fB CeYrCe-nN BcCeY -PN -rN DogC lr- iac Nme D nCs e lhiac (hiert nstp.se :/ / ( c h re t a tp tiv :/ e / c c o r m ea m t o iv n e s c .o o r m g/ m lic o e n n s s . e o s r / g b / y l - i n c c e - n n s d e / s 4 / . b 0/ y ) -nc-nd/4.0/) scaled proportional to the number of lanes. Each link has a set of outgoing movements denoted by the superscript
+P P e e e e r r - - r r e e v v ie i w ew u n u d n e d r e re r s r p e o s n p s o ib n i s li i t b y i o li f ty th e of C t o h n e fe C re o n n ce fe P r r e o n g c r e a m Pr C o h g a r i a rs m . Chairs. m=1,2,...,m,...,M.Allparametersarelink-specificthoughwedonotaddlinkindicesfornotationclarity.
+10.1016/j.procs.2019.04.118
+10.1016/j.procs.2019.04.118 1877-0509
+
+===== PAGE 2 =====
+
+Availableonlineatwww.sciencedirect.com
+Availableonlineatwww.sciencedirect.com
+Felipe de Souza et al. / Procedia Computer Science 151 (2019) 858–863 859
+2 Authors/ProcediaComputerScience00(2018)000–000
+realistic. For example, estimating fuel consumption requires higher level of detail in vehicle-level trajectories such
+ProcediaComputerScience00(2018)000–000 asspeed,acceleration,deceleration,idlingetc..Inthatregard,microscopicsimulationwouldbeanaturalchoice.On
+ProcediaComputerScience00(2018)000–000 www.elsevier.com/locate/procedia theotherhand,thesimulationmodelshouldbecomputationallyefficientinordertobeapplicableinlargenetworks.
+www.elsevier.com/locate/procedia
+Inthatcasemacroscopicmodelswouldbepreferredovermicroscopicmodelsasthelatterrequiresdetailednetwork
+The7thInternationalWorkshoponAgent-basedMobility,TrafficandTransportationModels, representation,variousparameterstobecalibratedandiscomputationallyintensive.
+The7thInternationalWorkshoponAgent-basedMobility,TrafficandTransportationModels, Here we present the traffic simulation model developed for the POLARIS tool. The model is mesoscopic in an
+MethodologiesandApplications(ABMTrans2018)
+MethodologiesandApplications(ABMTrans2018) attempt to obtain enough for applications that requires microscopic data while still inheriting the computational ef-
+Mesoscopic Traffic Flow Model for Agent-Based Simulation ficiencyofmacroscopictrafficflowmodels.Themodelismacroscopicatthelink-levelwithdynamicsbasedonthe
+Mesoscopic Traffic Flow Model for Agent-Based Simulation
+NewellsModel[7]andmicroscopicatthenodelevelwithflowcomputationbasedontheunderlyingintersectiontype.
+Felipe de Souzaa, , Omer Verbasa, Joshua Aulda Thispaperisorganizedasfollows.InSection2wepresentabriefreviewofrelatedliteratureandPOLARIS.In
+Felipe de Souzaa,∗ ∗ , Omer Verbasa, Joshua Aulda Section 3 the POLARIS traffic flow model is presented. In Section 4 we present the results of the POLARIS traffic
+aArgonneNationalLaboratory,Lemont,IL,60439,UnitedStates
+simulation.Finally,westateourconclusionsandfutureworkinSection5.
+aArgonneNationalLaboratory,Lemont,IL,60439,UnitedStates
+2. RelatedLiterature
+Abstract
+Abstract
+Trafficsimulationisakeyelementofagentbasedmodelsasthevariousagentsdecisionsimpactandareimpactedbytherealized
+Recentlyseveralpackageshavebeendevelopedforintegratedagent-basedmodeling.OPUS[8]isaPython-based
+tTrraav ffi elctsimimeuslaatniodndieslaaykseyineltehmeetrnatffiofcangeetnwtobraks.eHdemreodwelesparsetsheentvathrieoumseasgoesnctospdicectirsaioffincsiflmopwacmtoanddelairmepimlepmaecntetdedbyinthPeOrLeaAliRzeISd
+ttrraavnesplotirmtaetisonansydstdeemlasyssiminultahteort.rTaffi hecmnoedtweloirskm. eHseorsecowpeicpinreasnenatttethmepmtteosoobsctaoipnicentorau ffi ghcfoflroawppmliocadteilonimstphlaetmreeqnuteirdesinmPicOroLsAcoRpIiSc open-sourcelibrarydesignedtobeeasilyextensibleallowingresearcherstointegratespecificmodelsfortheirneeds
+dtraatnaspwohritlaetisotnillsyinstheemristisnigmtuhleatcoor.mTphuetamtioodnealliesffimceiseonsccyopoifcminaacnroastctoempipctttroaffiobctaflionwenmouogdhelfso.rTahpeplmicoadtieolnisstmhaatcrreoqsuciorpesicmaitctrhoescloinpkic- suchasdemandmodelinganddynamictrafficassignment.TRANSIMS[6]isanearlyattempttointegratedifferent
+ldeavtealwwhiitlhedstyilnlaimnhicesritbinasgedtheoncotmhepuNtaetwioenllaslMeffi ocdieelncayndofmmicarcorsocsocpoipcicattrtah ffi ecnflodoewlmevoedl.elWs.eTphreemseondtelliniks-mleavcerloasncodpnicetawtothrke-lleinvke-l transportationdatainformation,suchasland-useanddemographicwithhumandecisionmaking.Eachagenthasaset
+rleevsuelltswfiothrodnyenmamidic-ssizbeadsetrdaffioncntheetwNoerwk.eTllhseMreosdueltlsasnhdowmtihcarotsthceopmicodaetltchaenncoodmeblienveeal.ccWueracpyr,esleevnetlloinfkd-eletavielslaannddcnoemtwpourtkat-iloenveall ofplanthatisadaptedbasedontheresultingcongestionofagivenplan.
+ereffisuclitesnfcoyr.onemid-sizedtrafficnetwork.Theresultsshowthatthemodelcancombineaccuracy,levelofdetailsandcomputational TheconceptofplancreationandadaptationisalsopresentinMATSIM[5],anopen-sourcetoolforagent-based
+efficiency.
+modeling.Eachpersonismodeledasanagentthatadaptsitsitineraryiterativelybasedonscorescomputedbasedon
+c 2018TheAuthors.PublishedbyElsevierB.V. realized travel times at each iteration. The traffic flow model in MATSIM is very similar to (bounded) point-queue
+(cid:30) T (cid:30) c hi2s0i1s8aTnhoepeAnuathcocerss.sPaurtbilcilsehuedndbeyrEthleseCviCerBBY.-VN.C-NDlicense(http://creativecommons.org/licenses/by-nc-nd/4.0/) models in which a vehicles join the link queue after elapsed the free-flow travel time. The queue spill back (i.e.,
+PTeheisr-irsevainewopuenndaecrcreessspaorntiscibleiluitnydoefrtthheeCCoCnfBeYre-nNcCe-PNrDoglriacmenCseha(hirtstp.://creativecommons.org/licenses/by-nc-nd/4.0/)
+blockingofupstreamlinksduetocongestion)occurswhennumberofvehiclesinaqueuereachesitsmaximum.
+Peer-reviewunderresponsibilityoftheConferenceProgramChairs.
+Like MATSIM, POLARIS is an open-source platform for agent-based-modeling for transportation analysis. It is
+Keywords: TrafficSimulation;Mesoscopic;LinkTransmissionModel
+Keywords: TrafficSimulation;Mesoscopic;LinkTransmissionModel designedspecificallyforcomputationalefficiencywithaparalleldiscreteeventengineandalsoaspecializeddynamic
+memoryallocation.Theactivity-basedtravelmodelisbasedonADAPTS(Agent-basedDynamicActivityPlanning
+andTravelScheduling[2])whichwasdesignedspecificallytobeimpactedbydifferenttime-dependenttraveltimesin
+thetrafficnetwork.Eachagentalsoundertakesroutingdecisionsincludingen-routeswitching.Inthenetworkside,all
+1. Introduction variousaspectsarealsomodeledasindependentagentssuchasrampmeters,trafficlightsandotherITScomponents
+1. Introduction thatcaninteractwitheachother.Formoredetailssee[1].
+Theevolvingcomplexityoftransportationnetworkshadleadtotheintegratedmodelingoftraveldemandandnet-
+Theevolvingcomplexityoftransportationnetworkshadleadtotheintegratedmodelingoftraveldemandandnet-
+worksupplyasopposedtoasequentialprocess.Inparticular,Agent-Based-Models(ABM)capturetheseinteractions
+worksupplyasopposedtoasequentialprocess.Inparticular,Agent-Based-Models(ABM)capturetheseinteractions 3. POLARISMesoscopicTrafficFlowModel
+ontheperspectiveofaparticularagentthatengageonactivities(demand)basedontime-dependenttraveltimesfor
+ontheperspectiveofaparticularagentthatengageonactivities(demand)basedontime-dependenttraveltimesfor
+thedifferentmodesavailable(supply)insuchawaythatdemandandsupplyaremutuallydependent.Insuchtools,the
+t
+t
+r
+h
+a
+e
+ffi
+d
+c
+iff
+s
+e
+im
+re
+u
+n
+l
+t
+a
+m
+tio
+o
+n
+de
+m
+s
+o
+av
+d
+a
+e
+i
+l
+l
+s
+a
+h
+b
+o
+le
+ul
+(
+d
+su
+b
+p
+e
+p
+r
+ly
+ea
+)
+s
+i
+o
+n
+n
+s
+a
+u
+b
+c
+l
+h
+y
+a
+ac
+w
+c
+a
+u
+y
+ra
+t
+t
+h
+e
+a
+t
+t
+o
+d
+p
+em
+ro
+a
+v
+n
+id
+d
+e
+a
+r
+n
+e
+d
+al
+s
+i
+u
+st
+p
+i
+p
+c
+l
+t
+y
+ra
+a
+v
+r
+e
+e
+l
+m
+ti
+u
+m
+tu
+es
+al
+w
+ly
+h
+d
+il
+e
+e
+p
+c
+e
+o
+n
+m
+de
+p
+n
+u
+t
+t
+.
+a
+I
+t
+n
+io
+s
+n
+u
+a
+c
+l
+h
+ly
+to
+e
+o
+ffi
+ls
+c
+,
+ie
+th
+n
+e
+t
+POLARIStrafficflowmodelisbasedonamacroscopictrafficflowmodelonthelink-level,butflowsatthebound-
+trafficsimulationmodelshouldbereasonablyaccuratetoproviderealistictraveltimeswhilecomputationallyefficient ariesarecomputedatdiscretelevelsallowingtravelerstobetrackedalongtheirjourney.Asmacroscopicandmicro-
+sothatitcanbeappliedinlargescalenetworks.
+sothatitcanbeappliedinlargescalenetworks. scopicfeaturescoexistinthesamesimulationsetting,werefertoitasmesoscopictrafficsimulation[3].Eachofthese
+In ABM, each agent is represented by multiple models that ultimately define several decisions, from long-term,
+In ABM, each agent is represented by multiple models that ultimately define several decisions, from long-term, componentsaredetailedinthefollowingsub-sections.
+suchascar-ownership,toshort-term,suchasactivitylocation,departuretime,mode,androutefortheforthcoming
+suchascar-ownership,toshort-term,suchasactivitylocation,departuretime,mode,androutefortheforthcoming
+trip.
+trip.
+Twoconflictingrequirementsmaketheimplementationofasuitablemodelchallenging.Ononehand,itisdesirable 3.1. MacroscopicLinkModel
+Twoconflictingrequirementsmaketheimplementationofasuitablemodelchallenging.Ononehand,itisdesirable
+to have as much detail as possible so that the outputs are more useful for further decisions of the agents and more
+to have as much detail as possible so that the outputs are more useful for further decisions of the agents and more
+InPOLARISthelinkdynamicsisbasedonNewell’smodel[7]usingdemandandsupplyequivalenttotheLink
+Transmission Model [9]. Figure 1 depicts a POLARIS link. The geometric parameters are length, L, and number
+∗ Correspondingauthor.Tel.:+1-630-252-8153 of lanes, n. A given link may contain left and right pockets in the downstream end with number of lanes denoted
+∗
+EC-omrraeislpaodnddriensgs:afudthesoor.uTzeal@.:a+n1l.-g6o3v0-252-8153
+as n and n , respectively. The traffic flow characteristics are defined through the three parameters of the triangular
+E-mailaddress:fdesouza@anl.gov l r
+fundamentaldiagramwithV denotingthefree-flowspeed,W theshock-wavespeed,and K thejamdensity(forone
+1877-0509 c 2018TheAuthors.PublishedbyElsevierB.V.
+T18h7is7-is05a0n9o (cid:30)
+(cid:30)
+pcen20a1c8ceTsshearAticultehournsd.ePrutbhleisCheCdBbYy-ENlCse-vNieDrBlic.Ve.nse(http://creativecommons.org/licenses/by-nc-nd/4.0/) lane). The fundamental diagram leads to the per-lane capacity C = K
+V
+V
++
+W
+W
+. For multiple lanes, the jam spacing is
+PTeheisr-irsevainewopuenndaecrcreessspaorntiscibleiluitnydoefrtthheeCCoCnfBeYre-nNcCe-PNrDoglriacmenCseha(hirtstp.://creativecommons.org/licenses/by-nc-nd/4.0/) scaled proportional to the number of lanes. Each link has a set of outgoing movements denoted by the superscript
+Peer-reviewunderresponsibilityoftheConferenceProgramChairs. m=1,2,...,m,...,M.Allparametersarelink-specificthoughwedonotaddlinkindicesfornotationclarity.
+
+===== PAGE 3 =====
+
+860 Felipe de Souza et al. / Procedia Computer Science 151 (2019) 858–863
+Authors/ProcediaComputerScience00(2018)000–000 3 4 Authors/ProcediaComputerScience00(2018)000–000
+Fig.2:SchematicofMergenodes.
+Fig.1:ALinkanditsParameters
+Mergenodes
+Themergesarethebasicbuildingblockofallintersectiontypes.AmergehasonedownstreamlinkwithsupplySm
+All variables are computed at discrete step k of length ∆t by downstream movement m. The inflow fm(k) is the and Qupstreamlinksindexedbyq = 1,...,QasdepictedinFigure2.Thedownstreamflow, fm,andeachupstream
+number of vehicles that enter the link at discrete step k with the intention of leaving the link through downstream flowg canbecomputedthroughthefollowingschemes:
+q
+movement m. Similarly, the outflow gm(k) is the number of vehicles that leave the link at discrete step k through
+downstreammovementm.Thestatevariablesaretheupstreamanddownstreamcumulativeflows, Fm(k)andGm(k)
+respectively.Theyareupdatedas:
+g =min D ,Sm (D / D ) (proportionaltodemand)
+q q q u
+{ × }
+u= (cid:31)1,...,Q
+(4)
+Fm(k+1)= Fm(k)+ fm(k) g
+q
+=min D
+q
+,Sm/Q (equallysplitbetweenlinks)
+{ }
+Gm(k+1)=Gm(k)+gm(k). (1) g
+p
+=min
+{
+D
+p
+,Sm
+}
+, g
+p(cid:28)
+=min(D
+p(cid:28)
+,Sm
+−
+g
+p
+)(priority),
+where the indexes p and p refer to the upstream links with and without priority respectively. Each scheme can be
+In addition, the aggregated upstream and downstream cumulative flows are computed as F(k) = Fm(k) and (cid:28)
+m specifiedforeachintersection.Thepriorityschemeisoftenusedwhentherearepermissiveandprotectedmovements
+G(k)= Gm(k)respectively.Supplyiscomputedbasedontheaggregatedcumulativeflows: ∀
+∀ m (cid:31) withtheprioritygiventotheprotectedmovement.
+(cid:31) InPOLARISdivergesarenottreatedexplicitly;adivergewithoneincominglinkandmultipledownstreamlinks
+mreducestoaspecialcaseofmultipleindividualmergeswithoneincomingandoneoutgoingmovement:
+S(k)=min F(k) G(k T +1)+nKL,nC∆t , (2)
+W
+{ − − }
+whereT = L whichisthenumberofstepsfortravelingthelinkatshock-wavespeedwhere x istheinteger gm =min Dm,Sm , (5)
+W (cid:27)W∆t(cid:26) (cid:27) (cid:26) { }
+partofx.Demandiscomputedforeachoutboundmovementmas:
+where Dm referstothedemandthatwantstodivergetolinkm,andSm referstothesupplyoftheoutboundlink
+m. Commonly, the diverge node model proposed in [4] enforces the first-in-first-out (FIFO) discipline on the link.
+Dm(k)=min Fm(k T +1) Gm(k),Cm∆t , (3)
+{ − V − } However, most diverges happen on turns at traffic signals and on freeway off-ramps in which there may be specific
+lanes for each turn so that vehicles can overtake each other and practically violate the FIFO discipline. This is the
+reasonwhyweuseEq.(5)andallowthemodelviolateFIFO.
+whereCm isthecapacitybasedonthenumberoflanesavailableforthatmovementandT = L isthenumber
+V (cid:27)V∆t(cid:26)
+ofstepstakentotravelthelinkatfree-flowspeed.
+SignalizedIntersections
+Insignalizedintersections,POLARIScanhandlefixedtimeandactuatedcontrol,anditisalsopossibletointegrate
+anexternalmoduleforreal-timecontrol.Thecontrolindication(green,red)setsthewayeachmovementishandled.
+Inthecaseofredindication,novehicleleavestheupstreamlinkqwiththeexceptionofapermissiverightturn.Ifthe
+3.2. MicroscopicNodeModel
+rightturnispermissive,thatincomingmovementqisassumedtobenon-priority(p),whiletheincomingmovement
+(cid:28)
+withright-of-wayisassumedtobetheprioritymovement p.
+Thenodemodelisresponsibleforcomputingtheboundaryflowsateachintersectionbasedonthedemandfromthe
+upstreamlinksandthesupplyofdownstreamlinks.InPOLARISeachvehicleistrackedalongtheirtrips.Therefore
+eachunitofflowisassociatedtoonevehiclethatistransferredfromonelinktoanother.Fromamodelingpointview, Fourwaystops
+itrequiresthatflowstobeintegervalueswhichrequiresadifferentimplementationofnodemodelscomparedtothe Fourwaystopsaremodeledbyholdingvehiclesforatleastone-timestepbeforetheyareabletoleavethelink.It
+standardlinktransmissionmodelasin[9]. switchesbetweenDm(k)=0orDm(k)givenbyEquation(3).
+
+===== PAGE 4 =====
+
+Felipe de Souza et al. / Procedia Computer Science 151 (2019) 858–863 861
+Authors/ProcediaComputerScience00(2018)000–000 3 4 Authors/ProcediaComputerScience00(2018)000–000
+Fig.2:SchematicofMergenodes.
+Fig.1:ALinkanditsParameters
+Mergenodes
+Themergesarethebasicbuildingblockofallintersectiontypes.AmergehasonedownstreamlinkwithsupplySm
+All variables are computed at discrete step k of length ∆t by downstream movement m. The inflow fm(k) is the and Qupstreamlinksindexedbyq = 1,...,QasdepictedinFigure2.Thedownstreamflow, fm,andeachupstream
+number of vehicles that enter the link at discrete step k with the intention of leaving the link through downstream flowg canbecomputedthroughthefollowingschemes:
+q
+movement m. Similarly, the outflow gm(k) is the number of vehicles that leave the link at discrete step k through
+downstreammovementm.Thestatevariablesaretheupstreamanddownstreamcumulativeflows, Fm(k)andGm(k)
+respectively.Theyareupdatedas:
+g =min D ,Sm (D / D ) (proportionaltodemand)
+q q q u
+{ × }
+u= (cid:31)1,...,Q
+(4)
+Fm(k+1)= Fm(k)+ fm(k) g
+q
+=min D
+q
+,Sm/Q (equallysplitbetweenlinks)
+{ }
+Gm(k+1)=Gm(k)+gm(k). (1) g
+p
+=min
+{
+D
+p
+,Sm
+}
+, g
+p(cid:28)
+=min(D
+p(cid:28)
+,Sm
+−
+g
+p
+)(priority),
+where the indexes p and p refer to the upstream links with and without priority respectively. Each scheme can be
+In addition, the aggregated upstream and downstream cumulative flows are computed as F(k) = Fm(k) and (cid:28)
+m specifiedforeachintersection.Thepriorityschemeisoftenusedwhentherearepermissiveandprotectedmovements
+G(k)= Gm(k)respectively.Supplyiscomputedbasedontheaggregatedcumulativeflows: ∀
+∀ m (cid:31) withtheprioritygiventotheprotectedmovement.
+(cid:31) InPOLARISdivergesarenottreatedexplicitly;adivergewithoneincominglinkandmultipledownstreamlinks
+mreducestoaspecialcaseofmultipleindividualmergeswithoneincomingandoneoutgoingmovement:
+S(k)=min F(k) G(k T +1)+nKL,nC∆t , (2)
+W
+{ − − }
+whereT = L whichisthenumberofstepsfortravelingthelinkatshock-wavespeedwhere x istheinteger gm =min Dm,Sm , (5)
+W (cid:27)W∆t(cid:26) (cid:27) (cid:26) { }
+partofx.Demandiscomputedforeachoutboundmovementmas:
+where Dm referstothedemandthatwantstodivergetolinkm,andSm referstothesupplyoftheoutboundlink
+m. Commonly, the diverge node model proposed in [4] enforces the first-in-first-out (FIFO) discipline on the link.
+Dm(k)=min Fm(k T +1) Gm(k),Cm∆t , (3)
+{ − V − } However, most diverges happen on turns at traffic signals and on freeway off-ramps in which there may be specific
+lanes for each turn so that vehicles can overtake each other and practically violate the FIFO discipline. This is the
+reasonwhyweuseEq.(5)andallowthemodelviolateFIFO.
+whereCm isthecapacitybasedonthenumberoflanesavailableforthatmovementandT = L isthenumber
+V (cid:27)V∆t(cid:26)
+ofstepstakentotravelthelinkatfree-flowspeed.
+SignalizedIntersections
+Insignalizedintersections,POLARIScanhandlefixedtimeandactuatedcontrol,anditisalsopossibletointegrate
+anexternalmoduleforreal-timecontrol.Thecontrolindication(green,red)setsthewayeachmovementishandled.
+Inthecaseofredindication,novehicleleavestheupstreamlinkqwiththeexceptionofapermissiverightturn.Ifthe
+3.2. MicroscopicNodeModel
+rightturnispermissive,thatincomingmovementqisassumedtobenon-priority(p),whiletheincomingmovement
+(cid:28)
+withright-of-wayisassumedtobetheprioritymovement p.
+Thenodemodelisresponsibleforcomputingtheboundaryflowsateachintersectionbasedonthedemandfromthe
+upstreamlinksandthesupplyofdownstreamlinks.InPOLARISeachvehicleistrackedalongtheirtrips.Therefore
+eachunitofflowisassociatedtoonevehiclethatistransferredfromonelinktoanother.Fromamodelingpointview, Fourwaystops
+itrequiresthatflowstobeintegervalueswhichrequiresadifferentimplementationofnodemodelscomparedtothe Fourwaystopsaremodeledbyholdingvehiclesforatleastone-timestepbeforetheyareabletoleavethelink.It
+standardlinktransmissionmodelasin[9]. switchesbetweenDm(k)=0orDm(k)givenbyEquation(3).
+
+===== PAGE 5 =====
+
+862 Felipe de Souza et al. / Procedia Computer Science 151 (2019) 858–863 6 Authors/ProcediaComputerScience00(2018)000–000
+Authors/ProcediaComputerScience00(2018)000–000 5
+Fig.3:TheleftgraphdepictsthePOLARISnetworkmodelforBloomington,IL,USA.Themiddleandrightgraphdepictsthenetworkloadand
+Fig.4:Therightandmiddlegraphsdepictcumulativeinflowandoutflowintwosuccessivesignalizedlinks,Link7553andLink579.Theright
+flows,respectively.
+graphdepictsdensityovertimeandspaceatthesamelinks.
+For any case, the latter stage is to compute the integer flow and enumerate the vehicles that are transferred to 5. Conclusion
+thedownstreamlinks.Theimplementedmovementoutflowwereferhereasg˜m whichiscomputedbasedgm,anda
+left-overcapacitylm.Theleft-overcapacityatstepkisimplementedasfollows:
+WepresentedthemesoscopicmodelfeaturedinthePOLARISAgent-based-modelpackage.Themodelismacro-
+scopic at the link level and microscopic at the node level enabling some features presented in microscopic models
+whileinheritingthecomputationalefficiencyofmacroscopicmodels.Weappliedthemodelinamid-sizednetwork
+with7,000thousandlinksand350thousandindividualtrips.Themodelcanprovideflow,density,andspeedinforma-
+lm(k)=min gm(k) g˜m(k),Cm , (6) tionatdifferentscales,includingatthenetwork,link,andvehiclelevel.
+{ − }
+For future work we will integrate more microscopic features into POLARIS, enabling a subset of links to be
+simulated using models with higher fidelity. This will allow a better evaluation of strategies such as platooning and
+andtherealizedflowtakestheleft-overcapacityforcomputingtheflowas:
+eco-drivingaswellasmoreaccurateestimatesoftheimpactsofConnectedandAutomatedVehicles(CAV).Wealso
+wanttoaddfeaturestoanalyzetheimpactsofaspectsnotoftenconsideredintransportationmodelingsuchasparking
+andfreightdelivery.
+g˜m(k)= min gm(k)+lm(k 1),Dm(k) , (7)
+(cid:28) { − }(cid:27)
+6. Acknowledgements
+Withthisscheme,thelinkonaveragecandischargeatcapacitywhileswitchingbetweenvaluesaboveandbelow This paper and the work described were sponsored by the U.S. Department of Energy (DOE) Vehicle Technolo-
+capacity. As last step, the vehicles to be transferred are enumerated based on first-in-first-out for that movement. giesOffice(VTO)undertheSystemsandModelingforAcceleratedResearchinTransportation(SMART)Mobility
+For every vehicle, the entry and exit times for each link are recorded along with the delay at the intersection. This LaboratoryConsortium,aninitiativeoftheEnergyEfficientMobilitySystems(EEMS)Program.
+composesthetrajectoryforeveryvehicle.
+References
+4. Applications
+[1] Auld,J.,Hope,M.,Ley,H.,Sokolov,V.,Xu,B.,Zhang,K.,2016.Polaris:Agent-basedmodelingframeworkdevelopmentandimplementation
+forintegratedtraveldemandandnetworkandoperationssimulations.TransportationResearchPartC:EmergingTechnologies64,101–116.
+WeshowresultsfromBloomington,IL,USAcontainingaround7,000linksand2,500nodes.50ofthesenodesare
+[2] Auld,J.,Mohammadian,A.,2009.Frameworkforthedevelopmentoftheagent-baseddynamicactivityplanningandtravelscheduling(adapts)
+signalized.ThenetworkisdepictedinFigure3(left).About350thousandtripsaresimulatedforthe24hoursperiod model.TransportationLetters1,245–255.
+andweset∆t = 6s.Figure3depictsthenetworkloadandthenetworkflowsinthebasescenariointhemiddleand [3] Burghout,W.,Koutsopoulos,H.,Andreasson,I.,2005. Hybridmesoscopic-microscopictrafficsimulation. TransportationResearchRecord:
+rightgraphs,respectively.Thenetworkismostlyuncongested.Hence,theinflowandoutflowcurvesalmostoverlap. JournaloftheTransportationResearchBoard,218–255.
+[4] Daganzo,C.F.,1995.Thecelltransmissionmodel,partii:networktraffic.TransportationResearchPartB:Methodological29,79–93.
+The simulation output also provides detailed information at the link level based on the cumulative inflow and
+[5] Horni,A.,Nagel,K.,Axhausen,K.W.,2016.Themulti-agenttransportsimulationMATSim.UbiquityPressLondon:.
+outflows.ApplyingtheNewell’smodel,weobtainthecumulativeflowsatanypositionalongthelinkandthencompute
+[6] Nagel,K.,Beckman,R.J.,Barrett,C.L.,1999. Transimsforurbanplanning,in:6thinternationalconferenceoncomputersinurbanplanning
+flowsanddensities.Figure4showsaninbound(7553)andanoutbound(579)linkatasignalizedintersection.The andurbanmanagement,Venice,Italy.
+downstreamnodeoflink579isalsosignalized.TheleftandmiddlegraphsdepictthecumulativeinflowFandoutflow [7] Newell, G.F., 1993. A simplified theory of kinematic waves in highway traffic, part i: General theory. Transportation Research Part B:
+Goftheupstreamlink7553andthedownstreamlink579respectively.Onecanseethecongestionformingandlater Methodological27,281–287.
+[8] Waddell,P.,Sˇevcıkova´,H.,Socha,D.,Miller,E.,Nagel,K.,2005. Opus:Anopenplatformforurbansimulation,in:Computersinurban
+onrelievingbyobservingtheverticalshiftbetweenthecurvesforthecumulativeinflows F andoutflowsG onboth
+planningandurbanmanagementconference,London.
+links. The rightmost graph depicts density over space and time with position zero being the upstream node of the
+[9] Yperman,I.,2007.Thelinktransmissionmodelfordynamicnetworkloading.
+upstreamlink.
+
+===== PAGE 6 =====
+
+6 FAeulitpheo rdse/ SPoruozcae d eiat aClo. m/ PpruotecredSicai eCnocmep0u0te(2r 0S1c8ie)n0c0e0 1–5010 0(2019) 858–863 863
+Authors/ProcediaComputerScience00(2018)000–000 5
+Fig.3:TheleftgraphdepictsthePOLARISnetworkmodelforBloomington,IL,USA.Themiddleandrightgraphdepictsthenetworkloadand
+Fig.4:Therightandmiddlegraphsdepictcumulativeinflowandoutflowintwosuccessivesignalizedlinks,Link7553andLink579.Theright
+flows,respectively.
+graphdepictsdensityovertimeandspaceatthesamelinks.
+For any case, the latter stage is to compute the integer flow and enumerate the vehicles that are transferred to 5. Conclusion
+thedownstreamlinks.Theimplementedmovementoutflowwereferhereasg˜m whichiscomputedbasedgm,anda
+left-overcapacitylm.Theleft-overcapacityatstepkisimplementedasfollows:
+WepresentedthemesoscopicmodelfeaturedinthePOLARISAgent-based-modelpackage.Themodelismacro-
+scopic at the link level and microscopic at the node level enabling some features presented in microscopic models
+whileinheritingthecomputationalefficiencyofmacroscopicmodels.Weappliedthemodelinamid-sizednetwork
+with7,000thousandlinksand350thousandindividualtrips.Themodelcanprovideflow,density,andspeedinforma-
+lm(k)=min gm(k) g˜m(k),Cm , (6) tionatdifferentscales,includingatthenetwork,link,andvehiclelevel.
+{ − }
+For future work we will integrate more microscopic features into POLARIS, enabling a subset of links to be
+simulated using models with higher fidelity. This will allow a better evaluation of strategies such as platooning and
+andtherealizedflowtakestheleft-overcapacityforcomputingtheflowas:
+eco-drivingaswellasmoreaccurateestimatesoftheimpactsofConnectedandAutomatedVehicles(CAV).Wealso
+wanttoaddfeaturestoanalyzetheimpactsofaspectsnotoftenconsideredintransportationmodelingsuchasparking
+andfreightdelivery.
+g˜m(k)= min gm(k)+lm(k 1),Dm(k) , (7)
+(cid:28) { − }(cid:27)
+6. Acknowledgements
+Withthisscheme,thelinkonaveragecandischargeatcapacitywhileswitchingbetweenvaluesaboveandbelow This paper and the work described were sponsored by the U.S. Department of Energy (DOE) Vehicle Technolo-
+capacity. As last step, the vehicles to be transferred are enumerated based on first-in-first-out for that movement. giesOffice(VTO)undertheSystemsandModelingforAcceleratedResearchinTransportation(SMART)Mobility
+For every vehicle, the entry and exit times for each link are recorded along with the delay at the intersection. This LaboratoryConsortium,aninitiativeoftheEnergyEfficientMobilitySystems(EEMS)Program.
+composesthetrajectoryforeveryvehicle.
+References
+4. Applications
+[1] Auld,J.,Hope,M.,Ley,H.,Sokolov,V.,Xu,B.,Zhang,K.,2016.Polaris:Agent-basedmodelingframeworkdevelopmentandimplementation
+forintegratedtraveldemandandnetworkandoperationssimulations.TransportationResearchPartC:EmergingTechnologies64,101–116.
+WeshowresultsfromBloomington,IL,USAcontainingaround7,000linksand2,500nodes.50ofthesenodesare
+[2] Auld,J.,Mohammadian,A.,2009.Frameworkforthedevelopmentoftheagent-baseddynamicactivityplanningandtravelscheduling(adapts)
+signalized.ThenetworkisdepictedinFigure3(left).About350thousandtripsaresimulatedforthe24hoursperiod model.TransportationLetters1,245–255.
+andweset∆t = 6s.Figure3depictsthenetworkloadandthenetworkflowsinthebasescenariointhemiddleand [3] Burghout,W.,Koutsopoulos,H.,Andreasson,I.,2005. Hybridmesoscopic-microscopictrafficsimulation. TransportationResearchRecord:
+rightgraphs,respectively.Thenetworkismostlyuncongested.Hence,theinflowandoutflowcurvesalmostoverlap. JournaloftheTransportationResearchBoard,218–255.
+[4] Daganzo,C.F.,1995.Thecelltransmissionmodel,partii:networktraffic.TransportationResearchPartB:Methodological29,79–93.
+The simulation output also provides detailed information at the link level based on the cumulative inflow and
+[5] Horni,A.,Nagel,K.,Axhausen,K.W.,2016.Themulti-agenttransportsimulationMATSim.UbiquityPressLondon:.
+outflows.ApplyingtheNewell’smodel,weobtainthecumulativeflowsatanypositionalongthelinkandthencompute
+[6] Nagel,K.,Beckman,R.J.,Barrett,C.L.,1999. Transimsforurbanplanning,in:6thinternationalconferenceoncomputersinurbanplanning
+flowsanddensities.Figure4showsaninbound(7553)andanoutbound(579)linkatasignalizedintersection.The andurbanmanagement,Venice,Italy.
+downstreamnodeoflink579isalsosignalized.TheleftandmiddlegraphsdepictthecumulativeinflowFandoutflow [7] Newell, G.F., 1993. A simplified theory of kinematic waves in highway traffic, part i: General theory. Transportation Research Part B:
+Goftheupstreamlink7553andthedownstreamlink579respectively.Onecanseethecongestionformingandlater Methodological27,281–287.
+[8] Waddell,P.,Sˇevcıkova´,H.,Socha,D.,Miller,E.,Nagel,K.,2005. Opus:Anopenplatformforurbansimulation,in:Computersinurban
+onrelievingbyobservingtheverticalshiftbetweenthecurvesforthecumulativeinflows F andoutflowsG onboth
+planningandurbanmanagementconference,London.
+links. The rightmost graph depicts density over space and time with position zero being the upstream node of the
+[9] Yperman,I.,2007.Thelinktransmissionmodelfordynamicnetworkloading.
+upstreamlink.

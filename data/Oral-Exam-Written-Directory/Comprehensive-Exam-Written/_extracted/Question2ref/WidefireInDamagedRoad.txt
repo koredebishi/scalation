@@ -1,0 +1,1280 @@
+===== PAGE 1 =====
+
+SafetyScience187(2025)106835
+ContentslistsavailableatScienceDirect
+Safety Science
+journalhomepage:www.elsevier.com/locate/safety
+Analyzing wildfire evacuation dynamics with agent-based modeling in
+damaged road networks
+Fangjiao Maa , Ji Yun Leeb,*
+aPostdoctoralResearchFellow,TheCooperativeInstituteforSevereandHigh-ImpactWeatherResearchandOperations,UniversityofOklahoma,Norman,OK73072,
+USA
+bAssociateProfessor,WashingtonStateUniversity,Pullman,WA99164,USA
+A R T I C L E I N F O A B S T R A C T
+Keywords: WildfiresincreasinglythreatenresidentsintheWesternUnitedStates.Despitenumerousstateandlocalinitia-
+Wildfire tives aimed at mitigating these risks, completely eliminating the wildfire dangers remains unfeasible due to
+Evacuation substantial inherent uncertainties. In this case, evacuation is the most important and effective strategy for
+Agent-basedmodeling reducinghumancasualtiesduringwildfireevents.Whiletheprimarygoalofevacuation–movingpeopleatriskto
+Vulnerabilityassessment
+saferplaces–appearsstraightforwardtoachieve,therealityiscomplicatedbyunpredictablehumanbehaviors
+Trafficsimulation
+Machinelearning andthesurgeintraveldemand,whichoftenresultsinseveretrafficcongestionand,consequently,aheightened
+risktohumanlives.Inaddition,thereducedtraffic-carryingcapacitiesofroadsegmentsduetowildfiresfurther
+exacerbate these challenges. In this context, wildfire evacuation simulation can serve as an effective experi-
+mentalmeansforemergencymanagementandevacuationplanning,offeringacost-effectivemethodtoidentify
+bottlenecksandcriticalcongestionpointsduringanevacuation.
+Thispaper proposes anagent-based modeling (ABM) framework specifically designed to simulatewildfire
+evacuationsindamagedtransportationsettings.Theproposedframeworkuniquelyintegrateswildfiresimulation
+androadnetworkvulnerabilityassessmentwithABM,allowingforadetailedrepresentationofhumanbehaviors
+duringevacuationsandthedynamicnetworkfunctionalityinmicroscopictrafficsimulation.Anotablecontri-
+butionofthisstudyisitsfullyprobabilisticapproach,whichevaluatesevacuationperformanceandidentifies
+criticalcomponentsoftheroadnetworknotunderasinglescenariobutunderarangeofrepresentativesce-
+narios.Thisprobabilisticperspectiveprovidesamorecomprehensiveunderstandingofpotentiallyvulnerable
+andcongestedpoints,therebyenablingemergencymanagersandtransportationplannerstobetterallocatere-
+sourcesandenhancemobilityduringwildfireevacuations.TheeffectivenessoftheABMframeworkisdemon-
+stratedthroughitsapplicationinsimulatingwildfireevacuationsintheCityofSantaClarita,California.The
+simulation results aid in both pre-fire planning and emergency decision-making, ultimately contributing to
+improvedevacuationstrategiesandpublicsafetyduringwildfireevents.
+1. Introduction wildfires in the United States are partly attributed to global climate
+change,whichcontributestomorefrequentheatwavesandprolonged
+Recent wildfires in the Western United States have demonstrated dry periods (Westerling et al., 2006). In addition to climate change,
+theirdestructiveeffectsonproperty,humanlives,andtheenvironment. rapidpopulationgrowthandresidentialdevelopmentatthewildland-
+The 2018 Camp Fire, the deadliest and most destructive wildfire in urban interface (WUI) have greatly intensified property destruction
+California’shistory,claimed85livesanddestroyedover18,000build- andthehumanandeconomictollofwildfires(Leeetal.,2022;Maetal.,
+ings(Syphardetal.,2022).In2020alone,morethan100wildfiresinthe 2022).
+WesternUnitedStatesscorchedapproximately8.2millionacresofland Havingseentheenormouseconomicandhumanlossesthatwildfires
+(Keeley&Syphard,2021).Moreover,theUnitedStatesForestService havecausedoverthepastdecades,thefederalandlocalgovernments,
+(USFS) warns that billions of acres across the country are at risk of researchers,engineers,andthepublichavepaidincreasingattentionto
+catastrophic wildfires. The increasing frequency and severity of wildfireriskmanagement.Aspartofthiseffort,avarietyofcommunity-
+* Correspondingauthor.
+E-mailaddresses:fangjiao.ma@noaa.gov(F.Ma),jiyun.lee@wsu.edu(J.Y.Lee).
+https://doi.org/10.1016/j.ssci.2025.106835
+Received5June2024;Receivedinrevisedform31December2024;Accepted22February2025
+Availableonline5March2025
+0925-7535/©2025TheAuthors.PublishedbyElsevierLtd.ThisisanopenaccessarticleundertheCCBYlicense(http://creativecommons.org/licenses/by/4.0/).
+
+===== PAGE 2 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+levelwildfireprotectionplanshavebeenproposedandimplementedby interactionswithotheragentsandtheenvironmentaswellaslocalized
+federal,state,andlocalgovernmentagencies.Theplansincludezoning knowledge (Chen & Zhan, 2014). Thus, ABM can model individual
+regulation,firedepartmentsupport,adequatewatersupplyandflowfor agents’behaviorssimultaneouslyandcapturetheircollectivebehavior
+firefighting, road improvement for facilitated access, and public edu- subsequently in a dynamic system. A large number of studies have
+cation and outreach (Communities Committee, 2004). In WUI areas, employedABMinmodelingevacuation.Pan(2006)investigatedhuman
+individualhomeownersadoptwildfireriskmitigationactionsincluding behaviorsduringanearthquakeeventusingbasicconceptsofpsychol-
+theuseofnonflammableorignition-resistantmaterials,theinstallation ogyandsociologyandincorporatedthemintomulti-ABMfortheegress
+ofdual-panewindowsorfiresprinklers,vegetationfueltreatment,etc. analysis of a multi-story university building. Chen and Zhan (2014)
+Whilewildfireriskscanbemitigatedthroughtheseriskmitigationac- utilizedABMtoincorporatetheeffectofindividualdrivers’behaviorson
+tions, residual risks always exist due to substantial uncertainties in traffic flow in three different road structures. D’Orazio et al. (2014)
+wildfire activity. In this case, evacuation is the most important and modeledthepost-earthquakeevacuationpatternsofbuildingoccupants
+effective method to reduce human losses during a wildfire event. For usingvideotapeanalysis.
+example,whilemosttsunamiriskreductionmeasureswere destroyed SeveralresearcherscombinedhazardmodelswithABMtorepresent
+duringthe2011GreatEastJapanEarthquake/Tsunami,rapidevacua- morerealisticevacuationsituations.Masetal.(2012)proposedanin-
+tionsavedapproximately90%ofthetotalpopulationatriskfromthe tegratedABMtoestimatetsunami/earthquakeevacuationpatternsand
+tsunami(Masetal.,2012).However,intherealworld,massevacuation validatedthismodelusingthe2011GreatEastJapanearthquakeevent
+and traffic jams caused by exit route shortages under simultaneous having a magnitude of 9.0 Mw. The proposed evacuation model was
+evacuationordersmaycomplicatethesimpleandstraightforwardgoal integratedwithanumericalsimulationoftsunamistoestimatetsunami
+of evacuation that moves people at risk to safer places, thereby jeop- propagationandtheassociatedstarttimeofevacuation.Cimellaroetal.
+ardizinghumanlives(Covaetal.,2005).Althoughtrafficjamsduring (2017)utilizedABMtosimulatebuildingevacuationduringanearth-
+the2018CampFirewerenotsignificantcontributorstofatalities,they quakeevent.Themodelfirstperformedanumericalstructuralanalysis
+didresultinvehiclesbeingabandonedandresidentsevacuatingonfoot, ofabuildingtoestimatestructuralresponsestoawiderangeofpossible
+highlighting that road systems were not designed for such an urgent earthquakegroundmotionintensitiesandincorporatedhumananxiety
+evacuationduringahazardevent.Asimilarsituationoccurredduring andbehaviorunderemergency.
+the2023Mauifire,wheresomevictimsweretragicallydiscoveredin
+their vehicles while attempting to evacuate (Alvarez & Fuller, 2018; 1.2. Wildfireevacuationmodelingandframework
+Claytonetal.,2023).Thisproblemcanbeextendedtoothercommu-
+nities at great risk of wildfires in the United States. Thus, effective Advantaged by the development of microscopic traffic simulation
+community-based transportation evacuation planning has become an models, the majority of wildfire evacuation modeling has been con-
+emergentissueindisasteremergencyandriskmanagement. ducted using these microscopic traffic simulations. Wolshen and
+Marchive(2007)utilizedtheCORSIMmicroscopicsimulationplatform
+1.1. Evacuationsimulationmodeling toconducttrafficsimulationsduringwildfires,exploringvariousevac-
+uationscenariostoassesstheeffectsofdevelopmentdensityandstreet
+A considerable body of research has been carried out to develop networklayout.deAraujoetal.(2014)employedametropolitanplan-
+transportationevacuationsimulationmodelsforvarioustypesofnatural ningorganizationfour-stepmodeltoevaluateaworst-casescenarioand
+hazard events. Early studies on emergency evacuation employed compareditwiththepost-eventreportofanactualwildfireevacuation
+macroscopic trafficsimulations tocapturethedynamic flowoftraffic in the same area. Their study demonstrated the advantages of using
+across networks during the evacuation process (e.g., Burkard et al., traffic simulation to aid evacuation planning. Chen et al. (2020)
+1993). However, many of these early models assumed homogenous employedSUMOmicroscopictrafficsimulationduringwildfireevacu-
+behaviorsamongevacueesduetoahighcomputationalcost,resultingin ations. Similar to evacuation modeling for other types of hazards (as
+evacuationtimeestimatesatthemacro-ormeso-scale.Sincethemid- described in Section 1.1), community-based wildfire evacuation
+1990s,advancementsincomputertechnologyhaveenabledtheutili- modeling has also increasingly utilized ABM. For example, Li (2022)
+zation of microscopic traffic simulations in emergency evacuation proposed a data-driven wildfire evacuation modeling approach using
+models so as to simulate traffic flows at the individual vehicle level theABMplatformMATSimanddemonstratedastrongcorrelationbe-
+(Benjaafar et al., 1997; Hamacher & Tjandra, 2001; Wolshon & tweentheirestimatedevacuationtimesandactualoutcomesinacase
+MarchiveIII,2007). study.ThisworkunderscoredthepotentialofutilizingABMinwildfire
+Several studies started to incorporate the behaviors of individual evacuationsimulations.
+evacuees during disasters into behavior-based microscopic traffic While these microscopic traffic simulations and ABM have signifi-
+simulationmodels.Duringanevacuation,individualbehaviorplaysa cantlyadvancedourunderstandingofevacuationdynamics,theymay
+criticalroleintheevacuationprocessbecauseitsignificantlyaffectspre- not fully capture the complexities of wildfire scenarios. Wildfires are
+movementphases,reactiontime,decisionstoevacuate,andevacuation characterizedbyrapidlychangingmicroenvironmentalconditions(e.g.,
+phases, thus affecting total evacuation time (D’Orazio et al., 2014). windspeedanddirection),whichcanforceresidentstoevacuatewith
+Using the parameters describing each evacuee’s characteristics (e.g., little or no notice. Thus, weather analysis and wildfire propagation
+startlocation,physicalability,reactiontime,transportationmode,route prediction should be incorporated into the evacuation simulation to
+choice mechanism, vehicle speed, etc.), individual and collective be- improveitsaccuracy.Althoughmostexistingstudieshavenotaccounted
+haviorscanbecapturedindynamictrafficsimulationsatthemicro-scale forhazardanalysis(orhaveutilizedveryelementaryhazardmodeling)
+(Sinuany-Stern&Stern,1993). intheirevacuationmodels(Beykietal.,2023;Wahlqvistetal.,2021),
+In recent years, agent-based modeling (ABM) has received great somerecentresearchhasbeguntoaddressthisgapbyintegratingmore
+attention due to its advantages in capturing individual and collective sophisticatedwildfiresimulationmodel.Forexample,Wahlqvistetal.
+behaviorsinadynamiccomplexsystem(Cimellaroetal.,2017;D’Or- (2021) proposed a wildfire evacuation modeling platform WUI-NITY,
+azioetal.,2014;Epstein,1999;Fengetal.,2020;Masetal.,2012).ABM whichwasbuiltontheUnity3Dgameengine.Theplatformintegrated
+isoneoftheheuristiccomputationalmodelsthatcansimulatetheaction awildfiremodelinglayerbasedonFARSITE,atrafficsub-model,anda
+and interaction of individual agents with the goal of finding system simple response model. The inclusion of the fire layer enabled the
+movementtrends.InABM,eachevacuee(orvehicle)ismodeledasan simulationofastagedevacuationapproach,whileanempiricalproba-
+autonomous agent who has his/her own characteristics and follows bility distribution was utilized in the pedestrian model to represent
+specific decision rules. Individual agents make decisions based on responsetime.
+2
+
+===== PAGE 3 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+In addition to accurate hazard modeling and microscopic traffic becausewildfirebehaviormodelsareoftendevelopedseparatelyfrom
+simulation,understandinghumanbehaviorsiscrucialforimprovingthe wildfireevacuationsimulationmodels.Thisassumptiononauniformor
+performanceofevacuationassessments.Partlyduetothecomplexand simpleevacuationratefailstocapturethevariabilityinindividualre-
+unpredictablenatureofhumanresponsesduringemergencies,wildfire sponses.Integratingdemandgenerationbasedonindividualcharacter-
+evacuationbehaviorhasoftenbeenstudiedseparatelyfromevacuation isticswouldleadtoamoreheterogeneousandrealisticrepresentationof
+simulation modeling. Behavioral models for wildfire evacuation typi- evacuation behavior, more accurately reflecting the diversity of re-
+callyfocusonbinarychoices,suchasthedecisiontoevacuateorstay sponsesobservedinreal-worldscenarios.Finally,mostexistingevacu-
+(Kuligowskietal.,2020;Kuligowskietal.,2022;Mozumderetal.,2008; ationmodelshavereliedonascenario-basedapproach,whichfallsshort
+Toledo et al., 2018; Walpole et al., 2020; Wong et al. 2022). These of providing a comprehensive assessment within a full probabilistic
+models are often informed by qualitative (Christianson et al., 2019; space. This limitation hinders the models’ ability to fully capture the
+Cohnetal.,2006;McGeeetal.,2019;Tayloretal.,2005;)orquanti- variabilityanduncertaintyinherentinreal-worldwildfireevents.
+tativedata(Koksaletal.2019;Kuligowskietal.,2022;McCaffreyetal., ThispaperproposesanABMframeworkforwildfireevacuationin
+2018;Mozumderetal.,2008;Robersonetal.,2012;Toledoetal.,2018). damagedtransportationsettings.Tofilltheresearchgapsinthelitera-
+However, this approach often overlooks the complexity of real-world ture, this study develops an integrated framework that incorporates
+evacuationscenarios.InregionslikeCalifornia,Oregon,andWashing- hazardmodeling,vulnerabilityassessment,evacueeresponsemodeling,
+ton,evacuationordersarefrequentlyissuedinstages,withtwo-levelor andtrafficsimulationtopredicttrafficconditionsduringanevacuation
+three-levelevacuationannouncementsbeingcommon(Kuligowskietal. andidentifythecriticalpartsofthetransportationnetworkforpre-fire
+2023). This staged approach necessitates a more advanced under- riskmitigationactions.Thecontributionofthisstudyisthreefold:(a)
+standingofevacuationbehavior,wheredecisionsgobeyondthesimple theframeworkincorporatesanadvancedwildfirehazardmodelingand
+choicetostayorevacuate.Thespatiotemporaldynamicsofawildfire, vulnerabilityassessmenttoimprovetheaccuracyofwildfireevacuation
+particularlythemovementofthefirefront,shoulddirectlyinfluencethe indamagedtransportationsettings;(b)thisstudyconstructsanevacuee
+issuanceofstagedevacuationorders.Theseorders,inturn,significantly responsemodelbasedonastatedpreferencesurveytopredictindividual
+impacttheevacuationbehaviorsofindividualsandcommunities.Thus, evacuees’ behavior as a firefront approaches; and (c) this study in-
+incombinationwithwildfiresimulation,itisessentialtoincorporatea troducesanovelapproachbygeneratingrepresentativewildfireevents
+stagedevacuationbehaviormodelintoevacuationmodeling,asitbetter withinthedomainofprobabilityspace,whichenablestheprobabilistic
+reflectsthedecision-makingprocessesindividualsandcommunitiesface evaluation of evacuation performance while quantifying uncertainties
+duringthesemulti-phasedevacuationevents. inherenttohazardousevents.
+While the integration of wildfire simulation, staged evacuation
+behaviormodeling,andmicroscopictrafficsimulationhasbeenrecog- 2. Proposedmethodology:Anintegratedwildfireevacuation
+nized as essential for effective wildfire evacuation modeling, there is simulation
+anothercriticalcomponentthatmustnotbeoverlooked:roadnetwork
+vulnerability.Beloglazovetal.(2016)tookasignificantstepforwardby This studydevelopsanABM framework forwildfire evacuationin
+developingawildfireevacuationmodelthatcombinesspatiotemporal damagedtransportationsettingsaimedatpredictingtrafficconditions
+firefrontwithevacuationtriggermodelingandABM.Despitebeingone during an evacuation and identifying the critical parts of the trans-
+ofthemostcomprehensivewildfireevacuationmodels,itstilllackeda portation network for pre-fire risk mitigation actions. The framework
+vulnerabilitycomponent.Inaddition,thedataandparametersusedin integrateswildfiresimulationandvulnerabilityassessmentwithABMto
+thetriggerandbehavioralmodelingwereassumedordeterminedbased adequately represent both human behavior during an evacuation and
+on expert opinions, which made them hardly reproducible. To date, time-dependentnetworkfunctionalityinmicroscopictrafficsimulation.
+mostwildfireevacuationsimulationmodelsfailtoaccountforchanges Morespecifically,asillustratedinFig.1,theframeworkconsistsoffour
+innetworkconnectivityduringanevent,despiteitscriticalimpacton modules: wildfire simulation, vulnerability assessment, evacuee
+evacuation performance and evacuee safety (Niu et al., 2022). This responsemodel,andtrafficsimulation.Thefirstmoduleevaluatesthe
+oversightisparticularlyconcerninggiventhestrongnegativecorrela- spatiotemporalprobabilityofwildfireoccurrenceandgeneratesrepre-
+tionbetweennetworkconnectivityandfatalities.Giventhatmanyparts sentativewildfire scenariosinprobability space.FARSITEsimulates a
+of a transportation system are vulnerable to natural hazards, their time-dependent fire-front movement for each scenario and feeds that
+physical damage and the associated reduction in traffic carrying ca- informationintothesubsequentmodules.Thesecondmoduleperforms
+pacityduetoahazardeventshouldbeconsideredinacommunity-based aroadclosureassessmenttoevaluatewildfire-inducedchangesintraffic
+evacuationmodelsoastobetterrepresenttrafficconditionsandevac- capacity.Thethirdmoduleconstructsanevacueeresponsemodelbased
+uationprocess duringtheevent (Leeand Ma, 2023). Tothis end,the onastatedpreferencesurveytopredictindividualevacuees’behaviors
+conventionalABMshouldbeintegratedwithhazardanalysis,behavioral in response to fire propagation. The fourth module simulates traffic
+modeling,andvulnerabilityassessmentofatransportationsystemwhile conditionsbyupdatingtrafficdemandandcapacityateverytimestep.
+beingsupportedbyreproducible,quantitativedata. Allthevariablesconsideredintheframeworkareupdatedatevery
+fixedtimestep:roadclosurestatusanditstrafficcarryingcapacityare
+1.3. Researchgapsandcontributions updated based onfire propagationmeasured at every time step; each
+agent updates its state during an evacuation; and microscopic traffic
+The literature review conducted in this section has highlighted simulationcoupledwithABMisperformedbasedonthetime-dependent
+several significant research gaps in current wildfire evacuation network functionalityandtheupdatedlocationsofallagents. Private
+modeling. First, many existing wildfire evacuation models have not vehiclesaretheprimaryformofmobilityforpeoplelivinginwildfire-
+incorporated advanced hazard modeling, thus lacking the ability to proneareas(Beloglazovetal.,2016).Wethereforefocusoncapturing
+provide hazard inputs. This deficiency reduces the accuracy of the vehicle useand vehiculartrafficinourmodeling withoutconsidering
+models in predicting the diverse conditions that evacuees may face pedestrianbehaviors.Thefinalresultsaretime-dependenttrafficmaps
+duringanactualwildfire.Second,veryfewstudieshaveaddressedthe toidentifythecriticalpartsofthetransportationnetworkthatarethe
+vulnerabilityassessmentofthetransportationnetwork,anaspectthatis mostvulnerabletowildfiresandhavegreatpotentialforcausingtraffic
+crucialforevaluatingevacuationperformanceunderconditionswhere congestionduringanevacuation.Moreover,thetotalnumberofevac-
+the network has been damaged. Third, most studies have assumed a uatingvehiclesduringagiventimeperiodwillalsobeobtainedasafinal
+uniform evacuation rate or relied on a generalized probability curve, result.Theseresults,derivedfromaprobabilisticapproach,canbeused
+such as the S-curve, to represent evacuation behavior. This is partly to determine the road segments that most constrain evacuation
+3
+
+===== PAGE 4 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+Fig.1. TheproposedABMframeworkforwildfireevacuationindamagedtransportationsettings.
+performance and enable targeted interventions to enhance overall singleindicator,theenergyreleasecomponent(ERC).TheERCservesas
+evacuationefficiencyandsafety. acompositefuelmoistureindex,representingthevariabilityinbothlive
+and dead fuels. The ERC accounts for both short-term and long-term
+variations in fuel moisture content, which are influenced by changes
+2.1. Module1:Wildfiresimulation
+inprecipitation,temperature,andhumidity.Ithasbeenshowntohavea
+strongcorrelationwithfireoccurrenceacrossdifferentclimatezonesin
+AsillustratedinFig.1,thefirstmodulewithinthisframeworkper-
+theUnitedStates(Andresetal.2023;Finneyetal.,2011),makingita
+tainstowildfiresimulation.Thismoduleisresponsibleforquantifying
+suitable proxy for representing other weather-related temporal
+the inherent uncertainties associated with wildfire occurrences and
+variables.
+generatingasetofrepresentativewildfirescenarioswithintheproba-
+Ageneralizedadditivelogisticregressionisemployedtoconstructa
+bilityspace.Thesescenariosserveascrucialinputsforthesubsequent
+wildfire occurrence probability estimation model that accounts for
+modules,formingthefoundationalbasisfortheentiretyofthesimula-
+spatiotemporaldependenceandnon-linearrelationshipbetweeninde-
+tions.Thismoduleconsistsoftwostages:wildfireoccurrenceprobability
+pendent and dependent variables (Preisler et al., 2004). Since the
+estimation andfiregrowthmodeling.Thefirststageestimates spatio-
+wildfireoccurrenceprobabilityestimationmodelsareusedtogenerate
+temporally varying fire occurrence probabilities in the study region
+andgeneratesrepresentativewildfirescenarios.Thesecondstagesim- representativewildfirescenariosthattriggermassevacuation,theun-
+conditionalprobabilityofafireoccurringandturningintoa“largefire”
+ulates wildfire growth for each scenario and records time-dependent
+firefrontthatwillbefedintothesubsequentmodules. shouldbeestimated.Inthisstudy,alargefireisdefinedasafirethathas
+burnedareasgreaterthan100acres(Preisleretal.,2004).Theuncon-
+Inthefirststage,acommunityofinterestanditssurroundingareas
+aredefinedanddividedintosmallgrids(e.g.,4kmx4km)tofindthe ditionalprobability(Plarge)thatalargefireoccursatagivengridcelland
+probabilitiesoffirethatcanbepropagatedintothecommunity.Amodel aspecificERCvalueistheproductoftheignitionprobability,Pign,and
+for estimating fire occurrence probability should consider two main the conditional probability of an ignition turning into a large fire,
+causesofwildfire,includinghumancauses(e.g.,powerlines,equipment Plarge|ign. The generalized additive logistic regression models for esti-
+failure,accidentalignitions,smoking,fireworks,campfires,arson)and matingtheseprobabilitiesareexpressedmathematicallyby:
+natural causes. Population density, urban development, distance to
+freeway, railway or power lines, etc. can be used to estimate the
+occurrencerateofhuman-causedfires(Massadaetal.,2012;Rodrigues
+( ) ( ) (cid:0) ) ( )
+Pign (ERC,x,y)=β 0 +f1 (ERC)+f2 (x,y)+f3 pd x,y +f4 de x,y ,ds x,y +f5 ccx,y +f6 dr x,y (1)
+( ) ( ) (cid:0) ) ( )
+Plarge|ign (ERC,x,y)=γ 0 +g1 (ERC)+g2 (x,y)+g3 pd x,y +g4 de x,y ,ds x,y +g5 ccx,y +g6 dr x,y (2)
+& De la Riva, 2014), whereas weather and topographic factors (e.g.,
+wind,temperature,relativehumidity,landcover,elevation,slope)may Plarge =Pign •Plarge|ign (3)
+affecttheoccurrencerateofnature-causedwildfires(Finneyetal.,2011;
+Massadaetal.,2012).Inthisstudy,thedistancebetweenthecentroidof where β and γ = the intercept terms; f(•) and g(•) = the non-
+0 0
+a grid cell to transmission lines, major roads, picnic/camp sites, the parametricsmoothfunctions;ERC=theenergyreleasecomponent;x
+latitudeandlongitudeofthecentroidofagrid,thecanopycoverratio, =thelatitude;y=thelongitude;pd x,y =thepopulationdensityatagrid
+and the population density in a grid were considered as the spatial cellhavingthecentroid(x,y);de
+x,y
+,ds
+x,y
+,anddr
+x,y
+=thedistancefromthe
+variables that incorporate both human- and nature-related spatial di-
+centroidofagridcelltothenearesttransmissionline,picnic/campsite,
+versity.Ontheotherhand,temporalvariationwasencapsulatedintoa
+4
+
+===== PAGE 5 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+andmajorroad,respectively;andccx,y =thecanopycoverratioofagrid becomes a new firefront at the next time step. Because an iterative
+cell. It should be noted that the non-parametric smooth functions are simulation structure allows time-dependent inputs, FARSITE has the
+deterministicacrossthestudyareaoncefittedbythehistoricalwildfire abilitytomodelwildfiregrowthunderheterogeneousweather,fuel,and
+events. topography conditions, which produces more accurate simulation re-
+ToestimatethemodelsshowninEquations1–3,historicalwildfire sults compared to the other software programs. However, FARSITE is
+datashouldbeutilized.However,mostofthevoxels(i.e.,eachgridona computationallyinefficient:FARSITEsimulationtimecouldbeover10
+givenday)donothaveanyhistoricalfiresduetofinespatiotemporal times longer than the other programs, which limits its usage when
+scale.Forexample,itishighlyprobablethattherehasbeennofireina simulatingalargeandcomplexwildfireorgeneratingalargesuiteof
+specific square-kilometer grid on a given day (say September 1st). A fires.Ontheotherhand,otherwidelyusedwildfiresimulationsoftware
+subsamplingmethodcanbeusedtosolvetheissueandcreateabalanced programs,suchasFlamMap,FSPro,andFSim,model wildfire growth
+subsetbyrandomlysamplingaratiorofno-firevoxelstoestimatethe basedontheMinimumTravelTime(MTT)methoddevelopedbyFinney
+ignitionprobabilityPign(Brillingeretal.,2003;Preisleretal.,2004).The (2002).MTTisasimplifiedraster-basedfiregrowthmodelsearchingfor
+probability ofaneventthat afireoccurredatthevoxelk(EA)condi- theminimumtraveltimeamongthenodesofagrid.Fireshapeiscreated
+tionedontheeventthatvoxelkwasselectedinthesubset(EB)canbe bycontouringthenodeswiththesameminimumtraveltime.Sincethis
+expressedas: methodholdsweatherandfuelconditionsconstantintime,itssimula-
+tion results are not as precise as FARSITE. However, MTT greatly re-
+P(EA |EB )= P(EB
+P
+|E
+(
+A
+E
+)
+B
+P
+)
+(EA ) (4) d
+ev
+u
+e
+c
+r
+e
+y
+s
+t
+s
+i
+i
+m
+m
+e
+ul
+s
+a
+t
+t
+e
+i
+p
+on
+is
+ti
+k
+m
+ey
+e.
+t
+S
+o
+in
+e
+c
+ff
+e
+ec
+th
+ti
+e
+ve
+pr
+w
+e
+i
+d
+l
+i
+d
+c
+fi
+ti
+r
+o
+e
+n
+e
+a
+v
+c
+a
+c
+c
+u
+u
+r
+a
+a
+t
+c
+io
+y
+n
+o
+m
+ffi
+o
+r
+d
+e
+el
+g
+in
+ro
+g
+w
+,F
+th
+AR
+at
+-
+SITEisusedinthefiregrowthmodelingofthisstudydespiteitsrela-
+whereP(EA |EB )=thewildfireoccurrenceprobabilitypredictedbythe
+tivelyhighcomputationalcosts.
+balancedsubset,whichcanalsobeexpressedbypr(Preisleretal.,2004):
+Asetofgrid-specificraster-basedtopographicinputs(e.g.,elevation,
+P(EA |EB )=pr =
+pa +(1
+pa
+(cid:0) pa )r
+(5) s
+m
+lo
+o
+p
+d
+e
+e
+,
+,
+a
+ca
+n
+n
+d
+o
+a
+p
+s
+y
+p
+s
+e
+t
+c
+a
+t
+n
+)
+d
+an
+h
+d
+eig
+fu
+h
+e
+t,
+l
+c
+p
+a
+r
+n
+o
+o
+p
+p
+e
+y
+rt
+b
+y
+a
+i
+s
+n
+e
+p
+h
+u
+e
+t
+i
+s
+gh
+(e
+t,
+.g
+a
+.,
+nd
+ca
+c
+n
+a
+o
+n
+p
+o
+y
+py
+co
+b
+v
+u
+e
+l
+r
+k
+,
+d
+f
+e
+u
+n
+e
+-
+l
+sity) are collected and used as inputs for wildfire growth modeling.
+wherepa =theprobabilitythatafireoccurredatthevoxelk.Equation
+Additionally, hourlyweather dataincluding temperature, relative hu-
+(5) can be then written as Equation (6) through elementary algebra
+midity,precipitation,windspeed,andwinddirectionarecollectedfrom
+transformation(Preisleretal.,2004):
+therepresentativeRemoteAutomatedWeatherStations(RAWSs)inthe
+logit(pr )=logit(pa )(cid:0) log(r) (6) studyregiontocapturetemporalcharacteristics.Foreachrepresentative
+wildfire scenario, the spatiotemporal firefronts are generated and fed
+Theestimationoftheconditionalprobabilitythatanignitionturnsintoa into the vulnerability assessment (Module 2) and evacuee response
+largefirePlarge|ignisstraightforwardandisassessedsolelyfromthevoxels model(Module3)toidentifythelocationsofclosedroadsegmentsand
+associated with wildfire events. Therefore, applying the sub-sampling estimatethetimingofevacuationtriggeranddeparturetime.
+strategytothisconditionalprobabilityestimation,asusedforignition
+probabilities, is unnecessary in this case. It should be noted that the 2.2. Module2:Roadnetworkvulnerabilityassessment
+estimated wildfire occurrence probabilities are approximate, with an
+offsetinfluencedbythesubsamplingratiolog(r),whichaccountsforthe Roadnetworksplayapivotalroleinfacilitatingevacuations,forming
+uncertaintyarisingfromthesamplingofdatapoints.Thisuncertainty thefoundationfortransportingindividualstosafelocations.Estimating
+canbereducedbyincreasingthesub-samplingratior. the functionality states of road network components (e.g., highway
+Utilizing the spatiotemporal occurrence probability of large wild- bridges,roadsegments)duringfiresholdssignificantimportance,asit
+fires,calculatedthroughEquations1–6,asetofrepresentativewildfire directly influences evacuation efficiency. However, the vulnerability
+scenarios can be generated. These scenarios are centered at the and functionality assessment of road network during wildfires has
+geographic grid clusters and the ERC percentile groups, thus encom- receivedminimalattentioninexistingresearch.Whileanumberofre-
+passingabroadspectrumofplausibleevents.Geographicgridclusters, searchers have constructed data-driven models for assessing the
+composedofcloselysituatedgrids,representthespatialdimensionof vulnerabilityofbridgestofire(Naser,2021;Peris-Sayoletal.,2017),the
+ouranalysis,whileERCpercentilegroupsserveasclustersonthetem- scarcity of available data was a major issue: the data used in these
+poral scale. By combining these spatial and temporal clusters, this studies have predominantly been sourced from news reports, existing
+approachcanbalancetheinherentuncertaintyassociatedwithwildfires literature, and bridge management authorities, which has caused the
+whilekeepingcomputationaldemandsmanageable.Theprobabilityofa issueoflimiteddataavailabilityandrestrictedthebroaderapplicability
+representative wildfire scenario, which combines a geographic grid and robustness of thesemodels. Similarly, experimental works inthis
+clusterandanERCpercentilegroup,canbecalculatedby: area are still not sufficient to construct a fire fragility curve due to
+∏∏ (cid:0) ) differentlaboratorysettingsandlimitedresults.Moreover,theseprior
+Plarge (E,C)=1(cid:0)
+x,y∈C
+1(cid:0) Plarge (ERC,x,y) (7)
+researchinitiativeshavebeenlimitedtothevulnerabilityassessmentof
+ERC∈E
+individual bridges and have not yet been extended to other types of
+where E = the ERC percentile group; and C = the geographic grid components (e.g., road segments). These limitations have hindered a
+cluster. comprehensive understanding of how wildfires can impact trans-
+In the second stage, the ignition locations of the representative portationnetworks,necessitatingfurtherexplorationandanalysis.
+wildfirescenariosareassumedtobethecentroidsofthegeographicgrid Traditionally,roadshavebeenperceivedasconstructedfromnon-
+clusters.Wildfiregrowthisthensimulatedtogeneratespatiotemporal combustiblematerials,largelyresilienttophysicaldamageinwildfire
+firefront and time-dependent fire map. Wildfire growth is mostly situations. However, the realities of wildfires introduce a series of
+conditionedontopographyaswellasenvironmentalandweathercon- practicalchallengesthatextendbeyondstructuraldamageandhavethe
+ditions.Inthisstudy,theFireAreaSimulator(FARSITE),awidelyused potential to disrupt road networks significantly. These challenges
+wildfire simulation program now included in FlamMap 6, is used. include low visibility due to smoke, ashfall, flying embers, burning
+FARSITEutilizestheHuygensprinciple(Richards,1990),wheresmall debris,fallingtrees,andlandslides,whichoftenleadtoroadcapacity
+elliptical wavelets are formed around the perimeter of the fire (i.e., reductionorevenroadclosuresduringwildfireevents.Inthismodule,a
+firefront)atthecurrenttimestep,andtheouteredgeofthesewavelets data-drivenmachinelearning(ML)modelforfirevulnerabilityassess-
+mentwascreatedtoestimatetheprobabilitiesofroadclosuresresulting
+5
+
+===== PAGE 6 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+Table1 2.3. Module3:Evacueeresponsemodel
+Selectedmajorwildfireevents,burnedacres,andyearsinthewesternUnited
+States. Inthefourthmodule,trafficdemandwillbeestimatedattheindi-
+Fire Acres Year Fire Acres Year vidualevacuee,household,orvehiclelevel.Thus,inthismodule,indi-
+vidual responses and behaviors during evacuation are modeled and
+Dixie 963,405 2021 Camp 153,336 2018
+Bootleg 413,717 2021 Rough 151,547 2015 simulated.Similartotheclassicfour-steptransportationplanningmodel
+Creek 379,883 2020 ArchieCreek 131,596 2020 consistingofdemandestimation,destinationchoice,modechoice,and
+LNULightning 363,220 2020 Dolan 124,310 2020 trip assignment, evacuation modeling generally includes evacuation
+Complex decision,trafficmodesplit,destinationchoice,departuretimeestima-
+Claremont-Bear 318,777 2020 Woolsey 96,949 2018
+tion, and information update procedure. Individual evacuees start to
+Thomas 281,894 2017 EvansCanyon 75,693 2020
+Carr 229,651 2018 Rocky 69,438 2015 evacuateatdifferentpointsintimeevenwhentheyareexposedtothe
+Pearlhill 223,731 2020 Tamarack 67,054 2021 same level of wildfire threat (Katzilieris et al., 2022). Evacuation
+Monument 223,127 2021 Loyalton 56,477 2020 behaviorisakeyfactorinrealisticallysimulatingevacuationatboththe
+Caldor 221,786 2021 Archer 48,879 2017
+individualandcommunitylevelandcanbedefinedbyasetofactionsof
+Mountain
+BeachieCreek 193,566 2020 Earthstone 42,253 2017
+individualsandexternalstimuliduringanevacuation(D’Orazioetal.,
+ChetcoBar 191,242 2017 Slinkard 40,142 2017 2014).
+ColdSpring 189,912 2020 S.Obenchain 32,671 2020 To mathematically model an individual’s evacuation behavior, a
+Range12 176,610 2016 Bobcat 30,024 2020 series of three events is considered in this study: evacuation trigger,
+HolidayFarm 173,393 2020 Mill 3,935 2022
+decisiontimedelay,andpreparationtime(Masetal.,2012).First,four
+typesofexternalstimuliserveasevacuationtriggersforevacuees.An
+from both direct and potential indirect impacts of wildfires (e.g., evacuationalert(LevelI)letspeopleknowthatawildfirethreatisin
+structural damage, visibility issues, safety concerns, obstructions, and their areas and suggests they consider evacuation in the event that it
+roads reserved for emergency responders). The dataset was compiled becomesnecessary.Anevacuationwarning(LevelII)indicatesthehigh
+from30majorwildfireeventsthatoccurredbetween2015and2022in probabilityofaneedtoevacuate.Anevacuationorder(LevelIII)asks
+the western United States, as detailed in Table 1. The road closures people to evacuate within a specified time period. A large portion of
+duringwildfireswereidentifiedusingacombinationofvariouspublic peoplemayrespondtothesethreelevelsofevacuation,butsomepeople
+sources, including news reports and official announcements from maywaituntilafirefrontiswithinvisiblerangeoftheirinitiallocations
+agenciesandlocalfiredepartments.Roadsegmentsreportedasclosed (Mas et al., 2012). As such, evacuation triggers, which can actually
+bythesesourceswerelabeledasclosedroadsinthedataset.Allroad induceanindividualevacuee’sresponse,maydependonhisorherrisk-
+locationsandattributesweresourcedfromtheOpenStreetMap(OSM) averse attitude andother characteristics andshouldbe identified and
+roadlayers.Theselectedwildfireeventsaffected18,581roadsegments, explicitly incorporated into evacuation modeling. The timing of each
+with1,427segmentsexperiencingclosuresduringtheevents.Toaddress evacuationtriggercanbeestimatedusingthespatiotemporalfirefront
+theissueoftheimbalanceddataset,theclosedroadsegmentswereup- obtained from Module 1. For example, if the distance between the
+sampledtomatchthenumberofnon-closedroadsegments,resultingin firefront and the initial location of an evacuee is within a specific
+abalanceddatasetcontaining37,162roadsegments.Theup-sampling threshold,oneofthestimuliisactivated,andtheevacuee’sresponseis
+approachwasemployedtoincreasetherepresentationoftheminority simulated based on his/her risk attitudes and characteristics through
+class,acrucialstepintrainingrobustmodelsonimbalanceddatasets, MonteCarlosimulation(MCS).Thedeparturetimeisnotimmediately
+whichhelpspreventthepredictivemodelfromoverwhelminglyclassi- after the timing of the evacuation trigger but may be delayed due to
+fyinginstancesintothemajoritygroup.Itisimportanttoemphasizethat decisiondelayandpreparation.Decisiondelaymayoccurifhousehold
+this up-sampling technique is a common practice and preserves the members(oragroupofpeoplewhoplantoevacuatetogether)needto
+original data structure, focusing on giving equal weight to both the make a collaborative decision to evacuate. Decision delay may also
+majorityandminoritygroups. depend onanevacuee’s awareness, beliefs,andpriorities (Beloglazov
+The road properties considered in constructing the road closure etal.,2016).Preparationtimeisalsoanevacuee-specificparameter.
+predictivemodelincludedroadtype,whetheritisaone-wayroad,its To collect empirical data and understand highly unpredictable
+maximumspeedlimit,thenumberofintersectingroads,andthepres- human behaviors during a wildfire evacuation, we conducted a web-
+enceofbridgesortunnelsonthesegment.Theseroadpropertiescanbe basedstatedpreferencesurveyofresidentsinCalifornia,Oregon,and
+expanded to include additional detailed characteristics collected by Colorado (Ma & Lee, 2024). These states were chosen because they
+federal or local agencies, allowing for customization to meet specific experiencedmajorwildfireeventsandevacuationsinthepastseveral
+needs.VariousMLmodelswereadoptedandtestedtoconstructtheroad years. Participants were recruited through Amazon Mechanical Turk
+closurepredictionmodels.TheseincludednaïveBayesclassifier(NB),k- (MTurk) between April and May 2022. The inclusion criteria for
+nearestneighbors(KNN),supportvectormachine(SVM),randomforest participatinginthesurveywereresidentslivingatthestudysitewho
+(RF), decision tree (DT), and neural network (NN). These ML models wereatleast18yearsofage.Atotalof1,312participantscompletedthe
+have been employed to perform various types of classifications and survey,but554responseswereconsideredinvalidbecausetheyfailedto
+demonstratedhighaccuracycomparedtotraditionalstatisticalmodels meetatleastoneofthevalidationchecks:(a)attentioncheck;(b)con-
+(Katzilierisetal.,2022;Xuetal.,2023).Forillustrativepurposes,this sistency check; (c) logical check; and (d) IP address check (Kennedy
+studyusedthedefaulthyperparametersettingsfortheaforementioned etal.,2020;Ma&Lee,2024;Owens&Hawkins,2019).Consequently,
+ML algorithms, evaluating and comparing them based on prediction thefinaldatasethad758validresponses.Theonlinesurveycompriseda
+accuracy in the test dataset. Among various ML models, the Random seriesofclosed-endedquantitativeandqualitativequestionsaimedat
+Forest(RF)modelwasselectedastheroadclosurepredictionmodeldue gatheringdetailedinformationabouttherespondents.Thesequestions
+to its superior accuracy (97 %), significantly higher than the 70.5 % covered various aspects, including demographics, property and car
+accuracyoftraditionallogisticregression,forexample.Thepre-trained ownership,mobilityissues,riskperception,priorexperiencewithnat-
+RFmodelbasedontheup-sampleddatasetwasthenappliedtotheroad ural hazards, and potential evacuation-related actions. It should be
+segments exposed to the representative wildfire scenarios to identify notedthatthestatedpreferencesurveyconductedinthisstudydidnot
+potentialroadclosures. includeanyspecificcontrolstrategiesforrespondentswithpriorevac-
+uationexperience.Furtherresearchshouldconsiderincorporatingmore
+targetedcontrolstrategiesorconductingarevealedpreferencesurveyto
+6
+
+===== PAGE 7 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+reducepotentialbiasesandimprovethespecificityoftheresults. simulationsoftware,insimulatingwildfireevacuation.Transportation
+Basedonthesurveyresponses,weconstructedpredictivemodelsfor AnalysisandSimulationSystem(TRANSIMS)andSimulationofUrban
+evacuationtriggers,evacuationdestinations,andnavigationusesduring Mobility(SUMO)arealsowidelyusedsoftwareprogramsinevacuation
+anevacuationusingbothtraditionallogisticregressionmodelsandML planningandsimulation(Beloglazovetal.,2016;Lopezetal.,2018;Yin
+models. While ML techniques have been widely used in evacuation etal.,2014).SUMOischosentoperformtrafficsimulationinthefourth
+modeling, their use in the context of wildfire evacuation has been moduleofthisframeworkduetoitsaccessibilityandflexibility.
+limited,withonlyafewnotableexceptions(Katzilierisetal.,2022;Xu Eachevacueeinthecommunityismodeledasanagent,andbasedon
+etal.,2023).MLapproachesofferdistinctadvantagesovertraditional the survey results obtained from Module 3, individual characteristics
+statisticalmethods,particularlyinhandlingcomplexrelationshipsand anddecisionrulesareassignedtoeachagent.IntheABM,individual
+nonlinear interactions between variables. Thus, in this study, we agents determine their actual departure time, evacuation route, and
+compared the prediction accuracies of traditional logistic regression destinationpriortodeparture.Aftertheagentsdepartfromtheirpointof
+modelswithvariousMLmodels(e.g.,DT,RF,SVM,NB,KNN,NN)and origin(i.e.,theresultsfromModule3),theywillenterthetransportation
+chose the models exhibiting the highest prediction accuracies. A networkandchoosetheirevacuationroutesusingtheirroutingselection
+detailedcomparisonofthepredictionaccuraciesofthesemodelscanbe method(i.e.,theresultsfromModule3).Someagentswhowillnotuse
+found in Appendix C. Specifically, RFclassifier withsmall trees (max real-timemapsmaynotbeabletoselecttheoptimalevacuationroutes
+depth=5),theRFclassifierwithlargetrees(maxdepth=15),andthe because they will not have any real-time information, such as the lo-
+SVM with Gaussian kernel were chosen for the predictive models for cationsofclosedroadsduetofire,trafficcongestion,etc.Assuch,the
+evacuation triggers, evacuation destinations, and navigation uses, spatiotemporal movements of individual agents are recordedat every
+respectively. The superior performance of ML models compared to timestep.
+traditional logistic models observed in this study aligns with their The traffic carrying capacities of the links (i.e., the results from
+demonstrated effectiveness in predicting evacuation preferences in Module2)arealsodynamicallyupdatedasfirepropagatesovertime.
+Katzilierisetal.(2022)andXuetal.(2023).Ontheotherhand,forthe Dynamicupdatesonlinkcapacityandindividualagents’locationsare
+evacuation preparation time, both statistical analyses and ML models incorporatedintomicroscopictrafficsimulationtopredicttrafficflows
+showedlowperformance,withaccuracieshoveringaround28%,only atthelevelofindividualagentsandcapturetrafficdynamicsconsidering
+marginallybetterthanpurerandomguessing.Consequently,weopted collectiveactionsamongtheagents.TheABMframeworkforwildfire
+tosampletheevacuationpreparationtimesfromthefrequencydistri- evacuationindamagedtransportationsettingsprovidestime-dependent
+butioncorrespondingtoeachevacuationtiminggroup(i.e.,immediate, trafficmapstoidentifythecriticalpartsofthetransportationnetwork
+voluntary,andmandatorygroups).Acomprehensivedescriptionofthe that are the most vulnerable towildfires and havegreat potentialfor
+survey data collection process, analytical methods, discussions, and causing traffic congestion during an evacuation. Moreover, the total
+detaileddescriptionsofthepredictivemodelscanbefoundinMa&Lee numberofevacuatingagentsduringagiventimeisalsoobtainedasa
+(2024). finalresult.
+2.4. Module4:Agent-basedtrafficsimulation 3. Casestudy:TheCityofSantaClarita,California
+The reduced functionality of a transportation network (Module 2) 3.1. Studysite
+can endanger human lives when combined with the elevated travel
+demand patterns (Module 3) during an evacuation. Module 4 will To illustrate the application of the proposed ABM framework to a
+performtrafficsimulationbycombiningModule2resultswithModule3 real-worldcommunity,theCityofSantaClarita,Californiawasselected
+resultstopredicttrafficconditionsduringanevacuationandidentifythe asacasestudysite.TheCityofSantaClaritaislocatedinnorthwestern
+criticalpartsofthetransportationnetworkforpre-fireriskmitigation LosAngelesCountyinCaliforniaasshowninFig.2,andits2020pop-
+actions. Travel demand modeling for wildfire evacuation can be ulationwas228,673.ThiscitywaschosenbecausemanyhomesinSanta
+generallyclassifiedintotrip-basedandactivity-basedapproaches(Intini ClaritaarelocatedwithinWUIandathighwildfirerisk.Thispositioning
+etal.,2019).Thereferenceunitforthetrip-basedapproachisorigin- makesthecityparticularlysusceptibletomasswildfireevacuations.For
+–destinationpairs,andthetotaldemandisestimatedattheaggregated example,theRyeFire,whichignitedonDecember5th,2017,threatened
+level.Thisapproachisusuallyadoptedinmacroscopictrafficsimulation over 1,000 homes in the city and prompted evacuation orders for
+andismoresuitableforevacuationsinvolvinglargegeographicareas. approximately 1,300 homes. The fire also necessitated the closure of
+Ontheotherhand,theactivity-basedapproachmodelingeachevacuee both directions of Highway 5, one of the major thoroughfares in the
+asanagentisoftenadoptedinmicroscopictrafficsimulationandismore area.AnothersignificantincidentistheTickFire,whichbrokeouton
+appropriateforregionalevacuationmodelingduetoitshighcomputa- October24th,2019.Thisfireposedarisktoover10,000structuresin
+tionalburden.Consideringthatwildfireevacuationisoftenlimitedto thecityandledtotheevacuationofabout40,000residents.Thescale
+the community or county level, activity-based microscopic traffic and frequency of such events highlight the urgent need for effective
+simulationhasbeenwidelyusedinexistingwildfireevacuationstudies evacuationplanning.
+(Cova&Johnson,2002;Grajduraetal.,2020;Manchevaetal.,2019).In
+thisstudy,anactivity-basedmicroscopictrafficsimulationisintegrated 3.2. Simulationprocedure
+withinABM.Twosimpleactivitychainswereassumedforhouseholds
+subjecttoevacuationorders.Incaseswheresomehouseholdmembers 3.2.1. Module1Procedure:Wildfiresimulation
+areattheexposedpropertywithvehiclesavailableon-site,theyenter The first stage of the wildfire simulation module is to generate
+the network directly andtravel toevacuationexits or public shelters. spatiotemporallyvaryingfireoccurrenceprobabilitiesinthestudyre-
+Conversely, if no vehicles are available at the exposed property but gion as shown in Equations 1–6. The required inputs for the wildfire
+anotherhouseholdmemberisataworksitewithavehicle,theworking occurrenceprobabilityestimation models(seeEquations1–2)include
+memberfirstreturnstothehouseholdtogathertheremainingmembers griddeddailyclimatedata(i.e.,theERC),griddedhumanfactordata(i.
+beforeproceedingtotheevacuationexitsorpublicshelters. e.,populationdensity,distancesfromgridcentroidtotheclosestmajor
+There are various ABM software programs that have been used in roads, camp/picnic sites, and transmission lines), and gridded topo-
+evacuationstudies.NetLogo,ajava-basedprogram,wasusedbyGraj- graphic and fuel layers. The University of Idaho Gridded Surface
+duraetal.(2020)andSiametal.(2022)tomodelwildfireevacuations. Meteorological Dataset (gridMET) (Abatzoglou, 2012), daily high-
+CovaandJohnson(2002)usedParamics,whichisacommercialtraffic spatialresolution(~4km)climatedatacollectedsince1979,wasused
+7
+
+===== PAGE 8 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+Fig.2. TheCityofSantaClaritaaffectedbytheRyeFire.
+fortheclimatedata.Thegriddedhumanfactordataweregeneratedby
+Table2
+utilizing OSM data. The gridded topographic and fuel data available
+fromtheLANDFIREprogramhadaspatialresolutionof30mandwere
+Theprobabilitiesoftherepresentativewildfirescenarios(i.e.,Plarge (E,C)).
+usedastheinput.GiventhatthelargestwildfireinCaliforniahistory 0th(cid:0) 40th(cid:0) 60th(cid:0) 80th(cid:0) 90th(cid:0) 97th(cid:0)
+scorchedmorethan1millionacres,historicalwildfireeventswithin31 40th 60th 80th 90th 97th 100th
+zipcodessurroundingthecity,encompassingapproximately2,739,905 1 0.61% 0.34% 0.52% 0.23% 0.26% 0.65%
+acres, were collected for estimating wildfire ignition probabilities. 2 0.15% 0.09% 0.14% 0.06% 0.07% 0.18%
+3 0.24% 0.14% 0.22% 0.10% 0.11% 0.28%
+Duringtheperiodbetween2002and2021,therewere5,288,820voxels.
+4 0.34% 0.18% 0.28% 0.12% 0.14% 0.34%
+Among them, only 435 voxels had historical fire events that burned 5 0.43% 0.23% 0.35% 0.16% 0.18% 0.44%
+areasgreaterthan100acres,whiletheremaining5,288,385voxelsdid 6 0.32% 0.18% 0.28% 0.12% 0.14% 0.35%
+nothaveanylargefires.AsdescribedinSection2.1,toaddresstheissues
+withimbalanceddata,435voxelswerefirstrandomlysampledfromthe
+turningintoalargefiremodelyielded75.2%accuracy.Thenumberof
+no-fireset,whichisasubsamplingmethod.Then,thesubsetconsisting
+firevoxelswasrelativelysmallbecausethisstudyfocusedonlyonthe
+of435firevoxelsand435no-firevoxelswasdividedintotrainingand
+areas surrounding Santa Clarita City and utilized only a 20-year his-
+testingsetstoconstructthewildfireoccurrenceprobabilityestimation
+toricalrecord.Thismayhavecontributedtotherelativelylowpredic-
+model. The accuracy of the ignition probability model yielded 80 %
+tionaccuracy.Therearemultiplewaystoimproveitsaccuracy,suchas
+prediction accuracy, while the conditional probability of an ignition
+using longer climate data (e.g., collected during the period between
+1979and2021).
+To generate a set of representative wildfire scenarios, the region
+encompassingandsurroundingtheCityofSantaClaritawasdividedinto
+24gridcells,eachmeasuring4kmby4km,coveringatotalof94,888
+acres. More specifically, the region was divided into six clusters (see
+Fig.3),witheachclustercomprisingfourgridcells.Thereddotsdenote
+thecentroidofeachcluster,andthenumbersindicatethelabelsofthe
+clusters usedin Table 2. To account for temporal variability, six ERC
+percentile groups were considered: 0th-40th percentile, 40th-60th
+percentile, 60th-80th percentile, 80th-90th percentile, 90th-97th
+percentile,and97th-100thpercentile.Forthespatialcentroidofeach
+clusterandeachERCpercentilegroup,arepresentativewildfirescenario
+was generated. Table 2 presents the total 36 representative scenarios
+and their probabilities calculated based on the spatiotemporal occur-
+renceprobabilitymap.
+The ignition location of each representative wildfire scenario was
+designatedasthespatialcentroidoftherespectivecluster.Therequired
+inputstoFARSITEincludehourlyweatherdataandasetofrasterfiles(i.
+e., elevation, slope, aspect, fuel model, canopy cover, stand height,
+canopybaseheight,andcanopybulkdensity).Thehourlyweatherdata
+wereavailablefromtheRAWSslocatedthroughouttheUnitedStates,
+whileallrasterfilesweredownloadedfromtheLANDFIREprogram.It
+Fig.3. Clustersandtheircentroids.
+8
+
+===== PAGE 9 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+shouldbenotedthatthehourlydatausedtosimulateeachrepresenta- evacuation. Moreover, a lack of a suppression model in FARSITE
+tivewildfirescenariowasderivedfromhistoricalweatherrecords.The required additional assumptions about human suppression efforts in
+specificdateforthehourlyweatherdatawasselectedbyidentifyinga ordertostopthefire.WhileFARSITEhaslimitationsinsimulatingthe
+datewhentheERCmatchedtherepresentativeERCwithinitspercentile RyeFirefromitsignitiontofullcontainment,thesimilarpropagation
+group. This method ensures that the weather conditions used in the directionofbothsimulatedandactualfires(seeFig.4)indicatesthatthe
+simulation accurately reflect the conditions corresponding to the model has the capability to simulate fire growth successfully until
+representative ERC, thereby enhancing the reliability of the realistic humaninterventiongetsinvolved.
+wildfirescenariosimulations.Moreover,the40ScottandBurganFire
+BehaviorFuelModels(FBFM40)donotsupportfirespreadintourban 3.2.2. Module2Procedure:Roadnetworkvulnerabilityassessment
+and suburban areas, which is a limitation that contradicts historical The locations of the roads exposed to the representative wildfire
+wildfireeventsintheSantaClaritaarea(e.g.,TickFire,RyeFire).To eventsareillustratedinFig.5asblacklinks.Theattributesoftheroads
+addressthisdiscrepancyinthecasestudy,wereplacedtheurbanand wereextractedfromtheOSMroadlayer,includingroadtype,roadac-
+suburban development type (NB1) with the short, sparse dry climate cess restrictions (one-way or both ways), maximum speed limit, and
+grasstype(GR1)toallowfirestopropagateintourbanandsuburban vertical relationships between crossing or overlapping roads, bridges,
+areas. and tunnels. These attributes were processed and utilized in the road
+Foreachoftherepresentativescenarios,weassumedthatfireiniti- networkvulnerabilityassessmentmodel,whichwasestimatedbasedon
+ationoccurredat9amandstoppedpropagatingat8pm.Inotherwords, historicalclosuresdescribedinSection2.2.Outofthe3,623roadseg-
+theconclusionofthesimulationdoesnotnecessarilyindicatethatthe ments affected by the representative events, 54 road segments were
+fire has been completely contained. This assumption is reasonable predictedtobeclosed,shownastheredsegmentsinFig.5.Thereduced
+because,inmanyreal-worldcases,evacuationordersareliftedwithina capacitiesoftheroadsegmentsforeachrepresentativewildfire event
+day, reflecting the immediate need for evacuation during the most werethenintegratedintothetrafficsimulationinModule4.
+criticalperiodofwildfirespread.Moreover,theaccuracyoftheFARSITE
+simulationisprojectedtodiminishaftertheinitialperiodduetosub- 3.2.3. Module3Procedure:Evacueeresponsemodel
+stantial uncertainties introduced by human intervention. Firefighting Inthethirdmoduleoftheproposedframework,theevacueeresponse
+strategies,weatherchanges,andotherdynamicfactorscansignificantly model was simulated to reflect diverse individual behaviors and re-
+alterthefire’sbehavior,makinglong-termsimulationslessreliable.By sponses during an evacuation. To apply the evacuee response model
+constraining the simulation to this timeframe, we can focus on the developed based on the survey data, detailed information about the
+criticalearlystagesofwildfirespreadandevacuation,whicharecrucial propertiesandcharacteristicsofindividualresidentsandhouseholdsin
+forunderstandingandimprovingnetworkperformanceandevacuation thecommunitywasnecessary.Whereasdemographicinformationwas
+dynamicsunderurgentconditions. availablefromtheCensusdataset(U.S.CensusBureau,2021),someof
+TotesttheFARSITEwildfiresimulationperformance,thesimulated the key explanatory variables needed to estimate their evacuation
+fireperimeterduringthefirstburningdayoftheRyeFire(December5, timing or the use of real-time navigation (e.g., risk attitude, wildfire
+2017)wascomparedwiththeactualperimeter,asshowninFig.4.Only evacuationexperience)wereoftennotavailable.Thus,inthisstudy,we
+thefirst-daysimulatedfireperimeterwasconsideredhereinbecausethe generatedasyntheticpopulationfortheCityofSantaClarita.
+evacuation order was lifted the evening of the first burning day, and Twostandardapproachestogeneratingasyntheticpopulationare
+further wildfire growth simulation was unnecessary for estimating syntheticreconstruction(SR)andhillclimbing(HC)(Namazi-Radetal.,
+Fig.4. Comparisonbetweenthesimulatedfireperimeter(onlyduringthefirstburningday)andtheRyeFireperimeter.
+9
+
+===== PAGE 10 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+Fig.5. Locationsandpredictedclosuresofroadsegmentsduetotherepresentativewildfirescenarios(black:roadsexposedtotherepresentativewildfirescenarios;
+red:closedroads).(Forinterpretationofthereferencestocolourinthisfigurelegend,thereaderisreferredtothewebversionofthisarticle.)
+2014). TheSRapproach isatraditionalmethodforgenerating asyn- theOSMdatabase.Buildingswere classifiedintoresidential buildings
+thetic population based on both disaggregated- and aggregated-level andcommercialbuildings.Theresidentialbuildingshavingthetop30%
+data. By assuming that disaggregated-level data (i.e., seed data) can shapelengthwerelabeledasmultifamilyresidentialbuildings.Theratio
+fullyrepresentthetargetpopulation,thisapproachsamplesindividuals of30%wasdeterminedbasedonthe2019U.SCensusBureauAmerican
+withtherequiredsociodemographiccharacteristicsfromthetruepop- Housing Survey that 31.4 % of housing in the U.S. were multifamily
+ulationinthestudyarea,whichistypicallyextractedfromCensusdata, housing. For each census tract, all synthetic householdsin the census
+using a weighting technique. The HC approach is an optimization al- tractwererandomlyassignedtoresidentialbuildingsinthesamecensus
+gorithmthatmaximizesanobjectivefunction.Itstartswitharandom tract.Similarly,allindividualswhoworkedfull-timeorpart-timewere
+selectionofunitsfromtheseedpopulationanditerativelyreplacesthem randomlyassignedtoworkplaces(i.e.,commercialbuildings).Itshould
+untilimprovementbecomesnegligible(Namazi-Radetal.,2014).While benotedthattheassumedlandusetypes(e.g.,single-familyormulti-
+bothapproachesarecapableofgeneratingreliablesyntheticpopulations family residential properties) derived from the OSM database can be
+relative to the true population’s marginal distributions (Jain et al., replacedwithmoredetailedandaccurateparcel-leveldata.Parceldata,
+2015),theSRapproachwasadoptedinthisstudybecauseuser-friendly oftenmaintainedandprovidedbylocalplanningorzoningdepartments,
+andwell-developedsoftwareprogramswereavailable. includescomprehensiveinformationonpropertyboundaries,landuse
+First,weusedPopGentogenerateasyntheticpopulationintheCity classifications,andownershipdetails.
+ofSantaClaritaatthecensustractlevel.PopGenisasoftwareprogram Afterallocatingindividualstotheirhouseholds,homes,andwork-
+that produces synthetic populations while controlling and matching places,itwasassumedthateachhouseholdformedadecisiongroupand
+both individual- and household-level attribute distributions (Bar-Gera shared the same evacuation decision during the evacuation process.
+etal.,2009;Kondurietal.,2016;Yeetal.2009).Theseedpopulation Then, the evacuee response modeling for each household was con-
+wasadoptedfromthePublicUseMicrodataSample(PUMS)produced structedbasedonthesurveydataandmodelsdescribedinSection2.3.
+bytheU.S.CensusBureau,whichwasasmallportionofthetruepop- The evacuation timings of all synthetic households in the city were
+ulation (including both households and individuals) without identifi- determinedbasedontheRFmodel(seeAppendixC).Theexplanatory
+cation. The marginal distributions of the control population variables for evacuation timing included education, insured status,
+characteristicsinthestudyareawereavailablefromtheCensusBureau’s routineuseofnavigation,pasteffectiveevacuationexperience,disaster
+American Community Survey (ACS). The generated synthetic popula- plan,andfinancialriskpreference.Whereasthefirsttwocharacteristics
+tion consisted of 83,558 households and 246,830 residents with no of synthetic households were already realized during the synthetic
+significant difference fromthe marginaldistributions ofthe truepop- populationgeneration,thelastfourpropertiesofeachhouseholdwere
+ulation’s key characteristics (e.g., household size, household income, notknownbecausethesepropertieswereoftennotavailablefromtheU.
+thepresenceofchildren,age,gender,race,education,andemployment S. Census data. Thus, using MCS, these properties of each household
+status).Allindividualsinthesyntheticpopulationweregivenaunique wererandomlysampledfromthehistogramsofthesurveyresults(see
+ID number so that the individuals having the same ID number were Appendix A). Additionally, some of these explanatory variables are
+assumedtobeinthesamehousehold. individual-levelvariables(e.g.,educationandroutineuseofreal-time
+Torelateeachhouseholdtoitshome,thelocations,shapes,anddi- navigation).Thisstudyassumedthatthesurveyrespondentwasrepre-
+mensionsofallbuildingsintheCityofSantaClaritawereobtainedfrom sentativeofhisorherhouseholdorprimarydecision-makerandused
+10
+
+===== PAGE 11 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+the individual-level variables to predict household-level evacuation toevacuatetothepublicshelterwasevaluatedbasedontheregression
+decisions.However,itshouldbenotedthatthisassumptionmayintro- model (Ma &Lee, 2024) inwhich theexplanatory variables included
+ducebiasduetorepresentativeissues(Hung&Wang,2022;Seebauer age,gender,householdsize,homeownership,thepresenceofchildren,
+etal.,2017). carownership,routineuseofnavigation,insuredstatus,pasteffective
+The results indicated the following evacuation intentions among evacuation experience, evacuation plan, confidence in property, and
+synthetichouseholds:21.1%intendedtoevacuatewithoutanofficial riskpreferencesforpersonalsafetyandfinancialsafety.Theregression
+order;34.2%plannedtoevacuateunderavoluntaryevacuationorder; resultsindicatedthat362households(0.4%)intendedtoevacuateto
+39.7%intendedtoevacuateunderamandatoryevacuationorder;and5 publicshelters.Althoughthispercentageseemstobesmall,thisfinding
+%chosetostayorevacuateonlyafterobservingphysicalcues,suchas aligns with real-world observations of low public shelter usage: for
+embers, smokes, or flames. In combination with the wildfire growth example,duringtheRyeFireevent,anestimated2%ofevacueesused
+simulationresultsfromModule1,theevacuationtimesofallhouseholds publicshelters.Despitetheirlimiteduse,publicsheltersremainvitalin
+weredetermined.Ateverytimestep,onceanewfirefrontwasupdated, emergencypreparednessandresponse,offeringacriticalsafetynetfor
+threebufferzoneswereestablishedtogeneratethreetypesofevacuation individualsandfamilieswithoutalternativeevacuationoptions.Thus,
+triggers:a2-milebufferaroundtheupdatedfirefrontwasusedtotrigger thehouseholdspredictedtoevacuatetopublicshelterswererandomly
+theevacuationoftheimmediateevacuationgroup(thosewhoevacuate assignedtooneofthethreeshelters.Forhouseholdswhosefinaldesti-
+withoutanofficialorder);a1-milebuffertriggeredtheevacuationofthe nationswerenotpublicshelters,threemajorcommunityexits,asshown
+voluntaryevacuationgroup;anda0.5-milebufferinitiatedtheevacu- inFig.6,wereassignedastheirevacuationroutes.
+ation of the mandatory evacuation group. The actual departure time Inadditiontosimulatingevacuationtiminganddestinationprefer-
+couldbedelayedduetodecisiondelayandpreparation.Whilethetime ences,thismodulealsoexaminedindividuals’inclinationstowarduti-
+associated with evacuation delay can be affected by various evacuee- lizing GPS navigation during evacuations. The adoption of GPS
+andhousehold-specificparameters(e.g.,awareness,riskattitudes,pri- navigationcanfacilitateaccesstoreal-timetravelinformation,enabling
+orities, and beliefs), it is difficult to identify key independent factors individualstodynamicallyadjusttheirroutestoavoidtrafficcongestion
+affectingthedelaytimeandtheirstatisticalrelationshipbecauseofthe whileevacuating.TheuseofGPSnavigationbyindividualhouseholds
+abstractnatureofmajorparameters.Thus,inthisstudy,thedelaytime was predicted using the SVM model (Ma & Lee, 2024). This model
+ofeachhouseholdmainlyduetoevacuationpreparationwasrandomly incorporated a range of explanatory variables, including employment
+sampledfromthefrequencydistributionofpreparationtime(Ma&Lee, status, property ownership, the presence of household members with
+2024). specialneeds,routinenavigationusage,pastevacuationexperience,and
+The evacuation destinations of the synthetic households are also safetyriskattitudes.Amongthe83,558synthetichouseholds,theSVM
+uncertain. As presented in Appendix B, households have a numberof modelprojectedthat10,971householdswouldoptforGPSnavigation
+destination choices, including someone else’s house, hotel, public duringtheevacuationprocess,constitutingapproximately13.1%ofthe
+shelter,secondaryresidence,portablevehicle,andrentalhouse.Inthis totalpopulation.
+casestudy,itwasassumedthatpublicshelterswerelocatedintheCityof Thismodulegeneratedtheevacuationtiming,departuretime,GPS
+Santa Clarita, while other destinations were located outside the city. navigation usage, and final destinations for all synthetic households
+Fig. 6 showsthe three schools that are located within the city. These based on the survey results. Detailed descriptions of the survey and
+schoolswereconsideredpublicsheltersinthecasestudy.Theintention predictivemodelscanbefoundinMa&Lee(2024).However,public
+Fig.6. Thelocationsofpublicsheltersandcommunityexits.
+11
+
+===== PAGE 12 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+Fig.7. Vehicle-onlytransportationnetworkintheCityofSantaClarita.
+transportation was not considered in this module. Thus, we assumed impact on the overall number of vehicles within the network and on
+that households without vehicle ownership, yet desiring to evacuate, simulation performance remains marginal. In future investigations,
+wouldutilizehypotheticalvehiclesfortheevacuationprocess.Asthis these hypothetical vehicles could potentially be replaced by public
+assumptionappliedtoonly4,142(5%)ofthesynthetichouseholds,its transportation or ride-sharing alternatives. Finally, a total of 166,069
+Fig.8. ConditionalroadclosureprobabilitymapintheCityofSantaClarita.
+12
+
+===== PAGE 13 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+vehicles (both actual and hypothetical) were used during a wildfire onmajorroadsandhighways.Thiscanhelpensuresmootherandsafer
+evacuation. At each time increment, the module captured and docu- evacuations during wildfire events. Moreover, it can allow for better
+mentedtheimpendingdeparturesofvehicles,whichwasacrucialaspect allocations of resources, such as deploying firefighting units, traffic
+factoredintotheestimationoftrafficdemandwithinModule4. control personnel, and emergency responders to critical areas in
+advance,whileinformingdecisionsaboutinfrastructureimprovements
+3.2.4. Module4Procedure:Agent-basedtrafficsimulation (e.g., reinforcing major roads, creating alternative routes, and imple-
+Theagent-basedtrafficsimulationwasperformedusingSUMO.The mentingfirebreakstoreducetheriskofclosures).
+vehicle-only transportation network in the City of Santa Clarita is To illustrate both spatial and temporal variations in evacuation
+illustratedinFig.7.Ateverytimestep,thenetworkcapacity(i.e.,the performance and better understand evacuation dynamics, Fig. 9 por-
+outputfromModule2)andtrafficdemand(i.e.,theoutputfromModule trays the cumulative count of vehicles entering and evacuating the
+3)wereupdatedandusedasinputdatainSUMO.InSUMO,vehicles networkovertime.ThiscumulativenumberwasaveragedovertheERC
+wereconsideredautonomousagents,andtheiractionsandinteractions percentilesforeachgridcluster.Fig.9(a)presentsthevaryingaverage
+were simulated during a wildfire evacuation. Moreover, the evacuees traffic inflows for each geographic grid cluster on a per-second basis.
+were classified as navigation users and non-navigation users as Sincetherearesixrepresentativewildfirescenariosforeachcluster,the
+describedinSection2.4.WiththeGPSnavigationdevice,thenavigation averagetrafficinflowsrepresentthemeantrafficinflowsduringwildfire
+userscouldaccessthereal-timemapandreoptimizetheirrouteatevery scenariosthatignitedwithintherespectivecluster.AsshowninFig.9
+180simulationsecondsandrerouteifanyfasterrouteswereidentified. (a), clusters C2 and C5 exhibit the highest volume of evacuations
+Thenon-navigationusers,ontheotherhand,onlytooktheshortest(but comparedtotheremainingclusters.Thisindicatesthatwildfiresignited
+notthefastest)routesbecausetheychosefamiliarroutesorreliedon inC2orC5havethepotentialtoinducemassevacuations,whichcan
+conventional mapsduringanevacuationwithouthaving real-time in- leadtoseveretrafficcongestion.Fig.9(b)illustrateseachcluster’smean
+formation.Theresultsfromthismodulewerethelocationsofallvehicles cumulativeevacuationrate.Thisrateisdefinedastheratiobetweenthe
+at every second during the evacuation process, the time series of the cumulative number of vehicles that have successfully evacuated and
+numberofvehiclesinthetransportationnetwork,thenumberofvehi- exitedthenetworkandthetotalnumberofvehiclesthatdeparted.In
+clesthatsuccessfullyevacuated,averagespeed,etc. clustersC1,C2,andC5,alargeportionofvehiclessuccessfullyevacu-
+ated within the first 3 h after the fire ignited. This rapid increase in
+3.3. Resultsanddiscussions evacuationratesmayindicateaneffectiveinitialresponse,suggesting
+thattheevacuationroutesintheseclusterswerecapableofhandlingthe
+AftergeneratingasetofrepresentativewildfirescenariosfortheCity initial surge of traffic to some extent. Additionally, residents in these
+ofSantaClarita,weestimatedtheconditionalclosureprobabilitiesofall clusters might be highly aware of the wildfire threat and promptly
+road segments within the vehicle-only road network given that these complywithevacuationorders.However,itshouldbenotedthatdespite
+segmentsareenclosedbywildfireperimeters(seeFig.8).Thisestima- the effectiveness of the initial response, severe traffic congestion was
+tion utilized the pre-trained road network vulnerability assessment observedinclustersC2andC5duetothehighvolumeofevacuation
+modeldescribedinSection2.2.Theresultsrevealapatternwhereres- traffic,whichcanbefoundinFig.9(a).
+identialandminorroadsarelesslikelytobeclosed,whereasmajorroads Fig. 10 illustrates the average cumulative time loss at every road
+andhighwaysexhibitahigherlikelihoodofclosures.Itisnotuncommon segment during the first three hours following a fire outbreak. This
+forwildfirestoresultintheclosureofhighwaysandmajorroadsdueto three-hourtimeframewasselectedbecausethemostdramaticincrease
+safetyconcerns.Theseclosuresmaybepartlycausedbythedirectand intrafficinflowswasobserved(e.g.,Fig.9(a)).Thecumulativetimeloss
+indirect impacts ofwildfires, suchasweakened pavement, landslides, isdefinedasthetotalnumberofsecondsvehicleslostduetocongestion,
+debris, and dense smoke. Additionally, firefighting efforts can also summedoverallvehiclesthattraversedaparticularroadsegment.Time
+contributetotheclosureofmajorroads.Forexample,fireenginesand lossisoneofthebuilt-inperformancemetricsintheSUMOsimulation.It
+otherequipmentmayneedtobestationedonorneartheseroutes,and referstotheadditionaltimeavehiclespendsonitsjourneyduetofac-
+aerial firefighting operations, such as the dropping of water, require torssuchastrafficcongestion,trafficlights,andotherdelays.Itrepre-
+clearingtheareatoensuresafety.Theconditionalclosureprobability sentsthedifferencebetweentheactualtraveltimeandtheidealtravel
+map,suchastheoneshowninFig.8,servesasavaluableresourcefor timeifthevehiclewereabletotravelatitsdesiredspeedwithoutany
+risk management officials, offering a holistic perspective on network interruptions.Ahighercumulativetimelossvalueindicatesthatmore
+functionality and accessibility under wildfire threats. By providing a vehiclesexperiencedsignificantdelays,suggestingthatthesesegments
+pre-eventoutlookonpotentialroadclosuresandhighlightingtheareas arepronetoseverecongestionduringwildfireevacuation.Asshownin
+mostvulnerabletoroadclosures,thismapempowersemergencyman- Fig.10,themajorityofroadsegmentswithintheCityofSantaClarita
+agerstodevelopmoreeffectiveevacuationroutesthatminimizereliance are expected to encounter only minor slowdowns, with time delays
+Fig.9. (a)Meancumulativetrafficinflowsforgeographicgridclustersand(b)Meancumulativeevacuationrateforgeographicgridclusters.
+13
+
+===== PAGE 14 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+Fig.10. Spatialdistributionofaveragecumulativetimelossonroadsegments(unit:seconds).
+between100and300s.Asubsetofroads,particularlyinthesouthern generallyprefertousehighwaysduetotheirhighercapacityandspeed.
+andnorthwesternsectorsofthecity(Clusters1and5),mayexperience Suchhightrafficflowscouldimpedetrafficenteringfromtheon-ramps,
+significanttrafficcongestion,resultingintimelossesexceeding5000s. causing significant delays on these highway segments. Fig. 10 also
+Theseareasofpronouncedcongestionarehighlightedinblueandpur- identifiesanothervulnerableareaintheresidentialzoneslocatedinthe
+ple. According to the highlighted regions, severe traffic congestion is northofthecity(Cluster2).Residentsintheseareasmayfaceheight-
+likely to occur at highway entry points partly because evacuees enedriskduetothelimitedevacuationroutesavailable,increasingthe
+Fig.11. Spatialdistributionofannualexpectedcumulativetimelossonroadsegments(unit:seconds).
+14
+
+===== PAGE 15 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+likelihoodofdelayedevacuationsduringlarge-scaleevents.Thisspatial provide detailed information such as individual vehicle locations and
+visualization of cumulative time loss offers emergency managers a speeds at every second. At the aggregated level, it generates metrics
+valuabletoolforpre-eventassessmentofnetworkperformance.Byun- includingthecumulativecountofdepartingorevacuatingvehicles,the
+derstandingwhichareasaremostlikelytoexperienceseverecongestion numberofvehiclescurrentlywithinthenetworkortrappedintraffic,
+anddelays,theycanimplementtargetedstrategiestoimproveevacua- and time-series data depicting average travel speeds. This dual-level
+tionefficiencyandsafety. output capability allows for comprehensive analysis and insights into
+The spatial distribution of cumulative time loss can be further both fine-grained individual behaviors and broader traffic patterns
+analyzedwithinaprobabilisticframeworkandexpressedastheannual during evacuation scenarios. Additionally, this proposed framework
+expectedtimelossforeachroadsegment.Theannualexpectedtimeloss introducestheintegrationofdamagedtrafficsettingsintotheevacua-
+is a metric that quantifies the potentialimpact of wildfire evacuation tionprocess.Thisaspectunderscoreshowthereducednetworkcapacity
+scenarios on traffic performance by combining both the likelihood of due to wildfires affects evacuation efficiency, particularly when com-
+variouswildfireeventsandtheseverityoftheresultingtrafficdelays.It binedwithheightenedtraveldemand.
+is calculated as a weighted sum of the cumulative time loss for each Themaincontributionsofthisstudyinclude(a)theincorporationof
+representative wildfire scenario, with the weighting based on the anadvancedwildfirehazardmodelingandvulnerabilityassessmentto
+probability of each scenario occurring within a year. This measure reflect realistic evacuation dynamics in damaged transportation set-
+providesinsightintohowfrequentlyroadcongestionmightoccurduring tings,(b)thedevelopmentofamorecomprehensiveevacueeresponse
+evacuationsandhowseverethetrafficdelayscouldbe.Fig.11illustrates modelbasedonastatedpreferencesurveytopredictindividualevac-
+this visual representation. Similar to Fig. 10, the analysis results in uees’behaviorsasafirefrontapproaches,and(c)thefullyprobabilistic
+Fig.11indicatethatthesouthernandnorthwesternregionsoftheCityof assessmentofevacuationperformance.However,thestudyhasanum-
+SantaClaritaarelikelytoexperienceseverecongestionduringwildfire ber of limitations that may hinder its accuracy. First, public trans-
+evacuations.Thesehighlycongestedsegmentsalsoalignwellwiththe portation and ride-sharing behavior were not considered. Second, the
+roadclosureprobabilitymapshowninFig.8,indicatingthatroadclo- evacuationdestinationwasrandomlyassignedbasedonthesurveyre-
+sures further exacerbate trafficcongestion,especially when combined sults,whereasintherealworld,evacueesmaychoosetheclosestshelter
+with high volumes of traffic inflow (Fig. 9(a)). Thus, these segments orexit.Third,thesurveyplatformMTurk,utilizedinthisstudy,isless
+requiretargetedwildfireriskmitigationactionsgiventheirlikelihoodof effective in accurately targeting and engaging individuals who have
+closureandhightrafficvolumeduringevacuationevents.However,itis previously experienced wildfire evacuations, which could affect the
+important to note that most road segments experience negligible reliabilityofinsights.Fourth,whileoff-the-shelfsimulationapplications
+congestion in terms of annual expected time loss. This is because the (e.g.,FARSITE,SUMO)wereusedinthisstudyforwildfireandtraffic
+calculation takes into account the annual probability of wildfires simulations,theycouldbereplacedwithotherstate-of-the-artmodels
+affecting the region. While a majority of these road segments may forimprovedperformance.TofurtherenhancetheaccuracyoftheABM
+experience minor congestion when a wildfire does occur, the annual framework and broaden its applicability, future works will be con-
+expectedtimelossprovidesamorecomprehensivepicturebyreflecting ducted,including(a)theintroductionofpublictransportation,(b)the
+howoftensucheventsareanticipatedtoimpacttheregion.Ratherthan incorporationofcarpoolbehaviortoremovehypotheticalvehicles,(c)
+focusingontheabsolutevalueoftheannualexpectedtimeloss,itmay the use of more focused surveys targeting individuals experiencing
+bemorebeneficialtousethesevaluesinarelativemannertocompare wildfire evacuations, and (d) the development of a more detailed
+whichroadsegmentsaremorelikelytoexperiencecongestionfroma simulationmodelforassigningevacueestotheclosestshelterorexit.
+probabilisticstandpoint.Thisapproachcanhelpplannersanddecision-
+makers prioritize mitigation efforts and resource allocation to those CRediTauthorshipcontributionstatement
+areas where the risk of significant congestion is not only high during
+wildfireeventsbutalsorecurrentlysignificantovertime. Fangjiao Ma: Writing – original draft, Visualization, Validation,
+Software,Methodology,Investigation,Formalanalysis, Datacuration.
+4. Concludingremarks Ji Yun Lee: Writing – review & editing, Writing – original draft, Su-
+pervision, Resources, Project administration, Methodology, Investiga-
+Effectivecommunity-basedtransportationevacuationplanningisa tion,Fundingacquisition,Conceptualization.
+criticalconcernforstateandlocalpolicymakers.Whenwildfirerisksto
+communitiescannotbereducedbythefirstlineofdefense(e.g.,wildfire
+Funding
+countermeasures),evacuationbecomestheessentialsecondlineofde-
+fense. Inadequate planning and underestimating the complexities of ThisworkhasbeenfundedbytheUSDepartmentofTransportation’s
+evacuationcanleadtotragichumancasualtiesduringwildfireevents.
+University Transportation Center program, Grant # 69A355174110
+Anevacuationsimulationmodelmayassistawell-developedevacuation
+through the Pacific Northwest Regional University Transportation
+planandultimatelycouldsavehumanlives.
+Center(PacTrans).TheauthorswouldliketothankPacTransfortheir
+This study proposed an ABM framework designed for wildfire
+support.
+evacuation simulation in damaged transportation settings. This novel
+approach integrates wildfire simulation, road network vulnerability
+assessment,evacueeresponsemodeling,andtrafficsimulation,aimedat Declarationofcompetinginterest
+predictingtrafficconditionsduringwildfireevacuationandidentifying
+thecriticalsegmentsoftheroadnetworkthatnecessitatepre-firerisk The authors declare that they have noknown competing financial
+mitigationmeasures.ThisABMframeworkcangenerateoutputsatboth interestsorpersonalrelationshipsthatcouldhaveappearedtoinfluence
+disaggregatedandaggregatedlevels.Atthedisaggregatedlevel,itcan theworkreportedinthispaper.
+15
+
+===== PAGE 16 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+Appendix
+AppendixA:Surveydataonindividualandhouseholdcharacteristics
+Characteristics Classes Frequency
+Female 47.2%
+Gender
+Male 52.8%
+18–29 23.1%
+30–39 35.5%
+40–49 20.2%
+Age(years) 50–59 13.3%
+60–69 6.8%
+>=70 1.1%
+Lessthanahighschooldiploma 0.6%
+Highschooldiplomaorequivalent 15.4%
+Education Associatedegree 10.0%
+Bachelor’sdegree 58.5%
+Graduatedegree 15.5%
+Caucasian 68.4%
+Asian 12.0%
+AfricanAmerican 4.9%
+Ethnicity
+AmericanIndian,AlaskaNative,orNativeHawaiian 1.4%
+Twoormoreraces 5.7%
+Otherraces 7.6%
+Lessthan$49,999 28.6%
+$50,000to$99,999 47.9%
+Annualhouseholdincomebeforetaxes
+$100,000to$199,999 17.6%
+Over$200,000 5.9%
+Employed,working40ormorehoursperweek 71.1%
+Employed,workinglessthan40hperweek 16.3%
+Notemployed 5.5%
+Employment
+Retired 2.6%
+Disabled,notabletowork 1.0%
+Others 3.4%
+Personallyownedcar,truck,orvan 63.4%
+Personallyownedmotorcycle 10.2%
+Publictransportation(e.g.,bus,streetcarsubway) 5.7%
+Carpool 0.7%
+Sharedrides(e.g.,Uber,Lyft) 1.5%
+Modeofcommuting
+Taxicab 1.5%
+Personallyownedbicycle 1.5%
+Walk 2.1%
+Workfromhome 10.9%
+Other 2.5%
+Primarydecision-maker 23.8%
+Decision-makingrole Soledecision-maker 44.5%
+Sharedecision-makingrolesequallywithothers 31.7%
+1 16.3%
+2 19.2%
+FamilySize 3 21.4%
+4 32.6%
+5ormore 10.5%
+Ownwithoutmortgage 24.8%
+Ownwithmortgage 37.8%
+Propertyownership
+Rent 35.0%
+Other 2.4%
+Yes 54.5%
+Presenceofchildren
+No 45.5%
+Yes 26.1%
+Presenceofelderly
+No 73.9%
+Yes 25.4%
+Specialneedrequired
+No 74.6%
+None 9.5%
+1 57.2%
+Numberofvehiclesowned
+2 23.9%
+3ormore 9.4%
+(continuedonnextpage)
+16
+
+===== PAGE 17 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+(continued)
+Characteristics Classes Frequency
+Lessthan1year 4.8%
+1–3years 19.9%
+3–5years 21.6%
+Lengthofresidencyonthecurrentproperty 5–10years 25.0%
+10–15years 11.1%
+Morethan15years 17.6%
+None 24.3%
+Petonly 66.5%
+Animalownership
+Livestockonly 3.5%
+Bothpetandlivestock 5.7%
+Yes 99.3%
+Internetaccess
+No 0.7%
+Yes 98.1%
+Smartphoneaccess
+No 1.9%
+Yes 77.3%
+UseofGPS-navigationroutinely
+No 22.7%
+Notinsured 20.0%
+Homeownersinsurancestatus Under-insured 23.4%
+Fullyinsured 56.6%
+None 53.0%
+Once 18.8%
+Pastevacuationexperience 2–3times 21.0%
+4–5times 5.7%
+Morethan5times 1.5%
+Yes 26.7%
+Pastwildfire-inducedpropertydamage
+No 73.3%
+Noplan 46.5%
+Disasterplan Haveaplanbutnotinawrittenform 34.4%
+Haveawrittenplan 19.1%
+AppendixB:Surveydataonselectedevacuationdecisions
+Decisions Classes Frequency(%)
+Evacuatewithoutanyofficialannouncement 30.7%
+Evacuatewithavoluntaryevacuationorder 38.6%
+Evacuatewithamandatoryevacuationorder 27.4%
+EvacuationTiming
+Evacuateaftersmokeisobserved 1.2%
+Evacuateafterflames/embersareobserved 0.6%
+Stayanddefend 1.5%
+Friend’sorfamilymember’shouse 52%
+Hotelormotel 28.8%
+EvacuationDestination Publicshelter 8.9%
+Secondaryresidence 4.3%
+Others 6%
+AppendixC:Acomparisontableshowingthepredictionaccuraciesofregressionandmachinelearningmodelsforevacueeresponses
+Methods Evacuationtrigger Evacuationdestination Navigationuse
+Logisticregression 39.4% 64.8% 68.5%
+Decisiontree(m_depth,m_samples) 43.8%(10,4) 83.0%(16,6) 68.2%(6,26)
+Randomforest(n_trees,m_samples) 44.0%(50,6) 89.7%(190,2) 71.4%(30,18)
+Supportvectormachine(function,C,gamma) 42.8%(Gaussian,1,0.01) 90.2%(Gaussian,0.1,1) 71.1%(Gaussian,100,0.01)
+NaïveBayes(variant) 41.3%(Bernoulli) 60.6%(Gaussian) 68.4%(Gaussian)
+K-nearestneighbors(n_neighbors) 41.8%(6) 82.2%(2) 72.2%(12)
+Neuralnetwork(n_nodes,alpha,solver,activation) 43.2%(12,0.001,lbfgs,tanh) 78.2%(16,0.01,sgd,logistic) 71.8%(2,0.0001,lbfgs,logistic)
+Dataavailability References
+Datawillbemadeavailableonrequest. Abatzoglou,J.T.,2012.Developmentofgriddedsurfacemeteorologicaldatafor
+ecologicalapplicationsandmodeling.Int.J.Climatol.33(1),121–131.https://doi.
+org/10.1002/joc.3413.
+17
+
+===== PAGE 18 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+Alvarez,L.,&Fuller,T.2018.Californiafire:ThedevastationinParadise.TheNewYork geographicresolutions.In:Proceedingsofthe95thAnnualMeetingofthe
+Times.Availableat:https://www.nytimes.com/2018/11/11/us/california-fire-para TransportationResearchBoard,pp.10–14.
+dise.html.Accessed26August,2024. Kuligowski,E.D.,Walpole,E.H.,Lovreglio,R.,McCaffrey,S.,2020.Modellingevacuation
+Bar-Gera,H.,Konduri,K.,Sana,B.,Ye,X.andPendyala,R.M.,2009,January.Estimating decision-makinginthe2016ChimneyTops2fireinGatlinburg,TN.International
+surveyweightswithmultipleconstraintsusingentropyoptimizationmethods.Inthe JournalofWildlandFire29(12),1120–1132.https://doi.org/10.1071/WF20038.
+88thannualmeetingoftheTransportationResearchBoard,Washington,DC. Kuligowski,E.D.,Zhao,X.,Lovreglio,R.,Xu,N.,Yang,K.,Westbury,A.,Nilsson,D.,
+Beyki,S.M.,Santiago,A.,Laím,L.,Craveiro,H.D.,2023.EvacuationSimulationunder Brown,N.,2022.Modelingevacuationdecisionsinthe2019Kincadefirein
+ThreatofWildfire—AnOverviewofResearch,Development,andKnowledgeGaps. California.Saf.Sci.146,105541.
+Appl.Sci.13(17),9587. Kuligowski,E.D.,Waugh,N.A.,Sutton,J.,Cova,T.J.,2023.EmberAlerts:Assessing
+Beloglazov,A.,Almashor,M.,Abebe,E.,Richter,J.,Steer,K.C.B.,2016.Simulationof WirelessEmergencyAlertMessagesinWildfiresUsingtheWarningResponseModel.
+wildfireevacuationwithdynamicfactorsandmodelcomposition.Simul.Model. Nat.Hazard.Rev.24(2),04023009.
+Pract.Theory60,144–159. Lee,J.Y.andMa,F.,2023.Agent-basedModelingFrameworkforWildfireEvacuationin
+Benjaafar,S.,Dooley,K.andSetyawan,W.,1997.Cellularautomatafortrafficflow DamagedTransportationSettings.https://digital.lib.washington.edu/researchwork
+modeling.UniversityofMinnesota.RetrievedfromtheUniversityofMinnesota s/handle/1773/49800.Accessed4June,2024.
+DigitalConservancy,http://hdl.handle.net/11299/155096. Lee,J.Y.,Ma,F.,Li,Y.,2022.Understandinghomeownerproactiveactionsformanaging
+Brillinger,D.R.,Preisler,H.K.,Benoit,J.W.,2003.Riskassessment:aforestfireexample. wildfirerisks.Nat.Hazards114(2),1–23.
+LectureNotes-MonographSeries177–196. Li,D.,2022.Adata-drivenapproachtoimprovingevacuationtimeestimatesduring
+Burkard,R.E.,Dlaska,K.,Klinz,B.,1993.Thequickestflowproblem.ZeitschriftFür wildfiresforcommunitieswithpart-timeresidentsinthewildland-urbaninterface.
+OperationsResearch37(1),31–58. Int.J.DisasterRiskReduct.82,103363.
+Clayton,J.,Morris,R.,&Derico,B.2023.Revealed:MistakesthatblockedMauiwildfire Lopez,P.A.,Behrisch,M.,Bieker-Walz,L.,Erdmann,J.,Flo¨ttero¨d,Y.P.,Hilbrich,R.,
+escaperoutes.BBCNews.Availableat:https://www.bbc.com/news/world-us-ca Lücken,L.,Rummel,J.,Wagner,P.,Wießner,E.,2018.Microscopictraffic
+nada-67382947,accessed26August,2024. simulationusingsumo.In:201821stinternationalconferenceonintelligent
+Chen,X.,Zhan,F.B.,2014.Agent-basedmodelingandsimulationofurbanevacuation: transportationsystems(ITSC).IEEE,pp.2575–2582.
+relativeeffectivenessofsimultaneousandstagedevacuationstrategies.In:Agent- Ma,F.,Lee,J.Y.,2024.UnderstandingEvacuationBehaviorduringWildfires:Exploring
+BasedModelingandSimulation.PalgraveMacmillan,London,pp.78–96. KeyFactorsAffectingEvacueeBehaviorsandDevelopingPredictiveModelsfor
+ChenY.,YusefShafiS.,ChenY.,2020,SimulationPipelineforTrafficEvacuationin Decision-Making.FireTechnol.https://doi.org/10.1007/s10694-024-01683-w.
+UrbanAreasandEmergencyTrafficManagementPolicyImprovements.http://arxiv. Ma,F.,Lee,J.Y.,Camenzind,D.,Wolcott,M.P.,2022.ProbabilisticWildfireRisk
+org/abs/2002.06198. AssessmentMethodologyandEvaluationofaSupplyChainNetwork.Int.J.Disaster
+Christianson,A.C.,McGee,T.K.,Nation,W.L.F.,459.,2019.Wildfireevacuation RiskReduct.82,103340.
+experiencesofbandmembersofWhitefishLakeFirstNation459,Alberta,Canada. Mancheva,L.,Adam,C.andDugdale,J.,2019,May.Multi-agentgeospatialsimulationof
+NaturalHazards98(1),9–29.https://doi.org/10.1007/s11069-018-3556-9. humaninteractionsandbehaviourinbushfires.InInternationalConferenceon
+Cimellaro,G.P.,Ozzello,F.,Vallero,A.,Mahin,S.,Shao,B.,2017.Simulatingearthquake InformationSystemsforCrisisResponseandManagement.
+evacuationusinghumanbehaviormodels.Earthq.Eng.Struct.Dyn.46(6),985–1002. Mas,E.,Suppasri,A.,Imamura,F.,Koshimura,S.,2012.Agent-basedsimulationofthe
+Cohn,P.J.,Carroll,M.S.,Kumagai,Y.,2006.Evacuationbehaviorduringwildfires: 2011greateastJapanearthquake/tsunamievacuation:Anintegratedmodelof
+resultsofthreecasestudies.West.J.Appl.For.21(1),39–48.https://doi.org/ tsunamiinundationandevacuation.J.Nat.Dis.Sci.34(1),41–57.
+10.1093/wjaf/21.1.39. Massada,A.B.,Syphard,A.D.,Stewart,S.I.,Radeloff,V.C.,2012.Wildfireignition-
+CommunitiesCommittee,2004.Preparingacommunitywildfireprotectionplan:a distributionmodelling:acomparativestudyintheHuron–ManisteeNationalForest,
+handbookforwildlandurbaninterfacecommunities.CommunitiesCommittee,etal. Michigan,USA.Int.J.WildlandFire22(2),174–183.
+Availableat:https://www.forestsandrangelands.gov/documents/resources McCaffrey,S.,Wilson,R.,Konar,A.,2018.ShouldIstayorshouldIgonow?OrshouldI
+/communities/cwpphandbook.pdf.Accessed4June,2024. waitandsee?Influencesonwildfireevacuationdecisions.RiskAnal.38(7),
+Cova,T.J.,Johnson,J.P.,2002.Microsimulationofneighborhoodevacuationsinthe 1390–1404.
+urban–wildlandinterface.EnvironPlanA34(12),2211–2229. McGee,T.K.,Nation,M.O.,Christianson,A.C.,2019.Residents’wildfireevacuation
+Cova,T.J.,Dennison,P.E.,Kim,T.H.,Moritz,M.A.,2005.Settingwildfireevacuation actionsinMishkeegogamangOjibwayNation,Ontario,Canada.Int.J.DisasterRisk
+triggerpointsusingfirespreadmodelingandGIS.Trans.GIS9(4),603–617. Reduct.33,266–274.https://doi.org/10.1016/j.ijdrr.2018.10.012.
+deAraujo,M.P.,Lupa,M.R.,Casper,C.T.,Waters,B.,2014.WildfireEvacuationScenario Mozumder,P.,Raheem,N.,Talberth,J.,Berrens,R.P.,2008.Investigatingintended
+inColorado.TransportationResearchRecord:JournaloftheTransportationResearch evacuationfromwildfiresinthewildland–urbaninterface:applicationofabivariate
+Board.2430,133–144. probitmodel.ForestPolicyEcon.10(6),415–423.
+D’Orazio,M.,Spalazzi,L.,Quagliarini,E.,Bernardini,G.,2014.Agent-basedmodelfor Namazi-Rad,M.R.,Mokhtarian,P.,Perez,P.,2014.Generatingadynamicsynthetic
+earthquakepedestrians’evacuationinurbanoutdoorscenarios:Behavioural population–usinganage-structuredtwo-sexmodelforhouseholddynamics.PLoS
+patternsdefinitionandevacuationpathschoice.Saf.Sci.62,450–465. One9(4),e94761.
+Epstein,J.M.,1999.Agent-basedcomputationalmodelsandgenerativesocialscience. Naser,M.Z.,2021.Canpastfailureshelpidentifyvulnerablebridgestoextremeevents”
+Complexity4(5),41–60. Abiomimeticalmachinelearningapproach.Eng.Comput.37,1099–1131.
+Feng,K.,Li,Q.,Ellingwood,B.R.,2020.Post-earthquakemodellingoftransportation Niu,C.,Nair,D.J.,Zhang,T.,Dixit,V.,Murray-Tuite,P.,2022.Arewildfirefatalities
+networksusinganagent-basedmodel.Struct.Infrastruct.Eng.16(11),1578–1592. relatedtoroadnetworkcharacteristics?Apreliminaryanalysisofglobalwildfire
+Finney,M.A.,2002.Firegrowthusingminimumtraveltimemethods.Can.J.For.Res.32 cases.Int.J.DisasterRiskReduct.80,103217.
+(8),1420–1424. Owens,J.,Hawkins,E.M.,2019.Usingonlinelabormarketparticipantsfor
+Finney,M.A.,McHugh,C.W.,Grenfell,I.C.,Riley,K.L.,Short,K.C.,2011.Asimulationof nonprofessionalinvestorresearch:AcomparisonofMTurkandQualtricssamples.
+probabilisticwildfireriskcomponentsforthecontinentalUnitedStates.Stoch.Env. J.Inf.Syst.33(1),113–128.
+Res.RiskA.25(7),973–1000. Pan,X.,2006.Computationalmodelingofhumanandsocialbehaviorsforemergency
+Grajdura,S.A.,Borjigin,S.G.,Niemeier,D.A.,2020.November.Agent-basedwildfire egressanalysis.StanfordUniversity.
+evacuationwithspatialsimulation:acasestudy.In:InProceedingsofthe3rdACM Peris-Sayol,G.,Paya-Zaforteza,I.,Balasch-Parisi,S.,Also-Moya,J.,2017.Detailed
+SIGSPATIALInternationalWorkshoponGeoSpatialSimulation,pp.56–59. analysisofthecausesofbridgefiresandtheirassociateddamagelevels.J.Perform.
+Hamacher,H.W.andTjandra,S.A.,2001.Mathematicalmodellingofevacuation Constr.Facil31(3),04016108.
+problems:Astateofart.In:PedestrianandEvacuationDynamics(pp227-266). Preisler,H.K.,Brillinger,D.R.,Burgan,R.E.,Benoit,J.W.,2004.Probabilitybasedmodels
+Springer,Berlin. forestimationofwildfirerisk.Int.J.WildlandFire13(2),133–142.
+Hung,L.S.,Wang,C.,2022.Integratinganintrahouseholdperspectiveintoclimate Richards,G.D.,1990.Anellipticalgrowthmodelofforestfirefrontsanditsnumerical
+changeadaptationresearch.EnvironmentalScience&Policy131,143–148. solution.Int.J.Numer.Meth.Eng.30(6),1163–1179.
+Intini,P.,Ronchi,E.,Gwynne,S.,Pel,A.,2019.Trafficmodelingforwildland–urban Roberson,B.S.,Peterson,D.,Parsons,R.W.,2012.Attitudesonwildfireevacuation:
+interfacefireevacuation.JournalofTransportationEngineering,PartA:Systems145 ExploringtheintendedevacuationbehaviorofresidentslivingintwoSouthern
+(3),04019002. Californiacommunities.JournalofEmergencyManagement10(5),335–346.https://
+Jain,S.,Ronald,N.,Winter,S.,2015.December.Creatingasyntheticpopulation:A doi.org/10.5055/jem.2012.0111.
+comparisonoftools.In:Proceedingsofthe3rdConferenceTransportationResearch Rodrigues,M.,DelaRiva,J.,2014.Aninsightintomachine-learningalgorithmsto
+Group,pp.17–20. modelhuman-causedwildfireoccurrence.Environ.Model.Softw.57,192–201.
+Katzilieris,K.,Vlahogianni,E.I.,Wang,H.,2022.Evacuationbehaviorofaffected Seebauer,S.,Fleiß,J.,Schweighart,M.,2017.Ahouseholdisnotaperson:Consistencyof
+individualsandhouseholdsinresponsetothe2018Atticawildfires:Fromempirical pro-environmentalbehaviorinadultcouplesandtheaccuracyofproxy-reports.
+datatomodels.Saf.Sci.153,105799.https://doi.org/10.1016/j.ssci.2022.105799s. EnvironmentandBehavior49(6),603–637.https://doi.org/10.1177/
+Keeley,J.E.,Syphard,A.D.,2021.LargeCaliforniawildfires:2020firesinhistorical 0013916516663796.
+context.FireEcol.17(1),1–11. Siam,M.R.,Wang,H.,Lindell,M.K.,Chen,C.,Vlahogianni,E.I.,Axhausen,K.,2022.An
+Kennedy,R.,Clifford,S.,Burleigh,T.,Waggoner,P.D.,Jewell,R.,Winter,N.J.,2020.The interdisciplinaryagent-basedmultimodalwildfireevacuationmodel:critical
+shapeofandsolutionstotheMTurkqualitycrisis.Polit.Sci.Res.Methods8(4), decisionsandlifesafety.Transp.Res.PartD:Transp.Environ.103,103147.
+614–629.https://doi.org/10.1017/psrm.2020.6. Sinuany-Stern,Z.,Stern,E.,1993.Simulatingtheevacuationofasmallcity:theeffectsof
+Koksal,K.,McLennan,J.,Every,D.,Bearman,C.,2019.Australianwildland-urban trafficfactors.Socioecon.Plann.Sci.27(2),97–108.
+interfacehouseholders’wildfiresafetypreparations:‘Everydaylife’projectpriorities Syphard,A.D.,Keeley,J.E.,Gough,M.,Lazarz,M.,Rogan,J.,2022.WhatMakes
+andperceptionsofwildfirerisk.Int.J.DisasterRiskReduct.33,142–154. WildfiresDestructiveinCalifornia?Fire5(5),133.
+Konduri,K.C.,You,D.,Garikapati,V.M.,Pendyala,R.,2016.January.Applicationofan
+enhancedpopulationsynthesismodelthataccommodatescontrolsatmultiple
+18
+
+===== PAGE 19 =====
+
+F.MaandJ.Y.Lee SafetyScience187(2025)106835
+Taylor,J.G.,Gillette,S.C.,Hodgson,R.W.,&Downing,J.L.2005.Communicatingwith Wolshon,B.,MarchiveIII,E.,2007.Emergencyplanningintheurban-wildlandinterface:
+wildlandinterfacecommunitiesduringwildfire(No.2005-1061).USGeological Subdivision-levelanalysisofwildfireevacuations.JournalofUrbanPlanningand
+Survey. Development133(1),73–81.
+Toledo,T.,Marom,I.,Grimberg,E.,Bekhor,S.,2018.Analysisofevacuationbehaviorin Wong,S.D.,Broader,J.C.,Walker,J.L.,Shaheen,S.A.,2022.UnderstandingCalifornia
+awildfireevent.Int.J.DisasterRiskReduct.31,1366–1373.https://doi.org/ wildfireevacueebehaviorandjointchoicemaking.Transportation1–47.https://doi.
+10.1016/j.ijdrr.2018.03.033. org/10.1007/s11116-022-10275-y.
+U.S.CensusBureau.,2021.AmericanCommunitySurvey.Retrievedfromhttps://www. Xu,N.,Lovreglio,R.,Kuligowski,E.D.,Cova,T.J.,Nilsson,D.,Zhao,X.,2023.Predicting
+census.gov/programs-surveys/acs. andAssessingWildfireEvacuationDecision-MakingUsingMachineLearning:
+Wahlqvist,J.,Ronchi,E.,Gwynne,S.M.,Kinateder,M.,Rein,G.,Mitchell,H., Findingsfromthe2019KincadeFire.FireTechnology59(2),793–825.https://doi.
+Kuligowski,E.,2021.Thesimulationofwildland-urbaninterfacefireevacuation: org/10.1007/s10694-023-01363-1.
+TheWUI-NITYplatform.Saf.Sci.136,105145. Ye,X.,Konduri,K.,Pendyala,R.M.,Sana,B.andWaddell,P.,2009,January.A
+Walpole,H.D.,Wilson,R.S.,McCaffrey,S.M.,2020.Ifyouloveit,letitgo:theroleof methodologytomatchdistributionsofbothhouseholdandpersonattributesinthe
+homeattachmentinwildfireevacuationdecisions.EnvironmentSystemsandDecisions generationofsyntheticpopulations.In88thAnnualMeetingoftheTransportation
+40,29–40.https://doi.org/10.1007/s10669-019-09741-3. ResearchBoard,Washington,DC.
+Westerling,A.L.,Hidalgo,H.G.,Cayan,D.R.,Swetnam,T.W.,2006.Warmingandearlier Yin,W.,Murray-Tuite,P.,Ukkusuri,S.V.,Gladwin,H.,2014.Anagent-basedmodeling
+springincreasewesternUSforestwildfireactivity.Science313(5789),940–943. systemfortraveldemandsimulationforhurricaneevacuation.Transp.Res.PartC
+EmergingTechnol.42,44–59.
+19

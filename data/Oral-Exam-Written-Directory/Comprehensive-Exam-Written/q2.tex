@@ -1,0 +1,679 @@
+% =============================================================================
+%  Q2 — Behavioral Assumptions in Evacuation and Contraflow Modeling
+%  References for this question live in refQ2.bib
+%
+%  GROUNDED WORKFLOW FOR THIS ANSWER:
+%    1. Start from the real Q2 PDFs in:
+%         assets/Candidacy-Paper-reference/Question2ref/
+%    2. Use extracted text only as a search aid:
+%         assets/Candidacy-Paper-reference/_extracted/Question2ref/
+%    3. Use the generated index only for quick orientation:
+%         assets/Candidacy-Paper-reference/Question2ref/Question2ref.md
+%    4. Final claims must be grounded in:
+%         (a) PDF-verified literature,
+%         (b) AutoTrafficSim architecture,
+%         (c) Korede's real traffic-simulation experience, or
+%         (d) clearly marked proposal language.
+%
+%  MAIN ANSWER LOGIC:
+%    - Standard detector data can fit flow/speed/counts but cannot directly
+%      identify compliance, warning response, departure timing, rerouting, or
+%      stress behavior.
+%    - Therefore, do not hide these behaviors as calibration constants.
+%      Represent them as explicit assumptions/priors, cite why they are
+%      plausible, and test sensitivity across defensible ranges.
+%    - AutoTrafficSim is positioned as the architecture that records those
+%      assumptions, generates scenario families, runs the simulator, evaluates
+%      outcomes, and exposes decision-relevant uncertainty.
+%
+%  STYLE AND DEFENSIBILITY:
+%    - Use first-person proposal voice where the system is not built yet.
+%    - Do not claim completed results for AutoTrafficSim.
+%    - Do not invent data, percentages, parameter values, or personal stories.
+%    - If a sentence cannot be defended in oral exam, weaken or delete it.
+% =============================================================================
+
+\iffalse
+My Q2 note starting from:Pel, Bliemer, and Hoogendoorn (2012)
+
+What evacuation behavior is actually observable, and what is still assumed?
+Which assumption would I refuse to hide inside calibration?
+What does contraflow solve, and what can it make worse?
+Why is “panic” the wrong default modeling language?
+What would I test in my own I-210/SR-134 wildfire case?
+Where exactly does AutoTrafficSim help beyond SUMO: assumption tracking, scenario testing, or interpretation?
+
+
+
+The success of evacuate strongly depends on warning time, response time, info and instruction dissemination
+procedure, evac route and traffic flow conditions with the dynamics of the measures. 
+
+
+"This is lifted directly from \cite (pil). this is a strong argument for scientific discovery of an 
+agentic autotraffic simulator worthy of discovery knowledge if done well."
+
+We have seen how earlang2S in our first paper was able to model arrival pattern for us efficiently at the lane level of 
+traffic. 
+
+
+""
+These traffic simulation models can be applied to obtain a better
+understanding of the evacuation conditions and the effect of traffic regulations and control
+measures hereon, by predicting departure and arrival patterns, travel times, average speeds,
+queue lengths, traffic flow rates, etc. Insight into this dynamic process is necessary to make
+founded decisions on, for instance, the latest possible time to start evacuation, the best
+evacuation routes, or the most suitable traffic management measures.
+""
+
+What need modeling:
+1. Choice to evacuate
+2. departure time choice
+3. destination choice
+4. route choice
+--- Evacuation participation and departure time choice: Dynamic evacuation demand via repeated binary logit model. 
+--- For destination choice: More research is needed to ground the: location type specific destination choice models 
+--- For evacuate route choice: Argue in favour of hybrid route choice model that allows following instruction route and en-route switches. 
+
+The below mapping is how this choices are to be mapped based on pels. 
+
+model components:                       behavior discribed by each
+1.dynamic travel demand model  --------- Evacuation participation-----   departure time choice: Models the number of people who will evacuate and when they will depart.
+Once the area to be evaquated is identified as we have done with out 210/134 route, participation can be modelled subsequentally or simultaouly. 
+the common model used is weibul and sigmoid curve. 
+Repeated binary logit model. 
+
+
+
+dynamic trip distribution model, -----  destination choice
+dynamic traffic assignment model.  -----  and route choice               
+
+
+Behavioral modeling talks about evacuation participation, departure time choice and this can be modeled by dynamic travel demand modeling. 
+For destination choice behavior, this can be modeled by dynamic trip distribution modeling and the last behavioral modeling is route choice which can be modelled by 
+dynamic traffic assignment modeling. 
+
+based in the Q2, I need to map behaviours into modeling 
+complience: this is abviously mapped into dynamic travel demend modeling with participation and depature time choice as named by (pel)
+rerouting: (what should this be mapped to?): Should be on the dynamic traffic assignment. hybrid route choice that 
+mix pre-trip route and en-route route choice might be suitable for this since part planning and en-route accessment based on severity of desaster at each link
+can be use to evaluate choice at each junction. So at a junction one may let all cars check severity ahead and see if control flow measure is suitable. 
+"En-route and hybrid route choice models have another related advantage over pre-trip
+route choice models. Namely, the ability to model real-time traveller responses to changes
+in the road network conditions due to the hazard’s evolution in space and time (e.g., road
+sections becoming inaccessible due to flooding) and dynamic traffic regulations and control
+measures (e.g., contraflow operations to increase outbound capacity)."
+
+Finally, when testing and evaluating optimal evacuation routes, hybrid route choice
+models allow simulating partial traveller compliance behaviour, which is most likely to
+occur, as argued in.... By varying
+the minimum improvement that travellers require before deviating from their dedicated
+evacuation route, insight can be gained into the impact of evacuation instructions under
+various traveller compliance levels. This enables both testing the robustness of existing
+evacuation plans towards uncertain traveller compliance levels,
+In sum, hybrid route choice models are the most flexible and likely also the most
+appropriate approach in modelling travellers’ route choice behaviour during evacuation, as
+these allow incorporating the impact of dynamic traffic information, changes in the road
+network conditions, and partial traveller compliance behaviour towards evacuation route
+instructions.
+
+
+
+panic effect: (how about this?)
+
+
+Does this solve what I need" In all these models the origin–destination travel demand is either model input or is
+computed using a gravity-model based trip distribution model, or a combination of the two."
+
+depature time is models via a distribution (weibull, Poison etc) and dynamic origin destination matrix is preknown. 
+
+Literature largely support/suggest that people will rather make their own independent judgement during 
+an evacuation order and may not listen to public officers by making their own independent evacuation plans. 
+
+
+
+
+
+Developing Transportation Response Strategies for Wildfire Evacuations via an Empirically Supported Traffic Simulation of Berkeley, California
+Bingyu Zhao
+
+Zhao and Wong made some interesting assumption in there 2021 paper. 
+1.Network assumption even though the choosen area was affected by fire at all. 
+clean all data via OSM and received the nodes and link
+2. fire propagation assumption: eg all house hold traveling in a single car, evacuation notification given 15min prior. control flow measure allowed on a link
+speeed-density-fire spread bases. specifically "The hypothesized fire starts shortly before 11:00 am on a weekend, same as the Oakland Hills Fire. All households are assumed to be at home. These two critical assumptions were used to constitute a “worse-case” scenario."
+3. evacuation zone assumption: locations. For this study, we generated a random list of origin-destination pairs, where 30%, 30%, 30%, and 10% of the vehicles evacuate to destinations within 1-2 miles, 2-3 miles, 3-4 miles, and 5 or more miles. Our local focus stems from our survey data that found upwards of two-thirds of evacuees remained within their county of origin. The treatment of destination choices is simplistic, as evacuees’ destinations could be influenced multiple factors (e.g., availability of shelters, proximity to resources, safety of the destination). Moreover, we did not ask for exact destinations
+4. Transportation response scenario: We tested a range of wildfire evacuation scenarios, which can be categorized into three groups: hazard (fire speed), evacuation behavior (departure time, towed vehicle demand, transportation mode choice, GPS-enabled rerouting), and policies/responses (phased evacuation, contraflow). For a set of scenario variables, a base case value was chosen for comparison.
+For example, mode choice with a focus on vehicles per household was used as a key behavioral parameter. About 41% to 45% of evacuees depending on wildfire used two vehicles to evacuate. Moreover, an additional 9% to 17% of evacuees depending on wildfire used three or more vehicles to evacuate.
+
+TABLE TWO of Zhao gives more info. Zhao Limitation is a gold for this work in terms of behavioral assumptions. I think that limitation needs to be nit picked and used for this work. 
+
+Also he concluded with: Most critically, simulations are not perfect representatives of real-life behavior. The number of factors, random events, and governmental decisions would be nearly impossible to model. We acknowledge that our simulation, while incorporating past behavioral data, could be continuously improved with greater realism. This might also include how demographic characteristics impact the decision to evacuate or stay/defend (see (6–8,11,13)). Though, most of these studies have found that risk perceptions, not demographics, are better predictors of choice. Regardless, integrating discrete choice analyses with this simulation framework is a logical next step. Finally, the simulation framework is not straightforward for agencies to use directly due to the lack of an interactive dashboard. Efforts are being made to make the code and data open-sourced, as discussed in Section 3.4. Our aim is to produce a workable simulation model that is a stepping stone for more behaviorally driven research.
+
+
+Critical ... Effect of fire speed vs evacuation time. (Scenario.) Now when we are talking about hypothesis generation and scenario testing. 
+
+One can model at a good speed with autotrafficsim:
+1. fire speed vs evation time scenation. (fire speed: fast, medium, slow)  --- evacuation time (early depature, mid time, late depature). 
+2. we can also generate hypothesis with route choice modeling. I know they use Dijkstra.  (O dynamic origin destination) 
+3. We can also add contro flow to the mix .   (no contro flow, partial contro flow, full contro flow)
+
+We can have a matric of sceneario and form a mathematical model off them. What is the correction and relation between the below: 
+the below is my own hypothesis new knowledge generator. I need this as a table in the Answers
+
+fire speed            : full speed        medium speed         slow speed 
+evacuatio time        : ealy departure    med departure        late departure
+route choice          : pre-selected      dynamic selection    hybrid mix (pre-planned and dynamic selection mid travel due to link congestion and density)
+control flow          : No contro flow    half contra flow     full contraflow 
+phased evacuation     : No evac           phases               full evacuation : (How does this cause panic mode???? )
+behavioral assumptio  :Is this needed or mapped. (eg GPS data I am not sure of this. ) eg Transportation towing, mode split. 
+
+shows a reduction of 53% of exposed vehicles after implementing contraflow to the evacuation zone boundary. In the extended contraflow scenario, the number of exposed vehicles reduced by 73% compared to the baseline.
+
+
+
+3. We can measure and generate scerio based on all these effects and how they affect evation. 
+
+. Increased and rapid fire speed cut up with vehicles easily but as noted in research, evacute are not gonna wait 
+for fire to get to their house before they leave. 
+
+
+
+
+(I am guessing based on initial read: They incoporate survay data from real evacutes to models those behavioral assumptions that data can't capture)
+Then limit's household travel vehicle to 1 vehicle and only allow GPS enabled dynamic traffic rerouting and lastly 
+control flow (turning all vehicles away from the danger: road turn around away from desaster). Fire dynamics is also models
+
+Found GPS routing service and contra flow to be very effective. 
+To answer these questions, we developed a spatial-queue-based traffic simulation that integrates post-disaster wildfire survey data from three wildfires - the 2017 Northern California Wildfires, the 2017 Southern California Wildfires, and the 2018 Carr Wildfire - for several evacuation choices.
+
+""""
+VERY IMPORTANT:
+Most critically, simulations are not perfect representatives of real-life behavior. The number of factors, random events, and governmental decisions would be nearly impossible to model. We acknowledge that our simulation, while incorporating past behavioral data, could be continuously improved with greater realism. This might also include how demographic characteristics impact the decision to evacuate or stay/defend (see (6–8,11,13)). Though, most of these studies have found that risk perceptions, not demographics, are better predictors of choice.
+"""
+THIS IS IMPORTANT TO Q2: 
+To begin addressing these two key limitations, we developed several research questions:
+1. What behavioral assumptions in simulations could be replaced by previously collected evacuation data?
+2. What key factors should be integrated into traffic simulations to balance realism, computational complexity, and generalizability?
+3. What transportation responses/strategies could be simulated and how might responses/strategies differ?
+
+
+Altogether, the literature lacks in several areas: 1) fully understanding evacuee behavior, and 2) having enough survey data for most or all choices in wildfire evacuations. In addition, survey data has yet to be fully integrated into evacuation simulation models as behavioral variables are currently created via assumptions, expert opinions, and/or hypothesized statistical distributions.
+Apart from the wildfire specific studies referenced above, no-notice or short-notice evacuation under other types of hazards (e.g., truck attack, flash flood, or general emergency situations) have long attracted researchers’ attention (18–21). Research in this area can be categorized into two types. The first type focuses on understanding the evacuation demand, such as participation rates, origin locations, departure times, and destination locations (22). The second type analyzes operational strategies to accomplish the evacuation safely and efficiently (23). On the demand side, compared to early, self-organized evacuations, no- or short-notice evacuations are often characterized by excess levels of stress and uncertainties associated with dire situations (20,24). As a result, evacuees’ behaviors might differ from their response to long-notice evacuations. In addition, short-notice evacuations also have distinct phases (e.g., anticipation, warning, displacement, notification, and return and recovery) (24). Different evacuation behaviors are associated with each phase. Surveys and statistical models have been used to elicit qualitative and quantitative insights on the evacuation behavior parameters, such as the reasons and ratios of people choosing to stay in shelters, hotels, or with family/friends (22,24). It is also recognized that different behavior parameters are interconnected and correlated, and models with correlation structures have been used to capture their joint distribution (22).
+
+
+
+Ronchi, Reneke, and Peacock (2014)
+In fact, two main
+questions can be asked during the simulation of evacuation scenarios that
+include distributions or stochastic variables: (1) Which occupant-evacuation time
+curve is representative of model predictions in a fire safety design? (2) Which
+occupant-evacuation time curve should be used as reference during the comparison
+with experimental data in a validation study? To date, the answers to these
+questions are left to a qualitative judgment by the evacuation model user.
+
+
+
+Simulating the Impact of Dynamic Rerouting on
+Metropolitan-scale Traffic Systems
+CY CHAN, Lawrence Berkeley National Laboratory  
+
+\fi
+
+\begin{bibunit}[plainnat]
+
+\section{Q2.\ Behavioral Assumptions in Evacuation and Contraflow Modeling}
+
+\begin{quote}\itshape
+In your evacuation and contraflow study, how do you model and justify behavioral assumptions (e.g., compliance, rerouting, panic effects) that are rarely observed in standard datasets? What is the fundamental need for your agentic simulation framework given that existing tools like SUMO with calibration and optimization can already reproduce observed data, and how does your approach go beyond fitting to enable new, generalizable knowledge?
+\end{quote}
+
+\subsection{Q2.1\ Modeling unobserved behaviors}
+
+\textit{How do you model and justify behavioral assumptions (e.g., compliance, rerouting, panic effects) that are rarely observed in standard datasets?}
+
+\citet{pel2012evacuationbehavior} make the framing for this question
+explicit that the success of an evacuation strongly depends on many factors,
+such as warning time, response time, information and instructions
+dissemination procedure, evacuation routes, traffic flow conditions,
+dynamic traffic control measures, etc. Standard detector data do not
+observe any of these directly. They observe flows, speeds, and counts. The
+practical question is therefore not whether AutoTrafficSim can fit observed
+flow, but which of Pel's factors must be represented for the I-210 and
+SR-134 decision, which ones can be grounded in data, and which assumptions
+must remain visible during scenario testing.
+
+\citet{pel2012evacuationbehavior} also give me the modeling map. Evacuation
+behavior is not one decision. They decompose it into four:
+\begin{itemize}
+    \item \textbf{Whether to evacuate} and \textbf{when to leave}.
+    This is modeled by the dynamic travel demand model, where, the number
+    of people that will participate in the evacuation is predicted, as well
+    as their departure times.
+    \item \textbf{Where to go.} This is modeled by the dynamic trip
+    distribution model. Pel notes that for destination choice, further
+    research is needed.
+    \item \textbf{Which route to take, and whether to switch en route.}
+    This is modeled by the dynamic traffic assignment model. Pel argues in
+    favor of a hybrid route-choice formulation that admits both pre-trip
+    routes and en-route switches under dynamic controls such as contraflow.
+\end{itemize}
+Each row of Table~\ref{tab:q2_pel_mapping} maps one of these decisions onto
+the AutoTrafficSim component that would carry it, the first implementation
+I would attempt, and the assumption I would keep visible rather than hide
+inside calibration.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\caption{Evacuation behavioral decisions mapped to Pel's model components and to the AutoTrafficSim components that would carry them.}
+\label{tab:q2_pel_mapping}
+\begin{tabularx}{\textwidth}{
+  >{\raggedright\arraybackslash}p{2.8cm}
+  >{\raggedright\arraybackslash}p{3.0cm}
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{3.5cm}}
+\toprule
+\textbf{Behavioral decision} &
+\textbf{Pel's model component} &
+\textbf{AutoTrafficSim implementation} &
+\textbf{What remains uncertain} \\
+\midrule
+Whether households evacuate and when they leave &
+Dynamic travel demand model &
+Participation rate and response curve are kept as scenario inputs in the
+\textbf{Scenario DSL} and varied across a literature-grounded range. &
+Warning response, departure delay, and how compressed the departure curve is
+after warning. \\
+\midrule
+Where households go &
+Dynamic trip distribution model &
+The origin--destination matrix is an explicit input in the
+\textbf{Scenario DSL} using survey-grounded ranges where available. &
+Exact destinations. A location-specific destination-choice model is a later
+extension. \\
+\midrule
+Which routes vehicles take and whether they switch &
+Dynamic traffic assignment model &
+The \textbf{Simulation Layer} starts each vehicle on a pre-trip route and
+allows en-route switching when conditions change. The
+\textbf{Runtime Invariant Monitor} checks lane integrity and event ordering
+on the resulting trace. &
+Information access, partial compliance, and the minimum improvement
+required before switching. \\
+\midrule
+How households respond to route guidance &
+Dynamic traffic assignment input &
+The fraction of vehicles receiving or following route guidance is a
+scenario variable in the \textbf{Scenario DSL}. \textbf{Metrics
+Computation} reports clearance time and exposed vehicles for each
+fraction. &
+The level of route-guidance compliance during a wildfire evacuation. \\
+\midrule
+How many vehicles each household adds &
+Dynamic travel demand input &
+One-vehicle and multi-vehicle cases are encoded in the
+\textbf{Scenario DSL} using Zhao and Wong's survey ranges. &
+Household vehicle use and towing demand. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Two additional scenario inputs are required. Fire spread changes link
+availability over time. Contraflow changes outbound capacity and the available
+paths. These changes are why a static pre-trip route is not enough for this
+study.
+
+Dynamic traffic assignment is the required modeling direction for my
+contraflow study. I am not proposing a full dynamic user-equilibrium solver for
+the first implementation. Vehicles begin with a pre-trip route and may switch
+en route when conditions change. Pel argues for this hybrid route-choice model
+because it can represent road closures, dynamic traffic controls such as
+contraflow, and partial compliance with evacuation instructions
+\citep{pel2012evacuationbehavior}. The minimum improvement required before a
+driver switches routes remains visible as a scenario assumption.
+
+\citet{ronchi2014uncertainty} name the kind of uncertainty this introduces.
+They separate ``model input uncertainty,'' the assumptions employed to
+derive model input from experiments, from ``intrinsic uncertainty,'' the
+assumptions intrinsic to the model formulation itself. Compliance fraction,
+departure-curve shape, and en-route switching thresholds are model-input
+uncertainty in their sense: they are not measured by loop detectors, and
+AutoTrafficSim must record them as scenario inputs the Adaptive Feedback
+Loop varies, not as calibration constants the Evaluation Layer treats as
+ground truth.
+
+\citet{zhao2021berkeleywildfire} show what survey data can and cannot do.
+Their Berkeley model uses post-disaster survey data from the 2017 Northern
+California Wildfires, the 2017 Southern California Wildfires, and the 2018
+Carr Wildfire. That grounds household vehicle use, departure behavior,
+GPS-enabled rerouting, and destination ranges: about 41 to 45 percent of
+evacuees used two vehicles and an additional 9 to 17 percent used three or
+more, depending on the wildfire. But the survey data do not remove
+assumptions. The model still has to choose fire-spread rate, destination
+rules, rerouting access, phased evacuation, and contraflow design.
+AutoTrafficSim should record those assumptions in the Knowledge Layer and
+test whether they change the decision through the scenario sweep driven by
+the Agent Layer.
+
+\citet{quarantelli2001panic} tells me how to handle the behavior I would
+treat most carefully. His review shows that ``panic flight is very rare''
+and that panic is not the normal response to disaster. Pel reaches the same
+conclusion from the simulation literature: ``panicking behaviour has been
+shown to be quite an uncommon reaction to an emergency situation.'' I would
+therefore not add a vague panic switch just because the scenario is a
+wildfire. If stress must enter the traffic model, it enters through bounded
+driver parameters (reaction time $T$, desired headway, deceleration limits)
+that the simulation and the Runtime Invariant Monitor can interpret
+\citep{treiber2013book}.
+
+
+\subsection{Q2.2\ Why an agentic framework, not only a simulation engine}
+
+\textit{What is the fundamental need for your agentic simulation framework given that existing tools like SUMO with calibration and optimization can already reproduce observed data?}
+
+\citet{lopez2018sumo} describe SUMO as a mature open-source microscopic
+traffic simulator, and it can. The question is who builds the scenario
+in the first place, who picks the car-following law, the arrival process,
+and the lane-change model, and who recognizes when a parameter setting
+produces a physically inadmissible trajectory. That work today takes a
+graduate student years of apprenticeship before they can produce a
+microscopic traffic model defensible enough for review. SUMO does not
+shorten that apprenticeship. It assumes it has already happened.
+
+AutoTrafficSim is the agentic framework around the simulation engine
+that is intended to compress that apprenticeship. The architecture is
+domain-agnostic: it is built for discrete-event simulation, not only for
+traffic. The same agent that proposes a Gipps-versus-IDM model and
+routes the trace through a Formal Validator and Runtime Invariant
+Monitor could drive a supply-chain DES, a manufacturing DES, or a
+healthcare-queueing DES. The wildfire evacuation case in Q2.3 is the
+first demonstration, not the architectural scope.
+
+The standard calibration objective
+\[
+  \min_{\theta}\ \sum_t
+  \left\|y_t^{\mathrm{obs}} - y_t^{\mathrm{sim}}(\theta)\right\|^2
+\]
+tunes $\theta$ once the model structure $y_t^{\mathrm{sim}}(\cdot)$ is
+already chosen. The agentic contribution is upstream of $\theta$. It is
+the choice of $y_t^{\mathrm{sim}}$ itself: which car-following law,
+which arrival process, which lane-change rule, which scenario inputs.
+
+The agent does not work alone. Each proposal is checked. The
+\textbf{Formal Validator} rejects scenarios already wrong by
+construction (malformed DSL, density above jam, simultaneous-tick
+arrivals), which are the failures a senior researcher catches by
+experience. The \textbf{Runtime Invariant Monitor} catches the failures
+that appear only during execution (spacing below $\ell_i$, acceleration
+outside $[-b_{\max}, a_{\max}]$, flow violations), which are the
+failures that take a graduate student years of trace inspection to learn
+to spot. The \textbf{Adaptive Feedback Loop} returns each failure with a
+reason code, so the next proposal is bounded by the diagnostic rather
+than free-form regeneration \citep{yan2025guiding}. Q1.1 and Q1.2
+develop these mechanisms in detail.
+
+The pattern is not specific to traffic.
+\citet{koohestani2025agentguard} build the same idea for general agentic
+systems through an inspection layer, an online-learned model, and a
+threshold-based dashboard. \citet{srinivasan2025dura} formalize it as
+multi-role orchestration for cyber-physical systems, with SafetyMonitor,
+FaultInjector, and RecoveryPlanner roles closing the loop around a CPS
+simulator. \citet{kwon2026aivv} apply the same pattern to AI
+verification and validation. AutoTrafficSim is the first instance of
+this pattern, to my knowledge, applied to discrete-event simulation of
+microscopic traffic.
+
+The fundamental need is therefore not that SUMO cannot run a scenario.
+The fundamental need is that building the scenario (model selection,
+parameter choice, trace inspection, revision) is the slow part of
+scientific simulation work, and an agentic framework with the right
+architectural checks compresses that work into hours instead of years.
+The simulation engine is a substitution point: ScalaTion is the
+inspectable research engine in our lab, SUMO is the established
+open-source alternative, and another DES engine would also work.
+
+\subsection{Q2.3\ From fitting to generalizable knowledge}
+
+\textit{How does your approach go beyond fitting to enable new, generalizable knowledge?}
+
+The goal is not to produce one calibrated evacuation result. The goal is
+to test whether an evacuation recommendation still holds when the
+assumptions Q2.1 left visible (compliance, departure timing, en-route
+switching, household vehicle count) move within their literature-grounded
+ranges. Does contraflow still reduce exposed vehicles when departures
+occur later than expected? Does dynamic rerouting reduce exposure, or
+does it move congestion to another bottleneck? Does phased evacuation
+still help when household vehicle demand is higher?
+
+\citet{zhao2021berkeleywildfire} show why these questions matter. In
+their Berkeley case, contraflow extended to the evacuation-zone boundary
+reduced exposed vehicles by 53 percent, and extended contraflow reduced
+exposed vehicles by 73 percent against the baseline. I would not
+transfer those percentages to I-210 or SR-134. The question is not
+whether a simulator can reproduce a 73 percent reduction. The question
+is whether the benefit survives later departures, lower compliance,
+higher household vehicle demand, and faster fire spread.
+\citet{dixit2008contraflow} reinforce the point in their assessment of
+the I-4 contraflow plans: crossover location and the choice between
+microscopic and mesoscopic representation change the evaluation.
+
+For the I-210 and SR-134 case, AutoTrafficSim would organize these
+questions as a scenario matrix. Each row is an assumption the literature
+shows cannot be hidden inside calibration.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\caption{AutoTrafficSim scenario matrix for the I-210/SR-134 evacuation study.}
+\label{tab:q2_scenario_matrix}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.8cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Factor} & \textbf{Low or baseline} & \textbf{Middle} & \textbf{High or severe} \\
+\midrule
+Fire spread & Slow spread & Medium spread & Fast spread \\
+\midrule
+Departure timing & Early departure & Middle departure & Late departure \\
+\midrule
+Route choice & Pre-selected route & Dynamic rerouting & Hybrid route choice with pre-trip plan and en-route switching \\
+\midrule
+Contraflow & No contraflow & Partial contraflow & Full or extended contraflow \\
+\midrule
+Phased evacuation & No phasing & Phased zones & Full-area evacuation \\
+\midrule
+Vehicle demand & One vehicle per household & Mixed vehicle use & High multi-vehicle demand, including towing \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The scenario matrix can be summarized as
+\[
+  Y = f(v_f,\theta_T,r,u,\phi,h),
+\]
+where $Y$ is an evacuation outcome such as clearance time, exposed
+vehicles, queue duration, or bottleneck location; $v_f$ is fire spread
+speed; $\theta_T$ controls departure timing; $r$ is the route-choice
+regime; $u$ is the contraflow plan; $\phi$ is the phasing policy; and
+$h$ is household vehicle demand. This is not an analytical solution to
+the evacuation problem. It is a compact description of the experiment.
+It names which assumptions are varied and which outcomes are measured.
+
+\citet{ronchi2014uncertainty} show why one run is not enough. When an
+evacuation model includes distributions or stochastic variables, "the
+model user still has to decide which evacuation-time curve represents
+the prediction and which curve should be compared with data."
+AutoTrafficSim therefore reports repeated runs and the uncertainty
+range for each scenario family, not a single trace.
+
+My own microscopic traffic-simulation work showed me the same problem
+at a different scale. An aggregate traffic result can look acceptable
+while the vehicle-level mechanism is wrong. I have seen unrealistic
+acceleration, negative displacement, bad lane behavior, and parameter
+settings that only work because one error compensates for another. The
+evacuation case is harder because the behavioral assumptions are less
+directly observed.
+
+The knowledge claim is therefore specific. AutoTrafficSim does not
+learn the true compliance rate or the true departure curve from data
+that do not contain that information. It shows which assumptions change
+the recommendation. Extended contraflow may help only when enough
+drivers can reach and use the reversed links. Dynamic rerouting may
+reduce exposure but shift congestion to a secondary bottleneck. Those
+conditions are more useful than one calibrated clearance time. That is
+how the study goes beyond fitting.
+
+
+\bigskip
+\putbib[refQ2]
+\end{bibunit}
+
+
+
+
+
+
+\iffalse
+% \subsection*{Q2.1\ Modeling unobserved behaviors}
+
+% % SUBSECTION STRATEGY:
+% %   Answer the "how do you model and justify" part directly.
+% %   The key move is to separate observable traffic states from unobserved
+% %   behavior. Use Law for choosing model detail, Pel/Murray-Tuite for evacuation
+% %   behavior categories, Lindell/Sorensen for warning and compliance logic,
+% %   Tweedie/Murray-Tuite for departure timing, Quarantelli for why "panic"
+% %   should not be treated as a crude switch, and Treiber/Kesting for bounded
+% %   microscopic driver heterogeneity. The table is allowed because it makes the
+% %   assumptions inspectable. Do not add numeric ranges unless they are traced to
+% %   a paper or clearly marked as planned sensitivity settings.
+
+
+
+% \sout{I will have to ground this quation on pels mapping of modeling : behavioral name: I think this answer make no sense after reading pels paper}
+% I would not treat compliance, rerouting, or stress response as hidden constants that can be recovered from normal traffic data. In a PeMS-style data stream, I can observe flow, speed, occupancy, and congestion formation. I cannot directly observe whether a driver believed an evacuation order, whether they followed an instructed route, or whether a late departure was caused by warning delay, household preparation, risk perception, or network congestion. This is where I would be careful. A model can match a downstream count and still be wrong about why that count occurred.
+% % NOTE (Korede): autonomous vehicles with planned trips can exacerbate this gap; left out of the body because Q2 scope is human-driver evacuation behavior.
+
+% The modeling choice I propose is to make each behavioral assumption explicit as a prior range, then test how much the evacuation result depends on that range. This follows a standard simulation principle: the model should include the level of detail needed for the decision, not every possible detail of the real system \citep{law1991simulation}. For evacuation, the relevant decisions are not only vehicle movement decisions; they include warning response, departure timing, destination choice, route choice, and compliance with route instructions. These categories are treated directly in evacuation travel-behavior reviews \citep{pel2012evacuationbehavior,murraytuite2013evacuation}.
+
+% I would model each behavior at the point where it enters the evacuation process. Compliance captures whether a person follows an order or guidance. Departure timing is set by the response curve after warning. Rerouting concerns route choice under changing traffic, road closure, or hazard information. Stress should enter only through bounded driver parameters, not as a vague emotional label. Pel et al.'s review supports this separation because it treats evacuation participation and departure-time decisions separately from route choice and traffic assignment, and it argues for hybrid route choice when partial compliance and dynamic information matter \citep{pel2012evacuationbehavior}.
+
+% Table~\ref{tab:q2_behavior_priors} is how I would keep myself honest. I am not claiming that the exact values are already known. I am saying that each assumption has to be visible, tied to a source, and tested.
+
+% % NOTE (Korede): table is intentionally horizontal and inspectable.
+
+% \begin{table}[H]
+% \centering
+% \small
+% \renewcommand{\arraystretch}{1.25}
+% \caption{Behavioral assumptions as explicit priors rather than hidden calibration constants.}
+% \label{tab:q2_behavior_priors}
+% \begin{tabular}{p{2.2cm} p{2.8cm} p{3.0cm} p{3.0cm} p{2.4cm}}
+% \hline
+% \textbf{Behavior} & \textbf{Why standard data miss it} & \textbf{Modeling choice} & \textbf{Literature anchor} & \textbf{Test} \\
+% \hline
+% Compliance & Detectors observe vehicles, not obedience to warnings or route instructions. & Probability or threshold for following evacuation order, departure instruction, or route guidance. & PADM and warning-response literature; hybrid route choice with partial compliance \citep{lindell2012padm,sorensen2000warning,pel2012evacuationbehavior}. & Sweep compliance across voluntary-advisory, recommended, and mandatory-order regimes. \\
+% \hline
+% Departure timing & Counts show when vehicles arrive at detectors, not when households decide to leave. & Mobilization or response curve distributed over time. & Evacuation-time and departure-curve literature \citep{tweedie1986evacuation,murraytuite2013evacuation}. & Compare rapid against slow mobilization regimes drawn from wildfire and hurricane studies. \\
+% \hline
+% Rerouting & Normal route choice does not reveal route choice under fire, closure, or official guidance. & Hybrid pre-trip and en-route route choice with switching only when perceived improvement is large enough. & Evacuation route-choice review \citep{pel2012evacuationbehavior}. & Vary information penetration and the switching improvement threshold across scenarios. \\
+% \hline
+% Stress or panic effects & Panic is rarely observed directly and should not be assumed as default. & Bounded driver heterogeneity: desired speed, headway, acceleration, deceleration, and lane-change politeness. & Panic literature and microscopic driver models \citep{quarantelli2001panic,treiber2013book,kesting2007mobil}. & Sweep desired speed and time headway within the parameter ranges given for IDM and MOBIL, not as an unstructured panic state. \\
+% \hline
+% \end{tabular}
+% \end{table}
+
+% For compliance, I can represent whether driver or household $i$ follows a given instruction as
+% \[
+%   C_i \sim \mathrm{Bernoulli}(p_c),
+% \]
+% where $C_i=1$ means compliance. I would not claim that $p_c$ is the true compliance rate. I would treat it as a scenario parameter or prior to sweep. For departure timing, I can write
+% \[
+%   T_i \sim F_T(t;\theta_T),
+% \]
+% % NOTE (Korede): the response-curve prior F_T is sourced from Pel et al. response-curve survey (Q2.1 citation). The Knowledge Layer stores it with its citation, and the ScalaTion event-scheduling side fires departure events drawn from F_T at run time.
+% where $T_i$ is the departure time and $\theta_T$ controls the response curve. Pel et al. describe response curves as a common way to specify the percentage of departures in each time interval, and survey several distributional forms (Weibull, sigmoid, and others) whose choice is empirically non-trivial \citep{pel2012evacuationbehavior}. I would not defend one exact curve before the study is done. I would state the curve, cite why it is a reasonable modeling device, and then ask whether the conclusion changes when departures are compressed or spread out.
+
+% For rerouting, I would not assume that every driver instantly takes the system-optimal route. A defensible form is a bounded switching rule:
+% \[
+%   \Delta C_i = C_i^{\mathrm{old}} - C_i^{\mathrm{new}}, \qquad
+%   \text{switch if } \Delta C_i > \tau_i .
+% \]
+% Here $C_i^{\mathrm{old}}$ and $C_i^{\mathrm{new}}$ are perceived route costs, and $\tau_i$ is the improvement threshold needed before driver $i$ changes routes. This keeps the model from assuming perfect compliance or perfect information. It also matches the literature direction better than a full-compliance assumption, because hybrid route-choice models are specifically useful when drivers may begin with one route and later switch based on traffic information, road changes, or instructions \citep{pel2012evacuationbehavior}.
+
+% This is where the agentic part of AutoTrafficSim matters. The Knowledge Layer would store the priors and where they came from. The Agent Layer would propose scenario variants, such as low compliance with early warning or high rerouting with delayed departure. The Simulation Layer would run the traffic model. The Evaluation Layer would report clearance time, exposed vehicles, bottleneck formation, and variation across replications. Then the feedback loop would ask a practical question: which assumption actually changed the decision?
+
+% For panic, I would be especially conservative. Quarantelli's review treats many common claims about panic as empirically weak and notes that panic flight is very rare in disasters \citep{quarantelli2001panic}. In my model, I would therefore avoid a categorical ``panic'' switch. If stress must be represented, it should appear as bounded heterogeneity in driver parameters, such as desired headway or lane-change politeness, because those parameters have clear traffic-flow meanings in car-following and lane-changing models \citep{treiber2013book,kesting2007mobil}.
+
+% \subsection*{Q2.2\ Why an agentic framework, not SUMO + calibration}
+
+% % SUBSECTION STRATEGY:
+% %   Do not attack SUMO. Treat SUMO as a strong baseline, then narrow the
+% %   disagreement: calibration can reproduce observed traffic traces, but this
+% %   question asks about out-of-regime evacuation behavior and contraflow control.
+% %   Use Lopez for SUMO, Zhao/Beyki for wildfire evacuation scenario modeling,
+% %   and Dixit/Liu for contraflow/control evidence. AutoTrafficSim enters as the
+% %   layer that makes behavioral and control assumptions explicit before running
+% %   SUMO or another simulator. Keep the claim modest: the agentic framework
+% %   complements calibration; it does not replace the simulator.
+
+% My answer is not that SUMO is inadequate. SUMO is a strong microscopic simulation platform, and it is a reasonable baseline for calibrated traffic simulation \citep{lopez2018sumo}. The issue is that calibration answers a narrower question. It can tune a model so that simulated counts and speeds resemble observed counts and speeds. It does not, by itself, identify behavior that was not observed in the data, especially when the target condition combines wildfire threat, evacuation orders, contraflow, road closures, partial compliance, and dynamic rerouting.
+
+% The usual calibration problem can be written as
+% \[
+%   \min_{\theta} \sum_t \left\|y_t^{\mathrm{obs}} - y_t^{\mathrm{sim}}(\theta)\right\|^2,
+% \]
+% where $y_t^{\mathrm{obs}}$ may be detector counts, speeds, occupancies, or travel times, and $\theta$ is the parameter vector being tuned. That objective is useful wherever observed data exist, and it only rewards similarity to those observations. When the observations do not include evacuation orders, contraflow activation, fire-driven closures, or partial compliance, the calibrated $\theta$ cannot tell me how those mechanisms should behave.
+
+% The published agentic V\&V literature has begun to address exactly this gap. \citet{koohestani2025agentguard} introduces Dynamic Probabilistic Assurance, in which an online Model Learner continuously builds an Agentic Markov Decision Process $(S,A,P,R,\gamma)$ from observed agent traces and a Probabilistic Model Checker evaluates PCTL queries against that model, so the assurance question shifts from process conformance to emergent probabilistic behavior. \citet{kwon2026aivv} extends this direction with a hybrid neuro-symbolic pipeline because a conformal-bound mathematical gate first flags anomalies and a role-specialized council then adjudicates them through a clone-and-promote pattern that tests a candidate adaptation on a clone of the system before live promotion. \citet{srinivasan2025dura} formalizes the multi-role orchestration pattern itself, assigning specialized agents (SafetyMonitor, SecurityAssessor, PerformanceOracle, FaultInjector, RecoveryPlanner) that work in a closed-loop assurance process tightly integrated with a standard CPS simulator such as CARLA, AirSim, or Gazebo. These three references establish that agentic V\&V layered over a simulation engine is a published research pattern rather than a buzzword, and they give the architectural vocabulary AutoTrafficSim uses for the evacuation and contraflow setting.
+
+% The wildfire evacuation literature supports this distinction. Zhao and Wong used survey-informed evacuation simulation for Berkeley and tested response strategies including departure distribution, rerouting, phased evacuation, and contraflow \citep{zhao2021berkeleywildfire}. A recent modular wildfire evacuation framework also argues for integrating fire spread, multimodal transport, dynamic routing, rescue operations, and heterogeneous behavior in scenario testing \citep{beyki2026modularwildfire}. These papers do not make calibration irrelevant. They show why calibration must be placed inside a broader counterfactual workflow.
+
+% Contraflow makes the same point from the control side. Dixit and colleagues compared contraflow strategies and showed that crossover design and microscopic versus mesoscopic representation affect evacuation evaluation \citep{dixit2008contraflow}. More recent work on evacuation and rescue traffic optimization treats contraflow as a control problem involving competing evacuation and rescue directions, rather than as a simple capacity increase \citep{liu2024rescuecontraflow}. In my study, the agentic framework is needed because the control decision and the behavioral assumption interact. A contraflow plan that works under high compliance may fail or produce smaller benefits under low route-following or delayed departure.
+
+% AutoTrafficSim is positioned within the agentic V\&V pattern that \citet{koohestani2025agentguard}, \citet{kwon2026aivv}, and \citet{srinivasan2025dura} establish. ScalaTion~2.0, developed by Dr.~John Miller, is the simulation engine in the same category as SUMO, and AutoTrafficSim is the agentic framework layered above it. The Knowledge Layer stores the behavioral priors of Q2.1 together with the literature provenance for each one. The Agent Layer proposes scenario families over compliance, departure timing, rerouting, and contraflow control rather than searching for a single best-fit calibration. The Runtime Invariant Monitor plays the role of \citet{srinivasan2025dura}'s SafetyMonitor in the traffic setting, checking conservation, supply consistency, route continuity, feasible loading, and queue spillback on every trace, while the Adaptive Feedback Loop plays the role of the iterative closed-loop assurance process in \citet{srinivasan2025dura} and the clone-and-promote step in \citet{kwon2026aivv}, selecting the next scenario where uncertainty or invariant violations are highest. The simulation engine itself, ScalaTion or SUMO, is a substitution point under this layer rather than the contribution.
+
+% The need is therefore clear. SUMO plus calibration answers whether a simulator can reproduce a known traffic state. That question is necessary but not sufficient for evacuation and contraflow planning, because compliance, departure timing, rerouting, and stress response are rarely observed in standard datasets, and calibration cannot identify what was not observed. An agentic framework around the simulator is needed for the same reasons \citet{koohestani2025agentguard} give for runtime probabilistic checking of an LLM-agent workflow, \citet{kwon2026aivv} give for letting specialist roles judge flagged anomalies in a stochastic engineering system, and \citet{srinivasan2025dura} give for closed-loop checks on AI components inside a CPS simulator. AutoTrafficSim applies the same architecture to evacuation and contraflow, where it does not yet exist as a system.
+
+% \subsection*{Q2.3\ From fitting to generalizable knowledge}
+
+% % SUBSECTION STRATEGY:
+% %   Answer "beyond fitting" by shifting from one calibrated trace to mechanism
+% %   statements with uncertainty. Use Ronchi for behavioral uncertainty and
+% %   repeated runs. Bring in Korede's real simulation experience carefully:
+% %   aggregate calibration can look acceptable while lane-level dynamics or
+% %   behavioral mechanisms remain wrong. Use proposal voice for the I-210/SR-134
+% %   case. The defensible output is not "the true compliance rate"; it is a
+% %   response surface and sensitivity result showing which assumptions change the
+% %   decision. Avoid claiming that AutoTrafficSim has already produced results.
+
+% I do not want the final product to be one polished evacuation trace. That would be too easy to overfit. I want to know which assumptions actually move the decision. How sensitive is clearance time to departure compression? At what compliance range does contraflow stop helping? Does rerouting reduce exposure, or does it simply move congestion to another bottleneck?
+
+% Ronchi and colleagues provide the useful language here, because evacuation models that use stochastic variables produce behavioral uncertainty, and repeated runs are needed to understand how that uncertainty affects model predictions \citep{ronchi2014uncertainty}. I would extend that logic from repeated stochastic runs to structured scenario families. AutoTrafficSim would not search for one behavioral setting that best reproduces observed data. It would generate controlled scenario families over compliance, departure timing, route switching, and driving heterogeneity, then report the resulting uncertainty envelope.
+
+% The shift from a single calibrated trace to mechanism-level knowledge has a direct precedent in the agentic V\&V literature. \citet{koohestani2025agentguard} argue that the meaningful question is no longer whether a system will fail but the probability of failure under stated constraints, which is a knowledge claim about emergent behavior rather than a fit to one trace. \citet{kwon2026aivv} produce engineering artifacts beyond a binary verdict, because their specialist roles judge flagged anomalies and propose structured recalibration, with the reasoning trail attached rather than only a fitted parameter set. \citet{srinivasan2025dura} close the loop by feeding V\&V findings from monitoring roles back into the next round of test generation and adaptation planning, which is the multi-role version of the adaptive scenario selection AutoTrafficSim would apply to evacuation experiments. The shared lesson across these three is that the deliverable of an agentic framework is a profile of where the system holds, where it fails, and under which mechanisms --- not a single calibrated curve.
+
+% In notation, I would treat the main outputs as a response surface:
+% \[
+%   Y = f(p_c,\theta_T,\tau,\theta_d,u),
+% \]
+% where $Y$ is an evacuation outcome such as clearance time, exposed vehicles, queue duration, or bottleneck location; $p_c$ is compliance; $\theta_T$ controls departure timing; $\tau$ controls rerouting thresholds; $\theta_d$ represents driver-behavior parameters; and $u$ represents the control plan, such as no contraflow, short contraflow, extended contraflow, or phased evacuation. I am not pretending that the whole evacuation can be solved analytically. This is a bookkeeping device for the experimental design. It says what the answer depends on, and it forces me to report which inputs actually change the conclusion.
+
+% My own traffic-simulation experience is part of why I frame the answer this way. In ordinary freeway calibration, I can make a corridor-level metric look acceptable while still missing lane-level dynamics or using a parameter setting that is hard to defend mechanistically. In an evacuation case, that problem becomes more serious because the behaviors of interest are less directly observed. The framework has to separate three things: physical validity of the traffic trace, empirical fit where data exist, and sensitivity of the conclusion to assumptions that data do not identify.
+
+% That lesson comes directly from building and debugging microscopic traffic simulation. A simulation can look acceptable at the aggregate level while still having a vehicle-level problem: unrealistic acceleration, negative displacement, bad lane behavior, or a parameter setting that only works because it compensates for another model error. In normal calibration, those problems are already dangerous. In evacuation modeling, they are worse because the behavioral part is not fully observed. A fitted curve can hide the fact that the model got the right count for the wrong reason.
+
+
+% % NOTE (Korede): the framing below stays as-is.
+% For the Eaton/Palisades-style I-210 and SR-134 case I am proposing, I would not claim that one compliance rate is true. A more defensible result would be a response surface: contraflow on or off, compliance low or high, departure spread narrow or wide, rerouting limited or extensive, and fire-affected road availability changing over time. If the same bottleneck or threshold appears across those scenario families, then the model has produced knowledge that can travel beyond one fitted run. If the conclusion changes when a reasonable behavioral prior changes, then the model has found decision-relevant uncertainty rather than hiding it.
+
+% This is also how I would keep the case study from becoming only a local story. The I-210 and SR-134 network would anchor the experiment in a real corridor, but the knowledge claim would be stated at the mechanism level: which combinations of compliance, departure timing, rerouting, and contraflow control produce stable or unstable outcomes. A result like ``extended contraflow helps only when enough drivers can reach and use the reversed links'' is more useful than a single calibrated clearance time, because it explains the condition under which the control idea works. A result like ``rerouting reduces exposure but shifts congestion to a secondary bottleneck'' is also generalizable in a way that a single fitted run is not.
+
+% That is the fundamental difference between fitting and explanation in this work. Fitting asks whether the simulation can reproduce a known trace. My proposed use of AutoTrafficSim would ask which behavioral and control mechanisms are responsible for evacuation performance under plausible but rarely observed conditions. The claim is therefore modest but important. The agentic framework is not a replacement for ScalaTion, SUMO, or calibration. It is the discipline for generating, tracking, and stress-testing the assumptions that calibrated simulation engines cannot learn from standard traffic data alone, and it sits in the same architectural pattern that \citet{koohestani2025agentguard}, \citet{kwon2026aivv}, and \citet{srinivasan2025dura} have established for runtime, role-specialized, closed-loop assurance over a simulation engine.
+% \fi
+
+
+1.1: chnage font to 12pt
+1. Each Table of content for each question
+2. Bullet points for readability
+3. bold and italics for key words
+4. Subheading and sectioninf for introduced terms 
+5. Highlight important key words in tables. 
+6. New section should start in a new page. eg Q1.1, 1.2 .. 

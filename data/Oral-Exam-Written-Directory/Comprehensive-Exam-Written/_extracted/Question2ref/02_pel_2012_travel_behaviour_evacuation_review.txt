@@ -1,0 +1,1392 @@
+===== PAGE 1 =====
+
+Transportation(2012)39:97–123
+DOI10.1007/s11116-011-9320-6
+A review on travel behaviour modelling in dynamic
+traffic simulation models for evacuations
+Adam J. Pel • Michiel C. J. Bliemer • Serge P. Hoogendoorn
+Publishedonline:28January2011
+(cid:2)TheAuthor(s)2011.ThisarticleispublishedwithopenaccessatSpringerlink.com
+Abstract Dynamic traffic simulation models are frequently used to support decisions
+when planning an evacuation. This contribution reviews the different (mathematical)
+model formulations underlying these traffic simulation models used in evacuation studies
+and the behavioural assumptions that are made. The appropriateness of these behavioural
+assumptions is elaborated on in light of the current consensus on evacuation travel
+behaviour, based on the view from the social sciences as well as empirical studies on
+evacuation behaviour. The focus lies on how travellers’ decisions are predicted through
+simulationregardingthechoicetoevacuate,departuretimechoice,destinationchoice,and
+routechoice.Fortheevacuationparticipationanddeparturetimechoiceweargueinfavour
+ofthesimultaneousapproachtodynamicevacuationdemandpredictionusingtherepeated
+binarylogitmodel.Forthe destinationchoice weshowhowfurtherresearchisneededto
+generalizethecurrentpreliminaryfindingsonthelocation-typespecificdestinationchoice
+models.Fortheevacuationroutechoiceweargueinfavourofhybridroutechoicemodels
+that enable both following instructed routes and en-route switches. Within each of these
+discussions, we point at current limitations and make corresponding suggestions on
+promising future research directions.
+Keywords Evacuation(cid:2)Travelbehaviour(cid:2)Departuretimechoice(cid:2)Destinationchoice(cid:2)
+Route choice (cid:2) Dynamic traffic simulation
+A.J.Pel(&)(cid:2)M.C.J.Bliemer(cid:2)S.P.Hoogendoorn
+DepartmentofTransportandPlanning,FacultyofCivilEngineeringandGeosciences,
+DelftUniversityofTechnology,P.O.Box5048,2600GADelft,TheNetherlands
+e-mail:a.j.pel@tudelft.nl
+M.C.J.Bliemer
+e-mail:m.c.j.bliemer@tudelft.nl
+S.P.Hoogendoorn
+e-mail:s.p.hoogendoorn@tudelft.nl
+123
+
+===== PAGE 2 =====
+
+98 Transportation(2012)39:97–123
+Introduction
+Society is forced to deal with many natural and man-made disasters. These hurricanes,
+wildfires, floods, large storms, mudflows, terrorist attacks, chemical spills, industrial
+accidents,andmanysimilarhazardscausemassiveeconomicandsocialdamageaswellas
+lossofliveseveryyear.Studies,suchasthosebyHooke(2000)andNewkirk(2001),show
+that the frequency and intensity of natural disasters has been increasing over the past
+decades. Furthermore, other studies, such as those by Plowman (2001) and Barrett et al.
+(2000), argue that due to the population and urban development growingfaster than road
+infrastructurecapacity,massevacuationswillbecomeincreasinglymoredifficultandtime
+consuming. This underlines the importance for hazard prone regions to invest in efficient
+disaster management strategies. Such strategies can focus on avoidance, where precau-
+tionary measures reduce the probability of such disasters (e.g., reinforcing dams, raising
+dikes, clearing fire control lines), or mitigation, where responsive measures reduce the
+impact of such disasters (e.g., evacuation). Lave et al. (1990) uses explicit cost-benefit
+analysestoshowthattheresponsiveoptionofevacuationallowspreservingpeoples’lives
+at much lower costs. Nevertheless, in a later study (Lave and Apt 2006) it is argued that
+authorities might be reluctant to actually order an evacuation when warranted due to the
+uncertainty, lack of experience, and fear of financial liability involved in the process of
+evacuation.
+Thesuccessofanevacuationstronglydependsonmanyfactors,suchaswarningtime,
+response time, information and instructions dissemination procedure, evacuation routes,
+traffic flow conditions, dynamic traffic control measures, etc. (Dash and Gladwin 2007;
+Lindell and Prater 2007). Given the complexity of the underlying processes and the
+multitude of factorsinfluencing these procedures, trafficsimulation modelsare helpfulor
+even indispensible for the analysis and planning of emergency evacuations (Barrett et al.
+2000;Hardyetal.2010).Thesetrafficsimulationmodelscanbeappliedtoobtainabetter
+understandingoftheevacuationconditionsandtheeffectoftrafficregulationsandcontrol
+measureshereon,bypredictingdepartureandarrivalpatterns,traveltimes,averagespeeds,
+queuelengths,trafficflowrates,etc.Insightintothisdynamicprocessisnecessarytomake
+founded decisions on, for instance, the latest possible time to start evacuation, the best
+evacuation routes, or the most suitable traffic management measures.
+This contribution elaborates on the different (mathematical) model formulations
+underlyingthese trafficsimulationmodelsused inevacuationstudies andthebehavioural
+assumptionsthataremade.Welookatboth(commercial)trafficsimulationmodelsusedin
+evacuation studies as well as evacuation research and proposed model formulations. The
+focus lies on how travellers’ decisions regarding the choice to evacuate, departure time
+choice, destination choice and route choice are modelled. Hence, this review article is
+complementarytootherstate-of-the-artreviewarticlesonaspectssuchashowthesetraffic
+simulation models are used to evaluate and design optimal evacuation instructions and
+management strategies (e.g., Yusoff et al. 2008; Abdelgawad and Abdulhai 2009), the
+issuesthatmustbedealtwithonceimplementingtheseevacuationplansinpractice(e.g.,
+Wolshonetal.2005a,b),thedatarequirementstomanageandmodelemergencysituations
+(e.g., Wilmot et al. 2009; Henson et al. 2009), and driving behaviour under adverse
+conditions(e.g.,Hoogendoorn2010).Intheensuingdiscussionweconsiderthecarasthe
+mainmodeoftransportforevacuation.Inthisview,thisreviewarticleiscomplementaryto
+other state-of-the-art review articles on other modalities of transport, for instance, pedes-
+trian evacuation research (e.g., Schadschneider et al. 2008). Many of the evacuation
+modellingandsimulationissuesrelatingtocartravelbehaviouralsorelatetoevacuationby
+123
+
+===== PAGE 3 =====
+
+Transportation(2012)39:97–123 99
+Fig.1 Frameworkevacuationtrafficsimulationmodelandoutlinearticle
+public and organized transport, as well as multimodal evacuation. However, these modes
+of transport will not be discussed explicitly.
+Figure 1showstheframeworkofatypicaldynamictrafficsimulationmodelthatcanbe
+usedinevacuationstudies.Here,theblackboxesontheleft-handsiderepresentthemodel
+components:dynamictraveldemandmodel,dynamictripdistributionmodel,anddynamic
+traffic assignment model. The white boxes on the right-hand side indicate the behaviour
+that is described by each of these model components: evacuation participation and
+departure time choice, destination choice, and route choice. The outline of the article
+followsthismodelframeworkasfollows.Westartwithgivinganoverviewofthehistory
+ofevacuationsimulationmodelsandthecurrentstateofthepracticein‘‘Pastandcurrent
+evacuation traffic simulation models’’ section. After that, we discuss in ‘‘Traveller
+behaviour under evacuation conditions’’ section, the current view on travellers’ choice
+behaviourincaseofevacuation,makingreferencetobothanumberofempiricalstudieson
+evacuationbehaviouraswellasinsightsfromthebehaviouralsciencesrelatedtodecision
+making under emergency conditions. Then sections ‘‘Travel demand modelling’’, ‘‘Trip
+distribution modelling’’ and ‘‘Traffic assignment modelling’’ form the main body of this
+article, elaborating on the (implicit) assumptions regarding traveller behaviour that are
+generallymadeinevacuationtrafficsimulationmodelsorproposedmodelformulations—
+including those models discussed in ‘‘Past and current evacuation traffic simulation
+models’’—in light of the view presented in ‘‘Traveller behaviour under evacuation con-
+ditions’’ section. More precisely, we discuss travel demand modelling (i.e., travellers’
+evacuation and departure time choice decisions) in ‘‘Travel demand modelling’’ section.
+We discuss trip distribution modelling (i.e., travellers’ destination choice decisions) in
+‘‘Trip distribution modelling’’ section. And we discuss traffic assignment modelling (i.e.,
+travellers’ route choice decisions) in ‘‘Traffic assignment modelling’’ section. Each of
+these sections ends with a critical discussion on current practices and promising future
+research directions. The final section then gives a concluding discussion on the main
+findings and makes some final remarks.
+Past and current evacuation traffic simulation models
+Inthelate1970s,anumberofsimulationmodelsweredevelopedtoanalyzeandevaluate
+emergency evacuation plans. Early studies in the 1980s focused mainly on evacuation in
+123
+
+===== PAGE 4 =====
+
+100 Transportation(2012)39:97–123
+case of nuclear power plant emergency due to the Three Mile Island reactor incident in
+1979.Then,afteranumberofextremelydevastatinghurricaneshittingthecoastlineofthe
+U.S. in the 1990s, much evacuation modelling research shifted focus to hurricane evac-
+uation. Since the September 11, 2001, incident in the U.S., also mass evacuation due to
+terrorist attacks is getting more attention. Due to tsunamis in China and wildfires in
+Australiaoverthepastyears,evacuationresearchinthesecountriesfocusonthesetypesof
+evacuation. For the Dutch situation, rising sea levels and a perceived increasing threat of
+floodinghasledtothestartofanationalprograminitiatingfloodevacuationresearchand
+applications within the Netherlands.
+Inmanyoftheearlystudies,evacuationisrecognizedasanexceptionaleventregarding
+different travel demand patterns, driver behaviour, traffic management, etc., resulting in
+newtrafficmodelsbeingdevelopedspecificallyforevacuationstudies.Afewexamplesare
+NETVAC (Sheffi et al. 1980), DYNEV (KLD 1984), MASSVAC (Hobeika and Jamei
+1985; Hobeika and Kim 1998), TEDSS (Sherali et al. 1991), IMDAS (Franzese and Han
+2001), OREMS (Rathi and Solanki 1993), and CEMPS (Pidd et al. 1993). Some basic
+modelcharacteristicsandapplicationsofthesemodelsarelistedinTable 1.Anotecanbe
+made here that TEDSS is set up as a decision support system based on the simulation
+modelMASSVAC,whichinturncanbeseenasasuccessorofNETVAC.AndOREMSis
+based on the microscopic traffic simulation model CORSIM, which is developed for
+regular day-to-day traffic conditions. These early simulation models are typically devel-
+opedandcustomizedfortheevacuationofspecificregionsinresponsetoaspecifictypeof
+hazard. For instance, NETVAC is designed to plan evacuation in response to a nuclear
+power plant accident and therefore models the evacuation of all inhabitants from a pre-
+determined area (10 miles radius from plant site) in radial outward direction, while
+MASSVACisdevelopedforhurricaneevacuationofaruralareaandrequires evacuation
+routes as model input from all origin locations to all safe destinations, where the origins
+anddestinationsdependontheprojectedpathofthehurricane.Adistinguishingfeatureof
+DYNEV which is worth mentioning is that it is the only model listed in Table 1 where
+multimodalevacuationcanbesimulated,althoughinalimitedform.Carandbustransport
+are incorporated, where bus services are modelled explicitly by route, schedule, and stop
+locations.Earliermodelsthathavealsobeenappliedmorerecentlyandonreasonablylarge
+scaleareDYNEV(e.g.,Goldblatt2004;Wolshonetal.2005a)andOREMS(e.g.,Hanand
+Yuan 2005; Li et al. 2006; ORNL 2002).
+More recently, a large number of evacuation studies are conducted using well-estab-
+lished dynamic traffic simulation models developed for regular day-to-day traffic
+Table1 Earlyevacuationtrafficsimulationmodelsandtheircharacteristicsandapplications
+Model Trafficrepresentation Timedimension Application
+Micro Macro Static Dynamic Offline Online
+NETVAC x x x
+DYNEV x x x
+MASSVAC x x x
+TEDSS x x x
+IMDAS x x x
+OREMS x x x
+CEMPS x x x
+123
+
+===== PAGE 5 =====
+
+Transportation(2012)39:97–123 101
+applications,includingbothmicroscopicmodels,suchasPARAMICS(CovaandJohnson
+2003), CORSIM (Williams et al. 2007), VISSIM (Han and Yuan 2005), and INTEGRA-
+TION (Mitchell and Radwan 2006), and mesoscopic or macroscopic models, such as
+DYNASMART (Murray-Tuite 2007), DynaMIT (Balakrishna et al. 2008), DynusT (Noh
+etal.2009),TransCAD(Wangetal.2010),andINDY(Klunderetal.2009).Inanumber
+ofstudiesusingmicroscopicmodels,modelparametersdescribingdrivingbehaviour(such
+as headway, acceleration, reaction time) have been adjusted for the case of emergency
+evacuation (e.g., Tu et al. 2010). Other than that, the model structure and parameter
+settings are typically not changed.
+In all these models the origin–destination travel demand is either model input or is
+computedusingagravity-modelbasedtripdistributionmodel,oracombinationofthetwo.
+The departure times are generally determined by applying an exogenous response curve
+statingthepercentageofdeparturesineachtimeinterval.Sucharesponsecurvehasbeen
+assumedtofollowanumberofdifferentdistributions (e.g.,Uniformdistribution,Poisson
+distribution, and Weibull distribution). A user-defined dynamic origin–destination matrix
+allowsevaluating(mandatory)evacuationinstructionsregardingdedicateddeparturetime
+windows and destinations.
+These trips are then in most models assigned to the road network according to the
+(dynamic or static) user-equilibrium assignment assumption, where one may wonder
+whetheranequilibriumassumptionwillholdinanemergencyevacuation.Exceptionsare
+the few models (OREMS, MASSVAC, and VISSIM) where user-defined routes can be
+model input, thus allowing evaluating (mandatory) instructions regarding prescribed
+evacuation routes. Other exceptions are the route choice models incorporated in INTE-
+GRATION and DYNASMART allowing en-route route switching based on prevailing
+traffic conditions.
+In most models, traffic flow is simulated in which road network characteristics are
+mostlystatic.Insomemodelsroadnetworkcharacteristicssuchascapacityandmaximum
+speedvarytoincorporatethedamagingeffectofthehazardontheroadinfrastructure(e.g.,
+links becoming less accessible due to flooding) and dynamic traffic management and
+controlmeasures(e.g.,contraflowoperationstoincreaseoutboundcapacity).Forexample,
+MASSVAC allows modelling several consecutive time intervals (time-sliced static traffic
+assignment) in which road network characteristics change, and INDY incorporates so-
+called ‘events’ in which network characteristics and model parameters can vary in time.
+A final addition to this overview of prior and current evacuation traffic models is the
+development of decision support systems and traffic information systems which are inte-
+grated with a dynamic traffic simulation model. For instance, the Evacuation Traffic
+Information System ETIS (PBS&J 2000a) is set up as a web-based monitoring tool for
+collection and distribution of traffic information during the process of evacuation. ETIS
+usesreal-timeinformationfromdifferentsourceson,forexample,evacuationparticipation
+rates,trafficmanagementandcontrolmeasures,prevailingtrafficconditions,andweather
+conditions.Thetoolthenpredictstrafficconditionsforashorttimeaheadbasedonhistoric
+evacuation data, and evaluates the effect of applying traffic control measures such as
+contraflowandlaneclosures.ETIShasbeenappliedinpracticeinthesoutheasternstates
+oftheUnitedStates,includingNorthCarolina,SouthCarolina,Georgia,andFlorida,and
+later also Alabama, Mississippi, Louisiana, and Texas (Wolshon et al. 2005a).
+We should remark here that this overview of past and current evacuation traffic sim-
+ulation models does not aim to be complete, but to provide a framework of the current
+practices in traffic simulation models used in many evacuation studies. Here we only
+discussed the more ‘full fledged’ traffic simulation models. A number of interesting
+123
+
+===== PAGE 6 =====
+
+102 Transportation(2012)39:97–123
+proposed model formulations in evacuation research will be introduced and discussed in
+‘‘Travel demand modelling’’, ‘‘Trip distribution modelling’’ and ‘‘Traffic assignment
+modelling’’ sections when we elaborate on the individual model components of a typical
+evacuation traffic simulation model.
+Traveller behaviour under evacuation conditions
+Themodelsintroducedintheprevioussectionaimtosimulatetrafficconditionsonaroad
+network in case of evacuation. They thereby unavoidably make assumptions on how
+travellersmaybehaveinthesetypesofconditions.Toallowustoinvestigatethesuitability
+of these behavioural assumptions in the following sections, we will here discuss the
+viewpointofthebehaviouralsciencesonevacuationtravelchoicebehaviourandshowhow
+empirical studies on evacuation behaviour underline or question this view.
+Before discussing the psycho-behavioural research and empirics on evacuation
+behaviour,twonotescanbemadehere.Firstofall,thereexistsquiteanextensiveamount
+ofliteratureinthefieldofbehaviouralsciencesrelatingtohumans’psychologicalresponse
+to, for example, (imminent) emergency conditions, and decision making under time-
+pressureandsafetyconcerns(foranoverviewseeCourtetal.2004;Dombroskietal.2006;
+Mawson 2005). This kind of research has found almost no reference in evacuation traffic
+modellingandsimulationstudies.Thismightbepartlyduetoitsoftennon-quantitativeor
+experimentalsetup.Secondof all,remarkablyenough,incontrasttonetworkevacuation
+modelling, in crowd evacuation modelling, surprisingly many simulation models attempt
+toincorporatemorerealistichumanbehaviour.Thisisdonebyextendingthesepedestrian
+simulation models to more sophisticated agent frameworks. For instance, applying cog-
+nitive-behavioural frameworks to model individuals’ behaviour under specific conditions
+(e.g., the so-called belief-desire-intension framework is often applied), or different struc-
+tures are built-into model leadership and herding behaviour, or travellers’ information
+acquisition and exchange is modelled to include possible unfamiliarity and learning
+characteristics (see e.g., Murakami et al. 2002; Pelechano et al. 2005; Pelechano and
+Badler 2006; Shendarkar et al. 2006).
+Psycho-behavioural research and empirics on evacuation behaviour
+A large number of real life emergency situations collected and discussed by Quarantelli
+(1957)andLeachandCampling(1982)indicatethatthebehaviouralresponseofpeopleis
+remarkably consistent across different types of disastrous conditions. This structural pat-
+tern is divided into a number of temporal phases showing how behavioural responses
+change over time as the emergency conditions develop, summarized in Fig. 2. These
+phases range from pre-impact when an emergency is becoming probable to post-impact
+Fig.2 Phasesinemergencyconditionsandtheirmostprevalentbehaviouralresponses(fromHoogendoorn
+etal.2009,basedonLeachandCampling1982)
+123
+
+===== PAGE 7 =====
+
+Transportation(2012)39:97–123 103
+whentheemergencyhaspassed.Equivalentmodelshavebeenproposedby,forexample,
+Glass (1959) and Tyhurst (1951). The main value of this framework isthat each phase is
+accompaniedbyaspecificbehaviouralresponsewhichisfoundtobethenpredominantly
+prevailing.
+An equivalent dynamic approach focusing on the individual decision-making task
+states, that individuals experience a number of (quasi-)consecutive psycho-behavioural
+phases.Thedecision-makingtaskstartswithinformationacquisition,followedbysituation
+assessment, and finally action execution (first posed by Woodworth 1958). Since indi-
+viduals cannot assess all available information, the first two phases are undertaken
+simultaneously(Baddeley1972;Wickens1987).Informationisfilteredbasedonrelevance
+and trustworthiness according to how the current situation is perceived. This filtering
+processmakesthetaskeasier,howevermaydelayacceptingandappropriatelyresponding
+to changing conditions. This can be explained through the phenomenon of cognitive dis-
+sonance.Forexample,whenpeopleperceivethemselvesassafeyetreceiveinformationon
+a possible threat, then the logical inconsistency in these beliefs is (initially) resolved by
+rejecting or ignoring this warning information. A large number of real life examples are
+discussed by Leach and Campling (1982) where people in danger choose to ignore the
+possibility of the disaster despite the warnings prior to the disaster. In all cases, the
+conflicting information is discarded as being not relevant or untrustworthy.
+Thispatternofbehaviourisresembledbythefindingsinanumberofempiricalstudies
+specifictoevacuation.Forinstance,Miletietal.(1975)reportsthatthemoreinformation
+theinitialwarningcontains,themorelikelyitisthatpeoplerespond.And,whenwarnings
+are heard and believed, then evacuation is the end result. This is also underlined by the
+findingsofBaker(1991).Twenty-sixpost-hurricanesurveysintheperiod1961till1989in
+the US indicated that next to factors such as risk level, public instructions, housing type,
+andstormthreat,thepersonalriskperceptionwasmostprominentinthedecisionwhether
+toevacuate.SimilarlyforthecaseofcyclonesinAustralia,Raggattetal.(1993)foundthat
+peoplewithlesswarningtimeweremorelikelytodenytheirpersonalriskandresideina
+general feeling of complacency. De Jong and Helsloot (2010) report on the results from
+surveys held during a Dutch national exercise on flood evacuation. In this study, a large
+share of people (48–66%) remains unaware of the actual risk while warning is given and
+voluntaryevacuationisadvised.Atthesametime,thecredibilityoftheinformationthatis
+givenisdeemedlowbythemajority(52–88%).Averyinformativediscussiononthistopic
+isgivenbyDashandGladwin(2007).Oneoftheirstatementsisthatitistheperceptionof
+riskthatmotivatespeopletoevacuate,notthehearingofwarningsandevacuationorders.
+This is implied by the psycho-behavioural frameworks constructed in the behavioural
+sciences, as well as a strikingly common finding in many empirical studies.
+Oncethedangerisrecognizedandpeoplestartresponding,theirinformationprocessing
+and decision making capabilities might be limited due to mentally demanding circum-
+stances,associatedwithanxietyand(theperceptionof)time-pressure.Wills(1998)argues
+thatinthesesituationspeoplerelymoreoninstinctsandexperience,therebyavoidingthe
+timeneededformakingrationallythought-overdecisions.LeachandCampling(1982)and
+SchmidtandWarner(2002)foundevidenceforthisbyshowingthatpeopletypicallytend
+to remain calm, and only once they perceive inescapability do they express behaviour
+whichcanbeseenasirrationalandhabitual(notethattoexpresshabitualbehaviourunder
+disaster conditions, for instance, for the case of exit choice, can be seen as irrational or
+illogical).Leach andCampling (1982) furtherargue that duringthe impact phasethere is
+evidenceofacleardistinctionbetweenthepsycho-behaviouralresponsesofthreetypesof
+individuals. Once people undertake action in the impact phase, people may remain calm
+123
+
+===== PAGE 8 =====
+
+104 Transportation(2012)39:97–123
+andrational,maybestunnedbythesituationandreactinasemiautomaticmanner,ormay
+mentally breakdown and react uncontrolled and inappropriately. It is found that in most
+cases approximately 75% of the individuals express the second type of behaviour, while
+the behaviour of the remaining share corresponds evenly with the first and third type. It
+shouldbenotedthatalthoughtheappearance ofegocentricbehaviouriswidelyaccepted,
+especially panicking behaviour has been shown to be quite an uncommon reaction to an
+emergency situation (Aguirre 2005; Blake et al. 2004; Bohannon 2005; Cornwell 2003;
+Mawson 2005).
+A number of empirical studies on evacuation behaviour show a slightly different pat-
+tern.Thismighthavetodowiththefactthatthecircumstances(duringtheimpactphase)
+whichthesepsycho-behaviouralconstructsarebasedonaremoreimminentthantypically
+seen (or perceived) in these empirical evacuation studies. The surveys by De Jong and
+Helsloot(2010)intheDutchfloodexerciseshowthatoncetheactualdikebreachandflood
+occur,theneedforinformationonaspectsastheexpectedfloodingarea,waterheight,and
+possiblegovernmentaidintheevacuationincreased.Withanumberofpeople,thislackof
+information impaired them on making a decision whether to evacuate. Those people that
+dodecidetoevacuateshowasimilarprominentneedforinformation.Thisneedfortraffic
+informationonappropriateevacuationroutesisreported,forexample,byDowandCutter
+(2000)andLindelletal.(2005)afterconductingpost-hurricanesurveysandbyRobinson
+and Khattak (2010) based on stated preference surveys. In cases where this traffic infor-
+mation is not available, travellers might be impaired in their route decisions. Dow and
+Cutter(2002)heldasurveyamongSouthCarolinaresidentsafterhurricaneFloyd.Oneof
+theirfindingswasthat,despitethecongestiononthemainegressroutes,travellersdidnot
+switchtoalternativeroutesusingruralroads.Theauthorssuggestthatthismighthavebeen
+due to travellers’ uncertainty that alternative (rural) routes would not provide breakdown
+services and cell phone coverage. Likewise, Lindell and Prater (2006) report that for the
+case of hurricane Katrina, travellers relied slightly more on past familiarity with the
+evacuation route than on prevailing traffic conditions, likely due to the lack of traffic
+information.
+The last phase of recoil and rescue (see Fig. 2) will not be discussed here since the
+evacuation is most likely to have ended by then.
+Discussion
+Theaboveperspectiveonevacuationtravelbehaviourshowsthatanumberoffactorsplay
+an important role in determining the travel decisions of individuals. In sum, individuals
+reactaccordingtohowtheyperceivethechangingsituation.Theytherebyrespondtoboth
+the hazard’s evolution in space and time, as well as the dynamic traffic (management)
+conditions, possibly with some delay. This explains the evacuees’ need for information.
+That people do not automatically follow the advice and orders from public officials, but
+tend to seek information, assess their personal risk, and make independent evacuation
+decisions, is supported by a substantial number of empirical studies (e.g., Baker 1991,
+1995; Dash and Morrow 2001; De Jong and Helsloot 2010; Dow and Cutter 1998, 2000;
+Knowles 2003; Rasid et al. 2000). It is therefore essential that dynamic traffic simulation
+models that aim to simulate an evacuation include this reactive traveller behaviour,
+therewith incorporating the important role of time-varying disaster conditions, (traffic)
+information, and warnings, discretionary advice and evacuation orders.
+We should remark here that, as in ‘‘Past and current evacuation traffic simulation
+models’’section,thisoverviewofsocio-psychologicalresearchandempiricsonevacuation
+123
+
+===== PAGE 9 =====
+
+Transportation(2012)39:97–123 105
+behaviourattemptsinnowaytogiveacompletediscussiononall(empirical)researchon
+evacuation behaviour. Instead we wish to provide a background of the current consensus
+on evacuation behaviour. This background is needed in the following sections when dis-
+cussingthesuitabilityofthe(mathematical)modelformulationsthatareproposedandused
+to simulate traveller behaviour under evacuation conditions.
+Travel demand modelling
+Travel demand models predict the number of people who will evacuate and when these
+people will depart. In other words, these models describe the decisions of travellers
+regardingevacuationparticipationanddeparturetime.Thesedecisionsaregenerallymade
+atthehouseholdlevel(DashandGladwin2007;DowandCutter2000;Heathetal.2001;
+Whiteheadetal.2000).Wewillinthefollowingdiscussionhowevernotconsideratwhich
+level the decision is made, but how the resulting evacuation participation rates and
+departure time patterns are simulated.
+Acommonlyusedapproachtodynamictraveldemandmodellingistodosointwoor
+three consecutive steps. Logically, the first step is to identify the region that needs to be
+evacuated. The first step of establishing the region that will evacuate or needs to be
+evacuated is often done by expert judgment going by the hazard scenario characteristics.
+For hurricane evacuations, this procedure is formalized by Wilmot and Meduri (2005)
+using hurricane attributes such as the track, speed, and size to identify evacuation zones.
+Easilyidentifiablezones(bye.g.ZIPcodeandlandmarks)arethenassignedaspecificrisk
+and are expected to evacuate in case of specific scenarios. Here, regions above the max-
+imumsurgefloodlimitarenotconsidered.However,evidently,alsoareaswhichareinfact
+notatriskmaystartevacuating(shadowevacuation).Especiallyconsideringthefindingsin
+theprevioussectionthatevacuationisprimarilymotivatedbypeople’sperceptionofbeing
+at risk. Durham (2007) points out that this may particularly happen during mass evacua-
+tions and it would lead to larger travel demand thus hindering those in real need to
+evacuate.
+After the first step is undertaken and the evacuation region is identified, the share of
+peoplethatwillparticipateintheevacuationispredicted,aswellastheirdeparturetimes.
+Herein, we distinguish two approaches based on whether the participation and departure
+time choices are modelled as sequential decisions (‘‘Sequential travel demand model’’
+section) or conducted simultaneously (‘‘Simultaneous travel demand model’’ section).
+Sequential travel demand model
+In the sequential approach, once the evacuation region is identified, the second step in
+predictingtraveldemandistopredicttheshareofpeoplewhowillevacuate.Forthecase
+ofhurricanes,Baker(1991)listedfiveattributesdeterminingthedecisiontoevacuate:the
+risklevelwithinthearea,actionsbypublicauthorities,typeofhousing,priorperceptionof
+personalrisk,andastormspecificthreatfactor.Inthepast,theseattributeshaveservedfor
+an empirically based approach to predict evacuation demand by Tweedie et al. (1986).
+Later,PBS&J(2000b)developedacross-classificationtypeoftripgenerationmodelbased
+on survey data collected in the south-eastern states of the US where the evacuation par-
+ticipation specified by county depended on the hurricane category and speed, tourist
+occupancy, and type of housing in that area. The performance of this behaviour-based
+modelwastestedagainstanumberofdata-drivenmodels,namelylogisticalregressionand
+123
+
+===== PAGE 10 =====
+
+106 Transportation(2012)39:97–123
+Fig.3 Evacuationresponse
+curvefollowingWeibull
+distributionfordifferent
+parametersettings:dashedgraph
+b=0.135,c=2.55;dash-
+dottedgraphb=0.085,
+c=3.05;solidgraphb=0.085,
+c=2.55;longdash-dottedgraph
+b=0.085,c=2.05;long
+dashedgraphb=0.035,
+c=2.55
+variousformsofneuralnetworkmodels,byWilmotandMei(2003)onadatasetcollected
+in south-west Louisiana following hurricane Andrew. The findings showed that the data-
+driven models (particularly a feedforward neural network structure) were better able to
+predicttheobservedparticipationrate.Thedrawbacksofthesetypesofmodels(especially
+neuralnetworks)are,however,thattheyrequirespecificdataforcalibrationandtheresults
+are typically not transferable toother settings. Thiswhile behaviour-based modelsdo not
+havethesedrawbacksandprovidemoreinsightintotheevacuationparticipationbehaviour
+of people.
+The third step to predict the dynamic travel demand is to model travellers’ departure
+time choice. This is often done by applying an exogenous response curve stating the
+percentage of departures in each time interval. Since some origins will be earlier under
+threat than others, such a response curve istypically predicted for each origin separately.
+The departure response curve has been assumed to follow many different distributions.
+Someexamplesareinstantaneousdeparture(Lewis2001;ChenandZhan2004;Chiuetal.
+2006), a Uniform distribution (Liu et al. 2006; Yuan et al. 2006), a Rayleigh distribution
+(Tweedie et al. 1986), a Poisson distribution (Cova and Johnson 2002), a Weibull distri-
+bution (Jonkman 2007; Lindell 2008) or sigmoid curve (Kalafatas and Peeta 2009;
+Xie et al. 2010). The Weibull distribution and sigmoid curve are most often used and
+claimed to be most realistic. The Weibull distribution is given by
+DðtÞ¼1(cid:3)expð(cid:3)btcÞ ð1Þ
+whereD(t)isthecumulativepercentageofpeoplewhohaveevacuateduntiltimeinstantt.
+Theshapeofthedistributionisdeterminedbytwoparameters,bandc.Theeffectofthese
+parameters is shown in Fig. 3. Higher values for b and c lead to a faster response, while
+lower values represent a slower response. The sigmoid curve is given by
+DðtÞ¼ð1þexp½(cid:3)aðt(cid:3)hÞ(cid:4)Þ(cid:3)1 ð2Þ
+The shape of the curve is determinedby two parameters, aand h. Theeffect hereof is
+more distinguishable and allows behavioural interpretation (Fig. 4). The response rate a
+setstheslopeofthecurve,suchthatlowvaluesproduceamoreuniformdepartureprofile
+(slower response). The half loading time hsets the midpoint of the curve, and thus states
+thetimeatwhichhalfofthetotalnumberoftravellershavedeparted.Sensitivityanalyses
+ontheseparametersdonebyOzbayandYazici(2006)andPeletal.(2010b)concludethat
+advancing or postponing the half loading time h clearly has no impact on the evacuation
+process since travellers departat the same rate and thusqueue lengthsandaverage travel
+timesareequalforallcases(unlessroadnetworkcharacteristicsarestochasticortheroad
+123
+
+===== PAGE 11 =====
+
+Transportation(2012)39:97–123 107
+Fig.4 Evacuationresponse
+curvefollowingsigmoidcurve
+fordifferentparametersettings:
+longdashedgrapha=2.5,
+h=2.5;longdash-dottedgraph
+a=1.5,h=4;solidgraph
+a=2.5,h=4;dash-dotted
+grapha=3.5,h=4;dashed
+grapha=2.5,h=5.5
+network is not fully available throughout the duration of the evacuation). On the other
+hand, the response rate a has a substantial non-linear impact on the evacuation traffic
+conditions andarrival pattern, especially whenthe network loadisrelatively high(which
+can be expected during evacuation conditions). The reason is that a higher response rate
+leads to more traffic on the road network which results in more congested traffic condi-
+tions. These worse traffic conditions lead to lower network performance (measured by,
+e.g.,trafficflowandarrivalrates),whichinturnfurtherdeterioratenetworkperformance.
+Thispositivefeedbackloopimpliesthatahigherresponseratedoesnotguaranteeafaster
+evacuation; it may even be slower. This underlines the importance of estimating the
+appropriate parameters when using these models applying an exogenous response curve.
+The sequential approach discussed above is applied most often. Ozbay and Yazici
+(2006) reason that this is due to the mathematical simplicity of the approach and the fact
+thatrelativelylittlesituation-specificdataisrequired.Modelattributesandparametersare
+usually estimated based on expert judgment or past evacuation data. However, the draw-
+back of this sequential approach (and particularly the response curves) is that there is no
+clearbehaviouralbasistojustifythemethodonastheresponsecurvesareexogenousinput
+insteadofendogenouslydeterminedbythethreat/hazardwithinthemodel.Itisdifficult,if
+not impossible, to incorporate the findings on the important (socio-psychological and
+circumstantial) factors determining individuals’ evacuation decision as discussed in
+‘‘Traveller behaviourunderevacuationconditions’’section.ThisisalsounderlinedbyFu
+(2004) pointing out that response curves are typically constructed for short-lasting evac-
+uations(uptillseveralhours,whilemanyevacuationsmaylastforseveraldays),time-of-
+day variations are not included (the sigmoid curve does not allow incorporating the
+behaviouraleffectofday/nighttimeonthedeparturetimeswhichareobservedinreal-life),
+hazardspecificdynamicsknowntoinfluencethetraveldemandarenotincluded(e.g.,the
+speed,intensityandtrackofahurricaneorwildfireinappropriatelyhavenoeffectontravel
+demand), and the effect of an evacuation plan cannot be realistically assessed (since the
+impact of the evacuation order is not addressed).
+Simultaneous travel demand model
+Another approach relaxing many of these limitations is to execute these steps (i.e., pre-
+dictingtripgenerationanddeparturetime)simultaneouslyasanendogenousprocess.The
+dynamic travel demand is modelled by applying a repeated binary logit model where we
+repeatedlyintimepredicttheshareofpeoplewhodecidetoevacuateanddepartpresently,
+orpostponethedecisiontoevacuate,seeFig. 5.Thedecisiontoevacuate,modelledbythis
+123
+
+===== PAGE 12 =====
+
+108 Transportation(2012)39:97–123
+Fig.5 Conceptualframework
+repeatedbinarylogitmodel
+binary logit model, is based on the differential utility associated with evacuating (com-
+paredtonotevacuating)basedonthe(subjectivelyperceived)prevailingconditions,such
+as the proximity of the hazard. This is given by
+DðtÞ¼maxð1þexp½(cid:3)lVðt0Þ(cid:4)Þ(cid:3)1 ð3Þ
+t0(cid:5)t
+where D(t) is the cumulative share of all people who have evacuated until time instant
+t.Thisdependsontherelativeutilitytoevacuatecomparedtothealternativeofpostponing
+the decision, denoted by V(t). This relative evacuation utility is typically estimated as a
+combinationoffactorsdeterminingtheattractivenessofevacuating.Examplesofpossible
+factors which may influence the decision to evacuate (or not) are socio-demographic
+characteristics (such as age, gender, household composition), spatio-temporal disaster
+characteristics (such as wind speed, intensity, distance to hazard), the opportunity to
+undertake property protection, whether neighbours evacuate, the presence of pets, prior
+evacuation experiences, and whether an evacuation order is given. For a more complete
+overviewofthemanydifferentfactorsthathavebeenreportedtodeterminetheevacuation
+decision we refer to Carnegie and Deka (2010). Different people perceive these factors
+differently and assign different importance to these factors. The effect of this variance is
+modelled by the scale parameter l in Eq. 3, where a higher value suggests a smaller
+variance among people.
+Equation 3 maximizes over t0 B t since the cumulative share of evacuees is computed
+anditisassumedthatpeopledonotreturnoncetheyhavedecidedtoevacuate.Therefore,
+thecurrentshareofevacueesequalstheshareofpeoplewhowoulddecideonevacuating
+given any of the previously prevailing conditions. Or in other words, it equals the maxi-
+mum share of people who have decided to evacuate in any of the previous time instants
+given the then prevailing utility to evacuate.
+The performance of the repeated binary logit model depends evidently on how accu-
+rately the relative evacuation utilities V(t) are estimated. Relative utility functions have
+beenestimatedforthecaseofwildfires(Alsnihetal.2005)andhurricanes(FuandWilmot
+2004; Fu et al. 2006) using both stated preference surveys and post-hurricane revealed
+preference surveys. For the case of wildfire evacuation, Alsnih et al. (2005) selected a
+number of attributes describing weather and wildfire conditions from literature and a
+123
+
+===== PAGE 13 =====
+
+Transportation(2012)39:97–123 109
+pre-study focus group. Surveys were carried out with different combinations of attribute
+levels. A multinomial logit model and mixed logit model were estimated based on the
+collected stated choice experiment data identifying a number of statistically significant
+factors: temperature, wind speed, wind direction, fire type, fire distance, and household
+specific socio-demographic characteristics. Since the levels of these attributes are time-
+dependent, the evacuation participation behaviour can be predicted dynamically as the
+wildfire evolves. Remarkably, the parameter for the attribute modelling whether the
+evacuation route was under threat of being cut off by the fire (originally included in
+thesurvey)wasfoundtobestatisticallynotsignificant.Thissuggeststhatinthiscasethe
+decisiontoevacuatewas madeindependentlyfrom theroutechoice decision.Thiswould
+mean that the travel demand and traffic assignment can be modelled independently
+(sequentially). Follow up research is needed to show whether this holds in more cases.
+Forthecaseofhurricaneevacuation,FuandWilmot(2004)estimatedarepeatedbinary
+logitmodelbasedon evacuationbehaviourdataforhurricaneAndrew.They identifiedas
+beingstatisticallysignificant:thedistancetothestorm,theforwardspeedofthehurricane,
+time-of-day (three periods were introduced using dummy variables: morning, afternoon,
+andnight),thepresenceofanevacuationorder,possibilityofflooding,andhousingtype.
+Later,Fuetal.(2006)estimatedthesamemodel(nowalsoincludinghurricanewindspeed
+and time-to-landfall) for a dataset from hurricane Floyd in South Carolina and tested the
+calibrated model on the hurricane Andrew data. The predicted dynamic travel demand
+provedtobesimilartotheobservedtraveldemandsuggestingthetransferabilityofweights
+to different sites and hurricane scenarios.
+In the travel demand models discussed here where a possible evacuation order is
+included, the impact of the order is typically modelled by estimating the change in
+evacuationbehaviour(i.e.,theincreaseindeparturerate)directlyaftertheevacuationorder
+is given. This may be appropriate when the order to evacuate immediately is given sud-
+denly. However, more complex departure behaviour is likely to occur in case of a staged
+evacuation where (groups of) travellers receive different designated departure time win-
+dows in advance, where these instructed departure time windows follow from an evacu-
+ationplansetuptomoderateevacuationflowsandavoidcongestion.Forinstance,people
+may consider postponing their preferred departure time in order to comply. In order to
+model this type of behaviour, Pel et al. (2008) proposes including a dynamic term in the
+evacuation utility function. This factor could be the time difference with the instructed
+departure time window, which decreases the relative utility of evacuating early, where
+earlier time instants are associated with a larger disutility, while it increases the relative
+utilityofevacuatinglate.Thelatterisjustifiedsincetheevacuationdecisionismodelledas
+arepeateddecisionwhethertoevacuate,thusinorderto‘comply’oncethedeparturetime
+window has passed people would have to evacuate belatedly. The compliance to the
+designated time window is then determined by the corresponding weight in the utility
+function.Thisweightmostlikelydependsonboththetraveller’swillingnesstocomplyas
+wellasthelevelofenforcementconveyedbytheauthorityexecutingtheevacuationplan.
+Forexample,instructionsdistributedthroughthemediamayleadtolowercompliancethan
+instructions given directly by the police going door-to-door.
+Discussion
+Thesequentialandsimultaneousapproachesofpredictingtheevacuationparticipationrate
+and departure time profile are both used. Generally speaking, the simultaneous approach
+applyingtherepeatedbinarylogitmodelistypicallyusedinevacuationresearchfocusing
+123
+
+===== PAGE 14 =====
+
+110 Transportation(2012)39:97–123
+on predicting the dynamic travel demand under various evacuation conditions. As also
+mentioned earlier, this might be due to the fact that it provides insight into the actual
+decisions of evacuees. The sequential approach with a fixed participation rate and exog-
+enous response curve is typically used in practice (including the traffic models used in
+evacuation studies discussed in ‘‘Past and current evacuation traffic simulation models’’
+section), and evacuation research focusing on other aspects than departure time choice
+behaviour(e.g.,witha focusontraffic management).Asmentionedearlier, thismightbe
+due to its simplicity. The sequential approach using logistical regression or a neural
+network to predict travel demand has the drawbacks of both approaches. These methods
+arebothnotsimpleinthesensethattheyrequireelaborateandspecificdata,aswellasdo
+not provide as much insight into the traveller behaviour as the simultaneous approach.
+Using neural networks here in particular seems of little value since these models are not
+generalisable.
+The sequential approach as modelled by PBS&J (2000a) using a cross-classification
+model was compared with the repeated binary logit model by Fu and Wilmot (2007). As
+expected, the binary logit model more closely models observed dynamic travel demand
+behaviour(basedonadatasetcontainingevacuationbehaviourinsouthwestLouisianafor
+hurricaneAndrew).Thereasonwhythisisexpectedisthattherepeatedbinarylogitmodel
+has more flexibility (a higher number of parameters). Hence it is better capable of mod-
+elling evacuation behaviour given that elaborate and specific data is available for cali-
+bration. In other words, it better allows incorporating all insights on evacuation decision
+making from the behavioural sciences and empirical studies discussed in ‘‘Traveller
+behaviourunderevacuationconditions’’section.Wewouldliketoemphasizeanumberof
+clear behavioural advantages to this approach pointed out by Fu and Wilmot (2007): the
+model estimates how people dynamically respond to changing hazard conditions, road
+network conditions, and evacuation instructions, the model provides insight into the
+observedevacuationbehaviour,andtheresults(weightratios)appeartobeuptoacertain
+level transferable to other sites and situations. Whether the latter advantage can be
+generalizedneedstobeshownbyfutureresearch.Insum,therepeatedbinarylogitmodel
+provides insight into trade-offs made in the decision to evacuate, resulting in travel
+demandsthatonanaggregatedlevelaremoreorlessconsistentwiththeobservedchoices.
+Thereby, given that it is well calibrated, it yields exactly the information that we need as
+model input for our evacuation traffic simulation models.
+Anotecanbemadehereonfutureresearchontherepeatedbinarylogitmodel.Current
+practice is to use the prevailing conditions to estimate the dynamic differential utility to
+evacuate (compared to not evacuating), as discussed earlier. There is good reason to
+believe that people not only consider current conditions, but base their decision on the
+predictedconditions.Thatis,theyalsodistinguishpatternsinchanginghazardconditions,
+such as an increase in wind speed, a rising water level, a growing levee breach and
+resultingincreaseinfloodingspeed,andanincreasingwildfireintensity.Similarly,people
+may distinguish steady conditions from temporary fluctuations, for instance, a wind con-
+tinuouslypushingthewildfiretowardstheindividualorhouseholdisperceiveddifferently
+than a temporary change in wind direction (though having the same instantaneously pre-
+vailingconditions).Hence,itmightproveworthwhiletoestimatethesemodelsnotonthe
+dynamic prevailing conditions at the time instant that the decision is made, but on the
+dynamicpredictedconditions.Asaproxyforthesepredictedconditions,therecently-past
+conditionsthatleaduptothetimeinstantthatthedecisionismadecouldbeused.Clearly,
+future research needs to show the possible benefit (regarding enhanced predictive power)
+of this approach.
+123
+
+===== PAGE 15 =====
+
+Transportation(2012)39:97–123 111
+To conclude, travel demand is typically predicted as the whole of single trips from
+origin (often home or work location) to destination (either network exit point or final
+refugelocation).Anumberofempiricalstudiessupporttheviewthathouseholdsevacuate
+as a unit (e.g., Heath et al. 2001; Sime 1993; Zelinsky and Kosinski 1991). Hence, it is
+implicitly assumed that evacuees belonging to a single household are either already all
+togetheruponevacuationorevacuateindependentlyandmeetupafterarrivingoutsidethe
+threatenedregion.ThisisrelaxedinworkbyMurray-TuiteandMahmassani(2003,2004).
+Theyproposeanevacuationmodelformulationaccountingfortripchainsduetohousehold
+interactions.Itissimulatedhowthecarlesshouseholdmembersarepickedupbytheother
+householdmember(s)attheirschool,workorresidentiallocationtothencontinuetheirtrip
+together.Incorporatingthishouseholdtripchainingprincipallyallowscapturingotherwise
+unexplained evacuation travel patterns (such as longer trips and initially ‘evacuating’
+towards the disaster area) and avoids too optimistic evacuation time predictions. Meeting
+locations are currently arranged before evacuation, as well as are the carless household
+membersassignedtodrivers.Theauthorspointoutthatfurtherresearchmayconsiderthe
+impact of communication and traffic information provision on drivers switching pick-ups
+and rerouting en-route, thus leading to a more efficient evacuation.
+Trip distribution modelling
+Tripdistributiondescribestheresultofindividuals’destinationchoice.Muchfewerstudies
+areconductedonthischoicebehaviourthanonthepreviouslydiscussedparticipationand
+departure time choice behaviour. Also, these studies all share a common approach. Gen-
+erally speaking, this approach consists of two steps. The factors determining the type of
+location that people evacuate to are identified first. Second, a (often gravity-based) trip
+distribution model is used to relate these location type preferences to actual destination
+choice. Each of these steps is discussed next.
+Factors determining type of evacuation location
+Asmallnumberofstudiesidentifythefactorswhichdeterminethetypeoflocationpeople
+evacuate to. This is done using both stated preference and revealed preference data. For
+instance, Whitehead et al. (2000) and Brodie et al. (2006) report that people with higher
+incomeandeducationtendtoevacuatetowardshotelsandmotels,whilepeoplewithlower
+income and education tend to evacuate to shelters, based on post-hurricane evacuation
+data. Deka and Carnegie (2010) build on this by conducting a stated preference survey
+relating socio-economic and demographic characteristics to the decision whether to
+evacuatetoashelterlocationortoanon-shelterlocation,suchasfriendsorrelativesanda
+hotelormotel.Theestimatedbinarylogitmodelsupportssimilarfindings.Theprobability
+that a household evacuates to friends or relatives is modelled by Cuellar et al. (2009) in
+their model for the US Golf coast by the likelihood that the household belongs to the
+‘‘region’sdominantracialgroup’’.Whetherthiscanbegeneralizedtoothersettingscanbe
+questioned.
+Destination choice modelling
+TheUSArmyCorpsofEngineers(1995),inaguidelineforhurricaneevacuationstudies,
+suggeststhatevacueescanbeallocatedtodestinationsproportionallytothepopulationin
+123
+
+===== PAGE 16 =====
+
+112 Transportation(2012)39:97–123
+thispossible destination, weightedby a functionof the travel distance.Thisis essentially
+thegravity-basedtripdistributionmodelwhichisappliedtopredicttheorigin–destination
+matrices used as model input in all the traffic simulation models introduced in ‘‘Past and
+current evacuation traffic simulation models’’ section.
+In other studies, the different location types and accompanying different determining
+factors as identified by Whitehead et al. (2000) and Brodie et al. (2006) are recognized.
+For instance, Cuellar et al. (2009) compute attraction potentials per type of location. The
+attractionforhotelsandmotelsisestimatedbasedontheaccommodationavailabilityanda
+presumedaverageoccupancyrate.Whereastheattractionforsheltersisestimatedbasedon
+thepresenceofschoolswithgymnasiawherethesesheltersareoftenconstructed.Location
+typespecifictrippotentialsandtripattractionsarethencomputedandusedinthelocation
+typespecificgravity-basedtripdistributionmodelstopredicttravellers’destinationchoice.
+Similarly, Cheng (2007) used post-hurricane survey data to estimate a ‘friend/relative
+trip distribution model’ and a ‘hotel/motel trip distribution model’. In this case, the
+observedorigin–destinationmatrixwasreconstructedbasedonthesurveydataandthetrip
+distributionmodelswereestimatedtoproducethebestfittingestimatedorigin–destination
+matrix. The gravity-based trip distribution models were calibrated assuming that trip fre-
+quencies are considered inversely proportional to the travel distance once outside the
+threatened zone. Testing the trip length distribution as predicted by the calibrated trip
+distributionmodelsagainstobservedtriplengthdistributionsgavegoodstatisticalresults.
+However,littlebehaviouralinferencescanbemadefromsuchanapproach.Therefore,ina
+later study (Cheng et al. 2008) the same data was used to estimate two multinomial logit
+models. For the friend/relative model, it was found that, as expected, the parameters for
+travel distance and the probability that the destination was at risk by the hurricane were
+negative,indicatingthatadestinationatlargerdistanceandhigherriskislesslikelytobe
+chosen.Factorshavingapositiveinfluenceonthedestinationchoiceoftravellerswerethe
+destinationpopulation,whetherthedestinationisametropolitanarea,andthe‘‘percentage
+of white population’’ at the destination. For the hotel/motel multinomial logit model the
+factors travel distance, risk indicator, and white population percentage were also found,
+withthesameeffect.Here,alsothenumberofhotelsatthedestinationandtheproximityto
+theinterstatemotorwayhadapositiveeffect.Thestaticapproachinthisstudyisrelaxedin
+a subsequent study by Cheng and Wilmot (2009) where time-dependent travel times are
+included in a quasi-dynamic destination choice model. However, it should be remarked
+that these time-dependent travel times were reconstructed using the TransCAD traffic
+simulationmodelwhichcomputesaquasi-dynamicuserequilibriumassignmentbasedon
+link travel times following the Bureau of Public Roads (BPR) function. The authors
+themselves point out that this approach likely leads to wrong estimates on the prevailing
+travel times, and suggest improving the destination choice model by applying a different
+dynamic traffic assignment model.
+Discussion
+The available research on evacuation destination choice behaviour shows consistent
+findingsondistinguishingdeterminingfactorsfordestinationchoicedependingonthetype
+oflocationpeopleevacuateto.Also,itsuggeststhatgravity-basedtripdistributionmodels
+canbeusedtoreconstructevacuees’destinationdecisions.However,giventhatthenumber
+of studies is limited and a number of these rely on the same data set, it remains unclear
+whetherthesefindingscanbegeneralized.Moreresearchisneededtoshowwhetherthisis
+the case. Future research on evacuation trip distribution modelling should preferably be
+123
+
+===== PAGE 17 =====
+
+Transportation(2012)39:97–123 113
+focused on a dynamic approach as this allows capturing the time-dependent destination
+availability, prevailing travel times, and prevailing risk threat to the destinations (Cheng
+et al. 2008).
+Lessfocusislaidontravellers’destinationchoiceby,forexample,Peletal.(2008)and
+Peeta and Hsu (2009). In these traffic simulation models particularly used in short or no
+notice evacuation it is assumed that travellers do not choose their destination upon
+departure, but instead tend to choose the route which leads them out of the threatened
+regionassoonaspossible.Oncesafe,theycontinuetheirtriptotheirfinaldestination.This
+and other route choice models are discussed next.
+Traffic assignment modelling
+Traffic assignment relates to assigning travellers to routes, thereby modelling travellers’
+routechoicedecisions.Anumberofstudiesreportoncomputingevacuationtimeestimates
+without the use of traffic assignment as defined here (e.g., Lindell and Prater 2007; Van
+Zuilekometal.2005).Thesemethodssidesteproutechoicebehaviourbysimplylookingat
+the total spatially distributed travel demand, the available network exit points, and the
+capacity bottlenecks in the road network. The ratio of the travel demand (in number of
+travellers) and network supply (in number of travellers that can pass per unit of time),
+together with some correction terms, then may give a quick prediction on the minimum
+time required for the complete evacuation. However, this approach certainly does not
+providefullinsightintotheactualevacuationtimesofregionsandneighbourhoods,northe
+dynamic evacuation traffic conditions, nor the determining factors underlying the evacu-
+ationprocess.Therefore,wewillnotdiscussthistypeofmodels,sincethisarticlefocuses
+on traveller behaviour in evacuation traffic simulation models (and the fact that these
+modelsareusuallyappliedtogaininsightintothedeterminantsofthesuccessorfailureof
+an evacuation and how these can be manipulated).
+Westructurethefollowingdiscussiononroutechoicemodelsbydistinguishingmodels
+thatassumeroutedecisionstooccurpre-trip(‘‘Pre-triproutechoicemodels’’section),en-
+route(‘‘En-routeroutechoicemodels’’section),andthosecombiningpre-tripanden-route
+routedecisions(‘‘Hybridroutechoicemodels’’section).Theuserequilibriumassignment
+assumptionappliedinmostofthetrafficsimulationmodelsdiscussedin‘‘Pastandcurrent
+evacuationtrafficsimulationmodels’’sectionfallsunderthe pre-triproute choicemodels
+discussed next.
+Pre-trip route choice models
+Within pre-trip route choice models, travellers are assumed to choose their route from
+origintodestinationupondeparture(thustermedpre-trip)anddonotswitchrouteswhile
+travelling. These routes are chosen based on the currently prevailing or expected route
+utilities. The chosen routes may prove to be not the most attractive routes when the
+resulting traffic conditions (derived after simulation) deviate from the initially predicted
+trafficconditions onwhichthe routechoices were based.Therefore,typicallyaniterative
+procedure is used that allows travellers to choose a different route in the next iteration,
+based on the actually experienced route costs. Repeating this process over a sufficiently
+largenumberofiterationsleadstoauserequilibriumassignmentinwhichnotravellercan
+unilaterally switch routes and be better off (Wardrop’s equilibrium law, see Wardrop
+1952).
+123
+
+===== PAGE 18 =====
+
+114 Transportation(2012)39:97–123
+Insimulatingpre-triproutechoice,routeflowfractionsarecomputedattheoriginsand
+travellers are propagated from origins to destinations along these routes. The route flow
+fractions are determined by the probabilities that each route has the highest route utility,
+where these expected route utilities more closely resemble the actual (observed) route
+utilitiesasthenumberofiterationsincreases.Thesepre-triproutechoicemodelswithinan
+equilibrium framework are generally used for many dynamic traffic assignment applica-
+tions, though mainly for long-term planning purposes where it can be assumed that trav-
+ellershavepastexperiencesleadingtowell-informedexpectationsaboutthefuturetraffic
+conditionsthattheywillencounterduringtheirtrip.Thisassumptionontravellers’learning
+andhabitformationismostlikelynotanappropriateassumptionforthecaseofevacuation
+routechoicebehaviour.Thereasonforthisisthatevacuationisalow-frequentexceptional
+event accompanied by an unusual travel demand pattern and unusual network capacity
+(due to the combination of different driving behaviour, dynamic traffic control measures,
+and the adverse disaster conditions) resulting in different-from-normal traffic conditions,
+which are difficult to anticipate on.
+Thepre-triproutechoicemodelinanequilibriumframeworkisappliedinmostofthe
+dynamic traffic simulation models discussed in ‘‘Past and current evacuation traffic sim-
+ulationmodels’’section,aswellasinanumberofotherevacuationstudies(e.g.,Goemans
+and Jansen 2009; Lin et al. 2009; Song et al. 2009).
+An approach which is equivalent to an iterative user equilibrium assignment is by
+applying an incremental assignment method adopted by, for instance, Brown et al.
+(2009) while developing a hurricane evacuation model. Here, (pre-trip) route choices
+are modelled sequentially, instead of iteratively. Travellers are assigned to a route in a
+step-wise fashion. In one step, the (predicted) route costs are computed and a small
+number of travellers are assigned to the then most attractive routes. In the next step,
+the route costs are updated based on the new route flows, and again a small number of
+travellers are assigned to the most attractive routes. When the increments (i.e., the
+number of travellers assigned to a new route in each step) are sufficiently small, then a
+user equilibrium assignment is reached once all steps are executed and all travellers
+have been assigned to a route. Therefore, the same (likely inappropriate) behavioural
+assumption is made as with the iterative procedure computing the user equilibrium
+assignment.
+In some of the traffic simulation models discussed in ‘‘Past and current evacuation
+traffic simulation models’’ section (OREMS, MASSVAC, VISSIM, INDY) user-defined
+routes and route flow fractions can be model input. This allows evaluating (mandatory)
+instructions regarding prescribed evacuation routes. These prescribed evacuation routes
+do not necessarily minimize individual travel costs, thus leading to a user equilibrium,
+but may instead aim at minimizing, for instance, the total travel costs, thus leading to a
+system optimum (simulated by, e.g., Li et al. 2006; Liu et al. 2007; Kalafatas and Peeta
+2009; Zheng et al. 2010). Other optimization objectives than the system optimum have
+been used. An overview can be found in Yuan and Han (2009) and Huibregtse et al.
+(2010). The important issue here is that testing evacuation route instructions while
+simulating pre-trip route choice disables incorporating (partial) traveller compliance
+behaviour. It is necessarily assumed that travellers fully comply, since the pre-trip route
+choice model does not allow travellers to deviate from their (prescribed) evacuation
+route during their trip. The discussion in ‘‘Traveller behaviour under evacuation
+conditions’’ section shows that this full compliance assumption is most certainly too
+strict.
+123
+
+===== PAGE 19 =====
+
+Transportation(2012)39:97–123 115
+En-route route choice models
+Theassumptionthattravellerscannotdeviatefromtheir(pre-trip)chosenrouteisrelaxed
+in case of en-route route choice. Here, travellers observe prevailing traffic conditions as
+they travel, and make route choice decisions accordingly. En-route route choice models
+thus simulate travellers who travel from one intersection to the next, every time deciding
+onthenextdownstreamdirectionbasedonrouteguidanceortheavailableinformationon
+the prevailing (instantaneous or predicted) traffic conditions.
+Insimulatingen-routeroutechoice,linkflowfractions(alsocalledsplitproportionsor
+turn fractions) are computed at all intersection nodes, and travellers are propagated from
+oneintersectionnodetothenextalongthedownstreamlinks.Thelinkflowfractionfora
+downstreamlinkiscomputedbytheprobabilitythatanyroute(startingattheintersection
+node) in this downstream direction has the lowest route costs. This myopic opportunistic
+travel behaviour is described by, for instance, a set of fuzzy rules (Peeta and Yu 2005),
+recurrent neural network (Yang et al. 1995), fuzzy network (Hawas 2004), or discrete
+probabilistic choice model (Dia et al. 2001; Adler et al. 1993). This approach has been
+mainlyappliedindynamictrafficassignmentapplicationsontheimpactofrouteguidance
+ortrafficinformation.Evacuationstudiesusingtheen-routeroutechoicemodelarescarce.
+OnepossibleexampleisthestudybyMitchellandRadwan(2006)usingINTEGRATION
+(Rakha and van Aerde 2004) to study the impact of evacuation staging on network
+clearancetime.However,itshouldbementionedthatINTEGRATIONprovidesbothpre-
+trip and en-route route choice models and it is not fully clear which route choice model
+alternative was used in this study.
+Hybrid route choice models
+The assumption that travellers fully rely on past experiences in their route decisions (as
+madeinpre-triproutechoicemodels),aswellastheassumptionthattravellersbasetheir
+route decisions solely on prevailing traffic conditions (as made in en-route route choice
+models), are both relaxed in the hybrid route choice models. The hybrid models incor-
+porate the impact of unfamiliarity with traffic conditions and the provision of en-route
+traffic information by combining pre-trip route choice with en-route route switching.
+Travellers are assumed to choose an initial route upon departure, after which they may
+adapttheirrouteduringtheirtrip.Theymightdosowhenprevailingtrafficconditionsare
+such that travellers are better off (or have the feeling of being better off) by deviating to
+anotherroute.AhybridroutechoicemodelisusedinDYNASMART(Mahmassani2001)
+and EVAQ (Pel et al. 2009, 2011). The main difference is that in the mesoscopic
+DYNASMARTmodeltherouteswitchingischeckedforeachindividualtraveller,whilein
+the macroscopic EVAQ model this is checked for each intersection node and each class
+of travellers having the same initial route.
+In the macroscopic hybrid route choice model used in EVAQ, travellers who initially
+follow the same (pre-trip) route are said to belong to the same class. The class-specific
+routeflowfractionsarecomputedatallintersectionnodes,andtravellersofallclassesare
+propagatedalongtheseroutesuntilsometravellersdecidetoswitchtoanalternativeroute.
+Therouteflowfractionsfortravellersofaspecificclass(i.e.,initiallyfollowingthesame
+route)switchingtoanalternativerouteisgivenbytheprobabilitythatthisalternativeroute
+has the lowest route costs.
+Note that the pre-trip route choice model and en-route route choice model are special
+cases of the hybrid route choice model. In both of the hybrid route choice models
+123
+
+===== PAGE 20 =====
+
+116 Transportation(2012)39:97–123
+mentioned above, travellers only consider switching routes when the alternative route
+provides some minimum improvement. In the special case when this minimum improve-
+ment is set to infinite, travellers never deviate from their pre-trip chosen route (thus
+modelling pre-trip route choice). Whereas in the special case when this minimum
+improvement is set to zero, travellers always choose the then most attractive route,
+independent of their initial pre-trip chosen route (thus modelling en-route route choice).
+Values for the minimum improvement between zero and infinite allow modelling inter-
+mediatestateswheretravellersmakeatrade-offbetweencontinuingonthepre-tripchosen
+route and diverting to a more attractive route.
+Hybrid route choice models allow modelling and evaluating evacuation route instruc-
+tions, while accounting for partial traveller compliance. In this case, the initial (pre-trip
+chosen) routes can be set as the prescribed evacuation routes. Hence, the minimum
+improvement for travellers to deviate from their route represents the level of travellers’
+compliance, where a higher minimum improvement leads to a higher compliance level
+(since this reduces the probability of a more attractive alternative route), and vice versa.
+Thisway,thehybridroutechoicemodelformulationinEVAQhasbeenexploitedbyPel
+etal.(2010a)toevaluatetheimpactofpartialtravellercomplianceonexistingevacuation
+traffic plans, and by Pel et al. (2010c) to design new optimal evacuation plans while
+anticipating partial traveller compliance behaviour.
+Discussion
+Pre-trip routechoice isimplemented inmanytraffic simulationmodelsincludingmost of
+thoseusedinevacuationstudiesreportedin‘‘Pastandcurrentevacuationtrafficsimulation
+models’’ section. That the underlying behavioural assumption that travellers have well-
+informed expectations about the future traffic conditions that they will encounter during
+theirtrip(possiblyfrompastexperiences)isinappropriate,issupportedbythediscussion
+in ‘‘Traveller behaviour under evacuation conditions’’ section as well as a number of
+empiricalstudies.Theseempiricalstudiesshowthelargeroleofreroutingbehaviour,thus
+favouring the en-route and hybrid route choice models. For instance, Knoop et al. (2010)
+analyse how travellers use the provided traffic information when faced with otherwise
+unfamiliar traffic conditions (in this case not evacuation, but the aftermath of large scale
+traffic accidents). They found that a large share of travellers (up to 50%) is inclined to
+switch routes based on the prevailing traffic information. Also, rerouting is much more
+often observed when the origin of the adverse traffic conditions is an uncommon event
+(inthiscasethemajortrafficaccident),ascomparedtoequaladversetrafficconditionsdue
+toarecurringevent(e.g.,day-to-dayfluctuationsintraveldemandandnetworkcapacity).
+Similar conclusions were drawn by Robinson and Khattak (2010) using stated choice
+preference surveys on route choice under hypothetical evacuation situations. They
+observed that a large share of respondents (up to 72%) anticipated rerouting in case of
+evacuation, regardless of whether or not they frequently altered routes under non-evacu-
+ationconditionstoavoidcongestion.Thisreroutingbehaviourcanonlybesimulatedusing
+en-route or hybrid route choice models.
+En-route and hybrid route choice models have another related advantage over pre-trip
+routechoicemodels.Namely,theabilitytomodelreal-timetravellerresponsestochanges
+intheroadnetworkconditionsduetothehazard’sevolutioninspaceandtime(e.g.,road
+sectionsbecominginaccessibleduetoflooding)anddynamictrafficregulationsandcontrol
+measures (e.g., contraflow operations to increase outbound capacity). The effect of these
+roadinfrastructure dynamicscan onlybeproperlymodelled by en-routeand hybridroute
+123
+
+===== PAGE 21 =====
+
+Transportation(2012)39:97–123 117
+choicemodels.Thisisduetothefactthatinmodelswithpre-triproutechoicethereisno
+waytoavoidtravellersfromfollowingthechosenroute,evenifthenextlinkisobviously
+inaccessible.Therefore,thepossibilityofinaccessibleroadsectionsduetonetworkfall-out
+prohibitspre-triproutechoiceandrequiresen-routeroutedecisionsoncetravellersbecome
+aware of the changes in network conditions. Consequently, travellers will take detours
+around prevailing inaccessible sections of the road network.
+Finally, when testing and evaluating optimal evacuation routes, hybrid route choice
+models allow simulating partial traveller compliance behaviour, which is most likely to
+occur,asarguedin‘‘Travellerbehaviourunderevacuationconditions’’section.Byvarying
+the minimum improvement that travellers require before deviating from their dedicated
+evacuation route, insight can be gained into the impact of evacuation instructions under
+various traveller compliance levels. This enables both testing the robustness of existing
+evacuation plans towards uncertain traveller compliance levels, as well as designing
+evacuation plans while anticipating the expected traveller compliance behaviour.
+In sum, hybrid route choice models are the most flexible and likely also the most
+appropriateapproachinmodellingtravellers’routechoicebehaviourduringevacuation,as
+these allow incorporating the impact of dynamic traffic information, changes in the road
+network conditions, and partial traveller compliance behaviour towards evacuation route
+instructions.Thatthesefactorsplayanimportantroleinevacuationstudiesisshownbythe
+discussion in ‘‘Traveller behaviour under evacuation conditions’’ section.
+Afinalnotecanbemadehereonthefactthatsimulatedroutechoicedecisionsareoften
+determined by (expected) (prevailing) route travel times. The generalized route costs can
+arguablybeappendedwithotherattributesplayingaroleintravellers’routedecisions.For
+instance, Chiu and Mirchandani (2008) argue that there is a bias towards using familiar
+routesandmotorways,wherethelattermightbeascribedtotheperceptionoftheseroads
+beingmorereliable.ThisissupportedbythestudiesbyDowandCutter(2002)andLindell
+and Prater (2006) reporting high traffic volumes on the interstate motorways in the
+evacuations preceding respectively hurricane Floyd and hurricane Katrina despite the
+availability of alternative routes using rural roads. Further research is needed to show
+the actual role that these and similar route attributes play in evacuation route decisions.
+Concluding comments
+Thecontentandcontributionofthisarticleistwofold.Firstofall,itstructuresthecurrent
+state-of-the-practice in evacuation traffic simulation studies. To this end, a perspective is
+givenonpastandpresentevacuationtrafficsimulationmodels,andthecurrentconsensus
+onevacuationtravelbehaviour.Thelatterbasedonpsycho-behaviouralconstructsfromthe
+social sciences and empirical studies on evacuation behaviour. We argued that people do
+not automatically follow the advice and orders from public officials, but tend to seek
+information, assess their personal risk, and make independent evacuation decisions. It is
+therefore essential that dynamic traffic simulation models that aim to simulate an evacu-
+ationsimulatethisreactivetravellerbehaviour,therewithincorporatingtheimportantrole
+of time-varying disaster conditions, (traffic) information, and warnings, discretionary
+advice and evacuation orders. From this viewpoint, the different model formulations to
+simulate travel behaviour were elaborated on, as well as their suitability to the case of
+evacuation.Fortheevacuationparticipationanddeparturetimechoicewearguedinfavour
+ofthesimultaneousapproachtodynamicevacuationdemandpredictionusingtherepeated
+binarylogitmodel.Therepeatedbinarylogitmodelprovidesinsightintotrade-offsmade
+123
+
+===== PAGE 22 =====
+
+118 Transportation(2012)39:97–123
+in the decision to evacuate, resulting in dynamic travel demands that on an aggregated
+levelaremoreorlessconsistentwiththeobservedchoices.Forthedestinationchoicewe
+showedhowfutureresearchisneededtogeneralizethecurrentpreliminaryfindingsonthe
+location-specific (gravity-based) destination choice models. For the evacuation route
+choice we argued in favour of the use of a hybrid route choice model. This since hybrid
+route choice models allow incorporating the impact of dynamic traffic information,
+changesintheroadnetworkconditions,andpartialtravellercompliancebehaviourtowards
+evacuation route instructions.
+Second of all, this article gives direction to the current state-of-the-art in modelling
+evacuation travel behaviour. This is done by reviewing and consolidating the past and
+currentresearcheffortsondifferentmodelformulationsdescribingtheevacuationchoice,
+departure time choice, destination choice, and route choice. Within each of these discus-
+sions,wepointedatcurrentlimitationsandmadecorrespondingsuggestionsonpromising
+future research directions.
+OpenAccess ThisarticleisdistributedunderthetermsoftheCreativeCommonsAttributionNoncom-
+mercial License which permits any noncommercial use, distribution, and reproduction in any medium,
+providedtheoriginalauthor(s)andsourcearecredited.
+References
+Abdelgawad, H., Abdulhai, B.: Emergency evacuation planning as a network design problem: a critical
+review.Transp.Lett.1(1),41–58(2009)
+Adler,J.L.,Recker,W.W.,McNally,M.G.:Aconflictmodelandinteractivesimulator(FASTCARS)for
+predictingen-routedriverbehaviourinresponsetoreal-timetrafficconditioninformation.Transpor-
+tation20(2),83–106(1993)
+Aguirre, B.E.: Commentary on understanding mass panic and other collective responses to threat and
+disaster:emergencyevacuations,panic,andsocialpsychology.Psychiatry68,121–129(2005)
+Alsnih, R., Rose, J., Stopher, P.: Understanding household evacuation decisions using a stated choice
+survey—casestudyofbushfires.In:Proceedingsofthe84thAnnualMeetingTransportationResearch
+Board,Washington,DC,USA(2005)
+Baddeley, A.D.: Selective attention and performance in dangerous environments. Br. J. Psychol. 63,
+537–546(1972)
+Baker,E.J.:Hurricaneevacuationbehavior.Int.J.MassEmerg.Disasters9(2),287–310(1991)
+Baker,E.J.:Publicresponsestohurricaneprobabilityforecasts.Prof.Geogr.47(2),137–147(1995)
+Balakrishna, R., Wen, Y., Ben-Akiva, M., Antoniou, C.: Simulation-based framework for transportation
+networkmanagementforemergencies.Transp.Res.Rec.2041,80–88(2008)
+Barrett,B., Ran,B., Pillai,R.:Developinga dynamictrafficmanagement modellingframeworkforhur-
+ricaneevacuation.Transp.Res.Rec.1733,115–121(2000)
+Blake, S.J., Galea, E.R., Westeng, H., Dixon, A.J.P.: An analysis of human behavior during the WTC
+disaster of 11 September 2001 based on published survivor accounts. In: Proceedings of the Third
+International Symposium on Human Behavior in Fire, pp. 181–192. InterScience Communications,
+London(2004)
+Bohannon,J.:Directingtheherd:crowdsandthescienceofevacuation.Science310,219–221(2005)
+Brodie, M., Weltzien, E., Altman, D.: Experiences of hurricane Katrina evacuees in Houston shelters:
+implicationsforfutureplanning.Am.J.PublicHealth96,1402–1408(2006)
+Brown, C., White, W., van Slyke, C., Benson, J.D.: Development of a strategic hurricane evacuation
+dynamictrafficassignmentmodelfortheHoustonregion.In:Proceedingsofthe88thAnnualMeeting
+TransportationResearchBoard,Washington,DC,USA(2009)
+Carnegie,J.A.,Deka,D.:Usinghypotheticaldisasterscenariostopredictevacuationbehavioralresponse.
+In:Proceedingsofthe89thAnnualMeetingoftheTransportationResearchBoard,Washington,DC,
+USA(2010)
+Chen,X.,Zhan,F.B.:Agent-basedmodelingandsimulationofurbanevacuation:relativeeffectivenessof
+simultaneous and staged evacuation strategies. In: Proceedings of the 83rd Annual Meeting Trans-
+portationResearchBoard,Washington,DC,USA(2004)
+123
+
+===== PAGE 23 =====
+
+Transportation(2012)39:97–123 119
+Cheng,G.:Frictionfactorfunctionscalibrationforhurricaneevacuationtripdistribution.In:Proceedingsof
+the86thAnnualMeetingTransportationResearchBoard,Washington,DC,USA(2007)
+Cheng,G.,Wilmot,C.G.:Investigatetime-dependenttravelcostimpactonhurricaneevacuationdestination
+choicemodels. In:Proceedings ofthe88thAnnualMeetingTransportationResearchBoard,Wash-
+ington,DC,USA(2009)
+Cheng,G.,Wilmot,C.G.,Baker,E.J.:Adestinationchoicemodelforhurricaneevacuation.In:Proceedings
+ofthe87thAnnualMeetingTransportationResearchBoard,Washington,DC,USA(2008)
+Chiu, Y.C., Mirchandani, P.B.: Online behavior-robust feedback information routing strategy for mass
+evacuation.IEEETrans.Intell.Transp.Syst.9(2),264–274(2008)
+Chiu,Y.,Villalobos,J.,Gautam,B.,Zheng,H.:Modelingandsolvingtheoptimalevacuation-route-flow-
+staging problem for no-notice extreme events. In: Proceedings of the 85th Annual Meeting Trans-
+portationResearchBoard,Washington,DC,USA(2006)
+Cornwell, B.: Bonded fatalities: relational and ecological dimensions of a fire evacuation. Sociol. Q 44,
+617–638(2003)
+Court, M., Pittman, J., Alexopoulos, C., Goldsman, D., Kim, S., Loper, M., Pritchett, A., Haddock, J.:
+A framework for simulating human cognitive behavior and movement when predicting impacts of
+catastrophicevents.In:2004WinterSimulationConference(2004)
+Cova, T.J., Johnson, J.P.: Microsimulation of neighborhood evacuations in the urban–wildlife interface.
+Environ.Plan.A34(12),2211–2229(2002)
+Cova,T.J.,Johnson,J.P.:Anetworkflowmodelforlane-basedevacuationrouting.Transp.Res.A37(7),
+579–604(2003)
+Cuellar,L.,Kubicek,D.,Hengartner,N.,Hansson,A.:Emergencyrelocation:populationresponsemodelto
+disasters.In:ProceedingsoftheIEEEConferenceonTechnologiesforHomelandSecurity,Boston,
+MA,USA,pp.628–635(2009)
+Dash,N.,Gladwin,H.:Evacuationdecisionmakingandbehavioralresponses:individualandhousehold.
+Nat.HazardsRev.8(3),69–77(2007)
+Dash,N.,Morrow,B.H.:Returndelaysandevacuationordercompliance:thecaseofhurricaneGeorgesand
+theFloridaKeys.Environ.Hazards2,119–128(2001)
+De Jong, M., Helsloot, I.: The effects of information and evacuation plans on civilian response during
+the national Dutch crisis exercise ‘Waterproef’. In: Hoogendoorn, S.P., Pel, A.J., Taylor, M.A.P.,
+Mahmassani, H. (eds.) Proceedings of the 1st International Conference on Evacuation Modeling
+andManagement,pp.153–162.Elsevier,Amsterdam(2010)
+Deka, D., Carnegie, J.A.: Analyzing evacuation behavior of transportation-disadvantaged populations in
+northern New Jersey. In: Proceedings of the 89th Annual Meeting of the Transportation Research
+Board,Washington,DC,USA(2010)
+Dia, H., Harney, D., Boyle, A.: Dynamics of drivers’ route choice decisions under advanced traveller
+informationsystems.RoadTransp.Res.10,2–12(2001)
+Dombroski,M.,Fischhoff,B.,Fischbeck,P.:Predictingemergencyevacuationandshelteringbehavior:a
+structuredanalyticalapproach.RiskAnal.26(6),1675–1688(2006)
+Dow, K., Cutter, S.L.: Crying wolf: repeat responses to hurricane evacuation orders. Coast. Manag. 26,
+237–252(1998)
+Dow, K., Cutter, S.L.: Public orders and personal opinions: household strategies for hurricane risk
+assessment.Environ.Hazards2,143–155(2000)
+Dow, K., Cutter, S.L.: Emerging hurricane evacuation issues: Hurricane Floyd and South Carolina. Nat.
+HazardsRev.3(1),12–18(2002)
+Durham,C.M.:Hurricaneevacuation.In:Proceedingsofthe86thAnnualMeetingTransportationResearch
+Board,Washington,DC,USA(2007)
+Franzese,O.,Han,L.D.:Trafficmodelingframeworkforhurricaneevacuation.Internalreport,OakRidge
+NationalLaboratory,OakRidge(2001)
+Fu,H.:Developmentofdynamictraveldemandmodelsforhurricaneevacuation.Dissertation,Louisiana
+StateUniversity,USA(2004)
+Fu,H.,Wilmot,C.G.:Asequentiallogitdynamictraveldemandmodelforhurricaneevacuation.Transp.
+Res.Rec.1882,19–26(2004)
+Fu,H.,Wilmot,C.G.:Staticvs.dynamicandaggregatevs.disaggregate:acomparisonbetweenpracticeand
+researchinhurricaneevacuationtraveldemandmodeling.In:Proceedingsofthe86thAnnualMeeting
+TransportationResearchBoard,Washington,DC,USA(2007)
+Fu, H., Wilmot, C.G., Zhang, H.: Modeling the hurricane evacuation response curve. Transp. Res. Rec.
+2022,94–102(2006)
+Glass,A.:Psychologicalaspectsofdisaster.JAMA171(2),222–225(1959)
+123
+
+===== PAGE 24 =====
+
+120 Transportation(2012)39:97–123
+Goemans,J.W.,Jansen,W.R.:DevelopmentandapplicationsofaGIS-basedtrafficevacuationmodelfor
+Haaglanden,theNetherlands,usingthe‘Hoogwater?Vrijeweg!’toolbox.In:Proceedingsofthe1st
+InternationalConferenceonEvacuationModelingandManagement,TheHague,TheNetherlands(2009)
+Goldblatt,R.B.:Evacuationplanning,humanfactorsandtrafficengineeringperspectives.In:Proceedingsof
+the2004EuropeanTransportConference,Strasbourg,France(2004)
+Han, L.D., Yuan, F.: Evacuation modeling and operations using dynamic traffic assignment and most
+desirabledestinationapproaches.In:Proceedingsofthe84thAnnualMeetingTransportationResearch
+Board,Washington,DC,USA(2005)
+Hardy,M.,Wunderlich,K.,Bunch,J.,Smith,T.:Structuringmodelingandsimulationanalysesforevac-
+uation planning and operations. In: Proceedings of the 89th Annual Meeting of the Transportation
+ResearchBoard,Washington,DC,USA(2010)
+Hawas,Y.E.:Developmentandcalibrationofroutechoiceutilitymodels:neuro-fuzzyapproach.J.Transp.
+Eng.130(2),171–182(2004)
+Heath, S.E., Kass, P.H., Beck, A.M., Glickman, L.T.: Human and pet-related risk factors for household
+evacuationfailureduringanaturaldisaster.Am.J.Epidemiol.153(7),659–665(2001)
+Henson,K.M.,Goulias,K.G.,Golledge,R.G.:Anassessmentofactivity-basedmodellingandsimulationfor
+applicationsinoperationalstudies,disasterpreparedness,andhomelandsecurity.Transp.Lett.1(1),
+19–39(2009)
+Hobeika,A.G.,Jamei,B.:MASSVAC:amodelforcalculatingevacuationtimesundernaturaldisaster.In:
+ProceedingsoftheComputerSimulationinEmergencyPlanningConference,LaJolla,USA(1985)
+Hobeika, A.G., Kim, C.: Comparison of traffic assignments in evacuation modeling. IEEE Trans. Eng.
+Manag.45(2),192–198(1998)
+Hoogendoorn, R.G.: State-of-the-art driving theory and modeling in case of adverse conditions. Internal
+report,DelftUniversityofTechnology,Delft(2010)
+Hoogendoorn, S.P., Knoop, V., Pel, A.J., Huibregtse, O.L., Hoogendoorn, R., Landman, R.: Verkeers-
+management bij exceptionele omstandigheden [Dutch: Traffic management for exceptional condi-
+tions].N.M.Mag.2,25–28(2009)
+Hooke,W.H.:USparticipationininternationaldecadefornaturaldisasterreduction.Nat.HazardsRev.1,
+2–9(2000)
+Huibregtse, O.L., Hoogendoorn, S.P., Bliemer, M.C.J.: Optimization of evacuation measures under
+uncertainty. In: Proceedings of the 89th Annual Meeting of the Transportation Research Board,
+Washington,DC,USA(2010)
+Jonkman,S.N.:Lossoflifeestimationinfloodriskassessment:theoryandapplications.Dissertation,Delft
+UniversityofTechnology,TheNetherlands(2007)
+Kalafatas, G., Peeta, S.: Planning for evacuation: insights from an efficient network design model.
+J.Infrastruct.Syst.15(1),21–30(2009)
+KLD:FormulationsoftheDYNEVandI-DYNEVtrafficsimulationmodelsusedinESF.Technicalreport
+preparedfortheFederalEmergencyManagementAgency,KLDAssociates,Washington,DC(1984)
+Klunder, G., Terbruggen, S., Mak, J., Immers, B.: Large-scale evacuation of the Randstand: evacuation
+simulationswiththedynamictrafficassignmentmodelIndy.In:Proceedingsofthe1stInternational
+ConferenceonEvacuationModelingandManagement,TheHague,TheNetherlands(2009)
+Knoop, V.L., Hoogendoorn, S.P., Van Zuylen, H.J.: Rerouting behaviour of travellers under exceptional
+traffic conditions—an empirical analysis of route choice. In: Hoogendoorn, S.P., Pel, A.J., Taylor,
+M.A.P.,Mahmassani,H.(eds.)Proceedingsofthe1stInternationalConferenceonEvacuationMod-
+elingandManagement,pp.113–128.Elsevier,Amsterdam(2010)
+Knowles,L.:Sydneybushfireemergencyevacuation:analysisofqualitativeresearchconductedwithhome
+ownersinbushfire-proneareas.InternalReport.InstituteofTransportStudies,UniversityofSydney
+(2003)
+Lave, B.L., Apt, J.: Planning for natural disasters in a stochastic world. J. Risk Uncertain. 33, 117–130
+(2006)
+Lave,B.L.,Resendiz-Carrilla,D.,McMichael,F.:Safetygoalsforhigh-hazarddams:aredamstoosafe?
+WaterResour.Res.26,1683–1691(1990)
+Leach,J.,Campling,J.:SurvivalPsychology.PalgraveMacmillan,Basingstoke(1982)
+Lewis,D.:September’sgreatescape:newinformationsystemhelpsmanagehurricaneevacuations.Roads
+Bridges39,40–42(2001)
+Li,Q.,Yang,X.,Wei,H.:IntegratingtrafficsimulationmodelswithevacuationplanningsysteminaGIS
+environment.In:ProceedingsoftheIEEEIntelligenceTransportationSystemsConference,Toronto,
+Canada(2006)
+Lin,D.Y.,Eluru,N.,Waller,S.T.,Bhat,C.R.:Evacuationplanningusingtheintegratedsystemofactivity-
+basedmodelinganddynamictrafficassignment.Transp.Res.Rec.2132,69–77(2009)
+123
+
+===== PAGE 25 =====
+
+Transportation(2012)39:97–123 121
+Lindell,M.K.:EMBLEM2:anempiricallybasedlargescaleevacuationtimeestimatemodel.Transp.Res.A
+42,14–154(2008)
+Lindell, M.K., Prater, C.S.: Evacuation from hurricane Katrina: Jefferson and St. Charles parishes.
+In:ProceedingsoftheNationalHurricaneConference,Orlando,FL,USA(2006)
+Lindell,M.K.,Prater,C.S.:Criticalbehavioralassumptionsinevacuationtimeestimateanalysisforprivate
+vehicles:examplesfromhurricaneresearchandplanning.JUrbanPlan.Dev.133(1),18–29(2007)
+Lindell,M.K.,Lu,J.C.,Prater,C.S.:Householddecisionmakingandevacuationinresponsetohurricane
+Lili.Nat.HazardsRev.6(4),171–179(2005)
+Liu,Y.,Lai,X.,Chang,G.:Two-levelintegratedoptimizationsystemforplanningofemergencyevacu-
+ation.J.Transp.Eng.32(10),800–807(2006)
+Liu, H.X., He, X., Ban, X.: A cell-based many-to-one dynamic system optimal model and its heuristic
+solutionmethodforemergencyevacuation.In:Proceedingsofthe86thAnnualMeetingTransportation
+ResearchBoard,Washington,DC,USA(2007)
+Mahmassani,H.S.:Dynamicnetworktrafficassignmentandsimulationmethodologyinadvancedsystem
+managementapplications.Netw.Spat.Econ.1,267–292(2001)
+Mawson,A.R.:Understandingmasspanicandothercollectiveresponsestothreatanddisaster.Psychiatry
+68,95–113(2005)
+Mileti,D.S.,Drabek,T.E.,Haas,E.:Humansystemsinextremeenvironments:asociologicalperspective.
+ProgramonTechnology,EnvironmentandMan,MonographNo.21,InstituteofBehavioralScience,
+UniversityofColorado,Boulder(1975)
+Mitchell,S.W.,Radwan,E.:Heuristicprioritizationofemergencyevacuationstagingtoreduceclearancetime.
+In:Proceedingsofthe85thAnnualMeetingTransportationResearchBoard,Washington,DC,USA(2006)
+Murakami, Y., Minami, K., Kawasoe, T., Ishida, T.: Multi-agent simulation for crisis management.
+In:ProceedingsoftheIEEEonKnowledgeMediaNetworkingWorkshop,pp.135–139(2002)
+Murray-Tuite,P.:Perspectivesfornetworkmanagementinresponsetounplanneddisruptions.JUrbanPlan.
+Dev.133(1),9–17(2007)
+Murray-Tuite,P.,Mahmassani,H.S.:Modelofhouseholdtripchainsequencinginanemergencyevacua-
+tion.Transp.Res.Rec.1831,21–29(2003)
+Murray-Tuite,P.,Mahmassani,H.S.:Transportationnetworkevacuationplanningwithhouseholdactivity
+interactions.Transp.Res.Rec.1894,150–159(2004)
+Newkirk,R.T.:Theincreasingcostofdisasterin developedcountries:a challengetolocalplanningand
+government.J.Conting.CrisisManag.9(3),159–170(2001)
+Noh, H., Chiu, Y.C., Zheng, H., Hickman, M., Mirchandani, P.: An approach to modeling demand and
+supplyforashort-noticeevacuation.Transp.Res.Rec.2091,91–99(2009)
+ORNL:Respondingtoenergy-relatedemergencies.OakRidgeNatl.Lab.Rev.35(2)(2002).http://www.
+ornl.gov/info/ornlreview/v35_2_02/responding.shtml
+Ozbay,K.,Yazici,A.M.:Analysisofnetwork-wideimpactsofbehavioralresponsecurvesforevacuation
+conditions. In: Proceedings of the IEEE Intelligence Transportation Systems Conference, Toronto,
+Canada(2006)
+PBS&J:Evacuationtraveldemandforecastingsystem.Technicalreport,PBS&JInc,Tallahassee,FL,USA
+(2000a)
+PBS&J:SouthwestLouisianahurricaneevacuationstudy:transportationmodelsupportdocument.PBS&J
+Inc,Tallahassee(2000b)
+Peeta, S., Hsu, Y.T.: Behavior modeling for dynamic routing under no-notice mass evacuation. In: Pro-
+ceedingsofthe12thInternationalConferenceonTravelBehaviourResearch,Jaipur,India(2009)
+Peeta,S.,Yu,J.W.:Ahybridmodelfordriverroutechoiceincorporatingen-routeattributesandreal-time
+informationeffects.Netw.Spat.Econ.5(1),21–40(2005)
+Pel,A.J.,Bliemer,M.C.J.,Hoogendoorn,S.P.:EVAQ:anewanalyticalmodelforvoluntaryandmandatory
+evacuation strategies on time-varying networks. In: Proceedings of the 11th IEEE Conference on
+IntelligenceTransportationSystems,Beijing,China(2008)
+Pel,A.J.,Bliemer,M.C.J.,Hoogendoorn,S.P.:Hybridroutechoicemodelingindynamictrafficassignment.
+Transp.Res.Rec.2091,100–107(2009)
+Pel,A.J.,Bliemer,M.C.J.,Hoogendoorn,S.P.:Simulatingtravelbehaviorunderevacuationconditions.Eur.
+J.Transp.Infrastruc.Res.(underreview)(2011)
+Pel, A.J., Hoogendoorn, S.P., Bliemer, M.C.J.: Evacuation modeling including traveler information and
+compliancebehavior.In:Hoogendoorn,S.P.,Pel,A.J.,Taylor,M.A.P.,Mahmassani, H.(eds.)Pro-
+ceedingsofthe1stInternationalConferenceonEvacuationModelingandManagement,pp.101–111.
+Elsevier,Amsterdam(2010a)
+Pel,A.J.,Hoogendoorn,S.P.,Bliemer,M.C.J.:Impactofvariationsintraveldemandandnetworksupply
+factorsforevacuationstudies.Transp.Res.Rec.(inpress)(2010b)
+123
+
+===== PAGE 26 =====
+
+122 Transportation(2012)39:97–123
+Pel,A.J.,Huibregtse,O.L.,Hoogendoorn,S.P.,Bliemer,M.C.J.:Optimizingevacuationinstructionswhile
+anticipating traveler compliance behavior. In: Proceedings of the 13th IEEE Conference on Intelli-
+genceTransportationSystems,MadeiraIsland,Portugal(2010c)
+Pelechano,N.,Badler,N.:Modelingcrowdandtrainedleaderbehaviorduringbuildingevacuation.IEEE
+Comput.Graph.Appl.26(6),80–86(2006)
+Pelechano,N.,O’Brien,K.,Silverman,B.,Badler,N.:Crowdsimulationincorporatingagentpsychological
+models, roles and communication. In: Proceedings of the First International Crowd Simulation
+Workshop(2005)
+Pidd,M.,deSilva,F.N.,Eglese,R.:CEMPS:aconfigurableevacuationmanagementandplanningsystem—
+aprogressreport.In:Proceedingsofthe1993WinterSimulationConference(1993)
+Plowman,T.:Danger!Hurricanecoming.Planning67(12),16–21(2001)
+Quarantelli,E.L.:Thebehaviorofpanicparticipants.Sociol.Soc.Res.41,187–194(1957)
+Raggatt,P.,Butterworth,E.,Morrissey,S.:Issuesinnaturaldisastermanagement:communityresponseto
+thethreatoftropicalcyclonesinAustralia.DisasterPrev.Manag.2(3),12–21(1993)
+Rakha,H.,vanAerde,M.:INTEGRATIONUser’sGuide,vols.IandII.VanAerde&Associates,Kingston
+(2004)
+Rasid,H.,Wolfgang,H.,Hunt,L.:Post-floodassessmentofemergencyevacuationpoliciesintheRedRiver
+basin,southernManitoba.Can.Geogr.44(2),369–386(2000)
+Rathi,A.K.,Solanki,R.S.:Simulationoftrafficflowduringemergencyevacuations:amicrocomputerbased
+modelingsystem.In:Proceedingsofthe1993WinterSimulationConference(1993)
+Robinson,R.M.,Khattak,A.:Routechangedecision-makingbyhurricaneevacueesfacingcongestion.In:
+Proceedingsofthe89thAnnualMeetingoftheTransportationResearchBoard,Washington,DC,USA
+(2010)
+Schadschneider,A.,Klingsch,W.,Klupfel,H.,Kretz,T.,Rogsch,C.,Seyfried,A.:Evacuationdynamics:
+empirical results, modeling and applications. In: Meyers, B. (ed.) Encyclopedia of Complexity and
+SystemsScience.Springer,Berlin(2008)
+Schmidt,L.J.,Warner,B.:PANIC:Origins,InsightandTreatment.NorthAtlanticBooks,Berkley(2002)
+Sheffi,Y.,Mahmassani,H.S.,Powell,W.:NETVAC:ATransportationNetworkEvacuationModel.Center
+forTransportationStudies,MIT,Boston(1980)
+Shendarkar,A.,Vasudevan,K.,Lee,S.,Son,Y.:CrowdsimulationforemergencyresponseusingBDIagent
+basedonvirtualreality.In:Proceedingsofthe2006WinterSimulationConference(2006)
+Sherali, H.D., Carter, T.B., Hobeika, A.G.: A location-allocation model and algorithm for evacuation
+planningunderhurricane/floodconditions.Transp.Res.B25(6),439–452(1991)
+Sime, J.D.: Crowd psychology and engineering: designing for people or ball-bearings? In: Smith, R.A.,
+Dickie,J.F.(eds.)EngineeringforCrowdSafety,pp.119–131.Elsevier,NewYork(1993)
+Song, W., Zhu, L., Li, Q., Wang, X.D., Liu, Y., Dong, Y.C.: Evacuation model and application for
+emergencyevents.In:Proceedingsofthe4thIEEEInternationalConferenceonComputerScienceand
+InformationTechnology,Seoul,Korea(2009)
+Tu,H.,Tamminga,G.,Drolenga,H.,DeWit,J.,VanDerBerg,W.:EvacuationplanofthecityofAlmere:
+simulatingtheimpactofdrivingbehaviorsonevacuationclearancetime.In:Hoogendoorn,S.P.,Pel,
+A.J., Taylor, M.A.P., Mahmassani, H. (eds.) Proceedings of the 1st International Conference on
+EvacuationModelingandManagement,pp.67–75.Elsevier,Amsterdam(2010)
+Tweedie, S., Rowland, J., Walsh, S., Rhoten, R.: A methodology for estimating emergency evacuation
+times.Soc.Sci.J.23(2),189–204(1986)
+Tyhurst,J.:Individualreactionstocommunitydisaster:thenaturalhistoryofpsychiatricphenomena.Am.
+J.Psychiatry107(10),764–769(1951)
+US Army Corps of Engineers: Technical guidelines for hurricane evacuation studies. Technical report
+(1995)
+Van Zuilekom, K., van Maarseveen, M., van der Doef, M.: A decision support system for preventive
+evacuationofpeople.In: Geo-Information for Disaster Management, pp. 229–253. Springer,Berlin
+(2005)
+Wang,H.,Andrews,S.,Daiheng,N.,Collura,J.:Scenario-basedanalysisoftransportationimpactsincase
+ofdamfailurefloodevacuationinFranklincounty,Massachusetts.In:Proceedingsofthe89thAnnual
+MeetingoftheTransportationResearchBoard,Washington,DC,USA(2010)
+Wardrop,J.G.:Sometheoreticalaspectsofroadtrafficresearch.In:ProceedingsoftheInstitutionofCivil
+EngineersII(1)(1952)
+Whitehead,J.C.,Edwards,B.,vanWilligen,M.,Maiolo,J.R.,Wilson,K.,Smith,K.T.:Headingforhigher
+ground:factorsaffectingrealandhypotheticalhurricaneevacuationbehaviour.Glob.Environ.Chang.
+B2,133–142(2000)
+123
+
+===== PAGE 27 =====
+
+Transportation(2012)39:97–123 123
+Wickens,C.D.:Attention.In:Hancock,P.A.(ed.)HumanFactorsPsychology,pp.29–79.ElsevierScience
+PublishersB.V.,Amsterdam(1987)
+Williams,B.,Tagliaferri,A.,Meinhold,S.,Hummer,J.,Rouphail,N.:Simulationandanalysisoffreeway
+lanereversalforcoastalhurricaneevacuation.JUrbanPlan.Dev.133(1),61–72(2007)
+Wills,R.H.:HumanInstincts,EverydayLife,andtheBrain.BookEmporium,Canada(1998)
+Wilmot,C.G.,Meduri,N.:Amethodologytoestablishhurricaneevacuationzones.Transp.Res.Rec.1922,
+129–137(2005)
+Wilmot, C.G., Mei, B.: Comparison of alternative trip generation models for hurricane evacuation. In:
+Proceedings of the 82nd Annual Meeting Transportation Research Board, Washington, DC, USA
+(2003)
+Wilmot,C.G.,deLapparent,M.,Taylor,M.A.P.,Arce,C.,Baker,E.,Cherrington,L.,Gripsrud,M.,Lian,
+J.I.,Manore,M.,Potier,F.:Whatdatadoweneedforthemanagement(andmodelling)ofemergency
+situations—andhowcanthedatabecollected?In:Proceedingsofthe1stInternationalConferenceon
+EvacuationModelingandManagement,TheHague,TheNetherlands(2009)
+Wolshon, B., Urbina, E., Wilmot, C.G., Levitan, M.: Review of policies and practices for hurricane
+evacuation.I:Transportationplanning,preparedness,andresponse.Nat.HazardsRev.6(3),129–142
+(2005a)
+Wolshon, B., Urbina, E., Wilmot, C.G., Levitan, M.: Review of policies and practices for hurricane
+evacuation.II:Trafficoperations,management,andcontrol.Nat.HazardsRev.6(3),143–161(2005b)
+Woodworth,R.S.:DynamicsofBehavior.Holt,RinehartandWinston,NewYork(1958)
+Xie,C.,Lin,D.Y.,Waller,S.T.:Adynamicevacuationnetworkoptimizationproblemwithlanereversaland
+crossingeliminationstrategies.Transp.Res.E46,295–316(2010)
+Yang,R.H.,Vaughn,K.M.,Abdel-Aty,M.A.,Kitamura,R.,Jovanis,P.P.:Designofanartificialsimulator
+foranalyzingroutechoicebehaviorinthepresenceofinformationsystem.InternalreportRP-95-39,
+InstituteofTransportationStudies,UniversityofCaliforniaDavis(1995)
+Yuan,F.,Han,L.D.:Improvingevacuationplanningwithsensiblemeasureofeffectivenesschoices—acase
+study.Transp.Res.Rec.2137,54–62(2009)
+Yuan,F.,Han,L.D.,Chin,S.,Hwang,H.:Proposedframeworkforsimultaneousoptimizationofevacuation
+trafficdestinationandrouteassignment.Transp.Res.Rec.1964,50–58(2006)
+Yusoff, M., Ariffin, J., Mohamed, A.: Optimization approaches for macroscopic emergency evacuation
+planning:asurvey.In:ProceedingsoftheIEEEInternationalSymposiumonInformationTechnology,
+vol.3,pp.1–7(2008)
+Zelinsky, W., Kosinski, L.A.: The emergency evacuation of cities: a cross-national historical and geo-
+graphicalstudy.RowmanandLittlefield,Lanham(1991)
+Zheng,H.,Chiu,Y.C.,Mirchandani,P.B.,Hickman,M.:Modelingofevacuationandbackgroundtrafficfor
+anoptimalzone-basedvehicleevacuationstrategy.In:Proceedingsofthe89thAnnualMeetingofthe
+TransportationResearchBoard,Washington,DC,USA(2010)
+Author Biographies
+Adam J. Pel is working towards a doctoral degree at the Transport and Planning department at Delft
+University of Technology. His research interests are in evacuation modelling and optimization, travel
+behaviourmodelling,(dynamic)trafficassignment,andtrafficflowsimulation.
+Michiel C. J. Bliemer has a background in Econometrics and Operations Research, and is associate
+professorTransportationModellingatDelftUniversityofTechnologyintheNetherlands.Furthermore,he
+worksatGoudappelCoffengBVasheadofinnovationintransportandtrafficmodels.
+Serge P. Hoogendoorn is a professor at Traffic Management at Delft University of Technology. His
+research involves theory, modelling, simulation and management of traffic and transportation networks.
+Specific fields of interest are traffic data collection for traffic model identification, integrated network
+management,andtrafficandmobilitymanagementinexceptionalconditions.
+123

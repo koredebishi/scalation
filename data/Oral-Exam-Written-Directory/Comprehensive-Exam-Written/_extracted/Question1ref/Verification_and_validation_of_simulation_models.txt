@@ -1,0 +1,896 @@
+===== PAGE 1 =====
+
+Proceedings of the 2010 Winter Simulation Conference
+B. Johansson, S. Jain, J. Montoya-Torres, J. Hugan, and E. Yücesan, eds.
+VERIFICATION AND VALIDATION OF SIMULATION MODELS
+Robert G. Sargent
+Department of Electrical Engineering and Computer Science
+L. C. Smith College of Engineering and Computer Science
+Syracuse University
+Syracuse, NY 13244, USA
+ABSTRACT
+In this paper we discuss verification and validation of simulation models. Four different approaches to de-
+ciding model validity are described; two different paradigms that relate verification and validation to the
+model development process are presented; various validation techniques are defined; conceptual model
+validity, model verification, operational validity, and data validity are discussed; a way to document re-
+sults is given; a recommended procedure for model validation is presented; and model accreditation is
+briefly discussed.
+1 INTRODUCTION
+Simulation models are increasingly being used to solve problems and to aid in decision-making. The de-
+velopers and users of these models, the decision makers using information obtained from the results of
+these models, and the individuals affected by decisions based on such models are all rightly concerned
+with whether a model and its results are “correct”. This concern is addressed through model verification
+and validation. Model verification is often defined as “ensuring that the computer program of the compu-
+terized model and its implementation are correct” and is the definition adopted here. Model validation is
+usually defined to mean “substantiation that a computerized model within its domain of applicability pos-
+sesses a satisfactory range of accuracy consistent with the intended application of the model” (Schlesinger
+et al. 1979) and is the definition used here. A model sometimes becomes accredited through model accre-
+ditation. Model accreditation determines if a model satisfies specified model accreditation criteria accord-
+ing to a specified process. A related topic is model credibility. Model credibility is concerned with devel-
+oping in (potential) users the confidence they require in order to use a model and in the information
+derived from that model.
+A model should be developed for a specific purpose (or application) and its validity determined with
+respect to that purpose. If the purpose of a model is to answer a variety of questions, the validity of the
+model needs to be determined with respect to each question. Numerous sets of experimental conditions
+are usually required to define the domain of a model’s intended applicability. A model may be valid for
+one set of experimental conditions and invalid in another. A model is considered valid for a set of expe-
+rimental conditions if the model’s accuracy is within its acceptable range, which is the amount of accura-
+cy required for the model’s intended purpose. This usually requires that the model’s output variables of
+interest (i.e., the model variables used in answering the questions that the model is being developed to an-
+swer) be identified and that their required amount of accuracy be specified. The amount of accuracy re-
+quired should be specified prior to starting the development of the model or very early in the model de-
+velopment process. If the variables of interest are random variables, then properties and functions of the
+random variables such as means and variances are usually what is of primary interest and are what is used
+in determining model validity. Several versions of a model are usually developed prior to obtaining a sa-
+tisfactory valid model. The substantiation that a model is valid, i.e., performing model verification and va-
+978-1-4244-9865-9/10/$26.00 ©2010 IEEE 166
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 2 =====
+
+Sargent
+lidation, is generally considered to be a process and is usually part of the (total) model development
+process.
+It is often too costly and time consuming to determine that a model is absolutely valid over the com-
+plete domain of its intended applicability. Instead, tests and evaluations are conducted until sufficient con-
+fidence is obtained that a model can be considered valid for its intended application (Sargent 1982,
+1984a). If a test determines that a model does not have sufficient accuracy for any one of the sets of expe-
+rimental conditions, then the model is invalid. However, determining that a model has sufficient accuracy
+for numerous experimental conditions does not guarantee that a model is valid everywhere in its applica-
+ble domain. Figure 1 shows the relationships between model confidence and (a) cost (a similar relation-
+ship holds for the amount of time) of performing model validation and (b) the value of the model to a us-
+er. The cost of model validation is usually quite significant, especially when extremely high model
+confidence is required.
+Figure 1: Model Confidence
+The remainder of this paper is organized as follows: Section 2 presents the basic approaches used in
+deciding model validity; Section 3 describes two different paradigms used in verification and validation;
+Section 4 defines validation techniques; Sections 5, 6, 7, and 8 discuss data validity, conceptual model va-
+lidity, computerized model verification, and operational validity, respectively; Section 9 describes a way
+of documenting results; Section 10 gives a recommended validation procedure; Section 11 contains a
+brief description of accreditation; and Section 12 presents the summary. (Note that this tutorial paper is
+similar to Sargent (2009).)
+2 BASIC APPROACHES
+There are four basic decision-making approaches for deciding whether a simulation model is valid. Each
+of the approaches requires the model development team to conduct verification and validation as part of
+the model development process, which is discussed in Section 3. One approach, and a frequently used
+one, is for the model development team itself to make the decision as to whether a simulation model is va-
+lid. A subjective decision is made based on the results of the various tests and evaluations conducted as
+part of the model development process. However, it is usually better to use one of the next two approach-
+es, depending on which situation applies.
+If the size of the simulation team developing the model is small, a better approach than the one above
+is to have the user(s) of the model heavily involved with the model development team in deciding the va-
+lidity of the simulation model. In this approach the focus of determining the validity of the simulation
+model moves from the model developers to the model users. Also, this approach aids in model credibility.
+Another approach, usually called “independent verification and validation” (IV&V), uses a third (in-
+dependent) party to decide whether the simulation model is valid. The third party is independent of both
+the simulation development team(s) and the model sponsor/user(s). The IV&V approach should be used
+when developing large-scale simulation models, whose developments usually involve several teams.
+(This approach is also useful in model credibility, especially when the problem the simulation model is
+associated with has a high cost.) The third party needs to have a thorough understanding of the intended
+167
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 3 =====
+
+Sargent
+purpose(s) of the simulation model in order to conduct IV&V. There are two common ways that the third
+party conducts IV&V: (a) IV&V is conducted concurrently with the development of the simulation model
+and (b) IV&V is conducted after the simulation model has been developed.
+In the concurrent way of conducting IV&V, the model development team(s) receives inputs from the
+IV&V team regarding verification and validation as the model is being developed. When conducting
+IV&V this way, the development of a simulation model should not progress to the next stage of develop-
+ment until the model has satisfied the verification and validation requirements in its current stage. It is the
+author’s opinion that this is the better of the two ways to conduct IV&V.
+When IV&V is conducted after the simulation model has been completely developed, the evaluation
+performed can range from simply evaluating the verification and validation conducted by the model de-
+velopment team to performing a complete verification and validation effort. Wood (1986) describes expe-
+riences over this range of evaluation by a third party on energy models. One conclusion that Wood makes
+is that performing a complete IV&V effort after the simulation model has been completely developed is
+both extremely costly and time consuming, especially for what is obtained. This author’s view is that if
+IV&V is going to be conducted on a completed simulation model then it is usually best to only evaluate
+the verification and validation that has already been performed.
+The last approach for determining whether a model is valid is to use a scoring model. (See Balci
+(1989), Gass (1993), and Gass and Joel (1987) for examples of scoring models.) Scores (or weights) are
+determined subjectively when conducting various aspects of the validation process and then combined to
+determine category scores and an overall score for the simulation model. A simulation model is consi-
+dered valid if its overall and category scores are greater than some passing score(s). This approach is sel-
+dom used in practice.
+This author does not believe in the use of scoring models for determining validity because (1) a model
+may receive a passing score and yet have a defect that needs to be corrected, (2) the subjectiveness of this
+approach tends to be hidden resulting in this approach appearing to be objective, (3) the passing scores
+must be decided in some (usually) subjective way, (4) the score(s) may cause over confidence in a model,
+and (5) the scores can be used to argue that one model is better than another.
+3 PARADIGMS
+In this section we present and discuss paradigms that relate verification and validation to the model de-
+velopment process. There are two common ways to view this relationship. One way uses a simple view
+and the other uses a complex view. Banks, Gerstein, and Searles (1988) reviewed work using both of
+these ways and concluded that the simple way more clearly illuminates model verification and validation.
+We present one paradigm for each way developed by this author. The paradigm of the simple way is pre-
+sented first and is this author’s preferred paradigm.
+Consider the simplified version of the model development process in Figure 2 (Sargent 1981). The
+problem entity is the system (real or proposed), idea, situation, policy, or phenomena to be modeled; the
+conceptual model is the mathematical/logical/verbal representation (mimic) of the problem entity devel-
+oped for a particular study; and the computerized model is the conceptual model implemented on a com-
+puter. The conceptual model is developed through an analysis and modeling phase, the computerized
+model is developed through a computer programming and implementation phase, and inferences about
+the problem entity are obtained by conducting computer experiments on the computerized model in the
+experimentation phase.
+We now relate model validation and verification to this simplified version of the modeling process.
+(See Figure 2.) Conceptual model validation is defined as determining that the theories and assumptions
+underlying the conceptual model are correct and that the model representation of the problem entity is
+“reasonable” for the intended purpose of the model. Computerized model verification is defined as assur-
+ing that the computer programming and implementation of the conceptual model is correct. Operational
+validation is defined as determining that the model’s output behavior has sufficient accuracy for the mod-
+168
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 4 =====
+
+Sargent
+Problem Entity
+(Syste m)
+Operational
+Conceptual
+Model
+Validation
+Validation
+Analysis
+Experimentation
+and
+Data Modeling
+Validity
+Computerized Computer Programming Conceptual
+Model and Implementation Model
+Compute rized
+Model
+Verification
+Figure 2: Simplified Version of the Modeling Process
+el’s intended purpose over the domain of the model’s intended applicability. Data validity is defined as
+ensuring that the data necessary for model building, model evaluation and testing, and conducting the
+model experiments to solve the problem are adequate and correct.
+An iterative process is used to develop a valid simulation model (Sargent 1984a). A conceptual model
+is developed followed by conceptual model validation. This process is repeated until the conceptual mod-
+el is satisfactory. Next the computerized model is developed from the conceptual model followed by
+computerized model verification. This process is repeated until the computerized model is satisfactory.
+Next operational validity is conducted on the computerized model. Model changes required by conducting
+operational validity can be in either the conceptual model or in the computerized model. Verification and
+validation must be performed again when any model change is made. Usually several models are devel-
+oped prior to obtaining a valid simulation model.
+A detailed way of relating verification and validation to developing simulation models and system
+theories is shown in Figure 3. This paradigm shows the processes of developing system theories and si-
+mulation models and relates verification and validation to both of these processes.
+This paradigm (Sargent 2001b) shows a Real World and a Simulation World. We first discuss the
+Real World. There exist some system or problem entity in the real world of which an understanding of is
+desired. System theories describe the characteristics and the causal relationships of the system (or problem
+entity) and possibly its behavior (including data). System data and results are obtained by conducting ex-
+periments (experimenting) on the system. System theories are developed by abstracting what has been
+observed from the system and by hypothesizing from the system data and results. If a simulation model
+exists of this system, then hypothesizing of system theories can also be done from simulation data and re-
+sults. System theories are validated by performing theory validation. Theory validation involves the com-
+parison of system theories against system data and results over the domain the theory is applicable for to
+determine if there is agreement. This process requires numerous experiments to be conducted on the real
+system.
+We now discuss the Simulation World, which shows a slightly more complicated model development
+process than the previous paradigm (Figure 2). A simulation model should only be developed for a set of
+well-defined objectives. The conceptual model is the mathematical/logical/verbal representation (mimic)
+of the system developed for the objectives of a particular study. The simulation model specification is a
+written detailed description of the software design and specification for programming and implementing
+the conceptual model on a particular computer system. The simulation model is the conceptual model
+169
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 5 =====
+
+Sargent
+SYSTEM EXPERIMENTING SYSTEM SYSTEM
+DATA/RESULTS (PROBLEM EXPERIMENT
+ENTITY) OBJECTIVES
+REAL
+WORLD
+HYPOTHESIZING ABS TRACTING
+Theory
+Validation
+ADDITIONAL
+Operational SYSTEM
+(Results) THEORIES
+(T
+E
+E
+X
+S
+P
+T
+E
+S
+R
+)
+I
+N
+M
+E
+E
+E
+N
+D
+T
+E
+S
+D
+Validation Conceptual
+Model
+Validation
+HYPOTHESIZING
+MODELING
+SIMULATION
+SIMULATION
+MODEL CONCEPTUAL EXPERIMENT
+DATA/RESULTS MODEL OBJECTIVES
+SIMULATION
+WORLD
+SPECIFYING
+EXPERIMENTING Specification
+Verification
+SIMULATION IMPLEMENTING
+SIMULATION
+MODEL
+MODEL
+SPECIFICATION
+Implementation
+Verification
+Figure 3: Real World and Simulation World Relationships with Verification and Validation
+running on a computer system such that experiments can be conducted on the simulation model. The si-
+mulation model data and results are the data and results from experiments conducted (experimenting) on
+the simulation model. The conceptual model is developed by modeling the system for the objectives of
+the simulation study using the understanding of the system contained in the system theories. The simula-
+tion model is obtained by implementing the model on the specified computer system, which includes pro-
+gramming the conceptual model whose specifications are contained in the simulation model specification.
+Inferences about the system are made from data obtained by conducting computer experiments (experi-
+menting) on the simulation model.
+Conceptual model validation is defined as determining that the theories and assumptions underlying
+the conceptual model are consistent with those in the system theories and that the model representation of
+the system is “reasonable” for the intended purpose of the simulation model. Specification verification is
+defined as assuring that the software design and the specification for programming and implementing the
+conceptual model on the specified computer system is satisfactory. Implementation verification is defined
+as assuring that the simulation model has been implemented according to the simulation model specifica-
+tion. Operational validation is defined as determining that the model’s output behavior has sufficient ac-
+curacy for the model’s intended purpose over the domain of the model’s intended applicability.
+170
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 6 =====
+
+Sargent
+This paradigm shows processes for developing both valid system theories and valid simulation mod-
+els. Both are accomplished through iterative processes. To develop valid system theories, which are
+usually for a specific purpose, the system is first observed and then abstraction is performed from what
+has been observed to develop proposed system theories. These theories are tested for correctness by con-
+ducting experiments on the system to obtain data and results to compare against the proposed system
+theories. New proposed system theories may be hypothesized from the data and comparisons made, and
+also possibly from abstraction performed on additional system observations. These new proposed theories
+will require new experiments to be conducted on the system to obtain data to evaluate the correctness of
+these proposed system theories. This process repeats itself until a satisfactory set of validated system
+theories has been obtained. To develop a valid simulation model, a process similar to the one for the pre-
+vious paradigm is performed with the only difference being more detail is given in this paradigm. Several
+versions of a model are usually developed prior to obtaining a satisfactory valid simulation model. Model
+verification and validation must be performed in each model iteration.
+4 VALIDATION TECHNIQUES
+This section describes validation techniques and tests commonly used in model verification and vali-
+dation. Most of the techniques described here are found in the literature, although some may be described
+slightly differently. They can be used either subjectively or objectively. By “objectively,” we mean using
+some type of mathematical procedure or statistical test, e.g., hypothesis tests or confidence intervals. A
+combination of techniques is generally used. These techniques are used for verifying and validating the
+submodels and the overall model.
+Animation: The model’s operational behavior is displayed graphically as the model moves through
+time. E.g., the movements of parts through a factory during a simulation run are shown graphically.
+Comparison to Other Models: Various results (e.g., outputs) of the simulation model being validated
+are compared to results of other (valid) models. For example, (1) simple cases of a simulation model are
+compared to known results of analytic models, and (2) the simulation model is compared to other simula-
+tion models that have been validated.
+Degenerate Tests: The degeneracy of the model’s behavior is tested by appropriate selection of val-
+ues of the input and internal parameters. For example, does the average number in the queue of a single
+server continue to increase over time when the arrival rate is larger than the service rate?
+Event Validity: The “events” of occurrences of the simulation model are compared to those of the real
+system to determine if they are similar. For example, compare the number of fires in a fire department si-
+mulation to the actual number of fires.
+Extreme Condition Tests: The model structure and outputs should be plausible for any extreme and
+unlikely combination of levels of factors in the system. For example, if in-process inventories are zero,
+production output should usually be zero.
+Face Validity: Individuals knowledgeable about the system are asked whether the model and/or its
+behavior are reasonable. For example, is the logic in the conceptual model correct and are the model’s in-
+put-output relationships reasonable.
+Historical Data Validation: If historical data exist (e.g., data collected on a system specifically for
+building and testing a model), part of the data is used to build the model and the remaining data are used
+to determine (test) whether the model behaves as the system does. (This testing is conducted by driving
+the simulation model with either samples from distributions or traces (Balci and Sargent 1982a, 1982b,
+1984b).)
+Historical Methods: The three historical methods of validation are rationalism, empiricism, and posi-
+tive economics. Rationalism assumes that everyone knows whether the clearly stated underlying assump-
+tions of a model are true. Logic deductions are used from these assumptions to develop the correct (valid)
+model. Empiricism requires every assumption and outcome to be empirically validated. Positive econom-
+ics requires only that the model be able to predict the future and is not concerned with a model’s assump-
+tions or structure (causal relationships or mechanisms).
+171
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 7 =====
+
+Sargent
+Internal Validity: Several replications (runs) of a stochastic model are made to determine the amount
+of (internal) stochastic variability in the model. A large amount of variability (lack of consistency) may
+cause the model’s results to be questionable and if typical of the problem entity, may question the appro-
+priateness of the policy or system being investigated.
+Multistage Validation: Naylor and Finger (1967) proposed combining the three historical methods of
+rationalism, empiricism, and positive economics into a multistage process of validation. This validation
+method consists of (1) developing the model’s assumptions on theory, observations, and general know-
+ledge, (2) validating the model’s assumptions where possible by empirically testing them, and (3) com-
+paring (testing) the input-output relationships of the model to the real system.
+Operational Graphics: Values of various performance measures, e.g., the number in queue and per-
+centage of servers busy, are shown graphically as the model runs through time; i.e., the dynamical beha-
+viors of performance indicators are visually displayed as the simulation model runs through time to en-
+sure they behave correctly.
+Parameter Variability - Sensitivity Analysis: This technique consists of changing the values of the in-
+put and internal parameters of a model to determine the effect upon the model’s behavior or output. The
+same relationships should occur in the model as in the real system. This technique can be used qualitative-
+ly—directions only of outputs—and quantitatively—both directions and (precise) magnitudes of outputs.
+Those parameters that are sensitive, i.e., cause significant changes in the model’s behavior or output,
+should be made sufficiently accurate prior to using the model. (This may require iterations in model de-
+velopment.)
+Predictive Validation: The model is used to predict (forecast) the system’s behavior, and then com-
+parisons are made between the system’s behavior and the model’s forecast to determine if they are the
+same. The system data may come from an operational system or be obtained by conducting experiments
+on the system, e.g., field tests.
+Traces: The behaviors of different types of specific entities in the model are traced (followed)
+through the model to determine if the model’s logic is correct and if the necessary accuracy is obtained.
+Turing Tests: Individuals who are knowledgeable about the operations of the system being modeled
+are asked if they can discriminate between system and model outputs. (Schruben (1980) contains statistic-
+al tests for Turing tests.)
+5 DATA VALIDITY
+We discuss data validity, even though it is often not considered to be part of model validation, because it
+is usually difficult, time consuming, and costly to obtain appropriate, accurate, and sufficient data, and da-
+ta problems are often the reason that attempts to valid a model fail. Data are needed for three purposes:
+for building the conceptual model, for validating the model, and for performing experiments with the va-
+lidated model. In model validation we are usually concerned only with data for the first two purposes.
+To build a conceptual model we must have sufficient data on the problem entity to develop theories
+that can be used to build the model, to develop mathematical and logical relationships for use in the mod-
+el that will allow the model to adequately represent the problem entity for its intended purpose, and to test
+the model’s underlying assumptions. In addition, behavioral data are needed on the problem entity to be
+used in the operational validity step of comparing the problem entity’s behavior with the model’s beha-
+vior. (Usually, this data are system input/output data.) If behavior data are not available, high model con-
+fidence usually cannot be obtained because sufficient operational validity cannot be achieved.
+The concerns with data are that appropriate, accurate, and sufficient data are available, and all data
+transformations, such as data disaggregation, are made correctly. Unfortunately, there is not much that
+can be done to ensure that the data are correct. One should develop good procedures for (1) collecting and
+maintaining data, (2) testing the collected data using techniques such as internal consistency checks, and
+(3) screening the data for outliers and determining if the outliers are correct. If the amount of data is large,
+a database of the data should be developed and maintained.
+172
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 8 =====
+
+Sargent
+6 CONCEPTUAL MODEL VALIDATION
+Conceptual model validity is determining that (1) the theories and assumptions underlying the conceptual
+model are correct and (2) the model’s representation of the problem entity and the model’s structure, log-
+ic, and mathematical and causal relationships are “reasonable” for the intended purpose of the model. The
+theories and assumptions underlying the model should be tested using mathematical analysis and statistic-
+al methods on problem entity data. Examples of theories and assumptions are linearity, independence of
+data, and arrivals are Poisson. Examples of applicable statistical methods are fitting distributions to data,
+estimating parameter values from the data, and plotting data to determine if the data are stationary. In ad-
+dition, all theories used should be reviewed to ensure they were applied correctly. For example, if a Mar-
+kov chain is used, does the system have the Markov property, and are the states and transition probabili-
+ties correct?
+Each submodel and the overall model must be evaluated to determine if they are reasonable and cor-
+rect for the intended purpose of the model. This should include determining if the appropriate detail and
+aggregate relationships have been used for the model’s intended purpose, and also if appropriate structure,
+logic, and mathematical and causal relationships have been used. The primary validation techniques used
+for these evaluations are face validation and traces. Face validation has experts on the problem entity eva-
+luate the conceptual model to determine if it is correct and reasonable for its purpose. This usually re-
+quires examining the flowchart or graphical model (Sargent 1986), or the set of model equations. The use
+of traces is the tracking of entities through each submodel and the overall model to determine if the logic
+is correct and if the necessary accuracy is maintained. If errors are found in the conceptual model, it must
+be revised and conceptual model validation performed again.
+7 COMPUTERIZED MODEL VERIFICATION
+Computerized model verification ensures that the computer programming and implementation of the con-
+ceptual model are correct. The major factor affecting verification is whether a simulation language or a
+higher level programming language such as FORTRAN, C, or C++ is used. The use of a special-purpose
+simulation language generally will result in having fewer errors than if a general-purpose simulation lan-
+guage is used, and using a general-purpose simulation language will generally result in having fewer er-
+rors than if a general purpose higher level programming language is used. (The use of a simulation lan-
+guage also usually reduces both the programming time required and the amount of flexibility.)
+When a simulation language is used, verification is primarily concerned with ensuring that an error
+free simulation language has been used, that the simulation language has been properly implemented on
+the computer, that a tested (for correctness) pseudo random number generator has been properly imple-
+mented, and that the model has been programmed correctly in the simulation language. The primary tech-
+niques used to determine that the model has been programmed correctly are structured walkthroughs and
+traces.
+If a higher level programming language has been used, then the computer program should have been
+designed, developed, and implemented using techniques found in software engineering. (These include
+such techniques as object-oriented design, structured programming, and program modularity.) In this case
+verification is primarily concerned with determining that the simulation functions (e.g., the time-flow me-
+chanism, pseudo random number generator, and random variate generators) and the computerized (simu-
+lation) model have been programmed and implemented correctly.
+There are two basic approaches for testing simulation software: static testing and dynamic testing
+(Fairley 1976). In static testing the computer program is analyzed to determine if it is correct by using
+such techniques as structured walkthroughs, correctness proofs, and examining the structure properties of
+the program. In dynamic testing the computer program is executed under different conditions and the val-
+ues obtained (including those generated during the execution) are used to determine if the computer pro-
+gram and its implementations are correct. The techniques commonly used in dynamic testing are traces,
+investigations of input-output relations using different validation techniques, internal consistency checks,
+173
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 9 =====
+
+Sargent
+and reprogramming critical components to determine if the same results are obtained. If there are a large
+number of variables, one might aggregate the numerical values of some of the variables to reduce the
+number of tests needed or use certain types of design of experiments (Kleijnen 1987).
+It is necessary to be aware while checking the correctness of the computer program and its implemen-
+tation that errors found may be caused by the data, the conceptual model, the computer program, or the
+computer implementation. (See Whitner and Balci (1989) for a detailed discussion on model verification.)
+8 OPERATIONAL VALIDITY
+Operational validation is determining whether the simulation model’s output behavior has the accuracy
+required for the model’s intended purpose over the domain of the model’s intended applicability. This is
+where much of the validation testing and evaluation take place. Since the simulation model is used in op-
+erational validation, any deficiencies found may be caused by what was developed in any of the steps that
+are involved in developing the simulation model including developing the system’s theories or having
+invalid data.
+All of the validation techniques discussed in Section 4 are applicable to operational validity. Which
+techniques and whether to use them objectively or subjectively must be decided by the model develop-
+ment team and the other interested parties. The major attribute affecting operational validity is whether
+the problem entity (or system) is observable, where observable means it is possible to collect data on the
+operational behavior of the problem entity. Table 1 gives a classification of the validation techniques used
+in operational validity based on the decision approach and system observable. “Comparison” means com-
+paring the simulation model output behavior to either the system output behavior or another model output
+behavior using graphical displays or statistical tests and procedures. “Explore model behavior” means to
+examine the output behavior of the simulation model using appropriate validation techniques, including
+parameter variability-sensitivity analysis. Various sets of experimental conditions from the domain of the
+model’s intended applicability should be used for both comparison and exploring model behavior.
+Table 1: Operational Validity Classification
+Observable Non-observable
+System System
+• Comparison Using • Explore Model
+Subjective Graphical Displays Behavior
+Approach • Explore Model • Comparison to
+Behavior Other Models
+• Comparison Using • Comparison to
+Objective Statistical Tests Other Models
+Approach and Procedures Using Statistical
+Tests
+To obtain a high degree of confidence in a simulation model and its results, comparisons of the mod-
+el’s and system’s output behaviors for several different sets of experimental conditions are usually re-
+quired. Thus if a system is not observable, which is often the case, it is usually not possible to obtain a
+high degree of confidence in the model. In this situation the model output behavior(s) should be explored
+as thoroughly as possible and comparisons made to other valid models whenever possible.
+8.1 Explore Model Behavior
+The simulation model output behavior can be explored either qualitatively or quantitatively. In qualitative
+analysis the directions of the output behaviors are examined and also possibly whether the magnitudes are
+“reasonable.” In quantitative analysis both the directions and the precise magnitudes of the output beha-
+viors are examined. Experts on the system usually know the directions and often know the “general val-
+ues” of the magnitudes of the output behaviors. Many of the validation techniques given in Section 4 can
+174
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 10 =====
+
+Sargent
+be used for model exploration. Parameter variability-sensitivity analysis should usually be used. Graphs
+of the output data discussed in Subsection 8.2.1 below can be used to display the simulation model output
+behavior. A variety of statistical approaches can be used in performing model exploration including me-
+tamodeling and design of experiments. (See Kleijnen (1999) for further discussion on the use of statistical
+approaches.) Numerous sets of experimental frames should be used in performing model exploration.
+8.2 Comparisons of Output Behaviors
+There are three basic approaches used in comparing the simulation model output behavior to either the
+system output behavior or another model output behavior: (1) the use of graphs to make a subjective deci-
+sion, (2) the use of confidence intervals to make an objective decision, and (3) the use of hypothesis tests
+to make an objective decision. It is preferable to use confidence intervals or hypothesis tests for the com-
+parisons because these allow for objective decisions. However, it is often not possible in practice to use
+either one of these two approaches because (a) the statistical assumptions required cannot be satisfied or
+only with great difficulty (assumptions usually required are data independence and normality) and/or (b)
+there is an insufficient quantity of system data available, which causes the statistical results to be “mea-
+ningless” (e.g., the length of a confidence interval developed in the comparison of the system and simula-
+tion model means is to large for any practical usefulness). As a result, the use of graphs is the most com-
+monly used approach for operational validity. Each of these three approaches is discussed below using
+system output data (Note: these same approaches can also use with output data from a validated model in-
+stead of system output data when appropriate).
+8.2.1 Graphical Comparisons of Data
+The behavior data of the simulation model and the system are graphed for various sets of experimental
+conditions to determine if the model’s output behavior has sufficient accuracy for the model’s intended
+purpose. Three types of graphs are used: histograms, box (and whisker) plots, and behavior graphs using
+scatter plots. (See Sargent (1996a, 2001b) for a thorough discussion on the use of these for model valida-
+tion.) Examples of a histogram and a box plot are given in Figures 4 and 5, respectively; both taken from
+Lowery (1996). Examples of behavior graphs, taken from Anderson and Sargent (1974), are given in Fig-
+ures 6 and 7. A variety of graphs are required that use different types of (1) measures such as the mean,
+variance, maximum, distribution, and times series of the variables, and (2) relationships between (a) two
+measures of a single variable (see Figure 6) and (b) measures of two variables (see Figure 7). It is impor-
+tant that appropriate measures and relationships be used in validating a simulation model and that they be
+determined with respect to the model’s intended purpose. See Anderson and Sargent (1974) and Lowery
+(1996) for examples of sets of graphs used in the validation of two different simulation models.
+Hospital Study
+40
+30
+20
+10
+0
+Figure 4: Histogram of Hospital Data Figure 5: Box Plot of Hospital Data
+0.49 0.59 0.69 0.79 0.89 0.99
+24 Week Average
+ycneuqerF Model
+System
+175
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 11 =====
+
+Sargent
+Figure 6: Reaction Time Figure 7: Disk
+These graphs can be used in model validation in different ways. First, the model development team
+can use the graphs in the model development process to make a subjective judgment on whether a simula-
+tion model posses sufficient accuracy for it’s intend purpose. Second, they can be used in the face validity
+technique where experts are asked to make subjective judgments on whether a simulation model pos-
+sesses sufficient accuracy for its intended purpose. Third, the graphs can be used in Turing tests. Fourth,
+the graphs can be used in different ways in IV&V. We note that the data in these graphs do not need to be
+independence nor satisfy any statistical distribution requirement such as normality of the data (Sargent
+1996a, 2001a, 2001b).
+8.2.2 Confidence Intervals
+Confidence intervals (c.i.), simultaneous confidence intervals (s.c.i.), and joint confidence regions (j.c.r.)
+can be obtained for the differences between means, variances, and distributions of different simulation
+model and system output variables for each set of experimental conditions. These c.i., s.c.i., and j.c.r. can
+be used as the model range of accuracy for model validation.
+To construct the model range of accuracy, a statistical procedure containing a statistical technique and
+a method of data collection must be developed for each set of experimental conditions and for each varia-
+ble of interest. The statistical techniques used can be divided into two groups: (1) univariate statistical
+techniques and (2) multivariate statistical techniques. The univariate techniques can be used to develop
+c.i., and with the use of the Bonferroni inequality (Law 2007) s.c.i. The multivariate techniques can be
+used to develop s.c.i. and j.c.r. Both parametric and nonparametric techniques can be used.
+The method of data collection must satisfy the underlying assumptions of the statistical technique be-
+ing used. The standard statistical techniques and data collection methods used in simulation output analy-
+176
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 12 =====
+
+Sargent
+sis (Banks et al. 2005, Law 2007) can be used in developing the model range of accuracy, e.g., the me-
+thods of replication and (nonoverlapping) batch means.
+It is usually desirable to construct the model range of accuracy with the lengths of the c.i. and s.c.i.
+and the sizes of the j.c.r. as small as possible. The shorter the lengths or the smaller the sizes, the more
+useful and meaningful the model range of accuracy will usually be. The lengths and the sizes (1) are af-
+fected by the values of confidence levels, variances of the model and system output variables, and sample
+sizes, and (2) can be made smaller by decreasing the confidence levels or increasing the sample sizes. A
+tradeoff needs to be made among the sample sizes, confidence levels, and estimates of the length or sizes
+of the model range of accuracy, i.e., c.i., s.c.i. or j.c.r. Tradeoff curves can be constructed to aid in the tra-
+deoff analysis.
+Details on the use of c.i., s.c.i., and j.c.r. for operational validity, including a general methodology,
+are contained in Balci and Sargent (1984b).
+8.2.3 Hypothesis Tests
+Hypothesis tests can be used in the comparison of means, variances, distributions, and time series of the
+output variables of a model and a system for each set of experimental conditions to determine if the simu-
+lation model’s output behavior has an acceptable range of accuracy. An acceptable range of accuracy is
+the amount of accuracy that is required of a model to be valid for its intended purpose.
+The first step in hypothesis testing is to state the hypotheses to be tested:
+• H Model is valid for the acceptable range of accuracy under the set of experimental conditions.
+0
+• H Model is invalid for the acceptable range of accuracy under the set of experimental conditions.
+1
+Two types of errors are possible in testing hypotheses. The first, or type I error, is rejecting the validity of
+a valid model and the second, or type II error, is accepting the validity of an invalid model. The probabili-
+ty of a type I error, α, is called model builder’s risk, and the probability of type II error, β, is called model
+user’s risk (Balci and Sargent 1981). In model validation, the model user’s risk is extremely important
+and must be kept small. Thus both type I and type II errors must be carefully considered when using hy-
+pothesis testing for model validation.
+The amount of agreement between a model and a system can be measured by a validity measure, λ,
+which is chosen such that the model accuracy or the amount of agreement between the model and the sys-
+tem decrease as the value of the validity measure increases. The acceptable range of accuracy can be used
+to determine an acceptable validity range, 0 < λ < λ*.
+The probability of acceptance of a model being valid, P , can be examined as a function of the validi-
+a
+ty measure by using an operating characteristic curve (Johnson 2005). Figure 8 contains three different
+operating characteristic curves to illustrate how the sample size of observations affects P as a function of
+a
+λ. As can be seen, an inaccurate model has a high probability of being accepted if a small sample size of
+observations is used, and an accurate model has a low probability of being accepted if a large sample size
+of observations is used.
+The location and shape of the operating characteristic curves are a function of the statistical tech-
+nique being used, the value of α chosen for λ = 0, i.e. α*, and the sample size of observations. Once the
+operating characteristic curves are constructed, the intervals for the model user’s risk β(λ) and the model
+builder’s risk α can be determined for a given λ* as follows:
+α* < model builder’s risk α < (1 - β*)
+0 < model user’s risk β(λ) < β*.
+Thus there is a direct relationship among the builder’s risk, model user’s risk, acceptable validity range,
+and the sample size of observations. A tradeoff among these must be made when using hypothesis tests.
+177
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 13 =====
+
+Sargent
+Figure 8: Operating Characteristic Curves
+Details of the methodology for using hypotheses tests in comparing the model’s and system’s output
+data for model validations are given in Balci and Sargent (1981). Examples of the application of this me-
+thodology in the testing of output means for model validation are given in Balci and Sargent (1982a,
+1982b, 1983).
+9 DOCUMENTATION
+Documentation on model verification and validation is usually critical in convincing users of the “cor-
+rectness” of a model and its results, and should be included in the simulation model documentation. (See
+Gass (1984) for a general discussion on documentation of computer-based models.) Both detailed and
+summary documentation are desired. The detailed documentation should include specifics on the tests,
+evaluations made, data, results, etc. The summary documentation should contain a separate evaluation ta-
+ble for data validity, conceptual model validity, computer model verification, operational validity, and an
+overall summary. See Table 2 for an example of an evaluation table of conceptual model validity. (For
+examples of two other evaluation tables, see Sargent (1994, 1996b).) The columns of Table 2 are self-
+explanatory except for the last column, which refers to the confidence the evaluators have in the results or
+conclusions. These are often expressed as low, medium, or high.
+Table 2: Evaluation Table for Conceptual Model Validity
+178
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 14 =====
+
+Sargent
+10 RECOMMENDED PROCEDURE
+This author recommends that, as a minimum, the following eight steps be performed in model validation:
+1. An agreement be made prior to developing the model between (a) the model development team
+and (b) the model sponsors and (if possible) the users that specifies the basic validation approach
+and a minimum set of specific validation techniques to be used in the validation process.
+2. Specify the amount of accuracy required of the simulation model’s output variables of interest for
+the model’s intended application prior to starting the development of the model or very early in
+the model development process.
+3. Test, wherever possible, the assumptions and theories underlying the simulation model.
+4. In each model iteration, at least perform face validity on the conceptual model.
+5. In each model iteration, at least explore the simulation model’s behavior using the computerized
+model.
+6. In at least the last model iteration, make comparisons, if possible, between the simulation model
+and system behavior (output) data for at least a few sets of experimental conditions, and prefera-
+bly for several sets.
+7. Develop validation documentation for inclusion in the simulation model documentation.
+8. If the simulation model is to be used over a period of time, develop a schedule for periodic review
+of the model’s validity.
+Some simulation models are developed for repeated use. A procedure for reviewing the validity of
+these models over their life cycles needs to be developed, as specified in Step 8. No general procedure can
+be given, as each situation is different. For example, if no data were available on the system when a simu-
+lation model was initially developed and validated, then revalidation of the model should take place prior
+to each usage of the model if new data or system understanding has occurred since the last validation.
+11 ACCREDITATION
+The U. S. A. Department of Defense (DoD) has moved to accrediting simulation models. They define ac-
+creditation as the “official certification that a model, simulation, or federation of models and simulations
+and its associated data are acceptable for use for a specific application” (DoDI 5000.61 2003). The evalu-
+ation for accreditation is usually conducted by a third (independent) party, is subjective, and often in-
+cludes not only verification and validation but items such as documentation and how user friendly the si-
+mulation is. The acronym VV&A is used for Verification, Validation, and Accreditation. (Other areas and
+fields sometimes use the term “Certification” to certify that a model (or product) conforms to a specified
+set of characteristics (See Balci (2003) for further discussion.).)
+12 SUMMARY
+Model verification and validation are critical in the development of a simulation model. Unfortunately,
+there is no set of specific tests that can easily be applied to determine the “correctness” of a model. Fur-
+thermore, no algorithm exists to determine what techniques or procedures to use. Every simulation project
+presents a new and unique challenge to the model development team.
+In this paper we discussed ‘practical approaches’ to verification and validation of simulation models.
+For a discussion on the philosophy of model validation, see Kleindorfer and Ganeshan (1993).
+There is considerable literature on model verification and validation; see e.g. Balci and Sargent
+(1984a). Beyond the references already cited above, there are conference tutorials and papers (e.g. Carson
+(2002), Law (2008), Sargent (1979, 1984b, 1985, 1990, 2000, 2003, 2005, 2007)), journal articles (e.g.
+Gass (1983), Gass and Thompson (1980), Landry, Malouin, and Oral (1983)), discussions in textbooks
+(e.g., Banks et al. (2005), Law (2007), Robinson (2004), Zeigler (1976)), U.S.A. Government Reports
+(e.g., U. S. General Accounting Office (1987)), and a book by Knepell and Arangno (1993) that can be
+used to further your knowledge on model verification and validation.
+179
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 15 =====
+
+Sargent
+Research continues on these topics. This includes such items as advisory systems (e.g. Balci (2001)
+and Rao and Sargent (1988)), new approaches and procedures (e.g. Balci 2004, Sargent 2008), and new
+techniques (e.g. Balci et al. (2002), Rueβ and de Moura (2003)). See Sargent et al. (2000) for a discussion
+on research directions.
+REFERENCES
+Cheng, R. C. H. 1994. Selecting input models. In Proceedings of the 1994 Winter Simulation Conference,
+ed. J. D. Tew, S. Manivannan, D. A. Sadowski, and A. F. Seila, 184–191. Piscataway, New Jersey:
+Institute of Electrical and Electronics Engineers, Inc.
+Anderson, H. A. and R. G. Sargent. 1974. An investigation into scheduling for an interactive computer
+system. IBM Journal of Research and Development 18 (2): 125-137.
+Balci, O. 1989. How to assess the acceptability and credibility of simulation results. In Proceedings of the
+1989 Winter Simulation Conference, ed. E. A. MacNair, K. J. Musselman, and P. Heidelberger, 62-
+71. Piscataway, New Jersey: IEEE.
+Balci, O. 2001. A methodology for certification of modeling and simulation applications. ACM Trans. on
+Modeling and Computer Simulation 11 (4), 352-377.
+Balci, O. 2003. Validation, verification, and certification of modeling and simulation applications. In
+Proceedings of the 2003 Winter Simulation Conference, ed. S. Chick, P. J. Sanchez, E. Ferrin, and D.
+J.Morrice, 150-158. Piscataway, New Jersey: IEEE.
+Balci, O. 2004. Quality assessment, verification, and validation of modeling and simulation applications.
+In Proceedings of the 2004 Winter Simulation Conference, ed. R. G. Ingalls, M. D. Rossetti, J. S.
+Smith, and H. A. Peters, 122-129. Piscataway, New Jersey: IEEE.
+Balci, O., R. E. Nance, J. D. Arthur, and W. F. Ormsby. 2002. Expanding our horizons in verification, va-
+lidation, and accreditation research and practice. In Proceedings of the 2001 Winter Simulation Con-
+ference, ed. B. A. Peters, J. S. Smith, D. J Medeiros, and M. W. Rohrer, 653-663. Piscataway, New
+Jersey: IEEE.
+Balci, O. and R. G. Sargent. 1981. A methodology for cost-risk analysis in the statistical validation of si-
+mulation models. Comm. of the ACM 24 (6): 190-197.
+Balci, O. and R. G. Sargent. 1982a. Validation of multivariate response simulation models by using Ho-
+telling’s two-sample T2 test. Simulation 39(6): 185-192.
+Balci, O. and R. G. Sargent. 1982b. Some examples of simulation model validation using hypothesis test-
+ing. In Proceedings of the 1982 Winter Simulation Conference, ed. H. J. Highland, Y. W. Chao, and
+O. S. Madrigal, 620-629. Piscataway, New Jersey: IEEE.
+Balci, O. and R. G. Sargent. 1983. Validation of multivariate response trace-driven simulation models. In
+Performance 83, ed. Agrawada and Tripathi, 309-323. North Holland.
+Balci, O. and R. G. Sargent. 1984a. A bibliography on the credibility assessment and validation of simu-
+lation and mathematical models. Simuletter 15 (3): 15-27.
+Balci, O. and R. G. Sargent. 1984b. Validation of simulation models via simultaneous confidence inter-
+vals. American Journal of Mathematical and Management Science 4 (3): 375-406.
+Banks, J., J. S. Carson II, B. L. Nelson, and D. Nicol. 2005. Discrete-event system simulation. 4th ed. En-
+glewood Cliffs, NJ: Prentice-Hall.
+Banks, J., D. Gerstein, and S. P. Searles. 1988. Modeling processes, validation, and verification of com-
+plex simulations: a survey. In Methodology and Validation, Simulation Series, Vol. 19, No. 1, The
+Society for Computer Simulation, 13-18. San Diego, CA: Society for Modeling and Simulation Inter-
+national.
+Carson II, J. S. 2002. Model verification and validation. In Proceedings of the 2002 Winter Simulation
+Conference, ed. E. Yucesan, C.-H. Chen, J.L. Snowdon, J. M. Charnes, 52-58. Piscataway, New Jer-
+sey: IEEE.
+DoDI 5000.61. 2003. DoD modeling and simulation verification, validation, and accreditation, May 13,
+2003.
+180
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 16 =====
+
+Sargent
+Fairley, R. E. 1976. Dynamic testing of simulation software. In Proceedings of the 1976 Summer Com-
+puter Simulation Conference, 40-46. San Diego, CA: Society for Modeling and Simulation Interna-
+tional.
+Gass, S. I. 1983. Decision-aiding models: validation, assessment, and related issues for policy analysis.
+Operations Research 31 (4): 601-663.
+Gass, S. I. 1984. Documenting a computer-based model. Interfaces 14 (3): 84-93.
+Gass, S. I. 1993. Model accreditation: a rationale and process for determining a numerical rating. Euro-
+pean Journal of Operational Research 66 (2): 250-258.
+Gass, S. I. and L. Joel. 1987. Concepts of model confidence. Computers and Operations Research 8 (4):
+341-346.
+Gass, S. I. and B. W. Thompson. 1980. Guidelines for model evaluation: an abridged version of the U. S.
+general accounting office exposure draft. Operations Research 28 (2): 431-479.
+Johnson, R. A. 2005. Miller and Freund’s probability and statistics for engineers, 7th ed. Englewood
+Cliffs, NJ: Prentice-Hall.
+Kleijnen, J. P. C. 1987. Statistical tools for simulation practitioners. New York: Marcel Dekker.
+Kleijnen, J. P. C. 1999. Validation of models: statistical techniques and data availability. In Proceedings
+of the 1999 Simulation Conference, ed. P. A. Farrington, H. Black Nembhard, D. T. Sturrock, and G.
+W. Evans, 647-654. Piscataway, New Jersey: IEEE.
+Kleindorfer, G. B. and R. Ganeshan. 1993. The philosophy of science and validation in simulation. In
+Proceedings of the 1993 Winter Simulation Conference, ed. G. W. Evans, M. Mollaghasemi, E. C.
+Russell, and W. E. Biles, 50-57. Piscataway, New Jersey: IEEE.
+Knepell, P. L. and D. C. Arangno. 1993. Simulation validation: a confidence assessment methodology.
+IEEE Computer So-ciety Press.
+Landry, M, J. L. Malouin, and M. Oral. 1983. Model validation in operations research. European Journal
+of Operational Re-search 14: 207-220.
+Law, A. M. 2007. Simulation modeling and analysis. 4th ed. New York: McGraw-Hill.
+Law, A. M. 2008. How to build valid and credible simulation models. In Proceedings of the 2008 Winter
+Simulation Conference, ed. S. J. Mason, R. Hill, L. Moench, and O. Rose, 39-47. Piscataway, New
+Jersey: IEEE.
+Lowery, J. 1996. Design of hospital admissions scheduling system using simulation. In Proceedings of
+the 1996 Winter Simulation Conference, ed. J. M. Charnes, D. J. Morrice, D. T. Brunner, and J. J.
+Swain, 1199-1204. Pisctaway, New Jersey: IEEE.
+Naylor, T. H. and J. M. Finger. 1967. Verification of computer simulation models. Management Science
+14 (2): B92-B101.
+Rao, M. J. and R. G. Sargent. 1988. An advisory system for operational validity. In Artificial Intelligence
+and Simulation: the Diversity of Applications, ed. T. Hensen, 245-250. San Diego, CA: Society for
+Computer Simulation.
+Robinson, S. 2004. Simulation: The Practice of Model Development and Use. Chichester, West Sussex,
+England: John Wiley.
+Rueβ, H. and L. de Moura. 2003. From simulation to verification (and back). In Proceedings of the 2003
+Winter Simu-lation Conference, ed. S. Chick, P. J. Sanchez, E. Ferrin, and D. J. Morrice, 888-896.
+Piscataway, New Jesey: IEEE.
+Sargent, R. G. 1979. Validation of simulation models. In Proceedings of the 1979 Winter Simulation
+Conference, ed. H. J. Highland, M. F. Spiegel, and R. E. Shannon, 497-503. Piscataway, New Jersey:
+IEEE.
+Sargent, R. G. 1981. An assessment procedure and a set of criteria for use in the evaluation of compute-
+rized models and computer-based modeling tools. Final Technical Report RADC-TR-80-409, U.S.
+Air Force.
+Sargent, R. G. 1982. Verification and validation of simulation Models. Chapter IX in Progress in Model-
+ling and Simulation, ed. F. E. Cellier, 159-169. London: Academic Press.
+181
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 17 =====
+
+Sargent
+Sargent, R. G. 1984a. Simulation model validation. Chapter 19 in Simulation and Model-Based Metho-
+dologies: An Integrative View, ed. T. I. Oren, B. P. Zeigler, and M. S. Elzas, 537-555. Heidelberg,
+Germany: Springer-Verlag.
+Sargent, R. G. 1984b. A tutorial on verification and validation of simulation models. In Proceedings of
+the 1984 Win-ter Simulation Conference, ed. S. Sheppard, U. W. Pooch, and C. D. Pegden, 114-121.
+Piscataway, NJ: IEEE.
+Sargent, R. G. 1985. An expository on verification and validation of simulation models. In Proceedings of
+the 1985 Winter Simulation Conference, ed. D. T. Gantz, G. C. Blais, and S. L. Solomon, 15-22. Pis-
+cataway, NJ: IEEE.
+Sargent, R. G. 1986. The use of graphical models in model validation. In Proceedings of the 1986 Winter
+Simulation Conference, ed. J. R. Wil-son, J. O. Henriksen, and S. D. Roberts, 237-241. Piscataway,
+New Jersey: IEEE.
+Sargent, R. G. 1990. Validation of mathematical models. In Proc. of Geoval-90: Symposium on Valida-
+tion of Geosphere Flow and Transport Models, 571-579. Stockholm, Sweden.
+Sargent, R. G. 1994. Verification and validation of simulation models. In Proc. 1994 Winter Simulation
+Conference, ed. J. D. Tew, M. S. Manivannan, D. A. Sadowski, and A. F. Seila, 77-87. Piscataway,
+New Jersey: IEEE.
+Sargent, R. G. 1996a. Some subjective validation methods using graphical displays of data. In Proceed-
+ings of the 1996 Winter Simulation Conference, ed. J. M. Charnes, D. J. Morrice, D. T. Brunner, and
+J. J. Swain, 345-351. Piscataway, New Jersey: IEEE.
+Sargent, R. G. 1996b. Verifying and validating simulation models. In Proceedings of the 1996 Winter Si-
+mulation Conference, ed. J. M. Charnes, D. J. Morrice, D. T. Brunner, and J. J. Swain, 55-64. Pisca-
+taway, New Jer-sey: IEEE.
+Sargent, R. G. 2000. Verification, validation, and accreditation of simulation models. In Proceedings of
+the 2000 Winter Simulation Conference, ed. J. A. Joines, R. R. Barton, K. Kang, and P. A. Fishwick,
+50-59. Piscataway, New Jersey: IEEE.
+Sargent, R. G. 2001a. Graphical displays of simulation model data as statistical references. In Simulation
+2001 (Proc. of the 4th St. Petersburg Workshop on Simulation), ed. S. M. Ermakor, Yu. N. Kashta-
+nov, and V. B. Melas, 109-118. Publisher: Chemistry Research Institute of St. Petersburg University.
+Sargent, R. G. 2001b. Some approaches and paradigms for verifying and validating simulation models. In
+Proceedings of the 2001 Winter Simulation Conference, ed. B. A. Peters, J. S. Smith, D. J Medeiros,
+and M. W. Rohrer, 106-114. Piscataway, New Jersey: IEEE.
+Sargent, R. G. 2003. Verification and validation of simulation models. In Proc. 2003 Winter Simulation
+Conference, ed. S. Chick, P. J. Sanchez, E. Ferrin, and D. J. Morrice, 37-48. Piscataway, New Jersey:
+IEEE.
+Sargent, R. G. 2005. Verification and validation of simulation models. In Proc. 2005 Winter Simulation
+Conference, ed. M. E. Kuhl, N. M. Steiger, F. B. Armstrong, and J. A. Joines, 130-143. Piscataway,
+New Jersey: IEEE.
+Sargent, R. G. 2007. Verification and validation of simulation models. In Proceedings of the 2007 Winter
+Simulation Conference, ed. S. G. Henderson, B. Biller, M.-H. Hsieh, J. D. Tew, and R. R. Barton,
+124-137. Piscata-way, New Jersey: IEEE.
+Sargent, R. G. 2008. A new statistical procedure for validation of simulation models. International Feder-
+ation of Operational Research Societies Conference, Sandton, South Africa, July 2008.
+Sargent, R. G. 2009. Verification and validation of simulation models. In Proceedings of the 2009 Winter
+Simulation Conference, ed. M. D. Rossetti, R. R. Hill, B. Johansson, A. Dunkin, and R. G. Ingalls,
+162-176. Piscata-way, New Jersey: IEEE.
+Sargent, R. G., P. A. Glasow, J. P. C. Kleijnen, A. M. Law, I. McGregor, and S. Youngblood. 2000. Stra-
+tegic directions in verification, validation, and accreditation research. In Proceedings of the 2000
+Winter Simulation Conference, ed. J. A. Joines, R. R. Barton, K. Kang, and P. A. Fishwick, 909-916.
+Piscataway, New Jersey: IEEE.
+182
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.
+
+===== PAGE 18 =====
+
+Sargent
+Schlesinger, S. 1979 el al. Terminology for model credibility. Simulation 32 (3): 103-104.
+Schruben, L.W. 1980. Establishing the credibility of simulation models. Simulation 34 (3): 101-105. U. S.
+General Accounting Office, PEMD-88-3. 1987. DOD simulations: improved assessment procedures
+would increase the credibility of results.
+Whitner, R. G. and O. Balci. 1989.Guideline for selecting and using simulation model verification techni-
+ques. In Proceedings of the 1989 Winter Simulation Conference, ed. E. A. MacNair, K. J. Mussel-
+man, and P. Heidelberger, 559-568. Piscataway, New Jersey: IEEE.
+Wood, D. O. 1986. MIT model analysis program: what we have learned about policy model review. In
+Proceedings of the 1986 Winter Simulation Conference, ed. J. R. Wilson, J. O. Henriksen, and S. D.
+Roberts, 248-252. Piscataway, New Jersey: IEEE.
+Zeigler, B. P. 1976. Theory of modelling and simulation. New York: John Wiley and Sons, Inc.
+AUTHOR BIOGRAPHY
+ROBERT G. SARGENT is a Professor Emeritus of Syracuse University. He received his education at
+The University of Michigan. Dr. Sargent has served his profession in numerous ways including being the
+General Chair of the 1977 Winter Simulation Conference, serving on the WSC Board of Directors for ten
+years and chairing the Board for two years, being a Department Editor for the Communications of the
+ACM, holding the Presidency and other offices of what is now the INFORMS Simulation Society, and
+serving as Founding President of the WSC Foundation. He has received several awards and honors for his
+professional contributions including the INFORMS Simulation Society Lifetime Professional Achieve-
+ment Award and their Distinguished Service Award, a WSC 40th anniversary landmark paper award, ser-
+vice awards from ACM and IIE, and becoming a Fellow of INFORMS. His current research interests in-
+clude the methodology areas of modeling and of discrete event simulation, model validation, and
+performance evaluation. Professor Sargent has published extensively and is listed in Who’s Who in
+America and in Who’s Who in the World. His e-mail is <rsargent@syr.edu>.
+183
+Authorized licensed use limited to: University of Georgia. Downloaded on May 12,2026 at 14:20:55 UTC from IEEE Xplore. Restrictions apply.

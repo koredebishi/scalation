@@ -1,0 +1,2760 @@
+===== PAGE 1 =====
+
+Transportation Research Part B 126 (2019) 414–441
+Contents lists available at ScienceDirect
+Transportation Research Part B
+journal homepage: www.elsevier.com/locate/trb
+Simulation of rerouting phenomena in Dynamic Traffic
+Assignment with the Information Comply Model
+Rafał Kucharski a , ∗, Guido Gentile b
+a Department of Transportation Systems, Cracow University of Technology, ul. Warszawska 24, 31-155 Kraków, Poland
+b Dipartimento di Ingegneria Civile Edile e Ambientale –DICEA, Universitàdegli Studi di Roma “La Sapienza”, via Eudossiana 18, 00184
+Rome, Italy
+a r t i c l e i n f o a b s t r a c t
+Article history: We present the Information Comply Model (ICM) which extends the framework for macro-
+Received 15 December 2016 scopic within-day DTA proposed by Gentile (2016) to represent the rerouting of drivers
+Revised 8 August 2018 wrt a single traffic event. Rerouting is reproduced as a two-stage process: first, drivers
+Accepted 1 December 2018
+become aware about the event and its consequences on traffic; second, drivers may de-
+Available online 19 December 2018
+cide to change path. At each arc, unaware drivers have a probability of being informed
+Keywords:
+by multiple ATIS sources (radio, VMS, mobile apps), which depends not only on devise
+Dynamic user equilibrium penetration rates, but also on users space and time coordinates wrt the position and in-
+Macroscopic model terval of the event. At each node, aware drivers, who are somehow reluctant to change,
+Unexpected traffic events may finally modify their path based on a random rerouting utility, which is composed of
+En-trip route choice expected gains and avoided losses. ICM is thus capable of representing the evolution of
+Real-time traffic management rerouting phenomena in time and space when the information about a traffic event and
+its consequences on congestion spread among drivers and onto the network.
+This way, ICM extends the concept of dynamic user equilibrium to a case of imperfect
+information related to availability and awareness rather than to individual perception, as
+well as to a case of bounded rationality with prudent drivers. Besides the model architec-
+ture and specification, this paper provides a workable methodology which can be applied
+both off-line for transport planning and in real-time for traffic management on large size
+networks.
+©2018 Elsevier Ltd. All rights reserved.
+1. Introduction
+Traffic events (vehicle accidents, road closures, demand peaks, etc.) happen on a daily basis on road networks. Most typi-
+cal effects are related to local capacity reductions, or global flow increases, which may both cause oversaturation, congestion
+and then delays. Rerouting takes place when drivers, while travelling on the network, realize that the situation is atypical,
+and then decide en-trip to change their path, so as to partially avoid the negative consequences of the event.
+Forecasting how events affect the traffic pattern is of particular importance, since proper monitoring (to assess impacts)
+and management (to take actions) rely on predictions. Due to events, both travel times and traffic flows change with respect
+to typical values, not only for their direct effects, but also as a consequence of their indirect effects. More specifically, the
+event impacts may propagate on the network both upstream because of queue spillback and sideways because of rerouting,
+causing further delays ( Li et al., 2015 ). Modelling these effects on the supply side is relatively straightforward; if the route
+∗ Corresponding author.
+E-mail addresses: rkucharski@pk.edu.pl (R. Kucharski), guido.gentile@uniroma1.it (G.Gentile).
+https://doi.org/10.1016/j.trb.2018.12.001
+0191-2615/©2018ElsevierLtd.Allrightsreserved.
+
+===== PAGE 2 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 415
+Fig. 1. Due to the event (marked with an X) driver reroutes en-trip from the typical (bold) path to the actually optimal path (dashed) at a decision point
+(marked with arrow).
+choice pattern is assumed fixed, this can be accomplished through a dynamic network loading model ( Corthout et al., 2011 ).
+It is instead much more challenging to represent the effects on the demand side, namely how drivers are first informed and
+can then react to unexpected events by changing en-trip their pre-trip route choice.
+Some events are objectively unpredictable, and some other are only subjectively such. In both cases, not all drivers are
+informed in due time, i.e. before starting their trip. Moreover, drivers tend to be reluctant in changing their habitual path,
+which they clearly know better than currently optimal alternatives, so that modest delays are typically accepted without
+rerouting. Deficient information and prudential behaviour contradict the main assumptions of deterministic user equilibrium,
+i.e. perfect information and rational behaviour. Moreover, stochastic assignment is not of great help in reproducing the
+situation under analysis, because events produce perturbations of equilibrium which have an anisotropic gradient in space
+and time. Although several rerouting models were proposed in the literature, none of them allows at the same time to
+represent drivers’ behaviour realistically and to simulate efficiently how traffic flows and travel times evolve due to the
+event on large networks.
+Fig. 1 illustrates the rerouting phenomenon in an urban context. The path chosen pre-trip by the driver, that is optimal in
+terms of its typical costs, is not optimal anymore due to the unexpected event and to the delay that it caused. However, the
+driver may decide to change his/her path, to one that is optimal in terms of actual costs, only after receiving information
+about the traffic event and then realizing that he/she can partially avoid its negative consequences.
+Other authors call this phenomenon adaptation ( Gao et al., 2010 ), recourse ( Unnikrishnan and Waller, 2009 ) or en-route
+switching decisions ( Hu and Mahmassani, 1997 ); if path changing is limited to pre-trip choices, it is usually referred to as
+route-swapping and handled in the context of day-to-day models ( Cantarella and Watling, 2016 ). The relevance of rerout-
+ing has raised in the last years as the number of informed drivers has substantially increased with the growing market
+penetration of Advanced Traveller Information Systems (ATIS).
+In this paper, we present the Information Comply Model (ICM), which reproduces rerouting as a two-stage process,
+where drivers, first become aware of the event with a certain probability at each arc, thanks to a given ATIS configuration
+of available information sources (radio, VMS, internet apps, etc.), and second decide whether to change to an optimal path
+with a certain probability at each node, based on expected gains and avoided losses. Finally, rerouting drivers use their
+actual prediction of travel times and costs to choose their new path to destination. This schema results in a particular
+fixed-point formulation of Dynamic Traffic Assignment (DTA) where rerouting decisions are iteratively adjusted to reach an
+equilibrium which incorporates the above two-stage process.
+We apply the ICM in the macroscopic DTA framework of Gentile (2016) , which is here properly extended to represent
+rerouting. The resulting model has also been implemented as an add-in of PTV Optima, a commercial software solution
+
+===== PAGE 3 =====
+
+416 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+for traffic management ( PTV SISTeMA, 2016 ); this allowed to test the proposed model on both illustrative examples and
+real-size networks, thus demonstrating its practical applicability and the soundness of results.
+The paper is organized as follows. This introduction is complemented by a literature review and an outline of main
+contributions. In Section 2 , the macroscopic DTA is introduced and its limitations to reproduce rerouting are identified. In
+Section 3 , the Information Comply Model is presented, including the awareness model and the rerouting model. In Section 4 ,
+the ICM is casted into the proposed DTA framework. In Section 5 , some numerical results illustrate the capabilities of the
+resulting model to represent rerouting also on real-size networks. Finally, conclusions are drawn and further research direc-
+tions are outlined.
+1.1. Background
+Thanks to recent developments, DTA is now applied not only in off-line transportation planning, but also in real-
+time traffic management (e.g. PTV Optima, Gentile and Meschini, 2011 ; DynaMIT 2.0, Lu et al., 2015 ; AIMSUN online,
+Frisoet al., 2013 ). This, however, raises a number of issues, one of which is addressed in this paper: as Peeta and Mahmas-
+sani (1995) and later Dobler et al. (2012) pointed out, the usual equilibrium models, even if based on dynamic assignment
+methods, fail to reproduce atypical and unexpected situations where drivers reroute trying to avoid a traffic event.
+The need for improvement is motivated by the fact that the state-of-the-practice presents two solutions to handle unex-
+pected events within DTA, both of them intrinsically wrong. The first one is to solve a Dynamic User Equilibrium problem,
+assuming that the event and its consequences on travel times and traffic flows are perfectly known to drivers, which results
+in a predictive behaviour where users reroute before the event took place. The second one is to solve a Dynamic Network
+Loading problem, assuming that drivers will stick to their habitual path without rerouting, which results in the propagation
+of the demand flows on the network where the impacts of the event are taken into account only on the supply side. This is
+why an intermediate, more realistic model is looked-for and proposed in this paper.
+The rerouting problem can be derived from the route choice problem (for a broad review of route choice models we refer
+to Prato, 2009 ). Initial formulations, where the arc costs are assumed fixed and deterministic, have been gradually improved
+and became applicable also to the case of en-trip rerouting. Polychronopoulos and Tsitsiklis (1993) address the shortest path
+problem on graphs with random arc costs which provides a so-called policy that leads from an origin to a destination node
+with minimal expected cost. Gao and Chabini (2006) further extend this concept into the optimal routing policy problem
+on dynamic stochastic networks, where link travel times are modelled as random variables with time-dependent distribu-
+tions. Another valuable concept is the hybrid route choice model, first introduced by Mahmassani and Jayakrishnan (1991) ,
+where users can adapt their path while travelling. Waller and Ziliaskopoulos (2002) utilize this concept to introduce the
+online shortest path problem, where decision makers have the opportunity to reevaluate their remaining path en-trip when
+information becomes available.
+Coupling en-trip path adaptation and stochastic arc costs leads to the concept of adaptive routing policy , defined as a
+decision rule that maps all possible revealed traffic conditions to the next link choices, subject to the available informa-
+tion ( Gao et al., 2008 ). This allows to reproduce travellers’ strategic behaviour when adapting to revealed traffic conditions
+en route. The random path utilities are sequentially updated at each node with the revealed traffic conditions and ap-
+plied to revise the route choices. It is assumed that travellers know the probabilistic distributions of link travel times and
+the correlations among them. The computational burden of this assumption may somehow be reduced by: (1) an approx-
+imate heuristics ( Gao and Chabini, 2006 ); (2) simplifying the unknown travel time distributions with incomplete statistics
+( Flajolet et al., 2017 ); or (3) sampling them from simulation results ( Snowdon et al., 2012 ). Valuably, the adaptive routing
+policy can be further extended to the Prospect Theory ( Gao et al., 2010 ), which allows to reproduce the twofold attitudes
+toward travel time variability: risk seeking under high probability and risk averse under low probability; that cannot be
+captured when the utility is assumed linear. Unnikrishnan and Waller (2009) proposed an equilibrium framework defined
+on routing policies instead of paths: the network is in equilibrium if no user can improve his/her expected cost by changing
+the routing policies (i.e. each user chooses a routing policy with minimum expected cost).
+In contrast to the above, Hu and Mahmassani (1997) assume that users have access to full knowledge about the actual
+network costs. Perfectly informed users, however, behave with bounded rationality, so that rerouting takes place only if the
+difference between actual and typical travel times is greater than a given indifference threshold. In the model proposed by
+Mahmassani and Jayakrishnan (1991) drivers update their estimation of travel costs while travelling. The model was further
+extended through a rolling-horizon approach by Peeta and Mahmassani (1995) , so that a given share of drivers periodically
+becomes aware about the actual travel costs and can update en-trip their path choice.
+A similar hybrid model by Pel et al. (2009) requires path enumeration and is thus limited to a small networks, yet pro-
+vides concepts which we adopt in this paper to model rerouting, namely: (1) the rerouting utility shall be computed subject
+to the destination; (2) drivers may perceive the received information in different ways and inaccurately. Corthout et al.
+(2011) complements this by stating that: (3) informed drivers can anticipate downstream congestion, and (4) the share of
+rerouting drivers is related to the travel cost gains from the current decision point to the destination. The other concepts
+founding our approach to rerouting are: (5) a specific version of multi-class assignment where informed and uninformed
+drivers are propagated jointly but utilizing different cost patterns (as proposed in Mahmassani and Jayakrishnan, 1991 ); (6)
+representing the awareness process as a transition of unaware drivers into aware drivers at intermediate nodes ( Ma et al.,
+2016 ).
+
+===== PAGE 4 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 417
+Another, lately popular approach ( Dobler et al., 2012; Xiong et al., 2016; Ma et al., 2016; Cao et al., 2016 ) is to repro-
+duce rerouting with agent-based microscopic simulators, which provide a flexible framework to model driver acquisition of
+information and path choice behaviour in detail, yet are by nature stochastic and complex.
+The adaptive behaviour of drivers is broadly investigated in the day-to-day context. In particular, Cantarella and
+Cascetta (1995) define the probability of choosing a path in a given day as the product of: (a) the probability of recon-
+sidering the choice done in the previous day and (b) the conditional probability of choosing that path given that the choice
+of the previous day is reconsidered. Watling and Hazelton (2003) simulate the learning process through an exponential
+smoothing: cyclically a share of users update the expected travel times with the actual experience. Han et al. (2011) analyse
+the impact of ATIS on day-to-day adaptation. This is further examined by Bifulco et al. (2016) , showing that an inaccurate
+real-time information can destabilize the day-to-day dynamic system, and ATIS route indications are most efficient when the
+information is accurate. The day-to-day dynamic assignment is formulated by Bifulco et al. (2016) as a fixed point problem
+with predicted travel costs converging to the actual travel costs. In this paper we propose a similar fixed-point problem, but
+the DTA model is solved in the within-day context.
+An excellent review of recent findings about the effects of information on travellers’ behaviour can be found in Ben-
+Elia and Avineri (2015) . The revealed behaviour is complex and includes several phenomena like reinforced learning, risk
+and loss aversion, probability weighting, anchoring and ambiguity aversion, regret aversion. These behavioural theories are
+supported by experimental findings. Selected results from Stated Preference experiments, where travellers choose a route
+in a specific information context, are: (1) prescriptive information, where drivers are explicitly informed with the optimal
+route, has the largest impact on behaviour ( Ben-Elia et al., 2013 ); (2) real-time information availability at downstream nodes
+encourages participants to less risk-averse behaviour ( Lu et al., 2010 ); (3) more detailed VMS information yield higher di-
+version rates (Peeta at al., 20 0 0) ; (4) drivers’ reaction is both heterogenic and stochastic ( Dell’Orco and Marinelli, 2017 );
+(5) providing information on the range of travel times, i.e. the difference between maximum and minimum, can trigger
+risky behaviour ( Katsikopoulos et al., 2002 ). In the typical recent Revealed Preference experiments travellers are traced with
+GPS ( Papinski et al., 2009; Schlaich, 2010; Vacca and Meloni, 2015 ). Ramos (2015) applied the sequential logit model of
+Fosgerau et al. (2013) on GPS traces and revealed that drivers: (1) are more sensitive to actual travel times when they are
+informed; (2) comply with pre-trip, rather than en-trip, information, but (3) consult travel information just before departing;
+(4) make distinctions among information sources which then impact differently on their behaviour.
+The researches on Twitter data (e.g. Lerman and Ghosh, 2010; Sakaki et al., 2010; Bakshy et al., 2012 ) provide valuable
+insights on the information spread process. Its dynamics and range have been observed through the tweets posted after
+relevant emergencies: earthquake, hurricane, traffic events, rebellions, etc. Procter et al. (2013) show how information prop-
+agated through the Twitter network in time and obtained a Rayleigh-like shape of the spread curve, in-line with evacuation
+models ( Lindell and Prater, 2007 ). Ghosh and Lerman (2014) show that information in the communication network is either
+completely negligible or significant and spreads like a virus, being reposted forward with exponential probability.
+1.2. Objectives and contributions
+Although the rerouting phenomenon was the object for many researches, it can be still considered an open issue, since
+the applicability of the proposed models is limited, due to excessive simplification or complexity.
+Our contribution is a workable model that can be effectively applied on real-size networks to realistically represent the
+joint effects on supply (congestion) and demand (rerouting) of a single traffic event in presence of multiple information
+sources. To this end we extend the framework for macroscopic within-day DTA presented in Gentile (2016) .
+The methodology presented in this paper is built mainly on our previous research on DTA ( Bellei et al., 2005; Bellei
+et al., 2006; Gentile et al., 2007; Gentile, 2015 ), which exploits implicit path enumeration through a sequential approach to
+route choice ( Gentile and Papola, 2006; Long et al., 2013 ) and the Link Transmission Model ( Yperman, 2007; Gentile, 2010;
+Nezamuddin and Boyles, 2015 ) as a simulation engine on the supply side.
+After pointing out the limitations of the classic DTA to represent rerouting, we identify a suitable way to include the
+phenomenon in the model structure. Specifically, we based the proposed formulation on implicit path enumeration, as this
+allows to reproduce local en-trip decisions at nodes for users directed toward a given destination and to avoid the compu-
+tation of shortest paths.
+We adopted temporal layers to represent dynamics as this easies the flow handling when travel times change, which is
+instead challenging in trajectory based algorithms. Specifically, the path choices of the reference equilibrium can be used
+in the event scenario. Moreover, temporal layers allow for a less dense time discretization with long time intervals (e.g.
+5–10 min), which is crucial for real-time applications and large networks.
+Then, we present the ICM, which is suited for the specific DTA framework and reproduces rerouting as a two-stage
+process: first, drivers become aware about the event and its consequences on traffic; second, drivers may decide to change
+path.
+We represent the probability of becoming aware of the event as the joint probability of being informed by various ATIS
+sources (radio, VMS, mobile apps), not only as a function of their penetration rate, but also of the space and time coordinates
+of the driver wrt those of the event, as in Kucharski and Gentile (2015) .
+We represent the probability of rerouting by aware drivers, who are reluctant to change, through a random utility model,
+which takes into account expected gains and avoided losses.
+
+===== PAGE 5 =====
+
+418 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+This way we are capable of representing the evolution of the rerouting phenomena in time and space when the infor-
+mation about the event and its consequences on traffic spread onto the network.
+Since the outcomes of rerouting decisions are dependent on rerouting decisions made by other drivers, providing a sound
+equilibrium model is non-trivial. To this end we propose a fixed-point framework which converges to a solution where
+rerouting drivers will not only reduce their costs, but also their experienced travel costs will be in line with the expected
+ones.
+Finally, ICM is the first (up to authors knowledge) macroscopic DTA model capable of simulating a scenario with one
+traffic event on large-size networks in a reasonable computing time (comparable to dynamic user equilibrium), while rep-
+resenting the effect of multiple information sources and stochastic rerouting decisions.
+2. A macroscopic Dynamic Traffic Assignment model to road networks
+2.1. Schematic formulation of the DTA model
+The road network is here represented through a directed graph ( N, A ), where N is the set of nodes and A ⊆ N ×N is the
+set of arcs. Each arc a ∈ A has a (possibly time varying) vector of supply characteristics s a ( τ ), e.g. length, free flow speed,
+capacity, jam density, signal settings, etc., that allow to represent its performances under different traffic conditions. The
+initial node of the generic arc a ∈ A , referred to as tail , is denoted N a –∈ N , while the final node, referred to as head , is denoted
+N a + ∈ N . The set of arcs exiting the generic node i ∈ N , referred to as forward star , is denoted A i + = { a ∈ A: N a –= i }; the set of
+arcs entering node i ∈ N , referred to as backward star , is denoted A i –= { a ∈ A: N a + = i }.
+The subset of nodes where trips can start and/or end, referred to as centroids , is denoted Z ⊆N . The travel demand of road
+users is given as a fixed (but time varying) flow d
+od
+( τ ) of (equivalent) vehicles departing at time τ from each origin o ∈ Z
+and directed towards each destination d ∈ Z , which is also referred to as the dynamic O-D matrix .
+Notation will follow some general rules. The subscripts of a variable are used to denote network elements, e.g. i for node
+and a for arc. Because the proposed assignment model is destination based, we make an exception and use superscript d
+τ
+to refer it. Since the model is dynamic, each variable is represented as a piecewise continuous function of the clock time ,
+τ
+which is referred to as temporal profile ; by omitting in the notation the dependence to we refer to the whole temporal
+profile. The variables of the proposed rerouting model often refer alternatively to the typical traffic conditions (denoted with
+a hat) of that day-type, or to the actual traffic conditions (denoted without a hat) which are a consequence of the simulated
+event.
+Below we list the main variables and abbreviations used in the paper; all other variables are introduced as they appear.
+a ∈ A, i ∈ N generic arc and node of the graph
+o,d ∈ Z ⊆N generic origin and destination centroids
+q
+q
+d
+A
+s
+N
+p
+a
+d
+i d
+a o
+d
+−
+i
+a
+a
+−
+(
+d
+(
+(
+(
+,
+τ
+,
+(
+τ
+τ
+τ
+A
+τ
+N
+)
+)
+)
+)
++
+i
+)
+a
++
+,
+⊆
+pˆ
+∈
+d a
+A
+(
+N
+τ )
+s
+b
+a
+t
+d
+fl
+fl
+a
+u
+r
+a
+e
+o
+o
+i
+c τ
+p
+c
+m
+w
+w
+l
+k
+p
+, c
+a
+a
+w
+l
+o a
+n
+e
+e
+y
+n
+c n
+x
+n
+a
+d
+d
+t d
+c
+i
+r
+t
+u
+t
+d
+e
+h
+h
+i
+i
+fl
+a t
+r
+n
+a
+e
+i
+o
+l
+i
+a
+o
+g
+r
+a
+n
+w
+n
+a
+a n
+d
+g
+c
+n
+d
+n
+a
+t
+f
+d
+o
+o
+a
+l
+e
+r
+f
+d
+f
+r
+o
+o
+r
+p t
+c
+e
+i
+r
+m
+a
+y r
+s
+w
+o
+a
+p
+t
+i
+g
+i
+b
+∈
+∈
+i
+a
+c
+o
+e
+c a
+N
+A
+r
+s
+r
+n
+a
+d
+b
+i
+l
+e
+g
+o
+a
+i
+a
+l
+r
+i
+s
+f
+v
+t
+t
+i
+n
+i
+t
+t a
+c
+a
+a
+t
+y
+t
+l
+i
+r
+o
+i
+r
+u
+a
+m
+m
+c
+∈
+o e
+r
+o
+f
+Z
+c
+e
+s
+a
+e
+f
+∈
+e
+a
+t
+τ
+a
+τ
+n
+A
+o
+∈
+t
+g
+d
+d
+A
+e
+d
+a
+e
+i
+i
+r
+t
+e
+r
+n
+r
+i
+e
+e
+s
+n
+e
+t
+t
+c
+c
+i
+g
+r
+i
+m
+t
+t
+i
+n
+e
+e
+c
+a
+a
+e
+d
+d
+r
+t
+n
+c
+i
+τ
+t
+t
+o
+o
+o
+o
+a
+d
+n
+w
+w
+∈
+e
+d
+A
+a
+a
+i
+∈
+r
+r
+∈
+d
+f
+d
+Z
+o
+N
+s
+s
+r
+a
+d
+d
+t
+d
+e
+e
+r
+t
+s
+s
+i
+i
+t
+v
+t
+m
+i
+i
+e
+n
+n
+e
+r
+a
+a
+s
+t
+t
+τ
+i
+i
+d
+o
+o
+.
+i
+n
+n
+re
+d
+d
+c
+∈
+t
+∈
+e
+Z
+Z
+d towards destination d ∈ Z who exit from its tail N a −at time
+t a (τ) , tˆ a (τ) travel time of arc a ∈ A for drivers entering it at time τ, actual and typical values
+θ
+θ
+c
+w
+a a
+a
+−
+d
+i
+(
+(
+1
+τ
+(
+τ
+(
+τ
+)
+)
+τ
+)
+)
+e
+t
+e
+n
+r
+x
+n
+o
+a
+a
+i
+t
+d
+v
+t
+r
+t
+e
+e
+y
+t
+t
+l
+i
+i
+p
+m
+t
+m
+c
+i
+o
+o
+m
+e
+t
+e
+s
+e
+e
+t
+o
+n
+τ
+f
+o
+t
+o
+i
+f
+a
+f
+a
+r
+l
+a
+a
+,
+c
+r
+r
+i
+c
+c
+a
+. e
+∈
+a
+a
+.
+∈
+A
+∈
+e
+A
+A
+x
+f o
+p
+f
+f
+r
+e
+o
+o
+c
+r
+r
+d
+t
+r
+e
+d
+d
+i
+d
+r
+v
+r
+i
+i
+e
+v
+v
+v
+r
+e
+e
+a
+s
+r
+r
+l
+s
+u
+s
+e
+e
+n
+e
+e
+t
+n
+x
+o
+e
+t
+i
+f
+r
+t
+e
+i
+i
+r
+t
+n
+n
+h
+i
+g
+n
+g
+e
+g
+i
+i
+m
+t
+t
+i t
+a
+a
+i n
+t
+t
+a
+i
+t
+t
+t
+m
+i
+i
+t
+m
+m
+i
+u
+m
+e
+m
+e
+e
+τ
+τ
+r
+τ
+oute cost perceived to reach destination d ∈ Z by drivers exiting node i ∈ N
+w d
+a
+(τ) arc potential to reach destination d ∈ Z by drivers entering arc a ∈ A at time τ
+Rerouting variables:
+ι a ( τ) share of unaware drivers entering arc a ∈ A at time τ who become aware (i.e. informed) about the event while traveling along
+the arc
+κ
+v
+qˆ
+d
+i d
+i
+i
+d
+(
+(
+(
+τ
+τ
+τ
+)
+)
+)
+, q¯ d
+i
+(τ) , q˜ d
+i
+(τ) u
+s
+u
+h
+n
+ti
+a
+a
+l
+r
+i
+w
+t
+e
+y
+a
+o
+r
+t
+f
+e
+o
+,
+a
+r
+a
+w
+e
+w
+r
+a
+o
+a
+r
+u
+e
+re
+t
+d
+e
+a
+r
+f
+n
+i
+o
+v
+d
+e
+r
+r
+r
+d
+s
+e
+r
+r
+e
+i
+o
+v
+x
+u
+e
+it
+r
+t
+i
+s
+e
+n
+d
+e
+g
+x
+fl
+n
+i
+o
+t
+o
+i
+w
+n
+d
+g
+e
+o
+n
+i
+f
+∈
+o
+d
+N
+d
+r
+e
+i
+a
+v
+t
+e
+i ∈
+r
+t
+s
+N
+im
+e
+a
+x
+e
+t
+i t
+τ
+t
+i
+i
+n
+m
+d
+g
+i
+e
+r
+n
+e
+τ
+o
+c
+d
+t
+a
+e
+e
+n
+d
+d
+i ∈
+t o
+N
+d
+w
+i r
+a
+a
+e
+t
+r
+c
+d
+t
+t
+e
+i
+s
+m
+d
+d
+e
+e
+t o
+s
+τ
+w
+tin
+d
+a
+a
+r
+ir
+d
+t
+e
+i
+s
+o
+c
+n
+t
+d
+e
+e
+d
+d
+s
+∈
+t
+t
+i
+Z
+o
+n
+w
+a
+w
+t
+a
+i
+h
+o
+r
+o
+d
+n
+s
+d
+d
+d
+e
+∈
+e
+c
+Z
+s
+id
+ti
+e
+n a
+to
+ti o
+r
+n
+er o
+d
+u
+∈
+t
+Z
+e
+Abbreviations:
+DTA Dynamic Traffic Assignment
+ICM Information Comply Model
+RCM Route Choice Model
+FPM Flow Propagation Model
+MSA Method of Successive Averages
+ACM Arc Cost Model
+APM Arc Potential Model
+LRM Local Routing Model
+EAM Event Awareness Model
+ERM Event Routing Model
+
+===== PAGE 6 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 419
+Fig. 2. Simplified schema of the Dynamic Traffic Assignment model.
+Below, we describe in a compact form the DTA model to which the proposed ICM was applied; for more details we refer
+to Gentile (2016) .
+Dynamic Traffic Assignment can be regarded as the system of two sub-models: supply , being a function of the demand,
+and demand , being a function of the supply.
+The supply model yields the network performance pattern in terms of travel times t corresponding to the network usage
+pattern in terms of destination flows q for given supply characteristics s :
+t = Supply ( q ;s ). (1)
+The proposed DTA considers a macroscopic traffic flow model based on the kinematic wave theory, capable to repro-
+duce the main traffic phenomena (hypocritical congestion, queues and spillback). The supply model is crucial for DTA, but
+is not the focus of this paper; for details on how network performances are simulated in the proposed model refer to
+Gentile (2015) . However, in the ICM it can be easily substituted with any alternative simulation model of traffic flows.
+The demand model yields the network usage pattern in terms of destination flows q corresponding to the network
+performance pattern in terms of travel times t for a given demand o-d matrix d :
+q = Demand ( t ;d ) . (2)
+Travel costs c of users are first obtained by combining the results of the traffic flow model (i.e. travel time, queue length,
+etc.) with other relevant (flow-independent) attributes considered by drivers when making their route-choice (i.e. safety,
+toll, etc.). Then, a sequential ( Gentile and Papola, 2006 ) Route Choice Model (RCM), deterministic or stochastic, allowing
+for implicit path enumeration ( Gentile and Noekel, 2016 ) is applied to obtain the arc potentials w and the arc conditional
+probabilities p , for each destination, like in Dial (1971) . Finally, a Flow Propagation Model (FPM) is applied to load travel
+demand on the network, based on the arc conditional probabilities, thus obtaining the destination flows q . Both the RCM
+and the Flow FPM require the travel times t , being this the main difference from static and dynamic assignment models.
+The combination of the two sub-models yields a fixed point problem ( Bellei et al., 2005; Gentile et al., 2007 ) which
+formalizes the user equilibrium, i.e. a traffic condition where no driver can improve his (perceived, in the case of stochastic
+route choice model) path cost.
+The heuristic method to approximate the fixed-point is iterative applying following Method of Successive Averages (MSA),
+α
+where the step size n at iteration n is usually set equal to 1/ n :
+q n = ( 1 −α
+n
+) ·q n −1 + α
+n
+·Demand ( Supply ( q n −1 ;s ) ;d ) . (3)
+Faster and more exact methods than MSA are today available (e.g. Gentile, 2016 ), although the former is still widely used
+heuristic thanks to its robustness and generality, which is paid with slow convergence.
+In general, the DTA model provides the equilibrium temporal profiles of the main traffic variables (travel times t and
+destination flows q , from which it is immediate to obtain arc costs, volumes and probabilities, if needed) for a given supply
+s and demand d (schematically depicted at Fig. 2 ):
+( t , q ) = DT A ( s , d ). (4)
+2.2. Focus on route choice and flow propagation
+Since the rerouting phenomenon takes place at the demand side of DTA, in the following we present this model in some
+more detail.
+Arc travel times play here three roles:
+1. they are a major component of the arc costs perceived by drivers;
+2. they are used to evaluate the arc costs at the time when the driver enters them;
+3. they are used to propagate the flows on the network.
+γ
+Concerning point 1, the arc costs are assumed to depend linearly on the travel times through the value of time and a
+χ τ
+constant (monetary) term a ( ), which summarizes all flow-independent components of disutility:
+c
+a
+( τ) = γ ·t
+a
+( τ) + χ
+a
+( τ) . (5)
+Eq. (5) can be expressed in compact form as the Arc Cost Model:
+c = ACM ( t ) . (6)
+
+===== PAGE 7 =====
+
+420 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+Concerning points 2 and 3, it is useful to introduce the exit time and its inverse, which expresses the entry time, as a
+function of the travel time:
+θ
+a
+( τ) = τ + t
+a
+( τ) , (7)
+θ
+a
+− 1 ( τ + t
+a
+( τ) ) = τ. (8)
+Obviously, the above formulation is generic, and state-of-the-art traffic flow models are more complete. Specifically, to
+ease the presentation of the model, in the following we assume that the temporal discretization used for the numerical
+solution is sufficiently dense, so that no vehicle can travel any arc in less than one time interval. In practical implementa-
+tions this assumption is relaxed, because longer time intervals lead to less variables and then shorter computation runtime
+( Gentile et al., 2007; Himpe et al., 2016 ); but this implies a slightly more complex model where the acyclicity of the cor-
+responding space-time network does not hold anymore. Likewise, in practical implementations handle empty arcs at the
+beginning and end of the simulation period, flat cumulative flow profiles for periods with no inflow, etc.
+The proposed demand model with implicit path enumeration requires to process the nodes twice. First, node potentials
+w
+i
+d ( τ ) are determined recursively in reverse chronological order (but in no particular topological order) as a function of
+later node potentials of the forward star:
+(cid:2) (cid:3)
+w d
+i
+( τ) = w w d
+a
+( τ) : a ∈ A +
+i
+, (9)
+w d
+a
+( τ) = c
+a
+( τ) + w d
+N a +
+( θ
+a
+( τ) ) . (10)
+In Eq. (10) the arc potential w a d ( τ ) is introduced as the sum of the arc cost at time τ and of its head node potential eval-
+uated at the (later) exit time θ a d ( τ ) > τ . The specific function w to apply in Eq. (9) depends on the behavioural assumption
+made for route choice: e.g. deterministic models would apply a Bellman relation (like in Gentile, 2016 ):
+(cid:2) (cid:3)
+w d
+i
+( τ) = Min w d
+a
+( τ) : a ∈ A +
+i
+(11)
+while Logit models would apply a logsum formula (like in Bellei et al., 2005 ), where the parameter ϑ is proportional to the
+standard deviation of the random perception error:
+(cid:4) (cid:8)
+(cid:6) (cid:7)
+w d i ( τ) = −ϑ ·Log
+a
+(cid:5)
+∈ A +
+Exp − w d a ϑ ( τ) . (12)
+i
+The arc potentials can then be expressed in compact form through the Arc Potential Model as a function of arc perfor-
+mance:
+w = AP M ( c , t ) . (13)
+Then, the conditional probabilities p a d ( τ ) of each arc a ∈ A i + exiting node i ∈ N are obtained, in any order, as a vector
+function of the arc potentials of the forward star.
+(cid:2) (cid:3)
+p d A + ( τ) = p w d b ( τ) : b ∈ A + i . (14)
+i
+Again, the specific function p to apply in Eq. (14) depends on the behavioural assumption made for route choice: e.g.
+deterministic models would apply Wardrop’s principle, so that the arc conditional probabilities must jointly satisfy, besides
+consistency constraints (i.e. non negative values summing up to one), the following complementarity conditions (like in
+Gentile, 2016 ):
+(cid:2) (cid:3)
+pd
+a
+( τ) · w d
+a
+( τ) −w d
+i
+( τ) = 0 ∀ a ∈ A +
+i
+(15)
+while Logit models would apply a negative exponential proportion (like in Bellei et al., 2005 ):
+(cid:6) (cid:7)
+pd a ( τ) = Exp −
+w d
+a
+( τ)
+ϑ
+− w d
+i
+( τ)
+. (16)
+The arc conditional probabilities can then be expressed in compact form through the Local Routing Model as a function
+of arc potentials:
+p = LRM ( w ). (17)
+The Route Choice Model expresses in compact form the Eqs. (9) , (10) and (14) :
+p = LRM ( AP M ( c , t ) ) = RCM ( c , t ). (18)
+Although in principle route choice can be modelled equivalently through a deterministic or a stochastic model, the pres-
+ence in the proposed framework of other probabilistic events (being informed and deciding to reroute) would induce to opt
+for the second approach.
+Subsequently, the node flows q i d ( τ ) by destination, together with the flows q a d ( τ ) of each arc a ∈ A i + exiting node i ∈ N ,
+are obtained recursively in direct chronological order (but in no particular topological order) based on:
+
+===== PAGE 8 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 421
+Fig. 3. Schema of the Dynamic Traffic Assignment model with detailed demand model.
+1. flow conservation, which involves the o-d demand matrix and the earlier flows entering the arcs of the backward star;
+2. temporal consistency, which involves the entry time derivative, because speed variations imply vehicle dispersion or
+concentration:
+q d i ( τ) = d id ( τ) +
+(cid:5)
+q d a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3)
+·
+∂θ
+a
+−
+∂
+1
+τ
+( τ)
+, (19)
+a ∈ A −
+i
+q d
+a
+( τ) = q d
+N a −
+( τ) ·pd
+a
+( τ). (20)
+In Eq. (20) the arc flow q a d ( τ ) is simply obtained by multiplying the node flow and the arc conditional probability.
+Note that in practice the arc conditional probabilities can be computed together with the arc potentials or immediately
+before the destination flows; therefore demand model requires to process nodes only twice.
+The FPM expresses in compact form the Eqs. (19) and (20) :
+q = F P M ( p , t ;d ). (21)
+Finally the demand model is the composition of ACM, RCM, and FPM:
+Demand ( t ;d ) = F P M ( RCM ( ACM ( t ), t ), t ;d ). (22)
+To obtain the whole flow pattern, each destination d ∈ Z is processed in any order. Then, the destination flows of each
+arc a ∈ A are usually aggregated into the link volume q a ( τ ) of vehicle equivalents. Indeed, besides this being a fundamental
+output of DTA together with travel times, volumes suffice to source simple point queue models, while destination flows
+are required only by more detailed supply models which are though capable of representing spillback phenomena ( Gentile,
+2015; Himpe et al., 2016 ).
+If in the above schema ( Fig. 3 ) we exclude the dashed arrows (i.e. we assume given probabilities) the resulting model is a
+Dynamic Network Loading. At this point it is worth noting how the demand – supply system is conceptually different from
+the classical decomposition of DTA into a Dynamic Network Loading model and a RCM. The latter resembles more how a
+user equilibrium may be reached in reality as a day-to-day learning and updating process: drivers make their route decision,
+possibly updating the choice of the previous day, based on an estimation of performance pattern in which the travel times
+of the previous day are part of a learning mechanism that takes into account also all previous experiences (and, possibly,
+pre-trip information). Instead, the demand model does not correspond to a process that takes place in reality, and makes
+sense only as a component of the equilibrium together with the supply model.
+2.3. Numerical solution of the demand model
+In the numerical implementation of the method ( Algorithm 1 ) we as sume a piecewise approximation where each variable
+is computed only at predefined instants τ t , with t ∈ T = [0, μ ]. In particular, performance variables (like travel times and arc
+potentials) are assumed piecewise linear while usage variables (like destination flows and arc probabilities) are assumed
+piecewise constant in the interval τ t ≤τ< τ t + 1 , with 0 ≤t < μ ; the last μ th interval represents all instants t ≥τ μ .
+Temporal consistency is taken into account, not through the exit and entry time, but by:
+• the entry - exit map , with e at ∈ T being the exit interval of a vehicle entered at time τ t with t ∈ T , i.e. τ e ≤τ t + t at < τ e + 1 ,
+with e = e at > t (by assumption);
+• the propagation map , with m ate being the share of flow entering arc a during interval t ∈ T that exit it during interval
+e ∈ T > t –to reduce memory consumption, in the implementation only the positive elements of the map are instanced.
+Both maps are a result of the supply model, together with the travel times t at as all such variables can be obtained from
+the temporal profiles of the exit times:
+(cid:2) (cid:2) (cid:3) (cid:2) (cid:3) (cid:3)
+m ate = M in M in θ a − 1 ( τ e +1 ), τ τ t+1 − − τ M ax θ a − 1 ( τ e ), τ t , 0 . (23)
+t+1 t
+
+===== PAGE 9 =====
+
+422 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+Algorithm 1 Demand model.
+We assume that all users complete their trip before the end of the simulation, so that the travel times after the end of
+the simulation are uncongested.
+2.4. DTA model limitations and potential to represent rerouting phenomena
+Neither DTA, nor DNL as formulated above are suitable to simulate unexpected events and in particular to model rerout-
+ing phenomena. Indeed, in DTA the RCM assumes predictive information, and in DNL fixed demand pattern used in the
+propagation model.
+These are two extremal scenarios; typically part of the drivers behave accordingly with the DTA principle, and part with
+the DNL. In the present paper we aim at dealing with such mixture of conditions.
+Let us first consider the limit of DTA. In a dynamic RCM decisions are made based on future travel times taken from
+previous experience as well as from traffic information and forecast. Implicitly, such predictive route choice paradigm implies
+that a driver departing from his origin knows in advance the travel times that he will encounter until he arrives at his
+destination: in the proposed model this is attained with Eq. (10) . Using the actual network characteristics including the
+event to solve DTA results then in full knowledge about the future traffic states. Consequently, routing decisions would be
+made to avoid the event before it occurs or becomes known, leading to unrealistic patterns.
+Now, let us consider the limit of DNL. In the FPM the demand flows are loaded using routing decisions made pre-trip,
+based on expected network performances not including the event. Thus, if the actual travel times happen to be different
+from what was expected, only the propagation will be affected but no rerouting can be simulated.
+
+===== PAGE 10 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 423
+The proposed ICM model was conceived to extend the above model structure of DTA to simulate rerouting phenomena.
+Namely it exploits:
+1. implicit path enumeration, where route choice probabilities are reproduced as splitting rates from any node to each
+destination;
+2. supply-demand separation, where actual travel times can be obtained for flows propagated with several independent
+route choice models;
+3. strong distinction between travel times and perceived travel costs, which allows to propagate flows along the path of
+minimal perceived costs (possibly outdated) consistently with actual travel times;
+4. flow conservation thanks to temporal layers formulation with propagation maps.
+Thanks to these features, the ICM overcomes the above limits by ensuring that actual travel times cannot be perceived by
+unaware drivers in their route choices, while all drivers, not just those rerouting, are propagated on the basis of the actual
+travel times.
+3. The Information Comply Model
+Rerouting takes place when a driver tries to escape from some traffic event and en-trip decides to change path. We
+assume the following rerouting behaviour:
+1. a driver reroutes only once he becomes aware of the event, which may occur thanks to several information sources,
+including direct observation;
+2. the reason for rerouting is to avoid the negative consequences of the event and benefit from expected lower costs, which
+shall then more than compensate his reluctance to change;
+3. the driver reroutes to an optimal path considering the correct estimation of actual and future travel costs produced by
+the event and by the rerouting of other drivers, based on experiences of similar situations and/or on predictive traffic
+information.
+This behaviour is reproduced in the ICM as a sequence of states and changes in the mental condition of a driver who:
+• 1. is initially unaware about the event and follows his habitual path from his origin toward his destination, which has
+been chosen pre-trip on the basis of the typical within-day evolution of travel times on the network in that day-type;
+• 1–2. becomes informed about the event, while travelling on a certain arc of his habitual path, by some source of traffic
+broadcast and/or by observing the current situation: he can use his own eyes to spot queues, or he can experience
+anomalous travel times along his route;
+• 2. is now aware of the event (and, by hypothesis, of all its consequences, including other drivers rerouting) but does not
+see yet the necessity to reroute, although at every node he evaluates this alternative by properly considering the relative
+advantage of changing path, by comparing the actual and typical travel times, as well as the stress of doing it;
+• 2–3. decides to reroute at a certain node of his habitual path, when he reaches the conclusion that estimated delays are
+so high that the situation deserves action to save a consistent amount of time;
+• 3. follows the new optimal path until the destination, because his experience and/or available predictive information
+allow him to make a correct forecast of the traffic that he will encounter from now on along the trip without major
+surprises.
+We have then assumed (and broadly discuss in Section 3.3 ) that:
+• when the driver is informed, he perfectly becomes aware of the actual travel times, i.e. he is able to figure out the exact
+nature of the event;
+• experienced and/or informed drivers can predict, not only the direct consequences of the event (e.g. queues upstream of
+the event and their spillback), but also that other drivers will reroute and generate congestion on alternative paths.
+Clearly, the above strong assumptions represent a schematic simplification which is useful to model a complex phe-
+nomenon like rerouting, whereas in reality knowledge of drivers is never perfect and information systems are never fully ac-
+curate and predictive. However, these factors can be partially included in the proposed framework by considering a stochas-
+tic route choice model (like the multinomial logit) rather than a deterministic one.
+The demand flow in ICM is propagated in the three subsequent conditions: unaware, aware and rerouted ; with two tran-
+sitions: information , i.e. becoming aware (ICM awareness model), and comply , i.e. deciding to reroute (ICM rerouting model).
+We consider the user equilibrium results of DTA computed on the network without event as the typical traffic conditions,
+denoted with a hat.
+The immediate effects of the event can regard both the supply characteristics s (usually a temporary modification of
+some arc capacity or free flow speed) and the dynamic o-d matrix d (usually an impulse in the generation or attraction of
+some centroids). ICM allows to simulate one single event, which however can consist of a connected set of supply and/or
+demand changes (e.g. some roads are closed for the Christmas market and the evening demand of the area is increased;
+links are closed dynamically as a marathon moves through the city). As long as the information of all these changes spreads
+jointly among drivers, the assumptions of the ICM hold fine. On the contrary, simulating a sequence of mostly independent
+
+===== PAGE 11 =====
+
+424 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+events (e.g. one accident on the motorway and another one inside the city an hour later) is impossible with the ICM and
+requires, for example, a rolling horizon approach, like in Gentile et al. (2013) , who proposed a much simpler but more
+flexible rerouting model.
+By including these events in the DTA model and by replacing the classical demand sub-model with the above described
+ICM (only in a qualitative way, so far), we obtain the actual traffic conditions, denoted without a hat. Therefore, typical
+conditions are fixed and precomputed, while actual conditions are the result of a new user equilibrium with rerouting,
+which will be found only when convergence of the proposed DTA method is attained.
+3.1. The awareness model
+The awareness model aims at representing how drivers become aware of the unexpected event. We use the term aware
+to denote both being informed about the event and becoming conscious of experiencing atypical delays. The proposed model
+shall include not only all the major sources of traffic information but also the educated guessing of experienced drivers.
+As already signalized in the introduction, there are numerous ways the traffic information can be provided to the drivers.
+For a review of fundamental ATIS strategies and information types see Khattak et al. (1993) . Here we consider and unify
+three main information types: (a) generic (e.g. “tunnel blocked”), (b) prescriptive (e.g. “tunnel blocked, to reach City use
+A4”), (c) personalized (e.g. “tunnel blocked, to reach destination follow this path”). We argue that they can be unified in one
+cognitive paradigm for the rerouting driver. Namely, we assume that the aware driver (regardless what type of information
+he received) will act as if he is aware of the actual network travel times and costs and their future evolution resulting from
+the event and the drivers reaction to this event (rerouting), as further discussed in Section 3.3 .
+Specifically, we assume that the most accurate forecast of travel costs is available at the level of Traffic Management
+Centre (TMC) and broadcasted as a real-time route guidance, optimized VMS message, or online query made by drivers
+curios of the reason for the experienced delay. If, however, the driver autonomously updates his expectations on travel costs,
+it must be assumed that the driver is able to correctly predict the actual network costs. Under the above assumptions, we
+unify the information provision types and assume that drivers become aware of the current and future network costs. This
+allows to handle multiple information sources jointly and to propose a single behavioural model for rerouting (introduced in
+Section 3.2 ). Though, including the consequences of other drivers rerouting in the prediction of the traffic pattern requires
+to solve a circularity introduced in Section 3.3 .
+Awareness in ICM is treated as a binary variable: the driver is not aware as long as he did not receive information from
+ι τ
+any of the broadcasting sources or he did not get conscious of the event by its own means. The probability a ( ) of becoming
+aware while traversing arc a ∈ A and exiting it at time τ depends on the probability ι a s ( τ ) of becoming aware by means of
+each way s ∈ S among a set of available information sources . The probability of becoming aware from at least one source
+can be expressed as the complementary event that the driver does not become aware by any source. To make the model
+ι τ
+practical, we assume that all sources are mutually independent, so that the joint probability a ( ) can be expressed as the
+product of the complementary probabilities for all available sources s ∈ S :
+(cid:9)
+ι
+a
+( τ) = 1 − ( 1 −ιs
+a
+( τ) ). (24)
+s ∈ S
+The above general concept is designed to work with the most popular sources of traffic awareness that are present in
+contemporary road networks ( Kucharski and Gentile, 2016 ). In the following, we propose models for the main paradigms of
+information spreading:
+1. fixed time information, e.g. news broadcasted through the radio or cyclical TMC updates;
+2. fixed place information, e.g. messages shown at a road-side VMS;
+3. on-line information, e.g. published on a webpage, or via mobile applications;
+4. experiencing atypical traffic conditions, e.g. spotting unexpected queueing.
+3.1.1. Fixed time information
+Information like radio news and TMC traffic data are cyclically broadcasted and can reach a share of recipient drivers
+π NEWS (market penetration) wherever they are. At each subsequent broadcast time τ n NEWS , with n = 1, 2, …, only a portion
+π
+ON
+of unaware drivers who are actually listening to the news become aware, regardless their location.
+The total share I NEWS ( τ ) of informed drivers increases with every broadcast i , adding the probability that the driver was
+π π
+not informed by previous broadcasts (equal to the power i -1 of 1-
+ON
+) and is informed by that broadcast (equal to
+ON
+); it
+asymptotically reaches the market penetration.
+Max ( n :(cid:5) τ≤τ n N EWS )
+I NEW S ( τ) = π
+NEW S
+·π
+ON
+· ( 1 −π
+ON
+)i −1 . (25)
+i =1
+The probability of becoming aware through the radio news ι a NEWS ( τ ) is a function of how many times the news are
+broadcasted while the driver is travelling along arc a ∈ A ; it can be obtained as the difference between the above cumulative
+probability at the exit and entry times:
+ιN
+a
+EW S ( τ) = I NEW S ( τ + t
+a
+( τ) ) −I NEW S ( τ). (26)
+
+===== PAGE 12 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 425
+Mind that drivers can become aware via radio and other on-line sources also pre-trip, i.e. at their origin, before departure.
+To represent this circumstance a dummy arc is introduced at each origin from which users exit at the time of departure and
+enter at time
+τ=
+0, so that their aware share is correctly initialized. Moreover, part of the broadcast times can be earlier
+than the event time. With these expedients we can also represent the effect of predictable or known events of which drivers
+can be informed in advance.
+3.1.2. Fixed place information
+The information broadcasted at fixed locations, e.g. on Variable Message Signs (VMS), reaches only those drivers who
+traverse an arc equipped with a VMS while the latter is displaying the information about the event. The probability ι a VMS ( τ )
+τ
+that the event is considered by the monitoring system to be the most relevant for users passing arc a at time and is then
+displayed on its VMS (if any), hence making drivers aware, is here assumed to be a decreasing function of its total distance
+(cid:12) a e ( τ ) from the event.
+(cid:2) (cid:3)
+ιV
+a
+MS ( τ) = δ
+a
+V MS ·B τ ≥τV MS ·
+1 +
+(cid:2)
+(cid:12) ae
+1
+(cid:12)
+( τ )
+(cid:3)
+βVMS
+, (27)
+(cid:12) e
+a
+(τ) = (cid:8) a, e (cid:8) + v¯ ·(cid:8) Mid ( 0 , τ
+0
+e −τ, τ
+1
+e −2 τ)(cid:8) , (28)
+where:
+• δ a VMS is 1 if arc a is equipped with a VMS and is 0 otherwise;
+•
+τVMS
+is the time when the information about the event enters the monitoring system;
+• B ( x ) is 1 if x is true and is 0 if x is false (Boolean function);
+• ||a,e|| denotes a Cartesian distance from the arc tail to the event;
+• Mid ( a, b, c ) is the middle value of a, b, c (used to evaluate the temporal distance);
+• (cid:12)
+2
+is the total distance where the probability is halved (depends on the event relevance);
+•
+βVMS
+is a shape parameter to be calibrated;
+• ( τ
+0
+e , τ
+1
+e ) are the temporal coordinates of the event (start time and end time);
+• v ̅is the average direct speed on the network to transform temporal into spatial distances.
+In particular, the probability that the event is displayed on the VMS is assumed to have a hyperbolic decay wrt the power
+βVMS
+of the total (spatial and temporal) distance: if the total distance of the event from the arc tail (where we suppose the
+VMS is placed) is null and the event is occurring now, then the probability is one; if the total distance from the event is (cid:12)
+2
+,
+then the probability is halved. Note that, after the end of the event it is still relevant to inform drivers of its consequences
+(i.e. queues may still be ongoing).
+This isotropic hypothesis is valid only as a first approximation that may be accepted for off-line simulations. It does
+not take into account the actual topology of the network and the direction of demand flows. The proposed metric can be
+adjusted to reflect these aspects, like in the model used for the Virtual Message Sign inside OPTIMA ( PTV SISTeMA, 2016 ),
+where a priority to appear on the screen is assigned for several concurrent events. Moreover, in the real time environment,
+instead of the above formula, a simple Boolean signal can be obtained directly from the traffic management system.
+3.1.3. On-line sources
+Equally interesting and challenging is to represent the traffic information available on-line, which can be accessed by
+drivers at any time. Such information sources are widely used nowadays, especially by habitual drivers, and include: mobile
+applications, social networks, online services, etc. Obviously browsing for information online while driving is hazardous as
+it distracts the attention off the road. Anyhow we presume that many people would still do it (e.g. while stuck in traffic),
+Moreover, considering that drivers interactions with apps is constantly improving drivers may receive information without
+the need to browse (e.g. voice control, or pop-up notifications), which also fits the below model.
+τ
+Let’s assume that the information about the event is first published on-line at time
+ONLINE
+after which drivers utiliz-
+π
+ing the above type of sources with market penetration
+ONLINE
+may receive it. Drivers may notice the information while
+browsing, or because some of their contacts in a virtual community posted it. The cumulated probability of being informed
+gradually increases from zero at the publishing time to the total market penetration while the post spreads across the
+relevant social or media network.
+We derive the on-line spreading profile from empirical findings relative to Twitter data. Procter et al. (2013) studied how
+tweets are re-tweeted and reach the new recipients. The revealed spreading process supported the expectations of early
+researchers that the Rayleigh distribution is suitable to estimate the probability of receiving the information at a given time
+τ τ
+after its first publication
+ONLINE
+. Fig. 6 shows when the twitter information reached the recipients compared with the
+theoretical Rayleigh distribution.
+σ
+The cumulative distribution of Rayleigh, whose only parameter is the spreading pace , multiplied by the market pene-
+tration yields then the proba
+(cid:6)
+bility I ONL
+(cid:6)
+INE ( τ ) that a recipi
+(cid:7)
+en
+(cid:7)
+t driver is informed before time τ≥τ
+ONLINE
+:
+I ON LIN E ( τ) = π ON LIN E · 1 −Exp −
+( τ −
+2
+τ
+· O σ N L 2 I N E
+)2
+. (29)
+
+===== PAGE 13 =====
+
+426 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+Fig. 4. Incremental and cumulative probability that drivers become aware at the n th news broadcast, for π NEWS = 30% and π ON = 20%.
+Fig. 5. Hyperbolic expression of the decreasing probability that a VMS displays the event as a function of its distance x , for a halving factor x 2 = 1 and
+different values of the power β.
+The probability of becoming aware via an on-line source while traversing arc a is given by the difference between the
+above cumulative distribution at the exit and entry times:
+ιO
+a
+N LIN E ( τ) = I ON LIN E ( τ + t
+a
+( τ) ) −I ON LIN E ( τ). (30)
+On top of that, viral information reaches more recipients and reaches them faster ( Ghosh and Lerman, 2014 ). In the
+following, we extend the above model with information virality . Although the process of becoming viral is highly random
+and there are no efficient methods to predict it ( Hoang et al., 2011 ), some monitoring techniques are capable to identify if
+the information is spreading virally ( Sakaki et al., 2010 ).
+We assume that virality corresponds to the event significance, which can be measured with its impact on the total travel
+time. This is expressed in the following as the relative increase of the travel times spent on the network by all users (entered
+τ
+on arcs) up to the current time if the arc flows remained constant (we assume that arc closures can only be temporary
+so that the arc travel times are not infinite):
+(cid:10) (cid:11)
+0
+τ t
+a
+( θ) ·qˆ
+a
+( θ) ·d θ
+(cid:16) t ( τ) = a(cid:10) ∈ A (cid:11)
+0
+τ tˆ
+a
+( θ) ·qˆ
+a
+( θ) ·d θ −1 . (31)
+a ∈ A
+π σ
+The complement 1-
+ONLINE
+of the market penetration and the spreading pace of the Rayleigh distribution in
+Eq. (29) are then assumed to present a hyperbolic decay (see Fig. 4 ) wrt the relative increment (cid:16)t ( τ ):
+π
+ON LIN E
+( τ) = 1 −
+1 +
+1 (cid:2) −
+(cid:16) (cid:16)
+π
+t ( t τ
+0
+2
+O
+)
+N (cid:3) L
+β
+IN
+O
+E
+N LIN E
+, (32)
+σ
+σ( τ) =
+1 +
+(cid:2)
+(cid:16) (cid:16) t ( t τ 2
+0
+)
+(cid:3)
+βON LIN E
+. (33)
+The initial values of the market penetration π
+0
+ONLINE and of the spreading pace σ
+0
+as well as the halving increment
+(cid:16)t
+2
+and the power βONLINE shall be calibrated to match field data ( Mathioudakis and Koudas, 2010 ) . Fig. 7 shows how the
+cumulative probability I ONLINE ( τ ) changes for the viral events: the curve goes up and its banding is anticipated.
+
+===== PAGE 14 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 427
+Fig. 6. Empirically observed frequency of tweets after an event and Rayleigh distribution.
+(
+F
+b
+ig
+o
+.
+t t
+7
+o
+.
+m
+P r
+li
+o
+n
+b
+e
+a
+)
+b
+,
+i
+o
+li
+n
+ty
+e (
+t
+t
+h
+o
+a
+p
+t
+l
+a
+i n
+d
+e
+r
+)
+i v
+a
+e
+n
+r
+d
+i s
+in
+i n
+b
+f
+e
+o
+t
+r
+w
+m
+e
+e
+e
+d
+n
+w
+(t
+i
+h
+th
+in
+in
+l in
+(cid:16)
+e
+τ
+s);
+s e
+β
+c
+O
+o
+N
+n
+L
+d
+IN
+s
+E =
+af t
+0
+e
+.
+r
+5 ,
+t
+(cid:16)
+he
+t 2
+e
+=
+v e
+1
+n
+8
+t
+0
+f
+0
+o r
+s .
+a base penetration rate π 0 ONLINE = 0.4, assuming that (cid:16)t / (cid:16)t 2 is zero
+3.1.4. Awareness through observation
+Besides receiving information, drivers can become aware through observation. If an expert user of the road network
+experiences a relevant delay wrt typical travel times while travelling along an arc of his habitual path, he may correctly
+guess the reason and become aware about the event.
+The motivation to assume this skilled behaviour is twofold. First of all, a driver is curious of the delay and may use
+the available information sources to understand its cause, e.g. he can search on-line. Secondly, experienced drivers can
+correctly estimate the network travel times by observing atypical travel times along their route ( Gao et al., 2008 ), especially
+for recurrent but unexpected events (e.g. gridlocks in critical points of the network, or black-spots where accidents occur
+frequently).
+The awareness probability ι a OBS ( τ ) derived from observation is here assumed proportional to the delay experienced by
+τ
+the driver entering on arc a at time , i.e. the difference between actual and typical travel times, with a given threshold
+t
+0
+OBS and sensitivity ξOBS . A complete empirical evidence of this phenomenon is yet missing; more realistic formulations
+could be devised as revealed field data will be available (e.g. trajectories of floating car data).
+(cid:2) (cid:2) (cid:3) (cid:3)
+ιO
+a
+BS ( τ) = Mid 0 , 1 , ξOBS · t
+a
+( τ) −tˆ
+a
+( τ) −t
+0
+O BS . (34)
+The proposed model assumes each arc as an independent source of awareness through observation, which exposes results
+to the somewhat arbitrary articulation of the road network topology into elements, especially in regard to the disaggregation
+introduced by modellers for the optimal representation of supply. To have full control over driver perception of this aspect
+it is possible to apply the proposed model to predefined sequences of arcs.
+3.1.5. Summary of the awareness model
+The proposed awareness model covers the most significant sources of information present in contemporary road net-
+works. ICM can then be applied in the context of any combination of awareness sources reflecting actual or hypothetical
+ATIS scenarios. Table 1 demonstrates how the joint probability is sensitive to introducing additional sources and market
+penetration changes, further illustrated with numerical examples on Sioux-Falls network in Section 5.2 .
+
+===== PAGE 15 =====
+
+428 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+Table 1
+Joint awareness probability for multiple sources in various ATIS scenarios.
+ATIS scenario Awareness probability of a source: Joint probability ( Eq. (24) )
+Observation Radio Online VMS Radio #2
+1 0.2 – – – – 0.20
+2 0.2 0.2 – – – 0.36
+3 0.2 0.2 0.2 – – 0.49
+4 0.2 0.2 0.2 0.2 – 0.59
+5 0.2 0.2 0.8 0.2 – 0.90
+6 – 0.2 – – 0.2 0.36
+3.2. Rerouting model
+The second step of ICM is aimed at representing the rerouting decision process of drivers who have already become
+aware about the unexpected event and (as argued in Section 3.1 ) figured out the new cost pattern.
+The proposed rerouting model will be evaluated repeatedly within the DTA algorithm (for each node, instant, destination,
+and iteration). Because our requirement is the applicability of the method to large networks, the proposed model, apart from
+being methodologically sound and realistic, needs to be light in terms of computation resources. Instead, the existing models
+require relatively heavy calculation: correlation matrix ( Gao et al., 2008 ), path searches ( Pel et al., 2009 ), or agent within-day
+replanning ( Dobler et al., 2012 ).
+We propose a generic structure where the meaningful variables to express the utility of rerouting are provided at each
+decision point. Here we use the simple binomial logit model; it can be however replaced with more complex Random Utility
+Models. The model determines the discrete choice probability that aware drivers will reroute or not, subject to their current
+location, their final destination and the traffic conditions that they expect. More specifically, the rerouting model yields the
+share κ
+i
+d ( τ ) of aware drivers exiting from node i ∈ N at time τ and directed towards destination d ∈ Z who decide to change
+path.
+The two main reasons for which the aware drivers will reroute are:
+• the availability of a better alternative which differs substantially from the typical path, i.e. to seek for gains;
+• the estimate of significantly higher costs on the typical path wrt those on the currently optimal route choice, i.e. to avoid
+losses.
+τ
+The systematic utility of rerouting from node i at time is then defined as a function of:
+• (cid:16)p
+i
+d ( τ ), expected gain –which reflects the change of user optimal paths in terms of arc conditional probabilities between
+rerouting (based on actual costs) and not rerouting (based on typical costs);
+• (cid:16)w
+i
+d ( τ ), avoided loss – which reflects the performance difference in terms of average arc potentials between rerouting
+(based on actual paths) and not rerouting (based on typical paths).
+Both of the above variables are derived from the expected costs to get to the destination. The optimal path to possibly
+reroute can differ substantially in terms of topology from the typical path, even in presence of modest cost differences; on
+the other hand, relevant cost differences usually induce major changes in the optimal path. So, not all combinations of low
+and high expected gains and avoided losses are possible.
+3.2.1. Expected gain
+The conditional probabilities of the forward star of the generic node reflect the expected minimal costs to reach the
+destination using the corresponding arcs, subject to the behavioural assumptions on route choice model. Arc conditional
+probabilities change if new optimal paths are found, while, clearly, no gain can be obtained by travelling on the typical
+path. The fact that the actual (optimal) arc conditional probabilities are different from the typical (obsolete) ones indicates
+that the driver can gain by rerouting as compared to the baseline, i.e. propagate along typical probabilities. We then propose
+to measure the expected gain of rerouting in terms of how much the actual arc probabilities differ from the typical one. Note
+however that rerouting may or may not lead to a significant cost reduction, but it constitutes the necessary precondition to
+gain that.
+The cosine similarity is here used to compare the vector of forward star probabilities obtained from the typical costs and
+times, denoted pˆ = RCM ( cˆ, ˆt ), with that obtained from actual costs and times, denoted p = RCM ( c, t ):
+(cid:16) pd i ( τ) = 1 − (cid:12)
+a
+(cid:10)
+∈ A +
+a
+(cid:10)
+∈ p A d
+a
++ i (
+p
+τ
+d
+a
+)
+(
+2
+τ
+·
+)
+(cid:12)
+·
+a
+pˆ
+(cid:10)
+∈
+d
+a
+A
+(
++
+τ
+pˆ
+)
+d
+a
+( τ)2 . (35)
+i i
+In the above expression (cid:16)p increases for decreasing vectors similarity. Referring to the case of Fig. 8 , as intended we
+have: (cid:16)p = 0, for parallel vectors (0,1) and (0,1), i.e. if arc conditional probabilities did not change; (cid:16)p increases as the
+
+===== PAGE 16 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 429
+Fig. 8. Expected gain (cid:16)p computed for vectors (0, 1) and ( x , 1 −x ) as a function of x .
+Table 2
+Expected gain of rerouting (cid:16)p computed by cosine similarity for various situations of
+arc conditional probabilities at a generic node with three outgoing links (left, straight,
+right).
+Arc conditional probabilities p a d (cid:16)p ( Eq. (35) )
+Typical Actual
+Situation Left Straight Right Left Straight Right
+1 0 1 0 0 1 0 0.00
+2 0 1 0 1 0 0 1.00
+3 0 1 0 0.6 0 0.4 1.00
+4 0 1 0 0 0.9 0.1 0.01
+5 0 1 0 0 0.1 0.9 0.89
+6 0 1 0 0.3 0.3 0.4 0.49
+7 0.2 0.8 0 0 0.8 0.2 0.06
+8 0.3 0.4 0.3 0.3 0.3 0.4 0.03
+difference between the two vectors increases, reaching (cid:16)p = 1, for orthogonal vectors (0,1) and (1,0), i.e. when the arc con-
+ditional probabilities changed diametrically. Interestingly, the resulting non-linear shape implicitly provides a smoothed ver-
+sion of the indifference threshold for rerouting, which covers the hypothesis of Mahmassani and Jayakrishnan (1991) that
+drivers change path only when differences in time to get to destination become significant.
+3.2.2. Avoided loss
+To estimate the loss avoided by a rerouting driver we evaluate the relative difference in the two options of his expected
+costs . The latter is defined as the sum of the forward star arc potentials w a d ( τ ) weighted with the corresponding conditional
+probabilities.
+If the driver does not reroute and will follow his trip according to the typical arc conditional probabilities, his expected
+cost will be:
+(cid:5)
+pˆ d
+a
+( τ) ·w d
+a
+( τ). (36)
+a ∈ A +
+i
+Instead, if the driver does reroute according to the actual arc conditional probabilities, his expected cost will be:
+(cid:5)
+pd
+a
+( τ) ·w d
+a
+( τ). (37)
+a ∈ A +
+i
+The avoided loss of rerouting is then given by:
+(cid:16) w d
+i
+( τ) = 1 − a
+a
+(cid:10)
+(cid:10) ∈
+∈
+A
+A
++ i
++
+p
+pˆ
+d
+d
+a
+a
+(
+(
+τ
+τ
+)
+)
+·
+·
+w
+w
+d
+a
+d
+a
+(
+(
+τ
+τ
+)
+)
+. (38)
+i
+
+===== PAGE 17 =====
+
+430 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+Table 3
+Expected gain (cid:16)p and avoided loss (cid:16)w of rerouting compute d for several traffic situations at a generic node with two outgoing links (left and
+straight).
+w a d (actual costs) Arc conditional probabilities p a d Expected cost (cid:16)p ( Eq. (35) ) (cid:16)w ( Eq. (38) )
+Typical Actual
+Situation Left Straight Left Straight Left Straight Of not rerouting Of rerouting
+1 4 3 0 1 0 1 3.0 3.0 0 0.00
+2 2.9 3 0 1 1 0 3.0 2.9 1 0.03
+3 4 30 0 1 1 0 30.0 4.0 1 0.87
+Table 3 shows that (cid:16)w becomes significant only when costs on the typical path are higher wrt to the optimal route
+choice, while (cid:16)p is high as soon as new optimal paths are found.
+3.2.3. Binomial rerouting logit model
+The two above indicators can be synthetized into the rerouting utility of a discrete choice model. The rerouting utility
+for drivers being at node i ∈ N at time τ while travelling towards destination d ∈ Z is then a random variable with s ystematic
+component v
+i
+d ( τ ), which is a linear function of expected gain (cid:16)p
+i
+d ( τ ) and avoided loss (cid:16)w
+i
+d ( τ ) with given parameters β :
+v d i ( τ) = β 0 + β (cid:16)p ·(cid:16) pd i ( τ) + β (cid:16)w ·(cid:16) w d i ( τ). (39)
+The proposed formulation of the systematic utility is here applied in a binomial logit model where the two alternatives
+are: do and do not reroute. The systematic utility of not rerouting is assumed zero, because that of rerouting is based on
+gains and losses, which already express a utility difference. The output of the binomial rerouting model is the probability
+κ
+i
+d ( τ ) that aware drivers directed to destination d will change path being at node i at time τ :
+κ
+i
+d ( τ) =
+1 + Exp
+(cid:2) 1
+− v d
+i
+( τ)
+(cid:3) . (40)
+Model calibration is out of scope of the paper; for more details on the estimation problem we refer to Kucharski and
+β
+Gentile (2015) . Here we just discuss how to obtain a desired rerouting behaviour by tuning the parameters of the system-
+atic utility. In general, small values of betas lead to casual rerouting, barely sensitive to changes in the (cid:16)p and (cid:16)w , while
+large betas will lead to high sensitivity. Since (cid:16)p and (cid:16)w are normalized, the share between risk-prone aggressive drivers
+β
+seeking for gains and risk-adverse conservative drivers avoiding losses can be directly controlled via the ratio of (cid:16)p and
+β β
+(cid:16)w , while 0 controls the general willingness to reroute.
+Parameterization may be tested for boundary cases:
+• for no rerouting utility ( (cid:16)p and (cid:16)w are zero and the probability is a function of β
+0
+only), κ shall be infinitesimal;
+• for maximal utility ( (cid:16)p and (cid:16)w reaching 1), κ should reflect a high rerouting share, including the fact that some aware
+drivers will never reroute, regardless the utility.
+The proposed utility formulation and the hypotheses of non-linear rerouting behaviour (e.g. indifference band of
+Mahmassani and Jayakrishnan, 1991 ; or Prospect Theory behaviour of Gao et al., 2010 ) shall be verified while estimating
+the model with the field-data.
+In the numerical examples presented later in this paper, we found a suitable sensitivity of the rerouting model using
+parameters: β (cid:16)p = 2.5, β (cid:16)w = 2.5 and β 0 = –5. With this configuration the rerouting probability is close to zero when there
+is no rerouting utility and reaches 50% when (cid:16)p and (cid:16)w equal 1, as shown in Table 4 .
+Table 4
+Rerouting probabilities computed for various potential gains and expected
+losses.
+(cid:16)p (cid:16)w v κ
+0.00 0.00 −5.0 0 0 00.67%
+0.10 0.01 −4.725 00.88%
+0.30 0.01 −4.225 01.44%
+0.50 0.01 −3.725 02.35%
+0.70 0.01 −3.225 03.82%
+0.90 0.01 −2.725 06.15%
+1.00 0.01 −2.475 07.76%
+0.90 0.30 −2.0 0 0 11.92%
+0.90 0.50 −1.500 18.24%
+0.90 0.70 −1.0 0 0 26.89%
+1.00 1.00 −0.0 0 0 50.00%
+
+===== PAGE 18 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 431
+To enhance numerical stability and due to issues related with the long tails of logit model and its sequential application,
+κ
+which are discussed later in the paper, we introduced a threshold for rerouting probabilities: when is below 0.02 we
+assume it to be zero.
+3.3. Rerouting path
+In this step of ICM we reproduce how drivers choose a new path from the node where they decided to reroute to their
+destination. Generally, drivers update their knowledge on the network performance pattern with the information they have
+received and using their own prediction of the travel times resulting from the event.
+The cognitive and decision process of predicting the future travel costs and reacting to them is not only complex, but also
+nondeterministic, rarely rational, strongly dependent to the type of information and thus still remains an opened research
+question (see, for example, Ramos (2015) and Selten et al. (2007) for more insights on how informed travellers predict
+costs).
+To formalize the model, we argue that drivers make rerouting decisions based on accurate information. We follow the
+classic law of information provision by Bifulco et al. (2016) stating that the forecasted travel costs shall be in line with the
+actually experienced ones. Yet, since complying to the information alters the costs that user was informed about, the fixed-
+point problem arises. At the convergence of this fixed-point problem, rerouting drivers utilize the information on forecasted
+evolution of the system including anticipated reaction of drivers to that information. Accordingly, the rerouting drivers will
+experience the rerouting costs they were informed about. We propose the ICM model, where results are obtained after
+solving a fixed-point problem between information and drivers reaction to that information (we illustrate the convergence
+and intermediate results in the Sioux-Falls example in Section 5.2 ).
+Thanks to such approach, ICM model can be formalized with assumption that rerouting drivers use the arc conditional
+probabilities, p = RCM ( c,t ), computed with the RCM based on the actual costs and times. Clearly, at each iteration the costs
+may change since the rerouting flows will yield different costs. Likewise, the arc probabilities used for rerouting will change,
+until finally reaching convergence of this particular type of equilibrium (not fully in line with Wardrop principles though),
+where not all drivers are perfectly informed and comply with a rational behaviour.
+While the above assumptions may seem unrealistic and doubtful, they allow to keep the model deterministic and formal.
+Assuming that the rerouting drivers do not anticipate others retouring decisions at all would be even more unrealistic. As-
+suming partial (incomplete) anticipation would be arbitrary and intractable. Assuming perfect anticipation allows to obtain
+a formal model without heuristics, which allows for scenario comparison and benchmarking.
+Notably, proposed model does necessarily assume exceptional drivers predictive capabilities, since the information may
+be externally provided. Moreover, we believe that for rerouting phenomena, the effect of information spread and compliance
+is much more significant than the path choice process when the rerouting decision is made. Critical is when and where the
+driver receives the information rather than the assumptions on rerouting path choice behaviour, which do not change the
+essence of rerouting picture resulting from ICM.
+Also, the route choice model selection is also of high importance. Particular attention is to be paid for deterministic
+models, whose choice map is one-to-many. In this case, if all-or nothing assignment is considered in the demand model,
+small changes of costs will yield substantial changes in arc conditional probabilities. This can be avoided by considering at
+every iteration of the equilibrium method the probabilities provided by gradient projection algorithms, as in Gentile (2016) ,
+which depend smoothly on arc performances. In the numerical experiments we mainly utilize deterministic route-choice
+model not to make confusion between the stochasticity of the route choice model and that of the information and comply
+process. Yet if the non-deterministic driver behaviour needs to be reproduced, stochastic model can be used as shown in
+one of numerical tests. Importantly, the rerouting route-choice model can be differently parameterized than the typical RCM
+to capture more stochastic nature of rerouting choices, different utility formulation etc.
+4. Combining the ICM into the DTA
+4.1. Demand model based on ICM
+In this section the ICM formally introduced in the previous section is coupled with the DTA structure introduced in
+Section 2 . The ICM was conceived to be methodologically sound and to realistically represent the actual behaviour, but
+also to be seamlessly and efficiently integrated with the DTA model, so as to reproduce rerouting phenomena on real-size
+network in a suitable computation time.
+To integrate ICM in the macroscopic DTA model the propagated flow q is partitioned into the three conditions:
+• unaware qˆ ,
+• aware q¯ and
+• rerouted q˜ .
+These flows are propagated simultaneously with two possible subsequent transitions:
+ι
+• awareness probability , when unaware drivers become aware along arcs, and
+
+===== PAGE 19 =====
+
+432 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+Fig. 9. Example of rerouting systematic utility at a generic node where arc conditional probabilities changed significantly due to event. The driver ap-
+proaches the intersection from the bottom and makes his rerouting choice based on the following variables of the forward star arcs: a) typical conditional
+probabilities, b) actual conditional probabilities (different from the expected ones due to the event downstream), c) actual potentials.
+Fig. 10. Simplified schema of the DTA model with Information Comply Model.
+κ
+• rerouting probability , when aware drivers reroute at nodes.
+Unaware and aware flows are propagated accordingly with the typical arc conditional probabilities pˆ , which result from
+the dynamic user equilibrium of the day-type, while rerouted flows are propagated accordingly with the actual probabil-
+ities p , which result from the new assignment including the information comply process of the simulated event. All flow
+conditions (also unaware) are propagated accordingly with the actual travel times.
+To integrate the above concept into DTA, the flow propagation model is redefined as follows. First, the typical conditional
+probabilities can be easily obtained from the typical destination flows, by considering the share of arc flows exiting from
+the tail node:
+pˆ d
+a
+( τ) =
+qˆ d
+i
+q
+=
+ˆ d a
+N
+(
+a −
+τ
+( τ
+)
+)
+=
+b
+(cid:10)
+∈ A
+qˆ
++
+d a
+q
+(
+ˆ d
+b
+τ
+(
+)
+τ )
+. (41)
+i
+The demand starts at origins as unaware flow. This is progressively reduced along the arcs by the awareness probability
+and propagated toward the destination accordingly with the typical conditional probabilities:
+qˆ d i ( τ) = d id ( τ) +
+(cid:5)
+qˆ d a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3)
+·
+(cid:2)
+1 −ι a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3)(cid:3)
+·
+∂θ
+a
+−
+∂
+1
+τ
+( τ)
+, (42)
+a ∈ A −
+i
+qˆ d
+a
+( τ) = qˆ d
+N a −
+( τ) ·pˆ d
+a
+( τ). (43)
+Recall that all the demand starts at origins at time 0 and exits at the desired departure time from a fictitious arc which
+allows to correctly initialize the aware flows to take into account the information possibly obtained before starting the trip.
+The aware flow is first increased with the share of unaware flow given by the awareness probability, then reduced by the
+rerouting probability, and finally propagated toward the destination still in line with the typical conditional probabilities:
+q¯ d i ( τ) =
+(cid:2)
+1 −κ i d ( τ)
+(cid:3)
+·
+(cid:5) (cid:2)
+q¯ d a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3)
++ qˆ d a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3)
+·ι a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3) (cid:3)
+·
+∂θ
+a
+−
+∂
+1
+τ
+( τ)
+, (44)
+a ∈ A −
+i
+q¯ d a ( τ) = q¯ d N a − ( τ) ·pˆ d a ( τ). (45)
+
+===== PAGE 20 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 433
+Finally, the rerouted flow is increased with the share of both already and newly rerouted flow given by the rerouting
+probability, and propagated toward the destination, now in line with the actual conditional probabilities:
+q˜ d i ( τ) =
+(cid:5) (cid:2)
+q˜ d a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3)
++ κ i d ( τ) ·
+(cid:2)
+q¯ d a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3)
++ qˆ d a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3)
+·ι a
+(cid:2)
+θ a − 1 ( τ)
+(cid:3) (cid:3)(cid:3)
+·
+∂θ
+a
+−
+∂
+1
+τ
+( τ)
+, (46)
+a ∈ A −
+i
+q˜ d
+a
+( τ) = q˜ d
+N a −
+( τ) ·pd
+a
+( τ) . (47)
+This can be seen as Markov chain where transition probabilities of different kinds are involved, including the share
+of flow entering on an arc during a given interval and exiting it at a later interval, i.e. the propagation map, which will
+substitute the time derivatives in the algorithm implementation.
+The new version of the FPM with ICM expresses in compact form the Eqs. (41) –(47) :
+(cid:2) (cid:3)
+q = F P M −ICM p , t , ι, κ;qˆ ;d . (48)
+Based on the formulation presented in Section 3.1 we can obtain the awareness probability of the generic arc a ∈ A at time
+t ∈ T though the Event Awareness Model (EAM) as a function of the actual and typical travel time and of the total network
+time relative increment:
+(cid:2) (cid:3)
+ι
+at
+= EAM τ
+t
+, t
+at
+, tˆ
+a t
+, (cid:16) t
+t
+. (49)
+Based on the formulation presented in Section 3.2 we can obtain the rerouting probability to destination d ∈ Z from the
+generic node i ∈ N at time t ∈ T though the Event Routing Model (ERM) as a function of the actual and typical conditional
+probabilities and of the actual potentials of each arc in the node forward star:
+(cid:2) (cid:3)
+κ
+i
+d
+t
+= ERM pˆ d
+at
+, pd
+at
+, w d
+at
+: a ∈ A +
+i
+. (50)
+Note that, while rerouting probabilities are destination specific and shall then be computed together with the conditional
+probabilities, the awareness probabilities are not and can then be computed at once for all destinations.
+Finally, the new version of the demand model with ICM is the composition of ACM, EAM, APM, LRM, ERM, FPM, where
+the profile vector version of the EAM includes the computation of the relative time increments (31) and the ERM includes
+the computation of the typical conditional probabilities from the destination flows (41) :
+(cid:2) (cid:3) (cid:2) (cid:2) (cid:3) (cid:2) (cid:3) (cid:3)
+Demand −ICM t ;ˆt, qˆ ; d = F P M p = LRM ( w = AP M ( ACM ( t ), t ) ) , t , EAM t ;ˆt, qˆ , ERM p , w ;qˆ ;qˆ ;d . (51)
+The following Algorithm 2 computes the demand model with ICM, taking a fixed input the typical traffic pattern (ˆ t, qˆ ),
+while the actual travel times are provided by the supply model and will vary across iterations.
+Note that there is no need to memorize the different kinds of arc flows (unaware, aware, rerouted) between iterations as
+only their aggregated value is relevant in the supply model and for the convergence. In the practical implementation of the
+algorithm, only two vectors of variables by destination are saved in memory: the actual arc flows and the typical arc flows,
+from which it is immediate to obtain the conditional probabilities.
+4.2. DTA with Information Comply Model
+The combination of the two sub-models Demand-ICM (51) and Supply (1) yields a fixed point problem which formalizes
+the Dynamic Traffic Assignment with Information Comply Model:
+(cid:2) (cid:3)
+( t , q ) = DT A −ICM s , d ;ˆt, qˆ . (52)
+This can still be seen as a kind of user equilibrium (not fully in line with Wardrop principles though), i.e. a traffic
+condition where no driver can improve his perceived path cost, including both awareness of the event and reluctance to
+change.
+DTA-ICM provides usual DTA output (travel times and destination flows). The input are supply and demand including any
+direct event effect, as well as its position in time and space, the broadcast times, the time when the information enters then
+monitoring system, etc. As an additional input, the typical traffic conditions and flows are needed, which can be obtained
+by solving the DTA model for the typical supply sˆ and demand dˆ :
+(cid:13) (cid:14)
+(cid:2) (cid:3)
+ˆt, qˆ = DT A sˆ , dˆ . (53)
+4.3. Convergence of MSA and intermediate results
+The DTA-ICM is formulated as fixed point problem, which can be solved by repeatedly applying the following contraction
+formula:
+(cid:2) (cid:2) (cid:3) (cid:3)
+q n = ( 1 −α
+n
+) ·q n −1 + α
+n
+·Demand −ICM Supply q n −1 ;s ;ˆt , qˆ ; d . (54)
+
+===== PAGE 21 =====
+
+434 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+Algorithm 2 Demand model with Information Comply Model.
+The solution is obtained when a fixed-point is reached, while rerouting is adjusted iteration by iteration. In the interme-
+diate iterations the travel costs perceived by rerouted drivers while making their path choices are not optimal. This can be
+reflected by the following relative gap where only the already rerouting drives are considered:
+(cid:5) (cid:15) τ (cid:2) (cid:3)
+ρ n = a ∈ N,d∈ Z 0 q˜ d N a − (τ) w d a (τ) −w d N a − (τ) ·d τ, (55)
+ρ
+The gap n tends to zero as the DTA-ICM converges to a fixed-point along with rerouting drivers reaching perfect pre-
+ρ
+diction of actual travel costs. Intermediate solutions, when n is still above zero, represent drivers affected by imperfect
+travel costs prediction when making rerouting decision. Although these intermediate results are not obtained through a
+proper model but rather depend on the algorithm convergence, they can be considered as possible outcome of a simulation
+process and have then some explanatory value.
+4.4. Implementation
+We implemented the DTA-ICM in the framework of the TRE software, which is the simulation engine of Optima ( PTV SIS-
+TeMA, 2016 ). We tested its performance on the Sioux-Falls network and not only obtained meaningful results (reported
+
+===== PAGE 22 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 435
+Table 5
+Computation times of the DTA-ICM algorithm for the Sioux-Falls network.
+Network Classic DTA DTA-ICM
+Arcs Zones Time Time Comp. Demand output Comp. Of which:
+period intervals time size time
+Supply Shortest Load RCM FPM with Rerouting Other
+path typical awareness model
+demand model
+1306 24 4[h] 12[s] 8[s] 350[MB] 18[s] 6% 11% 0.04% 7% 60% 0.65% 15%
+Fig. 11. Corridor example. A path (bold) connecting origin O with destination D, passing through 7 decision points and one VMS sign just before the event
+marked with X.
+in Section 5.2 ), but also acceptable computation times. The DTA computation times after implementing ICM (reported in
+Table 5 ) grown from 8 to 18 s per iteration, and the increase was mainly due to recurrent Rayleigh PDF evaluation ( Eq.
+(29) ). This is a significant contribution, since this is (up to our knowledge) the first DTA method to reproduce rerouting
+behaviour in acceptable time.
+5. Numerical experiments
+We present here some experiments of the proposed Information Comply Model on test networks. We start with a generic
+corridor example along which we propagate 100 vehicles in three different scenarios exposing rerouting phenomena picture
+of ICM. Then we simulate the event on the Sioux-Falls network and report temporal profile of flows in five different ATIS.
+Finally, we report the algorithm convergence and stability in the case of limited capacity.
+5.1. Corridor detour
+We illustrate ICM with a corridor in the north of Kraków, Poland ( Fig. 11 ) consisting of 7 nodes at which the rerouting
+decision can be made. Close to the destination, at 7 10 , there is an event ( X ) blocking the arc, so that the typical route is
+no longer optimal and aware drivers start seeking for alternatives. We simulate the flow of 100 vehicles departing from the
+origin o at 7 00 and propagating towards the destination d. Table 6 shows at consecutive nodes: flows in three conditions,
+awareness probability of respective sources, rerouting probabilities and potential gains and losses of rerouting. Rerouting
+utility parameters are β (cid:16)p = 2.5, β (cid:16)w = 2.5 and β 0 = –5 and the lower bound for κ of 5% was used (the rerouting probability
+below 5% is assumed to be zero). We present results for the cases of: a) multiple sources of information, b) no information
+sources and c) information available at the origin. To keep the examples demonstrative, market penetrations of information
+sources were intentionally magnified, so that almost everybody becomes aware.
+Table 6 presents the results for the case when the information is broadcasted through the radio, available on-line and
+shown on the VMS. ICM modelled 95% of the drivers becoming aware and 36% actually rerouting. At the 1st node there
+is no information available, so the whole flow remains unaware. During propagation from 1st to 2nd node (7 00 to 7 10 ), 3%
+of the drivers became aware of the event by browsing on-line sources, yet none of them decides to reroute as the utility
+remains null. At 7 17 the information about the event is broadcasted on the radio, with increment of aware drivers during
+that broadcast ιNEWS = 30%. The drivers propagating from 3rd to 4th node at that time become aware. At 7 20 the event starts
+impacting the whole network and the (cid:16)t reaches 4% at 8 20 , triggering virality of on-line information which now spreads
+
+===== PAGE 23 =====
+
+436 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+Table 6
+ICM results at 7 consecutive nodes traversed during propagation along a corridor. Information broadcasted at the radio, on-line and at
+the VMS.
+Node Node flow Awareness model Rerouting model
+i τ qˆ q¯ q˜ 1 ι ιN a EWS (τ) ιV a MS (τ) ιO a N LIN E (τ) (cid:16)t tot ( τ) ι a OBS ( τ) (cid:16)t a 2 κ (cid:16)p (cid:16)w
+1 7:00 100 0 0 0% – – 0% – – – – 0.00 0.00
+2 7:10 97 3 0 3% – – 3% – – – – 0.01 0.00
+3 7:15 93 6 0 3% – – 3% – – – – 0.01 0.00
+4 7:20 63 37 0 33% 30% – 4% 1% – – – 0.00 0.00
+5 7:25 60 37 2 4% – – 4% 1% – – 6% 0.61 0.28
+6 7:40 54 36 8 10% – – 10% 2% – – 18% 0.76 0.64
+7 8:20 5 48 37 91% – 80% 6% 4% 50% 500 43% 1.00 0.89
+1 we do not propagate the rerouted flows since they may reroute outside of the corridor, thus q˜ in the table is only the incre-
+ment ( q¯ ·κ) .
+2 time increase in Eq. (34)
+Table 7
+ICM results at 7 consecutive nodes traversed during propagation along a corridor. No information about the event is available; drivers
+can only observe the atypical delay.
+Node Node flow Awareness model Rerouting model
+i τ qˆ q¯ q˜ ι ιN a EWS (τ) ιV a MS (τ) ιO a N LIN E (τ) (cid:16)t tot ( τ) ι a OBS ( τ) (cid:16)t a κ (cid:16)p (cid:16)w
+1 7:00 100 0 0 – – – – – – – – – –
+2 7:10 100 0 0 – – – – – – – – – –
+3 7:15 100 0 0 – – – – – – – – – –
+4 7:20 100 0 0 – – – – 1% – – – – –
+5 7:25 100 0 0 – – – – 2% – – 19% 0.92 0.50
+6 7:40 70 16 14 30% – – – 3% 30% 300 46% 0.98 0.95
+7 8:20 42 22 22 40% – – – 5% 40% 400 50% 1.00 1.00
+Table 8
+ICM results at 7 consecutive nodes traversed during propagation along a corridor. The event is known by 30% of drivers at the depar-
+ture time 8 00 . Information broadcasted at the radio, on-line and at the VMS.
+Node Node flow Awareness model Rerouting model
+i τ qˆ q¯ q˜ ι ιN a EWS (τ) ιV a MS (τ) ιO a N LIN E (τ) (cid:16)t tot ( τ) ι a OBS ( τ) (cid:16)t a κ (cid:16)p (cid:16)w
+1 8:00 69 31 0 31% – – 31% 4% – – – 0.00 0.00
+2 8:10 69 31 0 – – – – 4% – – – 0.01 0.01
+3 8:15 69 31 0 – – – – 4% – – – 0.01 0.00
+4 8:20 48 51 0 30% 30% – – 4% – – – 0.00 0.00
+5 8:25 48 48 3 – – – – 4% – – 6% 0.61 0.32
+6 8:40 48 39 8 – – – – 4% – – 17% 0.76 0.62
+7 9:20 5 54 30 91% – 80% – 4% 50% 500 35% 1.00 0.75
+faster and reaches more drivers. 80% of the drivers notice the VMS between node 6th and 7th. Since the event caused
+a delay at that arc (spillback), drivers become aware when experiencing it (educated guessing). Awareness for multiple
+sources reaches 91% at 7th node.
+The rerouted flow remains null up to 5th node, although the 40% of the flow is already aware up to that time. Due to
+low utility in the rerouting model, drivers do not change path prior the 5th node, since there are no reasonable alternatives
+at nodes 1–4 and the actual demand pattern is still in-line with the typical. From 5th node on, where the alternative paths
+are available, the rerouting probability becomes positive. (cid:16)w is highest at the last node, where the last opportunity to avoid
+the event is available.
+Table 7 presents the case when no information sources are available. Now the only source of awareness is the experi-
+enced delay (cid:16)t a . Drivers remain unaware until they observe the consequences (spillback) which propagates backward to
+node 6 (since less people got aware and rerouted). Due to the lack of awareness, no one reroutes at the 5th node even
+κ
+though the is reasonably high. The rerouting takes place when the experienced drivers guess about the event from the
+delay (30% and 40% respectively), which leads to changing path at node 6 and 7. Yet, still 42% of the flow remains unaware
+and drives into the event.
+Table 8 shows how ICM handles pre-trip rerouting by modelling the same corridor an hour later, when information is
+available on-line prior to departure. In this case 31% of drivers is aware already at the origin yet travel accordingly to the
+typical pattern until there is enough utility in rerouting. Since the rerouting utility did not change compared to the first
+example ( Table 6 ), the change of path takes place from 5th node.
+
+===== PAGE 24 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 437
+Fig. 12. Unexpected event in the Sioux-Falls network (red), vehicle flows directly affected the event marked with black bars. Two alternative arcs marked
+on Eastern and West side of the event. (For interpretation of the references to colour in this figure legend, the reader is referred to the web version of this
+article.)
+Table 9
+Rerouting scenarios at Sioux-Falls network.
+Scenario Description Total rerouting flow Queue length an hour
+past the event
+No information Drivers are unaware of the event 0 410
+Online information Broadcasted online 12 min past the event with spreading 129 281
+pace σ= 1.5 h
+VMS Placed upstream of event, visible to c.a. one third of flow, 30 380
+turned on 22 min past the event
+Radio news Radio news broadcasted 29 min past the event 116 294
+Mixed deterministic RCM All of the above simultaneously 156 254
+Mixed stochastic RCM All of the above simultaneously yet drivers reroute 156 254
+according to stochastic RCM
+5.2. Rerouting in the Sioux-Falls network
+We simulate the Sioux-Falls network where the event takes place at the central NS corridor northbound ( Fig. 12 ). We
+simulate demand for 2 hours with the event taking place after an hour of simulation and limiting the arc capacity to
+60 veh/h from this time forth. We conduct an experiment schema to illustrate DTA-ICM results. The demand is intentionally
+low (total 10 0 0 0 trips) to obtain uncongested cost pattern and draw attention to rerouting phenomena rather than to
+congestion. Like in the previous example, rerouting utility parameters are β (cid:16)p = 2.5, β (cid:16)w = 2.5 and β 0 = –5 and the lower
+bound for κ of 5% is used. ICM-DTA converges to ρ around 10 −4 in 50 iterations which is enough to stabilize route choice
+decision, awareness processes, rerouting decisions as well as rerouting route choice decisions. To obtain clear picture of
+rerouting behaviour we use deterministic route-choice model ( Eq. (11) ) except of the last scenario where we apply the
+probabilistic model to illustrate the difference between the two.
+The vehicles inflowing into the event arc build the queue and cause delays significant enough to make alternative routes
+attractive. The queue, however, does not reach the arc tail so that flows do not spillback. Aware drivers can avoid the event
+by rerouting to one of four alternative arcs, two of which are most attractive: western and eastern one.
+We report temporal profiles of inflows into the event arc ( Fig. 13 ) and the two alternative arcs ( Figs. 14 and 15 ) in six
+different scenarios described in ( Table 9 ). In no information is provided the steady flow of ca. 480 vehicles inflow to the
+event arc, when the arc becomes blocked, the queue grows to 410 vehicles an hour past the event. If no information is
+
+===== PAGE 25 =====
+
+438 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+Fig. 13. Temporal profile of vehicle inflow (veh/h) into the event arc in simulated scenarios.
+Fig. 14. Temporal profile of vehicle inflow into the western alternative arc in simulated scenarios.
+Fig. 15. Temporal profile of vehicle inflow into the eastern alternative arc in simulated scenarios.
+provided the inflows at alternative arc also remain flat, since no one reroutes. If the information starts being spread online,
+it steadily reaches drivers who start rerouting, visible as the inflow decrease at the event arc and increase at alternative arcs,
+with total 129 rerouted drivers an hour past the event. This number as well as the shape of the curve can be controlled
+with the information source market penetration rate and rerouting model parameters to match the actual behaviour. The
+VMS is placed at one of the upstream arcs ( Fig. 12 ), thus even if it is turned on, it is visible only by part of the drivers. The
+reaction is stable and around 30 aware drivers decides to reroute, mainly to the eastern alternative where the flow increases
+by more the 20 vehicles around 25 min past the event. The radio news of high penetration are broadcasted 30 min past the
+event. Drivers become aware whenever they are and instantly can make their rerouting decisions, resulting in rerouting 116
+drivers. Therefore the decrease in inflows is smoother since drivers reroute from more decision points as compared to VMS
+case. The mixed case where all of the above leads into complex rerouting picture. In the first part no one is aware and the
+inflow to the event arc is steady. Then it decreases first as the information spreads online, then as the VMS is turned on
+and finally after the radio broadcast. In total 156 drivers reroutes and the queue drops from 410 to 254 vehicles. The inflow
+
+===== PAGE 26 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 439
+Fig. 16. Inflows into the eastern alternative arc of limited capacity in respective iterations.
+Fig. 17. Relative gap of rerouting decisions , rerouting and aware flows stability across iterations.
+profile of the event arc does not change when we replace deterministic RCM with the probabilistic one, yet the rerouting
+flows are differently distributed to alternative arcs. The eastern alternative is now less popular to reroute since drivers act
+less optimally and are distributed among all feasible alternatives, including less efficient western one, where flows are now
+higher.
+To illustrate algorithm convergence to the fixed-point we limited the capacity of eastern alternative to 350 veh/h, i.e.
+higher than typical flows (315 veh/h), but lower than flows in the mixed rerouting scenario (410 veh/h). We run 50 iterations
+of mixed scenario and report inflows in the 3rd, 4th, 5th, 6th, 10th and 50th iteration ( Fig. 17 ). In the first iterations inflows
+exceed the capacity, i.e. rerouting drivers select path at which the queue builds up due to their decisions. Consequently
+their expected rerouting costs (both at the level of estimating rerouting utility and while making rerouting route-choice
+decision) differ from the actual ones that they will encounter. This however becomes consistent as the algorithm converges
+throughout the iterations. In 10th and 50th iterations the inflows are bounded by the capacity and drivers managed to op-
+timize their rerouting decisions. ICM-DTA allows to model both perfect predictive information and optimal drivers decision
+(which is the formal model), as well as intermediate incomplete information obtained at intermediate iterations (which are
+heuristics of potential practical significance). Finally we report the convergence and stability of obtained results. Fig. 18 de-
+picts number of aware and rerouting drivers obtained throughout the 50 iterations. The number of aware drivers stabilizes
+already at fourth iteration, number of drivers making rerouting decision stabilizes around sixth iteration, while the relative
+gap of rerouting decisions logarithmically decreases to zero and falls below 10 −03 in 10th iteration.
+6. Summary and conclusions
+The paper’s objective was to investigate DTA capabilities of modelling consequences of unexpected events and to propose
+its modification allowing to represent rerouting phenomena. Based on DTA structure analysis we proposed Information Com-
+ply Model and integrated it into macroscopic DTA model of Gentile (2016) . ICM originates from the thorough definition of
+
+===== PAGE 27 =====
+
+440 R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441
+the drivers behaviour and their decision process. Dividing the decision process into two steps: becoming aware and deciding
+to reroute, allows handling two processes separately. Thanks to this multiple information sources available in contemporary
+traffic networks can be handled consistently. Impact of VMS, online sources, radio broadcasts can be handled jointly and
+further extended with drivers guessing about atypical situation from an atypical delay. Thanks to this, number of aware
+drivers (knowing about the event) can be consistently estimated as a function of location and time – which is crucial, as
+informing process can strongly depend on time (for the radio news) and location (for VMS). In our model only aware drivers
+may reroute, but not all aware drivers will reroute. Rerouting decision is driven by the rerouting utility, composed of two
+factors: avoiding losses and maximizing gains efficiently computed from the cost differences between typical and actual sit-
+uations and further used in binomial logit to estimate rerouting probability in a given location and time. Thanks to this we
+can capture the rerouting only in cases when costs changed substantially and only at nodes with efficient alternatives. ICM
+is integrated in the modified demand model of DTA which now handles three drivers conditions of flow: unaware, aware
+and rerouted. Transitions between the conditions are handled with the awareness and rerouting models at each node of the
+propagation.
+Final contribution of the paper, ICM-DTA, extends the DTA by calculating the network performance and traffic flows in
+cases of unexpected events. Proposed model overcomes the limitations of classic DTA methods (perfect information and pre-
+dictive behaviour). It allows to efficiently compute travel times and vehicle flows for the unexpected event with acceptable
+computation burden. ICM can be computed in a standard DTA environment with input that is available and it provides a
+valuable, meaningful results in-line with what can be observed. In the case-study we demonstrated that the main objective
+was achieved (the rerouting phenomena was reproduced and computation times remained acceptable). In the parallel paper
+( Kucharski and Gentile, 2015 ) we show how ICM can be estimated with the field data to represent the actual phenom-
+ena, while in on-going research our aim is to use GPS od trajectories to understand the rerouting behaviour and calibrate
+rerouting model.
+There are number of directions to pursue in context of this research. Starting from the awareness model, where more
+source types could be included and supported with empirical findings. Further research on how the data spreads online can
+bring a valuable insight, as well as testing if the awareness sources are correlated. Various types of information (raw fact,
+forecast, guidance, travel time, etc.) shall be included in the spreading process with various impact on the behaviour. The
+proposed model deals with a fixed od demand, while events affect whole activity plans which can change due to events,
+thus an extension to event-depended od demand as defined in Dobler et al. (2012) might be a good improvement.
+Also, the drivers’ behaviour is probably more heterogenic and the single RCM for all users may be not valid, especially in
+unexpected cases. To this end one can introduce multiple demand classes, or use the perceived costs (derived from actual
+costs) for rerouting path. Similarly, one can substitute logit model with alternative discrete choice-model to overcome the
+issues of applying it sequentially along the trajectory, which in current version can lead to intractable results. The promising
+solutions seem to be: a) calculating rerouting utility up to the destination and determining the rerouting probability once,
+b) introducing a ‘memory’ into the sequential model by memorizing share of drivers that did not reroute and the utility that
+they rejected, c) discrete-choice models which can be applied sequentially (like recursive logit of Fosgerau et al. (2013) ).
+Finally, the biggest need for rerouting models is probably in real-time environment (TMC), yet to make ICM work in
+real-time, e.g. in rolling-horizon ( Gentile et al., 2013 ) the awareness and rerouting models should be redefined for multiple
+independent events with independently computed awareness, rerouting utility and rerouting path.
+This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
+References
+Bakshy, E. , Rosenn, I. , Marlow, C. , Adamic, L. , 2012. The role of social networks in information diffusion. In: Proceedings of the 21st International Conference
+on World Wide Web. ACM, New York (USA), pp. 519–528 .
+Bellei, G. , Gentile, G. , Papola, N. , 2005. A within-day dynamic traffic assignment model for urban road networks. Transp. Res. B 39, 1–29 .
+Bellei, G. , Gentile, G. , Meschini, L. , Papola, N. , 2006. A demand model with departure time choice for within-day dynamic traffic assignment. Eur. J. Oper.
+Res. 175, 1557–1576 .
+Ben-Elia, E. , Di Pace, R. , Bifulco, G.N. , Shiftan, Y. , 2013. The impact of travel information’s accuracy on route-choice. Transp. Res. C 26, 146–159 .
+Ben-Elia, E. , Avineri, E. , 2015. Response to travel information: a behavioural review. Transp. Rev. 35, 352–377 .
+Bifulco, G.N. , Cantarella, G.E. , Simonelli, F. , Velonà, P. , 2016. Advanced traveller information systems under recurrent traffic conditions: Network equilibrium
+and stability. Transp. Res. B 92, 73–87 .
+Cantarella, G.E. , Cascetta, E. , 1995. Dynamic processes and equilibrium in transportation networks: towards a unifying theory. Transp. Sci. 29, 305–329 .
+Cantarella, G.E. , Watling, D.P. , 2016. A general stochastic process for day-to-day dynamic traffic assignment: formulation, asymptotic behaviour, and stability
+analysis. Transp. Res. B 92, 3–21 .
+Cao, Z. , Jiang, S. , Zhang, J. , Guo, H. , 2016. A unified framework for vehicle rerouting and traffic light control to reduce traffic congestion. IEEE Trans. Intell.
+Transp. Syst. 99, 1–16 .
+Corthout, R. , Tampère, C. , Immers, B. , 2011. Combining drivers’ rerouting response and marginal computation for variability studies and traffic management
+applications. In: Proceedings of the 2nd International Conference on Models and Technologies for Intelligent Transportation Systems. Leuven .
+Dial, R.B. , 1971. A probabilistic multipath traffic assignment model which obviates path enumeration. Transp. Res. 5, 83–111 .
+Dell’Orco, M. , Marinelli, M. , 2017. Modeling the dynamic effect of information on drivers’ choice behavior in the context of an advanced traveler information
+system. Transp. Res. Part C Emerg. Technol. 85, 168–183 .
+Dobler, C. , Kowald, M. , Rieser-Schüssler, N. , Axhausen, K. , 2012. Within-day replanning of exceptional events. Transp. Res. Record J. Transp. Res. Board 2302,
+138–147 .
+Fosgerau, M. , Frejinger, E. , Karlstrom, A. , 2013. A link based network route choice model with unrestricted choice set. Transp. Res. B 56, 70–80 .
+Flajolet, A. , Blandin, S. , Jaillet, P. , 2017. Robust adaptive routing under uncertainty. Oper. Res 66 (1), 210–229 .
+Friso, K. , Zantema,J. , Mein, E. ,2013. On-linetraffic modelling in Assen: thesensor city. In: Proceedingsof the 3rd International Conference on Models and
+Technologies for Intelligent Transportation Systems. Dresden .
+
+===== PAGE 28 =====
+
+R. Kucharski and G. Gentile / Transportation Research Part B 126 (2019) 414–441 441
+Gao, S. , Chabini, I. , 2006. Optimal routing policy problems in stochastic time-dependent networks. Transp. Res. Part B 40, 93–122 .
+Gao, S. , Frejinger, E. , Ben-Akiva, M. , 2008. Adaptive route choice models in stochastic time-dependent networks. Transp. Res. Record J. Transp. Res. Board
+2085, 136–143 5 .
+Gao, S. , Frejinger, E. , Ben-Akiva, M. , 2010. Adaptive route choices in risky traffic networks: a prospect theory approach. Transp. Res. C 18, 727–740 .
+Gentile, G. , 2010. The general link transmission model for dynamic network loading and a comparison with the DUE algorithm. In new DEVELOPMENTS in
+transport planning: advances in dynamic traffic assignment. In: Immers, L.G.H., Tampere, C.M.J., Viti, F. (Eds.), Transport Economics, Management and
+Policy Series. Edward Elgar Publishing, MA, USA, pp. 153–178 .
+Gentile, G. , 2015. Using the general link transmission model in a dynamic traffic assignment to simulate congestion on urban networks. Transp. Res. Proc.
+5, 66–81 .
+Gentile, G. , 2016. Solving a dynamic user equilibrium model based on splitting rates with gradient projection algorithms. Transp. Res. B 92, 120–147 .
+Gentile, G. , Meschini, L. , Papola, N. , 2007. Spillback congestion in dynamic traffic assignment: a macroscopic flow model with time-varying bottlenecks.
+Transp. Res. B 41, 1114–1138 .
+Gentile, G. , Meschini, L. , 2011. Using dynamic assignment models for real-time traffic forecast on large urban networks. In: Proceedings of the Second
+International Conference on Models and Technologies for Intelligent Transportation Systems. Leuven, Belgium .
+Gentile, G. , Kucharski, R. , Meschini, L. , 2013. Modelling rerouting phenomena through dynamic traffic assignment in rolling horizon. In: Proceedings of the
+3rd International Conference on Models and Technologies for Intelligent Transportation Systems 2013. Dresden, pp. 513–522 .
+Gentile, G. , Noekel, K. , 2016. Modelling Public Transport Passenger Flows in the Era of Intelligent Transport Systems. Springer International Publishing
+Section 6.1 .
+Gentile, G. , Papola, A. , 2006. An alternative approach to route choice simulation: the sequential models. In: Proceedings of the European Transport Confer-
+ence, ETC. Strasbourg .
+Ghosh, R. , Lerman, K. , 2014. Rethinking centrality: the role of dynamical processes in social network analysis. Discrete Contin. Dyn. Syst. Ser. B 19,
+1355–1372 .
+Han, L. , Sun, H. , Wu, J. , Zhu, C. , 2011. Day-to-day evolution of the traffic network with advanced traveler information system. Chaos Solitons Fractals 42,
+914–919 .
+Himpe, W. , Corthout, R. , Tampère, C. , 2016. An efficient iterative link transmission model. Transp. Res. B 92, 170–190 .
+Hoang, T.A. , Lim, E.P. , Achananuparp, P. , Jiang, J. , Zhu, F. , 2011. On modeling virality of Twitter content. Lect. Notes Comput. Sci. 7008, 212–221 .
+Hu, T.Y. , Mahmassani, H.S. , 1997. Day-to-day evolution of network flows under real-time information and reactive signal control. Transp. Res. C 5, 51–69 .
+Katsikopoulos, K.V. , Duse-Anthony, Y. , Fisher, D.L. , Duffy, S.A. ,2002. Risk attitude reversals in drivers’ route choice when range of travel time information is
+provided. Hum. Factors 44, 466 .
+Khattak, A.J. , Schofer, J.L. , Koppelman, F.S. , 1993. Commuters’ enroute diversion and return decisions: analysis and implications for advanced traveler infor-
+mation systems. Transp. Res. A 27 (2), 101–111 .
+Kucharski, R. , Gentile, G. , 2015. Observing rerouting phenomena in dynamic traffic networks. In: Proceedings of the International Conference Models and
+Technologies for Intelligent Transportation Systems (MT-ITS). IEEE, Budapest, Hungary, pp. 140–147 .
+Kucharski, R. , Gentile, G. , 2016. Modelling information spread processes in dynamic traffic networks. Commun. Comput. Inf. Sci. 640, 317–328 .
+Lerman, K. , Ghosh, R. , 2010. Information contagion: an empirical study of the spread of news on Digg and Twitter social networks. In: Proceedings of the
+Fourth International Conference on Weblogs and Social Media, pp. 90–97 .
+Li, X. , Lam, W.H. , Shao, H. , Gao, Z. , 2015. Dynamic modelling of traffic incident impacts on network reliability. Transp. A 11 (9), 856–872 .
+Lindell, M.K. , Prater, C.S. , 2007. Critical behavioral assumptions in evacuation time estimate analysis for private vehicles: examples from hurricane research
+and planning. J. Urban Plann. Dev. 133 (1), 18–29 .
+Long, J. , Huang, H.J. , Gao, Z. , Szeto, W.Y. , 2013. An intersection-movement-based dynamic user optimal route choice problem. Oper. Res. 61 (5), 1134–1147 .
+Lu, X. , Gao, S. , Ben-Elia, E. ,2010. Experimental analysis of route choice behaviour with real-time information in congested, risky networks. In: Proceedings
+of the European Transport Conference, Association for European Transport .
+Lu, Y. , Seshadri, R. , Pereira, F. , OSullivan, A. , Antoniou, C. , Ben-Akiva, M. , 2015. DynaMIT2.0: architecture design and preliminary results on real-time data
+fusion for traffic prediction and crisis management. In: Proceedings of the IEEE 18th International Conference on Intelligent Transportation Systems,
+pp. 2250–2255 .
+Ma, J. , Smith, B.L. , Zhou, X. , 2016. Personalized real-time traffic information provision: agent-based optimization model and solution framework. Transp.
+Res. C 64, 164–182 .
+Mahmassani, H.S. , Jayakrishnan, R. , 1991. System performance and user response under real-time information in a congested traffic corridor. Transp. Res. A
+25 (5), 293–307 .
+Mathioudakis, M. , Koudas, N. , 2010. TwitterMonitor: trend detection over the twitter stream. In: Proceedings of the ACM SIGMOD International Conference
+on Management of data. ACM, New York, USA, pp. 1155–1158 .
+Nezamuddin, N. , Boyles, S.D. , 2015. A continuous DUE algorithm using the link transmission model. Netw. Spat. Econ. 15 (3), 465–483 .
+Papinski, D. , Scott, D.M. , Doherty, S.T. , 2009. Exploring the route choice decision-making process: a comparison of planned and observed routes obtained
+using person-based GPS. Transp. Res. F 12 (4), 347–358 .
+Peeta, S. , Mahmassani, H.S. , 1995. Multiple user classes real-time traffic assignment for online operations: a rolling horizon solution framework. Transp.
+Res. C 3, 83–98 .
+Peeta, S. , Ramos, J. , Pasupathy, R. , 20 0 0. Content of variable message signs and on-line driver behavior. Transp. Res. Record J. Transp. Res. Board 1725,
+102–108 .
+Pel, A. , Bliemer, M. , Hoogendoorn, S. , 2009. Hybrid route choice modeling in dynamic traffic assignment. Transp. Res. Record J. Transp. Res. Board 2091,
+100–107 .
+Polychronopoulos, G.H. , Tsitsiklis, J.N. , 1996. Stochastic shortest path problems with recourse. Networks: An International Journal 27 (2), 133–143 .
+Prato, C.G. , 2009. Route choice modeling: past, present and future research directions. J. Choice Modell. 2, 65–100 .
+Procter, R. , Vis, F. , Voss, A. , 2013. Reading the riots on Twitter: methodological innovation for the analysis of big data. Int. J. Soc. Res. Methodol. 16, 197–214 .
+PTV SISTeMA. Optima. (2016) www.ptvgroup.com .
+Ramos, G.D.M. , 2015. Dynamic Route Choice Modelling of the Effects of Travel Information using RP Data. TU Delft (Doctoral dissertation) .
+Sakaki, T. , Okazaki, M. , Matsuo, Y. , 2010. Earthquake shakes Twitter users: real-time event detection by social sensors. In: Proceedings of the 19th Interna-
+tional Conference on World Wide Web. ACM, New York, pp. 851–860 .
+Schlaich, J. , 2010. Analyzing route choice behavior with mobile phone trajectories. Transp. Res. Record J. Transp. Res. Board 2157, 78–85 .
+Selten, R. , Chmura, T. , Pitz, T. , Kube, S. , Schreckenberg, M. , 2007. Commuters route choice behaviour. Games Econ. Behav. 58, 394–406 .
+Snowdon, J. , Waterson, B. , Fangohr, H. , 2012. Evolution of adaptive route choice behaviour in drivers. In: Proceedings of the UTSG: 44th Annual Conference
+of the Universities’ Transport Study Group. Aberdeen .
+Vacca, A. , Meloni, I. , 2015. Understanding route switch behavior: an analysis using GPS based data. Transp. Res. Proc. 5, 56–65 .
+Unnikrishnan, A. , Waller, S.T. , 2009. User equilibrium with recourse. Netw. Spat. Econ. 9, 575 .
+Waller, S.T. , Ziliaskopoulos, A.K. , 2002. On the online shortest path problem with limited arc cost dependencies. Networks 40, 216–227 .
+Watling, D. , Hazelton, M. , 2003. The dynamics and equilibria of day-to-day assignment models. Netw. Spat. Econ. 3, 349–370 .
+Xiong, C. , Chen, X. , He, X. , Lin, X. , Zhang, L. , 2016. Agent-based en-route diversion: dynamic behavioral responses and network performance represented by
+macroscopic fundamental diagrams. Transp. Res. C 64, 148–163 .
+Yperman, I. , 2007. The Link Transmission Model for Dynamic Network Loading PhD thesis. Katholieke Universiteit, Leuven .
