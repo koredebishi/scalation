@@ -154,23 +154,6 @@ class VTransport (name: String, from_ : Component, to_ : Component,
 
             motion.updateV(actor, length) // update actor/vehicle's motion/position
 
-            // --- Lane-change decisions (MOBIL + exit steering) ---
-            val route = actor.myRoute
-            if route != null && actor.laneID >= 0 && actor.myRamp == null then
-                // 1. MOBIL discretionary (3s cooldown)
-                if (director.clock - actor.lastLaneChangeTime) > 3.0 then
-                    val dir = MOBIL.checkLaneChange (actor, route, actor.segId, actor.laneID)
-                    if dir != 0 then
-                        val ok = route.changeLane (actor.laneID, actor.laneID + dir, actor, actor.segId)
-                        if ok then actor.lastLaneChangeTime = director.clock
-                    end if
-                end if
-                // 2. Exit steering — runs independently, has its own cooldown
-                if actor.exitRampId != null then
-                    route.exitCheckAndSteer (actor, actor.segId, director.clock)
-                end if
-            end if
-
             val cp = calcPoint2(actor.disp)
             //debug ("move", s"${actor.displayLabel}, check if actor.disp = ${actor.disp} >= curve.length = ${curve.length}")
             if actor.disp >= length then
