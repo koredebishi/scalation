@@ -3,8 +3,21 @@
  *  @version 2.0
  *  @date    Sat Jan 25 19:44:16 EST 2014
  *  @see     LICENSE (MIT style license file).
- *
  *  @note    Pathway for Modeling a Lane Consisting of Multiple Segments
+ *
+ *
+ *Pathway
+ *           │
+ *           ├── lane identity
+ *           ├── ordered VTransport segments
+ *           ├── lane existence by segment
+ *           ├── longitudinal wiring
+ *           │     VT0.next = VT1
+ *           │     VT1.prev = VT0
+ *           │     ...
+ *           └── visualization / lane geometry
+ *
+ *
  */
 
 package scalation
@@ -139,15 +152,18 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     end getLast
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     /** Check whether this lane has a VTransport at the given segment index.
-     *  @param segId  the segment index to check
+     *
+     * @param segId the segment index to check
      */
-    def existsAt (segId: Int): Boolean =
+    def existsAt(segId: Int): Boolean =
         segId >= 0 && segId < seg.length && seg(segId) != null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     /** Return the location of the first curve to be the pathway starting point.
-     *  Finds the first non-null segment for sparse pathways.
+     * Finds the first non-null segment for sparse pathways.
      */
     override def at: Array[Double] =
         val first = seg.find(_ != null)
@@ -156,47 +172,51 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
             Array(xy(0), xy(1), 0.0, 0.0)
         else Array(0.0, 0.0, 0.0, 0.0)
 
-//
-//    def segLength(laneId: Int , car: Vehicle): Array[Double] =
-//        val pathInfo = car.pathInfo     // return the pathInfo
-//        // the length of this current segment
-//        // the length of the previous segment
-//        //the length of the ahead segment
-//        // prevSeg(lenght) current seglenght  (nextSeglenght)
-//
-//        Array(0.0)
-//    end segLength
+    //
+    //    def segLength(laneId: Int , car: Vehicle): Array[Double] =
+    //        val pathInfo = car.pathInfo     // return the pathInfo
+    //        // the length of this current segment
+    //        // the length of the previous segment
+    //        //the length of the ahead segment
+    //        // prevSeg(lenght) current seglenght  (nextSeglenght)
+    //
+    //        Array(0.0)
+    //    end segLength
 
     def getSeglength: Int = seg.length
 
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     /** Get the direction/turn random variate to determine next the direction.
-     *  This allows an application model to select the next component.
-     *  FIX - this won't work in general - seg(0) will only allow turns from first segment
+     * This allows an application model to select the next component.
+     * FIX - this won't work in general - seg(0) will only allow turns from first segment
      */
     def selector: Variate =
         val first = seg.find(_ != null)
         if first.isDefined then first.get.selector else null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     /** Set the direction/turn random variate for this pathway.
-     *  FIX - this won't work in general
-     *  @param selectorRV  the random variate used to select the direction
+     * FIX - this won't work in general
+     *
+     * @param selectorRV the random variate used to select the direction
      */
-    def selector_= (selectorRV: Variate): Unit =
+    def selector_=(selectorRV: Variate): Unit =
         val first = seg.find(_ != null)
         if first.isDefined then first.get.selector = selectorRV
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     /** Display this pathway — skip null segments (lane doesn't exist there).
      */
-    override def display (): Unit =
+    override def display(): Unit =
         for s <- seg.indices if seg(s) != null do
             val segment = seg(s)
-            director.animate (segment, CreateEdge, blue, segment.curve, segment.from, segment.to,
-                Array (segment.p1(0), segment.p1(1),
+            director.animate(segment, CreateEdge, blue, segment.curve, segment.from, segment.to,
+                Array(segment.p1(0), segment.p1(1),
                     segment.pc(0), segment.pc(1),
                     segment.p2(0), segment.p2(1)))
         end for

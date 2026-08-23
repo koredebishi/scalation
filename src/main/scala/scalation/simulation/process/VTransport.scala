@@ -3,8 +3,38 @@
  *  @version 2.0
  *  @date    Tue Feb  4 14:56:34 EST 2020
  *  @see     LICENSE (MIT style license file).
- *
  *  @note    Variable Speed Transport is a Pathway between Components
+ *           
+ *           
+ *           
+ *           
+ *           VTransport
+ *           │
+ *           ├── geometry
+ *           │   ├── length
+ *           │   ├── from
+ *           │   └── to
+ *           │
+ *           ├── vehicle state
+ *           │   ├── vList: DLL[Vehicle]
+ *           │   └── vCount
+ *           │
+ *           ├── microscopic queries
+ *           │   ├── leaderOf(vehicle)
+ *           │   ├── followerOf(vehicle)
+ *           │   ├── upstreamVehicle
+ *           │   └── downstreamVehicle
+ *           │
+ *           ├── lane-level traffic state
+ *           │   ├── vehicleCount
+ *           │   ├── density
+ *           │   ├── meanSpeed
+ *           │   ├── flow
+ *           │   └── availableStorage
+ *           │
+ *           └── immediate longitudinal connectivity
+ *           ├── previousSegment
+ *           └── nextSegment
  */
 
 package scalation
