@@ -40,6 +40,9 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
 
     private val debug = debugf ("CalRoute101_3", false)
 
+    /** Wall-clock mark taken before anything is built (see the [wall] line at the end). */
+    private val wallStart = System.nanoTime ()
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // Configuration - uses new architecture
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -248,9 +251,14 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
         RowTimeLoader.getMuForSourceDefault(mainlineArrivalSources, rampArrivalSources, 
                                              numLanes, nt, sourceIdx)
 
+    /** Anchor-sensor speed matrix -- read from the PeMS CSV once per run.
+     *  `VSource` asks for this on every vehicle it creates, so it must not
+     *  re-read the file each time.
+     */
+    private val anchorSpeed = RowTimeLoader.getSpeedMatrixDefault(demand)
+
     /** Get speed matrix - delegates to RowTimeLoader companion object. */
-    def getSpeedMatrix(): MatrixD =
-        RowTimeLoader.getSpeedMatrixDefault(demand)
+    def getSpeedMatrix(): MatrixD = anchorSpeed
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // Public accessors for calibration
@@ -290,8 +298,14 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
     // For standalone run, use @main def runCalRoute101_3
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    private val wallBuilt = System.nanoTime ()             // everything constructed, nothing simulated yet
+
     simulate ()
     waitFinished ()
+
+    private val wallEnd = System.nanoTime ()
+    println (f"[wall] setup ${(wallBuilt - wallStart) / 1e9}%.1f s   run ${(wallEnd - wallBuilt) / 1e9}%.1f s   total ${(wallEnd - wallStart) / 1e9}%.1f s")
+
     Model.shutdown ()
 
 end CalRoute101_3
