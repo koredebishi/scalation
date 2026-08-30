@@ -21,7 +21,7 @@ package model
 import scalation.mathstat.{MatrixD, VectorD}
 import scalation.random.{Exponential, Uniform}
 import scalation.simulation.process.{IntegratorType, IDMDynamics}
-import scalation.simulation.process.config.{AggregatedDemand, CorridorLayout, MultiCorridorConfig, PeMSDemand}
+import scalation.simulation.process.config.{AggregatedDemand, CorridorLayout, EatonCorridorConfig, MultiCorridorConfig, PeMSDemand}
 import scalation.simulation.process.builder.{CorridorBuilder, BuiltNetwork}
 import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSource, AggregatedRampArrivalSource}
 
@@ -29,7 +29,7 @@ import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSou
 /** Run the EatonFireModel simulation.
  *  > runMain scalation.simulation.process.model.runEatonFireModel
  */
-@main def runEatonFireModel (): Unit = new EatonFireModel (synthetic = false)
+@main def runEatonFireModel (): Unit = new EatonFireModel ()
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -52,7 +52,7 @@ import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSou
  */
 class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                       animating: Boolean = true, aniRatio: Double = 500.0,
-                      synthetic: Boolean = false)
+                      synthetic: Boolean = true)
       extends Model (name, reps, animating, aniRatio)
          with RowTimeLoader:
 
@@ -470,6 +470,16 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
         println ("=" * 70)
         super.fini (rep)
     end fini
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // Background map -- OSM road network as visual context (no-op when headless)
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    // Both corridors share one coordinate frame, so the bounding box must cover
+    // both.  Dimensions must be the frame the layouts were projected into.
+    private val osmGpsAnchors = layout210.mainlineGPS ++ layout134.mainlineGPS
+    loadOsmBackground ("data/osm/eaton_roads.json", osmGpsAnchors,
+                       EatonCorridorConfig.sharedWBDims)
 
     simulate ()
     waitFinished ()

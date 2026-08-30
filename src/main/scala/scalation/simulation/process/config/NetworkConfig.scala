@@ -142,6 +142,11 @@ object NetworkConfig:
                                      sensor3_gps, merge2_gps, sensor4_gps, sensor5_gps)
     private val rampGPS     = Array (merge1_gps, merge2_gps)
 
+    /** Mainline junction GPS anchors (lat, lon) -- used by `Model.loadOsmBackground`
+     *  to compute the OSM bounding box and to align the projection with the model.
+     */
+    def mainlineGPSAnchors: Array [(Double, Double)] = mainlineGPS
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert GPS to screen coordinates for animation.
      *  @param dims  screen dimensions (width, height)

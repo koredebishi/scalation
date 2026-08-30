@@ -151,6 +151,30 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     /** Allow the simulation to set/override the token eid -> actorId mapping. */
     def setTokenActorId(tokenEid: Int, actorId: Int): Unit = vsLock.synchronized { tokenToActorId.update(tokenEid, actorId) }
 
+    // -- Background OSM road network (Layer M-1) --------------------------------
+    @volatile private var backgroundRoads: Array [Array [(Double, Double)]] = null
+    @volatile private var backgroundRoadTypes: Array [String] = null
+    @volatile private var backgroundPlaces: Array [OsmPlace] = null
+
+    /** Push background road network polylines for map context rendering.
+     *  Called by `Model.loadOsmBackground` after projection to screen space.
+     *  @param roads     screen-space polylines, one per road segment
+     *  @param roadTypes OSM highway tags ("motorway", "primary", etc.)
+     */
+    def setBackgroundRoads (roads: Array [Array [(Double, Double)]],
+                            roadTypes: Array [String] = null): Unit =
+        backgroundRoads = roads
+        backgroundRoadTypes = roadTypes
+    end setBackgroundRoads
+
+    /** Push geographic place labels from OSM data.
+     *  Called by `Model.loadOsmBackground` -- data comes from the JSON file.
+     *  @param places  array of `OsmPlace` with screen-space positions
+     */
+    def setBackgroundPlaces (places: Array [OsmPlace]): Unit =
+        backgroundPlaces = places
+    end setBackgroundPlaces
+
     /** Public hook for the simulation to push state updates. */
     def updateVehicleState(actorId: Int, state: VehicleState): Unit =
         vsLock.synchronized { vehicleStateRegistry.update(actorId, state) }
@@ -492,6 +516,67 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             g2d.fillRect (0, 0, getWidth, getHeight)
 
             g2d.setTransform (at)                             // used for zooming
+
+
+            // -- Layer M-1: background OSM road network ------------------------
+            // Thin muted lines for every road in the area (visual context).
+            // Drawn BEFORE everything so simulation polygons sit on top.
+            val bgRoads = backgroundRoads                        // snapshot volatile
+            if bgRoads != null then
+                val bgTypes  = backgroundRoadTypes
+                // Per-class stroke widths and colors: major roads prominent, minor subtle
+                val strokeMotorway  = new BasicStroke (10.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                val strokeLink      = new BasicStroke (7.0f,  BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                val strokePrimary   = new BasicStroke (6.0f,  BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                val strokeSecondary = new BasicStroke (5.0f,  BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                val strokeMinor     = new BasicStroke (3.6f,  BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                for i <- bgRoads.indices do
+                    val road = bgRoads (i)
+                    if road.length >= 2 then
+                        val roadType = if bgTypes != null && i < bgTypes.length then bgTypes (i) else ""
+                        val (c, stroke) = roadType match
+                            case "motorway" | "trunk"            => (new Color (160, 165, 190, 200), strokeMotorway)
+                            case "motorway_link" | "trunk_link"  => (new Color (140, 145, 170, 180), strokeLink)
+                            case "primary" | "primary_link"      => (new Color (130, 135, 155, 170), strokePrimary)
+                            case "secondary" | "secondary_link"  => (new Color (115, 118, 140, 150), strokeSecondary)
+                            case "tertiary" | "tertiary_link"    => (new Color (100, 103, 125, 130), strokeMinor)
+                            case _                               => (new Color (85, 88, 108, 100), strokeMinor)
+                        g2d.setStroke (stroke)
+                        g2d.setPaint (c)
+                        for j <- 0 until road.length - 1 do
+                            g2d.drawLine (road(j)._1.toInt, road(j)._2.toInt,
+                                          road(j+1)._1.toInt, road(j+1)._2.toInt)
+                        end for
+                    end if
+                end for
+            end if
+
+
+            // -- Layer M-1b: OSM place labels (cities, suburbs, neighbourhoods) -
+            // Rendered from OSM data -- no hardcoded names.
+            // Font size driven by OSM place type: city > town > suburb > neighbourhood > hamlet.
+            val bgPlaces = backgroundPlaces                      // snapshot volatile
+            if bgPlaces != null && bgPlaces.nonEmpty then
+                val prevComp = g2d.getComposite
+                for place <- bgPlaces do
+                    val (fontSize, alpha) = place.placeType match
+                        case "city"          => (16, 0.50f)
+                        case "town"          => (14, 0.45f)
+                        case "suburb"        => (12, 0.40f)
+                        case "neighbourhood" => (10, 0.35f)
+                        case _               => ( 9, 0.30f)    // village, hamlet
+                    g2d.setFont (new Font ("SansSerif", java.awt.Font.BOLD, fontSize))
+                    val fm = g2d.getFontMetrics
+                    val txt = place.name.toUpperCase
+                    val tw  = fm.stringWidth (txt)
+                    g2d.setComposite (java.awt.AlphaComposite.getInstance (
+                        java.awt.AlphaComposite.SRC_OVER, alpha))
+                    g2d.setPaint (new Color (220, 225, 240))
+                    g2d.drawString (txt, (place.x - tw / 2.0).toFloat,
+                        (place.y + fm.getAscent / 2.0).toFloat)
+                end for
+                g2d.setComposite (prevComp)
+            end if
 
 
             // Display all nodes and their bound tokens

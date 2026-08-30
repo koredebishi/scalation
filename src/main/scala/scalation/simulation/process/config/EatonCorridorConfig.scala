@@ -65,6 +65,9 @@ case class StationWithCoords (record: StationRecord, screenXY: (Double, Double))
  *  @param segmentLengths    physical segment lengths in meters (from postmile differences)
  *  @param ffStations        freeway-to-freeway connector station records from PeMS
  *  @param junctionPMs       absolute postmiles for each mainline junction (empty for non-PeMS corridors)
+ *  @param mainlineGPS       (lat, lon) for each mainline Junction -- the anchors the
+ *                           screen positions were projected from; lets an OSM
+ *                           background map be aligned with this corridor
  */
 case class CorridorLayout (config: NetworkConfig,
                            junctionNames: Array [String],
@@ -73,7 +76,8 @@ case class CorridorLayout (config: NetworkConfig,
                            offRampScreenXY: Array [(Double, Double)],
                            segmentLengths: VectorD,
                            ffStations: Array [StationRecord],
-                           junctionPMs: Array [Double] = Array.empty [Double]):
+                           junctionPMs: Array [Double] = Array.empty [Double],
+                           mainlineGPS: Array [(Double, Double)] = Array.empty):
 
     /** All ramp screen positions (on-ramps first, then off-ramps). */
     def allRampScreenXY: Array [(Double, Double)] = onRampScreenXY ++ offRampScreenXY
@@ -312,6 +316,12 @@ object EatonCorridorConfig:
         buildLayoutFromCoords (corridorWithCoords, corridorId, rampShift, flowDir)
     end buildCorridorLayout
 
+    /** Screen canvas dimensions of the shared WB coordinate frame.
+     *  Anything projecting into the same frame -- e.g. the OSM background map --
+     *  must be given these same dimensions or it will not line up.
+     */
+    val sharedWBDims: (Double, Double) = (5000.0, 3000.0)
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build both WB corridor layouts (I-210 W + SR-134 W) in ONE shared
      *  coordinate frame so they appear in correct spatial relationship.
@@ -320,7 +330,7 @@ object EatonCorridorConfig:
      *  @param dims       animation window dimensions (width, height) in pixels
      *  @param rampShift  lateral pixel shift for ramp junctions
      */
-    def buildSharedWBLayouts (dims: (Double, Double) = (5000.0, 3000.0),
+    def buildSharedWBLayouts (dims: (Double, Double) = sharedWBDims,
                               rampShift: (Double, Double) = (65.0, -70.0)): (CorridorLayout, CorridorLayout) =
         val allRecords = loadStationMap ()
         val wbRecords  = allRecords.filter (s =>
@@ -433,9 +443,15 @@ object EatonCorridorConfig:
             sensors = sensors.toList
         )
 
-        // 10. Screen coordinates — mainline
+        // 10. Screen coordinates — mainline (and the GPS anchors they came from)
         val mainlineScreenXY = new Array [(Double, Double)] (nML)
         cfor (0, nML) { i => mainlineScreenXY(i) = mlStations(i).screenXY }
+
+        val mainlineGPS = new Array [(Double, Double)] (nML)
+        cfor (0, nML) { i =>
+            val r = mlStations(i).record
+            mainlineGPS(i) = (r.latitude, r.longitude)
+        }
 
         // 11. Screen coordinates — on-ramps with lateral shift
         val onRampScreenXY = new Array [(Double, Double)] (orStations.length)
@@ -464,7 +480,8 @@ object EatonCorridorConfig:
             offRampScreenXY  = offRampScreenXY,
             segmentLengths   = segLens,
             ffStations       = ffRecords,
-            junctionPMs      = mlPMs                            // preserve postmiles for PM-based lookups
+            junctionPMs      = mlPMs,                           // preserve postmiles for PM-based lookups
+            mainlineGPS      = mainlineGPS                      // anchors for OSM background alignment
         )
     end buildLayoutFromCoords
 
