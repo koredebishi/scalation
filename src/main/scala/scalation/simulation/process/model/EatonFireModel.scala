@@ -51,7 +51,7 @@ import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSou
  *  @param synthetic  if true, use fixed counts (100/50); if false, load PeMS data
  */
 class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
-                      animating: Boolean = true, aniRatio: Double = 500.0,
+                      animating: Boolean = true, aniRatio: Double = 200.0,
                       synthetic: Boolean = true)
       extends Model (name, reps, animating, aniRatio)
          with RowTimeLoader:
@@ -350,9 +350,11 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
             if localSub < nLanes then
                 // Mainline entry
                 laneID = localSub
+                junc(0).jump ()                             // wait at the junction first
+                // join the lane only once we start driving: jump() yields, and a
+                // vehicle in the list before move() has run has no position yet
                 val carAhead = route.pathway(laneID).getLast
                 route.pathway(laneID).addToAlist (this, carAhead)
-                junc(0).jump ()
                 driveHighway (route, junc, sinks, hwLen, 0)
             else
                 // Ramp entry
@@ -361,9 +363,11 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                 val r = ramps(rampIdx)
                 driveRamp (r)
                 val joinSeg = joinSegs(rampIdx)
-                val carAhead = route.pathway(laneID).seg(joinSeg).getLast
+                junc(joinSeg).jump ()                       // wait at the merge junction first
+                // lane-wide list: the car ahead may be in a downstream segment.
+                // Looked up AFTER the jump, so it is not stale across the yield.
+                val carAhead = route.pathway(laneID).mergeLeaderAt (joinSeg)
                 route.pathway(laneID).addToAlist (this, carAhead)
-                junc(joinSeg).jump ()
                 driveHighway (route, junc, sinks, hwLen, joinSeg)
         end actOnCorridor
 
@@ -399,9 +403,9 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
                     ffLane.removeFromAlist (this)
                     // 4. Enter SR-134 at merge junction — spread across all lanes
                     laneID = (rand.gen * numLanes134).toInt.min (numLanes134 - 1)
-                    val carAhead = route134.pathway(laneID).seg(ffMrgSeg134).getLast
+                    junc134(ffMrgSeg134).jump ()            // wait at the merge junction first
+                    val carAhead = route134.pathway(laneID).mergeLeaderAt (ffMrgSeg134)
                     route134.pathway(laneID).addToAlist (this, carAhead)
-                    junc134(ffMrgSeg134).jump ()
                     // 5. Continue driving on SR-134 to its sink
                     driveHighway (route134, junc134, sinks134, hwLen134, ffMrgSeg134)
                 end if

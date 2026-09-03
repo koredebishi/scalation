@@ -95,6 +95,64 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     end removeFromAlist
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Cumulative distance to the start of each segment: cumLen(i) is the sum of
+     *  the lengths of segments 0 until i.  One extra entry holds the lane total.
+     *  Lazy because segment lengths are assigned by the builder AFTER the Route
+     *  (and so this Pathway) is constructed.
+     */
+    lazy val cumLen: Array [Double] =
+        val c = new Array [Double] (seg.length + 1)
+        for i <- seg.indices do c(i + 1) = c(i) + seg(i).length
+        c
+    end cumLen
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Position along this lane measured from its entry -- one frame shared by
+     *  every vehicle in the lane, whatever segment it entered at.  This is what
+     *  makes a gap between a mainline vehicle and a merged ramp vehicle mean
+     *  anything: `t_disp` counts from each vehicle's own origin, this does not.
+     *  @param segIdx  the vehicle's current segment index
+     *  @param disp    its displacement within that segment
+     */
+    def corridorPos (segIdx: Int, disp: Double): Double = cumLen(segIdx) + disp
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The nearest vehicle AHEAD of a car entering this lane at the start of
+     *  segment `segIdx` -- i.e. the car it must be inserted behind in `vList`.
+     *
+     *  Only a merging vehicle needs this.  Car-following never does: a car
+     *  already in the list reads its leader with one hop, `myPathNode.ahead`.
+     *  The lookup is non-local only because `vList` spans the whole lane, so a
+     *  merging car's neighbours can sit in other segments.
+     *
+     *  Walks `vList` from the tail (furthest upstream) toward the head and
+     *  returns the first vehicle whose position is greater than the entry point.
+     *
+     *  It searches the DLL rather than the segment deques because a `vdeque`
+     *  holds only the vehicles currently inside `VTransport.move` -- a vehicle
+     *  delayed at a junction is on the road but in no deque, and a merging
+     *  vehicle that could not see it would insert itself ahead of it.  The DLL
+     *  never loses a vehicle, and `corridorPos` stays right across a junction
+     *  (`disp` is only reset at the top of `move`, so a waiting vehicle sits
+     *  exactly on the boundary).
+     *
+     *  Cost is the number of vehicles BEHIND the entry point, which is bounded
+     *  by lane capacity, not by fleet size.
+     *
+     *  @param segIdx  the segment where the vehicle joins the lane
+     *  @return the vehicle to merge in behind, or null when the lane is clear ahead
+     */
+    def mergeLeaderAt (segIdx: Int): Vehicle =
+        val pos = cumLen(segIdx)                             // entering at disp 0 of segIdx
+        var n   = vList.lastNode                             // tail = furthest upstream
+        while n != null do
+            if n.elem.corridorPos > pos then return n.elem   // first vehicle ahead of me
+            n = n.ahead
+        end while
+        null                                                 // nothing ahead in this lane
+    end mergeLeaderAt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the first vehicle in this pathway.
      */
     def getFirst: Vehicle =

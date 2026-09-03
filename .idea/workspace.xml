@@ -8,41 +8,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2426cf4f-6eea-44af-aca5-0ef65eba64ed" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/data/osm/eaton_roads.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/osm/us101_roads.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/01-vv-age-of-agentic-ai.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/02-runtime-invariant-monitor.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/03-goodhart-calibration.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/04-hpdes-rollback-across-resolution.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/05-links-as-agents.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/06-evacuation-scenario-matrix.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/07-agentic-vs-sumo-benchmark.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/3573900.fm.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/3615979.fm.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/3726301.fm.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/AgentGuard.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/PADS-Only paper on LLM.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/newSchema.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/pads-2027-candidates.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/paper1-vv-agentic/draft.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/paper1-vv-agentic/notes.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/paper1-vv-agentic/refs.bib" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/paper2-rim/draft.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/paper2-rim/notes.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/paper2-rim/refs.bib" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/s10208-015-9296-2.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/phd-papers/shared/figures/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/scalation/animation/OsmRoadNetwork.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/scripts/download_osm_geometry.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/scalation/dynamics/LWR.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/CalRoute101_3.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/CalRoute101_3.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/EatonFireModel.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/EatonFireModel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/.bloop/scalation_2-0-build.json" beforeDir="false" afterPath="$PROJECT_DIR$/project/.bloop/scalation_2-0-build.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/animation/DgAnimator.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/animation/DgAnimator.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Dynamics.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Dynamics.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Junction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Junction.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Model.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Model.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/config/EatonCorridorConfig.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/config/EatonCorridorConfig.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/config/NetworkConfig.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/config/NetworkConfig.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/model/CalRoute101_3.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/model/CalRoute101_3.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Pathway.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Pathway.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Recorder.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Recorder.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/VTransport.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/VTransport.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Vehicle.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/Vehicle.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/builder/CorridorBuilder.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/builder/CorridorBuilder.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/model/EatonFireModel.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/scalation/simulation/process/model/EatonFireModel.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator$.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator$Canvas.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator$Canvas.class" afterDir="false" />
@@ -50,60 +28,51 @@
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator$VehicleState.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator$VehicleState.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/animation/DgAnimator.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Dynamics.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Dynamics.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Dynamics.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Dynamics.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/GippsDynamics.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/GippsDynamics.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/GippsDynamics.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/GippsDynamics.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IDMDynamics$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IDMDynamics$.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IDMDynamics.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IDMDynamics.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IDMDynamics.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IDMDynamics.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IntegratorType.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IntegratorType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IntegratorType.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/IntegratorType.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Junction.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Junction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Junction.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Junction.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/KraussDynamics.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/KraussDynamics.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/KraussDynamics.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/KraussDynamics.tasty" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Model$$anon$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Model$$anon$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Model$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Model$.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Model.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Model.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Model.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Model.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/SOMEModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/SOMEModel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/SOMEModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/SOMEModel.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/DemandFlag.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/DemandFlag.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/DemandFlag.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/DemandFlag.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/FFConnectorSpec.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/FFConnectorSpec.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/FFConnectorSpec.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/FFConnectorSpec.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/FlowDirection.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/FlowDirection.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/FlowDirection.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/FlowDirection.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/MainlineSpec.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/MainlineSpec.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/MainlineSpec.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/MainlineSpec.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/NetworkConfig$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/NetworkConfig$.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/NetworkConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/NetworkConfig.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/NetworkConfig.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/NetworkConfig.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/RampMode.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/RampMode.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/RampMode.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/RampMode.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/RampSpec.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/RampSpec.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/RampSpec.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/RampSpec.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/SensorSpec.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/SensorSpec.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/SensorSpec.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/config/SensorSpec.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/BankModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/BankModel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/BankModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/BankModel.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/CallCenterModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/CallCenterModel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/CallCenterModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/CallCenterModel.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/EmerDeptModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/EmerDeptModel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/EmerDeptModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/EmerDeptModel.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/MachineModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/MachineModel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/MachineModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/MachineModel.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Pathway.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Pathway.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Pathway.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Pathway.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Recorder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Recorder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Recorder.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Recorder.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/VTransport.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/VTransport.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/VTransport.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/VTransport.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Vehicle$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Vehicle$.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Vehicle.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Vehicle.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Vehicle.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/Vehicle.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/BuiltCorridor.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/BuiltCorridor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/BuiltCorridor.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/BuiltCorridor.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/BuiltNetwork.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/BuiltNetwork.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/BuiltNetwork.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/BuiltNetwork.tasty" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/CorridorBuilder$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/CorridorBuilder$.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/CorridorBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/CorridorBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/CorridorBuilder.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/builder/CorridorBuilder.tasty" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayPathwayTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayPathwayTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayPathwayTest.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayPathwayTest.tasty" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayRouteTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayRouteTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayRouteTest.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayRouteTest.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayStreetModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayStreetModel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayStreetModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayStreetModel.tasty" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayVehicleModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayVehicleModel.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayVehicleModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_1/OneWayVehicleModel.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_MIR/BankModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_MIR/BankModel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_MIR/BankModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/example_MIR/BankModel.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3$.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3$package.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3$package.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3$package.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3$package.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/CalRoute101_3.tasty" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$package$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$package$.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$Car.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$Car.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$package.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$package.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$package.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel$package.tasty" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/EatonFireModel.tasty" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/runCalRoute101_3.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/runCalRoute101_3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/runCalRoute101_3.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/runCalRoute101_3.tasty" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/runEatonFireModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/runEatonFireModel.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/runEatonFireModel.tasty" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-3.8.2/classes/scalation/simulation/process/model/runEatonFireModel.tasty" afterDir="false" />
     </list>
@@ -129,6 +98,9 @@
       <entry key="chat-panel" value="Claude Opus 4.6" />
       <entry key="agent-panel" value="Claude Opus 4.6" />
     </selectedModels>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="1468" />
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
@@ -212,6 +184,9 @@
     "Application.dormandPrinceTest3.executor": "Run",
     "Application.eval.executor": "Run",
     "Application.jacksonNetTest.executor": "Run",
+    "Application.lwrPDETest.executor": "Run",
+    "Application.lwrPDETest2.executor": "Run",
+    "Application.lwrPDETest3.executor": "Run",
     "Application.metaModelTRTest.executor": "Run",
     "Application.nelderMeadSimplex2Test.executor": "Run",
     "Application.plotPemsVsSimulation.executor": "Run",
@@ -224,7 +199,7 @@
     "Application.runBank.executor": "Run",
     "Application.runCalRoute101.executor": "Run",
     "Application.runCalRoute101_2.executor": "Run",
-    "Application.runCalRoute101_3.executor": "Debug",
+    "Application.runCalRoute101_3.executor": "Run",
     "Application.runCalibrate_Compare.executor": "Run",
     "Application.runCalibrate_GSRS_TTS.executor": "Run",
     "Application.runCalibrate_NelderMead.executor": "Run",
@@ -243,6 +218,7 @@
     "Application.testCorridorSwitch.executor": "Run",
     "Application.testEatonCorridorCoords.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -320,9 +296,9 @@
       <recent name="C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\config" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.runEatonFireModel">
-    <configuration name="dormandPrinceTest3" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="scalation.dynamics.dormandPrinceTest3" />
+  <component name="RunManager" selected="Application.runCalRoute101_3">
+    <configuration name="lwrPDETest" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="scalation.dynamics.lwrPDETest" />
       <module name="scalation.main" />
       <extension name="coverage">
         <pattern>
@@ -334,12 +310,25 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="runArrivalSourceTest" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="scalation.simulation.process.arrival.runArrivalSourceTest" />
+    <configuration name="lwrPDETest2" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="scalation.dynamics.lwrPDETest2" />
       <module name="scalation.main" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="scalation.simulation.process.arrival.*" />
+          <option name="PATTERN" value="scalation.dynamics.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="lwrPDETest3" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="scalation.dynamics.lwrPDETest3" />
+      <module name="scalation.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="scalation.dynamics.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -373,26 +362,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="testEatonCorridorCoords" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="scalation.simulation.process.config.testEatonCorridorCoords" />
-      <module name="scalation.main" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="scalation.simulation.process.config.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.runEatonFireModel" />
         <item itemvalue="Application.runCalRoute101_3" />
-        <item itemvalue="Application.runArrivalSourceTest" />
-        <item itemvalue="Application.testEatonCorridorCoords" />
-        <item itemvalue="Application.dormandPrinceTest3" />
+        <item itemvalue="Application.lwrPDETest3" />
+        <item itemvalue="Application.lwrPDETest2" />
+        <item itemvalue="Application.lwrPDETest" />
+        <item itemvalue="Application.runEatonFireModel" />
       </list>
     </recent_temporary>
   </component>
@@ -567,6 +543,9 @@
       <workItem from="1774506302591" duration="19436000" />
       <workItem from="1774626538367" duration="72000" />
       <workItem from="1774631109785" duration="64286000" />
+      <workItem from="1788272270799" duration="749000" />
+      <workItem from="1788386327297" duration="3597000" />
+      <workItem from="1788401438051" duration="10280000" />
     </task>
     <servers />
   </component>

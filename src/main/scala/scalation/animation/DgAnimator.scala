@@ -131,13 +131,16 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     /** Set the corridor speed limit (mph) displayed on road signs.  Default 65. */
     def setHudSpeedLimit (mph: Int): Unit = hudSpeedLimitMph = mph
 
-    /** Push live throughput (veh/hr) and average speed (m/s) for HUD display. */
-    def updateHudStats (throughput: Double, avgSpeed: Double): Unit =
-        hudThroughput = throughput
-        hudAvgSpeed   = avgSpeed
+    /** Push live traffic state for HUD display.
+     *  @param flow            corridor flow q = sum of k*v over segments (veh/hr)
+     *  @param spaceMeanSpeed  space-mean speed v_s over all on-road vehicles (m/s)
+     */
+    def updateHudStats (flow: Double, spaceMeanSpeed: Double): Unit =
+        hudThroughput = flow
+        hudAvgSpeed   = spaceMeanSpeed
     end updateHudStats
 
-    /** Push per-segment density values (veh/km) for the mini bar chart.
+    /** Push per-segment density values (veh/km per lane) for the mini bar chart.
      *  @param densities  array of densities, one per segment
      *  @param labels     optional short labels for each segment
      */
@@ -741,8 +744,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             val wallHr12 = { val h = wallHr24 % 12; if h == 0 then 12 else h }
             lines.addOne ((f"Clock:  $wallHr12%d:$wallMin%02d $ampm  ($clock%,.0f s)", fgColor, false))
             lines.addOne ((s"Vehicles:  $onRoad on-road  /  $totalActorCount total", fgColor, false))
-            lines.addOne ((f"Throughput: $hudThroughput%,.0f veh/hr", fgColor, false))
-            lines.addOne ((f"Avg Speed:  $hudAvgSpeed%.1f m/s  (${hudAvgSpeed * 2.237}%.0f mph)", fgColor, false))
+            lines.addOne ((f"Flow:       $hudThroughput%,.0f veh/hr", fgColor, false))
+            lines.addOne ((f"Space-Mean Speed: $hudAvgSpeed%.1f m/s  (${hudAvgSpeed * 2.237}%.0f mph)", fgColor, false))
             lines.addOne ((f"Playback:   ${speedFactor}%.2fx", fgColor, false))
 
             if paused.get () then lines.addOne (("▐▐  PAUSED", red, true))
@@ -760,7 +763,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             val hasDensity = densities != null && densities.nonEmpty
             if hasDensity then
                 lines.addOne (("", fgColor, false))
-                lines.addOne (("Segment Density (veh/km)", fgColor, true))
+                lines.addOne (("Segment Density (veh/km/lane)", fgColor, true))
 
             // ── Measure box size ────────────────────────────────────────────
             g2d.setFont (hudFont)

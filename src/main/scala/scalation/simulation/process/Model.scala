@@ -262,25 +262,28 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
                     segLabels += vt.name
                 case _ =>   // ignore non-transport parts
 
-        // -- per-segment density (veh/km) and aggregate speed ----------------
+        // -- traffic state per lane-segment (see context/traffic-state-spec.md) --
+        // Each VTransport is one lane x one section, so its density and flow are
+        // per lane.  Speed is vehicle-weighted across segments, which keeps it a
+        // space-mean speed for the network; flow is summed to a corridor total.
         var totalVehicles = 0
         var sumVelocity   = 0.0
+        var sumFlow       = 0.0
         val densities     = new Array [Double] (vtSegs.length)
 
         for i <- vtSegs.indices do
-            val vt    = vtSegs(i)
-            val nVeh  = vt.vdeque.size
-            val lenKm = vt.length / 1000.0                     // convert metres → km
-            densities(i) = if lenKm > 0.0 then nVeh.toDouble / lenKm else 0.0
+            val vt   = vtSegs(i)
+            val nVeh = vt.vdeque.size
+            densities(i)   = vt.density                        // veh/km per lane
+            sumFlow       += vt.flow                           // veh/h per lane
             totalVehicles += nVeh
-            for v <- vt.vdeque do sumVelocity += v.velocity
+            sumVelocity   += vt.spaceMeanSpeed * nVeh          // weight by occupancy
         end for
 
-        val avgSpeed   = if totalVehicles > 0 then sumVelocity / totalVehicles else 0.0
-        val elapsed    = _clock - startTime
-        val throughput = if elapsed > 0.0 then numActors / (elapsed / 3600.0) else 0.0   // veh/hr
+        // space-mean speed over every vehicle currently on the modelled segments
+        val spaceMeanSpeed = if totalVehicles > 0 then sumVelocity / totalVehicles else 0.0
 
-        dgAni.updateHudStats (throughput, avgSpeed)
+        dgAni.updateHudStats (sumFlow, spaceMeanSpeed)
         if vtSegs.nonEmpty then
             dgAni.updateSegmentDensities (densities, segLabels.toArray)
     end pushHudStats

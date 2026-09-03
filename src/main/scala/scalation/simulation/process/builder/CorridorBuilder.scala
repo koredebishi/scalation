@@ -149,6 +149,32 @@ object CorridorBuilder:
         debug ("build", s"route: ${route.pathway.length} pathways, " +
                         s"${intermediateJunc.length} intermediate junctions")
 
+        // ── Step 3b: physical segment lengths ───────────────────────────────
+        // A VTransport otherwise defaults its length to the on-screen curve --
+        // i.e. PIXELS -- which would tie travel time, density and car-following
+        // gaps to the animation canvas size.  Where the config carries real
+        // lengths (metres, from postmile differences) use those instead.
+        config.mainline.segmentLengths match
+            case Some (segLens) =>
+                cfor (0, nSegments) { j =>
+                    // Descending builds junctions in reverse postmile order, so
+                    // model segment j is postmile segment nSegments-1-j.
+                    val pmSeg = direction match
+                        case FlowDirection.Ascending  => j
+                        case FlowDirection.Descending => nSegments - 1 - j
+                    val metres = segLens(pmSeg)
+                    for pw <- route.pathway do
+                        val s = pw.seg(j)
+                        if s != null then s.length = metres
+                    end for
+                }
+                debug ("build", s"segment lengths (m) from postmiles: " +
+                                s"${segLens.toString}")
+            case None =>
+                debug ("build", "no segmentLengths in config -- VTransport lengths " +
+                                "stay in SCREEN units (pixels)")
+        end match
+
         // ── Step 4: Sinks ───────────────────────────────────────────────────
         // Positioned near the exit end (junc.last) with a small offset.
 

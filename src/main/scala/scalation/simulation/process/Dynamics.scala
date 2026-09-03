@@ -323,18 +323,31 @@ object IDMDynamics
         val car_ahead = if ref != null then ref.elem else null
         val dt = rt
 
-        // Snapshot leader state (frozen during integration)
+        // Snapshot leader state (frozen during integration).
+        // Spacing comes from `corridorPos`, a frame shared by every vehicle in
+        // the lane; t_disp counts from each vehicle's own origin and cannot be
+        // differenced across a merge.  The leader is then placed `spacing` ahead
+        // on the follower's own t_disp scale, so the integrator is unaffected.
         val (x_leader, v_leader): (Double, Double) =                // leader's (position, velocity)
             if car_ahead == null then
                 (car.t_disp + 1000.0, car.velocity)                 // no leader: free-flow
-            else if car_ahead.segId < car.segId then
-                (car.t_disp + 1000.0, car.velocity)                 // leader is behind (stale DLL node): free-flow
-            else if car_ahead.t_disp - car.t_disp > FREERANGE then
-                (car.t_disp + 1000.0, car.velocity)                 // leader is far ahead: free-flow
             else
-                (car_ahead.t_disp, car_ahead.velocity)              // real leader: use it
+                val spacing = car_ahead.corridorPos - car.corridorPos
 
-        // ─────────────────────────────────────────────────────────────────────────
+                // TEMP DIAG: a negative spacing now means one thing only -- this
+                // pair is genuinely out of order in the list.  Delete when done.
+                if spacing < 0.0 then
+                    println (f"[gap<0] ${car.displayLabel}%-16s seg=${car.segId}%2d lane=${car.laneID}%d " +
+                             f"pos=${car.corridorPos}%9.1f v=${car.velocity}%5.1f vmax=${car.vmax}%5.1f  |  " +
+                             f"ldr=${car_ahead.displayLabel}%-16s seg=${car_ahead.segId}%2d lane=${car_ahead.laneID}%d " +
+                             f"pos=${car_ahead.corridorPos}%9.1f v=${car_ahead.velocity}%5.1f  |  " +
+                             f"spacing=${spacing}%9.1f")
+
+                if spacing < 0.0 || spacing > FREERANGE then
+                    (car.t_disp + 1000.0, car.velocity)             // mis-ordered, or far ahead: free-flow
+                else
+                    (car.t_disp + spacing, car_ahead.velocity)      // real leader, true spacing
+
         // STEP 2: Save old state for history tracking
         // ─────────────────────────────────────────────────────────────────────────
         val v_old = car.velocity
@@ -440,9 +453,18 @@ object IDMDynamics
         car.o_t_disp   = x_old                                          // save old position
 
         // ─────────────────────────────────────────────────────────────────────────
-        // STEP 7: Segment-bounded displacement update
+        // STEP 7: Segment-bounded, collision-free displacement update
         // ─────────────────────────────────────────────────────────────────────────
-        val dx = x_new - x_old                                         // change in position
+        // IDM is collision-free in continuous time, not under a coarse fixed step:
+        // with dt = 0.5 s a vehicle covers ~13 m per tick and can step straight
+        // through a slowing leader.  Bound the new position so it never reaches
+        // the leader's rear bumper.  Inert in the free-flow branches, where
+        // x_leader is car.t_disp + 1000.0 and far out of reach.
+        var x_safe = x_new
+        if car_ahead != null && x_leader - x_safe < len then
+            x_safe = max (x_old, x_leader - len)                       // hold, never reverse
+
+        val dx = x_safe - x_old                                        // change in position
         val proposed_disp = car.disp + dx                              // proposed new displacement
         val new_disp = if proposed_disp <= length then proposed_disp else length           // clamp to segment length
 

@@ -74,13 +74,45 @@ class VTransport (name: String, from_ : Component, to_ : Component,
     end getLast
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the instantaneous traffic density on this segment.
-     *  density k = number of vehicles on segment / segment length  (veh/m)
-     *  Called from driveHighway after each move() to snapshot the segment state.
+    // TRAFFIC STATE  (see context/traffic-state-spec.md)
+    // A VTransport is one lane x one section, so every quantity here is PER LANE.
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    /** Instantaneous traffic density on this segment.
+     *      k = n / L
+     *  where n is the number of vehicles occupying the segment right now and L
+     *  is its length.  A spatial measurement: it needs the whole section at one
+     *  moment, which is what `vdeque` holds.
+     *  @return density in veh/km per lane
      */
-    def snapshotDensity (): Double =
-        if length > 0.0 then vdeque.size.toDouble / length else 0.0
-    end snapshotDensity
+    def density: Double =
+        val lenKm = length / 1000.0                        // metres -> km
+        if lenKm > 0.0 then vdeque.size.toDouble / lenKm else 0.0
+    end density
+
+    /** Space-mean speed on this segment.
+     *      v_s = (1/n) * sum v_i        over the n vehicles on the segment now
+     *  The arithmetic mean is correct because the sample is spatial -- averaging
+     *  the speeds of the cars occupying a section at one instant IS the
+     *  space-mean speed.  Do not substitute a time-mean speed (mean of spot
+     *  speeds at a detector): v_t >= v_s (Wardrop), and only v_s satisfies
+     *  q = k * v.  Stopped vehicles belong in the average.
+     *  @return space-mean speed in m/s (0.0 when the segment is empty)
+     */
+    def spaceMeanSpeed: Double =
+        if vdeque.isEmpty then 0.0
+        else
+            var sum = 0.0
+            for v <- vdeque do sum += v.velocity
+            sum / vdeque.size
+    end spaceMeanSpeed
+
+    /** Modelled traffic flow on this segment, from the fundamental relation
+     *      q = k * v_s
+     *  The 3.6 converts veh/km * m/s to veh/h.
+     *  @return flow in veh/h per lane
+     */
+    def flow: Double = density * spaceMeanSpeed * 3.6
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -137,7 +169,11 @@ class VTransport (name: String, from_ : Component, to_ : Component,
     end move
 
     def calcPoint2(s: Double): Array[Double] =
-        curve.traj = s / curve.length // percentage of the curve the car has traveled thus far.
+        // Fraction of the segment travelled.  Normalise by `length` (the PHYSICAL
+        // length, metres where the config supplies it) -- not by curve.length,
+        // which is the on-screen pixel length.  Using the wrong one sends traj
+        // outside [0, 1] and the token leaves the road.
+        curve.traj = if length > 0.0 then s / length else 0.0
         val xy = curve.eval()
         Array(xy.x, xy.y)
     end calcPoint2
@@ -149,7 +185,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
      * @param s the current displacement along the road of the vehicle.
      */
     def calcPoint(s: Double): Array[Double] =
-        val prop = s / curve.length
+        val prop = if length > 0.0 then s / length else 0.0     // physical length, not pixels
         val x = p1(0) + (p2(0) - p1(0)) * prop
         val y = p1(1) + (p2(1) - p1(1)) * prop
         Array(x - RAD, y - RAD)

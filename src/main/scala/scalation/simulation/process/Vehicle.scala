@@ -79,6 +79,24 @@ abstract class Vehicle (name_ : String, director: Model)
         if ref != null then ref.elem else null
     end getCarBehind
     
+    /** Position within the structure that currently holds this vehicle, in a
+     *  frame shared by every vehicle in that structure -- so the difference
+     *  between two of them is a true spacing.
+     *
+     *  On a lane: distance from the lane entry, `cumLen(segId) + disp`.
+     *  On a `Ramp` or `FFConnector`: those own a single VTransport, and `move`
+     *  zeroes `disp` on entry, so `disp` is already that shared frame.
+     *
+     *  `t_disp` cannot serve either case: it counts from each vehicle's own
+     *  source, so vehicles that entered at different points carry unrelated
+     *  origins.  On an FF connector, where cars arrive from every lane after
+     *  driving different distances, differencing t_disp is meaningless.
+     */
+    def corridorPos: Double =
+        if myPathway != null then myPathway.corridorPos (segId, disp)
+        else disp                          // ramp / FF connector: one segment
+    end corridorPos
+
     inline def gapToLeader: Double =
         val leader = getCarAhead(this)
         if leader != null then leader.disp - this.disp - Vehicle.len else 0.0

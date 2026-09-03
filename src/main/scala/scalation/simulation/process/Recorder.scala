@@ -60,7 +60,7 @@ trait Recorder (nt: Int = 60, nLanes: Int = 4):
     /** Record instantaneous density for a segment at the current clock time.
      *  Accumulates samples within each interval and averages them at flush.
      *  @param ctime    the current simulation clock time
-     *  @param density  instantaneous density snapshot (veh/m) from VTransport.snapshotDensity()
+     *  @param density  instantaneous density snapshot (veh/km per lane) from VTransport.density
      *  @param segCol   the column index in r_density to write to (caller maps seg → col)
      */
     def recordDensity (ctime: Double, density: Double, segCol: Int): Unit =
