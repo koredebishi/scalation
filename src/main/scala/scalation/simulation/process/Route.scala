@@ -15,7 +15,7 @@ package process
 
 
 import scalation.mathstat.VectorD
-import scala.math.{min,abs}
+import scala.math.abs
 //import scalation.random.Variate
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -101,22 +101,33 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         val safeDisp = fromPath.seg(seg).safetydist
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        // vehicles to check in target lane
-        val vBehind = toPath.seg(seg).getFirst // car behind in same seg
-        val vAhead = if seg + 1 < toPath.seg.length
-            then toPath.seg(seg + 1).getLast else null
+        // Where the vehicle lands in the target lane.  Every lane of a Route is
+        // built from the same junction list, so the lanes share a segment layout
+        // and `corridorPos` carries across unchanged.
+        val pos = actor.corridorPos
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        // compute bumper-to-bumper gaps
-        val gapBehind = if vBehind != null then actor.disp - vBehind.disp else safeDisp
+        // Neighbours in the TARGET lane, read from that lane's list.  NOT from a
+        // segment `vdeque`: a deque holds only the cars currently inside
+        // `seg.move()`, so it misses a neighbour one segment away and returns
+        // null -- which `addToAlist` reads as "front of the whole lane".  A lane
+        // change is mid-segment, so the search starts at `pos`, not at a segment
+        // boundary.  With the leader in hand the follower is one hop back.
+        val vAhead  = toPath.leaderAt (pos)
+        val vBehind = if vAhead != null then vAhead.follower else toPath.getLast
 
-        val nextSeg = min(seg + 1, toPath.seg.length - 1)
-
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // Bumper-to-bumper gaps, both in the one `corridorPos` frame.  Every
+        // vehicle in a lane's list has a position (see `Pathway.addToAlist`), so
+        // both neighbours are read unguarded.
         val gapAhead =
-            if vAhead != null then toPath.seg(nextSeg).length - vAhead.disp - Vehicle.len
-            else safeDisp
+            if vAhead != null then vAhead.corridorPos - pos - Vehicle.len
+            else Double.PositiveInfinity
 
-        val gap = min(gapBehind, gapAhead)
+        val gapBehind =
+            if vBehind != null then pos - vBehind.corridorPos - Vehicle.len
+            else Double.PositiveInfinity
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         // feasibility check
         success &&= gapBehind >= safeDisp && gapAhead >= safeDisp
@@ -144,24 +155,25 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
      */
     def forceMerge(l1:Int, availLanes: Range, car: Vehicle, seg:Int): Int =
 
-        //fllfflf
         val fromPath = pathway(l1) // current Pathway  (lane l1)
         var bestLane = -1     // initialize best lane to -1 (no best lane found for now)
         var minGap = -1.0      //fromPath.seg(seg).safetydist  // initialize minGap to a large value
 
+        val pos = car.corridorPos    // where the car lands in whichever lane it picks
 
         // look for the best lane to merge into using max space availability as the criteria
         cfor(availLanes){ i =>
             if pathway(i) != null then
-                //val vAhead = pathway(i).seg(seg+1).getLast     // the vehicle ahead is the vehicle in the connecting segment and that vehcle is in seg+1
-                val nextSeg = min(seg + 1, pathway(i).seg.length - 1)  // ensure we don't go out of bounds
-                val vAhead  = pathway(i).seg(nextSeg).getLast   // vehicle ahead in next seg, check for null pathway first
+                // Leader from lane i's list, searched from the car's own position.
+                // A segment vdeque cannot answer this: it holds only the cars
+                // currently inside seg.move(), so it misses a leader one segment
+                // downstream and reports the lane as wide open.
+                val vAhead = pathway(i).leaderAt (pos)
 
                 // compute the gap ahead:
                 // if there is no vehicle ahead, then the gap is infinite
-                //else the gap is the distance from the start of the next segment to the vehicle ahead's rear bumper
                 val gapAhead = if vAhead == null then Double.PositiveInfinity
-                else pathway(i).seg(seg + 1).length - (vAhead.disp - Vehicle.len)
+                else vAhead.corridorPos - pos - Vehicle.len
 
                 if gapAhead > minGap then
                     minGap = gapAhead
@@ -177,10 +189,11 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         val changed = adjacent && changeLane(l1, bestLane, car, seg)   // try standard lane change
         if changed then return bestLane    // successful standard lane change
 
-        // force insert even if safety fails (lane ends)
+        // force insert even if safety fails (lane ends).  The safety check is
+        // what is being skipped here -- the ordering is not: the car still has
+        // to land in the right place in the target lane's list.
         val toPath = pathway(bestLane)
-        val nextSeg = min(seg + 1, toPath.seg.length - 1)
-        val vAhead = toPath.seg(nextSeg).getLast
+        val vAhead = toPath.leaderAt (pos)
 
         fromPath.removeFromAlist(car)
         car.laneID = bestLane

@@ -773,10 +773,24 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             val maxW    = lines.map { case (txt, _, bold) =>
                 if bold then fmBold.stringWidth (txt) else fmPlain.stringWidth (txt)
             }.max
+            // Gutter for the segment labels, MEASURED rather than assumed.  A
+            // hardcoded 45 px is narrower than a label like "Rte_seg0" at this
+            // font, so the bar used to start on top of the label text.
+            val densityFont = new Font ("SansSerif", java.awt.Font.PLAIN, 12)
+            g2d.setFont (densityFont)
+            val fmDens = g2d.getFontMetrics
+            val labelGutter =
+                if hasDensity && segLabels.nonEmpty then segLabels.map (fmDens.stringWidth).max + 10
+                else 50
+
+            // Clear the descenders of the "Segment Density" header: the bars are
+            // placed from the header's BASELINE, so a 4 px offset overlapped it.
+            val densityGap = 12
+
             // ensure box is wide enough for density bars
-            val densityRowW = if hasDensity then 50 + barMaxW + 40 else 0    // label + bar + value
+            val densityRowW = if hasDensity then labelGutter + barMaxW + 40 else 0   // label + bar + value
             val boxW = math.max (maxW, densityRowW) + pad * 2 + 12
-            val densityH = if hasDensity then densities.length * (barH + 6) + 4 else 0
+            val densityH = if hasDensity then densities.length * (barH + 6) + densityGap else 0
             val boxH = lines.length * lineH + pad * 2 + densityH
 
             // ── Semi-transparent background with AlphaComposite ─────────────
@@ -802,10 +816,9 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             // ── Draw segment density mini bar chart ─────────────────────────
             if hasDensity then
                 val maxDensity = math.max (1.0, densities.max)  // avoid div-by-zero
-                val startY = pad + lines.length * lineH + 4
+                val startY = pad + lines.length * lineH + densityGap
                 val labelX = pad + pad / 2
-                g2d.setFont (new Font ("SansSerif", java.awt.Font.PLAIN, 12))
-                val fm12 = g2d.getFontMetrics
+                g2d.setFont (densityFont)
 
                 for i <- densities.indices do
                     val y = startY + i * (barH + 6)
@@ -815,7 +828,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                     g2d.drawString (lbl, labelX, y + barH - 1)
 
                     // bar
-                    val barX = labelX + 45
+                    val barX = labelX + labelGutter
                     val ratio = densities (i) / maxDensity
                     val bw = (ratio * barMaxW).toInt
                     // color: green (low) → yellow → red (high jam density ~150 veh/km)

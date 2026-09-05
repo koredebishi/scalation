@@ -68,7 +68,37 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     initComponent(name, Array())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add a vehicle to the correct pathway's doubly linked list.
+    /** Join this lane at the START of segment `segIdx` -- what a vehicle entering
+     *  from a source, a ramp or a connector does.
+     *
+     *  `vList` is a single file ordered by position, so a member must HAVE a
+     *  position: `corridorPos` is `cumLen(segId) + disp`, and a vehicle that has
+     *  not run `move()` yet still carries `segId = -1` (index -1 into `cumLen`)
+     *  or, off a ramp, a `disp` measured in the ramp's frame.  Either way the
+     *  vehicle is unplaceable and unreadable as a leader.
+     *
+     *  `VTransport.move` normally owns `segId`/`disp` and sets exactly this, but
+     *  it runs AFTER the join, and every leader search in between falls in the
+     *  gap.  So the position is taken here, in the one place that admits a
+     *  vehicle to a lane, rather than at each call site.
+     *
+     *  A lane change does NOT use this: that vehicle is mid-segment and already
+     *  positioned, so it calls `addToAlist` directly and keeps its `disp`.
+     *
+     *  @param actor   the vehicle to add
+     *  @param other   the vehicle ahead of it (null if none)
+     *  @param segIdx  the segment it joins at
+     */
+    def joinAt (actor: Vehicle, other: Vehicle, segIdx: Int): Unit =
+        actor.segId = segIdx
+        actor.disp  = 0.0
+        addToAlist (actor, other)
+    end joinAt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add a vehicle to this pathway's doubly linked list, at the position it
+     *  already holds.  Use `joinAt` when the vehicle is entering the lane and has
+     *  no position in it yet.
      *  @param actor  the vehicle to add
      *  @param other  the other vehicle (the one ahead, null if none)
      */
@@ -142,15 +172,35 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
      *  @param segIdx  the segment where the vehicle joins the lane
      *  @return the vehicle to merge in behind, or null when the lane is clear ahead
      */
-    def mergeLeaderAt (segIdx: Int): Vehicle =
-        val pos = cumLen(segIdx)                             // entering at disp 0 of segIdx
-        var n   = vList.lastNode                             // tail = furthest upstream
+    def mergeLeaderAt (segIdx: Int): Vehicle = leaderAt (cumLen(segIdx))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The nearest vehicle AHEAD of position `pos` in this lane -- the car to be
+     *  inserted behind in `vList`.
+     *
+     *  `mergeLeaderAt` covers a ramp or connector, which always joins at `disp`
+     *  0 of a segment.  A lane change happens MID-segment, so it must pass the
+     *  changing vehicle's own `corridorPos`: searching from the segment start
+     *  would return a car the vehicle has already driven past.
+     *
+     *  Every member of `vList` has a valid position -- see `addToAlist` -- so this
+     *  reads `corridorPos` unguarded.  If that ever throws on `cumLen(-1)`, a
+     *  caller joined the list without taking up a position first; fix the caller,
+     *  do not add a skip here.  A silent skip would let a positionless vehicle sit
+     *  in the file invisible to every leader search around it.
+     *
+     *  @param pos  the entry position, in the lane's `corridorPos` frame
+     *  @return the vehicle to merge in behind, or null when the lane is clear ahead
+     */
+    def leaderAt (pos: Double): Vehicle =
+        var n = vList.lastNode                               // tail = furthest upstream
         while n != null do
-            if n.elem.corridorPos > pos then return n.elem   // first vehicle ahead of me
+            val v = n.elem
+            if v.corridorPos > pos then return v             // first vehicle ahead of me
             n = n.ahead
         end while
         null                                                 // nothing ahead in this lane
-    end mergeLeaderAt
+    end leaderAt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the first vehicle in this pathway.

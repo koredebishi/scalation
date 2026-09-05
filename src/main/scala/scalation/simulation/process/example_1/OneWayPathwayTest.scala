@@ -81,7 +81,7 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
 
             val carAhead = lane.getLast // Follow the last vehicle in the lane
             println(s"act: carAhead = $carAhead")
-            lane.addToAlist(this, carAhead) // Join the doubly linked list
+            lane.joinAt(this, carAhead, 0) // Join the doubly linked list at seg 0
 
 
             //:::::::Move through junctions

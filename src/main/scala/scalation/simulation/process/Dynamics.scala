@@ -319,34 +319,81 @@ object IDMDynamics
      *  @param length  the segment length
      */
     def updateM(car: Vehicle, length: Double): Unit =
-        val ref = car.myPathNode.ahead
-        val car_ahead = if ref != null then ref.elem else null
+        val car_ahead = car.leader                              // one hop in the lane's list
         val dt = rt
 
-        // Snapshot leader state (frozen during integration).
-        // Spacing comes from `corridorPos`, a frame shared by every vehicle in
-        // the lane; t_disp counts from each vehicle's own origin and cannot be
-        // differenced across a merge.  The leader is then placed `spacing` ahead
-        // on the follower's own t_disp scale, so the integrator is unaffected.
-        val (x_leader, v_leader): (Double, Double) =                // leader's (position, velocity)
+        // Gap to the leader, in `corridorPos` -- a frame shared by every vehicle
+        // in the lane.  t_disp counts from each vehicle's own origin and cannot
+        // be differenced across a merge.  NaN means there is no leader at all.
+        // A leader in the list always HAS a position (see `Pathway.addToAlist`),
+        // so `corridorPos` is read unguarded.
+        val spacing: Double =
             if car_ahead == null then
-                (car.t_disp + 1000.0, car.velocity)                 // no leader: free-flow
+                // No pairing this tick, so the next one counts as fresh.
+                car.o_leaderLabel = ""
+                car.o_spacing     = Double.NaN
+                Double.NaN
             else
-                val spacing = car_ahead.corridorPos - car.corridorPos
+                car_ahead.corridorPos - car.corridorPos
 
-                // TEMP DIAG: a negative spacing now means one thing only -- this
-                // pair is genuinely out of order in the list.  Delete when done.
-                if spacing < 0.0 then
-                    println (f"[gap<0] ${car.displayLabel}%-16s seg=${car.segId}%2d lane=${car.laneID}%d " +
-                             f"pos=${car.corridorPos}%9.1f v=${car.velocity}%5.1f vmax=${car.vmax}%5.1f  |  " +
-                             f"ldr=${car_ahead.displayLabel}%-16s seg=${car_ahead.segId}%2d lane=${car_ahead.laneID}%d " +
-                             f"pos=${car_ahead.corridorPos}%9.1f v=${car_ahead.velocity}%5.1f  |  " +
-                             f"spacing=${spacing}%9.1f")
+        if !spacing.isNaN then
 
-                if spacing < 0.0 || spacing > FREERANGE then
-                    (car.t_disp + 1000.0, car.velocity)             // mis-ordered, or far ahead: free-flow
-                else
-                    (car.t_disp + spacing, car_ahead.velocity)      // real leader, true spacing
+            // ── DIAG (temporary) ────────────────────────────────────────
+            // INVARIANT: the list is ordered by position, so a leader is
+            // never behind its follower.  Print only the tick where spacing
+            // FIRST goes negative -- printing every tick after that says
+            // nothing new and buries the one line that matters.
+            //
+            // Reading it: spacing cannot walk from positive to negative,
+            // because the clamp in STEP 7 pins a tracked follower `len`
+            // behind its leader, and at rt = 0.5 s a car covers ~15 m, far
+            // short of FREERANGE.  So a flip is discontinuous, and which
+            // kind it is tells us where to look:
+            //   LEADER CHANGED             -> a splice or removal re-paired
+            //                                 this car; an insert is wrong
+            //   same leader, prev small    -> the pair drove through each
+            //                                 other; the STEP 7 clamp leaks
+            //   same leader, prev > 150    -> a corridorPos jumped; check
+            //                                 the cumLen dump for pixels
+            // NaN starts the run, and !(NaN < 0.0) is true, so a pairing
+            // that is negative on its very first tick also fires here.
+            val flipped = spacing < 0.0 && !(car.o_spacing < 0.0)
+            if flipped then
+                val repaired = car_ahead.displayLabel != car.o_leaderLabel
+                val verdict  = if repaired then "LEADER CHANGED" else "same leader"
+                val prevLdr  = if car.o_leaderLabel.isEmpty then "<none>" else car.o_leaderLabel
+                val lens     = if car.myPathway != null then car.myPathway.cumLen.mkString(", ")
+                               else "<no pathway>"
+                println (f"[flip] ${car.displayLabel}%-14s lane=${car.laneID}%d  $verdict")
+                println (f"   prev: ldr=$prevLdr%-14s spacing=${car.o_spacing}%9.1f")
+                println (f"   now : ldr=${car_ahead.displayLabel}%-14s spacing=${spacing}%9.1f")
+                println (f"   me  : seg=${car.segId}%2d disp=${car.disp}%8.1f " +
+                         f"pos=${car.corridorPos}%9.1f v=${car.velocity}%5.1f vmax=${car.vmax}%5.1f")
+                println (f"   ldr : seg=${car_ahead.segId}%2d disp=${car_ahead.disp}%8.1f " +
+                         f"pos=${car_ahead.corridorPos}%9.1f v=${car_ahead.velocity}%5.1f")
+                println (s"   cumLen=[$lens]")
+            end if
+
+            car.o_leaderLabel = car_ahead.displayLabel
+            car.o_spacing     = spacing
+            // ── end DIAG ────────────────────────────────────────────────
+        end if
+
+        // A leader BEHIND its follower is not an open road.  It used to share the
+        // free-flow branch with `spacing > FREERANGE`, which handed the car a
+        // leader 1000 m ahead and let it accelerate straight through the real
+        // one -- so a fractional overlap became a permanent overtake that could
+        // never recover, since the gap only grew more negative.  Hold instead.
+        val blocked = spacing < 0.0                                 // false when NaN
+
+        // Snapshot leader state (frozen during integration).  The leader is
+        // placed `spacing` ahead on the follower's own t_disp scale, so the
+        // integrator is unaffected by the change of frame.
+        val (x_leader, v_leader): (Double, Double) =                // leader's (position, velocity)
+            if spacing.isNaN || spacing > FREERANGE then
+                (car.t_disp + 1000.0, car.velocity)                 // no leader, or far ahead: free-flow
+            else
+                (car.t_disp + spacing, car_ahead.velocity)          // real leader, true spacing
 
         // STEP 2: Save old state for history tracking
         // ─────────────────────────────────────────────────────────────────────────
@@ -360,6 +407,13 @@ object IDMDynamics
         */
         def idmAccel(x_n: Double, v_n: Double): Double =
             val b = abs(bmax)
+
+            // Leader behind: brake, never accelerate.  IDM has no defined answer
+            // here -- its gap term is (ss / Δx)^2 with Δx = xp - xn - sp, so a
+            // negative Δx is squared back into a plausible-looking number and a
+            // zero Δx gives Infinity, which the guard below turns into 0.0 (coast).
+            // Neither is braking.  Short-circuit instead of feeding it garbage.
+            if blocked then return -b
 
             // Call existing iDM with snapshotted leader state
             // iDM(an, bn, sp, Vn, xn, vn, xp, vp, T, s0, del)
@@ -424,11 +478,21 @@ object IDMDynamics
                 )
                 VectorD(x_new_b, v_new_b)
             case IntegratorType.Ballistic =>
-                // Ballistic: compute IDM acceleration once, then kinematic update
-                val a_idm = idmAccel(car.t_disp, car.velocity)
-                val v_ball = car.velocity + a_idm * dt   // v(t + dt) the new velocity
-                val x_ball = car.t_disp + car.velocity * dt + 0.5 * a_idm * dt * dt  // x(t + dt)
-                VectorD(x_ball, v_ball)  // construct new state vector
+                // Ballistic: compute IDM acceleration once, then kinematic update.
+                // A car that reaches v = 0 inside the step stops THERE and stays --
+                // the full kinematic term would carry it past the stopping point and
+                // backwards.  At v = 0 and a = -bmax that is 0.5*(-2.0)*0.25 = -0.25 m
+                // per tick, every tick, with nothing to stop it: the car reverses away
+                // from its leader until its own follower reads a negative gap.
+                val a_idm  = idmAccel(car.t_disp, car.velocity)
+                val v_ball = car.velocity + a_idm * dt              // v(t + dt)
+                val x_ball =
+                    if v_ball < 0.0 && a_idm < 0.0 then
+                        // stops mid-step: travel only the stopping distance v^2/(2|a|)
+                        car.t_disp + (car.velocity * car.velocity) / (2.0 * abs (a_idm))
+                    else
+                        car.t_disp + car.velocity * dt + 0.5 * a_idm * dt * dt
+                VectorD(x_ball, max (0.0, v_ball))     // never hand back a negative velocity
 
         // ─────────────────────────────────────────────────────────────────────────
         // STEP 5: Extract and clamp results
@@ -462,7 +526,14 @@ object IDMDynamics
         // x_leader is car.t_disp + 1000.0 and far out of reach.
         var x_safe = x_new
         if car_ahead != null && x_leader - x_safe < len then
-            x_safe = max (x_old, x_leader - len)                       // hold, never reverse
+            x_safe = max (x_old, x_leader - len)                       // hold, never reach the leader
+
+        // A vehicle never travels backwards, whatever the integrator returned.
+        // The clamp above only fires when the car is within `len` of its leader,
+        // so it cannot catch a reversal -- reversing moves the car AWAY from the
+        // leader, where that test is false.  This is the backstop, and it covers
+        // every integrator, not just Ballistic.
+        x_safe = max (x_old, x_safe)
 
         val dx = x_safe - x_old                                        // change in position
         val proposed_disp = car.disp + dx                              // proposed new displacement

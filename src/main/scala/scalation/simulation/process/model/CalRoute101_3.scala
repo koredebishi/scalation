@@ -177,18 +177,20 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
     case class Car () extends Vehicle ("c", this):
 
         override def act (): Unit =
+            //println (s"act: Car $this BEGINS")            // DIAG: ~56k vehicles, one line each
             if subtype < numLanes then
                 // Mainline entry - subtype 0 until numLanes
                 laneID = subtype
-                //debug ("Car.act", s"$me MAINLINE ENTRY: lane=$laneID, subtype=$subtype")
+                debug ("Act::: ", s"For $this actor in: lane: ${this.laneID}: LaneID Assigned")
+                junc(0).jump ()                             // wait at the junction first
                 val carAhead = route.pathway(laneID).getLast
-                route.pathway(laneID).addToAlist (this, carAhead)
-                junc(0).jump ()
+                //println (s"act: carAhead = $carAhead")
+                route.pathway(laneID).joinAt (this, carAhead, 0)
                 driveHighway ()
             else
                 // Ramp entry - subtype numLanes, numLanes+1, ...
                 laneID = numLanes - 1
-                //debug ("Car.act", s"$me RAMP ENTRY: rampIdx=${subtype - numLanes}, merging to lane=$laneID")
+                debug ("Act::: ", s"For $this actor in: lane: ${this.laneID}: LaneID Assigned")
                 val onRamp = ramps(subtype - numLanes)
                 driveRamp (onRamp)
                 driveHighway ()
@@ -199,13 +201,24 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
             //debug ("driveHighway", s"$me starting at seg=$joinSeg, lane=$laneID")
 
             if subtype >= numLanes then
-                val carAhead = route.pathway(laneID).seg(joinSeg).getLast
-                route.pathway(laneID).addToAlist (this, carAhead)
-                junc(joinSeg).jump ()
+                junc(joinSeg).jump ()                       // wait at the merge junction first
+                // lane-wide list: the car ahead may be in a downstream segment, so
+                // the leader comes from the DLL, never from seg(joinSeg)'s vdeque --
+                // an empty deque would return null, which addToAlist reads as
+                // "front of the whole lane" and would splice this car ahead of
+                // every vehicle downstream.  Looked up AFTER the jump, so it is
+                // not stale across the yield.
+                val carAhead = route.pathway(laneID).mergeLeaderAt (joinSeg)
+                //println (s"act: carAhead = $carAhead")
+                route.pathway(laneID).joinAt (this, carAhead, joinSeg)
             end if
 
             cfor (joinSeg, highway_length) { seg =>
-                // Deterministic lane change: if car ahead is slow, change lanes
+                // Deterministic lane change: if car ahead is slow, change lanes.
+                // NOTE: this is evaluated ONCE per segment, before move() runs, and
+                // move() then blocks for the whole segment.  A car that becomes
+                // blocked mid-segment cannot change lanes until the next segment --
+                // which on seg 0 means 1006 m away.
                 val carAhead = getCarAhead(this)
                 if carAhead != null && carAhead.velocity < 0.1 * vmax then
                     val target = if laneID > 0 then laneID - 1 else laneID + 1
@@ -218,7 +231,7 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
                     junc(seg + 1).jump ()
             }
 
-            //debug ("driveHighway", s"$me EXITING at ${sinks.head.name}, lane=$laneID")
+            //println (s"act: $this ENDS")
             route.pathway(laneID).removeFromAlist (this)
             sinks.head.leave ()
         end driveHighway
@@ -227,6 +240,7 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
             val r = comp.asInstanceOf [Ramp]
             //debug ("driveRamp", s"$me on ramp ${r.name}, mode=${r.mode}")
             val carAhead = r.getLast
+            //println (s"act: carAhead = $carAhead")
             r.addToAlist (this, carAhead)
 
             if r.mode == RampMode.On then

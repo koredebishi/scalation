@@ -31,7 +31,7 @@ import java.awt.geom.RoundRectangle2D
  */
 class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                esubtype: Int, units: Int,
-               iArrivalTime: Variate, loc: Array [Double])
+               iArrivalTime: Variate, loc: Array [Double], prefix: String = null)
     extends Source (name, director, null, esubtype, units, iArrivalTime, loc):
 
     private val debug = debugf ("VSource", false)                             // debug function
@@ -57,9 +57,11 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
      * @return "M" for mainline (subtype == 0), else "R<subtype>" (e.g., R1, R2)
      * Used by: label construction below to preserve origin after merging.
      */
-    private def srcPrefix: String = esubtype match
-        case 0 | 1 | 2 | 3 | 4 => "M"               // mainline
-        case n             => s"R$n"     // ramps
+    private def srcPrefix: String =
+        if prefix != null then prefix               // caller named it: use that
+        else esubtype match                         // otherwise guess from subtype
+            case 0 | 1 | 2 | 3 | 4 => "M"           // mainline
+            case n             => s"R$n"     // ramps
 
 
     //        case 0 => "M"
@@ -122,44 +124,63 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
 
                 //debug("act", s"after schedule actor $i")
 
-                // Generic check: works with any model that implements RowTimeLoader (CalRoute101_3, etc.)
+                // PeMS lookup, only for models that carry per-row data.  Everything
+                // BELOW this block -- releasing the actor and waiting out the
+                // inter-arrival gap -- is what a source does regardless, so it must
+                // not sit inside this `if`.  It used to, which meant a model that is
+                // not a `RowTimeLoader` created its actors and never scheduled a
+                // single one: no events, empty agenda, run over at clock 0.
+                // `mu` is left NaN when there is no data, and gen1 is skipped for it.
+                var mu = Double.NaN
                 if director.isInstanceOf[RowTimeLoader] then
                     val timeModel = director.asInstanceOf[RowTimeLoader]
                     timeModel.nextRow(director.clock) // update current row if needed
-                    if i < units then
 
-                        val currentRow = timeModel.getCurrentRow(director.clock)   // get the current row based on clock time
-                        val safeRow = math.min(currentRow, timeModel.getDataDimension - 1)  // ensure row index is within bounds
+                    val currentRow = timeModel.getCurrentRow(director.clock)   // get the current row based on clock time
+                    val safeRow = math.min(currentRow, timeModel.getDataDimension - 1)  // ensure row index is within bounds
 
-                        // Get mu (inter-arrival time) from model
-                        val mu = timeModel.getMuForSource(this.subtype)(safeRow)
+                    // Get mu (inter-arrival time) from model
+                    mu = timeModel.getMuForSource(this.subtype)(safeRow)
 
-                        // Get speed data from model (delegates to model's data source)
-                        val speedMatrix = timeModel.getSpeedMatrix()
-                        val safeLane  = math.min(actor.laneID, speedMatrix.dim2 - 1)
-                        val laneSpeed = speedMatrix(safeRow, safeLane)
+                    // Get speed data from model (delegates to model's data source)
+                    val speedMatrix = timeModel.getSpeedMatrix()
+                    val safeLane  = math.min(actor.laneID, speedMatrix.dim2 - 1)
+                    val laneSpeed = speedMatrix(safeRow, safeLane)
 
-                        actor.velocity = laneSpeed // set initial velocity of the vehicle
-                        actor.vmax     = laneSpeed // set vmax of the vehicle to lane speed
-                        actor.schedule(0.0)
+                    // Both entry speed and desired speed come from the PeMS lane
+                    // speed for this bin, so the corridor tracks the observed data
+                    // rather than a sampled free-flow speed.
+                    //
+                    // Known consequence, not a bug: `vmax` also caps the head of a
+                    // queue.  `iDMFree` gives a = amax*(1 - (v/vmax)^4), so a car
+                    // with no leader tops out at exactly vmax, and a queue cannot
+                    // discharge faster than its head car.  In a bin where the
+                    // detector saw 25 mph, the lane discharges at 25 mph.
+                    actor.velocity = laneSpeed // set initial velocity of the vehicle
+                    actor.vmax     = laneSpeed // set vmax of the vehicle to lane speed
+                end if
 
-                        // Generate inter-arrival time based on distribution type
-                        val duration = iArrivalTime match
+                actor.schedule(0.0)                    // release the vehicle into the model
+
+                if i < units then                      // last one has nobody to wait for
+                    // Inter-arrival time.  With PeMS data the distribution is
+                    // re-parameterised to the row's mean `mu`; without it, the
+                    // distribution is used as configured.
+                    val duration =
+                        if mu.isNaN then iArrivalTime.gen
+                        else iArrivalTime match
                             case erlang: Erlang =>
                                 val muPerStage = mu / erlang.k // 2
                                 iArrivalTime.gen1(muPerStage)
                             case erlang2S: Erlang2S =>
-                                //println(s"Arrival model is ${iArrivalTime.toString}")
                                 val muPerStage = (mu - erlang2S.tau) / 2.0
                                 iArrivalTime.gen1(muPerStage)
                             case _ =>
-                                //println(s"Arrival model is ${iArrivalTime.toString}")
                                 iArrivalTime.gen1(mu)
-                        val ctime = director.clock // clock time
-                        tally(duration) // tally duration
-                        schedule(duration)
-                        yieldToDirector() // yield and wait duration time units
 
+                    tally(duration) // tally duration
+                    schedule(duration)
+                    yieldToDirector() // yield and wait duration time units
                 end if
 
             }
@@ -193,9 +214,9 @@ object VSource:
      *  @param xy            the (x, y) coordinates for the top-left corner of the source.
      */
     def apply (name: String, director: Model, makeEntity: () => Vehicle, esubtype: Int, units: Int,
-               iArrivalTime: Variate, xy: (Int, Int)): VSource =
+               iArrivalTime: Variate, xy: (Int, Int), prefix: String = null): VSource =
         new VSource (name, director, makeEntity, esubtype, units, iArrivalTime,
-            Array (xy._1.toDouble, xy._2.toDouble, 20.0, 20.0))
+            Array (xy._1.toDouble, xy._2.toDouble, 20.0, 20.0), prefix)
     end apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

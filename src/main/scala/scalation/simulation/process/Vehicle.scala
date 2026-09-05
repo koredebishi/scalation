@@ -48,6 +48,12 @@ abstract class Vehicle (name_ : String, director: Model)
     var prevSegId: Int = -1                // previous segment id (before current segId)
     var segmentEnterTime: Double = -1.0    // simulation clock when entering current segment
 
+    // DIAG (temporary): previous tick's leader and spacing, so `Dynamics.updateM`
+    // can print the single tick where spacing first goes negative instead of
+    // every tick afterwards.  Remove with the [flip] block in Dynamics.
+    var o_leaderLabel: String = ""         // leader on the previous tick ("" = none)
+    var o_spacing: Double = Double.NaN     // spacing on the previous tick (NaN = none)
+
 
     // Derived: live time spent on current segment (call with director.clock)
     def segmentTravelTime(now: Double): Double =
@@ -69,15 +75,36 @@ abstract class Vehicle (name_ : String, director: Model)
 
 
 
-    inline def getCarAhead(car: Vehicle): Vehicle =
-        val ref = car.myPathNode.ahead
-        if ref != null then ref.elem else null
+    /** The vehicle immediately AHEAD of this one in the structure holding it --
+     *  one hop in the doubly linked list.  This is the only correct way to read
+     *  a leader: the list is the single file for the whole lane, so the leader
+     *  may sit in any segment, and a per-segment `vdeque` cannot answer this.
+     *  @return the leader, or null when this vehicle is at the front (or in no list)
+     */
+    inline def getCarAhead (car: Vehicle): Vehicle =
+        val node = car.myPathNode
+        if node == null then null                    // not currently in any list
+        else
+            val ref = node.ahead
+            if ref != null then ref.elem else null
     end getCarAhead
-    
-    inline def getCarBehind(car: Vehicle): Vehicle =
-        val ref = car.myPathNode.behind
-        if ref != null then ref.elem else null
+
+    /** The vehicle immediately BEHIND this one -- the mirror of `getCarAhead`.
+     *  @return the follower, or null when this vehicle is at the back (or in no list)
+     */
+    inline def getCarBehind (car: Vehicle): Vehicle =
+        val node = car.myPathNode
+        if node == null then null                    // not currently in any list
+        else
+            val ref = node.behind
+            if ref != null then ref.elem else null
     end getCarBehind
+
+    /** This vehicle's own leader / follower -- `getCarAhead(this)` reads worse
+     *  than `leader` at the call site.
+     */
+    inline def leader:   Vehicle = getCarAhead (this)
+    inline def follower: Vehicle = getCarBehind (this)
     
     /** Position within the structure that currently holds this vehicle, in a
      *  frame shared by every vehicle in that structure -- so the difference
@@ -97,9 +124,15 @@ abstract class Vehicle (name_ : String, director: Model)
         else disp                          // ramp / FF connector: one segment
     end corridorPos
 
+    /** Bumper-to-bumper gap to the leader.  Both positions are read in the
+     *  `corridorPos` frame: `disp` is segment-local, so differencing it across
+     *  two segments is meaningless.
+     *  @return the gap in metres, or `Double.PositiveInfinity` when there is no leader
+     */
     inline def gapToLeader: Double =
-        val leader = getCarAhead(this)
-        if leader != null then leader.disp - this.disp - Vehicle.len else 0.0
+        val ldr = leader
+        if ldr != null then ldr.corridorPos - corridorPos - Vehicle.len
+        else Double.PositiveInfinity
     end gapToLeader
         
 
@@ -135,10 +168,51 @@ object Vehicle:
         "bmax" -> -2.0,                      // max deceleration use to be -1.5
         "v0"   -> 4.0,                       // starting velocity // v0 should be adjustable to 0
         "vmax" -> 33.528,                    // max velocity
-        "T"    -> 3.0,                       // safe min time headway
-        "s"    -> 5.0,                       // safe min distance headway
+        "T"    -> 1.0,                       // safe min time headway (was 3.0 -- see below)
+        "s"    -> 2.0,                       // safe min standstill gap (was 5.0 -- see below)
         "len"  -> 4.0,                       // length of the vehicles
         "del"  -> 4.0)                       // acceleration exponent (delta)
+
+    /** Why T is 1.0 and s is 2.0.
+     *
+     *  The number that matters for a corridor whose entry backs up is not
+     *  CRUISING capacity but SATURATION FLOW -- the rate a standing queue
+     *  discharges.  Cars leaving a queue accelerate from rest, so the binding
+     *  headway is the one at LOW speed:
+     *
+     *      headway = T + (s + len) / v
+     *
+     *  At v = 10 m/s, T = 1.2 and s = 5.0 give 2.10 s -> 1714 veh/h, against a
+     *  2169 veh/h peak demand on lane 1.  Short by ~450 veh/h; over a two-hour
+     *  peak that is ~900 surplus vehicles, which is what piled up at seg 0
+     *  (observed: 1006 veh/km on a 1.006 km segment -- four times jam density,
+     *  i.e. vehicles literally stacked).
+     *
+     *  Note `s` dominates at low speed -- (s + len)/v is 0.90 s of the 2.10 at
+     *  10 m/s -- so tuning T alone cannot fix queue discharge.  s = 5.0 was also
+     *  well above Treiber's standstill gap of 2.0 m.
+     *
+     *  T = 1.0 with s = 2.0 gives 1.60 s -> 2250 veh/h at 10 m/s, clearing the
+     *  peak with headroom, and both sit in the usual IDM range.
+     *
+     *  ---- original note, on cruising capacity ----
+     *
+     *  IDM's equilibrium space headway is `s + v*T + len`, so a lane can pass at
+     *  most `3600 * v / (s + v*T + len)` veh/h.  At T = 3.0 that is ~1090 veh/h
+     *  per lane -- about half a real freeway lane.  The PeMS demand for US-101
+     *  Donald Doyle (1-401112ML.csv) exceeds it on lane 1 in 46 of 48 time bins,
+     *  peaking at 2169 veh/h against a 1090 capacity at the 7:30 bin.
+     *
+     *  That overload used to be invisible: a car whose gap went negative fell
+     *  into the free-flow branch of `IDMDynamics.updateM` and drove through its
+     *  leader, venting the excess by letting vehicles overlap.  With that branch
+     *  fixed the overload is real and the lane deadlocks at the entry instead.
+     *
+     *  Solving `T + (s + len)/v <= mu` at the binding bin (lane 1, mu = 1.66 s,
+     *  v = 26.5 m/s) gives T <= 1.32 s.  T = 1.2 is the largest round value that
+     *  clears every bin on every lane, leaving ~30% headroom at the peak, and it
+     *  sits in the usual IDM range (Treiber uses 1.0-1.6 s).
+     */
 
     /** current values for driver/vehicle characteristics/properties
      */

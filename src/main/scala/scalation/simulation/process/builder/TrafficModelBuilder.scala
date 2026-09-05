@@ -150,7 +150,11 @@ class TrafficModelBuilder (network: NetworkConfig, demand: PeMSDemand,
             val nStop = arrivalSources(l).getTotalVehicles (l) // vehicle count from arrival source
             val loc = shiftFromRoute (route, l)                // position near lane start
             debug ("buildMainlineSources", s"  lane $l: name=$name, nStop=$nStop, loc=(${loc(0)}, ${loc(1)})")
-            val src = new VSource (name, model, makeCar, subtype, nStop, iArrivalRV, loc)
+            // Label prefix "M<lane>": VSource.srcPrefix maps subtypes 0..4 all to
+            // "M", and its sequence counter is per-source, so without this every
+            // mainline lane AND ramp 1 emit M-1, M-2, ... -- five different
+            // vehicles all printing as Vehicle(M-1).
+            val src = new VSource (name, model, makeCar, subtype, nStop, iArrivalRV, loc, s"M$l")
             sources += src
         }
         sources.toList
@@ -183,7 +187,9 @@ class TrafficModelBuilder (network: NetworkConfig, demand: PeMSDemand,
             val loc = Array ((centerPos._1 + offset._1).toDouble,
                              (centerPos._2 + offset._2).toDouble, 20.0, 20.0)
             debug ("buildRampSources", s"  ramp $r: name=$name, nStop=$nStop, distribution=${rampDistribution}, loc=(${loc(0)}, ${loc(1)})")
-            val src = new VSource (name, model, makeCar, subtype, nStop, rampDistribution, loc)
+            // Label prefix "R<n>" -- see the note in buildMainlineSources.  Ramp 1
+            // has subtype numLanes (4 here), which srcPrefix would call "M".
+            val src = new VSource (name, model, makeCar, subtype, nStop, rampDistribution, loc, s"R${r + 1}")
             sources += src
         }
         sources.toList
