@@ -34,7 +34,7 @@ import scalation.simulation.process.builder.TrafficModelBuilder
  *  @param aniRatio   animation speed ratio
  */
 class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
-                     animating: Boolean = true, aniRatio: Double = 500.0)
+                     animating: Boolean = false, aniRatio: Double = 500.0)
       extends Model (name, reps, animating, aniRatio)
          with RowTimeLoader:
 
