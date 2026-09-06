@@ -1,4 +1,4 @@
-param([string]$Label = 'current', [int]$Seconds = 180, [switch]$Animated, [string]$RunName = 'run')
+param([string]$Label = 'current', [int]$Seconds = 180, [switch]$Animated, [string]$RunName = 'run', [switch]$ExitAfterSimulation)
 $ErrorActionPreference = 'Stop'
 $dest = "target/runtime-investigation/$Label"
 $dependencies = Get-Content benchmark-classpath.log | ForEach-Object {
@@ -9,7 +9,8 @@ $classes = (Resolve-Path "$dest/classes").Path
 $classpath = (@($classes) + @($dependencies)) -join ';'
 $headless = (!$Animated).ToString().ToLowerInvariant()
 $animate = $Animated.IsPresent.ToString().ToLowerInvariant()
-$arguments = @('-Xmx4g', "-Djava.awt.headless=$headless", "-Dbench.animate=$animate", "-Dbench.seconds=$Seconds", '-cp',
+$exitSimulation = $ExitAfterSimulation.IsPresent.ToString().ToLowerInvariant()
+$arguments = @('-Xmx4g', "-Djava.awt.headless=$headless", "-Dbench.animate=$animate", "-Dbench.seconds=$Seconds", "-Dbench.exitAfterSimulation=$exitSimulation", '-cp',
     ('"' + $classpath.Replace('\', '/') + '"'), 'scripts/RuntimeBenchmark.java')
 [IO.File]::WriteAllLines((Join-Path (Get-Location) "$dest/$RunName.args"), $arguments)
 $ErrorActionPreference = 'Continue'

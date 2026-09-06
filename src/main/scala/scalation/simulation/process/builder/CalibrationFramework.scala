@@ -226,21 +226,26 @@ import scalation.simulation.process.config.SimulationReport
 /** Calibration adapter for CalRoute101_3 model.
  *  Implements CalibratableModel trait to enable optimization.
  */
-class CalibrateCalRoute101_3 extends CalibratableModel:
+class CalibrateCalRoute101_3 (animating: Boolean = false) extends CalibratableModel:
     
     private var model: CalRoute101_3 = null
+    private var hasRun = false
     
     def applyParameters(params: VectorD): Unit =
         Vehicle.setProps(Vehicle.setParams(params))
-        model = new CalRoute101_3(animating = false)  // No animation during calibration
+        model = new CalRoute101_3 (animating = animating, autoRun = false)
+        hasRun = false
     end applyParameters
     
     def runSimulation(): Unit =
+        require (model != null && !hasRun, "apply parameters before each simulation run")
+        hasRun = true
         model.simulate()
         model.waitFinished()
     end runSimulation
     
     def computeFitness(): Double =
+        model.getBasicStats                                      // requires a completed run
         val report = SimulationReport.fromJunctions(
             model.getJunctions,
             model.getPemsSensorIndices,
@@ -251,12 +256,21 @@ class CalibrateCalRoute101_3 extends CalibratableModel:
 
     /** Get the simulation report for detailed output/export */
     def getReport(): SimulationReport =
+        model.getBasicStats                                      // requires a completed run
         SimulationReport.fromJunctions(
             model.getJunctions,
             model.getPemsSensorIndices,
             model.getDemandConfig
         )
     end getReport
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the completed model for the shared SimulationReport.compareRuns method. */
+    def getModel: Model =
+        require (model != null, "apply parameters before requesting the model")
+        model.getBasicStats
+        model
+    end getModel
 
     /** Get the car-following model name (idm, gipps, krause) */
     def getModelName(): String =

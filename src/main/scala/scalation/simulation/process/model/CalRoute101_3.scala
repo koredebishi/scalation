@@ -32,9 +32,10 @@ import scalation.simulation.process.builder.TrafficModelBuilder
  *  @param reps       the number of replications
  *  @param animating  whether to animate
  *  @param aniRatio   animation speed ratio
+ *  @param autoRun    run immediately for standalone use; false lets an evaluation adapter own the run
  */
 class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
-                     animating: Boolean = false, aniRatio: Double = 500.0)
+                     animating: Boolean = false, aniRatio: Double = 500.0, autoRun: Boolean = true)
       extends Model (name, reps, animating, aniRatio)
          with RowTimeLoader:
 
@@ -321,13 +322,11 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
 
     private val wallBuilt = System.nanoTime ()             // everything constructed, nothing simulated yet
 
-    simulate ()
-    waitFinished ()
-
-    private val wallEnd = System.nanoTime ()
-    println (f"[wall] setup ${(wallBuilt - wallStart) / 1e9}%.1f s   run ${(wallEnd - wallBuilt) / 1e9}%.1f s   total ${(wallEnd - wallStart) / 1e9}%.1f s")
-
-    Model.shutdown ()
+    if autoRun then
+        simulate ()
+        waitFinished ()
+        val wallEnd = System.nanoTime ()
+        println (f"[wall] setup ${(wallBuilt - wallStart) / 1e9}%.1f s   run ${(wallEnd - wallBuilt) / 1e9}%.1f s   total ${(wallEnd - wallStart) / 1e9}%.1f s")
+//        Model.shutdown ()
 
 end CalRoute101_3
-

@@ -70,6 +70,119 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
      */    
     private val cmdQ = new ConcurrentLinkedQueue [AnimateCommand] ()
 
+    private val liveState = new LiveAnimationState
+    @volatile private var liveSnapshots = false
+    private val drawnTokens = HashMap.empty [Int, AnimateCommand]
+    private var liveTimer: javax.swing.Timer = null
+
+    // Wall-clock pacing is independent of the simulation's event times and physics.
+    private val liveClockLock = new Object
+    private var liveWallAnchor = 0L
+    private var liveSimAnchor = 0.0
+    private var liveLastEvent = 0.0
+    private var liveStepLimit = Double.NaN
+    private var liveWindowClosed = false
+
+    def isLiveSnapshots: Boolean = liveSnapshots
+    def liveStateSize: Int = liveState.size
+
+    /** Opt-in live display: graph changes run on Swing's EDT, at most 30 fps.
+     *  The director waits at event boundaries to respect pause and playback speed.
+     */
+    def enableLiveSnapshots (): Unit =
+        liveSnapshots = true
+        SwingUtilities.invokeLater (() => {
+            replayBtn.setEnabled (false)
+            replayBtn.setToolTipText ("Live mode does not record a replay")
+            stepBtn.setToolTipText ("While paused, advance up to 0.5 simulated seconds")
+            resetBtn.setToolTipText ("1x: one simulated second per real second")
+            setSpeedFactor (speedFactor)
+            addWindowListener (new java.awt.event.WindowAdapter {
+                override def windowClosing (e: java.awt.event.WindowEvent): Unit = releaseLiveClock ()
+                override def windowClosed (e: java.awt.event.WindowEvent): Unit = releaseLiveClock ()
+            })
+            liveTimer = new javax.swing.Timer (33, _ => {
+                if !isDisplayable then liveTimer.stop ()
+                else renderLiveSnapshot ()
+            })
+            liveTimer.start ()
+        })
+    end enableLiveSnapshots
+
+    /** Start pacing after model construction, immediately before processing events. */
+    def startLiveClock (time: Double): Unit = liveClockLock.synchronized {
+        liveLastEvent = time
+        liveSimAnchor = time
+        liveWallAnchor = System.nanoTime ()
+        liveStepLimit = Double.NaN
+    }
+
+    /** Called only by the director, never by Swing or an individual vehicle.
+     *  Waiting changes elapsed real time, not the event order or simulated time.
+     */
+    def awaitLiveTime (time: Double): Unit = liveClockLock.synchronized {
+        var ready = false
+        while !ready && !liveWindowClosed do
+            if paused.get() then
+                if !liveStepLimit.isNaN && time <= liveStepLimit then ready = true
+                else liveClockLock.wait ()
+            else
+                val elapsed = (System.nanoTime () - liveWallAnchor) / 1e9
+                val remaining = time - liveSimAnchor - elapsed * speedFactor
+                if remaining <= 0.0 then ready = true
+                else
+                    val ns = math.min (50000000L, math.max (1L, (remaining * 1e9 / speedFactor).toLong))
+                    liveClockLock.wait (ns / 1000000L, (ns % 1000000L).toInt)
+        liveLastEvent = time
+    }
+
+    private def releaseLiveClock (): Unit = liveClockLock.synchronized {
+        liveWindowClosed = true
+        liveClockLock.notifyAll ()
+    }
+
+    /** Accept visual state without blocking on playback or retaining movement history. */
+    def submit (c: AnimateCommand): Unit =
+        if liveSnapshots then
+            liveState.submit (c)
+            if c.action == DestroyToken then vsLock.synchronized {
+                vehicleStateRegistry.remove (tokenToActorId.getOrElse (c.eid, c.eid))
+                tokenToActorId.remove (c.eid)
+            }
+        else cmdQ.add (c)
+    end submit
+
+    private def renderLiveSnapshot (): Unit =
+        val (now, structure, tokens) = liveState.snapshot ()
+        structure.foreach (invokeCommand)
+        val present = tokens.iterator.map (_._1.eid).toSet
+        drawnTokens.keysIterator.filterNot (present.contains).toVector.foreach { id =>
+            ani.destroyToken (id)
+            drawnTokens.remove (id)
+            vsLock.synchronized { tokenToActorId.remove (id) }
+        }
+        for (create, move) <- tokens do
+            if !drawnTokens.contains (create.eid) then
+                invokeCommand (create)
+                drawnTokens(create.eid) = null
+            if move != null && (drawnTokens(create.eid) ne move) then
+                invokeCommand (move)
+                drawnTokens(create.eid) = move
+        clock = now
+        actorCount = tokens.size
+        repaint ()
+    end renderLiveSnapshot
+
+    /** Flush the final state and stop the display timer after simulation completes. */
+    def finishLiveSnapshots (): Unit =
+        val finish = new Runnable:
+            def run (): Unit =
+                if liveTimer != null then liveTimer.stop ()
+                renderLiveSnapshot ()
+        if SwingUtilities.isEventDispatchThread then finish.run ()
+        else SwingUtilities.invokeAndWait (finish)
+    end finishLiveSnapshots
+
     /** Animation command processor
      */
     private val ani = new Animator (graph)
@@ -285,6 +398,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
       * - Safe to invoke multiple times; ignored if already replaying or nothing recorded.
       */
     def replay(): Unit =
+        if liveSnapshots then return
         // Unified replay entry point: switches run loop to Replay mode (no separate thread logic)
         if frames.isEmpty then
             println("Replay: no recorded frames (frames buffer empty). Run a simulation first.")
@@ -335,15 +449,21 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the playback speed multiplier and update Animator time dilation.
       * Mapping: dilation (>1 slows, <1 speeds) = 1.0 / speedFactor.
-      * @param speed  desired speed multiplier (clamped to [0.25, 8.0])
+      * @param speed  desired speed multiplier (live: 0.25-128x; replay: 0.25-8x)
       */
     private def setSpeedFactor(speed: Double): Unit =
-        val s  = math.max(0.25, math.min(8.0, speed))      // clamp for stability
-        speedFactor = s
+        val s = math.max (0.25, math.min (if liveSnapshots then 128.0 else 8.0, speed))
+        liveClockLock.synchronized {
+            // Re-anchor at actual progress: no catch-up burst after changing speed.
+            liveSimAnchor = liveLastEvent
+            liveWallAnchor = System.nanoTime ()
+            speedFactor = s
+            liveClockLock.notifyAll ()
+        }
         // Convert user speed to animator dilation factor
         val dilation = 1.0 / s
         ani.timeDilation(Array(dilation))                   // update underlying animator
-        speedLbl.setText(f"Speed ${s}%.2fx")               // update UI label
+        speedLbl.setText (if liveSnapshots then f"Live ${s}%.2fx" else f"Speed ${s}%.2fx")
      end setSpeedFactor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -910,12 +1030,26 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
     /** Pause the animation thread. */
     private def pause(): Unit =
-        if paused.compareAndSet(false, true) then playPauseBtn.setText("Play")
+        if liveSnapshots then liveClockLock.synchronized {
+            paused.set (true)
+            liveStepLimit = Double.NaN
+            playPauseBtn.setText ("Play")
+            liveClockLock.notifyAll ()
+        }
+        else if paused.compareAndSet(false, true) then playPauseBtn.setText("Play")
     end pause
 
     /** Resume the animation thread. */
     private def resume(): Unit =
-        if paused.compareAndSet(true, false) then
+        if liveSnapshots then liveClockLock.synchronized {
+            liveSimAnchor = liveLastEvent
+            liveWallAnchor = System.nanoTime ()
+            liveStepLimit = Double.NaN
+            paused.set (false)
+            playPauseBtn.setText ("Pause")
+            liveClockLock.notifyAll ()
+        }
+        else if paused.compareAndSet(true, false) then
             playPauseBtn.setText("Pause")
             pauseLock.synchronized { pauseLock.notifyAll() }
         end if
@@ -926,7 +1060,13 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
     /** Step a single command when paused, then re-pause. */
     private def step(): Unit =
-        if paused.get() then
+        if liveSnapshots then liveClockLock.synchronized {
+            if paused.get() then
+                val from = if liveStepLimit.isNaN then liveLastEvent else math.max (liveLastEvent, liveStepLimit)
+                liveStepLimit = from + 0.5
+                liveClockLock.notifyAll ()
+        }
+        else if paused.get() then
             stepOnce.set(true)
             pauseLock.synchronized { pauseLock.notifyAll() }
         end if
@@ -944,7 +1084,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invoke the animation command. */
     private def invokeCommand (c: AnimateCommand): Unit =
-        if c.action != MoveToken then println (s"DgAnimator.invokeCommand: $c")
+        if !liveSnapshots && c.action != MoveToken then println (s"DgAnimator.invokeCommand: $c")
         c.action match
         case CreateNode =>
             ani.createNode (c.eid, c.shape.asInstanceOf [RectPolyShape], c.label, c.primary, c.color, c.pts)

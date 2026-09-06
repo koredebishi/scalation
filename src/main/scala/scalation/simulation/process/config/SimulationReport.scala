@@ -23,7 +23,7 @@ import scala.math.{abs, sqrt}
  *  Always generated regardless of demand mode.
  *  @param totalVehicles   total number of vehicles that completed the simulation
  *  @param avgTravelTime   average travel time across all vehicles (seconds)
- *  @param throughput      vehicles per unit time
+ *  @param throughput      completed vehicles per hour over the simulation duration
  *  @param simDuration     total simulation duration (seconds)
  */
 case class BasicStats (totalVehicles: Int, avgTravelTime: Double,
@@ -45,8 +45,8 @@ case class MacroMetrics (r2: Double, mae: Double, rmse: Double, mean: Double, nr
  *  @param sensorIdx    the sensor index (0-based)
  *  @param flowMetrics  macro metrics for flow comparison
  *  @param speedMetrics macro metrics for speed comparison
- *  @param flowMicro    per-lane metrics for flow (Array of 4 lanes)
- *  @param speedMicro   per-lane metrics for speed (Array of 4 lanes)
+ *  @param flowMicro    per-lane metrics for flow
+ *  @param speedMicro   per-lane metrics for speed
  */
 case class SensorValidation (sensorIdx: Int, flowMetrics: MacroMetrics,
                              speedMetrics: MacroMetrics,
@@ -82,6 +82,15 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
 
     private val debug = debugf ("SimulationReport", false)
     private val nParams = 5                                          // number of fitted parameters
+
+    require (nSensors > 0 && simFlow.length == nSensors && simSpeed.length == nSensors &&
+             simDensity.length == nSensors, "report requires one set of matrices per sensor")
+    cfor (0, nSensors) { s =>
+        require (simFlow(s).dim == nRows && simFlow(s).dim2 == nLanes &&
+                 simSpeed(s).dim == nRows && simSpeed(s).dim2 == nLanes &&
+                 simDensity(s).dim == nRows && simDensity(s).dim2 == nLanes,
+                 "report matrices must share the configured row and lane dimensions")
+    }
 
     // Fit object for matrix-level diagnostics
     private object TestFit extends Fit (dfr = nParams, df = nRows - nParams)
@@ -176,7 +185,10 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
         cfor (0, nSensors) { s =>
             debug ("validate", s"  Processing sensor $s...")
             // Load PeMS data for this sensor using PeMSDataHelper (corridor-agnostic)
-            val (pemsFlow, pemsSpeed) = PeMSDataHelper.loadMainlineSensor(demand, s)
+            val (pemsFlow, pemsSpeed) = PeMSDataHelper.loadMainlineSensor (demand, s, demand.window, demand.layout)
+            require (pemsFlow.dim == simFlow(s).dim && pemsFlow.dim2 == simFlow(s).dim2 &&
+                     pemsSpeed.dim == simSpeed(s).dim && pemsSpeed.dim2 == simSpeed(s).dim2,
+                     "observed and simulated sensor matrices must have matching dimensions")
             debug ("validate", s"    PeMS loaded: flow=${pemsFlow.dim}x${pemsFlow.dim2}, speed=${pemsSpeed.dim}x${pemsSpeed.dim2}")
             debug ("validate", s"    Sim data: flow=${simFlow(s).dim}x${simFlow(s).dim2}, speed=${simSpeed(s).dim}x${simSpeed(s).dim2}")
 
@@ -423,6 +435,61 @@ end SimulationReport
  */
 object SimulationReport:
 
+    /** Labels for the maximum absolute differences returned by compareRuns. */
+    val comparisonLabels = Array ("detector counts", "detector speed (m/s)", "density (veh/km/lane)",
+                                  "generated actors", "completed vehicles", "mean travel time (s)",
+                                  "throughput (veh/h)", "simulation duration (s)")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare two completed runs without loading observations or invoking optimization.
+     *  Recorder matrices are matched by component order, name, interval and dimensions.
+     *  The returned VectorD contains maximum absolute differences in comparisonLabels order.
+     *  All zeroes mean these recorded results match exactly; this does not compare
+     *  individual trajectories or prove physical validity. Non-finite data fails comparison.
+     *  @param first   baseline model after waitFinished
+     *  @param second  comparison model after waitFinished
+     */
+    def compareRuns (first: process.Model, second: process.Model): VectorD =
+        val aStats = first.getBasicStats
+        val bStats = second.getBasicStats
+        val a = first.getRecorders
+        val b = second.getRecorders
+        require (a.length == b.length, "runs must have the same recorder components")
+        val differences = new VectorD (comparisonLabels.length)
+
+        def compareMatrix (x: MatrixD, y: MatrixD, metric: Int): Unit =
+            require (x.dim == y.dim && x.dim2 == y.dim2, "recorder matrix dimensions differ")
+            cfor (0, x.dim) { i =>
+                cfor (0, x.dim2) { j =>
+                    val d = abs (x(i, j) - y(i, j))
+                    differences(metric) = if d.isFinite then math.max (differences(metric), d)
+                                          else Double.PositiveInfinity
+                }
+            }
+        end compareMatrix
+
+        cfor (0, a.length) { i =>
+            require (a(i)._1 == b(i)._1, "recorder names or registration order differ")
+            val left = a(i)._2
+            val right = b(i)._2
+            require (left.rowTime == right.rowTime, "recorder observation intervals differ")
+            val (lc, ls) = left.getRecorderMat
+            val (rc, rs) = right.getRecorderMat
+            compareMatrix (lc, rc, 0)
+            compareMatrix (ls, rs, 1)
+            compareMatrix (left.getDensityMat, right.getDensityMat, 2)
+        }
+        differences(3) = abs (first.getNumActors.toDouble - second.getNumActors)
+        differences(4) = abs (aStats.totalVehicles.toDouble - bStats.totalVehicles)
+        differences(5) = abs (aStats.avgTravelTime - bStats.avgTravelTime)
+        differences(6) = abs (aStats.throughput - bStats.throughput)
+        differences(7) = abs (aStats.simDuration - bStats.simDuration)
+        cfor (0, differences.dim) { i =>
+            if !differences(i).isFinite then differences(i) = Double.PositiveInfinity
+        }
+        differences
+    end compareRuns
+
     private val debug = debugf ("SimulationReport.companion", false)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -438,6 +505,7 @@ object SimulationReport:
         debug ("fromJunctions", s"pemsIndices = ${pemsIndices.mkString(",")}")
 
         val nSensors = pemsIndices.length
+        require (nSensors > 0, "at least one sensor is required for a validation report")
         val simFlow    = new Array [MatrixD] (nSensors)
         val simSpeed   = new Array [MatrixD] (nSensors)
         val simDensity = new Array [MatrixD] (nSensors)
@@ -454,7 +522,8 @@ object SimulationReport:
         }
 
         debug ("fromJunctions", "Report created successfully")
-        new SimulationReport (simFlow, simSpeed, simDensity, demand, nSensors)
+        new SimulationReport (simFlow, simSpeed, simDensity, demand, nSensors,
+                              simFlow(0).dim2, simFlow(0).dim)
     end fromJunctions
 
 end SimulationReport

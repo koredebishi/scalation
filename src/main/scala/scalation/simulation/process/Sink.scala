@@ -62,6 +62,7 @@ class Sink (name: String, at: Array [Double])
         //director.log.trace (this, "terminates", actor, director.clock)
         director.animate (actor, MoveToken, null, null, Array (at(0) + DIAM, at(1) + at(3) / 2.0 - RAD))
 
+        director.retireLiveToken (actor)
         actor.yieldToDirector (true)                                   // yield and terminate
     end leave
     

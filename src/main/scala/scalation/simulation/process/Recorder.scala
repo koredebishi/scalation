@@ -27,15 +27,27 @@ trait Recorder (nt: Int = 60, nLanes: Int = 4):
 
     protected val r_counts  = new MatrixD (nt, nLanes)                    // record counts in time interval
     protected val r_speeds  = new MatrixD (nt, nLanes)                    // record average speed in time interval
-    protected val r_density = new MatrixD (nt, nLanes)                    // record density (veh/m) per interval per segment
+    protected val r_density = new MatrixD (nt, nLanes)                    // latest density (veh/km/lane) per interval
 
 
     private[process] var ew = new EasyWriter("recorder", "recorder.csv")
 
 
     //private val timeConv = 54000.0 / nt                                   // 60 * 60 * 15 = 54000 seconds per busy part of the day
-    val rowTime = 15.0 * MINUTE
-    private val timeConv = rowTime // ← THIS IS CORRECT!
+    private var timeConv = 15.0 * MINUTE
+    private var recordingStarted = false
+    def rowTime: Double = timeConv
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the observation interval before recording begins.
+     *  `Model` supplies the existing RowTimeLoader.rowTimeSlice when available.
+     *  @param seconds  observation interval in simulated seconds
+     */
+    def setRecorderInterval (seconds: Double): Unit =
+        require (seconds > 0.0 && seconds.isFinite, "recorder interval must be positive and finite")
+        require (!recordingStarted || seconds == timeConv, "cannot change intervals after recording begins")
+        timeConv = seconds
+    end setRecorderInterval
     //println(s"Recorder created with nt = $nt, nLanes = $nLanes, timeConv = $timeConv")
 
     //  private val timeConv = 86400.0 / nt                                   // 60 * 60 * 24 = 86400 seconds per day
@@ -43,33 +55,29 @@ trait Recorder (nt: Int = 60, nLanes: Int = 4):
     private val lane_stat = Array.fill (nLanes) (new Statistic ("lane"))  // array of `Statistic`
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the recorder matrices.
-    *  Automatically flushes the final interval data before returning.
+    /** Snapshot the recorder matrices without consuming the current interval.
+     *  Repeated reports and continued recording must preserve all samples.
      */
     def getRecorderMat: (MatrixD, MatrixD) =
         recordInMatrix(i_pre)  // Flush final interval (clamped to valid range)
-        (r_counts, r_speeds)
+        (r_counts.copy, r_speeds.copy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the density matrix (veh/m per time interval per segment).
-     *  Caller maps segment index to column index.
+    /** Snapshot the latest sampled density (veh/km/lane) in each interval.
      */
-    def getDensityMat: MatrixD = r_density
+    def getDensityMat: MatrixD = r_density.copy
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Record instantaneous density for a segment at the current clock time.
-     *  Accumulates samples within each interval and averages them at flush.
+    /** Record the latest density sample per lane and interval, not an interval average.
      *  @param ctime    the current simulation clock time
      *  @param density  instantaneous density snapshot (veh/km per lane) from VTransport.density
-     *  @param segCol   the column index in r_density to write to (caller maps seg → col)
+     *  @param lane     lane index at this recorder's cross-section
      */
-    def recordDensity (ctime: Double, density: Double, segCol: Int): Unit =
+    def recordDensity (ctime: Double, density: Double, lane: Int): Unit =
         val i_cur = floor (ctime / timeConv).toInt
-        if i_cur >= 0 && i_cur < nt && segCol >= 0 && segCol < r_density.dim2 then
-            // Accumulate running average: store sum in cell, count separately
-            // Simple approach: overwrite with latest snapshot each tick (last-value-wins per interval)
-            // For a true average, use a separate Statistic — keeping this minimal.
-            r_density(i_cur, segCol) = density
+        if i_cur >= 0 && i_cur < nt && lane >= 0 && lane < nLanes then
+            recordingStarted = true
+            r_density(i_cur, lane) = density
     end recordDensity
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -80,8 +88,11 @@ trait Recorder (nt: Int = 60, nLanes: Int = 4):
      */
     def record (ctime: Double, speed: Double, lane: Int): Unit =
         val i_cur = floor (ctime / timeConv).toInt                        // determine the current time interval
+        if i_cur < 0 || i_cur >= nt then return                          // observation window is half-open
+        recordingStarted = true
         if i_cur > i_pre then                                             // detected start of new time interval
             recordInMatrix (i_pre)                                        // put stats in recorder matrices
+            cfor (0, nLanes) { l => lane_stat(l).reset () }
             i_pre = i_cur                                                 // update i_pre
         lane_stat(lane).tally (speed)                                     // record the speed/property of interest
     end record
@@ -103,16 +114,15 @@ trait Recorder (nt: Int = 60, nLanes: Int = 4):
     end record
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Put the lane statistics in recorder matrices and reset the statistical counters
-     *  at the end of each (ii-th) observation/time interval.
+    /** Copy lane statistics into the matrix; only an interval transition resets them.
      *  @param ii    the relevant observation/time interval
      */
     private def recordInMatrix (ii: Int): Unit =
         if ii >= 0 && ii < nt then                                   // check for valid range
-            for l <- r_counts.indices2 do                                 // for each lane
+            cfor (0, nLanes) { l =>
                 r_counts(ii, l) = lane_stat(l).num                        // vehicles counted during the time interval
                 r_speeds(ii, l) = lane_stat(l).mean                       // average speed during the time interval
-                lane_stat(l).reset ()                                     // reset statistical counters
+            }
     end recordInMatrix
 
 
