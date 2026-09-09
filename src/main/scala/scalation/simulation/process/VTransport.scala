@@ -141,6 +141,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
         easyW.println(s"[t=$now] Vehicle ${actor.displayLabel} enters seg=${actor.segId} (from seg=$lastSeg), enterT=$now")
 
         //debug("move", s"actor = $actor, disp=${actor.disp} along the VTransport")
+        accum (vdeque.size)                                // existing time-persistent occupancy statistic
         vdeque += actor
 
         tally(Vehicle.rt)
@@ -155,6 +156,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
             //debug ("move", s"${actor.displayLabel}, check if actor.disp = ${actor.disp} >= curve.length = ${curve.length}")
             if actor.disp >= length then
                 done = true
+                accum (vdeque.size)                        // occupancy held since the preceding entry/exit event
                 vdeque -= actor
             end if
 

@@ -113,7 +113,7 @@ seconds.  This is evidence that the link remained continuously constrained
 after its first release and enforced its configured two-second discharge
 headway.
 
-Recorded micro findings from the matched run:
+Recorded micro findings from the matched run:no
 
 | Measure | Value |
 |---|---:|
@@ -149,6 +149,7 @@ Matched results after raising offered demand to 3600 veh/h while retaining
 | Whole-run throughput | 2062.388643 veh/h | 1676.340472 veh/h |
 | Mean traversal speed | 38.694 km/h | 25.077 km/h |
 | Whole-run mean density | 53.300 veh/km/lane | 66.847 veh/km/lane |
+
 | Agenda activations | 78752 | 1497 |
 | Activations/completed vehicle | 262.506667 | 4.990000 |
 
@@ -191,23 +192,28 @@ Use the measured micro free-flow completion time of `49.183333 s` in:
 | Lambda (veh/h) | nStop | Duration (s) | Whole-run throughput (veh/h) | Corrected capacity (veh/h) | Mean travel time (s) | Agenda activations | Activations/vehicle | Interpretation |
 |---:|---:|---:|---:|---:|---:|---:|---:|---|
 | 2400 | 300 | 499.496956 | 2162.175341 | 2390.334085 | 67.463333 | 41078 | 136.926667 | Demand-limited/lower-congestion estimate |
-| 3000 | 300 | pending | pending | pending | pending | pending | pending | Pending |
+| 3000 | 300 | 481.597564 | 2242.536258 | 2489.279775 | 88.343333 | 53606 | 178.686667 | Held-out observation; highest corrected discharge observed, not used to fit C |
 | 3600 | 300 | 523.664637 | 2062.388643 | 2268.582538 | 130.253333 | 78752 | 262.506667 | Saturated; estimate is 5.09% below 2400 run |
 | 4800 | 300 | 551.498478 | 1958.300963 | 2142.877857 | 182.328333 | 109997 | 366.656667 | Saturated; estimate is 5.54% below 3600 run |
 
-The corrected estimates decrease from 2390.33 to 2268.58 to 2142.88 veh/h as
-offered demand rises.  This is not a constant-capacity plateau.  Higher forced
-entry density is causing lower IDM discharge, so continuing to raise `lambda`
-would measure congestion-induced capacity drop rather than identify a single
-maximum-capacity parameter.  The maximum observed corrected flow is currently
-2390.33 veh/h near the 2400 veh/h offered-demand case.
+The expanded sweep does not exhibit a constant-capacity plateau.  The 2400
+veh/h case remained partly demand-limited, while the held-out 3000 veh/h case
+produced the highest observed corrected discharge estimate, 2489.280 veh/h.
+At higher demands, corrected discharge decreases as forced entry density
+intensifies IDM congestion.
 
-### G1.5 Saturated comparison after meso capacity calibration
+This demonstrates that effective microscopic discharge is regime-dependent,
+whereas the present mesoscopic baseline deliberately uses one fixed capacity.
+Because 3000 veh/h was designated as held-out demand, its result was not used
+to revise the frozen value `C = 2390 veh/h`.  This preserves the out-of-sample
+evaluation protocol.
+
+### G1.5 In-sample consistency after mesoscopic capacity calibration
 
 The mesoscopic capacity was set to `2390 veh/h`, the rounded maximum corrected
-micro flow observed in the demand sweep.  Offered demand was returned to
-`lambda = 3600 veh/h` with `nStop = 300`.  The mesoscopic result is compared
-against the already-recorded micro run at the same demand.
+micro flow observed in the 2400 and 3600 veh/h fit set.  Offered demand was
+returned to `lambda = 3600 veh/h` with `nStop = 300`.  The mesoscopic result is
+compared against the already-recorded micro run at the same fit demand.
 
 | Measure | Micro | Calibrated meso | Meso relative to micro |
 |---|---:|---:|---:|
@@ -232,7 +238,185 @@ matches the maximum observed micro flow for the present one-link experiment;
 it does not claim that IDM has a demand-independent discharge rate under every
 congestion level.
 
-**Matched saturated micro-to-meso fidelity: PASS.**
+**In-sample calibrated consistency: PASS.**
+
+This comparison confirms that the fixed-capacity mesoscopic implementation can
+reproduce the calibration regime closely.  Out-of-sample behavior is evaluated
+separately in Experiment B.
+
+### G1.6 Experiment A - Finite-storage admission/wakeup mechanism
+
+This is a deterministic correctness test, not a micro-to-meso fidelity test.
+It validates finite admission, FIFO blocking, one-for-one space release, and
+event-driven wakeup without polling.
+
+Configuration:
+
+| Parameter | Value |
+|---|---:|
+| Vehicles | 4 |
+| Arrival interval | 0.5 s, deterministic |
+| Link length | 500 m |
+| Free-flow speed | 10 m/s |
+| Free-flow traversal | 50.0 s |
+| Discharge capacity | 1800 veh/h |
+| Release headway | 2.0 s |
+| Storage capacity | 2 vehicles |
+
+Expected trace derived before execution:
+
+| Time (s) | Expected event | Occupancy after event |
+|---:|---|---:|
+| 0.0 | V1 admitted | 1 |
+| 0.5 | V2 admitted | 2 |
+| 1.0 | V3 blocked outside the link | 2 |
+| 1.5 | V4 blocked behind V3 | 2 |
+| 50.0 | V1 releases; its freed slot is reserved for and wakes V3 | 1, then 2 after V3 admission |
+| 52.0 | V2 releases; its freed slot is reserved for and wakes V4 | 1, then 2 after V4 admission |
+| 100.0 | V3 releases | 1 |
+| 102.0 | V4 releases | 0 |
+
+Expected total agenda activations: `15` (`4` source activations plus `11`
+vehicle activations).  A blocked vehicle receives exactly one storage wakeup;
+its later free-flow completion is normal traversal work, not polling.
+
+Acceptance checks:
+
+- maximum occupancy is at most 2;
+- V3 receives `SPACE_RELEASE` before V4;
+- no blocked vehicle polls;
+- entered = released = completed = 4;
+- final admitted occupancy and blocked queue are both zero.
+
+Observed trace matched the hand-derived trace exactly:
+
+- V1 and V2 were admitted at 0.0 and 0.5 s;
+- V3 and V4 blocked at 1.0 and 1.5 s;
+- V3 received `SPACE_RELEASE` and woke at 50.0 s before V4 at 52.0 s;
+- releases occurred at 50.0, 52.0, 100.0, and 102.0 s;
+- maximum occupancy was 2 and final occupancy was 0;
+- entered = released = completed = 4; and
+- agenda activations were exactly 15, confirming that blocked vehicles did not poll.
+
+**Status: PASS.**
+
+This one-link experiment proves the admission/wakeup mechanism.  It does not
+alone prove physical spillback across connected links, because the current
+vehicle script leaves one segment before attempting admission to the next.
+Cross-link transfer ownership is a Gate 2 boundary concern.
+
+### G1.7 Experiment B - Frozen held-out fidelity
+
+Experiment B tests whether one fixed mesoscopic capacity and storage limit,
+chosen without seeing the test cases, continue to track the microscopic model
+as congestion rises.  It is a fidelity and abstraction-limit test, not another
+correctness test.
+
+The fit demands are 2400 and 3600 veh/h.  The fit-side corrected micro discharge
+was 2390.334 veh/h at 2400 demand and 2268.583 veh/h at 3600 demand.  Since the
+simple meso accepts only one fixed capacity, the declared fitting rule is to use
+the maximum observed fit-side discharge, rounded to a whole vehicle per hour:
+`C = 2390 veh/h`.  The lower 3600 result documents the IDM capacity drop that a
+fixed `C` cannot reproduce; it is not averaged into a demand-specific parameter.
+Rerun micro at 3600 veh/h and read maximum occupancy from the segment's native
+`TimeStatistic.max`.  For the one-lane 1.4-km link:
+
+`K = floor(rho_max * 1.4 km * 1 lane) = maximum observed occupancy`
+
+Record `C`, `K`, and the freeze date here before any held-out result is viewed.
+Then do not retune either parameter.
+
+The 3600 veh/h micro fit run completed all 300 vehicles and reported maximum
+occupancy 133 and maximum instantaneous density 95.000 veh/km/lane.  Therefore:
+
+`K = floor(95.000 * 1.4 * 1) = 133 vehicles`
+
+After freezing, run micro and meso with the same arrival-stream configuration,
+`nStop = 300`, at the held-out demands of 3000 and 5400 veh/h.  Record mean
+travel time, mean traversal speed, mean density, whole-run throughput,
+simulation duration, agenda activations, and activations per completed vehicle.
+Report meso relative to micro for each measure.  A poor 5400 veh/h result is a
+valid finding and must not cause post-test fitting.
+
+Frozen configuration:
+
+| Parameter | Value |
+|---|---|
+| C | 2390 veh/h |
+| K | 133 vehicles |
+| Freeze date | 2026-09-09 |
+
+Held-out comparison table:
+
+| Demand | Model | Mean travel time | Mean traversal speed | Mean density | Whole-run throughput | Duration | Agenda activations | Activations/completed vehicle |
+|---:|---|---:|---:|---:|---:|---:|---:|---:|
+| 3000 | Micro | 88.343 s | 57.050 km/h | 39.308 veh/km/lane | 2242.536 veh/h | 481.598 s | 53606 | 178.687 |
+| 3000 | Meso | 98.312 s | 51.265 km/h | 42.419 veh/km/lane | 2174.626 veh/h | 496.637 s | 1495 | 4.983 |
+| 5400 | Micro | 207.195 s | 24.325 km/h | 77.855 veh/km/lane | 1893.818 veh/h | 570.276 s | 124917 | 416.390 |
+| 5400 | Meso | 175.262 s | 28.757 km/h | 75.621 veh/km/lane | 2174.626 veh/h | 496.637 s | 1619 | 5.397 |
+
+Meso relative to micro (`100 * (meso - micro) / micro`):
+
+| Demand | Travel time | Speed | Density | Throughput | Duration | Agenda activations |
+|---:|---:|---:|---:|---:|---:|---:|
+| 3000 | +11.284% | -10.140% | +7.914% | -3.028% | +3.123% | -97.211% |
+| 5400 | -15.412% | +18.220% | -2.869% | +14.828% | -12.913% | -98.704% |
+
+At 5400 veh/h, the fixed-capacity meso releases vehicles faster than the
+density-sensitive IDM micro model: travel time is 15.412% lower, speed is
+18.220% higher, and throughput is 14.828% higher.  This is the expected limit
+of one fixed discharge capacity, not a reason to retune after observing the
+held-out test.  Agenda work is reduced by 98.704%.
+
+The held-out 5400 veh/h micro run reached a maximum occupancy of 207 vehicles
+(147.857 veh/km/lane), compared with the frozen mesoscopic storage threshold
+`K = 133` derived from the 3600 veh/h fit run.  Therefore, `K` represents a
+calibrated finite-storage threshold for the fitted operating regime rather
+than a physical jam-storage limit.
+
+This distinction does not invalidate the finite-storage mechanism established
+by Experiment A.  It identifies physical storage and cross-boundary queue
+placement as concerns for the mixed-resolution experiments in Gate 2.
+
+At 3000 veh/h, meso travel time is 11.284% higher, speed is 10.140% lower,
+density is 7.914% higher, and throughput is 3.028% lower than micro.  Agenda
+work is reduced by 97.211%.
+
+Activation reduction across the four measured congested demands:
+
+| Demand (veh/h) | Micro activations | Meso activations | Activation reduction |
+|---:|---:|---:|---:|
+| 2400 | 41078 | 1496 | 96.358% |
+| 3000 | 53606 | 1495 | 97.211% |
+| 3600 | 78752 | 1497 | 98.099% |
+| 5400 | 124917 | 1619 | 98.704% |
+
+```mermaid
+xychart-beta
+    title "Agenda activation reduction versus demand"
+    x-axis "Demand (veh/h)" [2400, 3000, 3600, 5400]
+    y-axis "Reduction (%)" 96 --> 99
+    line [96.358, 97.211, 98.099, 98.704]
+```
+
+The reduction rises monotonically with demand because microscopic car-following
+requires increasingly frequent agenda work under congestion, while mesoscopic
+movement remains sparse.
+
+Gate 1 establishes viability rather than universal calibration.  The
+mesoscopic implementation satisfies its event-ordering, capacity, finite
+storage, FIFO wakeup, and no-polling requirements.  At the held-out 3000 veh/h
+demand, it reduces agenda activations by 97.211% while keeping all reported
+traffic measures within approximately 11.3% of micro.  At the more extreme
+5400 veh/h demand, activation reduction rises to 98.704%, while traffic error
+increases to approximately 18.2%.
+
+The high-demand divergence is consistent with the intended limitation of a
+single fixed-capacity abstraction: microscopic IDM discharge changes with
+density, while the mesoscopic baseline retains its frozen capacity.  This
+measured fidelity-efficiency tradeoff closes Gate 1 and motivates the
+mixed-resolution boundary study in Gate 2; it does not trigger retrospective
+parameter tuning.
 
 ## Gate 1 status
 
@@ -243,7 +427,8 @@ congestion level.
 | Sparse-activation reduction | PASS |
 | Meso discharge-capacity enforcement | PASS |
 | Working single-capacity calibration | PASS (2390 veh/h) |
-| Matched saturated micro-to-meso fidelity | PASS |
-| Finite-storage and spillback validation | PENDING |
+| In-sample calibrated consistency | PASS |
+| Finite-storage admission/wakeup mechanism | PASS |
+| Frozen held-out fidelity experiment | COMPLETE |
 
-**Gate 1 overall: OPEN.**
+**Gate 1 overall: CLOSED.**

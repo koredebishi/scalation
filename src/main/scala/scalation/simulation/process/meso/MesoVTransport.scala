@@ -19,7 +19,8 @@ import scalation.mathstat.VectorD
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MesoVTransport` class models one lane using sparse vehicle activations.
  *  Free-flow traversal makes a vehicle ready; FIFO and capacity govern departure.
- *  Storage is unlimited and the downstream boundary is open.
+ *  Finite storage blocks excess vehicles in a native FIFO `WaitQueue` and wakes
+ *  one blocked vehicle whenever a departure frees one reserved slot.
  *  @param name           the name of the transport
  *  @param from_          the starting component
  *  @param to_            the ending component
@@ -28,12 +29,18 @@ import scalation.mathstat.VectorD
  *  @param bend           curvature of the displayed road
  *  @param shift1         display shift at the starting component
  *  @param shift2         display shift at the ending component
+ *  @param storageCapacity maximum admitted vehicles, including running and ready vehicles
  */
 class MesoVTransport (name: String, from_ : Component, to_ : Component,
                       val freeFlowSpeed: Double, val capacity: Double,
                       bend: Double = 0.0, shift1: VectorD = VectorD (0, 0),
-                      shift2: VectorD = VectorD (0, 0))
+                      shift2: VectorD = VectorD (0, 0),
+                      val storageCapacity: Int = Int.MaxValue)
       extends Transport (name, from_, to_, null, false, bend, shift1, shift2):
+
+    private val debug = debugf ("MesoVTransport", false)
+
+    require (storageCapacity > 0, "mesoscopic link storage capacity must be positive")
 
     var length = 0.0                                            // physical road length (metres); builder/config may set it
     if length <= 0.0 then length = curve.length                 // else fall back to the drawing length, same as VTransport
@@ -47,16 +54,40 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     end Entry
 
     private val vdeque = ArrayDeque [Entry] ()
+    private val blocked = new WaitQueue (s"$name-blocked", from_.at.clone ())
     private var nextReleaseTime = Double.NegativeInfinity
+    private var reservedSlots = 0
     private var entered = 0L
     private var released = 0L
 
     def occupancy: Int = vdeque.size
     def enteredCount: Long = entered
     def releasedCount: Long = released
+    def blockedCount: Int = blocked.size
 
     /** Instantaneous density (vehicles/km for this lane), including waiting vehicles. */
     def density: Double = occupancy * 1000.0 / length
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Wait outside the link until storage is available.  A released slot is
+     *  reserved before its FIFO waiter is scheduled, so a same-time new arrival
+     *  cannot steal it.
+     */
+    private def awaitAdmission (actor: Vehicle): Unit =
+        if occupancy + reservedSlots >= storageCapacity || blocked.nonEmpty then
+            blocked.director = director
+            debug ("BLOCK", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
+                   s"reserved=$reservedSlots, blocked=${blocked.size}")
+            val joined = blocked.waitIn ()
+            assert (joined, "the mesoscopic entry wait queue must not bar vehicles")
+            assert (reservedSlots > 0, "a woken vehicle must own a reserved storage slot")
+            reservedSlots -= 1
+            debug ("WAKE", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
+                   s"reserved=$reservedSlots, blocked=${blocked.size}")
+        end if
+        assert (occupancy + reservedSlots < storageCapacity,
+                "admission must not exceed mesoscopic link storage")
+    end awaitAdmission
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Traverse the link on the existing process agenda with the same vehicle.
@@ -65,11 +96,16 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
      */
     override def move (): Unit =
         val actor = director.theActor.asInstanceOf [Vehicle]
+        awaitAdmission (actor)
         val entryTime = director.clock
         val entry = new Entry (actor)
         accum (occupancy)
         vdeque += entry
         entered += 1
+        debug ("ADMIT", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
+               s"reserved=$reservedSlots, blocked=${blocked.size}")
+        assert (occupancy + reservedSlots <= storageCapacity,
+                "mesoscopic link occupancy plus reservations exceeds storage")
 
         actor.schedule (freeFlowTime)
         actor.yieldToDirector ()
@@ -91,6 +127,17 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         vdeque.removeHead ()
         released += 1
         tally (director.clock - entryTime)                     // complete link travel time
+        debug ("RELEASE", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
+               s"reserved=$reservedSlots, blocked=${blocked.size}")
+
+        // Reserve the newly freed slot before scheduling exactly one FIFO waiter.
+        if blocked.nonEmpty then
+            val waitingActor = blocked.dequeue ()
+            reservedSlots += 1
+            debug ("SPACE_RELEASE", s"t=${director.clock}, actor=${waitingActor.asInstanceOf [Vehicle].displayLabel}, " +
+                   s"occupancy=$occupancy, reserved=$reservedSlots, blocked=${blocked.size}")
+            waitingActor.schedule (0.0)
+        end if
 
         // Draw only the departure.
         if director.isAnimating then

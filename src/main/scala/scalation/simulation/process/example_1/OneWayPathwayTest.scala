@@ -42,7 +42,7 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
     //--------------------------------------------------
     // Initialize Model Constants
 
-    val lambda        = 4800.0                              // car arrival rate (per hour)
+    val lambda        = 5400.0                              // Experiment B held-out demand
     val freeFlowSpeed = 68.0 / 2.24694                    // initial speed (metres/second)
 
     Vehicle.setInitialSpeed (freeFlowSpeed)
@@ -118,7 +118,8 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
     println (s"Mean arrival interval (s): ${HOUR / lambda}")
     // Whole-run trial averages for a fully drained road; junction time is excluded.
     println ("Link | From -> To | Length (m) | Completed | Whole-run flow (veh/h) | " +
-             "Mean travel time (s) | Mean traversal speed (km/h) | Whole-run mean density (veh/km/lane)")
+             "Mean travel time (s) | Mean traversal speed (km/h) | Whole-run mean density (veh/km/lane) | " +
+             "Maximum occupancy | Maximum instantaneous density (veh/km/lane)")
     for i <- lane.seg.indices do
         val segment = lane.seg(i)
         val flow = if runSecs > 0.0 then linkCounts(i) * HOUR / runSecs else 0.0
@@ -128,8 +129,11 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
             if runSecs > 0.0 && segment.length > 0.0 then
                 linkTimes(i) * 1000.0 / (runSecs * segment.length)
             else 0.0
+        val maxOccupancy = segment.persistentStat.max.toInt
+        val maxDensity = if segment.length > 0.0 then maxOccupancy * 1000.0 / segment.length else 0.0
         println (s"${segment.name} | ${segment.from.name} -> ${segment.to.name} | " +
-                 f"${segment.length}%.2f | ${linkCounts(i)}%d | $flow%.3f | $travelTime%.3f | $speed%.3f | $density%.3f")
+                 f"${segment.length}%.2f | ${linkCounts(i)}%d | $flow%.3f | $travelTime%.3f | $speed%.3f | " +
+                 f"$density%.3f | $maxOccupancy%d | $maxDensity%.3f")
     end for
 
     Model.shutdown ()

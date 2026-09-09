@@ -24,16 +24,18 @@ end RampMesoMode
  *  @param mode           on-ramp or off-ramp
  *  @param bend           curvature of the displayed ramp
  *  @param offset         lateral display offset
+ *  @param storageCapacity maximum admitted vehicles on the ramp link
  */
 class RampMeso (name: String, val from: Component, val to: Component,
                 length: Double, freeFlowSpeed: Double, capacity: Double, val mode: RampMesoMode,
-                bend: Double = 0.10, offset: Double = 0.0)
+                bend: Double = 0.10, offset: Double = 0.0,
+                storageCapacity: Int = Int.MaxValue)
     extends Component:
 
     private val shift = calculateShift ()
 
     val lane = new MesoVTransport (name, from, to, freeFlowSpeed, capacity,
-                                  bend, shift, shift)
+                                  bend, shift, shift, storageCapacity)
     if length > 0.0 then lane.length = length          // else keep the drawing length
 
     subpart += lane
@@ -93,6 +95,22 @@ object RampMeso:
                RampMesoInfo: (String, Component, Component, RampMesoMode, Double, Double)*): Array [RampMeso] =
         RampMesoInfo.map { case (name, from, to, mode, bend, offset) =>
             new RampMeso (name, from, to, length, freeFlowSpeed, capacity, mode, bend, offset)
+        }.toArray
+    end group
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a group of finite-storage ramps with shared travel parameters.
+     *  @param length           physical length of each ramp (metres)
+     *  @param freeFlowSpeed    free-flow speed for all ramps (metres/second)
+     *  @param capacity         discharge capacity for each ramp (vehicles/hour)
+     *  @param storageCapacity  maximum admitted vehicles on each ramp
+     *  @param RampMesoInfo     ramp name, endpoints, mode, bend and offset
+     */
+    def group (length: Double, freeFlowSpeed: Double, capacity: Double, storageCapacity: Int,
+               RampMesoInfo: (String, Component, Component, RampMesoMode, Double, Double)*): Array [RampMeso] =
+        RampMesoInfo.map { case (name, from, to, mode, bend, offset) =>
+            new RampMeso (name, from, to, length, freeFlowSpeed, capacity, mode,
+                          bend, offset, storageCapacity)
         }.toArray
     end group
 

@@ -16,8 +16,8 @@ import scalation.mathstat.VectorD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PathwayMeso` class defines a single lane of mesoscopic segments connected
- *  by shared junctions.  Each segment has its own FIFO and discharge capacity,
- *  with unlimited storage and an open downstream boundary.
+ *  by shared junctions.  Each segment has its own FIFO, discharge capacity,
+ *  and configurable storage capacity.
  *  @param name            the name of the pathway
  *  @param junc            the array of junctions connecting the segments
  *  @param from            the starting component
@@ -27,10 +27,12 @@ import scalation.mathstat.VectorD
  *  @param capacity        discharge capacity in vehicles/hour per lane for all segments
  *  @param bend            curvature of the displayed lane
  *  @param laneShift       display shift applied to each segment's endpoints
+ *  @param storageCapacity maximum admitted vehicles on each segment
  */
 class PathwayMeso (name: String, val junc: Array [Junction], val from: Component, val to: Component,
                    segmentLengths: VectorD, freeFlowSpeed: Double, capacity: Double,
-                   bend: Double = 0.0, laneShift: VectorD = VectorD (0.0, 0.0))
+                   bend: Double = 0.0, laneShift: VectorD = VectorD (0.0, 0.0),
+                   storageCapacity: Int = Int.MaxValue)
     extends Component:
 
     val points = from +: junc.toList :+ to
@@ -43,7 +45,7 @@ class PathwayMeso (name: String, val junc: Array [Junction], val from: Component
 
         seg(i) = new MesoVTransport (s"${name}_seg${i}", p1, p2,
                                     freeFlowSpeed, capacity,
-                                    bend, laneShift, laneShift)
+                                    bend, laneShift, laneShift, storageCapacity)
         if segmentLengths(i) > 0.0 then seg(i).length = segmentLengths(i)   // else keep the drawing length
         subpart += seg(i)                               // add to the subparts
     end for

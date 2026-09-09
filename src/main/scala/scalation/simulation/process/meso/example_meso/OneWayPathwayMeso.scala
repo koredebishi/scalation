@@ -40,10 +40,11 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
     //--------------------------------------------------
     // Initialize Model Constants
 
-    val lambda         = 3600.0                           // car arrival rate (per hour)
+    val lambda         = 5400.0                           // Experiment B held-out demand
     val numJunc        = 0                              // number of intermediate junctions
     val freeFlowSpeed  = 68.0 / 2.24694                 // free-flow speed (metres/second)
     val capacity       = 2390.0                         // discharge capacity (vehicles/hour)
+    val storageCapacity = 133                            // frozen from micro 3600 veh/h maximum occupancy
     val segmentLengths = new VectorD (numJunc + 1)      // zero uses the display length
 
     Vehicle.setInitialSpeed (freeFlowSpeed)
@@ -65,7 +66,8 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
         junc(i) = Junction (s"jc-$i", xy = (entry.at(0) + spacing * (i + 1), 290), nt = 2, nl = 1)
     end for
 
-    val lane = PathwayMeso ("lane", junc, entry, exit, segmentLengths, freeFlowSpeed, capacity)
+    val lane = PathwayMeso ("lane", junc, entry, exit, segmentLengths, freeFlowSpeed, capacity,
+                            storageCapacity = storageCapacity)
 
     addComponents (List (entry), junc.toList, List (exit), List (lane))  // add endpoints before transport
 
