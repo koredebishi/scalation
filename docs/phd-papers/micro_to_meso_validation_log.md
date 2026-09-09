@@ -432,3 +432,87 @@ parameter tuning.
 | Frozen held-out fidelity experiment | COMPLETE |
 
 **Gate 1 overall: CLOSED.**
+
+## Gate 2 - Mixed-resolution viability
+
+### G2.1 Same-actor micro-meso-micro corridor
+
+This deterministic proof sends one `Vehicle` actor through two microscopic
+`VTransport` links separated by one `MesoVTransport`, all under the same
+process `Model`, director, clock, and agenda:
+
+`VSource -> VTransport -> MesoVTransport -> VTransport -> Sink`
+
+Expected ownership trace:
+
+1. the vehicle joins the incoming `Pathway` doubly linked list;
+2. it completes the incoming `VTransport`, executes the first `Junction.jump`,
+   and then leaves that list;
+3. the same actor and ID traverse `MesoVTransport` without micro-list membership;
+4. it executes the second `Junction.jump`, obtains the current outgoing leader,
+   and joins the outgoing `Pathway` list;
+5. it completes the second `VTransport`, leaves that list, and completes at the
+   `Sink`.
+
+Acceptance checks:
+
+- the same actor ID is retained across both resolution boundaries;
+- each resolution boundary is crossed through the native `Junction.jump`;
+- micro DLL membership is absent during mesoscopic traversal;
+- outgoing micro DLL membership is established before microscopic movement;
+- exactly one vehicle enters and releases from the mesoscopic link;
+- exactly one vehicle completes at the sink;
+- final meso occupancy and both micro DLL sizes are zero; and
+- no second director, clock, agenda, or vehicle representation is introduced.
+
+Initial one-vehicle trace before junction crossings were added:
+
+| Time (s) | Actor ID | Transition |
+|---:|---:|---|
+| 0.0 | 12 | joined incoming micro DLL |
+| 17.5 | 12 | left incoming micro DLL and entered meso |
+| 67.5 | 12 | left meso after its 50.0-second traversal and joined outgoing micro DLL |
+| 82.0 | 12 | left outgoing micro DLL and completed at sink |
+
+Final checks reported one sink completion, one meso entry and release, zero
+meso occupancy, zero blocked vehicles, and zero vehicles in both microscopic
+DLLs.  The run used 67 agenda activations.  The unchanged actor ID confirms
+that no vehicle reconstruction occurred at either boundary.
+
+The first run passed its local state assertions, but visual inspection showed
+the token stopping at the first resolution boundary.  The actor had called the
+three transport `move` methods directly and treated both `Junction` components
+as passive geometry.  It therefore bypassed `Junction.jump`, including the
+native boundary animation, recorder, tally, and junction occupancy lifecycle.
+That first run is not accepted as the mixed-boundary proof.
+
+The corrected actor calls the first `jump` while it still belongs to the
+incoming micro pathway, removes itself from that DLL only after the jump, and
+calls the second `jump` before querying `mergeLeaderAt(0)` and `joinAt` on the
+outgoing micro pathway.  Looking up the leader after `jump` is required because
+the jump yields and the downstream traffic state may change while it waits.
+
+Corrected four-vehicle trace with `storageCapacity = 2`:
+
+| Actor | ID | Micro-in entry | Meso entry | Micro-out entry | Sink |
+|---|---:|---:|---:|---:|---:|
+| M-1 | 12 | 0.0 | 18.5 | 69.5 | 84.0 |
+| M-2 | 13 | 1.0 | 20.5 | 71.5 | 87.5 |
+| M-3 | 14 | 2.0 | 27.0 | 119.5 | 142.5 |
+| M-4 | 15 | 3.0 | 28.5 | 121.5 | 143.5 |
+
+All four vehicles completed.  The mesoscopic link reported four entries and
+four releases, both microscopic DLLs ended empty, mesoscopic occupancy ended
+at zero, and the run used 342 agenda activations.  Visual inspection confirmed
+that the vehicles transferred across both resolution boundaries.  The long
+pause for M-3 and M-4 was caused by the deliberately restrictive two-vehicle
+mesoscopic storage used for the earlier spillback mechanism test: each waited
+for a slot and then traversed the 50-second mesoscopic link.  This is not an
+execution-performance measurement.
+
+The mesoscopic animation remains sparse: a vehicle is stationary at the entry
+boundary during its traversal and is placed at the downstream boundary on
+release.  That visualization limitation does not invalidate the observed
+same-actor transfer.
+
+**Status: PASS.**
