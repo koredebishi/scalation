@@ -16,18 +16,8 @@ import scalation.mathstat.*
 import scalation.modeling.{Fit, FitM}
 import scalation.simulation.process.config.PeMSDemand
 
+import scala.collection.mutable.ArrayBuffer
 import scala.math.{abs, sqrt}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `BasicStats` case class holds basic simulation statistics.
- *  Always generated regardless of demand mode.
- *  @param totalVehicles   total number of vehicles that completed the simulation
- *  @param avgTravelTime   average travel time across all vehicles (seconds)
- *  @param throughput      completed vehicles per hour over the simulation duration
- *  @param simDuration     total simulation duration (seconds)
- */
-case class BasicStats (totalVehicles: Int, avgTravelTime: Double,
-                       throughput: Double, simDuration: Double)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MacroMetrics` case class holds macro-level validation metrics per sensor.
@@ -435,60 +425,81 @@ end SimulationReport
  */
 object SimulationReport:
 
-    /** Labels for the maximum absolute differences returned by compareRuns. */
-    val comparisonLabels = Array ("detector counts", "detector speed (m/s)", "density (veh/km/lane)",
-                                  "generated actors", "completed vehicles", "mean travel time (s)",
-                                  "throughput (veh/h)", "simulation duration (s)")
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** A model's components and all their subparts, in registration order. */
+    private def walkComponents (model: process.Model): List [process.Component] =
+        def visit (p: process.Component): List [process.Component] =
+            p :: (0 until p.subpart.size).toList.flatMap (i => visit (p.subpart(i)))
+        model.getComponents.toList.flatMap (visit)
+    end walkComponents
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare two completed runs without loading observations or invoking optimization.
-     *  Recorder matrices are matched by component order, name, interval and dimensions.
-     *  The returned VectorD contains maximum absolute differences in comparisonLabels order.
-     *  All zeroes mean these recorded results match exactly; this does not compare
-     *  individual trajectories or prove physical validity. Non-finite data fails comparison.
-     *  @param first   baseline model after waitFinished
-     *  @param second  comparison model after waitFinished
+    /** Save lightweight accounting and all registered recorder matrices after a run.
+     *  Completed count and mean travel time come from each `Sink`'s own duration
+     *  statistic (pooled via `Statistic.aggregate`); throughput is that count over
+     *  the model's run length.  Returns a unique prefix that callers may also use
+     *  for validation exports.
+     *  @param model       completed model (one replication)
+     *  @param dynamics    car-following model and solver description
+     *  @param parameters  actual parameters applied by the caller, in dynamics order
      */
-    def compareRuns (first: process.Model, second: process.Model): VectorD =
-        val aStats = first.getBasicStats
-        val bStats = second.getBasicStats
-        val a = first.getRecorders
-        val b = second.getRecorders
-        require (a.length == b.length, "runs must have the same recorder components")
-        val differences = new VectorD (comparisonLabels.length)
+    def exportRun (model: process.Model, dynamics: String, parameters: VectorD): String =
+        require (model.reps == 1, "run accounting export currently requires one replication")
+        val comps      = walkComponents (model)
+        val sinks      = comps.collect { case s: process.Sink => s }
+        val sinkDur    = ArrayBuffer.from (sinks.map (_.durationStat))
+        val agg        = if sinkDur.nonEmpty then Statistic.aggregate (sinkDur, "sinks") else null
+        val completed  = if agg != null then agg.num else 0
+        val meanTravel = if agg != null then agg.mean else 0.0
+        val duration   = model.simDuration
+        val throughput = if duration > 0.0 then completed * 3600.0 / duration else 0.0
+        val prefix = s"run_${java.time.Instant.now.toEpochMilli}_${java.util.UUID.randomUUID}"
+        val writer = new EasyWriter ("simulation", s"${prefix}_summary.txt")
+        def emit (line: String): Unit =
+            println (line)
+            writer.println (line)
+        end emit
 
-        def compareMatrix (x: MatrixD, y: MatrixD, metric: Int): Unit =
-            require (x.dim == y.dim && x.dim2 == y.dim2, "recorder matrix dimensions differ")
-            cfor (0, x.dim) { i =>
-                cfor (0, x.dim2) { j =>
-                    val d = abs (x(i, j) - y(i, j))
-                    differences(metric) = if d.isFinite then math.max (differences(metric), d)
-                                          else Double.PositiveInfinity
-                }
-            }
-        end compareMatrix
+        try
+            emit (s"Model: ${model.name}")
+            emit (s"Dynamics: $dynamics")
+            emit (s"Applied parameters (dynamics order): $parameters")
+            emit (s"Animated: ${model.isAnimating}")
+            emit (s"Simulation duration (s): $duration")
+            emit (s"Generated actors: ${model.getNumActors}")
+            emit (s"Completed at sinks: $completed")
+            emit (s"Generated minus completed (unfinished or otherwise unaccounted): ${model.getNumActors - completed}")
+            emit (s"Mean completed travel time (s): $meanTravel")
+            emit (s"Completed throughput (veh/h): $throughput")
+            emit ("\nSink totals:")
+            for s <- sinks do
+                val st = s.durationStat
+                emit (s"${s.name} [${s.id}] | completed=${st.num} | mean travel time (s)=${if st.num > 0 then st.mean else 0.0}")
+            emit ("Recorder CSV covers each recorder's configured time window; counts may therefore differ from full-run passage totals.")
+            emit ("Speed is mean detector speed; density is the latest recorded sample in the interval, not an interval mean.")
+            emit ("A zero recorder value may indicate no sample. These aggregates do not establish physical gap safety.")
+        finally writer.finish ()
 
-        cfor (0, a.length) { i =>
-            require (a(i)._1 == b(i)._1, "recorder names or registration order differ")
-            val left = a(i)._2
-            val right = b(i)._2
-            require (left.rowTime == right.rowTime, "recorder observation intervals differ")
-            val (lc, ls) = left.getRecorderMat
-            val (rc, rs) = right.getRecorderMat
-            compareMatrix (lc, rc, 0)
-            compareMatrix (ls, rs, 1)
-            compareMatrix (left.getDensityMat, right.getDensityMat, 2)
-        }
-        differences(3) = abs (first.getNumActors.toDouble - second.getNumActors)
-        differences(4) = abs (aStats.totalVehicles.toDouble - bStats.totalVehicles)
-        differences(5) = abs (aStats.avgTravelTime - bStats.avgTravelTime)
-        differences(6) = abs (aStats.throughput - bStats.throughput)
-        differences(7) = abs (aStats.simDuration - bStats.simDuration)
-        cfor (0, differences.dim) { i =>
-            if !differences(i).isFinite then differences(i) = Double.PositiveInfinity
-        }
-        differences
-    end compareRuns
+        val csv = new EasyWriter ("simulation", s"${prefix}_recorders.csv")
+        def quote (s: String): String = "\"" + s.replace ("\"", "\"\"") + "\""
+        try
+            csv.println ("recorder_index,component,interval_start_s,interval_end_s,lane_index,count,mean_detector_speed_m_s,latest_density_veh_km_lane")
+            var r = 0
+            for c <- comps do c match
+                case rec: process.Recorder =>
+                    val (counts, speeds) = rec.getRecorderMat
+                    val density = rec.getDensityMat
+                    cfor (0, counts.dim) { i =>
+                        cfor (0, counts.dim2) { l =>
+                            csv.println (s"$r,${quote (c.name)},${i * rec.rowTime},${(i + 1) * rec.rowTime},$l,${counts(i, l)},${speeds(i, l)},${density(i, l)}")
+                        }
+                    }
+                    r += 1
+                case _ =>
+        finally csv.finish ()
+        println (s"Run accounting saved to log/simulation/${prefix}_summary.txt and ${prefix}_recorders.csv")
+        prefix
+    end exportRun
 
     private val debug = debugf ("SimulationReport.companion", false)
 

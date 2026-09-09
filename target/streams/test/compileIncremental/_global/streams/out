@@ -1,0 +1,24 @@
+[debug] [zinc] IncrementalCompile -----------
+[debug] IncrementalCompile.incrementalCompile
+[debug] previous = Stamps for: 0 products, 0 sources, 0 libraries
+[debug] current source = Set(${BASE}/src/test/scala/scalation/animation/LiveAnimationStateTest.scala)
+[debug] > initialChanges = InitialChanges(Changes(added = Set(${BASE}/src/test/scala/scalation/animation/LiveAnimationStateTest.scala), removed = Set(), changed = Set(), unmodified = ...),Set(),Set(),API Changes: Set())
+[debug] Full compilation, no sources in previous analysis.
+[debug] all 1 sources are invalidated
+[debug] Initial set of included nodes: 
+[debug] Recompiling all sources: number of invalidated sources > 50.0 percent of all sources
+[debug] compilation cycle 1
+[info] compiling 1 Scala source to C:\Simulation\scalation_2.0\target\scala-3.8.2\test-classes ...
+[debug] Returning already retrieved and compiled bridge: C:\Users\kored\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala3-sbt-bridge\3.8.2\scala3-sbt-bridge-3.8.2.jar.
+[debug] [zinc] Running cached compiler 7c544f0a for Scala Compiler version 3.8.2
+[debug] [zinc] The Scala compiler is invoked with:
+[debug] 	-deprecation
+[debug] 	-explain
+[debug] 	-explain-types
+[debug] 	-new-syntax
+[debug] 	-Wunused:imports
+[debug] 	-Werror
+[debug] 	-classpath
+[debug] 	C:\Simulation\scalation_2.0\target\scala-3.8.2\test-classes;C:\Simulation\scalation_2.0\target\scala-3.8.2\classes;C:\Users\kored\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala3-library_3\3.8.2\scala3-library_3-3.8.2.jar;C:\Users\kored\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\com\google\code\gson\gson\2.10\gson-2.10.jar;C:\Users\kored\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\junit\jupiter\junit-jupiter-api\5.9.1\junit-jupiter-api-5.9.1.jar;C:\Users\kored\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala-library\3.8.2\scala-library-3.8.2.jar;C:\Users\kored\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\kored\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\junit\platform\junit-platform-commons\1.9.1\junit-platform-commons-1.9.1.jar;C:\Users\kored\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar
+[debug] Scala compilation took 0.7807575 s
+[info] done compiling

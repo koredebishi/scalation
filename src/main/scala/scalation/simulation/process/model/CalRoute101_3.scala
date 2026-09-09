@@ -327,6 +327,6 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
         waitFinished ()
         val wallEnd = System.nanoTime ()
         println (f"[wall] setup ${(wallBuilt - wallStart) / 1e9}%.1f s   run ${(wallEnd - wallBuilt) / 1e9}%.1f s   total ${(wallEnd - wallStart) / 1e9}%.1f s")
-//        Model.shutdown ()
+        Model.shutdown ()
 
 end CalRoute101_3

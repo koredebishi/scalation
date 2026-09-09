@@ -38,22 +38,20 @@ class OneWayVehicleModel (name: String = "OneWayVehicle", reps: Int = 1, animati
 
     //--------------------------------------------------
     // Initialize Model Constants
-
     val lambda = 20.0                                     // car arrival rate (per hour)
-    val mvTime = (2900.0, 3100.0)                         // (lower, upper) on move time
 
     //--------------------------------------------------
     // Create Random Variables (RVs)
 
     val iArrivalRV = Exponential (HOUR / lambda, stream)
-    val motion     = GippsDynamics
+    val motion     = IDMDynamics
 
     //--------------------------------------------------
     // Create Model Components
 
     val entry = VSource ("entry", this, () => Car (), 0, nStop, iArrivalRV, (100, 290))
     val exit  = Sink ("exit", (600, 290))
-    val lane  = VTransport ("lane", entry, exit, motion, false, 0.25)
+    val lane  = VTransport ("lane", entry, exit, motion, false, 0.00)
 
     addComponent (entry, exit, lane)                      // must add from and to before transport!!
 

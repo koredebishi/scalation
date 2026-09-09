@@ -114,7 +114,7 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                 actor.setDisplayLabel(s"$srcPrefix-$seq") // NEW: set human-friendly display label
 
 
-                director.numActors += 1 // number of actors created by all sources, so far
+                director.recordGenerated (this)
                 if director.isAnimating then director.dgAni.updateActorCount(director.numActors) // korede
                 //director.log.trace(this, "generates", actor, director.clock)
                 val carShape = new RoundRectangle2D.Double (0, 0, 14, 7, 4, 4)   // car-shaped token

@@ -65,10 +65,12 @@ object CFParams:
     end fromVector
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** IDM literature defaults (Treiber & Kesting, 2013).
+    /** IDM defaults from the shared vehicle defaults used by standalone runs.
+     *  Read def_prop rather than prop so calibration overrides cannot change this baseline.
      */
-    // val idmDefault: CFParams = CFParams (s0 = 2.0, amax = 1.0, bmax = -1.5, T = 1.5, tau = 0.6)  // literature defaults (Treiber & Kesting, 2013)
-    val idmDefault: CFParams = CFParams (s0 = 5.0, amax = 4.0, bmax = -2.0, T = 3.0, tau = 0.5)   // empirical defaults matching Vehicle.def_prop (ANNSIM 2026)
+    val idmDefault: CFParams = CFParams (s0 = Vehicle.def_prop("s"), amax = Vehicle.def_prop("amax"),
+                                        bmax = Vehicle.def_prop("bmax"), T = Vehicle.def_prop("T"),
+                                        tau = Vehicle.def_prop("rt"), delta = Vehicle.def_prop("del"))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Gipps model defaults.

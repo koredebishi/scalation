@@ -35,21 +35,23 @@ import scalation.mathstat.VectorD
  *  @param nStop      the number arrivals before stopping
  *  @param stream     the base random number stream (0 to 999)
  */
-class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating: Boolean = true,
-                        aniRatio: Double = 500.0, nStop: Int = 10, stream: Int = 0)
+class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating: Boolean = false,
+                        aniRatio: Double = 500.0, nStop: Int = 300, stream: Int = 0)
     extends Model (name, reps, animating, aniRatio):
 
     //--------------------------------------------------
     // Initialize Model Constants
 
-    val lambda = 10.0                                     // car arrival rate (per hour)
-    private val debug = debugf("OneWayPathwayTest", true) // debug function
+    val lambda        = 4800.0                              // car arrival rate (per hour)
+    val freeFlowSpeed = 68.0 / 2.24694                    // initial speed (metres/second)
+
+    Vehicle.setInitialSpeed (freeFlowSpeed)
 
     //--------------------------------------------------
     // Create Random Variables (RVs)
 
-    val iArrivalRV = Exponential (MINUTE / lambda, stream)
-    val motion     = GippsDynamics
+    val iArrivalRV = Exponential (HOUR / lambda, stream)
+    val motion     = IDMDynamics
     val numJunc = 0
     //--------------------------------------------------
     // Create Model Components
@@ -68,31 +70,28 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
     //--------------------------------------------------
     // Specify Scripts for each Type of Simulation Actor
 
+    val linkCounts = Array.ofDim [Int] (lane.seg.length)
+    val linkTimes  = Array.ofDim [Double] (lane.seg.length)
+
     case class Car() extends Vehicle("c", this):
 
         override def act(): Unit =
-            println(s"act: Car $this BEGINS")
 
 
-            Vehicle.setInitialSpeed(68.0 / 2.24694) // Speed initialization
-            //::::::::::::::::::::::::::::::::::::::
             this.laneID = subtype                                                           //Assign this laneID to the Vehicle
-            debug("Act::: ", s"For $this actor in: lane: ${this.laneID}: LaneID Assigned")
 
             val carAhead = lane.getLast // Follow the last vehicle in the lane
-            println(s"act: carAhead = $carAhead")
             lane.joinAt(this, carAhead, 0) // Join the doubly linked list at seg 0
 
 
-            //:::::::Move through junctions
-            for i <- lane.junc.indices do
-                lane.seg(i).move() // Move along the current segment
-                lane.junc(i).jump() // Take stats at the corresponding junction
+            for i <- lane.seg.indices do
+                val entryTime = director.clock
+                lane.seg(i).move ()
+                linkCounts(i) += 1
+                linkTimes(i) += director.clock - entryTime
+                if i < lane.junc.length then lane.junc(i).jump ()
             end for
 
-            lane.seg.last.move()    // move at the last junction to exit.
-
-            println(s"act: $this ENDS")
             lane.removeFromAlist(this) // Remove from the lane at the end
             exit.leave() // Exit the system
         end act
@@ -101,8 +100,38 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
 
     simulate ()
     waitFinished ()
+
+    val completed  = exit.durationStat.num                 // Sink owns the completed-vehicle count
+    val meanTravel = exit.durationStat.mean                // and the mean travel time
+    val runSecs    = simDuration                           // the one run-level fact the Model supplies
+    banner ("Micro pathway statistics")
+    println (s"Generated vehicles: $getNumActors")
+    println (s"Junctions: ${lane.junc.length}")
+    println (s"Transport segments: ${lane.seg.length}")
+    println ("Lanes: 1")
+    println (s"Completed vehicles: $completed")
+    println (s"Mean travel time (s): $meanTravel")
+    println (s"Simulation duration (s): $runSecs")
+    println (s"Whole-run throughput (veh/h): ${if runSecs > 0.0 then completed * HOUR / runSecs else 0.0}")
+    println (s"Agenda activations: $agendaActivations")
+    println (s"Agenda activations per completed vehicle: ${if completed > 0 then agendaActivations.toDouble / completed else 0.0}")
+    println (s"Mean arrival interval (s): ${HOUR / lambda}")
+    // Whole-run trial averages for a fully drained road; junction time is excluded.
+    println ("Link | From -> To | Length (m) | Completed | Whole-run flow (veh/h) | " +
+             "Mean travel time (s) | Mean traversal speed (km/h) | Whole-run mean density (veh/km/lane)")
+    for i <- lane.seg.indices do
+        val segment = lane.seg(i)
+        val flow = if runSecs > 0.0 then linkCounts(i) * HOUR / runSecs else 0.0
+        val travelTime = if linkCounts(i) > 0 then linkTimes(i) / linkCounts(i) else 0.0
+        val speed = if travelTime > 0.0 then 3.6 * segment.length / travelTime else 0.0
+        val density =
+            if runSecs > 0.0 && segment.length > 0.0 then
+                linkTimes(i) * 1000.0 / (runSecs * segment.length)
+            else 0.0
+        println (s"${segment.name} | ${segment.from.name} -> ${segment.to.name} | " +
+                 f"${segment.length}%.2f | ${linkCounts(i)}%d | $flow%.3f | $travelTime%.3f | $speed%.3f | $density%.3f")
+    end for
+
     Model.shutdown ()
 
 end OneWayPathwayTest
-
-

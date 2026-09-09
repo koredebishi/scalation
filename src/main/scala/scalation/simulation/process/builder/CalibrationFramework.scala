@@ -245,7 +245,7 @@ class CalibrateCalRoute101_3 (animating: Boolean = false) extends CalibratableMo
     end runSimulation
     
     def computeFitness(): Double =
-        model.getBasicStats                                      // requires a completed run
+        require (hasRun, "run the simulation before computing fitness")
         val report = SimulationReport.fromJunctions(
             model.getJunctions,
             model.getPemsSensorIndices,
@@ -256,7 +256,7 @@ class CalibrateCalRoute101_3 (animating: Boolean = false) extends CalibratableMo
 
     /** Get the simulation report for detailed output/export */
     def getReport(): SimulationReport =
-        model.getBasicStats                                      // requires a completed run
+        require (hasRun, "run the simulation before generating a report")
         SimulationReport.fromJunctions(
             model.getJunctions,
             model.getPemsSensorIndices,
@@ -265,10 +265,10 @@ class CalibrateCalRoute101_3 (animating: Boolean = false) extends CalibratableMo
     end getReport
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the completed model for the shared SimulationReport.compareRuns method. */
+    /** Return the completed model for run-accounting export. */
     def getModel: Model =
         require (model != null, "apply parameters before requesting the model")
-        model.getBasicStats
+        require (hasRun, "run the simulation before requesting the model")
         model
     end getModel
 
@@ -315,8 +315,9 @@ end CalibrateCalRoute101_3
     println (s"\nGenerating report and exporting files for model: $modelName...")
     val report = modelAdapter.getReport()
     report.report()
-    report.exportCSV(s"unoptimized_${modelName}_data.csv")
-    report.exportReport(s"unoptimized_${modelName}_report.txt")
+    val runPrefix = SimulationReport.exportRun (modelAdapter.getModel, dynamicsConfig.toString, defaultParams)
+    report.exportCSV(s"${runPrefix}_validation_data.csv")
+    report.exportReport(s"${runPrefix}_validation_report.txt")
 
     println (s"\nThe fitness value is: $fitness")
     modelAdapter.shutDown()

@@ -88,7 +88,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor,
                     val actor = makeEntity ()                                // make new actor
                     actor.mySource = this                                    // actor's source
                     actor.subtype  = esubtype                                // set the entity subtype
-                    director.numActors += 1                                  // number of actors created by all sources, so far
+                    director.recordGenerated (this)
                     //if director.isAnimating then director.dgAni.updateActorCount(director.numActors)
                     director.log.trace (this, "generates", actor, director.clock)
                     director.animate (actor, CreateToken, randomColor (actor.id), Ellipse (),
