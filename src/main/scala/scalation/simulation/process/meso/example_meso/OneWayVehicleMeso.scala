@@ -34,8 +34,8 @@ import scalation.random.Sharp
  *  @param nStop      the number of arrivals before stopping
  *  @param stream     the base random number stream (0 to 999)
  */
-class OneWayVehicleMeso (name: String = "OneWayVehicleMeso", reps: Int = 1, animating: Boolean = false,
-                        aniRatio: Double = 8.0, nStop: Int = 4, stream: Int = 0)
+class OneWayVehicleMeso (name: String = "OneWayVehicleMeso", reps: Int = 1, animating: Boolean = true,
+                        aniRatio: Double = 500.0, nStop: Int = 4, stream: Int = 0)
     extends Model (name, reps, animating, aniRatio):
 
     //--------------------------------------------------

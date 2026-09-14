@@ -16,7 +16,7 @@ Your "actors" are the MesoSpec primitives, and the blueprint already names their
 |---|---|---|
 | `MesoTransport` (link) | `Time Delay` | `enter`: post `Ready` at `t + L/v_f`; `ready`: check capacity/downstream → `Release` or `Block`; on release: post next FIFO head |
 | FIFO + `releaseHeadway` | `Noninterruptible Timer` | delay next head until `releaseHeadway` since last release |
-| `MesoNode` / `Movement` | atomic `FSM` actor | one guarded transition per firing (downstream space ∧ priority) |
+| `MesoNode` / `Movement` | atomic `FSM` actor | one guarded transition per firing when downstream space is available |
 | `Source` | `Clock` | `init` posts first arrival; `postfire` posts the next |
 | `Sink` | `Timed Plotter` | record arrival time; no output |
 

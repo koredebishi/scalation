@@ -1,0 +1,31 @@
+flowchart TB
+
+    A["California Microscopic Network<br/>[BuiltNetwork]"]
+    B["Extract Traffic Semantics<br/>[MicroIRExtractor]"]
+    C["Canonical Micro Model<br/>[MicroIRJson]"]
+    D["Generate Mesoscopic Abstraction<br/>[LLM + MesoSpec Schema]"]
+    E["Validate Generated Model<br/>[MesoSpecJson]"]
+    F["Accepted Abstraction<br/>[MesoSpec]"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+
+    C --> G{"Derive Resolution Partition<br/>[MicroIR + MesoSpec]"}
+    F --> G
+
+    G -->|"Mapped segments"| H["MESO Majority<br/>Approximately 9,000-node region"]
+    G -->|"Unmapped segments"| I["MICRO Pockets<br/>Approximately 1,000-node region"]
+
+    H --> J["Construct Meso Components<br/>[T_S + MesoVTransport]"]
+    I --> K["Retain Micro Components<br/>[Pathway + VTransport]"]
+
+    J --> L["Connect Resolution Boundaries<br/>[Junction + same Vehicle]"]
+    K --> L
+
+    L --> M["California Hybrid Model<br/>[Model + one event agenda]"]
+
+    F --> N["Formal Translation<br/>[T_M]"]
+    N --> O["Verify Same Semantics<br/>[Maude]"]

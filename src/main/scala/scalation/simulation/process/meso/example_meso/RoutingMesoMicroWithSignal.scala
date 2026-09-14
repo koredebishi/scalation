@@ -4,10 +4,13 @@
  *  `short-direct` selects the short upper/lower arms; `cheap-detour` makes the
  *  North route through `merge` cheaper.
  */
-package scalation.simulation.process.meso.example_meso
+package scalation
+package simulation
+package process
+package meso
+package example_meso
 
-import scalation.database.graph_pm.ShortestPath
-import scalation.mathstat.{MatrixD, MatrixI, VectorD}
+import scalation.mathstat.{MatrixD, VectorD}
 import scalation.random.Sharp
 
 import scala.collection.immutable.Map
@@ -16,154 +19,166 @@ import scala.collection.immutable.Map
 @main def runRoutingMesoMicroWithSignalCheapDetour (): Unit =
   new RoutingMesoMicroWithSignal (costProfile = "cheap-detour")
 
-class RoutingMesoMicroWithSignal(name: String = "DestinationRoutingMesoMicro", reps: Int = 1,
+class RoutingMesoMicroWithSignal(name: String = "RoutingMesoMicroWithSignal", reps: Int = 1,
                                  animating: Boolean = true, aniRatio: Double = 500.0,
                                  nStop: Int = 30, stream: Int = 0,
                                  costProfile: String = "short-direct")
-  extends Model (name, reps, animating, aniRatio):
-
-  require (nStop > 0 && nStop % 2 == 0,
-    "destination-routing experiment requires a positive even number of vehicles per source")
-  require (reps == 1, "this single-run routing experiment currently assumes reps = 1")
-  require (costProfile == "short-direct" || costProfile == "cheap-detour",
-    s"unknown routing cost profile: $costProfile")
-
-  private val debug = debugf ("DestinationRoutingMesoMicro", true)
-  private val arrivalInterval = 5.0
-  // split, upper, lower, merge, north sink, east sink, west source, south source
-  private val splitNode = 0; private val upperNode = 1; private val lowerNode = 2
-  private val mergeNode = 3; private val sinkNorthNode = 4; private val sinkEastNode = 5
-  private val sourceWestNode = 6; private val sourceSouthNode = 7; private val nodeCount = 8
-  private val destinations = Array (sinkNorthNode, sinkEastNode)
-
-  val freeFlowSpeed = 68.0 / 2.24694
-  val mesoCapacity = 1800.0
-  val storageCapacity = 10
-  Vehicle.setInitialSpeed (freeFlowSpeed)
-
-  // Both sources assign the same destination in each clock round. Clock-based
-  // alternation is deterministic and resets with every replication.
-  private def makeCar (origin: Int): Vehicle =
-    val i = math.round (director.clock / arrivalInterval).toInt
-    Car (origin, destinations(i % destinations.length))
-  end makeCar
-
-  val sourceWest = VSource ("source-west", this, () => makeCar (sourceWestNode), 0, nStop,
-    Sharp (arrivalInterval, stream), (100, 600))
-  val sourceSouth = VSource ("source-south", this, () => makeCar (sourceSouthNode), 0, nStop,
-    Sharp (arrivalInterval, stream + 1), (600, 1100))
-  val split = Junction ("split", xy = (600.0, 600.0), nt = 2, nl = 1)
-  val upper = Junction ("upper", xy = (850.0, 350.0), nt = 2, nl = 1)
-  val lower = Junction ("lower", xy = (850.0, 850.0), nt = 2, nl = 1)
-  val merge = Junction ("merge", xy = (1100.0, 350.0), nt = 2, nl = 1)
-  val sinkNorth = Sink ("sink-north", (1100, 100)); val sinkEast = Sink ("sink-east", (1350, 600))
-
-  private def link (name: String, from: Component, to: Component, length: Double,
-                    shift1: VectorD = VectorD (0.0, 0.0), shift2: VectorD = VectorD (0.0, 0.0)): MesoVTransport =
-    val x = MesoVTransport (name, from, to, freeFlowSpeed, mesoCapacity,
-      shift1 = shift1, shift2 = shift2, storageCapacity = storageCapacity)
-    x.length = length; x
-  end link
-
-  val fromWest = link ("from-west", sourceWest, split, 300.0, shift2 = VectorD (-20.0, 0.0))
-  val fromSouth = link ("from-south", sourceSouth, split, 350.0, shift2 = VectorD (0.0, 20.0))
-  val splitUpper = link ("split-upper", split, upper, 300.0)
-  val upperNorth = link ("upper-north", upper, sinkNorth, 300.0)
-  val splitLower = link ("split-lower", split, lower, 300.0)
-  val lowerEast = link ("lower-east", lower, sinkEast, 300.0)
-  val upperMerge = link ("upper-merge", upper, merge, 500.0)
-  val lowerMerge = link ("lower-merge", lower, merge, 500.0)
-  val mergeNorth = link ("merge-north", merge, sinkNorth, 500.0)
-  val mergeEast = link ("merge-east", merge, sinkEast, 500.0)
-  if costProfile == "cheap-detour" then upperNorth.length = 1200.0
-  private val allLinks = Array (fromWest, fromSouth, splitUpper, upperNorth, splitLower, lowerEast,
-    upperMerge, lowerMerge, mergeNorth, mergeEast)
-  private val sinks = Array (sinkNorth, sinkEast)
-  private val destinationSink: Map [Int, Sink] = Map (sinkNorthNode -> sinkNorth, sinkEastNode -> sinkEast)
-
-  // Every edge in this experiment is mesoscopic, so retain the concrete
-  // type here to use its native free-flow travel-time accessor.
-  private val roads: Map [(Int, Int), MesoVTransport] = Map (
-    (sourceWestNode, splitNode) -> fromWest, (sourceSouthNode, splitNode) -> fromSouth,
-    (splitNode, upperNode) -> splitUpper, (upperNode, sinkNorthNode) -> upperNorth,
-    (splitNode, lowerNode) -> splitLower, (lowerNode, sinkEastNode) -> lowerEast,
-    (upperNode, mergeNode) -> upperMerge, (lowerNode, mergeNode) -> lowerMerge,
-    (mergeNode, sinkNorthNode) -> mergeNorth, (mergeNode, sinkEastNode) -> mergeEast)
-
-  // Reverse the graph and run native Dijkstra once per destination. Native
-  // ShortestPath interprets zero as "no edge"; every real edge has positive cost.
-  private val reverseCost = new MatrixD (nodeCount, nodeCount)
-  for ((u, v), transport) <- roads do reverseCost(v, u) = transport.freeFlowTime
-  private val nextHop = MatrixI ((nodeCount, nodeCount), Array.fill (nodeCount * nodeCount)(-1)*)
-  for destination <- destinations do
-    val (_, predecessor) = new ShortestPath (reverseCost.copy, destination).spath ()
-    for node <- 0 until nodeCount do nextHop(node, destination) = predecessor(node)
-  end for
-
-  private def route (atNode: Int, destination: Int): (Int, MesoVTransport) =
-    val nextNode = nextHop(atNode, destination).toInt
-    require (nextNode >= 0, s"no route from node $atNode to destination $destination")
-    val transport = roads.getOrElse ((atNode, nextNode),
-      throw new IllegalStateException (s"no transport for routing edge $atNode -> $nextNode"))
-    (nextNode, transport)
-  end route
-
-  private val components: Seq [Component] =
-    Seq (sourceWest, sourceSouth, split, upper, lower, merge, sinkNorth, sinkEast) ++ allLinks.toSeq
-  addComponent (components*)
-
-  case class Car (origin: Int, destination: Int) extends Vehicle ("c", this):
-    override def act (): Unit =
-      // Origin selects the fixed ingress; Dijkstra begins at split.
-      val ingress = if origin == sourceWestNode then fromWest else fromSouth
-      val ingressSource = if origin == sourceWestNode then sourceWest else sourceSouth
-      require (ingress.from eq ingressSource, s"invalid ingress for origin $origin")
-      ingress.move ()
-      split.jump ()
-      var atNode = splitNode
-      var atComponent: Component = split
-      while atNode != destination do
-        val (nextNode, selected) = route (atNode, destination)
-        require (selected.from eq atComponent, s"selected ${selected.name} does not leave node $atNode")
-        selected.move ()
-        selected.to match
-          case j: Junction =>
-            j.jump (); atComponent = j; atNode = nextNode
-            debug ("ROUTE", s"t=${director.clock}, actor=$displayLabel, id=$id, origin=$origin, destination=$destination, ${selected.name} -> ${j.name}")
-          case sink: Sink =>
-            require (nextNode == destination && (destinationSink(destination) eq sink), s"unexpected sink ${sink.name}")
-            sink.leave (); atNode = destination
-          case other => throw new IllegalStateException (s"route ended at non-junction component $other")
-      end while
-    end act
-  end Car
-
-  banner (s"G2.3A destination-aware Dijkstra branching [$costProfile]")
-  println ("two Sources -> split -> diamond alternatives -> two Sinks")
-  println (s"vehicles per source=$nStop, total vehicles=${2 * nStop}, destinations=${destinations.mkString ("[", ",", "]")}")
-  println (s"split next hops: North=${nextHop(splitNode, sinkNorthNode).toInt}, East=${nextHop(splitNode, sinkEastNode).toInt}")
-  require (nextHop(splitNode, sinkNorthNode).toInt == upperNode && nextHop(splitNode, sinkEastNode).toInt == lowerNode,
-    "Dijkstra did not select the expected destination-specific first arms")
-  val northAfterUpper = nextHop(upperNode, sinkNorthNode).toInt
-  require (northAfterUpper == (if costProfile == "short-direct" then sinkNorthNode else mergeNode),
-    s"North route after Upper=$northAfterUpper under profile $costProfile")
-
-  simulate (); waitFinished ()
-  val totalVehicles = 2 * nStop; val expectedPerSink = totalVehicles / destinations.length
-  val completed = sinks.map (_.durationStat.num).sum
-  require (completed == totalVehicles, s"completed=$completed, expected=$totalVehicles")
-  for sink <- sinks do require (sink.durationStat.num == expectedPerSink, s"${sink.name} completions=${sink.durationStat.num}, expected=$expectedPerSink")
-  require (split.durationStat.num == totalVehicles, s"split crossings=${split.durationStat.num}")
-  require (upper.durationStat.num == expectedPerSink && lower.durationStat.num == expectedPerSink, s"direct-arm crossings upper/lower=${upper.durationStat.num}/${lower.durationStat.num}")
-  val expectedMerge = if costProfile == "short-direct" then 0 else expectedPerSink
-  require (merge.durationStat.num == expectedMerge,
-    s"merge crossings=${merge.durationStat.num}, expected=$expectedMerge")
-  require (fromWest.enteredCount == nStop && fromSouth.enteredCount == nStop,
-    s"ingress entries west/south=${fromWest.enteredCount}/${fromSouth.enteredCount}")
-  for link <- allLinks do require (link.occupancy == 0 && link.blockedCount == 0, s"${link.name} not drained")
-  banner (s"Destination-aware Dijkstra branching [$costProfile]: PASS")
-  println (s"completed=$completed, sink completions=${sinks.map (_.durationStat.num).mkString ("[", ",", "]")}")
-  println (s"split/upper/lower/merge crossings=${split.durationStat.num}/${upper.durationStat.num}/${lower.durationStat.num}/${merge.durationStat.num}")
-  println (s"agenda activations=$agendaActivations")
-  Model.shutdown ()
+    extends Model (name, reps, animating, aniRatio):
+  
+    require (nStop > 0 && nStop % 2 == 0,
+      "destination-routing experiment requires a positive even number of vehicles per source")
+    require (reps == 1, "this single-run routing experiment currently assumes reps = 1")
+    require (costProfile == "short-direct" || costProfile == "cheap-detour",
+      s"unknown routing cost profile: $costProfile")
+  
+    private val debug = debugf ("RoutingMesoMicroWithSignal", true)
+    private val arrivalInterval = 5.0
+    // split, upper, lower, merge, north sink, east sink, west source, south source
+    private val splitNode = 0; private val upperNode = 1; private val lowerNode = 2
+    private val mergeNode = 3; private val sinkNorthNode = 4; private val sinkEastNode = 5
+    private val sourceWestNode = 6; private val sourceSouthNode = 7; private val nodeCount = 8
+    private val destinations = Array (sinkNorthNode, sinkEastNode)
+  
+    // Experiment-local three-phase signal: one FIFO queue controls branch entry.
+    private val signalQueue = WaitQueue ("split-signal-queue", (580, 620))
+    private val splitSignal = TrafficLight ("split-signal", this, signalQueue,
+                                            greenTime = 15.0, amberTime = 3.0,
+                                            redTime = 15.0, xy = (620, 580),
+                                            cycles = 1000, satHeadway = 2.0,
+                                            startupLoss = 0.0)
+  
+    val freeFlowSpeed = 68.0 / 2.24694
+    val mesoCapacity = 1800.0
+    val storageCapacity = 10
+    Vehicle.setInitialSpeed (freeFlowSpeed)
+  
+    // Both sources assign the same destination in each clock round. Clock-based
+    // alternation is deterministic and resets with every replication.
+    private def makeCar (origin: Int): Vehicle =
+      val i = math.round (director.clock / arrivalInterval).toInt
+      Car (origin, destinations(i % destinations.length))
+    end makeCar
+  
+    val sourceWest = VSource ("source-west", this, () => makeCar (sourceWestNode), 0, nStop,
+      Sharp (arrivalInterval, stream), (100, 600))
+    val sourceSouth = VSource ("source-south", this, () => makeCar (sourceSouthNode), 0, nStop,
+      Sharp (arrivalInterval, stream + 1), (600, 1100))
+    val split = Junction ("split", xy = (600.0, 600.0), nt = 2, nl = 1)
+    val upper = Junction ("upper", xy = (850.0, 350.0), nt = 2, nl = 1)
+    val lower = Junction ("lower", xy = (850.0, 850.0), nt = 2, nl = 1)
+    val merge = Junction ("merge", xy = (1100.0, 350.0), nt = 2, nl = 1)
+    val sinkNorth = Sink ("sink-north", (1100, 100)); val sinkEast = Sink ("sink-east", (1350, 600))
+  
+    private def link (name: String, from: Component, to: Component, length: Double,
+                      shift1: VectorD = VectorD (0.0, 0.0), shift2: VectorD = VectorD (0.0, 0.0)): MesoVTransport =
+        val x = MesoVTransport (name, from, to, freeFlowSpeed, mesoCapacity,
+          shift1 = shift1, shift2 = shift2, storageCapacity = storageCapacity)
+        x.length = length; x
+    end link
+  
+    val fromWest = link ("from-west", sourceWest, split, 300.0, shift2 = VectorD (-20.0, 0.0))
+    val fromSouth = link ("from-south", sourceSouth, split, 350.0, shift2 = VectorD (0.0, 20.0))
+    val splitUpper = link ("split-upper", split, upper, 300.0)
+    val upperNorth = link ("upper-north", upper, sinkNorth, 300.0)
+    val splitLower = link ("split-lower", split, lower, 300.0)
+    val lowerEast = link ("lower-east", lower, sinkEast, 300.0)
+    val upperMerge = link ("upper-merge", upper, merge, 500.0)
+    val lowerMerge = link ("lower-merge", lower, merge, 500.0)
+    val mergeNorth = link ("merge-north", merge, sinkNorth, 500.0)
+    val mergeEast = link ("merge-east", merge, sinkEast, 500.0)
+    if costProfile == "cheap-detour" then upperNorth.length = 1200.0
+    private val allLinks = Array (fromWest, fromSouth, splitUpper, upperNorth, splitLower, lowerEast,
+      upperMerge, lowerMerge, mergeNorth, mergeEast)
+    private val sinks = Array (sinkNorth, sinkEast)
+    private val destinationSink: Map [Int, Sink] = Map (sinkNorthNode -> sinkNorth, sinkEastNode -> sinkEast)
+  
+    // Every edge in this experiment is mesoscopic, so retain the concrete
+    // type here to use its native free-flow travel-time accessor.
+    private val roads: Map [(Int, Int), MesoVTransport] = Map (
+        (sourceWestNode, splitNode) -> fromWest, (sourceSouthNode, splitNode) -> fromSouth,
+        (splitNode, upperNode) -> splitUpper, (upperNode, sinkNorthNode) -> upperNorth,
+        (splitNode, lowerNode) -> splitLower, (lowerNode, sinkEastNode) -> lowerEast,
+        (upperNode, mergeNode) -> upperMerge, (lowerNode, mergeNode) -> lowerMerge,
+        (mergeNode, sinkNorthNode) -> mergeNorth, (mergeNode, sinkEastNode) -> mergeEast)
+  
+    // Reverse the graph and run native Dijkstra once per destination. Native
+    private val cost = new MatrixD (nodeCount, nodeCount)
+    for ((u, v), transport) <- roads do cost(u, v) = transport.freeFlowTime
+    private val routingTable = new RoutingTable ("RoutingMesoMicroWithSignal", cost, destinations)
+    split.setRouting (routingTable, splitNode)
+    upper.setRouting (routingTable, upperNode)
+    lower.setRouting (routingTable, lowerNode)
+    merge.setRouting (routingTable, mergeNode)
+    split.setOutgoing (upperNode -> splitUpper, lowerNode -> splitLower)
+    upper.setOutgoing (sinkNorthNode -> upperNorth, mergeNode -> upperMerge)
+    lower.setOutgoing (sinkEastNode -> lowerEast, mergeNode -> lowerMerge)
+    merge.setOutgoing (sinkNorthNode -> mergeNorth, sinkEastNode -> mergeEast)
+    split.setControl (splitSignal)
+  
+    private def route (atNode: Int, atJunction: Junction, destination: Int): (Int, MesoVTransport) =
+        val nextNode = atJunction.nextNode (destination)
+        require (nextNode >= 0, s"no route from node $atNode to destination $destination")
+        val transport = roads.getOrElse ((atNode, nextNode),
+          throw new IllegalStateException (s"no transport for routing edge $atNode -> $nextNode"))
+        (nextNode, transport)
+    end route
+  
+    private val components: Seq [Component] =
+      Seq (sourceWest, sourceSouth, split, upper, lower, merge, sinkNorth, sinkEast) ++ allLinks.toSeq
+    private val signalComponents: Seq [Component] = components ++ Seq (splitSignal)
+    addComponent (signalComponents*)
+  
+    case class Car (origin: Int, destination: Int) extends Vehicle ("c", this):
+      override def act (): Unit =
+        // Origin selects the fixed ingress; Dijkstra begins at split.
+        val ingress = if origin == sourceWestNode then fromWest else fromSouth
+        val ingressSource = if origin == sourceWestNode then sourceWest else sourceSouth
+        require (ingress.from eq ingressSource, s"invalid ingress for origin $origin")
+        ingress.move ()
+        var atNode = splitNode
+        var selected = split.jumpTo (destination).asInstanceOf [MesoVTransport]
+        while atNode != destination do
+          selected.move ()
+          selected.to match
+            case j: Junction =>
+              atNode = j.nodeId
+              selected = j.jumpTo (destination).asInstanceOf [MesoVTransport]
+              debug ("ROUTE", s"t=${director.clock}, actor=$displayLabel, id=$id, origin=$origin, destination=$destination, ${selected.name} from ${j.name}")
+            case sink: Sink =>
+              require (destinationSink(destination) eq sink, s"unexpected sink ${sink.name}")
+              sink.leave (); atNode = destination
+            case other => throw new IllegalStateException (s"route ended at non-junction component $other")
+        end while
+      end act
+    end Car
+  
+    banner (s"G2.3C signalized destination-aware routing [$costProfile]")
+    println ("two Sources -> split -> diamond alternatives -> two Sinks")
+    println (s"vehicles per source=$nStop, total vehicles=${2 * nStop}, destinations=${destinations.mkString ("[", ",", "]")}")
+    println (s"split next hops: North=${routingTable.next (splitNode, sinkNorthNode)}, East=${routingTable.next (splitNode, sinkEastNode)}")
+    require (routingTable.next (splitNode, sinkNorthNode) == upperNode && routingTable.next (splitNode, sinkEastNode) == lowerNode,
+             "Dijkstra did not select the expected destination-specific first arms")
+    val northAfterUpper = routingTable.next (upperNode, sinkNorthNode)
+    require (northAfterUpper == (if costProfile == "short-direct" then sinkNorthNode else mergeNode),
+      s"North route after Upper=$northAfterUpper under profile $costProfile")
+  
+    simulate (); waitFinished ()
+    val totalVehicles = 2 * nStop; val expectedPerSink = totalVehicles / destinations.length
+    val completed = sinks.map (_.durationStat.num).sum
+    require (completed == totalVehicles, s"completed=$completed, expected=$totalVehicles")
+    for sink <- sinks do require (sink.durationStat.num == expectedPerSink, s"${sink.name} completions=${sink.durationStat.num}, expected=$expectedPerSink")
+    require (split.durationStat.num == totalVehicles, s"split crossings=${split.durationStat.num}")
+    require (upper.durationStat.num == expectedPerSink && lower.durationStat.num == expectedPerSink, s"direct-arm crossings upper/lower=${upper.durationStat.num}/${lower.durationStat.num}")
+    val expectedMerge = if costProfile == "short-direct" then 0 else expectedPerSink
+        require (merge.durationStat.num == expectedMerge,
+                 s"merge crossings=${merge.durationStat.num}, expected=$expectedMerge")
+        require (signalQueue.isEmpty, s"signal queue contains ${signalQueue.size} vehicles after completion")
+    require (fromWest.enteredCount == nStop && fromSouth.enteredCount == nStop,
+      s"ingress entries west/south=${fromWest.enteredCount}/${fromSouth.enteredCount}")
+    for link <- allLinks do require (link.occupancy == 0 && link.blockedCount == 0, s"${link.name} not drained")
+    banner (s"G2.3C signalized destination-aware routing [$costProfile]: PASS")
+    println (s"completed=$completed, sink completions=${sinks.map (_.durationStat.num).mkString ("[", ",", "]")}")
+    println (s"split/upper/lower/merge crossings=${split.durationStat.num}/${upper.durationStat.num}/${lower.durationStat.num}/${merge.durationStat.num}")
+    println (s"agenda activations=$agendaActivations")
+    Model.shutdown ()
 end RoutingMesoMicroWithSignal

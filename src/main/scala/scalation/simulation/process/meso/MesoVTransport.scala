@@ -53,8 +53,8 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         var ready = false
     end Entry
 
-    private val vdeque = ArrayDeque [Entry] ()
-    private val blocked = new WaitQueue (s"$name-blocked", from_.at.clone ())
+    private val vdeque = ArrayDeque [Entry] ()   // Array deque of vehicle 
+    private val blocked = new WaitQueue (s"$name-blocked", from_.at.clone ())     // FIFO queue for blocked vehicles
     private var nextReleaseTime = Double.NegativeInfinity
     private var reservedSlots = 0
     private var entered = 0L
@@ -78,7 +78,7 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
             blocked.director = director
             debug ("BLOCK", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
                    s"reserved=$reservedSlots, blocked=${blocked.size}")
-            val joined = blocked.waitIn ()
+            val joined = blocked.waitIn ()       // wait until a reserved slot is available
             assert (joined, "the mesoscopic entry wait queue must not bar vehicles")
             assert (reservedSlots > 0, "a woken vehicle must own a reserved storage slot")
             reservedSlots -= 1
@@ -96,9 +96,9 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
      */
     override def move (): Unit =
         val actor = director.theActor.asInstanceOf [Vehicle]
-        awaitAdmission (actor)
+        awaitAdmission (actor)          // wait until storage is available 
         val entryTime = director.clock
-        val entry = new Entry (actor)
+        val entry = new Entry (actor)     
         accum (occupancy)
         vdeque += entry
         entered += 1
@@ -107,23 +107,28 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         assert (occupancy + reservedSlots <= storageCapacity,
                 "mesoscopic link occupancy plus reservations exceeds storage")
 
-        actor.schedule (freeFlowTime)
+        val traversalTime = freeFlowTime
+        director.animateTraversal (actor, this, traversalTime)
+        actor.schedule (traversalTime)
         actor.yieldToDirector ()
         entry.ready = true
 
+        //A vehicle can't release until it is the head of the FIFO and the release headway has passed.
+        //this way a vehicle can't overtake another vehicle that is ahead of it in the FIFO, 
+        // even if it is ready to release.
         if vdeque.head ne entry then
             actor.yieldToDirector ()                            // sleep until head releases
         end if
-        assert (vdeque.head eq entry, "only the FIFO head may release")
+        assert (vdeque.head eq entry, "only the FIFO head may release") // sanity check
 
-        val delay = nextReleaseTime - director.clock
+        val delay = nextReleaseTime - director.clock           // seconds until next release
         if delay > 0.0 then
             actor.schedule (delay)
             actor.yieldToDirector ()
         end if
 
-        nextReleaseTime = director.clock + releaseHeadway
-        accum (occupancy)
+        nextReleaseTime = director.clock + releaseHeadway         // schedule next release time
+        accum (occupancy)                                         // 
         vdeque.removeHead ()
         released += 1
         tally (director.clock - entryTime)                     // complete link travel time

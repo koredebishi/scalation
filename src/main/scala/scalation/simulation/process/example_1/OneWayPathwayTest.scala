@@ -16,6 +16,7 @@ package example_1
 
 import scalation.random._
 import scalation.mathstat.VectorD
+//import scalation.simulation.process.ir.MicroIRExtractor
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `runOneWayPathwayTest` function is used to launc h the `OneWayVehicleModel` class.
@@ -42,17 +43,17 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
     //--------------------------------------------------
     // Initialize Model Constants
 
-    val lambda        = 5400.0                              // Experiment B held-out demand
-    val freeFlowSpeed = 68.0 / 2.24694                    // initial speed (metres/second)
+    val lambda        = 200                             // Experiment B held-out demand
+    val initialSpeed  = 68.0 / 2.24694                    // initial speed (metres/second)
 
-    Vehicle.setInitialSpeed (freeFlowSpeed)
+    Vehicle.setInitialSpeed (initialSpeed)
 
     //--------------------------------------------------
     // Create Random Variables (RVs)
 
     val iArrivalRV = Exponential (HOUR / lambda, stream)
     val motion     = IDMDynamics
-    val numJunc = 0
+    val numJunc = 1
     //--------------------------------------------------
     // Create Model Components
     val entry = VSource("entry", this, () => Car(), 0, nStop, iArrivalRV, (100, 290))
@@ -66,6 +67,15 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
 
     val lane  = Pathway("lane",junc,entry,exit,motion, laneShift = VectorD(0.0, 0.0)) // simple and clean
     addComponents (List(entry),junc.toList, List(exit), List(lane))                      // Caveat: must add from and to before transport!!
+
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ///  Create a canonical model snapshot for the micro pathway for the micro meso conversion
+    //val microIR = MicroIRExtractor (lane, iArrivalRV, motion)       // canonical model snapshot
+    //val json    = microIR.prettyJson                                // indented JSON for display
+    //println (s"microir_json =\n$json")
+    //println (s"microir_sha256 = ${microIR.sha256}")
 
     //--------------------------------------------------
     // Specify Scripts for each Type of Simulation Actor
@@ -104,37 +114,36 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
     val completed  = exit.durationStat.num                 // Sink owns the completed-vehicle count
     val meanTravel = exit.durationStat.mean                // and the mean travel time
     val runSecs    = simDuration                           // the one run-level fact the Model supplies
-    banner ("Micro pathway statistics")
-    println (s"Generated vehicles: $getNumActors")
-    println (s"Junctions: ${lane.junc.length}")
-    println (s"Transport segments: ${lane.seg.length}")
-    println ("Lanes: 1")
-    println (s"Completed vehicles: $completed")
-    println (s"Mean travel time (s): $meanTravel")
-    println (s"Simulation duration (s): $runSecs")
-    println (s"Whole-run throughput (veh/h): ${if runSecs > 0.0 then completed * HOUR / runSecs else 0.0}")
-    println (s"Agenda activations: $agendaActivations")
-    println (s"Agenda activations per completed vehicle: ${if completed > 0 then agendaActivations.toDouble / completed else 0.0}")
-    println (s"Mean arrival interval (s): ${HOUR / lambda}")
-    // Whole-run trial averages for a fully drained road; junction time is excluded.
-    println ("Link | From -> To | Length (m) | Completed | Whole-run flow (veh/h) | " +
-             "Mean travel time (s) | Mean traversal speed (km/h) | Whole-run mean density (veh/km/lane) | " +
-             "Maximum occupancy | Maximum instantaneous density (veh/km/lane)")
+    val throughput = if runSecs > 0.0 then completed * HOUR / runSecs else 0.0
+    val activationsPerVehicle = if completed > 0 then agendaActivations.toDouble / completed else 0.0
+    val recorderReports = Array.ofDim [SimulationRecorderReport] (lane.junc.length)
+    cfor (0, lane.junc.length) { i =>
+        val (counts, speeds) = lane.junc(i).getRecorderMat
+        recorderReports(i) = SimulationRecorderReport (lane.junc(i).name, lane.junc(i).rowTime,
+            counts, speeds, lane.junc(i).getDensityMat)
+    }
+    val laneCount = if recorderReports.nonEmpty then recorderReports(0).counts.dim2 else 0
+    val linkReports = Array.ofDim [SimulationLinkReport] (lane.seg.length)
     for i <- lane.seg.indices do
         val segment = lane.seg(i)
         val flow = if runSecs > 0.0 then linkCounts(i) * HOUR / runSecs else 0.0
         val travelTime = if linkCounts(i) > 0 then linkTimes(i) / linkCounts(i) else 0.0
-        val speed = if travelTime > 0.0 then 3.6 * segment.length / travelTime else 0.0
+        val speed = if travelTime > 0.0 then segment.length / travelTime else 0.0
         val density =
             if runSecs > 0.0 && segment.length > 0.0 then
                 linkTimes(i) * 1000.0 / (runSecs * segment.length)
             else 0.0
         val maxOccupancy = segment.persistentStat.max.toInt
         val maxDensity = if segment.length > 0.0 then maxOccupancy * 1000.0 / segment.length else 0.0
-        println (s"${segment.name} | ${segment.from.name} -> ${segment.to.name} | " +
-                 f"${segment.length}%.2f | ${linkCounts(i)}%d | $flow%.3f | $travelTime%.3f | $speed%.3f | " +
-                 f"$density%.3f | $maxOccupancy%d | $maxDensity%.3f")
+        linkReports(i) = SimulationLinkReport (segment.name, segment.from.name, segment.to.name,
+            segment.length, linkCounts(i), flow, travelTime, speed, density, maxOccupancy, maxDensity)
     end for
+
+    val runReport = SimulationRunReport (name, getNumActors, lane.junc.length, lane.seg.length, laneCount,
+        completed, meanTravel, runSecs, throughput, agendaActivations, activationsPerVehicle,
+        HOUR / lambda, recorderReports, linkReports)
+    banner ("Micro pathway JSON report")
+    println (s"simulation_run_json =\n${runReport.prettyJson}")
 
     Model.shutdown ()
 

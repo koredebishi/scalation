@@ -4,6 +4,19 @@
 
 ### Status
 
+**Gate 1 status (2026-09-10): CLOSED.** Experiments A and B are complete.  The
+active work is to freeze the validated mixed-resolution mechanism and define
+the `MesoSpec` grammar and translators; city-scale network-builder expansion is
+out of scope for the present contribution.
+
+**T_S status (2026-09-13): LINEAR MULTI-LINK TRANSLATION PASSED.** The
+`runMesoSpecTwoLinkScalation` test translated and executed an accepted
+three-link `MesoSpec` as native ScalaTion components with two junctions and four
+completed vehicles (`mesospec_sha256 =
+69d8cda511e66912661562125d97594460105c0d2bd8f297c4af93f522cc984f`). This
+extends the retained one-link baseline while leaving branching, merging, and
+mixed-resolution translation as the remaining `T_S` work.
+
 This document supersedes the earlier two-paper blueprint.
 
 The earlier plan correctly separated model reduction from coupling, but it inherited an incorrect assumption that the existing microscopic Scalation simulator was a conventional discrete-time simulator that would need to be synchronized with a separate discrete-event mesoscopic engine. The source code shows otherwise.
@@ -275,7 +288,6 @@ Actual release depends on:
 - discharge capacity,
 - FIFO ordering,
 - downstream storage,
-- node/merge priority,
 - boundary insertion feasibility.
 
 This distinction solves an important event-semantics problem discussed below.
@@ -380,14 +392,13 @@ This avoids fixed-step polling and avoids having to cancel a precommitted false 
 
 # 7. Same-timestamp event ordering
 
-One agenda also requires deterministic semantics for equal timestamps.
-
-We should define a total ordering as part of the specification.
+One agenda also requires both backends to reproduce the same semantics for
+equal timestamps.
 
 For example:
 
 \[
-(eventTime,\ eventPhase,\ movementPriority,\ sequenceNo).
+(eventTime,\ eventPhase,\ sequenceNo).
 \]
 
 Initial event phases should be:
@@ -395,15 +406,16 @@ Initial event phases should be:
 1. **SpaceRelease** — downstream occupancy decreases.
 2. **Release/Transfer** — waiting vehicles may use newly available space.
 3. **Ready/Admission** — new vehicles become eligible.
-4. deterministic sequence number as final tie-break.
+4. native agenda execution sequence as the final tie-break.
 
-For merges, movement priority is explicit.
-
-For equal-priority movements, use deterministic FIFO/sequence order.
+For simultaneous competing movements, the native agenda determines which
+actor requests downstream admission first and the shared waiting queue
+preserves FIFO order. MesoSpec does not add a second movement-priority policy.
 
 The precise ordering can change during design if traffic semantics demand it, but **once frozen it must live in MesoSpec and both backends must implement the same rule**.
 
-There must not be one tie-breaking rule in Maude and another implicit rule in Scala's priority queue.
+Maude must reproduce the selected ScalaTion agenda/FIFO semantics rather than
+inventing a separate movement-priority rule.
 
 ---
 
@@ -480,6 +492,11 @@ There should be exactly two small semantic representations.
 
 `MicroIR` describes what matters about the existing microscopic model.
 
+MicroIR is a typed intermediate representation, not a user-facing DSL and not
+executable Scala.  It is the smallest deterministic semantic description that
+is sufficient for the micro-to-meso abstraction being studied.  It must not be
+treated as a complete serialization of every Scalation implementation detail.
+
 ```text
 Network
     Segment
@@ -508,6 +525,102 @@ Observables
     density
     travel time
 ```
+
+### MicroIR v0.1 contract
+
+The first frozen representation contains only:
+
+```text
+MicroIR
+    version
+    network
+        nodes
+        segments
+        connectivity
+    demand
+        sources
+        arrival processes
+        routes
+    vehicleDynamics
+        model
+        parameters
+        update interval
+    observables
+        flow
+        speed
+        density
+        travel time
+```
+
+`laneBehavior` is deliberately excluded from v0.1.  The current single-lane
+abstraction does not require it.  Lane changing, merge behavior and related
+semantics become an explicit v0.2 extension when the study moves to a
+multi-lane corridor; they must not be smuggled into v0.1 as optional fields.
+
+### Canonical MicroIR serialization
+
+MicroIR has one typed ADT and one canonical serializer.  The canonical form is
+the input to the LLM and the durable identity of an experiment:
+
+```text
+Scalation microscopic model
+        |
+        v
+    MicroIR ADT
+        |
+        v
+canonical MicroIR JSON
+        |
+        +--> SHA-256 hash in experiment logs
+        |
+        v
+       LLM
+```
+
+Canonical JSON must use deterministic object-field ordering, stable entity IDs,
+deterministic ordering for arrays and collections, deterministic numeric
+formatting, UTF-8 encoding, and one fixed newline convention.  The implementation
+uses the pinned `io.github.erdtman:java-json-canonicalization:1.1` dependency,
+which implements RFC 8785; the ADT serializer remains responsible for semantic
+array ordering before canonicalization.  The hash is
+computed over the canonical JSON bytes, not over presentation formatting:
+
+```text
+microir_sha256 = SHA256 (canonical_json_bytes)
+```
+
+Consequently, the same microscopic model must produce the same typed MicroIR,
+the same JSON bytes, and the same hash.  Every generated MesoSpec and every
+translator-agreement run records the MicroIR version and hash.
+
+### MesoSpec boundary
+
+The LLM emits only candidate serialized MesoSpec data.  It never constructs the
+objects consumed by a backend.  One schema/parser validates the candidate and
+creates the canonical typed `MesoSpec` ADT; both translators consume that exact
+object:
+
+```text
+candidate MesoSpec JSON
+        |
+        v
+one schema/parser
+   |          |
+ fail       pass
+   |          v
+ retry   MesoSpec ADT
+              |
+        +-----+-----+
+        v           v
+       T_S         T_M
+```
+
+The structural schema is generated from, or mechanically checked against, the
+MesoSpec ADTs so that the grammar and implementation do not become competing
+authorities.  Unknown fields are rejected after the representation is frozen.
+Representation versions are operational: a loader dispatches explicitly on
+the version and rejects unsupported versions.  Results generated under
+different representation versions are not silently combined.
 
 The source already exposes these concepts through classes such as `Vehicle`, `VTransport`, `Route`, `Junction`, `Ramp`, `VSource`, and the dynamics implementations.
 
@@ -545,7 +658,6 @@ Link L1
 Node N1
     inputs = [L1, Ramp1]
     output = L2
-    priority = ...
 
 Movement
     routeCondition = ...
@@ -587,7 +699,6 @@ Queue
 TravelTime
 Capacity
 Storage
-Priority
 RouteChoice
 Enter
 Ready
@@ -609,9 +720,7 @@ A merge is represented by:
 \[
 \text{multiple incoming movements}
 +
-\text{shared downstream storage}
-+
-\text{priority}.
+\text{shared downstream storage}.
 \]
 
 A diverge is:
@@ -964,11 +1073,12 @@ A blocked vehicle is never reactivated after downstream capacity becomes availab
 
 Expected: reach bounded deadlock/progress failure.
 
-### M6 — Merge-order violation
+### M6 — FIFO merge-order violation
 
-At equal timestamps, a lower-priority movement releases before the specified higher-priority movement.
+After competing movements enter the shared wait queue, a later entrant releases
+before an earlier entrant.
 
-Expected: violate the declared node-order semantics.
+Expected: violate the declared FIFO semantics.
 
 Run:
 
@@ -2174,7 +2284,6 @@ MesoNode
 └── Movement
     ├── fromLink
     ├── toLink
-    ├── priority
     └── routeCondition
 ```
 
@@ -2211,13 +2320,11 @@ MesoNetwork
     │
     ├── Movement M0
     │   ├── from = L0
-    │   ├── to   = L1
-    │   └── priority = mainline
+    │   └── to   = L1
     │
     ├── Movement M1
     │   ├── from = Ramp0
-    │   ├── to   = L1
-    │   └── priority = ramp
+    │   └── to   = L1
     │
     └── blockedUpstream
 ```

@@ -6,6 +6,12 @@ This is the single durable record for micro-to-meso validation runs, derived
 comparisons, gate decisions, and remaining work.  It records meaningful run
 results rather than complete IDE launch commands or cleanup output.
 
+**Current status (2026-09-10): Gate 1 is CLOSED.** Experiments A (finite-storage
+admission/wakeup) and B (held-out capacity/fidelity) are complete.  The next
+work is Gate 2 consolidation followed by the `MesoSpec` grammar, translators,
+agreement test, and mutation study.  Do not treat Gate 1 as open or begin a
+new city-scale network framework from this document.
+
 ## Measurement definitions
 
 - **Whole-run throughput** = completed vehicles x 3600 / simulation duration.
@@ -134,7 +140,8 @@ micro-to-meso fidelity can be judged.
 
 **Mesoscopic capacity enforcement: PASS.**
 
-**Saturated micro-to-meso fidelity: PENDING CAPACITY CALIBRATION.**
+**Historical pre-calibration result: superseded.** The subsequent calibration
+and held-out run below are the authoritative Gate 1 results.
 
 Matched results after raising offered demand to 3600 veh/h while retaining
 `nStop = 300`:
@@ -257,7 +264,7 @@ Configuration:
 | Vehicles | 4 |
 | Arrival interval | 0.5 s, deterministic |
 | Link length | 500 m |
-| Free-flow speed | 10 m/s |
+| Free-flow speed | 68 mph = 30.263 m/s |
 | Free-flow traversal | 50.0 s |
 | Discharge capacity | 1800 veh/h |
 | Release headway | 2.0 s |
@@ -516,3 +523,300 @@ release.  That visualization limitation does not invalidate the observed
 same-actor transfer.
 
 **Status: PASS.**
+
+### G2.1b Meso-to-micro admission-gap stress test
+
+This diagnostic test determines whether the current meso-to-micro boundary can
+insert a vehicle into physically occupied microscopic entry space.  It must run
+before adding an admission mechanism, so that any change is justified by an
+observed violation rather than an assumed one.
+
+Configuration:
+
+| Parameter | Value |
+|---|---:|
+| Vehicles | 10 |
+| Deterministic arrival interval | 1.0 s |
+| Incoming micro length | 500 m |
+| Meso length | 500 m |
+| Meso discharge capacity | 3600 veh/h |
+| Meso release headway | 1.0 s |
+| Meso storage | 10 vehicles |
+| Outgoing micro length | 100 m |
+
+Immediately after the downstream `Junction.jump` and before `joinAt`, the test
+uses the native `Pathway.mergeLeaderAt(0)` lookup.  The available bumper gap is:
+
+`leader.corridorPos - entryPosition - Vehicle.len`
+
+It is compared with the receiving `VTransport.safetydist`, currently 20.0 m.
+The debug record includes simulation time, entering vehicle, leader, leader
+position, available bumper gap, and required gap.  An assertion stops the test
+on the first unsafe admission.
+
+Initial pre-correction result (10 m/s and compressed display geometry):
+
+| Measure | Result |
+|---|---:|
+| Completed vehicles | 10 / 10 |
+| Meso entered / released | 10 / 10 |
+| Minimum finite bumper gap | 27.220 m |
+| Required legacy safety distance | 20.000 m |
+| Final micro-in DLL / meso occupancy / micro-out DLL | 0 / 0 / 0 |
+| Agenda activations | 637 |
+
+Every observed admission met the existing 20.0 m threshold; the assertion did
+not fire.  The smallest finite gap was 27.220 m for M-7 at t = 85.0 s.  The
+incoming microscopic region throttled arrivals into the mesoscopic link, while
+the short outgoing microscopic link cleared vehicles quickly.  Therefore this
+configuration did not create a congested receiving boundary.
+
+This result does **not** prove that unrestricted meso-to-micro admission is safe
+for every corridor or demand.  It establishes only that no violation was
+observed in the tested configuration.  Also, the 20.0 m comparison is the
+legacy `VTransport.safetydist`, not IDM's dynamic desired gap.  No production
+admission mechanism is justified or added from this result, and the temporary
+stress instrumentation is removed before continuing.
+
+**Status: COMPLETE — NO VIOLATION OBSERVED.**
+
+### G2.2 Repeated mixed-resolution freeway corridor
+
+Goal: verify that the same `Vehicle` actor can cross repeated resolution
+changes and consecutive same-resolution links under one director:
+
+`Source -> Meso -> Meso -> Micro -> Micro -> Micro -> Meso -> Micro -> Meso -> Meso -> Sink`
+
+The experiment uses existing Scalation ownership structures:
+
+- Five individual `MesoVTransport` links, which do not use a microscopic DLL.
+- One `Pathway` containing the three consecutive microscopic segments and two
+  internal junctions.  Its vehicles remain in one shared DLL across all three
+  segments.
+- One separate single-segment `Pathway` for the isolated microscopic region.
+- Eight `Junction` components.  Every boundary crossing uses native `jump()`;
+  its existing `Recorder` supplies the crossing count.
+- The existing sink `Statistic` supplies the completion count and travel-time
+  samples.  No parallel reporting or counting structure is introduced.
+
+Configuration:
+
+| Parameter | Value |
+|---|---:|
+| Vehicles | 30 |
+| Deterministic arrival interval | 60.0 s |
+| Transport segments | 9 |
+| Mesoscopic segments | 5 |
+| Microscopic segments | 4 |
+| Corridor junctions | 8 |
+| Segment length | 500 m |
+| Free-flow speed | 10 m/s |
+| Meso capacity | 1800 veh/h/link |
+| Meso storage | 10 vehicles/link |
+
+Expected ownership transitions:
+
+1. The actor traverses Meso1 and Meso2 without DLL membership.
+2. At J2 it joins the continuous microscopic `Pathway` once.
+3. It crosses J3 and J4 while remaining in that same DLL.
+4. At J5 it leaves that DLL before entering Meso3.
+5. At J6 it joins the isolated microscopic `Pathway`.
+6. At J7 it leaves that DLL before entering Meso4 and Meso5.
+7. The same actor identity reaches the sink.
+
+Acceptance criteria:
+
+- All 30 vehicles complete.
+- Each of J1 through J8 records exactly 30 crossings.
+- Each mesoscopic link records 30 entries and 30 releases.
+- Every mesoscopic link ends with zero occupancy and zero blocked vehicles.
+- Both microscopic pathway DLLs end empty.
+- No resolution transition changes vehicle identity.
+
+Observed result:
+
+| Measure | Result |
+|---|---:|
+| Completed vehicles | 30 / 30 |
+| Junction crossings J1–J8 | 30 each |
+| Meso entries M1–M5 | 30 each |
+| Meso releases M1–M5 | 30 each |
+| Final continuous-micro DLL | 0 |
+| Final isolated-micro DLL | 0 |
+| Final meso occupancy / blocked queue | 0 / 0 on every link |
+| Agenda activations | 4,823 |
+| Activations per completed vehicle | 160.767 |
+| Last observed sink completion | 2055.0 s |
+
+All assertions passed.  Each actor retained its original identity through the
+entire nine-segment corridor.  The three consecutive microscopic segments
+correctly behaved as one lane with one shared DLL: vehicles joined it once,
+remained members across its two internal junctions, and left it once at the
+micro-to-meso boundary.  The isolated microscopic segment used its separate
+DLL, and both DLLs were empty at completion.
+
+The final blocked-queue checks establish that no waiter remained at shutdown;
+this run did not add a separate historical blocked-event counter.  The run is a
+resolution-transfer and ownership test, not a congestion-fidelity test.
+
+Animation review found that the initial experiment drawing compressed each
+500 m link into 100 coordinate units.  Although physical link lengths used by
+the movement semantics remained 500 m, that drawing was an unacceptable visual
+representation of the corridor.  The experiment geometry has been corrected
+to use 500 coordinate units per 500 m link, from x=100 through x=4600.  The
+experiment retains the standard `Model` animation-panel dimensions and relies
+on the animator's native zoom/pan viewport.
+
+The initial experiment also inherited 10 m/s from the earlier 500 m/50 s
+correctness proof.  That is 36 km/h and is not a freeway free-flow speed.  G2.2
+now uses the same 68 mph conversion as the Gate 1 micro/meso comparison.
+
+Animation-pacing history showed that live snapshots introduced in commit
+`308139987e` bypassed the existing `aniRatio` and always started at 1x.  Live
+mode now converts the historical milliseconds-per-simulation-unit contract to
+an equivalent initial multiplier: `liveSpeed = 1000 / aniRatio`.  The 1x button
+still resets to real time, while the `+` control may increase live playback to
+200x.  Process-model live-mode detection now uses the native `Transport` base
+class, so both `VTransport` and `MesoVTransport` receive the same pacing mode.
+
+The behavioral assertions were subsequently reconfirmed with the corrected
+geometry and pacing; the G2.2 run is closed as a behavioral mixed-resolution
+validation.  Queue-position animation remains a presentation limitation.
+
+Mesoscopic admission now registers display-only travel from the edge start at
+admission time to the edge end at free-flow readiness time.  The existing live
+animation timer evaluates that quadratic trajectory against its paced display
+clock.  If capacity delays release after readiness, the token remains visibly
+at the downstream end until the release and junction events occur.  This uses
+the existing `LiveAnimationState` token mailbox and adds no actor scheduling,
+simulation events, or agenda activations.
+
+**Status: COMPLETE — behavioral checks passed; visual queue refinement deferred.**
+
+### G2.3A Destination-aware branching without signal control
+
+Goal: isolate global origin-destination routing from traffic-signal behavior.
+The experiment does not repeat the earlier ramp divergence test: a ramp choice
+was scripted locally, whereas this test gives vehicles from two sources an
+explicit destination and obtains both their incoming and outgoing links from a
+precomputed shortest-path table.
+
+Topology (the direct arms are shorter than the crossover alternatives):
+
+```text
+                 Sink North       Sink East
+                     ^               ^
+                     |               |
+                   Upper           Lower
+                    ^  \           /  ^
+                    |   \         /   |
+Source West -> Split                 Source South
+                    |   /         \   |
+                    v  /           \  v
+                   Lower/Upper -> Merge
+```
+
+Active cross animation coordinates (500 coordinate units per arm):
+
+| Component | Coordinate |
+|---|---:|
+| Source West | (100, 600) |
+| Split | (600, 600) |
+| Upper | (850, 350) |
+| Lower | (850, 850) |
+| Merge | (1100, 350) |
+| Sink North | (1100, 100) |
+| Sink East | (1350, 600) |
+| Source South | (600, 1100) |
+
+Retained trident coordinates for a later fan-out visualization:
+
+| Component | Coordinate |
+|---|---:|
+| Source | (100, 290) |
+| Junction | (600, 290) |
+| Sink A | (1100, 90) |
+| Sink B | (1100, 290) |
+| Sink C | (1100, 490) |
+
+The trident layout is not active in G2.3A; it is preserved here as a reusable
+three-way fan-out drawing.
+
+Native Scalation facilities used:
+
+- `ShortestPath` supplies Dijkstra's algorithm.
+- `MatrixD` stores nonnegative free-flow edge costs.
+- The native `MatrixI` factory creates the integer-valued `MatrixD` that stores
+  `nextHop(currentNode, destination)`; this repository intentionally has no
+  separate `MatrixI` class.
+- `Vehicle.nextTransport` stores only the resolved next link, not a private
+  route or shortest-path implementation.
+- `Junction.jump()` supplies the existing crossing `Recorder`.
+- `Sink.durationStat` and each transport's existing statistics/counters supply
+  the acceptance measurements.
+
+The original road edges are reversed before running `ShortestPath` once from
+each destination.  For a static network, the resulting predecessor at the
+branch is the next node toward that destination in the original graph.  The
+table is computed before `simulate()`; no vehicle runs Dijkstra while moving.
+Each run receives `reverseCost.copy` because the native `spath()` implementation
+mutates its source row through an aliased matrix-row view.
+The experiment uses only existing `Transport` references for the edge-to-link
+mapping and introduces no new routing data-structure implementation.
+
+Configuration and expected result:
+
+| Measure | Expected |
+|---|---:|
+| Sources / sinks | 2 / 2 |
+| Vehicles per source | 30 (default; even) |
+| Total vehicles | 60 |
+| Explicit OD pairs exercised | 4 |
+| Shortest-path alternatives per destination | 2 |
+| Split crossings | 60 |
+| Upper / lower direct-arm crossings | 30 / 30 |
+| Merge crossings (long alternatives, short-direct profile) | 0 |
+| Final occupancy and blocked count | 0 on every link |
+
+Each source deterministically alternates destinations North and East using the
+replication-reset simulation clock, exercising all four OD pairs.  Origin picks
+the fixed ingress link; Dijkstra begins at Split and is run on the reversed graph
+once per sink using a copied native cost matrix.  The experiment asserts that
+Split chooses Upper for North and Lower for East, and that no vehicle uses the
+longer crossover through Merge.  Signal control,
+signal queues, and changes to the base `Vehicle`, `Gate`, `Model`, and
+`Component` classes are deliberately outside this routing experiment.
+
+The earlier four-link tree run (8 vehicles, 47 activations) remains historical
+evidence that destination plumbing worked, but it did not exercise a routing
+choice and is not the Dijkstra result.  The diamond experiment is the active
+G2.3A test.  Junction conflict serialization remains a separate correctness
+experiment; it is intentionally not mixed into this routing-isolation test.
+
+Completed profile results:
+
+| Profile | Completed | Sink North / East | Split / Upper / Lower / Merge crossings | Agenda activations |
+|---|---:|---:|---:|---:|
+| `short-direct` | 60 | 30 / 30 | 60 / 30 / 30 / 0 | 451 |
+| `cheap-detour` | 60 | 30 / 30 | 60 / 30 / 30 / 30 | 511 |
+
+The short profile selects Upper directly to North.  After increasing the
+Upper-to-North cost, the cheap-detour profile selects Upper-to-Merge-to-North
+for all North-bound vehicles, while East-bound vehicles remain on the Lower
+direct arm.  This confirms that the native Dijkstra next-hop table responds to
+link costs rather than merely following a topology-forced tree.
+
+**Status: COMPLETE — both cost profiles passed.**
+- Waiting is event-driven; blocked vehicles do not poll.
+- Incoming approaches use distinct endpoint shifts so a waiting vehicle remains
+  visibly outside the occupied center.
+
+**Status: COMPLETE — routing profiles passed; signal control is validated in the
+separate G2.3C experiment.**
+
+### Current Gate 2 status
+
+G2.1, G2.1b, G2.2, G2.3A, G2.3B, and G2.3C have passed their current
+behavioral acceptance checks.  Signal queue filing in the animation remains a
+deferred presentation enhancement and is not an open routing or correctness
+gate.

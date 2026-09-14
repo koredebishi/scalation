@@ -36,11 +36,12 @@ import scalation.scala2d.Colors._
  *  @param shut0     `Boolean` indicating if the gate is initially opened or closed
  *  @param cap       the maximum number of entities that will be released when the gate is opened
  */
-class Gate (name: String, director: Model, line: WaitQueue, units: Int,
+class Gate (name: String, director: Model, val line: WaitQueue, units: Int,
             onTime: Variate, offTime: Variate,
             loc: Array [Double], shut0: Boolean = false, cap: Int = 10)
       extends SimActor (name, director)
-         with Component:
+         with Component
+         with SignalControl:
 
     initStats (name)
     at = loc

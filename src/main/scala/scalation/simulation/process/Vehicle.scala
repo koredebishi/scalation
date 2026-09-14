@@ -38,7 +38,8 @@ abstract class Vehicle (name_ : String, director: Model)
     // this is only valuable for generic simulation where we want to randomize vehicle speeds. where
     //some vehicles are fast some are slow. (trucs and cars)
     //Hower, we need this overriden in VSource when we set the pems speed. so we can cars not going above pems speed.
-    var vmax = Vehicle.speedGen.gen    // this is for generic. needs pems version.
+    // var vmax = Vehicle.speedGen.gen                         // heterogeneous speeds retained for later
+    var vmax = Vehicle.vmax                                    // common maximum speed for every vehicle
 
 
     var key  = -0.0

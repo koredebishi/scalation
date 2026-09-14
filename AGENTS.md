@@ -15,6 +15,19 @@ These instructions apply to all work in this repository.
 - Do not place feature-specific state or reporting inside a broad class merely because it is convenient. For example, `Model` is the simulation model/director; do not add a parallel `BasicStats` system there when Scalation already has `Statistic`, `TimeStatistic`, `getStatistics`, `report`, and `reportV`.
 - Use the established statistics/reporting system as the source of truth. Derive feature-specific measures from those statistics and the minimum unique domain inputs (for example, deriving density from the appropriate statistic and link length) instead of maintaining duplicate counters or reports.
 
+## Independent Design Review — No Yes-Man Implementation
+
+- Independently evaluate every proposed design, regardless of whether it comes from the user, another AI, existing notes, or an earlier recommendation.
+- Do not accept a proposal merely because it sounds plausible or is presented confidently. Clearly state agreement, disagreement, uncertainties, and tradeoffs before proposing implementation.
+- For every proposed field, class, relation, or abstraction, determine:
+  - whether it is fundamental semantics, derived information, or runtime state;
+  - which class properly owns it;
+  - which concrete consumer needs it;
+  - whether it can be derived cheaply and deterministically from an existing authority;
+  - whether storing it would create duplicate or conflicting sources of truth.
+- Required behavior does not automatically justify adding a stored representation. Prefer deriving information from the authoritative model when practical.
+- If further reasoning exposes a weakness in an earlier recommendation, correct it directly before implementation rather than defending or preserving it.
+
 ## Approval for Cross-Cutting Changes
 
 - Before touching `Model`, `Component`, or any class the user has not already been told will change, show the user the complete list of affected classes/files and describe the intended change to each one.
@@ -26,4 +39,3 @@ These instructions apply to all work in this repository.
 - Do not compile this repository for the user.
 - Do not run build, test, benchmark, or simulation commands unless the user explicitly requests that exact execution. The user performs compilation by default.
 - A message such as "continue" authorizes continued discussion or analysis only. It does not authorize code changes, compilation, tests, benchmarks, or simulations.
-

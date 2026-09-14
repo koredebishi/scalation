@@ -15,7 +15,6 @@ import scala.util.control.Breaks.{breakable, break}
 
 import scalation.animation.CommandType._
 import scalation.scala2d.Ellipse
-import scalation.scala2d.Rectangle
 import scalation.scala2d.Colors._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -40,13 +39,14 @@ import scalation.scala2d.Colors._
  *  @param startupLoss  start-up lost time at the beginning of green (seconds)
  *  @param offset       delay before the first green, for coordinating signals
  */
-class TrafficLight (name: String, director: Model, line: WaitQueue,
+class TrafficLight (name: String, director: Model, val line: WaitQueue,
                     greenTime: Double, amberTime: Double, redTime: Double,
                     loc: Array [Double], cycles: Int = 1000,
                     satHeadway: Double = 2.0, startupLoss: Double = 2.0,
                     offset: Double = 0.0)
   extends SimActor (name, director)
-    with Component:
+    with Component
+    with SignalControl:
 
   import TrafficLight.Phase
 
@@ -107,7 +107,6 @@ class TrafficLight (name: String, director: Model, line: WaitQueue,
    */
   def display (): Unit =
     director.animate (this, CreateNode, phaseColor, Ellipse (), at)
-    director.animate (line, CreateNode, cyan, Rectangle (), line.at)
   end display
 
   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

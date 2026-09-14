@@ -239,7 +239,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     def simulate (_startTime: Double = 0.0): Unit =
         var traffic = false
         visitComponents { p =>
-            if p.isInstanceOf [Pathway] || p.isInstanceOf [VTransport] ||
+            if p.isInstanceOf [Pathway] || p.isInstanceOf [Transport] ||
                p.isInstanceOf [Ramp] || p.isInstanceOf [FFConnector] then traffic = true
             (this, p) match
             case (loader: RowTimeLoader, recorder: Recorder) => recorder.setRecorderInterval (loader.rowTimeSlice)
@@ -482,6 +482,24 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
             dgAni.submit (AnimateCommand (what, eid, shape, label, true, color, at, _clock))
         end if
     end animate
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Plan animation-only movement along a transport without adding actor
+     *  activations to the simulation agenda.
+     *  @param who       the actor whose token will move
+     *  @param transport the displayed transport edge
+     *  @param duration  simulated traversal time
+     */
+    private [process] def animateTraversal (who: Identifiable, transport: Transport,
+                                             duration: Double): Unit =
+        if animating && dgAni.isLiveSnapshots then
+            val a = transport.p1
+            val c = transport.pc
+            val b = transport.p2
+            dgAni.planTraversal (who.id,
+                                 Array (a(0), a(1), c(0), c(1), b(0), b(1)),
+                                 _clock, _clock + duration)
+    end animateTraversal
 
     // Convenience: explicit-label variant to avoid overload ambiguity
     /** Enqueue an animation command with an explicit display label. NEW

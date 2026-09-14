@@ -1,0 +1,33 @@
+flowchart TD
+
+A[Existing ScalaTion MICRO Model]
+B[Deterministic Extraction]
+C[MicroIR]
+D[Canonical MicroIR JSON]
+E[LLM]
+F[Candidate MesoSpec JSON]
+G[Strict Parser + Validation]
+H[Accepted MesoSpec ADT]
+
+I[T_S<br/>Deterministic ScalaTion Translator]
+J[T_M<br/>Deterministic Maude Translator]
+
+K[Runnable ScalaTion MESO Model]
+L[Maude Model]
+M[Formal Verification]
+
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+G --> H
+
+H --> I
+H --> J
+
+I --> K
+J --> L
+L --> M
+

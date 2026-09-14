@@ -23,6 +23,9 @@ resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repos
 // https://mvnrepository.com/artifact/com.google.code.gson/gson
 libraryDependencies += "com.google.code.gson" % "gson" % "2.10"
 
+// RFC 8785 JSON Canonicalization Scheme
+libraryDependencies += "io.github.erdtman" % "java-json-canonicalization" % "1.1"
+
 // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
 libraryDependencies += "org.junit.jupiter" % "junit-jupiter-api" % "5.9.1" % Test
 

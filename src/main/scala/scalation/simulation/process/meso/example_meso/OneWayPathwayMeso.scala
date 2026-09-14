@@ -38,9 +38,9 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
     extends Model (name, reps, animating, aniRatio):
 
     //--------------------------------------------------
-    // Initialize Model Constants
+       // Initialize Model Constants
 
-    val lambda         = 5400.0                           // Experiment B held-out demand
+    val lambda         = 200.0                           // Experiment B held-out demand
     val numJunc        = 0                              // number of intermediate junctions
     val freeFlowSpeed  = 68.0 / 2.24694                 // free-flow speed (metres/second)
     val capacity       = 2390.0                         // discharge capacity (vehicles/hour)
@@ -52,18 +52,18 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
     //--------------------------------------------------
     // Create Random Variables (RVs)
 
-    val iArrivalRV = Exponential (HOUR / lambda, stream)
+    val iArrivalRV = Exponential(HOUR / lambda, stream)
 
     //--------------------------------------------------
     // Create Model Components
 
-    val entry = VSource ("entry", this, () => Car (), 0, nStop, iArrivalRV, (100, 290))
-    val exit  = Sink ("exit", (1500, 290))
-    val junc  = Array.ofDim [Junction] (numJunc)
+    val entry = VSource("entry", this, () => Car(), 0, nStop, iArrivalRV, (100, 290))
+    val exit = Sink("exit", (1500, 290))
+    val junc = Array.ofDim[Junction](numJunc)
 
     val spacing = (exit.at(0) - entry.at(0)) / (numJunc + 1)
     for i <- junc.indices do
-        junc(i) = Junction (s"jc-$i", xy = (entry.at(0) + spacing * (i + 1), 290), nt = 2, nl = 1)
+        junc(i) = Junction(s"jc-$i", xy = (entry.at(0) + spacing * (i + 1), 290), nt = 2, nl = 1)
     end for
 
     val lane = PathwayMeso ("lane", junc, entry, exit, segmentLengths, freeFlowSpeed, capacity,
@@ -74,8 +74,8 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
     //--------------------------------------------------
     // Specify Scripts for each Type of Simulation Actor
 
-    val linkCounts = Array.ofDim [Int] (lane.seg.length)
-    val linkTimes  = Array.ofDim [Double] (lane.seg.length)
+    val linkCounts = Array.ofDim [Int] (lane.seg.length)                 // number of completed vehicles per link
+    val linkTimes  = Array.ofDim [Double] (lane.seg.length)              // total travel time per link
 
     case class Car () extends Vehicle ("c", this):
 
@@ -95,36 +95,42 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
     simulate ()
     waitFinished ()
 
-    val completed  = exit.durationStat.num                 // Sink owns the completed-vehicle count
+    //--------------------------------------------------
+    // Collect and report statistics
+
+    val completed  = exit.durationStat.num                 // Numbers of vehicles that completed the pathway
     val meanTravel = exit.durationStat.mean                // and the mean travel time
     val runSecs    = simDuration                           // the one run-level fact the Model supplies
-    banner ("Meso pathway statistics")
-    println (s"Generated vehicles: $getNumActors")
-    println (s"Junctions: ${lane.junc.length}")
-    println (s"Transport segments: ${lane.seg.length}")
-    println ("Lanes: 1")
-    println (s"Completed vehicles: $completed")
-    println (s"Mean travel time (s): $meanTravel")
-    println (s"Simulation duration (s): $runSecs")
-    println (s"Whole-run throughput (veh/h): ${if runSecs > 0.0 then completed * HOUR / runSecs else 0.0}")
-    println (s"Agenda activations: $agendaActivations")
-    println (s"Agenda activations per completed vehicle: ${if completed > 0 then agendaActivations.toDouble / completed else 0.0}")
-    println (s"Mean arrival interval (s): ${HOUR / lambda}")
-    // Whole-run trial averages for a fully drained road; junction time is excluded.
-    println ("Link | From -> To | Length (m) | Completed | Whole-run flow (veh/h) | " +
-             "Mean travel time (s) | Mean traversal speed (km/h) | Whole-run mean density (veh/km/lane)")
+    val throughput = if runSecs > 0.0 then completed * HOUR / runSecs else 0.0
+    val activationsPerVehicle = if completed > 0 then agendaActivations.toDouble / completed else 0.0
+    val recorderReports = Array.ofDim [SimulationRecorderReport] (lane.junc.length)
+    cfor (0, lane.junc.length) { i =>
+        val (counts, speeds) = lane.junc(i).getRecorderMat
+        recorderReports(i) = SimulationRecorderReport (lane.junc(i).name, lane.junc(i).rowTime,
+            counts, speeds, lane.junc(i).getDensityMat)
+    }
+    val laneCount = if recorderReports.nonEmpty then recorderReports(0).counts.dim2 else 0
+    val linkReports = Array.ofDim [SimulationLinkReport] (lane.seg.length)
     for i <- lane.seg.indices do
         val segment = lane.seg(i)
         val flow = if runSecs > 0.0 then linkCounts(i) * HOUR / runSecs else 0.0
         val travelTime = if linkCounts(i) > 0 then linkTimes(i) / linkCounts(i) else 0.0
-        val speed = if travelTime > 0.0 then 3.6 * segment.length / travelTime else 0.0
+        val speed = if travelTime > 0.0 then segment.length / travelTime else 0.0
         val density =
             if runSecs > 0.0 && segment.length > 0.0 then
                 linkTimes(i) * 1000.0 / (runSecs * segment.length)
             else 0.0
-        println (s"${segment.name} | ${segment.from.name} -> ${segment.to.name} | " +
-                 f"${segment.length}%.2f | ${linkCounts(i)}%d | $flow%.3f | $travelTime%.3f | $speed%.3f | $density%.3f")
+        val maxOccupancy = segment.persistentStat.max.toInt
+        val maxDensity = if segment.length > 0.0 then maxOccupancy * 1000.0 / segment.length else 0.0
+        linkReports(i) = SimulationLinkReport (segment.name, segment.from.name, segment.to.name,
+            segment.length, linkCounts(i), flow, travelTime, speed, density, maxOccupancy, maxDensity)
     end for
+
+    val runReport = SimulationRunReport (name, getNumActors, lane.junc.length, lane.seg.length, laneCount,
+        completed, meanTravel, runSecs, throughput, agendaActivations, activationsPerVehicle,
+        HOUR / lambda, recorderReports, linkReports)
+    banner ("Meso pathway JSON report")
+    println (s"simulation_run_json =\n${runReport.prettyJson}")
 
     Model.shutdown ()
 

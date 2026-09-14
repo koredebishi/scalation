@@ -80,11 +80,29 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     private var liveWallAnchor = 0L
     private var liveSimAnchor = 0.0
     private var liveLastEvent = 0.0
+    private var liveDisplayTime = 0.0
+    private var liveTargetTime = 0.0
     private var liveStepLimit = Double.NaN
     private var liveWindowClosed = false
 
+    // Preserve the historical aniRatio contract: milliseconds of wall-clock
+    // delay per simulation-time unit.  Live mode expresses the same pace as a
+    // simulation-time multiplier (e.g., 500 ms/unit = 2x).
+    private val configuredLiveSpeed =
+        if aniRatio > 0.0 then 1000.0 / aniRatio else 1.0
+
     def isLiveSnapshots: Boolean = liveSnapshots
     def liveStateSize: Int = liveState.size
+
+    /** Advance the display clock toward the event currently awaited by the
+     *  director.  Call only while holding `liveClockLock`.
+     */
+    private def advanceLiveDisplayTime (): Unit =
+        if !paused.get () then
+            val elapsed = (System.nanoTime () - liveWallAnchor) / 1e9
+            val advanced = liveSimAnchor + elapsed * speedFactor
+            liveDisplayTime = math.min (liveTargetTime, math.max (liveDisplayTime, advanced))
+    end advanceLiveDisplayTime
 
     /** Opt-in live display: graph changes run on Swing's EDT, at most 30 fps.
      *  The director waits at event boundaries to respect pause and playback speed.
@@ -96,7 +114,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             replayBtn.setToolTipText ("Live mode does not record a replay")
             stepBtn.setToolTipText ("While paused, advance up to 0.5 simulated seconds")
             resetBtn.setToolTipText ("1x: one simulated second per real second")
-            setSpeedFactor (speedFactor)
+            setSpeedFactor (configuredLiveSpeed)
             addWindowListener (new java.awt.event.WindowAdapter {
                 override def windowClosing (e: java.awt.event.WindowEvent): Unit = releaseLiveClock ()
                 override def windowClosed (e: java.awt.event.WindowEvent): Unit = releaseLiveClock ()
@@ -113,6 +131,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     def startLiveClock (time: Double): Unit = liveClockLock.synchronized {
         liveLastEvent = time
         liveSimAnchor = time
+        liveDisplayTime = time
+        liveTargetTime = time
         liveWallAnchor = System.nanoTime ()
         liveStepLimit = Double.NaN
     }
@@ -121,19 +141,21 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
      *  Waiting changes elapsed real time, not the event order or simulated time.
      */
     def awaitLiveTime (time: Double): Unit = liveClockLock.synchronized {
+        liveTargetTime = time
         var ready = false
         while !ready && !liveWindowClosed do
             if paused.get() then
                 if !liveStepLimit.isNaN && time <= liveStepLimit then ready = true
                 else liveClockLock.wait ()
             else
-                val elapsed = (System.nanoTime () - liveWallAnchor) / 1e9
-                val remaining = time - liveSimAnchor - elapsed * speedFactor
+                advanceLiveDisplayTime ()
+                val remaining = time - liveDisplayTime
                 if remaining <= 0.0 then ready = true
                 else
                     val ns = math.min (50000000L, math.max (1L, (remaining * 1e9 / speedFactor).toLong))
                     liveClockLock.wait (ns / 1000000L, (ns % 1000000L).toInt)
-        liveLastEvent = time
+        liveDisplayTime = time
+        liveLastEvent   = time
     }
 
     private def releaseLiveClock (): Unit = liveClockLock.synchronized {
@@ -152,8 +174,17 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         else cmdQ.add (c)
     end submit
 
+    /** Register event-free live motion along a quadratic edge. */
+    def planTraversal (eid: Int, pts: Array [Double], start: Double, stop: Double): Unit =
+        if liveSnapshots then liveState.planTraversal (eid, pts, start, stop)
+    end planTraversal
+
     private def renderLiveSnapshot (): Unit =
-        val (now, structure, tokens) = liveState.snapshot ()
+        val displayTime = liveClockLock.synchronized {
+            advanceLiveDisplayTime ()
+            liveDisplayTime
+        }
+        val (now, structure, tokens) = liveState.snapshot (displayTime)
         structure.foreach (invokeCommand)
         val present = tokens.iterator.map (_._1.eid).toSet
         drawnTokens.keysIterator.filterNot (present.contains).toVector.foreach { id =>
@@ -449,13 +480,14 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the playback speed multiplier and update Animator time dilation.
       * Mapping: dilation (>1 slows, <1 speeds) = 1.0 / speedFactor.
-      * @param speed  desired speed multiplier (live: 0.25-128x; replay: 0.25-8x)
+      * @param speed  desired speed multiplier (live: 0.25-200x; replay: 0.25-8x)
       */
     private def setSpeedFactor(speed: Double): Unit =
-        val s = math.max (0.25, math.min (if liveSnapshots then 128.0 else 8.0, speed))
+        val s = math.max (0.25, math.min (if liveSnapshots then 200.0 else 8.0, speed))
         liveClockLock.synchronized {
             // Re-anchor at actual progress: no catch-up burst after changing speed.
-            liveSimAnchor = liveLastEvent
+            advanceLiveDisplayTime ()
+            liveSimAnchor = liveDisplayTime
             liveWallAnchor = System.nanoTime ()
             speedFactor = s
             liveClockLock.notifyAll ()
@@ -1031,6 +1063,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     /** Pause the animation thread. */
     private def pause(): Unit =
         if liveSnapshots then liveClockLock.synchronized {
+            advanceLiveDisplayTime ()
+            liveSimAnchor = liveDisplayTime
             paused.set (true)
             liveStepLimit = Double.NaN
             playPauseBtn.setText ("Play")
@@ -1042,7 +1076,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     /** Resume the animation thread. */
     private def resume(): Unit =
         if liveSnapshots then liveClockLock.synchronized {
-            liveSimAnchor = liveLastEvent
+            liveSimAnchor = liveDisplayTime
             liveWallAnchor = System.nanoTime ()
             liveStepLimit = Double.NaN
             paused.set (false)
