@@ -12,6 +12,7 @@ package simulation
 package process
 package meso
 
+import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -28,11 +29,14 @@ import scalation.mathstat.VectorD
  *  @param bend            curvature of the displayed lane
  *  @param laneShift       display shift applied to each segment's endpoints
  *  @param storageCapacity maximum admitted vehicles on each segment
+ *  @param flowDiagram    optional density-sensitive equilibrium speed relation applied to every
+ *                        segment; when absent, all segments keep the fixed `freeFlowSpeed`
  */
 class PathwayMeso (name: String, val junc: Array [Junction], val from: Component, val to: Component,
                    segmentLengths: VectorD, freeFlowSpeed: Double, capacity: Double,
                    bend: Double = 0.0, laneShift: VectorD = VectorD (0.0, 0.0),
-                   storageCapacity: Int = Int.MaxValue)
+                   storageCapacity: Int = Int.MaxValue,
+                   flowDiagram: Option [IdmFlux] = None)
     extends Component:
 
     val points = from +: junc.toList :+ to
@@ -45,7 +49,7 @@ class PathwayMeso (name: String, val junc: Array [Junction], val from: Component
 
         seg(i) = new MesoVTransport (s"${name}_seg${i}", p1, p2,
                                     freeFlowSpeed, capacity,
-                                    bend, laneShift, laneShift, storageCapacity)
+                                    bend, laneShift, laneShift, storageCapacity, flowDiagram)
         if segmentLengths(i) > 0.0 then seg(i).length = segmentLengths(i)   // else keep the drawing length
         subpart += seg(i)                               // add to the subparts
     end for

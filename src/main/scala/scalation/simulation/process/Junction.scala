@@ -67,6 +67,11 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int, nl: I
     override def toString: String = name
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset interval observations between independent model replications. */
+    override def resetForReplication (): Unit = resetRecorder ()
+    end resetForReplication
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Attach the precomputed network routing policy to this junction.
      *  The node id identifies this junction in the routing table.
      *  @param table the destination-indexed routing table

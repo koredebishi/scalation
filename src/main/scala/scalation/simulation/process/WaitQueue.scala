@@ -36,7 +36,7 @@ class WaitQueue (name: String, at: Array [Double], cap: Int = Int.MaxValue)
 
     initComponent (name, at)
 
-    private val debug   = debugf ("WaitQueue", true)           // debug function
+    private val debug   = debugf ("WaitQueue", false)           // debug function
 
     protected var _barred = 0            // number of entities barred from entering due to the wait-queue being full
 

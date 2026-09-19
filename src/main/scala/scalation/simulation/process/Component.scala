@@ -129,5 +129,13 @@ trait Component
      */
     def persistentStat: TimeStatistic = _persistentStat
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset component-owned runtime state between independent replications.
+     *  Atomic components with replication-specific state override this hook;
+     *  Model also resets the component's native statistic collectors.
+     */
+    def resetForReplication (): Unit = {}
+    end resetForReplication
+
 end Component
 

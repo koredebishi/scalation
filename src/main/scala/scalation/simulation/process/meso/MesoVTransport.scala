@@ -14,8 +14,9 @@ package meso
 import scala.collection.mutable.ArrayDeque
 
 import scalation.animation.CommandType.MoveToken
+import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
-
+import scala.math.min
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MesoVTransport` class models one lane using sparse vehicle activations.
  *  Free-flow traversal makes a vehicle ready; FIFO and capacity govern departure.
@@ -29,13 +30,18 @@ import scalation.mathstat.VectorD
  *  @param bend           curvature of the displayed road
  *  @param shift1         display shift at the starting component
  *  @param shift2         display shift at the ending component
- *  @param storageCapacity maximum admitted vehicles, including running and ready vehicles
+ *  @param storageCapacity configured upper bound on admitted vehicles; with a flow diagram,
+ *                         physical storage is also bounded by link length and jam density
+ *  @param flowDiagram    optional density-sensitive equilibrium speed relation (`IdmFlux`,
+ *                        derived from the corridor's own IDM parameters).  When absent, traversal
+ *                        speed remains the fixed `freeFlowSpeed`, unchanged from prior behavior.
  */
 class MesoVTransport (name: String, from_ : Component, to_ : Component,
                       val freeFlowSpeed: Double, val capacity: Double,
                       bend: Double = 0.0, shift1: VectorD = VectorD (0, 0),
                       shift2: VectorD = VectorD (0, 0),
-                      val storageCapacity: Int = Int.MaxValue)
+                      val storageCapacity: Int = Int.MaxValue,
+                      val flowDiagram: Option [IdmFlux] = None)
       extends Transport (name, from_, to_, null, false, bend, shift1, shift2):
 
     private val debug = debugf ("MesoVTransport", false)
@@ -65,7 +71,45 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     def releasedCount: Long = released
     def blockedCount: Int = blocked.size
 
-    /** Instantaneous density (vehicles/km for this lane), including waiting vehicles. */
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset link-owned runtime state between independent model replications.
+     *  A completed replication must have drained the link and its admission queue.
+     */
+    override def resetForReplication (): Unit =
+        assert (vdeque.isEmpty, s"$name retains ${vdeque.size} vehicles at replication boundary")
+        assert (blocked.isEmpty && reservedSlots == 0,
+                s"$name retains blocked vehicles or slot reservations at replication boundary")
+        nextReleaseTime = Double.NegativeInfinity
+        entered = 0L
+        released = 0L
+    end resetForReplication
+
+    /** Number of vehicles still traversing this link. */
+    def runningCount: Int = vdeque.count (e => ! e.ready)
+
+    /** Number of vehicles that have reached the downstream queue. */
+    def queuedCount: Int = vdeque.count (_.ready)
+
+    /** Physical spacing at the jam density specified by the IDM diagram. */
+    private def jamSpacing: Double = flowDiagram.map (fd => 1.0 / fd.rho_m).getOrElse (0.0)
+
+    /** Length occupied by vehicles waiting for link discharge. */
+    private def queueLength: Double = queuedCount * jamSpacing
+
+    /** Physical storage limit for this link, bounded by its own length. */
+    private def admissionCapacity: Int =
+        flowDiagram match
+            case Some (fd) => min (storageCapacity, (length * fd.rho_m).toInt.max (1))
+            case None      => storageCapacity
+    end admissionCapacity
+
+    /** Density on the moving part of this link (vehicles/metre). */
+    private def runningDensity: Double =
+        if runningCount == 0 then 0.0
+        else runningCount / (length - queueLength)
+    end runningDensity
+
+    /** Instantaneous density over the whole link (vehicles/km for this lane). */
     def density: Double = occupancy * 1000.0 / length
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -74,10 +118,11 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
      *  cannot steal it.
      */
     private def awaitAdmission (actor: Vehicle): Unit =
-        if occupancy + reservedSlots >= storageCapacity || blocked.nonEmpty then
+        val linkCapacity = admissionCapacity
+        if occupancy + reservedSlots >= linkCapacity || blocked.nonEmpty then
             blocked.director = director
             debug ("BLOCK", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
-                   s"reserved=$reservedSlots, blocked=${blocked.size}")
+                   s"reserved=$reservedSlots, capacity=$linkCapacity, blocked=${blocked.size}")
             val joined = blocked.waitIn ()       // wait until a reserved slot is available
             assert (joined, "the mesoscopic entry wait queue must not bar vehicles")
             assert (reservedSlots > 0, "a woken vehicle must own a reserved storage slot")
@@ -85,7 +130,7 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
             debug ("WAKE", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
                    s"reserved=$reservedSlots, blocked=${blocked.size}")
         end if
-        assert (occupancy + reservedSlots < storageCapacity,
+        assert (occupancy + reservedSlots < linkCapacity,
                 "admission must not exceed mesoscopic link storage")
     end awaitAdmission
 
@@ -98,16 +143,20 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         val actor = director.theActor.asInstanceOf [Vehicle]
         awaitAdmission (actor)          // wait until storage is available 
         val entryTime = director.clock
+        val rho = flowDiagram.map (_ => runningDensity).getOrElse (0.0)
+        val traversalTime = flowDiagram match
+            case Some (fd) =>
+                val speed = fd.speed (rho)
+                length / speed
+            case None => freeFlowTime
         val entry = new Entry (actor)     
         accum (occupancy)
         vdeque += entry
         entered += 1
         debug ("ADMIT", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
                s"reserved=$reservedSlots, blocked=${blocked.size}")
-        assert (occupancy + reservedSlots <= storageCapacity,
+        assert (occupancy + reservedSlots <= admissionCapacity,
                 "mesoscopic link occupancy plus reservations exceeds storage")
-
-        val traversalTime = freeFlowTime
         director.animateTraversal (actor, this, traversalTime)
         actor.schedule (traversalTime)
         actor.yieldToDirector ()

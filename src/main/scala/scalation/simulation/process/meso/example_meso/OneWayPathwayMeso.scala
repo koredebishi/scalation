@@ -13,14 +13,33 @@ package process
 package meso
 package example_meso                                    // One-Shot
 
+import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
+import scalation.mathstat.Statistic
 import scalation.random.Exponential
+import java.nio.file.Path
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `runOneWayPathwayMeso` function is used to launch the `OneWayPathwayMeso` class.
  *  > runMain scalation.simulation.process.meso.example_meso.runOneWayPathwayMeso
  */
-@main def runOneWayPathwayMeso (): Unit = new OneWayPathwayMeso ()
+@main def runOneWayPathwayMeso (): Unit =
+    new OneWayPathwayMeso (name = "Fixed meso")
+end runOneWayPathwayMeso
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `runOneWayPathwayMesoIdm` function launches the same pathway with the
+ *  density-sensitive IDM equilibrium speed built from the microscopic Vehicle
+ *  parameters.  This example is separate from the frozen C = 2390 veh/h,
+ *  K = 133 calibration in the validation log.
+ *  > runMain scalation.simulation.process.meso.example_meso.runOneWayPathwayMesoIdm
+ */
+@main def runOneWayPathwayMesoIdm (): Unit =
+    val fd = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T, s0 = Vehicle.s,
+                          len = Vehicle.len, delta = Vehicle.del)
+    new OneWayPathwayMeso (name = "IDM meso", flowDiagram = Some (fd))
+end runOneWayPathwayMesoIdm
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -32,17 +51,22 @@ import scalation.random.Exponential
  *  @param aniRatio   the ratio of simulation speed vs. animation speed
  *  @param nStop      the number of arrivals before stopping
  *  @param stream     the base random number stream (0 to 999)
+ *  @param flowDiagram optional density-sensitive equilibrium speed relation; when absent,
+ *                     every segment keeps the fixed `freeFlowSpeed`, unchanged from prior behavior
+ *  @param warmups    initial runs omitted from the summary; for 10 measured runs,
+ *                    set `reps = 12, warmups = 2`. Defaults preserve one ordinary run.
  */
-class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, animating: Boolean = false,
-                        aniRatio: Double = 500.0, nStop: Int = 300, stream: Int = 0)
-    extends Model (name, reps, animating, aniRatio):
+class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 12, animating: Boolean = false,
+                        aniRatio: Double = 500.0, nStop: Int = 30, stream: Int = 0,
+                        flowDiagram: Option [IdmFlux] = None, warmups: Int = 2)
+    extends Model (name, reps, animating, aniRatio, warmupReps = warmups):
 
     //--------------------------------------------------
        // Initialize Model Constants
 
-    val lambda         = 200.0                           // Experiment B held-out demand
-    val numJunc        = 0                              // number of intermediate junctions
-    val freeFlowSpeed  = 68.0 / 2.24694                 // free-flow speed (metres/second)
+    val lambda         = 3200.0                           // Experiment B held-out demand
+    val numJunc        = 1                              // number of intermediate junctions
+    val freeFlowSpeed  = 68.0 / 2.23694                 // free-flow speed (metres/second)
     val capacity       = 2390.0                         // discharge capacity (vehicles/hour)
     val storageCapacity = 133                            // frozen from micro 3600 veh/h maximum occupancy
     val segmentLengths = new VectorD (numJunc + 1)      // zero uses the display length
@@ -67,7 +91,7 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
     end for
 
     val lane = PathwayMeso ("lane", junc, entry, exit, segmentLengths, freeFlowSpeed, capacity,
-                            storageCapacity = storageCapacity)
+                            storageCapacity = storageCapacity, flowDiagram = flowDiagram)
 
     addComponents (List (entry), junc.toList, List (exit), List (lane))  // add endpoints before transport
 
@@ -76,6 +100,15 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
 
     val linkCounts = Array.ofDim [Int] (lane.seg.length)                 // number of completed vehicles per link
     val linkTimes  = Array.ofDim [Double] (lane.seg.length)              // total travel time per link
+
+    private val completedPerRepStat = new Statistic ("completed vehicles per replication")
+    private val link0SpeedStat = new Statistic ("link 0 speed (m/s)")
+    private val meanTravelTimeStat = new Statistic ("mean travel time (s)")
+    private val simulationTimeStat = new Statistic ("simulation time (s)")
+    private val computationTimeStat = new Statistic ("computation time (ms)")
+    private val agendaActivationsStat = new Statistic ("agenda activations per replication")
+    private val activationsPerVehicleStat = new Statistic ("activations per vehicle")
+    private var lastReplicationComputationTimeMs = 0.0
 
     case class Car () extends Vehicle ("c", this):
 
@@ -92,8 +125,29 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
 
     end Car
 
+    override protected def replicationCompleted (rep: Int, computationTimeMs: Double): Unit =
+        lastReplicationComputationTimeMs = computationTimeMs
+        if rep > warmups then
+            val completed = exit.durationStat.num
+            val travelTime = exit.durationStat.mean
+            val link0Time = if linkCounts(0) > 0 then linkTimes(0) / linkCounts(0) else 0.0
+            completedPerRepStat.tally (completed.toDouble)
+            link0SpeedStat.tally (if link0Time > 0.0 then lane.seg(0).length / link0Time else 0.0)
+            meanTravelTimeStat.tally (travelTime)
+            simulationTimeStat.tally (simDuration)
+            computationTimeStat.tally (computationTimeMs)
+            agendaActivationsStat.tally (agendaActivations.toDouble)
+            activationsPerVehicleStat.tally (if completed > 0 then agendaActivations.toDouble / completed else 0.0)
+        end if
+        if rep < reps then
+            java.util.Arrays.fill (linkCounts, 0)
+            java.util.Arrays.fill (linkTimes, 0.0)
+        end if
+    end replicationCompleted
+
     simulate ()
     waitFinished ()
+    val computationTimeMs = lastReplicationComputationTimeMs
 
     //--------------------------------------------------
     // Collect and report statistics
@@ -126,11 +180,25 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 1, anim
             segment.length, linkCounts(i), flow, travelTime, speed, density, maxOccupancy, maxDensity)
     end for
 
-    val runReport = SimulationRunReport (name, getNumActors, lane.junc.length, lane.seg.length, laneCount,
-        completed, meanTravel, runSecs, throughput, agendaActivations, activationsPerVehicle,
+    val runReport = SimulationRunReport (name, nStop, lane.junc.length, lane.seg.length, laneCount,
+        completed, meanTravel, runSecs, computationTimeMs, throughput, agendaActivations, activationsPerVehicle,
         HOUR / lambda, recorderReports, linkReports)
     banner ("Meso pathway JSON report")
     println (s"simulation_run_json =\n${runReport.prettyJson}")
+
+    val experimentSummary = SimulationExperimentSummary (name, warmups, reps - warmups, nStop,
+        SimulationMetricSummary.from (completedPerRepStat),
+        SimulationMetricSummary.from (link0SpeedStat),
+        SimulationMetricSummary.from (meanTravelTimeStat),
+        SimulationMetricSummary.from (simulationTimeStat),
+        SimulationMetricSummary.from (computationTimeStat),
+        SimulationMetricSummary.from (agendaActivationsStat),
+        SimulationMetricSummary.from (activationsPerVehicleStat))
+    val summaryFile = if flowDiagram.isDefined then "idm_meso.json" else "fixed_meso.json"
+    val summaryPath = Path.of ("log", "simulation", "Simulation-plot", summaryFile)
+    experimentSummary.writeJson (summaryPath)
+    println (s"simulation_experiment_json = ${summaryPath}")
+    println (experimentSummary.prettyJson)
 
     Model.shutdown ()
 

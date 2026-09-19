@@ -47,7 +47,7 @@ class FreewayCorridorMixed (name: String = "FreewayCorridorMixed", reps: Int = 1
     private val debug = debugf ("FreewayCorridorMixed", true)
 
     val linkLength      = 500.0                         // metres per transport segment
-    val freeFlowSpeed   = 68.0 / 2.24694                // 68 mph in metres/second
+    val freeFlowSpeed   = 68.0 / 2.23694                // 68 mph in metres/second
     val mesoCapacity    = 1800.0                        // vehicles/hour
     val storageCapacity = 10                            // vehicles per mesoscopic link
 

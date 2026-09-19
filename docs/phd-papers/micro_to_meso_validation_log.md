@@ -6,11 +6,36 @@ This is the single durable record for micro-to-meso validation runs, derived
 comparisons, gate decisions, and remaining work.  It records meaningful run
 results rather than complete IDE launch commands or cleanup output.
 
-**Current status (2026-09-10): Gate 1 is CLOSED.** Experiments A (finite-storage
-admission/wakeup) and B (held-out capacity/fidelity) are complete.  The next
-work is Gate 2 consolidation followed by the `MesoSpec` grammar, translators,
-agreement test, and mutation study.  Do not treat Gate 1 as open or begin a
-new city-scale network framework from this document.
+**Current status (2026-09-16): Gates 1 and 2 are CLOSED.** Gate 1 experiments
+A (finite-storage admission/wakeup) and B (held-out capacity/fidelity) passed.
+Gate 2's mixed-resolution behavioral checks also passed; see the Gate 2 results
+below. Do not reopen either gate or begin a new city-scale network framework
+from this document.
+
+MicroIR and MesoSpec v0.1 now have typed representations, validation, JSON
+parsing/schema support, and canonical JSON identities. The ScalaTion MesoSpec
+translator has passed one-link, three-link linear, and branching/merging runs;
+these runs are meso-only, not generated mixed-resolution runs.
+
+One specification gap remains before extending that translator: `MesoLink`
+currently specifies free-flow time, capacity, and storage, but not an
+IDM-derived density-sensitive speed relation. `MesoVTransport` accepts
+`IdmFlux`, but the current MesoSpec translators do not supply one. Decide how
+the relation and its source IDM parameters are represented before coding that
+extension.
+
+## Remaining work
+
+1. Decide and record the IDM-flux semantics in MesoSpec, reusing the source
+   MicroIR parameters without creating a second conflicting authority.
+2. Extend `T_S` from meso-only networks to a generated mixed micro/meso model.
+3. Implement `T_M` from the same MesoSpec.
+4. Check bounded ScalaTion/Maude trace agreement.
+5. Freeze and run the mutation study, then evaluate LLM generation against the
+   deterministic baseline.
+
+The blueprint has the same status and ordered work list; city-scale builder
+expansion is outside this paper's current scope.
 
 ## Measurement definitions
 
@@ -813,6 +838,41 @@ link costs rather than merely following a topology-forced tree.
 
 **Status: COMPLETE — routing profiles passed; signal control is validated in the
 separate G2.3C experiment.**
+
+### Generated T_S mixed-resolution slice
+
+The first deterministic generator-backed mixed translation is implemented in
+`MesoSpecMixedScalation.scala`. It accepts one MicroIR source and route, one
+interior MesoSpec link, and an IDM equilibrium speed relation. The translator
+constructs a microscopic prefix and suffix with native `Pathway` components,
+places an IDM-flux `MesoVTransport` between them, and sends the same `Vehicle`
+actor through all three regions under one Model agenda.
+
+The run passed with four generated and completed vehicles:
+
+| Check | Result |
+|---|---:|
+| MicroIR source and route | 1 / 1 |
+| Microscopic prefix segments | 1 |
+| IDM-flux mesoscopic links | 1 |
+| Microscopic suffix segments | 1 |
+| Mesoscopic entries / releases | 4 / 4 |
+| Sink completions | 4 |
+| Final mesoscopic occupancy | 0 |
+
+The test establishes the first T_S generation slice. It does not yet cover
+multiple mesoscopic links, route-conditioned branching, or mixed networks with
+more than one source and route.
+
+**Status: PASS — first generated mixed T_S slice.**
+
+The follow-up linear multi-link generator uses the same MicroIR route with a
+microscopic prefix, two consecutive IDM-flux `MesoVTransport` links, and a
+microscopic suffix. Four vehicles completed; each mesoscopic link reported
+four entries and four releases, and both links drained to zero occupancy. The
+run used one Model agenda and 188 agenda activations.
+
+**Status: PASS — generated linear multi-link T_S slice.**
 
 ### Current Gate 2 status
 

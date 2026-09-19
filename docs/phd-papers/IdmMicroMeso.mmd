@@ -1,0 +1,42 @@
+flowchart LR
+
+P["Shared IDM parameters<br/>vmax, T, s0, vehicle length, delta"]
+
+subgraph MICRO["Microscopic model"]
+    direction TB
+    M0["IDMDynamics"]
+    M1["At each update, use vehicle state,<br/>leader gap, and relative speed"]
+    M2["Compute IDM acceleration<br/>using a, b, and shared parameters"]
+    M3["Update each vehicle's speed<br/>and position"]
+    M0 --> M1
+    M1 --> M2
+    M2 --> M3
+end
+
+subgraph MESO["Mesoscopic speed relation"]
+    direction TB
+    F0["IdmFlux"]
+    F1["Equilibrium assumption:<br/>acceleration = 0, relative speed = 0"]
+    F2["Desired gap:<br/>s* = s0 + vT"]
+    F3["Solve for equilibrium bumper gap:<br/>g_e(v) = (s0 + vT) / sqrt(1 - (v/vmax)^delta)"]
+    F4["Space headway = g_e(v) + vehicle length"]
+    F5["Derive density and flow:<br/>rho(v) = 1 / space headway<br/>q(v) = rho(v) * v"]
+    F6["Tabulate rho(v); use bisection<br/>to invert it, then interpolate v(rho)"]
+    F7["At link entry, MesoVTransport<br/>measures running-part density rho"]
+    F8["Use v(rho) for traversal speed"]
+    F9["Traversal time = link length / speed"]
+    F0 --> F1
+    F1 --> F2
+    F2 --> F3
+    F3 --> F4
+    F4 --> F5
+    F5 --> F6
+    F6 --> F7
+    F7 --> F8
+    F8 --> F9
+end
+
+P --> M0
+P --> F0
+
+F5 -.-> Q["Flow is computed, but does not set discharge.<br/>Configured link capacity sets the FIFO release headway:<br/>3600 / capacity"]

@@ -38,7 +38,7 @@ class DestinationRoutingMixed (name: String = "DestinationRoutingMixed", reps: I
     private val sourceWestNode = 6; private val sourceSouthNode = 7; private val nodeCount = 8
     private val destinations = Array (sinkNorthNode, sinkEastNode)
 
-    val freeFlowSpeed = 68.0 / 2.24694
+    val freeFlowSpeed = 68.0 / 2.23694
     val mesoCapacity = 1800.0
     val storageCapacity = 10
     Vehicle.setInitialSpeed (freeFlowSpeed)

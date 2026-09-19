@@ -130,7 +130,7 @@ class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating
         override def act(): Unit =
             println(s"act: Car $this BEGINS")
 
-            Vehicle.setInitialSpeed(68.0 / 2.24694)
+            Vehicle.setInitialSpeed(68.0 / 2.23694)
             var laneIdx = laneRV.igen % numLane // pick an initial lane
             this.laneID = laneIdx
             debug("Act::: ", s"For $this actor in: lane: ${this.laneID}: LaneID Assigned")

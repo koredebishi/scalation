@@ -164,7 +164,7 @@ class Dgraph (name: String, bipartite: Boolean = false):
             p2(0) += radius2 * cos (Pi + angle - gapShift)
             p2(1) += radius2 * sin (Pi + angle - gapShift)
 
-            println (s"move2Boundary: from p1 = $p1, to p2 = $p2")
+            // println (s"move2Boundary: from p1 = $p1, to p2 = $p2")
         end move2Boundary
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -47,7 +47,7 @@ class RoutingMesoMicroWithSignal(name: String = "RoutingMesoMicroWithSignal", re
                                             cycles = 1000, satHeadway = 2.0,
                                             startupLoss = 0.0)
   
-    val freeFlowSpeed = 68.0 / 2.24694
+    val freeFlowSpeed = 68.0 / 2.23694
     val mesoCapacity = 1800.0
     val storageCapacity = 10
     Vehicle.setInitialSpeed (freeFlowSpeed)

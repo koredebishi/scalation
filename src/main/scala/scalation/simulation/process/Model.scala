@@ -36,10 +36,11 @@ import scala.collection.mutable.ArrayBuffer
  *  @param width      the width of the animation panel
  *  @param height     the height of the animation panel
  *  @param liveAnimation  use paced live display for traffic components; false retains recorded playback
+ *  @param warmupReps  initial replications excluded from the reported replication statistics
  */
 class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRatio: Double = 1.0,
              val full: Boolean = true, weight: Int = 1200, height: Int = 800,
-             liveAnimation: Boolean = true)
+             liveAnimation: Boolean = true, val warmupReps: Int = 0)
       extends Coroutine (name)
          with Completion
          with Modelable
@@ -49,6 +50,10 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
     private val debug = debugf ("Model", false)                      // debug function
     private val flaw  = flawf ("Model")                             // flaw function
+
+    require (reps > 0, "Model.reps must be positive")
+    require (warmupReps >= 0 && warmupReps < reps,
+             "Model.warmupReps must be non-negative and less than reps")
 
 
 
@@ -218,6 +223,11 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     def reset (): Unit =
         banner ("Model.reset in progress")
 
+        visitComponents { p =>
+            p.resetForReplication ()
+            if p.persistentStat != null then p.persistentStat.reset (startTime)
+        }
+
         // reset the agenda - activation priority queue
         while ! agenda.isEmpty do agenda.dequeue ()                 // clean out actors from agenda
 
@@ -225,6 +235,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
         for p <- parts do
             if p.isInstanceOf [Source] then                         // reset sources
                 val s = p.asInstanceOf [Source]
+                s.actTime = startTime
                 reschedule (s)
             if p.isInstanceOf [WaitQueue] then                      // reset wait queues
                 val w = p.asInstanceOf [WaitQueue]
@@ -251,10 +262,10 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
         _clock = startTime
         log.trace (this, "starts", this, _clock)
 
+        visitComponents (p => p.director = this)                    // every registered part and ALL its descendants
+
         for p <- parts do
             log.trace (this, s"establish x = ${p.at(0)}, y = ${p.at(1)}", p, _clock)
-            p.director = this
-            for q <- p.subpart do q.director = this
             if p.isInstanceOf [Source] then reschedule (p.asInstanceOf [Source]) 
         end for
 
@@ -397,58 +408,56 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     override def act(): Unit =
         log.trace(this, s"starts model for $reps replications", null, _clock)
 
-        //for rep <- 1 to reps do                                         // LOOP THROUGH REPLICATIONS
-        val rep = 1
-        _clock = startTime                                          //Initialize the clock at StartTime
-        if rep == 1 && animating then display()                     // turn animation on (true) off (false)
+        for rep <- 1 to reps do
+            _clock = startTime
+            if rep == 1 && animating then display()
 
-        log.trace(this, s"starts rep $rep", null, _clock)           // log this simulation
+            log.trace(this, s"starts rep $rep", null, _clock)
+            simulating = true
+            agendaActivationCount = 0L
+            if isAnimating && dgAni.isLiveSnapshots then dgAni.startLiveClock (_clock)
 
-        simulating = true                                           // Start the simulation as true,
-        agendaActivationCount = 0L
+            val (_, computationTimeMs) = timed {
+                while simulating && !agenda.isEmpty do
+                    _theActor = agenda.dequeue()
+                    agendaActivationCount += 1
+                    if _theActor.actTime < clock then
+                        flaw("act", s"actor $_theActor activation time < $_clock")
+                        println("QUIT")
+                        simulating = false
+                    else
+                        if isAnimating && dgAni.isLiveSnapshots then dgAni.awaitLiveTime (_theActor.actTime)
+                        _clock = _theActor.actTime
 
-        if isAnimating && dgAni.isLiveSnapshots then dgAni.startLiveClock (_clock)
-
-        while simulating && !agenda.isEmpty do                      // INNER SCHEDULING LOOP
-            _theActor = agenda.dequeue()                            // get next actor from priority queue
-            agendaActivationCount += 1
-            if _theActor.actTime < clock then
-                flaw("act", s"actor $_theActor activation time < $_clock")
-                println("QUIT")
-                simulating = false                                  //stop the simulation and quit
-            else
-                if isAnimating && dgAni.isLiveSnapshots then dgAni.awaitLiveTime (_theActor.actTime)
-                _clock = _theActor.actTime                          // advance time
-
-                if _clock > stopTime && _theActor.isInstanceOf[Source] then
-                    println(s"Skipping Source actor due to time limit at clock = $clock")
-                else
-                    if isAnimating then dgAni.updateActorCount(numActors)
-                    hudPushCounter += 1
-                    if isAnimating && hudPushCounter >= HUD_PUSH_INTERVAL then
-                        hudPushCounter = 0
-                        if !dgAni.isLiveSnapshots then pushHudStats ()
+                        if _clock > stopTime && _theActor.isInstanceOf[Source] then
+                            println(s"Skipping Source actor due to time limit at clock = $clock")
                         else
-                            val now = System.nanoTime ()
-                            if now >= nextLiveHudUpdate then
-                                pushHudStats ()
-                                nextLiveHudUpdate = now + 100000000L
+                            if isAnimating then dgAni.updateActorCount(numActors)
+                            hudPushCounter += 1
+                            if isAnimating && hudPushCounter >= HUD_PUSH_INTERVAL then
+                                hudPushCounter = 0
+                                if !dgAni.isLiveSnapshots then pushHudStats ()
+                                else
+                                    val now = System.nanoTime ()
+                                    if now >= nextLiveHudUpdate then
+                                        pushHudStats ()
+                                        nextLiveHudUpdate = now + 100000000L
+                                end if
+                            end if
+                            yyield(_theActor)
+                        end if
                     end if
-                    //debug("act", s"${this.me} resumes ${_theActor} at clock= $clock")
-                    //log.trace(this, "resumes", _theActor, _clock)
-                    yyield(_theActor) // yield to actor
-                    //debug ("act", s"after yyield at clock $clock")
-            end if
-        end while
+                end while
+            }
 
-        simulating = false
-        log.trace(this, s"ends rep $rep", null, _clock)
-
-        agendaActivationStat.tally (agendaActivationCount.toDouble) // one run-level observation per replication
-        fini(rep)
-        if rep < reps then reset()
-        resetStats(rep)
-        //end for
+            simulating = false
+            log.trace(this, s"ends rep $rep", null, _clock)
+            agendaActivationStat.tally (agendaActivationCount.toDouble)
+            replicationCompleted (rep, computationTimeMs)
+            if rep == 1 then fini(rep)
+            resetStats(rep)
+            if rep < reps then reset()
+        end for
 
         cleanup()
         if reps > 1 then reportV()
@@ -457,6 +466,14 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
         hasFinished()
         yyield(null, true)
     end act
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Collect model-specific measures before component statistics are reset.
+     *  @param rep                 the completed replication number
+     *  @param computationTimeMs   wall-clock time for this replication's scheduler
+     */
+    protected def replicationCompleted (rep: Int, computationTimeMs: Double): Unit = {}
+    end replicationCompleted
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Put the components on the animation engine's queue.
@@ -586,10 +603,18 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
      */
     def resetStats (rep: Int, rmax: Int = reps): Unit =
         if rep == 1 then
-            for stat <- getStatistics do statV += stat.name -> new VectorD (rmax)
-        for stat <- getStatistics do
-            statV (stat.name)(rep - 1) = stat.mean
-            if rep < rmax then stat.reset ()               // keep the final rep's collectors readable after the run
+            statV.clear ()
+            for stat <- getStatistics do statV += stat.name -> new VectorD (rmax - warmupReps)
+        val stats = getStatistics
+        for stat <- stats do
+            if rep > warmupReps then statV (stat.name)(rep - warmupReps - 1) = stat.mean
+        if rep < rmax then
+            for stat <- stats do stat.reset ()
+            visitComponents { p =>
+                p.durationStat.reset ()
+                if p.persistentStat != null then p.persistentStat.reset (clock)
+            }
+        end if
     end resetStats
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

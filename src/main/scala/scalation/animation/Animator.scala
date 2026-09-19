@@ -28,7 +28,7 @@ class Animator (graph: Dgraph)
 
     /** The debug function
      */
-    private val debug = debugf ("Animator", true)
+    private val debug = debugf ("Animator", false)
 
     /** The flaw function
      */

@@ -40,6 +40,7 @@ object MesoSpecTwoLinkScalation:
     /** Translate one linear MesoSpec route containing two or more links.
      *  Screen coordinates and run controls remain executable-model concerns.
      *  @param spec        the accepted mesoscopic specification
+     *  @param micro       the source MicroIR supplying IDM parameters
      *  @param director    the ScalaTion process model that owns the components
      *  @param makeEntity  the vehicle factory used by the source
      *  @param nStop       the number of vehicles generated for this run
@@ -48,12 +49,12 @@ object MesoSpecTwoLinkScalation:
      *  @param sourceXY    the display coordinates for the source
      *  @param sinkXY      the display coordinates for the sink
      */
-    def linear (spec: MesoSpec, director: Model, makeEntity: () => Vehicle,
+    def linear (spec: MesoSpec, micro: MicroIR, director: Model, makeEntity: () => Vehicle,
                 nStop: Int, stream: Int = 0, nt: Int = 1,
                 sourceXY: (Int, Int) = (100, 290),
                 sinkXY: (Int, Int) = (900, 290)): MesoScalationLinearNetwork =
 
-        spec.validate ()                                        // accept only a legal MesoSpec
+        spec.validateAgainst (micro)                            // bind to its claimed microscopic model
         checkLinear (spec)                                      // enforce this translator slice
 
         val sourceSpec = spec.demand.sources(0)                 // sole source declaration
@@ -61,6 +62,7 @@ object MesoSpecTwoLinkScalation:
         val linkMap    = spec.links.map (e => e.id -> e).toMap  // specification link lookup
         val linkSpecs  = routeSpec.links.map (linkMap)           // links in traversal order
         val iArrivalRV = arrivalVariate (sourceSpec.arrival, stream)
+        val flowDiagram = MesoSpecScalation.flowDiagram (spec, micro) // one model-wide relation
 
         val source = VSource (sourceSpec.id, director, makeEntity, 0, nStop,
                               iArrivalRV, sourceXY)
@@ -86,7 +88,8 @@ object MesoSpecTwoLinkScalation:
             val speed = linkSpec.length / linkSpec.freeFlowTime // preserve traversal time
             links(i) = MesoVTransport (linkSpec.id,
                 component (linkSpec.from), component (linkSpec.to), speed,
-                linkSpec.capacity, storageCapacity = linkSpec.storageCapacity)
+                linkSpec.capacity, storageCapacity = linkSpec.storageCapacity,
+                flowDiagram = flowDiagram)
             links(i).length = linkSpec.length                   // use physical road length
         }
 
@@ -157,6 +160,7 @@ end MesoSpecTwoLinkScalation
 /** The `MesoSpecTwoLinkScalationModel` class executes a translated linear
  *  MesoSpec containing two or more links.
  *  @param spec       the accepted linear MesoSpec
+ *  @param micro      the MicroIR bound to that specification
  *  @param name       the name of the simulation model
  *  @param reps       the number of independent replications
  *  @param animating  whether to animate the model
@@ -164,7 +168,7 @@ end MesoSpecTwoLinkScalation
  *  @param nStop      the number of vehicles generated for this run
  *  @param stream     the random-number stream used for arrivals
  */
-class MesoSpecTwoLinkScalationModel (spec: MesoSpec,
+class MesoSpecTwoLinkScalationModel (spec: MesoSpec, micro: MicroIR,
                                      name: String = "MesoSpecTwoLinkScalationModel",
                                      reps: Int = 1, animating: Boolean = false,
                                      aniRatio: Double = 500.0, val nStop: Int = 4,
@@ -174,7 +178,7 @@ class MesoSpecTwoLinkScalationModel (spec: MesoSpec,
     //--------------------------------------------------
     // Translate and Register Model Components
 
-    val network   = MesoSpecTwoLinkScalation.linear (spec, this, () => Car (), nStop, stream)
+    val network   = MesoSpecTwoLinkScalation.linear (spec, micro, this, () => Car (), nStop, stream)
     val source    = network.source                            // generated vehicle source
     val junctions = network.junctions                         // ordered junctions
     val links     = network.links                             // ordered mesoscopic links
@@ -233,7 +237,10 @@ end MesoSpecTwoLinkScalationModel
         CarFollowingModel.IDM,
         ODESolverType.Ballistic,
         Array (MicroParameter ("timeHeadway", 1.5),
-               MicroParameter ("minimumGap", 2.0)),
+               MicroParameter ("minimumGap", 2.0),
+               MicroParameter ("maximumSpeed", 10.0),
+               MicroParameter ("vehicleLength", 4.0),
+               MicroParameter ("delta", 4.0)),
         0.5)
     val micro = MicroIR (
         MicroIR.version,
@@ -257,6 +264,7 @@ end MesoSpecTwoLinkScalationModel
         MesoSpec.version,
         micro.version,
         micro.sha256,
+        MesoSpeedRelation.IdmEquilibrium,
         Array (MesoNode ("entry", MicroNodeKind.Source),
                MesoNode ("j1", MicroNodeKind.Junction),
                MesoNode ("j2", MicroNodeKind.Junction),
@@ -269,7 +277,7 @@ end MesoSpecTwoLinkScalationModel
         MesoSpec.eventOrder)
 
     spec.validateAgainst (micro)                               // accept this abstraction
-    val model = new MesoSpecTwoLinkScalationModel (spec)
+    val model = new MesoSpecTwoLinkScalationModel (spec, micro)
     val completed = model.sink.durationStat.num                // completed translated trips
 
     cfor (0, model.links.length) { i =>
@@ -280,6 +288,9 @@ end MesoSpecTwoLinkScalationModel
         assert (model.links(i).persistentStat.max <= model.links(i).storageCapacity)
     }
     assert (completed == model.nStop)
+    val fluxes = model.links.map (_.flowDiagram.get)
+    assert (fluxes.forall (_ eq fluxes(0)))                    // translated links share one IDM relation
+    assert (fluxes(0).v0 == 10.0)                              // derived from source MicroIR parameters
 
     banner ("Multi-link MesoSpec to ScalaTion test: PASS")
     println (s"mesospec_sha256 = ${spec.sha256}")

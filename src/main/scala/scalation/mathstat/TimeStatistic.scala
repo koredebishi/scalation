@@ -37,6 +37,19 @@ class TimeStatistic (override val name: String = "p-stat",
     def minX_  = minX
     def maxX_  = maxX
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset both the accumulated values and the time cursor for a fresh run.
+     */
+    override def reset (): Unit =
+        reset (_startTime)
+    end reset
+
+    /** Reset the accumulated values and position the cursor at simulation time `t`. */
+    def reset (t: Double): Unit =
+        super.reset ()
+        _lastTime = t
+    end reset
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the last time statistics were recorded by this collector.
      */

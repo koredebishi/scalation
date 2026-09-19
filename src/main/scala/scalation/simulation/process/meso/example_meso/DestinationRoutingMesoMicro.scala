@@ -28,7 +28,7 @@ class DestinationRoutingMesoMicro (name: String = "DestinationRoutingMesoMicro",
     private val mergeNode = 3; private val northNode = 4; private val eastNode = 5
     private val westNode = 6; private val southNode = 7; private val pocketNode = 8
     private val nodeCount = 9; private val destinations = Array (northNode, eastNode)
-    val freeFlowSpeed = 68.0 / 2.24694; val mesoCapacity = 1800.0; val storageCapacity = 10
+    val freeFlowSpeed = 68.0 / 2.23694; val mesoCapacity = 1800.0; val storageCapacity = 10
     Vehicle.setInitialSpeed (freeFlowSpeed)
 
     private def makeCar (origin: Int): Vehicle =

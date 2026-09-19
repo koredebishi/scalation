@@ -35,7 +35,7 @@ import scalation.simulation.process.builder.TrafficModelBuilder
  *  @param autoRun    run immediately for standalone use; false lets an evaluation adapter own the run
  */
 class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
-                     animating: Boolean = false, aniRatio: Double = 500.0, autoRun: Boolean = true)
+                     animating: Boolean = true, aniRatio: Double = 500.0, autoRun: Boolean = true)
       extends Model (name, reps, animating, aniRatio)
          with RowTimeLoader:
 

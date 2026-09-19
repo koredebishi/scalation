@@ -12,7 +12,7 @@
     </content>
     <content url="file://$MODULE_DIR$/../../../target/scala-3.8.2/resource_managed/main" />
     <content url="file://$MODULE_DIR$/../../../target/scala-3.8.2/src_managed/main" />
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="25" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="sbt: scala-sdk-3.8.2" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala3-library_3:3.8.2:jar" level="project" />

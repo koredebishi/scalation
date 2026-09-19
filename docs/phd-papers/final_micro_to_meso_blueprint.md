@@ -4,18 +4,48 @@
 
 ### Status
 
-**Gate 1 status (2026-09-10): CLOSED.** Experiments A and B are complete.  The
-active work is to freeze the validated mixed-resolution mechanism and define
-the `MesoSpec` grammar and translators; city-scale network-builder expansion is
-out of scope for the present contribution.
+**Current status (2026-09-17): Gates 1 and 2 are CLOSED.** Gate 1 experiments
+A and B passed; the Gate 2 mixed-resolution behavioral checks are also recorded
+as passed in the [validation log](micro_to_meso_validation_log.md).
 
-**T_S status (2026-09-13): LINEAR MULTI-LINK TRANSLATION PASSED.** The
-`runMesoSpecTwoLinkScalation` test translated and executed an accepted
-three-link `MesoSpec` as native ScalaTion components with two junctions and four
-completed vehicles (`mesospec_sha256 =
-69d8cda511e66912661562125d97594460105c0d2bd8f297c4af93f522cc984f`). This
-extends the retained one-link baseline while leaving branching, merging, and
-mixed-resolution translation as the remaining `T_S` work.
+**MicroIR v0.1 and MesoSpec v0.2 are implemented** as typed representations with
+validation, JSON parsing/schema support, canonical JSON, and hashes. The
+ScalaTion translator has passed one-link, three-link linear, and branching/
+merging MesoSpec runs. The first generated mixed-resolution `T_S` slice also
+passes: one accepted MesoSpec IDM link is placed between microscopic prefix and
+suffix Pathways while the same Vehicle actor remains on the shared agenda.
+The follow-up linear multi-link slice also passes: two consecutive IDM-flux
+MesoLinks are generated between microscopic prefix and suffix Pathways under
+the same actor and agenda. Branched mixed-network generation is still open.
+
+**IDM-flux semantics are represented in MesoSpec v0.2** by
+`MesoSpeedRelation.IdmEquilibrium`. The linked MicroIR remains the authority
+for IDM parameters, and the ScalaTion translator builds an `IdmFlux` from those
+parameters for its supported translation slice. The table exporter provides
+those same `IdmFlux` samples to the formal backend; the backend must import the
+table rather than independently derive another one. General mixed-resolution
+translation and the Real-Time Maude event model remain open.
+
+The completed work is the Scala-side foundation, not the formal backend: the
+typed specifications, canonical artifacts, IDM table export, ScalaTion
+translators, and initial mixed-resolution generators are available. The actual
+Real-Time Maude model, its timed rewrite rules, timestamp mapping, and
+translator-agreement traces have not yet been implemented.
+
+### Remaining work, in order
+
+1. Extend the passing `T_S` mixed slice to branched mixed networks and multiple
+   source/route cases, using the same vehicle and Scalation runtime.
+2. Implement `T_M`, translating the same MesoSpec event semantics to
+   **Real-Time Maude** and importing the exported IDM equilibrium table.
+3. Define the timestamp representation used by Real-Time Maude and its
+   deterministic mapping to ScalaTion event times before comparing traces.
+4. Compare bounded canonical traces from ScalaTion and Real-Time Maude.
+5. Freeze and run the mutation study; then evaluate LLM generation against the
+   deterministic baseline.
+
+City-scale network-builder expansion remains out of scope for the present
+contribution.
 
 This document supersedes the earlier two-paper blueprint.
 
@@ -861,9 +891,20 @@ Effort remains a secondary result, not the primary scientific claim, but it cann
 
 ---
 
-# 14. Role of Maude
+# 14. Role of Real-Time Maude
 
-Maude should not be used as a glorified schema checker.
+This project uses **Real-Time Maude (RTM)** as the formal backend. The timed
+events in MesoSpec—link traversal completion, release headways, blocked
+vehicles, and downstream space becoming available—are part of the behavior to
+verify, so the backend models timed transitions rather than treating time as
+incidental data. The IDM equilibrium table is imported from the ScalaTion
+`IdmFlux` export; RTM does not re-derive its IDM relation.
+
+The numeric time representation and mapping from ScalaTion's event timestamps
+must be specified explicitly for bounded trace comparison; no quantization or
+floating-point equivalence is assumed by this blueprint.
+
+RTM should not be used as a glorified schema checker.
 
 Basic checks such as:
 
@@ -874,7 +915,8 @@ Basic checks such as:
 
 belong in Scala/schema validation.
 
-Maude is useful because rewrite theories and model checking let us inspect possible event-state evolutions.
+RTM is used to inspect possible timed event-state evolutions through rewrite
+theories and model checking.
 
 Its role here is:
 
@@ -941,7 +983,7 @@ T_S:MesoSpec\rightarrow ScalaTion
 and
 
 \[
-T_M:MesoSpec\rightarrow Maude.
+T_M:\text{MesoSpec}\rightarrow\text{Real-Time Maude}.
 \]
 
 If:
@@ -990,7 +1032,7 @@ Then require:
 \[
 \boxed{
 \pi(
-Trace_{Maude}(MesoSpec)
+Trace_{RTM}(MesoSpec)
 )
 =
 \pi(
@@ -1608,12 +1650,12 @@ Start LLM-versus-deterministic comparisons.
 
 ---
 
-## Week 5 — Maude translation and agreement
+## Week 5 — Real-Time Maude translation and agreement
 
 Implement:
 
 \[
-MesoSpec\rightarrow Maude.
+\text{MesoSpec}\rightarrow\text{Real-Time Maude}.
 \]
 
 Before formal claims, implement translator-agreement tests.
@@ -2364,7 +2406,12 @@ That is Gate 2 work.
 
 ---
 
-# One issue in the existing process agenda we must remember
+# Historical agenda-design discussion (not an open Gate 2 task)
+
+The following TODO and prototype recommendation predate the completed Gate 2
+results above. They are retained as design history, not as current instructions
+to create the listed files or reopen Gate 2. Any remaining event-order questions
+belong to the MesoSpec/translator-conformance work above.
 
 Your process agenda is:
 

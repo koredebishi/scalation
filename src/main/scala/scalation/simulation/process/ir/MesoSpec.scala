@@ -29,6 +29,14 @@ enum MesoEventPhase:
 end MesoEventPhase
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MesoSpeedRelation` enumeration selects how a mesoscopic link obtains
+ *  traversal speed.  `IdmEquilibrium` uses the linked source MicroIR parameters.
+ */
+enum MesoSpeedRelation:
+    case Fixed, IdmEquilibrium
+end MesoSpeedRelation
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MesoNode` class stores one mesoscopic network node.
  *  @param id    the stable node identifier
  *  @param kind  the semantic role of the node
@@ -37,7 +45,7 @@ case class MesoNode (id: String, kind: MicroNodeKind)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MesoLink` class specifies one directed, single-lane mesoscopic link.
- *  Its FIFO transit/ready queue and blocked-entry queue are fixed v0.1
+ *  Its FIFO transit/ready queue and blocked-entry queue are fixed v0.2
  *  semantics implemented by `MesoVTransport`.
  *  @param id               the stable link identifier
  *  @param microSegments    the microscopic segments represented by this link
@@ -105,11 +113,12 @@ class UnsupportedMesoSpecVersion (version: String)
 case class MesoObservable (measure: MicroMeasure, location: String)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MesoSpec` class is the typed v0.1 specification consumed by both the
+/** The `MesoSpec` class is the typed v0.2 specification consumed by both the
  *  ScalaTion and Maude translators.
  *  @param version         the MesoSpec schema version
  *  @param microIRVersion  the source MicroIR schema version
  *  @param microIRSha256   the identity of the source canonical MicroIR
+ *  @param speedRelation   the mesoscopic speed law, using source MicroIR IDM parameters when selected
  *  @param nodes           the mesoscopic network nodes
  *  @param links           the directed mesoscopic links
  *  @param movements       the allowed junction movements
@@ -118,6 +127,7 @@ case class MesoObservable (measure: MicroMeasure, location: String)
  *  @param eventOrder      the simultaneous-event phase order
  */
 case class MesoSpec (version: String, microIRVersion: String, microIRSha256: String,
+                     speedRelation: MesoSpeedRelation,
                      nodes: Array [MesoNode], links: Array [MesoLink],
                      movements: Array [MesoMovement], demand: MesoDemand,
                      observables: Array [MesoObservable],
@@ -169,11 +179,11 @@ end MesoSpec
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MesoSpec` companion object contains the v0.1 semantic contract.
+/** The `MesoSpec` companion object contains the v0.2 semantic contract.
  */
 object MesoSpec:
 
-    val version = "0.1"                                        // current schema version
+    val version = "0.2"                                        // current schema version
 
     def eventOrder: Array [MesoEventPhase] =
         Array (MesoEventPhase.SpaceRelease,                     // storage is freed first
@@ -455,6 +465,29 @@ object MesoSpec:
         if spec.microIRSha256 != micro.sha256 then
             errors += s"microIRSha256 '${spec.microIRSha256}' does not match '${micro.sha256}'"
 
+        if spec.speedRelation == MesoSpeedRelation.IdmEquilibrium then
+            if micro.vehicleDynamics.model != CarFollowingModel.IDM then
+                errors += "IDM equilibrium speed requires IDM vehicle dynamics in the source MicroIR"
+            val parameters = micro.vehicleDynamics.parameters.map (p => p.name -> p.value).toMap
+            val required = Array ("maximumSpeed", "timeHeadway", "minimumGap", "vehicleLength", "delta")
+            for name <- required do
+                if !parameters.contains (name) then
+                    errors += s"IDM equilibrium speed requires source MicroIR parameter '$name'"
+            end for
+            if required.forall (parameters.contains) then
+                val v0 = parameters("maximumSpeed")
+                val tau = parameters("timeHeadway")
+                val s0 = parameters("minimumGap")
+                val len = parameters("vehicleLength")
+                val delta = parameters("delta")
+                if v0 <= 0.0 then errors += "source MicroIR maximumSpeed must be positive for IDM equilibrium speed"
+                if tau <= 0.0 then errors += "source MicroIR timeHeadway must be positive for IDM equilibrium speed"
+                if s0 < 0.0 then errors += "source MicroIR minimumGap must be nonnegative for IDM equilibrium speed"
+                if len <= 0.0 then errors += "source MicroIR vehicleLength must be positive for IDM equilibrium speed"
+                if delta <= 0.0 then errors += "source MicroIR delta must be positive for IDM equilibrium speed"
+            end if
+        end if
+
         for segment <- (mappedSet -- microSegmentSet).toArray.sorted do
             errors += s"mapped microscopic segment '$segment' does not exist"
 
@@ -538,7 +571,7 @@ end MesoSpec
  */
 object MesoSpecJson:
 
-    private val rootFields = Array ("version", "microIRVersion", "microIRSha256",
+    private val rootFields = Array ("version", "microIRVersion", "microIRSha256", "speedRelation",
                                     "nodes", "links", "movements", "demand",
                                     "observables", "eventOrder")       // MesoSpec fields
     private val nodeFields = Array ("id", "kind")                     // MesoNode fields
@@ -576,7 +609,7 @@ object MesoSpecJson:
     private [ir] def sha256 (spec: MesoSpec): String = CanonicalJson.sha256 (apply (spec))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the canonical JSON Schema supplied to the LLM for MesoSpec v0.1.
+    /** Return the canonical JSON Schema supplied to the LLM for MesoSpec v0.2.
      */
     def schema: String = CanonicalJson (rawSchema)
 
@@ -600,6 +633,7 @@ object MesoSpecJson:
             version,
             stringField (root, "microIRVersion", "MesoSpec"),
             stringField (root, "microIRSha256", "MesoSpec"),
+            parseSpeedRelation (stringField (root, "speedRelation", "MesoSpec")),
             parseNodes (arrayField (root, "nodes", "MesoSpec")),
             parseLinks (arrayField (root, "links", "MesoSpec")),
             parseMovements (arrayField (root, "movements", "MesoSpec")),
@@ -620,6 +654,7 @@ object MesoSpecJson:
         root.addProperty ("version", spec.version)
         root.addProperty ("microIRVersion", spec.microIRVersion)
         root.addProperty ("microIRSha256", spec.microIRSha256)
+        root.addProperty ("speedRelation", speedRelation (spec.speedRelation))
         root.add ("nodes", encodeNodes (spec.nodes))
         root.add ("links", encodeLinks (spec.links))
         root.add ("movements", encodeMovements (spec.movements))
@@ -630,7 +665,7 @@ object MesoSpecJson:
     end raw
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build the MesoSpec v0.1 JSON Schema from the parser's field contracts.
+    /** Build the MesoSpec v0.2 JSON Schema from the parser's field contracts.
      */
     private def rawSchema: String =
         val definitions = new JsonObject ()                      // reusable record schemas
@@ -688,6 +723,7 @@ object MesoSpecJson:
             "version" -> enumSchema (Array (MesoSpec.version)),
             "microIRVersion" -> enumSchema (Array (MicroIR.version)),
             "microIRSha256" -> patternSchema ("^[0-9a-f]{64}$"),
+            "speedRelation" -> enumSchema (MesoSpeedRelation.values.map (speedRelation)),
             "nodes" -> arraySchema (referenceSchema ("node"), true),
             "links" -> arraySchema (referenceSchema ("link"), true),
             "movements" -> arraySchema (referenceSchema ("movement"), false),
@@ -696,7 +732,7 @@ object MesoSpecJson:
             "eventOrder" -> arraySchema (
                 enumSchema (MesoEventPhase.values.map (eventPhase)), true)))
         root.addProperty ("$schema", "https://json-schema.org/draft/2020-12/schema")
-        root.addProperty ("title", "ScalaTion MesoSpec v0.1")
+        root.addProperty ("title", "ScalaTion MesoSpec v0.2")
         root.add ("$defs", definitions)
         root.toString
     end rawSchema
@@ -1189,6 +1225,21 @@ object MesoSpecJson:
         case MesoEventPhase.Ready        => "ready"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the canonical label for a mesoscopic speed relation.
+     */
+    private def speedRelation (relation: MesoSpeedRelation): String = relation match
+        case MesoSpeedRelation.Fixed         => "fixed"
+        case MesoSpeedRelation.IdmEquilibrium => "idmEquilibrium"
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Parse the canonical label for a mesoscopic speed relation.
+     */
+    private def parseSpeedRelation (relation: String): MesoSpeedRelation = relation match
+        case "fixed"         => MesoSpeedRelation.Fixed
+        case "idmEquilibrium" => MesoSpeedRelation.IdmEquilibrium
+        case _ => throw new IllegalArgumentException (s"unknown speed relation '$relation'")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Parse the canonical label for a node kind.
      */
     private def parseNodeKind (kind: String): MicroNodeKind = kind match
@@ -1230,7 +1281,7 @@ end MesoSpecJson
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `runMesoSpec` main function tests the typed MesoSpec v0.1 contract.
+/** The `runMesoSpec` main function tests the typed MesoSpec v0.2 contract.
  *  > runMain scalation.simulation.process.ir.runMesoSpec
  */
 @main def runMesoSpec (): Unit =
@@ -1324,6 +1375,7 @@ end MesoSpecJson
         MesoSpec.version,
         micro.version,
         micro.sha256,
+        MesoSpeedRelation.Fixed,
         Array (west, ramp, merge, exit),
         Array (westLink, rampLink, exitLink),
         Array (westMove, rampMove),
@@ -1363,13 +1415,20 @@ end MesoSpecJson
     val semanticChange = spec.copy (links = Array (
         westLink, rampLink, exitLink.copy (capacity = exitLink.capacity + 1.0)))
     assert (semanticChange.sha256 != spec.sha256)                // semantics change identity
+    val idmMode = spec.copy (speedRelation = MesoSpeedRelation.IdmEquilibrium)
+    assert (idmMode.sha256 != spec.sha256)                        // speed law is semantic
+    assert (rejectsAgainst (idmMode, micro))                      // source must provide its IDM parameters
 
     val unknownField = JsonParser.parseString (json).getAsJsonObject
     unknownField.addProperty ("extra", true)
     assert (rejectsJson { MesoSpecJson.parse (unknownField.toString) }) // strict field set
 
+    val unknownSpeedRelation = JsonParser.parseString (json).getAsJsonObject
+    unknownSpeedRelation.addProperty ("speedRelation", "unrecognized")
+    assert (rejectsJson { MesoSpecJson.parse (unknownSpeedRelation.toString) })
+
     val wrongVersionJson = JsonParser.parseString (json).getAsJsonObject
-    wrongVersionJson.addProperty ("version", "0.2")
+    wrongVersionJson.addProperty ("version", "0.1")
     assert (rejectsJson { MesoSpecJson.parse (wrongVersionJson.toString) }) // explicit version dispatch
 
     assert (MesoSpecJson.parse (spec.prettyJson).json == json)   // display form remains parseable

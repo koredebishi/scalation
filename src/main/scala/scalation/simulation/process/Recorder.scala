@@ -68,6 +68,20 @@ trait Recorder (nt: Int = 60, nLanes: Int = 4):
     def getDensityMat: MatrixD = r_density.copy
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clear all interval observations before an independent replication.
+     *  Keep the configured observation interval, but reset its cursor and the
+     *  per-lane interval accumulators along with the reported matrices.
+     */
+    def resetRecorder (): Unit =
+        r_counts.setAll (0.0)
+        r_speeds.setAll (0.0)
+        r_density.setAll (0.0)
+        cfor (0, nLanes) { lane => lane_stat(lane).reset () }
+        i_pre = 0
+        recordingStarted = false
+    end resetRecorder
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Record the latest density sample per lane and interval, not an interval average.
      *  @param ctime    the current simulation clock time
      *  @param density  instantaneous density snapshot (veh/km per lane) from VTransport.density

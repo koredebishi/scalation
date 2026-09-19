@@ -52,7 +52,7 @@ end FundamentalDiagram
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `IdmFlux` class builds the fundamental diagram from the EXACT equilibrium
- *  solution of the Intelligent Driver Model, so that the macroscopic model and
+ *  solution of the Intelligent Driver Model, so that the macroscopic(meso) model and
  *  the microscopic model describe the same road with the same parameters.
  *
  *  IDM acceleration:
@@ -138,8 +138,10 @@ class IdmFlux (val v0: Double = 30.0, val tau: Double = 1.5, val s0: Double = 2.
         qT(k) * (1.0 - f) + qT(k + 1) * f
     end q
 
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the equilibrium speed at density rho by linear interpolation.
+     *
      */
     def speed (rho: Double): Double =
         val r = min (max0 (rho), rho_m)
@@ -148,7 +150,6 @@ class IdmFlux (val v0: Double = 30.0, val tau: Double = 1.5, val s0: Double = 2.
         val f = x - k
         vT(k) * (1.0 - f) + vT(k + 1) * f
     end speed
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the characteristic speed dq/drho by central difference.
      */

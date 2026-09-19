@@ -24,6 +24,7 @@ import scalation.simulation.process.{IntegratorType, IDMDynamics}
 import scalation.simulation.process.config.{AggregatedDemand, CorridorLayout, EatonCorridorConfig, MultiCorridorConfig, PeMSDemand}
 import scalation.simulation.process.builder.{CorridorBuilder, BuiltNetwork}
 import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSource, AggregatedRampArrivalSource}
+import scalation.animation.OsmRoadNetwork
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Run the EatonFireModel simulation.
@@ -481,9 +482,19 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
 
     // Both corridors share one coordinate frame, so the bounding box must cover
     // both.  Dimensions must be the frame the layouts were projected into.
+    //
+    // Uses the cleaned county network (build_eaton_network.py output) instead
+    // of the cosmetic-only download_osm_geometry.py backdrop -- same
+    // OsmRoadNetwork/DgAnimator plumbing Model.loadOsmBackground uses, called
+    // directly here since that method doesn't yet know about the GeoJSON
+    // source (Model.scala is a foundational class -- not touched without a
+    // separate, disclosed change).
     private val osmGpsAnchors = layout210.mainlineGPS ++ layout134.mainlineGPS
-    loadOsmBackground ("data/osm/eaton_roads.json", osmGpsAnchors,
-                       EatonCorridorConfig.sharedWBDims)
+    if dgAni != null && osmGpsAnchors.nonEmpty then
+        val net = OsmRoadNetwork.loadGeoJSON ("data/network/eaton/edges.geojson",
+                                              osmGpsAnchors, EatonCorridorConfig.sharedWBDims)
+        dgAni.setBackgroundRoads (net.polylines, net.roadTypes)
+    end if
 
     simulate ()
     waitFinished ()

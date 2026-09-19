@@ -93,8 +93,7 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
         this.subtype = esubtype   // ensure source subtype is set
         //ew.write(f"\n[$sourceType] STARTED | Budget=$units vehicles\n")
 
-        val rep = 1
-        //for rep <- 1 to director.reps do // MAJOR LOOP - replications
+        for rep <- 1 to director.reps do {                         // MAJOR LOOP - replications
         actTime = director.clock // set to model start time
 
         breakable {
@@ -190,7 +189,7 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
         if rep < director.reps then
             //director.log.trace(this, "wait for next rep", director, director.clock)
             yieldToDirector() // yield and wait for next replication
-        //end for
+        }
 
         //director.log.trace(this, "terminates", null, director.clock)
         yieldToDirector(true) // yield and terminate

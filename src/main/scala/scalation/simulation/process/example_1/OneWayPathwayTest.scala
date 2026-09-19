@@ -15,14 +15,17 @@ package example_1
 // One-Shot
 
 import scalation.random._
-import scalation.mathstat.VectorD
+import scalation.mathstat.{Statistic, VectorD}
+import java.nio.file.Path
 //import scalation.simulation.process.ir.MicroIRExtractor
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `runOneWayPathwayTest` function is used to launc h the `OneWayVehicleModel` class.
  *  > runMain scalation.simulation.process.example_1.runOneWayPathwayTest
  */
-@main def runOneWayPathwayTest (): Unit = new OneWayPathwayTest ()
+@main def runOneWayPathwayTest (): Unit =
+    new OneWayPathwayTest (name = "Micro IDM")
+end runOneWayPathwayTest
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -35,16 +38,19 @@ import scalation.mathstat.VectorD
  *  @param aniRatio   the ratio of simulation speed vs. animation speed
  *  @param nStop      the number arrivals before stopping
  *  @param stream     the base random number stream (0 to 999)
+ *  @param warmups    initial runs omitted from the summary; for 10 measured runs,
+ *                    set `reps = 12, warmups = 2`. Defaults preserve one ordinary run.
  */
-class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating: Boolean = false,
-                        aniRatio: Double = 500.0, nStop: Int = 300, stream: Int = 0)
-    extends Model (name, reps, animating, aniRatio):
+class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 12, animating: Boolean = false,
+                        aniRatio: Double = 500.0, nStop: Int = 30, stream: Int = 0,
+                        warmups: Int = 2)
+    extends Model (name, reps, animating, aniRatio, warmupReps = warmups):
 
     //--------------------------------------------------
     // Initialize Model Constants
 
-    val lambda        = 200                             // Experiment B held-out demand
-    val initialSpeed  = 68.0 / 2.24694                    // initial speed (metres/second)
+    val lambda        = 3200                             // Experiment B held-out demand
+    val initialSpeed  = 68.0 / 2.23694                    // initial speed (metres/second)
 
     Vehicle.setInitialSpeed (initialSpeed)
 
@@ -83,6 +89,15 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
     val linkCounts = Array.ofDim [Int] (lane.seg.length)
     val linkTimes  = Array.ofDim [Double] (lane.seg.length)
 
+    private val completedPerRepStat = new Statistic ("completed vehicles per replication")
+    private val link0SpeedStat = new Statistic ("link 0 speed (m/s)")
+    private val meanTravelTimeStat = new Statistic ("mean travel time (s)")
+    private val simulationTimeStat = new Statistic ("simulation time (s)")
+    private val computationTimeStat = new Statistic ("computation time (ms)")
+    private val agendaActivationsStat = new Statistic ("agenda activations per replication")
+    private val activationsPerVehicleStat = new Statistic ("activations per vehicle")
+    private var lastReplicationComputationTimeMs = 0.0
+
     case class Car() extends Vehicle("c", this):
 
         override def act(): Unit =
@@ -107,9 +122,30 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
         end act
     end Car
 
+    override protected def replicationCompleted (rep: Int, computationTimeMs: Double): Unit =
+        lastReplicationComputationTimeMs = computationTimeMs
+        if rep > warmups then
+            val completed = exit.durationStat.num
+            val travelTime = exit.durationStat.mean
+            val link0Time = if linkCounts(0) > 0 then linkTimes(0) / linkCounts(0) else 0.0
+            completedPerRepStat.tally (completed.toDouble)
+            link0SpeedStat.tally (if link0Time > 0.0 then lane.seg(0).length / link0Time else 0.0)
+            meanTravelTimeStat.tally (travelTime)
+            simulationTimeStat.tally (simDuration)
+            computationTimeStat.tally (computationTimeMs)
+            agendaActivationsStat.tally (agendaActivations.toDouble)
+            activationsPerVehicleStat.tally (if completed > 0 then agendaActivations.toDouble / completed else 0.0)
+        end if
+        if rep < reps then
+            java.util.Arrays.fill (linkCounts, 0)
+            java.util.Arrays.fill (linkTimes, 0.0)
+        end if
+    end replicationCompleted
+
 
     simulate ()
     waitFinished ()
+    val computationTimeMs = lastReplicationComputationTimeMs
 
     val completed  = exit.durationStat.num                 // Sink owns the completed-vehicle count
     val meanTravel = exit.durationStat.mean                // and the mean travel time
@@ -139,11 +175,24 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
             segment.length, linkCounts(i), flow, travelTime, speed, density, maxOccupancy, maxDensity)
     end for
 
-    val runReport = SimulationRunReport (name, getNumActors, lane.junc.length, lane.seg.length, laneCount,
-        completed, meanTravel, runSecs, throughput, agendaActivations, activationsPerVehicle,
+    val runReport = SimulationRunReport (name, nStop, lane.junc.length, lane.seg.length, laneCount,
+        completed, meanTravel, runSecs, computationTimeMs, throughput, agendaActivations, activationsPerVehicle,
         HOUR / lambda, recorderReports, linkReports)
     banner ("Micro pathway JSON report")
     println (s"simulation_run_json =\n${runReport.prettyJson}")
+
+    val experimentSummary = SimulationExperimentSummary (name, warmups, reps - warmups, nStop,
+        SimulationMetricSummary.from (completedPerRepStat),
+        SimulationMetricSummary.from (link0SpeedStat),
+        SimulationMetricSummary.from (meanTravelTimeStat),
+        SimulationMetricSummary.from (simulationTimeStat),
+        SimulationMetricSummary.from (computationTimeStat),
+        SimulationMetricSummary.from (agendaActivationsStat),
+        SimulationMetricSummary.from (activationsPerVehicleStat))
+    val summaryPath = Path.of ("log", "simulation", "Simulation-plot", "micro_idm.json")
+    experimentSummary.writeJson (summaryPath)
+    println (s"simulation_experiment_json = ${summaryPath}")
+    println (experimentSummary.prettyJson)
 
     Model.shutdown ()
 

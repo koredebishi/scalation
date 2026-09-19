@@ -13,6 +13,7 @@ package process
 package ir
 
 import scalation.random.{Erlang, Erlang2S, Exponential, Sharp, Variate}
+import scalation.dynamics.IdmFlux
 import scalation.simulation.process.meso.MesoVTransport
 import scalation.simulation.process.config.{CarFollowingModel, ODESolverType}
 
@@ -40,6 +41,7 @@ object MesoSpecScalation:
      *  Run controls and screen coordinates belong to the executable model,
      *  rather than to the semantic MesoSpec.
      *  @param spec        the accepted mesoscopic specification
+     *  @param micro       the source MicroIR supplying IDM parameters
      *  @param director    the ScalaTion process model that owns the components
      *  @param makeEntity  the vehicle factory used by the source
      *  @param nStop       the number of vehicles generated for this run
@@ -47,12 +49,12 @@ object MesoSpecScalation:
      *  @param sourceXY    the display coordinates for the source
      *  @param sinkXY      the display coordinates for the sink
      */
-    def oneLink (spec: MesoSpec, director: Model, makeEntity: () => Vehicle,
+    def oneLink (spec: MesoSpec, micro: MicroIR, director: Model, makeEntity: () => Vehicle,
                  nStop: Int, stream: Int = 0,
                  sourceXY: (Int, Int) = (100, 290),
                  sinkXY: (Int, Int) = (600, 290)): MesoScalationNetwork =
 
-        spec.validate ()                                        // accept only a legal MesoSpec
+        spec.validateAgainst (micro)                            // bind to its claimed microscopic model
         checkOneLink (spec)                                     // enforce this translator slice
 
         val sourceSpec = spec.demand.sources(0)                 // sole source declaration
@@ -65,11 +67,26 @@ object MesoSpecScalation:
         val sink = Sink (sinkSpec.id, sinkXY)
         val speed = linkSpec.length / linkSpec.freeFlowTime     // preserve specified traversal time
         val link = MesoVTransport (linkSpec.id, source, sink, speed, linkSpec.capacity,
-                                   storageCapacity = linkSpec.storageCapacity)
+                                   storageCapacity = linkSpec.storageCapacity,
+                                   flowDiagram = flowDiagram (spec, micro))
         link.length = linkSpec.length                           // use physical rather than drawing length
 
         MesoScalationNetwork (Array (source), Array (link), Array (sink))
     end oneLink
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build the one IDM equilibrium relation shared by all links in a translation.
+     *  The MicroIR is the parameter authority; the MesoSpec only selects its use.
+     */
+    private [ir] def flowDiagram (spec: MesoSpec, micro: MicroIR): Option [IdmFlux] =
+        spec.speedRelation match
+            case MesoSpeedRelation.Fixed => None
+            case MesoSpeedRelation.IdmEquilibrium =>
+                val parameters = micro.vehicleDynamics.parameters.map (p => p.name -> p.value).toMap
+                Some (new IdmFlux (parameters("maximumSpeed"), parameters("timeHeadway"),
+                                   parameters("minimumGap"), parameters("vehicleLength"),
+                                   parameters("delta")))
+    end flowDiagram
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check the structural boundary of the first translator slice.
@@ -114,6 +131,7 @@ end MesoSpecScalation
 /** The `MesoSpecScalationModel` class executes the first deterministic
  *  MesoSpec-to-ScalaTion translation slice.
  *  @param spec       the accepted one-link MesoSpec
+ *  @param micro      the MicroIR bound to that specification
  *  @param name       the name of the simulation model
  *  @param reps       the number of independent replications
  *  @param animating  whether to animate the model
@@ -121,7 +139,7 @@ end MesoSpecScalation
  *  @param nStop      the number of vehicles generated for this run
  *  @param stream     the random-number stream used for arrivals
  */
-class MesoSpecScalationModel (spec: MesoSpec,
+class MesoSpecScalationModel (spec: MesoSpec, micro: MicroIR,
                               name: String = "MesoSpecScalationModel",
                               reps: Int = 1, animating: Boolean = false,
                               aniRatio: Double = 500.0, val nStop: Int = 4,
@@ -131,7 +149,7 @@ class MesoSpecScalationModel (spec: MesoSpec,
     //--------------------------------------------------
     // Translate and Register Model Components
 
-    val network = MesoSpecScalation.oneLink (spec, this, () => Car (), nStop, stream)
+    val network = MesoSpecScalation.oneLink (spec, micro, this, () => Car (), nStop, stream)
     val source  = network.sources(0)                            // generated vehicle source
     val link    = network.links(0)                              // translated mesoscopic link
     val sink    = network.sinks(0)                              // terminal sink
@@ -195,6 +213,7 @@ end MesoSpecScalationModel
         MesoSpec.version,
         micro.version,
         micro.sha256,
+        MesoSpeedRelation.Fixed,
         Array (MesoNode ("entry", MicroNodeKind.Source),
                MesoNode ("exit", MicroNodeKind.Sink)),
         Array (MesoLink ("link-0", Array ("micro-link-0"), "entry", "exit",
@@ -206,7 +225,7 @@ end MesoSpecScalationModel
         MesoSpec.eventOrder)
 
     spec.validateAgainst (micro)                               // accept this abstraction
-    val model = new MesoSpecScalationModel (spec)
+    val model = new MesoSpecScalationModel (spec, micro)
     val completed = model.sink.durationStat.num                // completed translated trips
 
     assert (model.link.enteredCount == model.nStop)
@@ -215,6 +234,7 @@ end MesoSpecScalationModel
     assert (model.link.occupancy == 0)
     assert (model.link.blockedCount == 0)
     assert (model.link.persistentStat.max <= model.link.storageCapacity)
+    assert (model.link.flowDiagram.isEmpty)                     // fixed-speed one-link baseline stays unchanged
 
     banner ("MesoSpec to ScalaTion test: PASS")
     println (s"mesospec_sha256 = ${spec.sha256}")
