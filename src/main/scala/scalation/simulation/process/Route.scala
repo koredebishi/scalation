@@ -31,16 +31,25 @@ import scala.math.abs
  *  @param motion   the dynamics model used for movement
  *  @param isSpeed  whether speed or trip-time is used
  *  @param bend     curvature of the lanes
+ *  @param geometry projected centerline shared by the lane pathways
+ *  @param segmentGeometry projected centerline for each pathway segment
+ *  @param laneGap  pixels between adjacent drawn lanes (default 50, the original spacing)
  */
 class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component, to: Component,
-             motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0)
+             motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0,
+             geometry: Array [(Double, Double)] = Array.empty, laneGap: Double = 50.0,
+             segmentGeometry: Array [Array [(Double, Double)]] = Array.empty)
     extends Component ():
 
 
     private val debug = debugf("Route", true)     // debug function
 
     val pathway = Array.ofDim[Pathway](numLanes)      // create array of parallel Pathways
-    private val GAP = 50.0     // pixel between lanes
+    private val GAP = laneGap  // pixel between lanes
+
+    private def shiftGeometry (points: Array [(Double, Double)], shift: VectorD): Array [(Double, Double)] =
+        points.map (point => (point._1 + shift (0), point._2 + shift (1)))
+    end shiftGeometry
 
     for i <- pathway.indices do
         // this for loop draws n amount of pathways based on numLanes. each of these pathways
@@ -52,7 +61,12 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         // -------------|                  |------------------|-------------------|
         val physicalLane = numLanes - 1 - i  // Reverse: i=0 → lane 4 (rightmost), i=4 → lane 0 (leftmost)
         val shift = calcShift2 * ((physicalLane - (numLanes - 1) / 2.0) * GAP)
-        pathway(i) = new Pathway(s"${name}_$i", junc, from, to, motion, isSpeed, bend, laneShift = shift)
+        val laneGeometry = geometry.map (p => (p._1 + shift (0), p._2 + shift (1)))
+        val laneSegmentGeometry: Array [Array [(Double, Double)]] =
+            segmentGeometry.map (points => shiftGeometry (points, shift))
+        pathway(i) = new Pathway(s"${name}_$i", junc, from, to, motion, isSpeed, bend,
+                                 laneShift = shift, geometry = laneGeometry,
+                                 segmentGeometry = laneSegmentGeometry)
         subpart += pathway(i)
     end for
 

@@ -12,7 +12,7 @@ package scalation
 package scala2d
 
 import java.awt.event.{MouseEvent, MouseListener, MouseMotionListener, MouseWheelEvent, MouseWheelListener}
-import java.awt.geom.{AffineTransform, Point2D}
+import java.awt.geom.{AffineTransform, Point2D, Rectangle2D}
 
 //import scala.runtime.ScalaRunTime.stringOf
 
@@ -46,6 +46,31 @@ trait ZoomablePanel
     val mat = Array.ofDim [Double] (6)
     at.getMatrix (mat)                                           // get the first two rows of transform matrix
 //  println (s"zoomablePanel: mat = ${stringOf (mat)}")
+
+    /** Fit world bounds into the current panel while keeping zoom and drag state coherent.
+     *  The transform is replaced rather than composed with the initial scale.
+     */
+    protected def fitTo (bounds: Rectangle2D, margin: Double = 0.05): Unit =
+        if bounds == null || bounds.isEmpty then return
+        val width  = math.max (getWidth.toDouble, 1.0)
+        val height = math.max (getHeight.toDouble, 1.0)
+        val bw     = math.max (bounds.getWidth, 1.0)
+        val bh     = math.max (bounds.getHeight, 1.0)
+        val usable = math.max (0.0, math.min (0.45, margin))
+        val sx     = width  * (1.0 - 2.0 * usable) / bw
+        val sy     = height * (1.0 - 2.0 * usable) / bh
+        val s      = math.max (1.0e-9, math.min (sx, sy))
+        val tx     = width  / 2.0 - s * bounds.getCenterX
+        val ty     = height / 2.0 - s * bounds.getCenterY
+        at.setTransform (s, 0.0, 0.0, s, tx, ty)
+        scale  = s
+        originx = tx
+        originy = ty
+        basex = 0.0
+        basey = 0.0
+        revalidate ()
+        repaint ()
+    end fitTo
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Override the mouseWheelMoved method to set the scale of the

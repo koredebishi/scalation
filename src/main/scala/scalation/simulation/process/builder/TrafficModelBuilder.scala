@@ -17,9 +17,15 @@ import scalation.simulation.process.config.*
 import scalation.simulation.process.arrival.ArrivalSource
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TrafficModelBuilder` class constructs a traffic simulation model from
- *  configuration objects. Encapsulates the creation of junctions, routes, sources,
- *  ramps, and sinks.
+/** The `TrafficModelBuilder` class assembles traffic demand and vehicle behavior
+ *  from configuration objects. It owns PeMS demand, arrival processes, and dynamics;
+ *  GeoJSON topology, projected geometry, shared graph nodes, and micro/meso edge
+ *  construction belong exclusively to `NetworkBuilder`.
+ *
+ *  OWNERSHIP RULE
+ *    This builder supplies demand and dynamics to a network; it must not create a
+ *    competing road topology or duplicate GeoJSON coordinates. Model-specific code
+ *    may attach sources, destinations, and observations to the built network.
  *  @param network    the network topology configuration
  *  @param demand     the demand/arrival configuration
  *  @param dynamics   the vehicle dynamics configuration
@@ -221,6 +227,7 @@ class TrafficModelBuilder (network: NetworkConfig, demand: PeMSDemand,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute shifted location near start of lane for VSource positioning.
+     *
      *  @param route  the route
      *  @param l      the lane index
      *  @param back   how far back from lane start
@@ -350,5 +357,4 @@ end TrafficModelBuilder
         println (f"  Ramp $i: total = ${src.getTotalVehicles (0)}%5d, mu(0) = ${src.getMu (0, 0)}%.2f")
     }
 end runTestBuilderPeMS
-
 

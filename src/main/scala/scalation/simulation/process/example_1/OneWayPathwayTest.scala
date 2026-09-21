@@ -41,9 +41,9 @@ end runOneWayPathwayTest
  *  @param warmups    initial runs omitted from the summary; for 10 measured runs,
  *                    set `reps = 12, warmups = 2`. Defaults preserve one ordinary run.
  */
-class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 12, animating: Boolean = false,
+class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating: Boolean = false,
                         aniRatio: Double = 500.0, nStop: Int = 30, stream: Int = 0,
-                        warmups: Int = 2)
+                        warmups: Int = 0)
     extends Model (name, reps, animating, aniRatio, warmupReps = warmups):
 
     //--------------------------------------------------

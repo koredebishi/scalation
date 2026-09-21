@@ -355,10 +355,17 @@ object AggregatedRampArrivalSource:
     /** Cache: key = "dataDir/orFile:startTime" → sorted array of (PM, flowRows)
      *  Parsed once per unique demand config, shared across all ramps.
      */
-    private val orCache = HashMap[String, Array[(Double, ArrayBuffer[Double])]]()
+    private case class RampSeries (stationId: Int, postmile: Double,
+                                   flows: ArrayBuffer [Double])
+
+    private val orCache = HashMap[String, Array [RampSeries]] ()
+    private val stationCache = HashMap[String, Map [Int, RampSeries]] ()
 
     /** Clear the cache (for testing). */
-    def clearCache(): Unit = orCache.clear()
+    def clearCache(): Unit =
+        orCache.clear ()
+        stationCache.clear ()
+    end clearCache
     /** Load ramp data from aggregated OR CSV (cached).
      *  Ramps are ordered by postmile; rampIdx selects which one.
      *  @return (total vehicles, muArray)
@@ -377,22 +384,50 @@ object AggregatedRampArrivalSource:
 
                 if rampIdx >= sortedRamps.length then return (0, Array.empty)
 
-                val (rampPM, rampRows) = sortedRamps(rampIdx)
-                val rampTotal = rampRows.sum.toInt
+                val ramp = sortedRamps(rampIdx)
+                val rampTotal = ramp.flows.sum.toInt
 
                 // Compute mu per time row for THIS ramp
-                val muArray = rampRows.map { flow =>
+                val muArray = ramp.flows.map { flow =>
                     if flow > 0.0 then rowTime / flow else Double.MaxValue
                 }.toArray
 
-                debug ("loadRamp", s"ramp $rampIdx at PM=$rampPM, total=$rampTotal (cached)")
+                debug ("loadRamp", s"ramp $rampIdx station=${ramp.stationId} at PM=${ramp.postmile}, total=$rampTotal (cached)")
                 (rampTotal, muArray)
     end loadRamp
+
+    /** Load one ramp series by its PeMS station ID.
+     *  The CSV is parsed once and indexed by station ID; this lookup is O(1) and
+     *  never occurs per vehicle.
+     *  @param demand   aggregated demand configuration
+     *  @param stationId PeMS station identifier
+     *  @param rowTime  seconds per flow row
+     *  @return total vehicles and inter-arrival means for the requested station
+     */
+    def loadRampByStation (demand: AggregatedDemand, stationId: Int,
+                           rowTime: Double): (Int, Array [Double]) =
+        demand.orFile match
+            case None => (0, Array.empty)
+            case Some (orFile) =>
+                val cacheKey = s"${demand.dataDir}/$orFile:${demand.startTime}"
+                val byStation = stationCache.getOrElseUpdate (cacheKey,
+                    orCache.getOrElseUpdate (cacheKey, parseRampCSV (demand, orFile))
+                        .map (r => r.stationId -> r).toMap)
+                byStation.get (stationId) match
+                    case None =>
+                        debug ("loadRampByStation", s"station=$stationId not found in $orFile")
+                        (0, Array.empty)
+                    case Some (ramp) =>
+                        val mu = ramp.flows.map { flow =>
+                            if flow > 0.0 then rowTime / flow else Double.MaxValue
+                        }.toArray
+                        (ramp.flows.sum.toInt, mu)
+    end loadRampByStation
 
     /** Parse ramp CSV once — returns sorted array of (PM, flowRows) for caching.
      *  Called only on cache miss.
      */
-    private def parseRampCSV(demand: AggregatedDemand, orFile: String): Array[(Double, ArrayBuffer[Double])] =
+    private def parseRampCSV(demand: AggregatedDemand, orFile: String): Array [RampSeries] =
         val filePath = s"${demand.dataDir}/$orFile"
         try
             val reader = new BufferedReader(new FileReader(filePath))
@@ -402,20 +437,23 @@ object AggregatedRampArrivalSource:
                 return Array.empty
 
             val cols = header.split(",").map(_.trim)
+            val stationIdx = cols.indexWhere (_.contains ("Station"))
             val pmIdx = cols.indexWhere(_.contains("Abs_PM"))
             val totalFlowIdx = cols.indexWhere(_.contains("Total Flow"))
 
-            // Read all rows, group by station PM
-            val stationData = HashMap[Double, ArrayBuffer[Double]]()
+            // Read all rows, group by the stable PeMS station ID and retain PM for ordering.
+            val stationData = HashMap [(Int, Double), ArrayBuffer [Double]] ()
             var line = reader.readLine()
             while line != null do
                 val parts = line.split(",").map(_.trim)
                 val timestamp = parts(0)
-                if timestamp >= demand.startTime && parts.length > pmIdx && pmIdx >= 0 then
+                if timestamp >= demand.startTime && parts.length > pmIdx && pmIdx >= 0 &&
+                   parts.length > stationIdx && stationIdx >= 0 then
+                    val stationId = parts(stationIdx).toIntOption.getOrElse (0)
                     val pm = parts(pmIdx).toDoubleOption.getOrElse(0.0)
                     val flow = if totalFlowIdx >= 0 && totalFlowIdx < parts.length then
                         parts(totalFlowIdx).toDoubleOption.getOrElse(0.0) else 0.0
-                    stationData.getOrElseUpdate(pm, ArrayBuffer()) += flow
+                    stationData.getOrElseUpdate ((stationId, pm), ArrayBuffer ()) += flow
                 line = reader.readLine()
             end while
             reader.close()
@@ -423,7 +461,9 @@ object AggregatedRampArrivalSource:
             if stationData.isEmpty then return Array.empty
 
             // Sort stations by PM (descending for WB — entry to exit order)
-            val sorted = stationData.toArray.sortBy(-_._1)
+            val sorted = stationData.toArray.sortBy (-_._1._2).map {
+                case ((stationId, postmile), flows) => RampSeries (stationId, postmile, flows)
+            }
             debug ("parseRampCSV", s"Parsed ${sorted.length} ramp stations")
             sorted
         catch

@@ -27,10 +27,14 @@ import scalation.scala2d.Colors._
  *  @param motion   the variate or dynamics model
  *  @param isSpeed  whether speed or trip-time is used
  *  @param bend     curvature of the lane
+ *  @param geometry projected centerline for a single-segment pathway
+ *  @param segmentGeometry projected centerline for each segment
  */
 class Pathway (name: String, val junc: Array [Junction], val from: Component, val to: Component,
                motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0, 
-               laneShift: VectorD = VectorD(0.0, 0.0))
+               laneShift: VectorD = VectorD(0.0, 0.0),
+               geometry: Array [(Double, Double)] = Array.empty,
+               segmentGeometry: Array [Array [(Double, Double)]] = Array.empty)
     extends Component with Joinable:
 
     private val debug = debugf ("Pathway", true)             // debug function
@@ -43,13 +47,20 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
 
     val points = from +: junc.toList :+ to
     val seg = Array.ofDim[VTransport](points.length - 1)
+    require (segmentGeometry.isEmpty || segmentGeometry.length == seg.length,
+             s"segment geometry count ${segmentGeometry.length} does not match segment count ${seg.length}")
 
     for i <- 0 until points.length - 1 do
         val p1 = points(i)
         val p2 = points(i + 1)
         val shift = laneShift
         
-        seg(i) = new VTransport (s"${name}_seg${i}", p1, p2, motion, isSpeed, bend, shift, shift, i)
+        val pointsForSegment =
+            if segmentGeometry.nonEmpty then segmentGeometry(i)
+            else if seg.length == 1 then geometry
+            else Array.empty [(Double, Double)]
+        seg(i) = new VTransport (s"${name}_seg${i}", p1, p2, motion, isSpeed, bend, shift, shift, i,
+                                 pointsForSegment)
         subpart  += seg(i)                                   // add to the subpart
     end for
 

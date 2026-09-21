@@ -32,7 +32,6 @@ import scalation.animation.OsmRoadNetwork
  */
 @main def runEatonFireModel (): Unit = new EatonFireModel ()
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `EatonFireModel` class is a dual-corridor traffic simulation model
  *  for I-210 Westbound + SR-134 Westbound (Eaton fire evacuation).

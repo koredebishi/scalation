@@ -16,7 +16,7 @@ import javax.swing.{JButton, JToolBar, JComponent, JLabel}
 import javax.swing.KeyStroke
 import java.awt.BorderLayout
 import java.awt.{BasicStroke, GradientPaint, RenderingHints}
-import java.awt.geom.{AffineTransform, Point2D}
+import java.awt.geom.{AffineTransform, Point2D, Rectangle2D}
 import scala.math.round
 import scalation.scala2d.*
 import scalation.scala2d.Colors.*
@@ -65,6 +65,10 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     /** Graph to animate
      */
     private val graph = new Dgraph ("Animated_Graph")
+
+    /** Automatically fit the first complete animated network into the canvas. */
+    var fitOnStart = false
+    private var initialFitDone = false
 
     /** Shared queue holding animation commands
      */    
@@ -186,6 +190,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         }
         val (now, structure, tokens) = liveState.snapshot (displayTime)
         structure.foreach (invokeCommand)
+        if fitOnStart && !initialFitDone && tokens.nonEmpty && graph.nodes.nonEmpty then fitView ()
         val present = tokens.iterator.map (_._1.eid).toSet
         drawnTokens.keysIterator.filterNot (present.contains).toVector.foreach { id =>
             ani.destroyToken (id)
@@ -419,6 +424,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         graph.freeTokens.clear()
         actorCount = 0
         clock = 0.0
+        initialFitDone = false
         repaint()
     end resetSceneForReplay
 
@@ -1011,7 +1017,37 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             g2d.setComposite (prevComposite)
         end drawTokenGlow
 
+        /** Public bridge for the enclosing animator to use the panel-owned transform. */
+        def fitViewTo (bounds: Rectangle2D): Unit = fitTo (bounds)
+
     end Canvas
+
+    /** The canvas is retained so the animator can request a view fit. */
+    private val canvas = new Canvas
+
+    /** Fit the current graph, including both nodes and edges, into the canvas. */
+    def fitView (): Unit =
+        val bounds = new Rectangle2D.Double ()
+        var found = false
+
+        def include (r: Rectangle2D): Unit =
+            if r != null && !r.isEmpty then
+                if !found then
+                    bounds.setRect (r.getX, r.getY, r.getWidth, r.getHeight)
+                    found = true
+                else bounds.add (r)
+        end include
+
+        for node <- graph.nodes do include (node.shape.getBounds2D)
+        for edge <- graph.edges do include (edge.shape.getBounds2D)
+        if found then
+            if canvas.getWidth <= 0 || canvas.getHeight <= 0 then
+                SwingUtilities.invokeLater (() => fitView ())
+            else
+                initialFitDone = true
+                SwingUtilities.invokeLater (() => canvas.fitViewTo (bounds))
+            end if
+    end fitView
 
     //================================================================================
     // Playback controls (Play/Pause/Step)
@@ -1057,6 +1093,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         rp.registerKeyboardAction(_ => step(),           KeyStroke.getKeyStroke("N"),     JComponent.WHEN_IN_FOCUSED_WINDOW)
         rp.registerKeyboardAction(_ => replay(),         KeyStroke.getKeyStroke("R"),     JComponent.WHEN_IN_FOCUSED_WINDOW)
         rp.registerKeyboardAction(_ => toggleInspector(),KeyStroke.getKeyStroke("I"),     JComponent.WHEN_IN_FOCUSED_WINDOW)
+        rp.registerKeyboardAction(_ => fitView(), KeyStroke.getKeyStroke("F"), JComponent.WHEN_IN_FOCUSED_WINDOW)
         setSpeedFactor(1.0)
     end buildControls
 
@@ -1108,7 +1145,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
     // Primary constructor block
     {
-        getContentPane ().add (new Canvas)
+        getContentPane ().add (canvas)
         buildControls()
         buildInspector()
         setVisible (true)
@@ -1178,6 +1215,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             case PlaybackMode.Live =>
                 // Termination conditions for Live mode
                 if cmdQ.isEmpty then
+                    if fitOnStart && !initialFitDone && aniDone && graph.nodes.nonEmpty then fitView ()
                     if aniDone then
                         println("DgAnimator.run: Live mode complete (queue empty & aniDone)")
                         running.set(false)
@@ -1207,6 +1245,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                     clock  = when
                     nCmds += 1
                     invokeCommand(cmd)
+                    if fitOnStart && !initialFitDone &&
+                       (cmd.action == CreateToken || cmd.action == MoveToken) then fitView ()
                     // Record only during Live mode
                     frames += Frame(cmd)
                     if cmd.action == CreateToken then actorCount += 1
@@ -1228,6 +1268,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                     if dt > 0 then Thread.sleep(round(dt))
                     clock = f.time
                     invokeCommand(f)
+                    if fitOnStart && !initialFitDone &&
+                       (f.action == CreateToken || f.action == MoveToken) then fitView ()
                     if f.action == CreateToken then actorCount += 1
                     repaint()
                     lastTime = clock

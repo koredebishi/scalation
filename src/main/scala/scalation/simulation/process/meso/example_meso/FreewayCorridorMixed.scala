@@ -13,8 +13,9 @@ package process
 package meso
 package example_meso                                    // One-Shot
 
+import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
-import scalation.random.Sharp
+import scalation.random.Exponential
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Launch the repeated mixed-resolution freeway-corridor experiment.
@@ -23,6 +24,13 @@ import scalation.random.Sharp
 @main def runFreewayCorridorMixed (): Unit = new FreewayCorridorMixed ()
 
 
+
+
+@main def runFreewayMesoIdm (): Unit =
+    val fd = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T, s0 = Vehicle.s,
+        len = Vehicle.len, delta = Vehicle.del)
+    new FreewayCorridorMixed (name = "FreewayMixIdmFlux", flowDiagram = Some (fd), traceSpeeds = true)
+end runFreewayMesoIdm
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `FreewayCorridorMixed` class sends each `Vehicle` actor through this
  *  sequence under one process-interaction director and agenda:
@@ -38,14 +46,19 @@ import scalation.random.Sharp
  *  @param aniRatio   the ratio of simulation speed versus animation speed
  *  @param nStop      the number of arrivals before stopping
  *  @param stream     the base random-number stream
+ *  @param flowDiagram optional IDM equilibrium speed relation shared by all mesoscopic links
+ *  @param traceSpeeds print each IDM density/speed lookup
  */
 class FreewayCorridorMixed (name: String = "FreewayCorridorMixed", reps: Int = 1,
-                            animating: Boolean = false, aniRatio: Double = 500.0,
-                            nStop: Int = 130, stream: Int = 0)
+                            animating: Boolean = true, aniRatio: Double = 500.0,
+                            nStop: Int = 130, stream: Int = 0,
+                            flowDiagram: Option [IdmFlux] = None, traceSpeeds: Boolean = false)
     extends Model (name, reps, animating, aniRatio):
 
     private val debug = debugf ("FreewayCorridorMixed", true)
 
+
+    val lambda = 1800.0 // Experiment B held-out demand
     val linkLength      = 500.0                         // metres per transport segment
     val freeFlowSpeed   = 68.0 / 2.23694                // 68 mph in metres/second
     val mesoCapacity    = 1800.0                        // vehicles/hour
@@ -53,11 +66,18 @@ class FreewayCorridorMixed (name: String = "FreewayCorridorMixed", reps: Int = 1
 
     Vehicle.setInitialSpeed (freeFlowSpeed)
 
+    
     //--------------------------------------------------
-    // Nine transport segments separated by eight junctions
+    // Create Random Variables (RVs)
+    
+    val iArrivalRV = Exponential(HOUR / lambda, stream)
+
+
+//--------------------------------------------------
+    // Nine transport segments separated by eight junctio
 
     val entry = VSource ("entry", this, () => Car (), 0, nStop,
-                         Sharp (5.0, stream), (100, 290))
+                         iArrivalRV, (100, 290))
 
     val j1 = Junction ("j1", xy = (600, 290), nt = 2, nl = 1)
     val j2 = Junction ("j2", xy = (1100, 290), nt = 2, nl = 1)
@@ -71,23 +91,28 @@ class FreewayCorridorMixed (name: String = "FreewayCorridorMixed", reps: Int = 1
     val exit = Sink ("exit", (4600, 290))
 
     val meso1 = MesoVTransport ("meso1", entry, j1, freeFlowSpeed, mesoCapacity,
-                                storageCapacity = storageCapacity)
+                                storageCapacity = storageCapacity, flowDiagram = flowDiagram,
+                                traceSpeed = traceSpeeds)
     val meso2 = MesoVTransport ("meso2", j1, j2, freeFlowSpeed, mesoCapacity,
-                                storageCapacity = storageCapacity)
+                                storageCapacity = storageCapacity, flowDiagram = flowDiagram,
+                                traceSpeed = traceSpeeds)
 
     val microMain = Pathway ("micro-main", Array (j3, j4), j2, j5,
                              IDMDynamics, laneShift = VectorD (0.0, 0.0))
 
     val meso3 = MesoVTransport ("meso3", j5, j6, freeFlowSpeed, mesoCapacity,
-                                storageCapacity = storageCapacity)
+                                storageCapacity = storageCapacity, flowDiagram = flowDiagram,
+                                traceSpeed = traceSpeeds)
 
     val microIsolated = Pathway ("micro-isolated", Array.empty [Junction], j6, j7,
                                  IDMDynamics, laneShift = VectorD (0.0, 0.0))
 
     val meso4 = MesoVTransport ("meso4", j7, j8, freeFlowSpeed, mesoCapacity,
-                                storageCapacity = storageCapacity)
+                                storageCapacity = storageCapacity, flowDiagram = flowDiagram,
+                                traceSpeed = traceSpeeds)
     val meso5 = MesoVTransport ("meso5", j8, exit, freeFlowSpeed, mesoCapacity,
-                                storageCapacity = storageCapacity)
+                                storageCapacity = storageCapacity, flowDiagram = flowDiagram,
+                                traceSpeed = traceSpeeds)
 
     val junctions = Array (j1, j2, j3, j4, j5, j6, j7, j8)
     val mesoLinks = Array (meso1, meso2, meso3, meso4, meso5)
@@ -113,7 +138,7 @@ class FreewayCorridorMixed (name: String = "FreewayCorridorMixed", reps: Int = 1
             meso2.move ()
             j2.jump ()
 
-            microMain.joinAt (this, microMain.mergeLeaderAt (0), 0)
+            microMain.joinAt (this, microMain.mergeLeaderAt (0), 0)        // join the continuous micro DLL
             require (myPathNode != null && (myPathway eq microMain),
                      "vehicle must join the continuous micro DLL")
             for i <- microMain.seg.indices do

@@ -313,12 +313,6 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
     // For standalone run, use @main def runCalRoute101_3
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // Background map -- OSM road network as visual context (no-op when headless)
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    private val osmGpsAnchors = NetworkConfig.mainlineGPSAnchors
-    loadOsmBackground ("data/osm/us101_roads.json", osmGpsAnchors, (w.toDouble, h.toDouble))
 
     private val wallBuilt = System.nanoTime ()             // everything constructed, nothing simulated yet
 

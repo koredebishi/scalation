@@ -174,11 +174,10 @@ object NetworkConfig:
         val main  = getMainlineCoordinates (dims)
         val ramps = getRampCoordinates (dims)
         val centerPos = ((main(0)._1 - 50.0).toInt, (main(0)._2 + 50.0).toInt)
-        val (dx, dy) = (800.0, -350.0)
         val offsets = Array (
             (0, 0),
-            ((ramps(0)._1 + dx).toInt - centerPos._1, (ramps(0)._2 + dy).toInt - centerPos._2),
-            ((ramps(1)._1 + dx).toInt - centerPos._1, (ramps(1)._2 + dy).toInt - centerPos._2)
+            ((ramps(0)._1).toInt - centerPos._1, (ramps(0)._2).toInt - centerPos._2),
+            ((ramps(1)._1).toInt - centerPos._1, (ramps(1)._2).toInt - centerPos._2)
         )
         (centerPos, offsets)
     end getVSourceCenterAndOffsets

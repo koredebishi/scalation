@@ -37,7 +37,9 @@ import scalation.scala2d.QCurve.calcControlPoint2
  */
 class Transport (name: String, val from: Component, val to: Component,
                  motion: Variate, isSpeed: Boolean = false, bend: Double = 0.0,
-                 shift1: VectorD = VectorD (0, 0), shift2: VectorD = VectorD (0, 0))
+                 shift1: VectorD = VectorD (0, 0), shift2: VectorD = VectorD (0, 0),
+                 /** Optional projected centerline, retained from the network source. */
+                 geometry: Array [(Double, Double)] = Array.empty)
       extends Component:
 
 
@@ -50,7 +52,11 @@ class Transport (name: String, val from: Component, val to: Component,
 
     private [process] val curve    = QCurve ()                          // shadow QCurve for computing locations as tokens move along curve
     private [process] val (p1, p2) = calcEndPoints                      // first and second endpoints
-    private [process] val pc       = calcControlPoint2 (p1, p2, bend)   // control point (determines curvature)
+    /** Use the middle of the supplied centerline as the quadratic control point.
+     *  The animation engine represents an edge as a quadratic curve, so this is
+     *  the native approximation while preserving the authoritative endpoints.
+     */
+    private [process] val pc       = controlPointFromGeometry                         // control point (determines curvature)
 
     initComponent(name, (p1.toArray))
 
@@ -60,13 +66,25 @@ class Transport (name: String, val from: Component, val to: Component,
 
     debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
 
-    if abs (bend) < EPSILON then
+    if geometry.length >= 3 then
+        curve.setLine (p1, pc, p2)
+    else if abs (bend) < EPSILON then
         curve.setLine (p1, p2)
     else
         curve.setLine (p1, p2, bend)
 //      curve.setLine (p1, pc, p2)
 //      println ("loc = " + curve.getFirst)
     end if
+
+    private def controlPointFromGeometry: VectorD =
+        if geometry.length < 3 then calcControlPoint2 (p1, p2, bend)
+        else
+            val middle = geometry (geometry.length / 2)
+            val first  = geometry.head
+            VectorD (middle._1 + p1 (0) - first._1,
+                     middle._2 + p1 (1) - first._2)
+        end if
+    end controlPointFromGeometry
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Give the location of the curve to be its starting point.

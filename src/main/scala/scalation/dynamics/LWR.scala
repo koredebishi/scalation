@@ -103,9 +103,9 @@ class IdmFlux (val v0: Double = 30.0, val tau: Double = 1.5, val s0: Double = 2.
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the IDM equilibrium density at speed v, equation (2).
      */
-    def rhoEq (v: Double): Double = 1.0 / (gapEq (v) + len)
+    def rhoEq (v: Double): Double = 1.0 / (gapEq (v) + len)            // equation (2)
 
-    // build the table: for each density, bisect for the equilibrium speed
+    // IDM gives rho(v), so construct its inverse v(rho) on a density grid.
     cfor (0, nTab) { k =>
         val r = k * drho
         rhoT(k) = r
@@ -114,12 +114,12 @@ class IdmFlux (val v0: Double = 30.0, val tau: Double = 1.5, val s0: Double = 2.
             qT(0) = 0.0
         else
             var lo = 0.0; var hi = v0 * (1.0 - 1E-12)
-            cfor (0, 100) { _ =>                                // bisection on monotone rhoEq
-                val mid = 0.5 * (lo + hi)
+            cfor (0, 100) { _ =>                                // bisection finds the speed for density r
+                val mid = 0.5 * (lo + hi)                       // mid is the candidate speed
                 if rhoEq (mid) > r then lo = mid else hi = mid
             }
-            vT(k) = 0.5 * (lo + hi)
-            qT(k) = r * vT(k)
+            vT(k) = 0.5 * (lo + hi)                             // numerical inverse: v(r)
+            qT(k) = r * vT(k)                                   // traffic identity: q = rho * v
     }
 
     private val kc = qT.argmax ()                               // index of capacity
@@ -140,9 +140,7 @@ class IdmFlux (val v0: Double = 30.0, val tau: Double = 1.5, val s0: Double = 2.
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the equilibrium speed at density rho by linear interpolation.
-     *
-     */
+    /** Return the equilibrium speed at density rho by interpolating v(rho). */
     def speed (rho: Double): Double =
         val r = min (max0 (rho), rho_m)
         val x = r / drho
@@ -202,6 +200,88 @@ class IdmFlux (val v0: Double = 30.0, val tau: Double = 1.5, val s0: Double = 2.
         s"  max |dq/drho| = ${"%.3f".format (maxWaveSpeed)} m/s,  concave = $isConcave"
 
 end IdmFlux
+
+
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Check the IDM equilibrium table independently of the LWR PDE solver.
+ *  The test prints representative density, speed, and flow rows so that the
+ *  analytical construction and its numerical inverse can be inspected directly.
+ *
+ *  > runMain scalation.dynamics.idmFluxTest
+ */
+@main def idmFluxTest (): Unit =
+
+    // Build the table from one explicit set of IDM parameters.
+    val fd = new IdmFlux (v0 = 33.528, tau = 1.0, s0 = 2.0, len = 4.0, delta = 4.0)
+    val rho = fd.rhoGrid
+    val speed = fd.vGrid
+    val flow = fd.qGrid
+
+    // At zero density, the equilibrium speed is the desired IDM speed.
+    require (abs (rho(0)) < 1E-12, "the empty-road density must be zero")
+    require (abs (speed(0) - fd.v0) < 1E-12, "the empty-road speed must equal v0")
+    // At jam density, the table reaches the maximum physically admissible density.
+    require (abs (rho(rho.dim - 1) - fd.rho_m) < 1E-12,
+        "the table must reach the IDM jam density")
+    require (speed(speed.dim - 1) >= 0.0, "equilibrium speed must not be negative")
+
+    // The IDM equilibrium speed must fall as density increases.
+    var monotone = true
+    cfor (1, speed.dim) { k => if speed(k) > speed(k - 1) + 1E-10 then monotone = false }
+    require (monotone, "IDM equilibrium speed must decrease with density")
+
+    // Every stored flow row must satisfy the traffic identity q = rho * v.
+    cfor (0, flow.dim) { k =>
+        require (abs (flow(k) - rho(k) * speed(k)) < 1E-10,
+            s"flow identity failed at table row $k")
+    }
+
+    // Print selected rows so the inverse construction can be checked by inspection.
+    banner ("IDM equilibrium table test")
+    println (s"parameters: v0=${fd.v0} m/s, T=${fd.tau} s, s0=${fd.s0} m, " +
+             s"length=${fd.len} m, delta=${fd.delta}")
+    println (s"jam density (rho_m): ${fd.rho_m} veh/m " +
+             s"(${fd.rho_m * 1000.0} veh/km)")
+    println ("  maximum represented density; vehicles are at the minimum equilibrium spacing")
+    println (s"critical density (rho_c): ${fd.rho_c} veh/m " +
+             s"(${fd.rho_c * 1000.0} veh/km)")
+    println ("  density at which the equilibrium flow is highest")
+    println (s"maximum flow (q_max): ${fd.q_max} veh/s " +
+             s"(${fd.q_max * 3600.0} veh/h)")
+    println ("  traffic capacity corresponding to the critical density")
+    println ("density (veh/m) | speed (m/s) | flow (veh/s)")
+    for target <- Array (0.0, 0.01, 0.012, 0.02, fd.rho_c, fd.rho_m) do
+        println (f"${target}%.9f | ${fd.speed (target)}%.9f | ${fd.q (target)}%.9f")
+    end for
+    println ()
+    println (s"full lookup table (${rho.dim} rows):")
+    println ("row | density (veh/m) | speed (m/s) | flow (veh/s)")
+    for k <- 0 until rho.dim do
+        println (f"$k%4d | ${rho(k)}%.9f | ${speed(k)}%.9f | ${flow(k)}%.9f")
+    end for
+    banner ("IDM equilibrium table test: PASS")
+
+end idmFluxTest
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -442,6 +522,7 @@ end LwrPDE
     new Plot (xg, profile(0), profile(1), "rho vs. x (black-godunov, red-lax-wendroff)", true)
 
 end lwrPDETest
+
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

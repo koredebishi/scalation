@@ -23,6 +23,7 @@ import scala.io.Source
 import scala.collection.mutable.ArrayBuffer
 import scalation.banner                                    // ScalaTion's formatted section header printer
 import scalation.mathstat.{VectorD, Plot}
+import scalation.simulation.process.builder.NetEdge
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StationRecord` case class represents one row from a PeMS station_map.csv.
@@ -241,6 +242,51 @@ object EatonCorridorConfig:
         finally source.close ()
         buf.toArray
     end loadStationMap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Load reviewed station-to-edge bindings without copying road or sensor metadata.
+     *  An excluded station has no edge and retains its review reason.  Stations
+     *  absent from this file remain unmapped; there is no nearest-road fallback.
+     *  This small CSV has six unquoted fields; notes must not contain commas.
+     *  @param stations  authoritative PeMS station records
+     *  @param edges     authoritative directed OSM edges
+     *  @param path      reviewed bindings CSV
+     */
+    def loadStationEdges (stations: Array [StationRecord], edges: Array [NetEdge],
+                          path: String = "data/network/eaton/station_edges.csv")
+                        : Array [(StationRecord, Option [NetEdge], String)] =
+        val stationById = stations.map (s => s.stationId -> s).toMap
+        val edgeById = edges.map (e => (e.u, e.v, e.key) -> e).toMap
+        require (stationById.size == stations.length, "duplicate PeMS station IDs")
+        require (edgeById.size == edges.length, "duplicate OSM (u, v, key) IDs")
+        val source = Source.fromFile (path)
+        val bindings = ArrayBuffer [(StationRecord, Option [NetEdge], String)] ()
+        try
+            val lines = source.getLines ()
+            require (lines.hasNext && lines.next ().trim == "station,u,v,key,status,note",
+                     s"invalid station binding header in $path")
+            for line <- lines if line.trim.nonEmpty do
+                val c = line.split (",", -1).map (_.trim)
+                require (c.length == 6, s"invalid station binding row: $line")
+                val id = c(0).toInt
+                require (stationById.contains (id), s"unknown PeMS station $id")
+                val edge = c(4) match
+                    case "mapped" =>
+                        val key = (c(1).toLong, c(2).toLong, c(3).toInt)
+                        require (edgeById.contains (key), s"station $id references missing edge $key")
+                        Some (edgeById(key))
+                    case "excluded" =>
+                        require (c.slice (1, 4).forall (_.isEmpty) && c(5).nonEmpty,
+                                 s"excluded station $id needs empty edge fields and a reason")
+                        None
+                    case other => throw new IllegalArgumentException (s"unknown binding status $other")
+                bindings += ((stationById(id), edge, c(5)))
+            end for
+        finally source.close ()
+        require (bindings.map (_._1.stationId).distinct.size == bindings.size,
+                 "a station may appear only once in the binding file")
+        bindings.toArray
+    end loadStationEdges
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute animation coordinates for all stations in one shared coordinate frame.

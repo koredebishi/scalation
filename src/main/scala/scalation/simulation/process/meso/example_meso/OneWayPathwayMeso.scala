@@ -38,7 +38,7 @@ end runOneWayPathwayMeso
 @main def runOneWayPathwayMesoIdm (): Unit =
     val fd = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T, s0 = Vehicle.s,
                           len = Vehicle.len, delta = Vehicle.del)
-    new OneWayPathwayMeso (name = "IDM meso", flowDiagram = Some (fd))
+    new OneWayPathwayMeso (name = "IDM meso", flowDiagram = Some (fd), traceSpeeds = true)
 end runOneWayPathwayMesoIdm
 
 
@@ -53,12 +53,14 @@ end runOneWayPathwayMesoIdm
  *  @param stream     the base random number stream (0 to 999)
  *  @param flowDiagram optional density-sensitive equilibrium speed relation; when absent,
  *                     every segment keeps the fixed `freeFlowSpeed`, unchanged from prior behavior
+ *  @param traceSpeeds  print each IDM density/speed lookup
  *  @param warmups    initial runs omitted from the summary; for 10 measured runs,
  *                    set `reps = 12, warmups = 2`. Defaults preserve one ordinary run.
  */
 class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 12, animating: Boolean = false,
                         aniRatio: Double = 500.0, nStop: Int = 30, stream: Int = 0,
-                        flowDiagram: Option [IdmFlux] = None, warmups: Int = 2)
+                        flowDiagram: Option [IdmFlux] = None, warmups: Int = 2,
+                        traceSpeeds: Boolean = false)
     extends Model (name, reps, animating, aniRatio, warmupReps = warmups):
 
     //--------------------------------------------------
@@ -91,7 +93,8 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 12, ani
     end for
 
     val lane = PathwayMeso ("lane", junc, entry, exit, segmentLengths, freeFlowSpeed, capacity,
-                            storageCapacity = storageCapacity, flowDiagram = flowDiagram)
+                            storageCapacity = storageCapacity, flowDiagram = flowDiagram,
+                            traceSpeed = traceSpeeds)
 
     addComponents (List (entry), junc.toList, List (exit), List (lane))  // add endpoints before transport
 

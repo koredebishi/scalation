@@ -31,12 +31,13 @@ import scalation.mathstat.VectorD
  *  @param storageCapacity maximum admitted vehicles on each segment
  *  @param flowDiagram    optional density-sensitive equilibrium speed relation applied to every
  *                        segment; when absent, all segments keep the fixed `freeFlowSpeed`
+ *  @param traceSpeed     print each IDM density/speed lookup
  */
 class PathwayMeso (name: String, val junc: Array [Junction], val from: Component, val to: Component,
                    segmentLengths: VectorD, freeFlowSpeed: Double, capacity: Double,
                    bend: Double = 0.0, laneShift: VectorD = VectorD (0.0, 0.0),
                    storageCapacity: Int = Int.MaxValue,
-                   flowDiagram: Option [IdmFlux] = None)
+                   flowDiagram: Option [IdmFlux] = None, traceSpeed: Boolean = false)
     extends Component:
 
     val points = from +: junc.toList :+ to
@@ -49,7 +50,8 @@ class PathwayMeso (name: String, val junc: Array [Junction], val from: Component
 
         seg(i) = new MesoVTransport (s"${name}_seg${i}", p1, p2,
                                     freeFlowSpeed, capacity,
-                                    bend, laneShift, laneShift, storageCapacity, flowDiagram)
+                                    bend, laneShift, laneShift, storageCapacity, flowDiagram,
+                                    traceSpeed)
         if segmentLengths(i) > 0.0 then seg(i).length = segmentLengths(i)   // else keep the drawing length
         subpart += seg(i)                               // add to the subparts
     end for

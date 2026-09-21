@@ -1,10 +1,16 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** NetworkBuilder -- BLUEPRINT (no code yet; convert to code after approval)
+/** NetworkBuilder -- GeoJSON network authority
  *
  *  PURPOSE
  *    Turn the cleaned OSM network (data/network/<name>/edges.geojson, written by
  *    scripts/build_eaton_network.py) into simulation components.  Topology and
  *    resolution only; demand (VSource rates) stays in the model, like CorridorBuilder.
+ *
+ *  OWNERSHIP RULE
+ *    NetworkBuilder is the only authority for GeoJSON topology, directed edge identity,
+ *    projected geometry, shared graph nodes, and micro/meso edge construction. A model
+ *    or TrafficModelBuilder must not recreate those roads from a second topology table;
+ *    it may only attach demand, dynamics, destinations, and observations.
  *
  *  DATA FLOW
  *
@@ -14,8 +20,8 @@
  *                        | resolution + speed from the RoadGroup table    |
  *                        v                                                v
  *                 MICRO edge                                        MESO edge
- *          Route(name, lanes, junc=[], from, to, motion)   PathwayMeso(name, junc=[], from, to,
- *          set VTransport length = edge length                 VectorD(length), v0, capacity,
+ *          Route(name, lanes, junc, from, to, motion)     PathwayMeso(name, junc=[], from, to,
+ *          set VTransport length = segment length                VectorD(length), v0, capacity,
  *                                                              storageCapacity, flowDiagram)
  *                        |                                                |
  *                        +--------------------+---------------------------+
@@ -102,22 +108,21 @@
  *       same style as `private [process]` / `private [simulation]` elsewhere).
  *       The builder takes the projector as a parameter from the model.
  *
- *    5. Micro -> micro with different lane counts.  A Route has one fixed lane
- *       count, so motorway (6 lanes) -> motorway_link (2 lanes) cannot share one
- *       Pathway/DLL.  Each micro edge is its own Route; the car leaves one
- *       (removeFromAlist) and joins the next (joinAt).  Leader/follower order is
- *       not carried across that boundary.
+ *    5. Micro grouping.  Consecutive degree-two micro edges with the same road
+ *       group and lane count are one Route/Pathway with multiple VTransport segments, preserving
+ *       one DLL across the chain.  Ramps, branches, lane changes, and resolution
+ *       boundaries remain separate transitions.
  *       READ (Pathway.scala:37, 92-96, 120-125; EatonFireModel.scala:353-418):
  *       a Pathway is ONE lane with its own DLL (vList); a Route is numLanes
- *       Pathways.  The caller picks the lane and joins it:
+ *       Pathways.  Equal-width handoffs preserve the lane; width changes use
+ *       deterministic vehicle-id mapping before the caller joins it:
  *         laneID = <lane>
  *         route.pathway (laneID).joinAt (car, route.pathway (laneID).mergeLeaderAt (0), 0)
  *         ... route.pathway (laneID).seg (i).move () ...
  *         route.pathway (laneID).removeFromAlist (car)
  *       joinAt sets segId and disp itself.  Precedent for a lane-count change:
- *       EatonFireModel.scala:406 (I-210 -> SR-134 connector) draws
- *       laneID = (rand.gen * lanes).toInt.min (lanes - 1) on the new road.
- *       Plan: same rule at every micro entry after a different lane count.
+ *       Lane identity is preserved across edges and clamped when the next edge
+ *       has fewer lanes; the builder does not invent a random lane change.
  *
  *    6. Destination.  Searched: Vehicle has no destination field.  SimActor has
  *       `subtype` (Int, "e.g. for turning choices") and `nextTransport`, but
@@ -166,8 +171,8 @@
  *        joinAt, move segments, removeFromAlist.
  *    Nothing is stored twice: speed, lanes, length are read from edge(e).
  *
- *  NOT TOUCHED: Model, Route, Pathway, PathwayMeso, VTransport, MesoVTransport,
- *    Junction, CorridorBuilder, EatonFireModel, OsmRoadNetwork, Vehicle.
+ *  NOT TOUCHED: Model, PathwayMeso, VTransport, MesoVTransport, Junction,
+ *    CorridorBuilder, EatonFireModel, OsmRoadNetwork, Vehicle.
  */
 
 package scalation
@@ -175,6 +180,7 @@ package simulation
 package process
 package builder
 
+import scala.collection.immutable.Map
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters.*
 
@@ -182,7 +188,7 @@ import com.google.gson.JsonParser as GsonJsonParser
 
 import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
-import scalation.random.Uniform
+import scalation.random.Sharp
 import scalation.simulation.process.meso.MesoVTransport
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -236,9 +242,15 @@ end RoadGroup
  *  @param vLat     latitude of the head node
  *  @param vLon     longitude of the head node
  *  @param name     the street name (may be empty)
+ *  @param geometry complete directed centerline in (latitude, longitude) order
+ *  @param ref      road reference, e.g., I 210 or CA 134 (may be empty)
+ *  @param key      parallel-edge key; (u, v, key) identifies the directed edge
+ *  @param osmid    original OSM way id(s), semicolon-separated for merged ways (may be empty)
  */
 case class NetEdge (u: Long, v: Long, highway: String, lanes: Int, length: Double,
-                    uLat: Double, uLon: Double, vLat: Double, vLon: Double, name: String):
+                    uLat: Double, uLon: Double, vLat: Double, vLon: Double, name: String,
+                    geometry: Array [(Double, Double)] = Array.empty,
+                    ref: String = "", key: Int = 0, osmid: String = ""):
 
     def group: RoadGroup = RoadGroup.of (highway)
 
@@ -257,16 +269,16 @@ end NetEdge
  *  @param edge    the edges
  *  @param from    tail node index of each edge
  *  @param to      head node index of each edge
- *  @param route   micro `Route` of each edge, null for a meso edge
+ *  @param route   micro `Route` containing the edge, null for a meso edge
+ *  @param microGroup  grouped micro-edge indices for each micro route
  *  @param lane    meso links of each edge (one per lane), null for a micro edge
  *  @param cost    travel-time cost of each edge (length / group speed)
- *  @param stream  random stream for lane choice
+ *  @param stream  retained for builder-call compatibility
  */
 class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edge: Array [NetEdge],
                   val from: Array [Int], val to: Array [Int], val route: Array [Route],
-                  val lane: Array [Array [MesoVTransport]], val cost: Array [Double], stream: Int):
-
-    private val rand = Uniform (0.0, 1.0, stream)                       // lane choice on entry to an edge
+                  val lane: Array [Array [MesoVTransport]], val microGroup: Array [Array [Int]],
+                  val cost: Array [Double], stream: Int):
 
     // edges leaving each node: outEdge (outStart (i)) until outEdge (outStart (i + 1))
     private val outStart = new Array [Int] (nodeId.length + 1)
@@ -299,34 +311,50 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
     end routeTo
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return every component to hand to `Model.addComponent`.  A micro edge is
-     *  registered as its `Route`; `Model.simulate` gives a registered component and
-     *  all of its descendants (Route -> Pathway -> VTransport) a director.
+    /** Return every component to hand to `Model.addComponent`.  A grouped micro
+     *  chain is registered once as its `Route`; `Model.simulate` gives a registered
+     *  component and all of its descendants a director.
      */
     def components: List [Component] =
         node.toList ++
-        route.toList.filter (_ != null) ++
+        route.toList.filter (_ != null).distinct ++
         lane.toList.filter (_ != null).flatMap (_.toList)
     end components
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the edge leaving node `a` for node `b`.
+    /** Return the edge leaving node `a` for node `b`.  When parallel edges join the
+     *  same two nodes, return the cheapest, the one the routing table costed.
      *  @param a  the tail node index
      *  @param b  the head node index
      */
     private def edgeBetween (a: Int, b: Int): Int =
-        var k = outStart (a)
-        while k < outStart (a + 1) && to (outEdge (k)) != b do k += 1
-        require (k < outStart (a + 1), s"no edge from node ${nodeId (a)} to node ${nodeId (b)}")
-        outEdge (k)
+        var best = -1
+        cfor (outStart (a), outStart (a + 1)) { k =>
+            val e = outEdge (k)
+            if to (e) == b && (best < 0 || cost (e) < cost (best)) then best = e
+        }
+        require (best >= 0, s"no edge from node ${nodeId (a)} to node ${nodeId (b)}")
+        best
     end edgeBetween
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Choose the lane at a graph-edge boundary.  Equal-width links preserve
+     *  lane identity; a width change uses the vehicle id to distribute entries
+     *  reproducibly over the new lanes.
+     */
+    private def handoffLane (car: Vehicle, previousLanes: Int, targetLanes: Int): Int =
+        require (targetLanes > 0, "a transport must have at least one lane")
+        if previousLanes <= 0 || car.laneID < 0 then Math.floorMod (car.id, targetLanes)
+        else if previousLanes == targetLanes then math.min (car.laneID, targetLanes - 1)
+        else Math.floorMod (car.id + car.laneID, targetLanes)
+    end handoffLane
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Drive one vehicle from a start node to a destination sink, following the
      *  routing table.  Call from the vehicle's `act`.
      *  On every edge the car's IDM desired speed (`vmax`) is set to that edge's
-     *  group speed, and its lane is drawn once (on the first edge) and then kept,
-     *  limited to the lane count of each edge.
+ *  group speed.  Equal-width links preserve lane identity; width changes use
+ *  deterministic vehicle-id handoff to distribute vehicles over target lanes.
      *   meso edge:  `move`, then cross the end junction
      *   micro edge: `joinAt` its DLL, `move`, cross the end junction,
      *               then `removeFromAlist` (the order used in `FreewayCorridorMixed`)
@@ -338,31 +366,39 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
         require (table != null, "call routeTo before drive")
         require (node (destination).isInstanceOf [Sink], s"destination node ${nodeId (destination)} is not a Sink")
         var here  = startNode
-        var first = true                                                // the lane is drawn on the first edge only
+        var previousLanes = 0
         while here != destination do
             val next = table.next (here, destination)
             require (next >= 0, s"no route from node ${nodeId (here)} to node ${nodeId (destination)}")
             val e = edgeBetween (here, next)
 
             val lanes = if route (e) != null then route (e).pathway.length else lane (e).length
-            if first then car.laneID = (rand.gen * lanes).toInt.min (lanes - 1)
-            else car.laneID = math.min (math.max (car.laneID, 0), lanes - 1)
-            first = false
+            car.laneID = handoffLane (car, previousLanes, lanes)
+            previousLanes = lanes
             car.vmax = edge (e).group.speed                             // one speed law: this edge's group speed
 
             var pathway: Pathway = null                                 // set only for a micro edge
             if route (e) != null then
                 pathway = route (e).pathway (car.laneID)
-                pathway.joinAt (car, pathway.mergeLeaderAt (0), 0)
-                pathway.seg (0).move ()
+                val group = microGroup (e)
+                val first = group.indexOf (e)
+                val firstSegment = if first >= 0 then first else 0
+                pathway.joinAt (car, pathway.mergeLeaderAt (firstSegment), firstSegment)
+                var i = firstSegment
+                while i < group.length do
+                    car.vmax = edge (group (i)).group.speed
+                    pathway.seg (i).move ()
+                    if i < pathway.junc.length then pathway.junc (i).jump ()
+                    i += 1
+                end while
+                here = to (group.last)
             else
                 lane (e)(car.laneID).move ()
+                here = next
+                node (here) match
+                    case j: Junction => j.jump ()
+                    case _           =>
             end if
-
-            here = next
-            node (here) match
-                case j: Junction => j.jump ()
-                case _           =>
             if pathway != null then pathway.removeFromAlist (car)
         end while
         node (destination).asInstanceOf [Sink].leave ()
@@ -378,7 +414,9 @@ end BuiltGraph
  */
 object NetworkBuilder:
 
-    private val LANE_GAP = 50.0                                         // pixels between drawn meso lanes: the same as Route.GAP
+    private val LANE_GAP = 10.0                                         // pixels between drawn lanes: passed to Route as laneGap and used for meso lanes
+    private val NODE     = 4.0                                          // drawn size of a junction or sink disc, in pixels (the default is 20)
+    private val JUNCTION_DELAY = 0.0                                    // ordinary imported nodes have no uncalibrated delay
 
     private val flux = new Array [IdmFlux] (RoadGroup.values.length)   // one IdmFlux per group, built on demand
 
@@ -405,6 +443,10 @@ object NetworkBuilder:
             val coords = obj.getAsJsonObject ("geometry").getAsJsonArray ("coordinates")
             val first  = coords.get (0).getAsJsonArray                   // GeoJSON order: [lon, lat]
             val last   = coords.get (coords.size - 1).getAsJsonArray
+            val geometry = Array.tabulate (coords.size) { i =>
+                val point = coords.get (i).getAsJsonArray
+                (point.get (1).getAsDouble, point.get (0).getAsDouble)
+            }
 
             def text (key: String): String =
                 val v = p.get (key)
@@ -414,7 +456,8 @@ object NetworkBuilder:
                             text ("highway").split (";").headOption.getOrElse (""),
                             p.get ("lanes_effective").getAsInt, p.get ("length").getAsDouble,
                             first.get (1).getAsDouble, first.get (0).getAsDouble,
-                            last.get (1).getAsDouble, last.get (0).getAsDouble, text ("name"))
+                            last.get (1).getAsDouble, last.get (0).getAsDouble, text ("name"), geometry,
+                            ref = text ("ref"), key = p.get ("key").getAsInt, osmid = text ("osmid"))
         end for
         out.toArray
     end read
@@ -443,10 +486,13 @@ object NetworkBuilder:
      *  @param project    latitude, longitude -> screen (x, y), the frame of the background map
      *  @param motion     the car-following dynamics for micro edges
      *  @param nt         number of time intervals for junction recording
-     *  @param stream     random stream for lane choice
+     *  @param stream     retained for builder-call compatibility
+     *  @param sourceComponents optional source components keyed by their OSM node id;
+     *                          these replace the generated node at that location
      */
     def build (edges: Array [NetEdge], sinkNodes: Array [Long], project: (Double, Double) => (Double, Double),
-               motion: Dynamics, nt: Int, stream: Int = 0): BuiltGraph =
+               motion: Dynamics, nt: Int, stream: Int = 0,
+               sourceComponents: Map [Long, Component] = Map.empty): BuiltGraph =
         require (edges.nonEmpty, "no edges to build")
 
         val nodeId = (edges.map (_.u) ++ edges.map (_.v)).distinct.sorted
@@ -469,13 +515,64 @@ object NetworkBuilder:
         val node = new Array [Component] (n)
         cfor (0, n) { i =>
             node(i) =
-                if sinkNodes.contains (nodeId(i)) then new Sink ("SK", at(i))
-                else new Junction ("JC", at(i), nt, nl(i))
+                if sourceComponents.contains (nodeId(i)) then sourceComponents (nodeId(i))
+                else if sinkNodes.contains (nodeId(i)) then new Sink ("SK", Array (at(i)._1, at(i)._2, NODE, NODE))
+                else new Junction ("JC", Sharp (JUNCTION_DELAY), Array (at(i)._1, at(i)._2, NODE, NODE), nt, nl(i))
         }
 
         val route = new Array [Route] (edges.length)
         val lane  = new Array [Array [MesoVTransport]] (edges.length)
+        val outgoing = Array.fill (n) (ArrayBuffer [Int] ())
+        val incoming = Array.fill (n) (ArrayBuffer [Int] ())
         val cost  = new Array [Double] (edges.length)
+
+        cfor (0, edges.length) { e =>
+            outgoing (from(e)) += e
+            incoming (to(e)) += e
+        }
+
+        // Group only degree-two, same-lane microscopic chains.  Branches,
+        // ramps, lane changes, and resolution boundaries remain graph edges.
+        val microGroup = Array.fill [Array [Int]] (edges.length) (null)
+        val visited = Array.fill (edges.length) (false)
+        cfor (0, edges.length) { e =>
+            val tail = from(e)
+            val hasMicroPredecessor = incoming(tail).exists { f =>
+                edges(f).group == edges(e).group && edges(f).lanes == edges(e).lanes
+            }
+            val startsChain = sourceComponents.contains (nodeId(tail)) ||
+                              incoming(tail).size != 1 || outgoing(tail).size != 1 || !hasMicroPredecessor
+            if edges(e).group.micro && !visited(e) && startsChain then
+                val chain = ArrayBuffer [Int] (e)
+                visited(e) = true
+                var current = e
+                var extend = true
+                while extend do
+                    val nodeAt = to(current)
+                    val next = outgoing(nodeAt).filter { f =>
+                        edges(f).group == edges(current).group && edges(f).lanes == edges(current).lanes
+                    }
+                    val prev = incoming(nodeAt).filter { f =>
+                        edges(f).group == edges(current).group && edges(f).lanes == edges(current).lanes
+                    }
+                    if outgoing(nodeAt).size == 1 && incoming(nodeAt).size == 1 &&
+                       next.length == 1 && prev.length == 1 &&
+                       !sourceComponents.contains (nodeId(nodeAt)) then
+                        val f = next(0)
+                        if !visited(f) then
+                            chain += f
+                            visited(f) = true
+                            current = f
+                        else extend = false
+                    else extend = false
+                end while
+                val grouped = chain.toArray
+                for f <- grouped do microGroup(f) = grouped
+            end if
+        }
+        cfor (0, edges.length) { e =>
+            if edges(e).group.micro && microGroup(e) == null then microGroup(e) = Array (e)
+        }
 
         cfor (0, edges.length) { e =>
             val ed = edges (e)
@@ -484,8 +581,17 @@ object NetworkBuilder:
             cost(e) = ed.length / g.speed
 
             if g.micro then
-                route(e) = Route ("MR", ed.lanes, Array.empty [Junction], node(from(e)), node(to(e)), motion)
-                for pathway <- route(e).pathway do pathway.seg (0).length = ed.length
+                val grouped = microGroup(e)
+                if grouped.head == e then
+                    val last  = edges (grouped.last)
+                    val junctions = grouped.dropRight (1).map (f => node(to(f)).asInstanceOf [Junction])
+                    val segmentGeometry = grouped.map (f => edges(f).geometry.map (p => project (p._1, p._2)))
+                    val r = Route ("MR", ed.lanes, junctions, node(from(e)), node(to(grouped.last)), motion,
+                                   laneGap = LANE_GAP, segmentGeometry = segmentGeometry)
+                    for i <- grouped.indices do
+                        for pathway <- r.pathway do pathway.seg(i).length = edges(grouped(i)).length
+                    for f <- grouped do route(f) = r
+                end if
             else
                 val fd   = fluxOf (g)
                 val dx   = at(to(e))._1 - at(from(e))._1                // lane offset as in Route: perpendicular to the edge
@@ -495,16 +601,19 @@ object NetworkBuilder:
                 lane(e) = Array.tabulate (ed.lanes) { k =>
                     val physicalLane = ed.lanes - 1 - k                 // lane k is Route's pathway (k)
                     val shift = perp * ((physicalLane - (ed.lanes - 1) / 2.0) * LANE_GAP)
+                    val centerline = ed.geometry.map (p => project (p._1, p._2))
+                    val laneGeometry = centerline.map (p => (p._1 + shift (0), p._2 + shift (1)))
                     val link = new MesoVTransport ("ML", node(from(e)), node(to(e)),
                                                    g.speed, fd.q_max * 3600.0,
-                                                   shift1 = shift, shift2 = shift, flowDiagram = Some (fd))
+                                                   shift1 = shift, shift2 = shift, flowDiagram = Some (fd),
+                                                   geometry = laneGeometry)
                     link.length = ed.length
                     link
                 }
             end if
         }
 
-        new BuiltGraph (nodeId, node, edges, from, to, route, lane, cost, stream)
+        new BuiltGraph (nodeId, node, edges, from, to, route, lane, microGroup, cost, stream)
     end build
 
 end NetworkBuilder
