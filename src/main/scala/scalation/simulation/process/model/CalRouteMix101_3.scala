@@ -10,7 +10,7 @@ package model
 import scalation.dynamics.IdmFlux
 import scalation.mathstat.{MatrixD, VectorD}
 import scalation.simulation.process.builder.TrafficModelBuilder
-import scalation.simulation.process.config.{CarFollowingModel, NetworkConfig, SimulationReport}
+import scalation.simulation.process.config.{BoundingBox, CarFollowingModel, NetworkConfig, OsmSpec, SimulationReport}
 import scalation.simulation.process.{GippsDynamics, IDMDynamics, IntegratorType, KraussDynamics}
 
 @main def runCalRouteMix101_3 (): Unit = new CalRouteMix101_3 ()
@@ -27,6 +27,17 @@ class CalRouteMix101_3 (name: String = "CalRouteMix101_3", reps: Int = 1,
          with RowTimeLoader:
 
     private val debug = debugf ("CalRouteMix101_3", false)
+
+    //--------------------------------------------------
+    // Declare and prepare the shared US-101 OSM network
+    private val osmAnchors = NetworkConfig.mainlineGPSAnchors
+    private val osmBounds = BoundingBox (
+        osmAnchors.map (_._1).min, osmAnchors.map (_._2).min,
+        osmAnchors.map (_._1).max, osmAnchors.map (_._2).max)
+    private val osm = OsmSpec ("calroute101_mix", osmBounds, marginMeters = 500.0)
+    private val osmArtifact = osm.ensurePrepared ()
+    debug ("osm", s"prepared artifact=$osmArtifact")
+
     private val builder = TrafficModelBuilder.US101_DonaldDoyle_PeMS ()
     builder.summary ()
 

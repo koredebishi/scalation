@@ -12,7 +12,7 @@
  *                      (cosmetic-only backdrop; road polylines + highway
  *                      type, name, ref, plus place labels).
  *    - `loadGeoJSON` — the cleaned network produced by
- *                      `simulation/scripts/build_eaton_network.py`
+ *                      `simulation/scripts/build_osm_network.py`
  *                      (standard GeoJSON edges, richer/denser road data,
  *                      no place labels).
  *  Both project GPS coordinates to screen space using the existing
@@ -194,7 +194,7 @@ object OsmRoadNetwork:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Load background road network from a cleaned GeoJSON edges file, as
-     *  produced by `simulation/scripts/build_eaton_network.py` (standard
+     *  produced by `simulation/scripts/build_osm_network.py` (standard
      *  GeoJSON, not the custom schema `load` reads).  Parsed with the
      *  Gson library already used by `ir.CanonicalJson`, not hand-rolled
      *  regex — GeoJSON's nested structure isn't safely regex-scrapable

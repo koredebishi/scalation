@@ -3,7 +3,7 @@
  *
  *  PURPOSE
  *    Turn the cleaned OSM network (data/network/<name>/edges.geojson, written by
- *    scripts/build_eaton_network.py) into simulation components.  Topology and
+ *    scripts/build_osm_network.py) into simulation components.  Topology and
  *    resolution only; demand (VSource rates) stays in the model, like CorridorBuilder.
  *
  *  OWNERSHIP RULE
@@ -428,7 +428,7 @@ object NetworkBuilder:
     end fluxOf
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Read every edge of an `edges.geojson` file written by `build_eaton_network.py`.
+    /** Read every edge of an `edges.geojson` file written by `build_osm_network.py`.
      *  @param edgesPath  path to `data/network/<name>/edges.geojson`
      */
     def read (edgesPath: String): Array [NetEdge] =

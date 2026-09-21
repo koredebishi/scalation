@@ -25,7 +25,7 @@ import scalation.random.Uniform
 import scalation.simulation.process.{IntegratorType, IDMDynamics}
 import scalation.simulation.process.builder.NetworkBuilder
 import scalation.simulation.process.arrival.{AggregatedArrivalSource, AggregatedRampArrivalSource, ArrivalSource}
-import scalation.simulation.process.config.{AggregatedDemand, EatonCorridorConfig, PeMSDemand}
+import scalation.simulation.process.config.{AggregatedDemand, BoundingBox, EatonCorridorConfig, OsmSpec, PeMSDemand}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Run the EatonMiniTest simulation.
@@ -48,13 +48,21 @@ class EatonMiniTest (name: String = "EatonMiniTest", reps: Int = 1, animating: B
 
     IDMDynamics.integratorType = IntegratorType.Ballistic
 
+    //--------------------------------------------------
+    // Declare the prepared OSM network consumed by this model
+    private val osm = OsmSpec (
+        "eaton",
+        BoundingBox (south = 34.131843, west = -118.304031,
+                     north = 34.244987, east = -118.061321),
+        marginMeters = 0.0)
+
     // The source is upstream of the I-210/SR-134 westbound split.
     private val sourceId = 616843101L        // Rosemead I-210 WB entry edge tail
     private val i210Sink = 356052035L        // terminal I-210 westbound node
     private val sr134Sink = 27568007L        // terminal SR-134/CA-2 westbound node
 
     // the whole network, straight from the GeoJSON
-    private val edges = NetworkBuilder.read ("data/network/eaton/edges.geojson")
+    private val edges = NetworkBuilder.read (osm.ensurePrepared ())
 
     // Bind PeMS observations to existing roads; internal observations are not sources.
     private val stations = EatonCorridorConfig.loadStationMap ()

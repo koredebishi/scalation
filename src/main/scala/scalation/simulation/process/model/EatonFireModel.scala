@@ -482,7 +482,7 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     // Both corridors share one coordinate frame, so the bounding box must cover
     // both.  Dimensions must be the frame the layouts were projected into.
     //
-    // Uses the cleaned county network (build_eaton_network.py output) instead
+    // Uses the cleaned county network (build_osm_network.py output) instead
     // of the cosmetic-only download_osm_geometry.py backdrop -- same
     // OsmRoadNetwork/DgAnimator plumbing Model.loadOsmBackground uses, called
     // directly here since that method doesn't yet know about the GeoJSON
@@ -500,4 +500,3 @@ class EatonFireModel (name: String = "EatonFireModel", reps: Int = 1,
     Model.shutdown ()
 
 end EatonFireModel
-
