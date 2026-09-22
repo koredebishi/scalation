@@ -25,6 +25,8 @@ import scalation.simulation.process.config.{RampMode => ConfigRampMode}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Run the EatonFireModel simulation.
  *  > runMain scalation.simulation.process.model.runEatonFireModel
+ * The legacy Eaton Model. deprecated. We are working on
+ *EatonMiniTest now and we are keeping this for reference only.
  */
 @main def runEatonFireModel (): Unit = new EatonFireModel ()
 

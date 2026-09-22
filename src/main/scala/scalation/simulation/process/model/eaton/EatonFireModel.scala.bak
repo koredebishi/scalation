@@ -13,18 +13,15 @@
  *  @see config-layer-standard.md Section 4c, 7
  */
 
-package scalation
-package simulation
-package process
-package model
+package scalation.simulation.process.model.eaton
 
+import scalation.animation.OsmRoadNetwork
 import scalation.mathstat.{MatrixD, VectorD}
 import scalation.random.{Exponential, Uniform}
-import scalation.simulation.process.{IntegratorType, IDMDynamics}
-import scalation.simulation.process.config.{AggregatedDemand, CorridorLayout, EatonCorridorConfig, MultiCorridorConfig, PeMSDemand}
-import scalation.simulation.process.builder.{CorridorBuilder, BuiltNetwork}
-import scalation.simulation.process.arrival.{ArrivalSource, AggregatedArrivalSource, AggregatedRampArrivalSource}
-import scalation.animation.OsmRoadNetwork
+import scalation.simulation.process.arrival.{AggregatedArrivalSource, AggregatedRampArrivalSource, ArrivalSource}
+import scalation.simulation.process.builder.{BuiltNetwork, CorridorBuilder}
+import scalation.simulation.process.config.*
+import scalation.simulation.process.*
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Run the EatonFireModel simulation.

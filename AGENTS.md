@@ -95,3 +95,25 @@ Use the actual Eaton GeoJSON network for both simulation and animation, with PeM
 3. Add detector/count comparison using native Recorder/statistics facilities, without duplicate counters.
 
 The user agreed with the destination approach, but the next implementation scope has NOT been presented or approved. Do not treat this handoff as approval to edit runtime classes, compile, or run simulations.
+
+## OSM API Ownership Rule — 2026-09-21
+
+- `OsmSpec` declares a named network, its bounds, and optional real sensor locations.
+  `OsmSpec.ensurePrepared()` reuses `data/network/<name>/edges.geojson` or invokes
+  the configured venv and `build_osm_network.py` to create it.
+- `NetworkBuilder` is the reusable OSM topology API. It reads the prepared directed
+  GeoJSON, owns shared graph nodes and geometry, and consumes a caller-supplied
+  `EdgePolicy` for resolution/speed classification, micro/meso component construction,
+  routing costs, and generic mixed-resolution traversal.
+- `process/model/eaton/` owns Eaton-specific source IDs, PeMS demand, destination
+  selection, projection, and driving. `EatonMiniTest` is the lifecycle orchestrator;
+  `EatonMiniConfig`, `EatonMiniData`, `EatonMiniNetwork`, and `EatonMiniDriver` hold
+  the cohesive Eaton responsibilities. Those concerns must not be moved into
+  `NetworkBuilder`.
+- `BuiltGraph.drive` is generic graph traversal, not Eaton-specific logic: it applies
+  routing, lane handoff, micro/meso movement, junction crossing, and sink completion.
+  Keep it with the reusable built graph unless a future API replaces it for every OSM
+  model, not by copying it into an individual model.
+- CalRoute models may use the same OSM API, but their analytical corridor topology
+  must not be silently replaced by the full OSM graph until station, ramp, route, and
+  resolution mappings have been validated.
