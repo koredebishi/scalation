@@ -150,7 +150,7 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int, nl: I
         end if
     end awaitConflictZone
 
-    def jump(): Unit =
+    def jump(linkDensity: Option [Double] = None): Unit =
         val actor = director.theActor.asInstanceOf[Vehicle]
         awaitConflictZone (actor)
         val duration = jTime.gen
@@ -160,11 +160,15 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int, nl: I
         record(actor, ctime)
 
         // Snapshot density from the segment the vehicle just finished.
-        // actor.segId is the segment index; actor.myPathway.seg(segId) is that VTransport.
+        // A caller leaving a link this junction cannot see (e.g., a meso link) supplies it;
+        // otherwise actor.segId is the segment index and actor.myPathway.seg(segId) is that VTransport.
         // Recorder columns identify lanes at this junction, not segment indices.
-        if actor.myPathway != null && actor.segId >= 0 && actor.segId < actor.myPathway.seg.length then
-            val k = actor.myPathway.seg(actor.segId).density        // veh/km per lane
-            recordDensity(ctime, k, actor.laneID)
+        linkDensity match
+            case Some (k) => recordDensity(ctime, k, actor.laneID)     // veh/km per lane
+            case None =>
+                if actor.myPathway != null && actor.segId >= 0 && actor.segId < actor.myPathway.seg.length then
+                    val k = actor.myPathway.seg(actor.segId).density    // veh/km per lane
+                    recordDensity(ctime, k, actor.laneID)
 
         onJunction += 1
         director.log.trace(this, s"jump for $duration", actor, director.clock)

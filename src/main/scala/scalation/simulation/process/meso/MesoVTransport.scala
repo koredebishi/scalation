@@ -203,7 +203,9 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         accum (occupancy)                                         // 
         vdeque.removeHead ()
         released += 1
-        tally (director.clock - entryTime)                     // complete link travel time
+        val linkTime = director.clock - entryTime               // time on this link: traversal + FIFO wait + headway
+        tally (linkTime)                                        // complete link travel time
+        actor.velocity = length / linkTime                      // leave the link at the speed averaged across it
         debug ("RELEASE", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
                s"reserved=$reservedSlots, blocked=${blocked.size}")
 

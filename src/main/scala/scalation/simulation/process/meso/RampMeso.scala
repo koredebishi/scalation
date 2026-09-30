@@ -3,6 +3,7 @@ package simulation
 package process
 package meso
 
+import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -25,17 +26,20 @@ end RampMesoMode
  *  @param bend           curvature of the displayed ramp
  *  @param offset         lateral display offset
  *  @param storageCapacity maximum admitted vehicles on the ramp link
+ *  @param flowDiagram    optional density-sensitive equilibrium speed relation for the ramp link;
+ *                        when absent, the link keeps the fixed `freeFlowSpeed`
  */
 class RampMeso (name: String, val from: Component, val to: Component,
                 length: Double, freeFlowSpeed: Double, capacity: Double, val mode: RampMesoMode,
                 bend: Double = 0.10, offset: Double = 0.0,
-                storageCapacity: Int = Int.MaxValue)
+                storageCapacity: Int = Int.MaxValue,
+                flowDiagram: Option [IdmFlux] = None)
     extends Component:
 
     private val shift = calculateShift ()
 
     val lane = new MesoVTransport (name, from, to, freeFlowSpeed, capacity,
-                                  bend, shift, shift, storageCapacity)
+                                  bend, shift, shift, storageCapacity, flowDiagram)
     if length > 0.0 then lane.length = length          // else keep the drawing length
 
     subpart += lane

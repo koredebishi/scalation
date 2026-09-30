@@ -62,6 +62,75 @@ trait Dynamics:
             case _             => { IDMDynamics.updateM (car,  maxDisp) }
     end updateV
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** MOBIL lane-change decision (Treiber & Kesting 2007; Traffic Flow Dynamics 2013),
+     *  built on THIS car-following model's own acceleration, so IDM, Gipps and Krauss
+     *  each decide with their own physics.  Call it on the model object, e.g.,
+     *  `motion.laneChange (car, route)`.  It only decides; `Route.changeLane` moves the car.
+     *  Positions are the lane-wide `corridorPos`, which all lanes of a Route share.
+     *
+     *  Safety:    ã_n ≥ -bSafe                                  (new follower after the cut-in)
+     *  Incentive: (ã_c - a_c) + p·[(ã_n - a_n) + (ã_o - a_o)] > Δa_th
+     *             c = the car, n = new follower (target lane), o = old follower (current lane)
+     *
+     *  @param car         the vehicle considering a change (must be in a micro lane)
+     *  @param route       the route that owns the lanes
+     *  @param politeness  p in [0, 1]: 0 selfish, 1 fully altruistic
+     *  @param threshold   Δa_th (m/s²), keeps small gains from causing a change
+     *  @param bSafe       largest braking the change may force on the new follower (m/s², positive)
+     *  @return -1 (to lane - 1), 0 (stay), +1 (to lane + 1)
+     */
+    def laneChange (car: Vehicle, route: Route, politeness: Double = 0.5,
+                    threshold: Double = 0.2, bSafe: Double = 4.0): Int =
+        if car.myPathway == null then return 0                      // not in a micro lane (ramp, meso link)
+        val lane   = car.laneID
+        val pos    = car.corridorPos
+        val oldLdr = car.leader
+        val oldFol = car.follower
+        val a_c    = accelFor (car, oldLdr)                         // car, current lane
+        val a_o    = accelFor (oldFol, car)                         // old follower, now
+        val a_o_t  = accelFor (oldFol, oldLdr)                      // old follower, after the car leaves
+
+        def incentive (target: Int): Double =
+            val toPath = route.pathway(target)
+            val newLdr = toPath.leaderAt (pos)                      // first car ahead of pos in the target lane
+            val newFol = if newLdr != null then newLdr.follower     // the car just behind pos
+                         else toPath.getFirst                       // nobody ahead: the front car is behind pos
+            val a_n    = accelFor (newFol, newLdr)                  // new follower, now
+            val a_n_t  = accelFor (newFol, car)                     // new follower, after the cut-in
+            if a_n_t < -bSafe then Double.NegativeInfinity          // safety criterion fails
+            else
+                val a_c_t = accelFor (car, newLdr)                  // car, in the target lane
+                (a_c_t - a_c) + politeness * ((a_n_t - a_n) + (a_o_t - a_o))
+        end incentive
+
+        var best      = 0
+        var bestValue = threshold                                   // must exceed Δa_th to change
+        if lane - 1 >= 0 then
+            val inc = incentive (lane - 1)
+            if inc > bestValue then { best = -1; bestValue = inc }
+        end if
+        if lane + 1 < route.pathway.length then
+            val inc = incentive (lane + 1)
+            if inc > bestValue then { best = +1; bestValue = inc }
+        end if
+        best
+    end laneChange
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Acceleration of `fol` behind `ldr` under THIS car-following model; 0 when there is
+     *  no follower.  Dispatches like `updateV`.
+     *  @param fol  the following vehicle (may be null)
+     *  @param ldr  the vehicle ahead (null = free road)
+     */
+    private def accelFor (fol: Vehicle, ldr: Vehicle): Double =
+        if fol == null then 0.0
+        else this match
+            case GippsDynamics  => GippsDynamics.accelOf (fol, ldr)
+            case KraussDynamics => KraussDynamics.accelOf (fol, ldr)
+            case _              => IDMDynamics.accelOf (fol, ldr)
+    end accelFor
+
 end Dynamics
 
 
@@ -136,6 +205,21 @@ object GippsDynamics
                             else length + cp.disp
             gipps (amax, bmax, len, cn.vmax, cn.disp, cn.velocity, cp_r_disp, cp.velocity, prop("rt"))
     end gipps
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Acceleration of `fol` behind `ldr` under Gipps' model, (v_next - v) / rt, in the
+     *  lane-wide `corridorPos` frame; negative infinity when the two overlap.
+     *  Used by `Dynamics.laneChange`.
+     *  @param fol  the following vehicle
+     *  @param ldr  the vehicle ahead (null = free road)
+     */
+    private [process] def accelOf (fol: Vehicle, ldr: Vehicle): Double =
+        val rt       = prop("rt")
+        val xn       = fol.corridorPos
+        val (xp, vp) = if ldr == null then (xn + 1000.0, fol.vmax) else (ldr.corridorPos, ldr.velocity)
+        if xp - xn - len <= 0.0 then Double.NegativeInfinity
+        else (gipps (amax, bmax, len, fol.vmax, xn, fol.velocity, xp, vp, rt) - fol.velocity) / rt
+    end accelOf
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     /** Return the velocity of the vehicle based on Gipps' model.
@@ -286,6 +370,22 @@ object KraussDynamics
         val eps = noiseRV.gen
         max(0.0, v_star - eps)
     end krauss
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Acceleration of `fol` behind `ldr` under the Krauss model, (v_next - v) / rt, in the
+     *  lane-wide `corridorPos` frame; negative infinity when the two overlap.
+     *  Note: `krauss` includes its random imperfection, so each call draws from `noiseRV`.
+     *  Used by `Dynamics.laneChange`.
+     *  @param fol  the following vehicle
+     *  @param ldr  the vehicle ahead (null = free road)
+     */
+    private [process] def accelOf (fol: Vehicle, ldr: Vehicle): Double =
+        val rt       = prop("rt")
+        val xn       = fol.corridorPos
+        val (xp, vp) = if ldr == null then (xn + 1000.0, fol.vmax) else (ldr.corridorPos, ldr.velocity)
+        if xp - xn - len <= 0.0 then Double.NegativeInfinity
+        else (krauss (amax, bmax, len, fol.vmax, xn, fol.velocity, xp, vp, rt, s) - fol.velocity) / rt
+    end accelOf
 
 end KraussDynamics    
     
@@ -558,6 +658,20 @@ object IDMDynamics
         else
             iDM (amax, abs(bmax), len, cn.vmax, cn.t_disp, cn.velocity, cp.t_disp, cp.velocity, T, s, del)
     end iDM
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** IDM acceleration of `fol` behind `ldr` in the lane-wide `corridorPos` frame;
+     *  free-road acceleration when there is no leader within FREERANGE, negative
+     *  infinity when the two overlap.  Used by `Dynamics.laneChange`.
+     *  @param fol  the following vehicle
+     *  @param ldr  the vehicle ahead (null = free road)
+     */
+    private [process] def accelOf (fol: Vehicle, ldr: Vehicle): Double =
+        val xn = fol.corridorPos
+        if ldr == null || ldr.corridorPos - xn > FREERANGE then iDMFree (amax, fol.velocity, fol.vmax, del)
+        else if ldr.corridorPos - xn - len <= 0.0 then Double.NegativeInfinity
+        else iDM (amax, abs(bmax), len, fol.vmax, xn, fol.velocity, ldr.corridorPos, ldr.velocity, T, s, del)
+    end accelOf
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the acceleration of the vehicle based on the Intelligent Driver Model.

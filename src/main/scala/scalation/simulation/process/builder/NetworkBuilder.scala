@@ -4,7 +4,7 @@
  *  PURPOSE
  *    Turn the cleaned OSM network (data/network/<name>/edges.geojson, written by
  *    scripts/build_osm_network.py) into simulation components.  Topology and
- *    resolution only; demand (VSource rates) stays in the model, like CorridorBuilder.
+ *    resolution only; demand (VSource rates) stays in the consuming model.
  *
  *  OWNERSHIP RULE
  *    NetworkBuilder is the reusable OSM topology API and the only authority for GeoJSON topology, directed edge identity,
@@ -28,7 +28,7 @@
  *                                             v
  *          one Junction per graph NODE (u/v ids), shared by every edge touching it
  *                                             v
- *                     BuiltNetwork-style result handed to the Model
+ *                     BuiltGraph result handed to the Model
  *                     (junctions, pathways/routes by edge, in/out edges per node)
  *
  *  BUILDER DOES                          BUILDER DOES NOT
@@ -88,194 +88,6 @@ import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
 import scalation.random.Sharp
 import scalation.simulation.process.meso.MesoVTransport
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `NetEdge` case class is one directed road segment read from `edges.geojson`.
- *  Speed and resolution are supplied by the consuming model's `EdgePolicy`.
- *  @param u        OSM id of the tail node
- *  @param v        OSM id of the head node
- *  @param highway  OSM highway class
- *  @param lanes    lanes in this direction (`lanes_effective`)
- *  @param length   length in metres
- *  @param uLat     latitude of the tail node
- *  @param uLon     longitude of the tail node
- *  @param vLat     latitude of the head node
- *  @param vLon     longitude of the head node
- *  @param name     the street name (may be empty)
- *  @param geometry complete directed centerline in (latitude, longitude) order
- *  @param ref      road reference, e.g., I 210 or CA 134 (may be empty)
- *  @param key      parallel-edge key; (u, v, key) identifies the directed edge
- *  @param osmid    original OSM way id(s), semicolon-separated for merged ways (may be empty)
- */
-case class NetEdge (u: Long, v: Long, highway: String, lanes: Int, length: Double,
-                    uLat: Double, uLon: Double, vLat: Double, vLon: Double, name: String,
-                    geometry: Array [(Double, Double)] = Array.empty,
-                    ref: String = "", key: Int = 0, osmid: String = ""):
-
-end NetEdge
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Generic edge behavior selected by the consuming model. */
-case class EdgeProfile (group: String, micro: Boolean, speed: Double)
-
-/** Policy supplied by a model when converting raw OSM edges to simulation links. */
-trait EdgePolicy:
-    def profile (edge: NetEdge): EdgeProfile
-end EdgePolicy
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `BuiltGraph` class holds the components built from a set of edges and
- *  moves vehicles through them.
- *
- *  Node `i` is `node(i)`, a `Junction` or, for a sink node, a `Sink`.  Edge `e`
- *  runs from node `from(e)` to node `to(e)` at cost `cost(e)` and is either micro
- *  (`route(e)` non-null) or meso (`lane(e)` non-null, one link per lane).
- *  @param nodeId  sorted OSM node ids
- *  @param node    the component of each node
- *  @param edge    the edges
- *  @param from    tail node index of each edge
- *  @param to      head node index of each edge
- *  @param route   micro `Route` containing the edge, null for a meso edge
- *  @param microGroup  grouped micro-edge indices for each micro route
- *  @param lane    meso links of each edge (one per lane), null for a micro edge
- *  @param cost    travel-time cost of each edge (length / profile speed)
- *  @param profile caller-supplied resolution and speed profile for each edge
- *  @param stream  retained for builder-call compatibility
- */
-class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edge: Array [NetEdge],
-                  val from: Array [Int], val to: Array [Int], val route: Array [Route],
-                  val lane: Array [Array [MesoVTransport]], val microGroup: Array [Array [Int]],
-                  val cost: Array [Double], val profile: Array [EdgeProfile], stream: Int):
-
-    // edges leaving each node: outEdge (outStart (i)) until outEdge (outStart (i + 1))
-    private val outStart = new Array [Int] (nodeId.length + 1)
-    private val outEdge  = new Array [Int] (edge.length)
-    cfor (0, edge.length) { e => outStart (from(e) + 1) += 1 }
-    cfor (0, nodeId.length) { i => outStart (i + 1) += outStart (i) }
-    private val fill = outStart.clone ()
-    cfor (0, edge.length) { e => outEdge (fill (from(e))) = e; fill (from(e)) += 1 }
-
-    /** The routing table used by `drive`; set by `routeTo`, replaceable at any time. */
-    var table: RoutingTable = null
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the index of a node given its OSM id.
-     *  @param id  the OSM node id
-     */
-    def nodeIndex (id: Long): Int =
-        val i = java.util.Arrays.binarySearch (nodeId, id)
-        require (i >= 0, s"node $id is not in this graph")
-        i
-    end nodeIndex
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build the routing table for the given destination node indices, from the
-     *  current `cost` array.  Call again after changing `cost` to reroute.
-     *  @param destinations  destination node indices (sink nodes)
-     */
-    def routeTo (destinations: Array [Int]): Unit =
-        table = new RoutingTable ("RT", nodeId.length, from, to, cost, destinations)
-    end routeTo
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return every component to hand to `Model.addComponent`.  A grouped micro
-     *  chain is registered once as its `Route`; `Model.simulate` gives a registered
-     *  component and all of its descendants a director.
-     */
-    def components: List [Component] =
-        node.toList ++
-        route.toList.filter (_ != null).distinct ++
-        lane.toList.filter (_ != null).flatMap (_.toList)
-    end components
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the edge leaving node `a` for node `b`.  When parallel edges join the
-     *  same two nodes, return the cheapest, the one the routing table costed.
-     *  @param a  the tail node index
-     *  @param b  the head node index
-     */
-    private def edgeBetween (a: Int, b: Int): Int =
-        var best = -1
-        cfor (outStart (a), outStart (a + 1)) { k =>
-            val e = outEdge (k)
-            if to (e) == b && (best < 0 || cost (e) < cost (best)) then best = e
-        }
-        require (best >= 0, s"no edge from node ${nodeId (a)} to node ${nodeId (b)}")
-        best
-    end edgeBetween
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Choose the lane at a graph-edge boundary.  Equal-width links preserve
-     *  lane identity; a width change uses the vehicle id to distribute entries
-     *  reproducibly over the new lanes.
-     */
-    private def handoffLane (car: Vehicle, previousLanes: Int, targetLanes: Int): Int =
-        require (targetLanes > 0, "a transport must have at least one lane")
-        if previousLanes <= 0 || car.laneID < 0 then Math.floorMod (car.id, targetLanes)
-        else if previousLanes == targetLanes then math.min (car.laneID, targetLanes - 1)
-        else Math.floorMod (car.id + car.laneID, targetLanes)
-    end handoffLane
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Drive one vehicle from a start node to a destination sink, following the
-     *  routing table.  Call from the vehicle's `act`.
-     *  On every edge the car's IDM desired speed (`vmax`) is set to that edge's
- *  supplied profile speed.  Equal-width links preserve lane identity; width
- *  changes use deterministic vehicle-id handoff to distribute vehicles over
- *  target lanes.
-     *   meso edge:  `move`, then cross the end junction
-     *   micro edge: `joinAt` its DLL, `move`, cross the end junction,
-     *               then `removeFromAlist`
-     *  @param car          the vehicle (the actor running this call)
-     *  @param startNode    index of the node it starts at
-     *  @param destination  index of the destination sink node
-     */
-    def drive (car: Vehicle, startNode: Int, destination: Int): Unit =
-        require (table != null, "call routeTo before drive")
-        require (node (destination).isInstanceOf [Sink], s"destination node ${nodeId (destination)} is not a Sink")
-        var here  = startNode
-        var previousLanes = 0
-        while here != destination do
-            val next = table.next (here, destination)
-            require (next >= 0, s"no route from node ${nodeId (here)} to node ${nodeId (destination)}")
-            val e = edgeBetween (here, next)
-
-            val lanes = if route (e) != null then route (e).pathway.length else lane (e).length
-            car.laneID = handoffLane (car, previousLanes, lanes)
-            previousLanes = lanes
-            car.vmax = profile (e).speed                                // one speed law supplied by the model
-
-            var pathway: Pathway = null                                 // set only for a micro edge
-            if route (e) != null then
-                pathway = route (e).pathway (car.laneID)
-                val group = microGroup (e)
-                val first = group.indexOf (e)
-                val firstSegment = if first >= 0 then first else 0
-                pathway.joinAt (car, pathway.mergeLeaderAt (firstSegment), firstSegment)
-                var i = firstSegment
-                while i < group.length do
-                    car.vmax = profile (group (i)).speed
-                    pathway.seg (i).move ()
-                    if i < pathway.junc.length then pathway.junc (i).jump ()
-                    i += 1
-                end while
-                here = to (group.last)
-            else
-                lane (e)(car.laneID).move ()
-                here = next
-                node (here) match
-                    case j: Junction => j.jump ()
-                    case _           =>
-            end if
-            if pathway != null then pathway.removeFromAlist (car)
-        end while
-        node (destination).asInstanceOf [Sink].leave ()
-    end drive
-
-end BuiltGraph
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NetworkBuilder` object reads a cleaned OSM network and builds simulation
@@ -390,8 +202,7 @@ object NetworkBuilder:
                 else new Junction ("JC", Sharp (JUNCTION_DELAY), Array (at(i)._1, at(i)._2, NODE, NODE), nt, nl(i))
         }
 
-        val route = new Array [Route] (edges.length)
-        val lane  = new Array [Array [MesoVTransport]] (edges.length)
+        val builtLink = new Array [BuiltLink] (edges.length)
         val outgoing = Array.fill (n) (ArrayBuffer [Int] ())
         val incoming = Array.fill (n) (ArrayBuffer [Int] ())
         val cost  = new Array [Double] (edges.length)
@@ -460,7 +271,7 @@ object NetworkBuilder:
                                    laneGap = LANE_GAP, segmentGeometry = segmentGeometry)
                     for i <- grouped.indices do
                         for pathway <- r.pathway do pathway.seg(i).length = edges(grouped(i)).length
-                    for f <- grouped do route(f) = r
+                    for f <- grouped do builtLink(f) = MicroLink (r, grouped)
                 end if
             else
                 val fd   = fluxOf (p.speed)
@@ -468,7 +279,7 @@ object NetworkBuilder:
                 val dy   = at(to(e))._2 - at(from(e))._2
                 val hyp  = math.hypot (dx, dy)
                 val perp = if hyp > 0.0 then VectorD (dy / hyp, -dx / hyp) else VectorD (0.0, 0.0)
-                lane(e) = Array.tabulate (ed.lanes) { k =>
+                val lanes = Array.tabulate (ed.lanes) { k =>
                     val physicalLane = ed.lanes - 1 - k                 // lane k is Route's pathway (k)
                     val shift = perp * ((physicalLane - (ed.lanes - 1) / 2.0) * LANE_GAP)
                     val centerline = ed.geometry.map (p => project (p._1, p._2))
@@ -480,10 +291,11 @@ object NetworkBuilder:
                     link.length = ed.length
                     link
                 }
+                builtLink(e) = MesoLink (lanes)
             end if
         }
 
-        new BuiltGraph (nodeId, node, edges, from, to, route, lane, microGroup, cost, profile, stream)
+        new BuiltGraph (nodeId, node, edges, from, to, builtLink, cost, profile, stream)
     end build
 
 end NetworkBuilder

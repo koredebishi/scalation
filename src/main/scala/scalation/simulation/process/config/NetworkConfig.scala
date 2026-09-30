@@ -142,6 +142,17 @@ object NetworkConfig:
                                      sensor3_gps, merge2_gps, sensor4_gps, sensor5_gps)
     private val rampGPS     = Array (merge1_gps, merge2_gps)
 
+    private val LANE_GAP   = 50.0                       // Route's default laneGap
+    private val RAMP_LEN   = 200.0                      // drawn ramp length (also the ramp VTransport length)
+    private val RAMP_ANGLE = math.toRadians (30.0)      // angle between ramp and road at the merge
+
+    /** Unit vector from p to q. */
+    private def unit (p: (Double, Double), q: (Double, Double)): (Double, Double) =
+        val (dx, dy) = (q._1 - p._1, q._2 - p._2)
+        val hyp = math.hypot (dx, dy).max (1.0)
+        (dx / hyp, dy / hyp)
+    end unit
+
     /** Mainline junction GPS anchors (lat, lon) -- used by `Model.loadOsmBackground`
      *  to compute the OSM bounding box and to align the projection with the model.
      */
@@ -157,13 +168,18 @@ object NetworkConfig:
     end getMainlineCoordinates
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get ramp coordinates for animation (with shift offset).
+    /** Ramp end points: each ramp ends ON the outer (ramp) lane at its merge junction,
+     *  using the same projection as the mainline and the same lane shift as `Route`.
      *  @param dims  screen dimensions (width, height)
      */
     def getRampCoordinates (dims: (Double, Double)): Array [(Double, Double)] =
-        val coords = new scalation.Coordinates (dims._1, dims._2, rampGPS)
-        val (sx, sy) = (65.0, -70.0)
-        coords.aniCoords.map (a => (a(0) + sx, a(1) + sy))
+        val main     = getMainlineCoordinates (dims)
+        val (ux, uy) = unit (main.head, main.last)                         // corridor direction, as Route.calcShift2
+        val outer    = (US101_DonaldDoyle.mainline.lanesPerSegment - 1) / 2.0 * LANE_GAP   // centre line to the ramp lane
+        rampGPS.map { gps =>
+            val merge = main (mainlineGPS.indexOf (gps))                   // the merge junction of this ramp
+            (merge._1 - uy * outer, merge._2 + ux * outer)                 // Route's shift for lane numLanes-1
+        }
     end getRampCoordinates
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -174,11 +190,18 @@ object NetworkConfig:
         val main  = getMainlineCoordinates (dims)
         val ramps = getRampCoordinates (dims)
         val centerPos = ((main(0)._1 - 50.0).toInt, (main(0)._2 + 50.0).toInt)
-        val offsets = Array (
-            (0, 0),
-            ((ramps(0)._1).toInt - centerPos._1, (ramps(0)._2).toInt - centerPos._2),
-            ((ramps(1)._1).toInt - centerPos._1, (ramps(1)._2).toInt - centerPos._2)
-        )
+        val offsets = new Array [(Int, Int)] (1 + ramps.length)
+        offsets(0) = (0, 0)
+        for r <- ramps.indices do
+            val m        = mainlineGPS.indexOf (rampGPS(r))                // merge junction index
+            val (lx, ly) = unit (main(m - 1), main(m))                     // road direction where this ramp joins
+            val back     = RAMP_LEN * math.cos (RAMP_ANGLE)                // upstream along the road
+            val out      = RAMP_LEN * math.sin (RAMP_ANGLE)                // out to the right of travel
+            val sourceX  = ramps(r)._1 - back * lx - out * ly
+            val sourceY  = ramps(r)._2 - back * ly + out * lx
+            offsets(r + 1) = ((sourceX - centerPos._1).toInt,
+                              (sourceY - centerPos._2).toInt)
+        end for
         (centerPos, offsets)
     end getVSourceCenterAndOffsets
 
