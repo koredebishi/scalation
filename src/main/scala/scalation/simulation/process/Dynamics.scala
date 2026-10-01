@@ -83,38 +83,62 @@ trait Dynamics:
     def laneChange (car: Vehicle, route: Route, politeness: Double = 0.5,
                     threshold: Double = 0.2, bSafe: Double = 4.0): Int =
         if car.myPathway == null then return 0                      // not in a micro lane (ramp, meso link)
-        val lane   = car.laneID
-        val pos    = car.corridorPos
-        val oldLdr = car.leader
-        val oldFol = car.follower
-        val a_c    = accelFor (car, oldLdr)                         // car, current lane
-        val a_o    = accelFor (oldFol, car)                         // old follower, now
-        val a_o_t  = accelFor (oldFol, oldLdr)                      // old follower, after the car leaves
 
-        def incentive (target: Int): Double =
-            val toPath = route.pathway(target)
-            val newLdr = toPath.leaderAt (pos)                      // first car ahead of pos in the target lane
-            val newFol = if newLdr != null then newLdr.follower     // the car just behind pos
-                         else toPath.getFirst                       // nobody ahead: the front car is behind pos
-            val a_n    = accelFor (newFol, newLdr)                  // new follower, now
-            val a_n_t  = accelFor (newFol, car)                     // new follower, after the cut-in
-            if a_n_t < -bSafe then Double.NegativeInfinity          // safety criterion fails
-            else
-                val a_c_t = accelFor (car, newLdr)                  // car, in the target lane
-                (a_c_t - a_c) + politeness * ((a_n_t - a_n) + (a_o_t - a_o))
-        end incentive
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //  Find/get the neighbours from the lane lists (lane-wide DLLs, corridorPos frame)
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        val lane     = car.laneID
+        val pos      = car.corridorPos                              // the car's position along the lane
+        val oldLdr   = car.leader                                   // ahead of the car, current lane
+        val oldFol   = car.follower                                 // behind the car, current lane
 
-        var best      = 0
-        var bestValue = threshold                                   // must exceed Δa_th to change
-        if lane - 1 >= 0 then
-            val inc = incentive (lane - 1)
-            if inc > bestValue then { best = -1; bestValue = inc }
-        end if
-        if lane + 1 < route.pathway.length then
-            val inc = incentive (lane + 1)
-            if inc > bestValue then { best = +1; bestValue = inc }
-        end if
-        best
+        val hasLeft  = lane - 1 >= 0                                // lane - 1 exists
+        val hasRight = lane + 1 < route.pathway.length              // lane + 1 exists
+        val ldrL     = if hasLeft  then route.pathway(lane - 1).leaderAt (pos) else null    // new leader, lane - 1
+        val ldrR     = if hasRight then route.pathway(lane + 1).leaderAt (pos) else null    // new leader, lane + 1
+        val folL     = if ! hasLeft then null                       // new follower, lane - 1:
+                       else if ldrL != null then ldrL.follower      //   the car just behind pos, or
+                       else route.pathway(lane - 1).getFirst        //   nobody ahead -> the front car is behind pos
+        val folR     = if ! hasRight then null                      // new follower, lane + 1 (same rule)
+                       else if ldrR != null then ldrR.follower
+                       else route.pathway(lane + 1).getFirst
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //  Ask for accelerations from THIS car-following model (accelFor -> accelOf).
+        //  Why 6 per candidate lane: MOBIL compares the 3 drivers a change affects --
+        //  the car, its new follower, its old follower -- each NOW and AFTER the change
+        //  (3 drivers x 2 states).  The 3 current-lane values are shared by both sides,
+        //  so 9 calls when both sides exist, 6 at an outer lane.
+        //  Naming: a_x = now, a_x_t = after the change ("tilde"); c car, n new follower, o old follower.
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        val a_c     = accelFor (car, oldLdr)                        // car, now (current lane)
+        val a_o     = accelFor (oldFol, car)                        // old follower, now
+        val a_o_t   = accelFor (oldFol, oldLdr)                     // old follower, after the car leaves
+
+        val a_c_tL  = if hasLeft then accelFor (car, ldrL) else 0.0      // car, after moving to lane - 1
+        val a_nL    = if hasLeft then accelFor (folL, ldrL) else 0.0     // new follower lane - 1, now
+        val a_n_tL  = if hasLeft then accelFor (folL, car) else 0.0      // new follower lane - 1, after the cut-in
+
+        val a_c_tR  = if hasRight then accelFor (car, ldrR) else 0.0     // car, after moving to lane + 1
+        val a_nR    = if hasRight then accelFor (folR, ldrR) else 0.0    // new follower lane + 1, now
+        val a_n_tR  = if hasRight then accelFor (folR, car) else 0.0     // new follower lane + 1, after the cut-in
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //  Apply MOBIL (lane-change model, Treiber & Kesting 2007)
+        //    safety:    a_n_t >= -bSafe                       (else that side is ruled out)
+        //    incentive: (a_c_t - a_c) + p * ((a_n_t - a_n) + (a_o_t - a_o)) > threshold
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        def score (exists: Boolean, a_c_t: Double, a_n: Double, a_n_t: Double): Double =
+            if ! exists || a_n_t < -bSafe then Double.NegativeInfinity
+            else (a_c_t - a_c) + politeness * ((a_n_t - a_n) + (a_o_t - a_o))
+        end score
+
+        val scoreL = score (hasLeft,  a_c_tL, a_nL, a_n_tL)
+        val scoreR = score (hasRight, a_c_tR, a_nR, a_n_tR)
+
+        if scoreL > threshold && scoreL >= scoreR then -1           // lane - 1 wins (ties go to lane - 1)
+        else if scoreR > threshold then +1                          // lane + 1
+        else 0                                                      // stay
     end laneChange
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
