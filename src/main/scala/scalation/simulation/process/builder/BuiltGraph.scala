@@ -120,12 +120,12 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
                     var i = firstSegment
                     while i < group.length do
                         car.vmax = profile (group (i)).speed
-                        pathway.seg (i).move ()
+                        route.driveSegment (car, i)             // MOBIL lane choice + car-follow this segment
                         if i < pathway.junc.length then pathway.junc (i).jump ()
                         i += 1
                     end while
                     here = to (group.last)
-                    pathway.removeFromAlist (car)
+                    route.pathway (car.laneID).removeFromAlist (car)   // the car may have changed lanes
                 case MesoLink (lanes) =>
                     lanes (car.laneID).move ()
                     here = next

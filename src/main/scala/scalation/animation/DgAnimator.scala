@@ -273,6 +273,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     @volatile private var hudSegDensities: Array [Double] = Array.empty  // veh/km per segment
     @volatile private var hudSegLabels: Array [String]    = Array.empty  // e.g. "S0","S1",...
     @volatile private var hudSpeedLimitMph: Int = 65                    // corridor speed limit for signs
+    @volatile private var hudLaneChanges: Long  = 0L                    // lane changes so far (all lanes)
 
     /** Set the dynamics model name shown on the HUD (e.g., "IDM", "Gipps"). */
     def setHudModelName (name: String): Unit = hudModelName = name
@@ -288,6 +289,11 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
         hudThroughput = flow
         hudAvgSpeed   = spaceMeanSpeed
     end updateHudStats
+
+    /** Push the number of lane changes made so far (all lanes) for HUD display.
+     *  @param count  total lane changes
+     */
+    def updateHudLaneChanges (count: Long): Unit = hudLaneChanges = count
 
     /** Push per-segment density values (veh/km per lane) for the mini bar chart.
      *  @param densities  array of densities, one per segment
@@ -904,6 +910,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             lines.addOne ((s"Vehicles:  $onRoad on-road  /  $totalActorCount total", fgColor, false))
             lines.addOne ((f"Flow:       $hudThroughput%,.0f veh/hr", fgColor, false))
             lines.addOne ((f"Space-Mean Speed: $hudAvgSpeed%.1f m/s  (${hudAvgSpeed * 2.237}%.0f mph)", fgColor, false))
+            lines.addOne ((f"Lane changes: $hudLaneChanges%,d", fgColor, false))
             lines.addOne ((f"Playback:   ${speedFactor}%.2fx", fgColor, false))
 
             if paused.get () then lines.addOne (("▐▐  PAUSED", red, true))

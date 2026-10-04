@@ -265,12 +265,14 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
         val vtSegs     = ArrayBuffer.empty [VTransport]
         val segLabels  = ArrayBuffer.empty [String]
+        var laneChanges = 0L                                // sum of each lane's laneChangeStat.num
 
         // VTransport segments live inside Pathway.subpart (or Pathway.seg),
         // which in turn lives inside parts.  We must recurse one level.
         for p <- parts do
             p match
                 case pw: Pathway =>
+                    laneChanges += pw.laneChangeStat.num
                     for s <- pw.seg do
                         vtSegs    += s
                         segLabels += s.name
@@ -301,6 +303,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
         val spaceMeanSpeed = if totalVehicles > 0 then sumVelocity / totalVehicles else 0.0
 
         dgAni.updateHudStats (sumFlow, spaceMeanSpeed)
+        dgAni.updateHudLaneChanges (laneChanges)
         if vtSegs.nonEmpty then
             dgAni.updateSegmentDensities (densities, segLabels.toArray)
     end pushHudStats

@@ -36,7 +36,7 @@ import scalation.simulation.process.*
  *  @param autoRun    run immediately for standalone use; false lets an evaluation adapter own the run
  */
 class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
-                     animating: Boolean = true, aniRatio: Double = 500.0)
+                     animating: Boolean = false, aniRatio: Double = 500.0)
       extends Model (name, reps, animating, aniRatio)
          with RowTimeLoader
          with CalRouteReadings:
@@ -222,18 +222,8 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
             end if
 
             cfor (joinSeg, highway_length) { seg =>
-                // Deterministic lane change: if car ahead is slow, change lanes.
-                // NOTE: this is evaluated ONCE per segment, before move() runs, and
-                // move() then blocks for the whole segment.  A car that becomes
-                // blocked mid-segment cannot change lanes until the next segment --
-                // which on seg 0 means 1006 m away.
-                val carAhead = getCarAhead(this)
-                if carAhead != null && carAhead.velocity < 0.1 * vmax then
-                    val target = if laneID > 0 then laneID - 1 else laneID + 1
-                    route.changeLane(laneID, target, this, seg)
-                end if
-
-                route.pathway(laneID).seg(seg).move ()
+                if seg == 0 then route.pathway(laneID).seg(seg).move ()   // warm-up: keep the PeMS lane up to sensor 1
+                else route.driveSegment (this, seg)             // MOBIL lane choice + car-follow this segment
 
                 if junc(seg + 1).name.startsWith ("sensor") then
                     junc(seg + 1).jump ()
@@ -322,9 +312,9 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
 
 
 //    private val wallBuilt = System.nanoTime ()             // everything constructed, nothing simulated yet
-    simulate ()
-    waitFinished ()
-    val wallEnd = System.nanoTime ()
-    Model.shutdown ()
+//    simulate ()
+//    waitFinished ()
+//    val wallEnd = System.nanoTime ()
+//    Model.shutdown ()
 
 end CalRoute101_3

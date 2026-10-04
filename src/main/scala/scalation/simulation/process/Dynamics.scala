@@ -78,10 +78,13 @@ trait Dynamics:
      *  @param politeness  p in [0, 1]: 0 selfish, 1 fully altruistic
      *  @param threshold   Δa_th (m/s²), keeps small gains from causing a change
      *  @param bSafe       largest braking the change may force on the new follower (m/s², positive)
+     *  @param bias        keep-right bias (m/s²): moving left (lane - 1, towards lane 0, the
+     *                     leftmost lane) needs threshold + bias, moving right needs threshold - bias
+     *                     (asymmetric MOBIL); 0.0 gives the symmetric rule
      *  @return -1 (to lane - 1), 0 (stay), +1 (to lane + 1)
      */
     def laneChange (car: Vehicle, route: Route, politeness: Double = 0.5,
-                    threshold: Double = 0.2, bSafe: Double = 4.0): Int =
+                    threshold: Double = 0.2, bSafe: Double = 4.0, bias: Double = 0.3): Int =
         if car.myPathway == null then return 0                      // not in a micro lane (ramp, meso link)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -127,6 +130,7 @@ trait Dynamics:
         //  Apply MOBIL (lane-change model, Treiber & Kesting 2007)
         //    safety:    a_n_t >= -bSafe                       (else that side is ruled out)
         //    incentive: (a_c_t - a_c) + p * ((a_n_t - a_n) + (a_o_t - a_o)) > threshold
+        //    keep-right (asymmetric): left needs threshold + bias, right needs threshold - bias
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         def score (exists: Boolean, a_c_t: Double, a_n: Double, a_n_t: Double): Double =
             if ! exists || a_n_t < -bSafe then Double.NegativeInfinity
@@ -136,8 +140,11 @@ trait Dynamics:
         val scoreL = score (hasLeft,  a_c_tL, a_nL, a_n_tL)
         val scoreR = score (hasRight, a_c_tR, a_nR, a_n_tR)
 
-        if scoreL > threshold && scoreL >= scoreR then -1           // lane - 1 wins (ties go to lane - 1)
-        else if scoreR > threshold then +1                          // lane + 1
+        val marginL = scoreL - (threshold + bias)                   // left must clear the higher bar
+        val marginR = scoreR - (threshold - bias)                   // right clears a lower bar
+
+        if marginL > 0.0 && marginL >= marginR then -1              // lane - 1 wins (ties go to lane - 1)
+        else if marginR > 0.0 then +1                               // lane + 1
         else 0                                                      // stay
     end laneChange
 

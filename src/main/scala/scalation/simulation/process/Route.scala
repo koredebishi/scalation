@@ -96,69 +96,50 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
 
     // ----------------------------------------------------------------------------
 
-    /** Attempt to change lanes for a vehicle that is on segment `seg` of lane `l1`
-     * and wants to move to adjacent lane `l2`.
-     *
-     * @return true if the lane-change succeeds; false otherwise
+    /** Move a vehicle on segment `seg` from lane `l1` to the adjacent lane `l2`, at its
+     *  current position.  Makes NO decision: the caller (e.g., MOBIL via `driveSegment`)
+     *  has already judged the change safe and worthwhile.
+     *  @return true if moved; false if the lanes are not adjacent or do not exist
      */
     def changeLane(l1: Int, l2: Int, actor: Vehicle, seg: Int): Boolean =
-
-        var success = abs(l1 - l2) == 1
-        if !success then return success
+        if abs(l1 - l2) != 1 then return false
 
         val fromPath = pathway(l1) // current Pathway  (lane l1)
         val toPath = pathway(l2) // target Pathway   (lane l2)
-
-        // Check if either lane doesn't exist
-        if fromPath == null || toPath == null then return false
-
-        val safeDisp = fromPath.seg(seg).safetydist
+        if fromPath == null || toPath == null then return false      // a lane does not exist
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         // Where the vehicle lands in the target lane.  Every lane of a Route is
         // built from the same junction list, so the lanes share a segment layout
-        // and `corridorPos` carries across unchanged.
-        val pos = actor.corridorPos
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        // Neighbours in the TARGET lane, read from that lane's list.  NOT from a
-        // segment `vdeque`: a deque holds only the cars currently inside
-        // `seg.move()`, so it misses a neighbour one segment away and returns
-        // null -- which `addToAlist` reads as "front of the whole lane".  A lane
-        // change is mid-segment, so the search starts at `pos`, not at a segment
-        // boundary.  With the leader in hand the follower is one hop back.
-        val vAhead  = toPath.leaderAt (pos)
-        val vBehind = if vAhead != null then vAhead.follower else toPath.getLast
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        // Bumper-to-bumper gaps, both in the one `corridorPos` frame.  Every
-        // vehicle in a lane's list has a position (see `Pathway.addToAlist`), so
-        // both neighbours are read unguarded.
-        val gapAhead =
-            if vAhead != null then vAhead.corridorPos - pos - Vehicle.len
-            else Double.PositiveInfinity
-
-        val gapBehind =
-            if vBehind != null then pos - vBehind.corridorPos - Vehicle.len
-            else Double.PositiveInfinity
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        // feasibility check
-        success &&= gapBehind >= safeDisp && gapAhead >= safeDisp
+        // and `corridorPos` carries across unchanged.  The insertion point is the
+        // first car ahead of that position in the TARGET lane's list (not a segment
+        // `vdeque`, which only holds cars inside `seg.move()`).
+        val vAhead = toPath.leaderAt (actor.corridorPos)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         // --- perform the lane change --------------------------------------------
-        if success then
-            fromPath.removeFromAlist(actor) // detach from old lane
-            assert(actor.myPathNode == null, s"Vehicle $this not cleared before lane-change insertion!")
+        fromPath.removeFromAlist(actor) // detach from old lane
+        assert(actor.myPathNode == null, s"Vehicle $this not cleared before lane-change insertion!")
 
-            actor.laneID = l2 // update laneID
-            actor.pathInfo = toPath.seg(seg).name // update pathInfo
-            toPath.addToAlist(actor, vAhead) // insert before vAhead in target lane
-        end if
-
-        success
+        actor.laneID = l2 // update laneID
+        actor.pathInfo = toPath.seg(seg).name // update pathInfo
+        toPath.addToAlist(actor, vAhead) // insert before vAhead in target lane
+        toPath.laneChangeStat.tally (l2 - l1) // count the change where it happens (+1 / -1)
+        true
     end changeLane
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Drive one vehicle along segment `seg`: this route's car-following model decides
+     *  a lane change (MOBIL, `Dynamics.laneChange`), `changeLane` makes it, then the
+     *  vehicle car-follows to the end of the segment.  The one verb drive loops call.
+     *  @param car  the vehicle (in one of this route's lanes)
+     *  @param seg  the segment index it is about to drive
+     */
+    def driveSegment (car: Vehicle, seg: Int): Unit =
+        val dir = motion.laneChange (car, this)                       // -1, 0, +1 (decides only)
+        if dir != 0 then changeLane (car.laneID, car.laneID + dir, car, seg)
+        pathway(car.laneID).seg(seg).move ()                          // car-follow on the (new) lane
+    end driveSegment
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

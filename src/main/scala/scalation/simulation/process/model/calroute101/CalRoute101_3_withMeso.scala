@@ -259,12 +259,7 @@ class CalRoute101_3_withMeso(name: String = "CalRoute101_3_withMeso", reps: Int 
                           inMicro = true
                       end if
 
-                      val carAhead = getCarAhead(this)
-                      if carAhead != null && carAhead.velocity < 0.1 * vmax then
-                          val target = if laneID > 0 then laneID - 1 else laneID + 1
-                          route.changeLane(laneID, target, this, seg)
-                      end if
-                      route.pathway(laneID).seg(seg).move ()
+                      route.driveSegment (this, seg)            // MOBIL lane choice + car-follow this segment
                   end if
 
                   if junc(seg + 1).name.startsWith ("sensor") then

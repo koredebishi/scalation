@@ -12,7 +12,7 @@ package simulation
 package process
 
 import scalation.animation.CommandType._
-import scalation.mathstat.VectorD
+import scalation.mathstat.{Statistic, VectorD}
 import scalation.random.Variate
 import scalation.scala2d.Colors._
 
@@ -39,6 +39,11 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
 
     private val debug = debugf ("Pathway", true)             // debug function
     val vList = DoublyLinkedList [Vehicle]                   // one lane = one doubly linked list
+
+    /** Lane changes INTO this lane: tallied by `Route.changeLane` with the direction
+     *  (+1 / -1) of each change, so `num` is the count.
+     */
+    val laneChangeStat = new Statistic (s"${name}_laneChangesIn")
 
     // Enhanced DLL identification for debugging
     val dllId = s"DLL_${name}_Lane"

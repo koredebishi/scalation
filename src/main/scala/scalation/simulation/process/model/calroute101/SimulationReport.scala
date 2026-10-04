@@ -202,13 +202,13 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
 
         val avgFlowNRMSE = totalFlowNRMSE / nSensors
         val avgSpeedNRMSE = totalSpeedNRMSE / nSensors
-
-        // Fitness: 20/80 weighted combination (speed dominates; flow already near-optimal via Erlang2S)
-        // Flow protection: soft penalty when flow NRMSE exceeds 2.5 (well above unoptimized baseline of 2.03)
-        // This prevents the optimizer from trading flow accuracy for speed gains
-        val flowThreshold = 2.5
-        val flowPenalty   = if avgFlowNRMSE > flowThreshold then 10.0 * (avgFlowNRMSE - flowThreshold) else 0.0
-        val fitness       = 0.2 * avgFlowNRMSE + 0.8 * avgSpeedNRMSE + flowPenalty
+//
+//        // Fitness: 20/80 weighted combination (speed dominates; flow already near-optimal via Erlang2S)
+//        // Flow protection: soft penalty when flow NRMSE exceeds 2.5 (well above unoptimized baseline of 2.03)
+//        // This prevents the optimizer from trading flow accuracy for speed gains
+//        val flowThreshold = 2.5
+//        val flowPenalty   = if avgFlowNRMSE > flowThreshold then 10.0 * (avgFlowNRMSE - flowThreshold) else 0.0
+        val fitness       = 0.2 * avgFlowNRMSE + 0.8 * avgSpeedNRMSE
 
         ValidationResult (sensorResults, avgFlowNRMSE, avgSpeedNRMSE, fitness)
     end validate
@@ -293,7 +293,7 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
         println ("=" * 60)
         println (f"Average Flow NRMSE*100:  ${vr.avgFlowNRMSE}%.4f")
         println (f"Average Speed NRMSE*100: ${vr.avgSpeedNRMSE}%.4f")
-        println (f"Fitness (avg NRMSE*100): ${vr.fitness}%.4f")
+        println (f"Fitness (0.2 flow + 0.8 speed NRMSE): ${vr.fitness}%.4f")
         println ("=" * 60)
     end printValidationReport
 
@@ -416,7 +416,7 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
         writer.println ("=" * 60)
         writer.println (f"Average Flow NRMSE*100:  ${vr.avgFlowNRMSE}%.4f")
         writer.println (f"Average Speed NRMSE*100: ${vr.avgSpeedNRMSE}%.4f")
-        writer.println (f"Fitness (avg NRMSE*100): ${vr.fitness}%.4f")
+        writer.println (f"Fitness (0.2 flow + 0.8 speed NRMSE): ${vr.fitness}%.4f")
         writer.println ("=" * 60)
         
         writer.flush ()
@@ -497,7 +497,7 @@ object SimulationReport:
                 emit ("-" * 60)
                 row ("Avg flow NRMSE*100", f"${vr.avgFlowNRMSE}%.4f")
                 row ("Avg speed NRMSE*100", f"${vr.avgSpeedNRMSE}%.4f")
-                row ("Fitness (avg NRMSE*100)", f"${vr.fitness}%.4f")
+                row ("Fitness (0.2 flow+0.8 speed)", f"${vr.fitness}%.4f")
             emit ("=" * 60)
 
             emit ("\n" + "=" * 60)

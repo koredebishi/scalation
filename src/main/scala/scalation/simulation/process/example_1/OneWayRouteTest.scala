@@ -147,18 +147,8 @@ class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating
                 // ------------------ drive through segments up to junction 2 ------
                 val offRampJunction = 2
                 for seg <- 0 until offRampJunction do
-                    if laneChangeRV.igen == 1 then
-                        val target = (laneIdx + 1) % numLane // simple rule
-                        if route.changeLane(laneIdx, target, this, seg) then
-                            laneIdx = target // changeLane already moved this car into
-                                             // `target`'s list and set laneID; without
-                                             // this the next move() runs on the OLD
-                                             // lane's segment while the car lives in
-                                             // the new lane's file
-                            println(s"$this changed to lane $laneIdx @ seg $seg")
-                        end if
-                    end if
-                    route.path(laneIdx).seg(seg).move()
+                    route.driveSegment(this, seg)        // MOBIL lane choice + car-follow this segment
+                    laneIdx = this.laneID                // driveSegment may have moved the car to another lane
                     if seg < junc.length then junc(seg).jump()
                 end for
 
@@ -169,14 +159,8 @@ class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating
                 else
                     // ------------------ drive through remaining segments ----------
                     for seg <- offRampJunction until route.segments do
-                        if laneChangeRV.igen == 1 then
-                            val target = (laneIdx + 1) % numLane // simple rule
-                            if route.changeLane(laneIdx, target, this, seg) then
-                                laneIdx = target                 // see note above
-                                println(s"$this changed to lane $laneIdx @ seg $seg")
-                            end if
-                        end if
-                        route.path(laneIdx).seg(seg).move()
+                        route.driveSegment(this, seg)    // MOBIL lane choice + car-follow this segment
+                        laneIdx = this.laneID            // driveSegment may have moved the car to another lane
                         if seg < junc.length then junc(seg).jump()
                     end for
 
@@ -201,13 +185,8 @@ class OneWayRouteTest(name: String = "OneWayRouteTest", reps: Int = 1, animating
                 route.path(laneIdx).joinAt(this, carAhead, 1)   // rejoins at segment 1
 
                 for seg <- 1 until route.segments do
-                    if laneChangeRV.igen == 1 then
-                        val target = (laneIdx + 1) % numLane
-                        if route.changeLane(laneIdx, target, this, seg) then
-                            laneIdx = target                     // see note above
-                            println(s"$this changed to lane $laneIdx @ seg $seg")
-                    end if
-                    route.path(laneIdx).seg(seg).move()
+                    route.driveSegment(this, seg)        // MOBIL lane choice + car-follow this segment
+                    laneIdx = this.laneID                // driveSegment may have moved the car to another lane
                     if seg < junc.length then junc(seg).jump()
                 end for
 
