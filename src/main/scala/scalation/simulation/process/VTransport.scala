@@ -39,13 +39,11 @@ class VTransport (name: String, from_ : Component, to_ : Component,
                   motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0,
                   shift1: VectorD = VectorD (0, 0), shift2: VectorD = VectorD (0, 0), segIndex: Int = -1,
                   geometry: Array [(Double, Double)] = Array.empty)
-    extends Transport (name, from_, to_, null, isSpeed, bend, shift1, shift2, geometry):
+    extends Transport (name, from_, to_, null, isSpeed, bend, shift1, shift2, geometry), TrafficLink:
 
     private val debug = debugf ("VTransport", false)                     // debug function
     //debug ("init", s"name = $name, p1 = $p1, pc = $pc, p2 = $p2, located at ${stringOf (at)}")
 
-    var length = 0.0    //  The actual length of the road segment.
-    if length <= 0.0 then length = curve.length
     val safetydist = 20.0
     
 
@@ -75,21 +73,13 @@ class VTransport (name: String, from_ : Component, to_ : Component,
     end getLast
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    // TRAFFIC STATE  (see context/traffic-state-spec.md)
-    // A VTransport is one lane x one section, so every quantity here is PER LANE.
+    // TRAFFIC STATE  (see context/traffic-state-spec.md, `TrafficLink`)
+    // length, density and flow come from `TrafficLink`; this link supplies its count and speed.
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    /** Instantaneous traffic density on this segment.
-     *      k = n / L
-     *  where n is the number of vehicles occupying the segment right now and L
-     *  is its length.  A spatial measurement: it needs the whole section at one
-     *  moment, which is what `vdeque` holds.
-     *  @return density in veh/km per lane
+    /** Number of vehicles on this segment right now (the lane's `vdeque`).
      */
-    def density: Double =
-        val lenKm = length / 1000.0                        // metres -> km
-        if lenKm > 0.0 then vdeque.size.toDouble / lenKm else 0.0
-    end density
+    def vehicleCount: Int = vdeque.size
 
     /** Space-mean speed on this segment.
      *      v_s = (1/n) * sum v_i        over the n vehicles on the segment now
@@ -107,13 +97,6 @@ class VTransport (name: String, from_ : Component, to_ : Component,
             for v <- vdeque do sum += v.velocity
             sum / vdeque.size
     end spaceMeanSpeed
-
-    /** Modelled traffic flow on this segment, from the fundamental relation
-     *      q = k * v_s
-     *  The 3.6 converts veh/km * m/s to veh/h.
-     *  @return flow in veh/h per lane
-     */
-    def flow: Double = density * spaceMeanSpeed * 3.6
 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

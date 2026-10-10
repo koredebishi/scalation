@@ -255,48 +255,50 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Push live statistics to the animation HUD.
-     *  Scans model `parts` for VTransport segments, aggregates vehicle counts,
-     *  average speed, and per-segment density.  Called periodically from the
-     *  scheduling loop so that **any** model inheriting from `Model` gets a
+     *  Scans model `parts` (and their subparts, e.g., a `Pathway`'s segments) for
+     *  every `TrafficLink` -- micro or meso, it does not matter -- and aggregates
+     *  vehicle counts, space-mean speed and per-link density.  Called periodically
+     *  from the scheduling loop so that **any** model inheriting from `Model` gets a
      *  live HUD without model-specific wiring.
      */
     private def pushHudStats (): Unit =
         if !animating || dgAni == null then return
 
-        val vtSegs     = ArrayBuffer.empty [VTransport]
+        val links      = ArrayBuffer.empty [TrafficLink]
         val segLabels  = ArrayBuffer.empty [String]
         var laneChanges = 0L                                // sum of each lane's laneChangeStat.num
 
-        // VTransport segments live inside Pathway.subpart (or Pathway.seg),
-        // which in turn lives inside parts.  We must recurse one level.
-        for p <- parts do
-            p match
-                case pw: Pathway =>
-                    laneChanges += pw.laneChangeStat.num
-                    for s <- pw.seg do
-                        vtSegs    += s
-                        segLabels += s.name
-                case vt: VTransport =>          // in case a VTransport is added directly
-                    vtSegs    += vt
-                    segLabels += vt.name
-                case _ =>   // ignore non-transport parts
+        // Collect every road link, wherever it sits in the part tree.
+        def collect (c: Component): Unit =
+            c match
+                case link: TrafficLink =>
+                    links     += link
+                    segLabels += c.name
+                case _ =>
+            c match
+                case pw: Pathway => laneChanges += pw.laneChangeStat.num   // lane changes are owned by the Pathway
+                case _ =>
+            for sub <- c.subpart do collect (sub)
+        end collect
 
-        // -- traffic state per lane-segment (see context/traffic-state-spec.md) --
-        // Each VTransport is one lane x one section, so its density and flow are
-        // per lane.  Speed is vehicle-weighted across segments, which keeps it a
+        for p <- parts do collect (p)
+
+        // -- traffic state per lane-link (see context/traffic-state-spec.md) --
+        // Each link is one lane x one section, so its density and flow are
+        // per lane.  Speed is vehicle-weighted across links, which keeps it a
         // space-mean speed for the network; flow is summed to a corridor total.
         var totalVehicles = 0
         var sumVelocity   = 0.0
         var sumFlow       = 0.0
-        val densities     = new Array [Double] (vtSegs.length)
+        val densities     = new Array [Double] (links.length)
 
-        for i <- vtSegs.indices do
-            val vt   = vtSegs(i)
-            val nVeh = vt.vdeque.size
-            densities(i)   = vt.density                        // veh/km per lane
-            sumFlow       += vt.flow                           // veh/h per lane
+        for i <- links.indices do
+            val link = links(i)
+            val nVeh = link.vehicleCount
+            densities(i)   = link.density                        // veh/km per lane
+            sumFlow       += link.flow                           // veh/h per lane
             totalVehicles += nVeh
-            sumVelocity   += vt.spaceMeanSpeed * nVeh          // weight by occupancy
+            sumVelocity   += link.spaceMeanSpeed * nVeh          // weight by occupancy
         end for
 
         // space-mean speed over every vehicle currently on the modelled segments
@@ -304,7 +306,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
         dgAni.updateHudStats (sumFlow, spaceMeanSpeed)
         dgAni.updateHudLaneChanges (laneChanges)
-        if vtSegs.nonEmpty then
+        if links.nonEmpty then
             dgAni.updateSegmentDensities (densities, segLabels.toArray)
     end pushHudStats
 

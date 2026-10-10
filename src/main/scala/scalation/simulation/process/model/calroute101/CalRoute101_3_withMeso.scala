@@ -40,7 +40,7 @@ import scalation.{cfor, debugf}
  *  @param autoRun    run immediately for standalone use; false lets an evaluation adapter own the run
  */
 class CalRoute101_3_withMeso(name: String = "CalRoute101_3_withMeso", reps: Int = 1,
-                             animating: Boolean = true, aniRatio: Double = 500.0, autoRun: Boolean = true)
+                             animating: Boolean = true, aniRatio: Double = 500.0)
   extends Model (name, reps, animating, aniRatio)
            with RowTimeLoader
            with CalRouteReadings:
@@ -259,7 +259,9 @@ class CalRoute101_3_withMeso(name: String = "CalRoute101_3_withMeso", reps: Int 
                           inMicro = true
                       end if
 
-                      route.driveSegment (this, seg)            // MOBIL lane choice + car-follow this segment
+//                    route.driveSegment (this, seg)            // MOBIL ON: lane choice + car-follow this segment
+//                    route.pathway(laneID).seg(seg).move ()    // MOBIL OFF: no lane changes (swap with the line above)
+                      route.driveSegmentSimple (this, seg)      // SIMPLE: old rule (leader < 0.1 vmax + 20 m gaps)
                   end if
 
                   if junc(seg + 1).name.startsWith ("sensor") then
@@ -352,13 +354,10 @@ class CalRoute101_3_withMeso(name: String = "CalRoute101_3_withMeso", reps: Int 
       //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-//      private val wallBuilt = System.nanoTime ()             // everything constructed, nothing simulated yet
-//
-//      if autoRun then
-//          simulate ()
-//          waitFinished ()
-//          val wallEnd = System.nanoTime ()
-//          println (f"[wall] setup ${(wallBuilt - wallStart) / 1e9}%.1f s   run ${(wallEnd - wallBuilt) / 1e9}%.1f s   total ${(wallEnd - wallStart) / 1e9}%.1f s")
-//          Model.shutdown ()
+
+//      simulate ()
+//      waitFinished ()
+//      //println (f"[wall] setup ${(wallBuilt - wallStart) / 1e9}%.1f s   run ${(wallEnd - wallBuilt) / 1e9}%.1f s   total ${(wallEnd - wallStart) / 1e9}%.1f s")
+//      Model.shutdown ()
 
   end CalRoute101_3_withMeso

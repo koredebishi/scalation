@@ -45,14 +45,11 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
                       val flowDiagram: Option [IdmFlux] = None,
                       traceSpeed: Boolean = false,
                       geometry: Array [(Double, Double)] = Array.empty)
-      extends Transport (name, from_, to_, null, false, bend, shift1, shift2, geometry):
+      extends Transport (name, from_, to_, null, false, bend, shift1, shift2, geometry), TrafficLink:
 
     private val debug = debugf ("MesoVTransport", false)
 
     require (storageCapacity > 0, "mesoscopic link storage capacity must be positive")
-
-    var length = 0.0                                            // physical road length (metres); builder/config may set it
-    if length <= 0.0 then length = curve.length                 // else fall back to the drawing length, same as VTransport
 
     def freeFlowTime = length / freeFlowSpeed                   // seconds until readiness (live: length may be set after construction)
     val releaseHeadway = 3600.0 / capacity                     // seconds between departures
@@ -60,6 +57,7 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     /** Distinguish a sleeping ready vehicle from one with readiness on the agenda. */
     private class Entry (val actor: Vehicle):
         var ready = false
+        var speed = 0.0                                         // speed assigned for crossing the running part (m/s)
     end Entry
 
     private val vdeque = ArrayDeque [Entry] ()   // Array deque of vehicle 
@@ -73,6 +71,21 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     def enteredCount: Long = entered
     def releasedCount: Long = released
     def blockedCount: Int = blocked.size
+
+    /** Number of vehicles on this link right now (running + queued). */
+    def vehicleCount: Int = occupancy
+
+    /** Space-mean speed on this link: each running vehicle at its assigned crossing
+     *  speed, queued vehicles at 0 (stopped vehicles belong in the average, as in `VTransport`).
+     *  @return space-mean speed in m/s (0.0 when the link is empty)
+     */
+    def spaceMeanSpeed: Double =
+        if vdeque.isEmpty then 0.0
+        else
+            var sum = 0.0
+            for e <- vdeque if ! e.ready do sum += e.speed
+            sum / vdeque.size
+    end spaceMeanSpeed
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset link-owned runtime state between independent model replications.
@@ -117,17 +130,11 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
      *
      * */
     private def runningDensity: Double =
+        val running = length - queueLength                          // the running (moving) part of the link
         if runningCount == 0 then 0.0
-        else runningCount / (length - queueLength)
+        else if running <= jamSpacing then flowDiagram.map (_.rho_m).getOrElse (0.0)   // queue fills the link: jam density
+        else runningCount / running
     end runningDensity
-
-    /** Instantaneous density over the whole link (vehicles/km for this lane).
-     *   k = n / L
-     *  where n is the number of vehicles occupying the link right now and L
-     *  is its length. For example, 10 vehicles on a 500 m link:
-     * 10 / 0.5 km = 20 vehicles/km
-     * */
-    def density: Double = occupancy * 1000.0 / length          // diving by length in metres gives density in veh/km for this lane
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Wait outside the link until storage is available.  A released slot is
@@ -164,15 +171,21 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         awaitAdmission (actor)          // wait until storage is available 
         val entryTime = director.clock
         val rho = flowDiagram.map (_ => runningDensity).getOrElse (0.0)
+        val runningLength = math.max (length - queueLength, 0.0)    // the car crosses the running part; the queue is the FIFO's job
         val traversalTime = flowDiagram match
             case Some (fd) =>
-                val speed = fd.speed (rho)         // use the flow diagram to determine the speed at the current density
+                val v0    = min (fd.v0, actor.vmax)                 // the car's desired speed, never above the road's
+                val speed = fd.withV0 (v0).speed (rho)              // IDM steady state with that v0 (same v0 as micro's IDM)
                 if traceSpeed then
                     println (s"IDM_FLUX_SPEED vehicle=${actor.displayLabel}, link=$name, " +
                              s"density=$rho veh/m, speed=$speed m/s")
-                length / speed                     // convert speed to time (seconds) for the current vehicle
-            case None => freeFlowTime             // use the fixed free-flow speed when no flow diagram is provided
+                val fluxTime  = if speed <= 0.0 then 0.0            // jam density: no running part to cross, join the queue
+                                else runningLength / speed          // time (s) to cross the running part
+                val queueTime = runningLength / actor.vmax + occupancy * releaseHeadway   // cars ahead leave at capacity: a jam empties from its front
+                min (fluxTime, queueTime)
+            case None => runningLength / min(freeFlowSpeed, actor.vmax)   // fixed free-flow speed, capped at the car's desired speed
         val entry = new Entry (actor)     
+        entry.speed = if traversalTime > 0.0 then runningLength / traversalTime else 0.0   // derived: the speed this car crosses at
         accum (occupancy)                        // existing time-persistent occupancy statistic
         vdeque += entry                          // add the vehicle to the end of the FIFO
         entered += 1                             // increment vehicle count on this Vtranport. need to keep track of this for the statistics

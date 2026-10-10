@@ -36,7 +36,7 @@ import scalation.simulation.process.*
  *  @param autoRun    run immediately for standalone use; false lets an evaluation adapter own the run
  */
 class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
-                     animating: Boolean = false, aniRatio: Double = 500.0)
+                     animating: Boolean = true, aniRatio: Double = 500.0)
       extends Model (name, reps, animating, aniRatio)
          with RowTimeLoader
          with CalRouteReadings:
@@ -223,7 +223,9 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
 
             cfor (joinSeg, highway_length) { seg =>
                 if seg == 0 then route.pathway(laneID).seg(seg).move ()   // warm-up: keep the PeMS lane up to sensor 1
-                else route.driveSegment (this, seg)             // MOBIL lane choice + car-follow this segment
+                //else route.driveSegment (this, seg)             // MOBIL ON: lane choice + car-follow this segment
+//              else route.pathway(laneID).seg(seg).move ()     // MOBIL OFF: no lane changes (swap with the line above)
+                else route.driveSegmentSimple (this, seg)       // SIMPLE: old rule (leader < 0.1 vmax + 20 m gaps)
 
                 if junc(seg + 1).name.startsWith ("sensor") then
                     junc(seg + 1).jump ()
@@ -311,7 +313,7 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-//    private val wallBuilt = System.nanoTime ()             // everything constructed, nothing simulated yet
+    //private val wallBuilt = System.nanoTime ()             // everything constructed, nothing simulated yet
 //    simulate ()
 //    waitFinished ()
 //    val wallEnd = System.nanoTime ()

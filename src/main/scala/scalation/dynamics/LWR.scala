@@ -199,6 +199,33 @@ class IdmFlux (val v0: Double = 30.0, val tau: Double = 1.5, val s0: Double = 2.
         s"  q_max = ${"%.6f".format (q_max)} veh/s = ${"%.0f".format (q_max * 3600)} veh/hr\n" +
         s"  max |dq/drho| = ${"%.3f".format (maxWaveSpeed)} m/s,  concave = $isConcave"
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the same diagram (tau, s0, len, delta, grid) for another desired
+     *  speed v, e.g., one vehicle's own v0.  Tables are built once and reused.
+     *  @param v  the desired (free-flow) speed v0 (m/s)
+     */
+    def withV0 (v: Double): IdmFlux =
+        if v == v0 then this else IdmFlux.of (v, tau, s0, len, delta, nTab)
+    end withV0
+
+end IdmFlux
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `IdmFlux` companion object keeps one table per parameter set, so a family
+ *  of diagrams differing only in v0 (one per vehicle desired speed) is built once.
+ */
+object IdmFlux:
+
+    private val tables = scala.collection.mutable.Map [(Double, Double, Double, Double, Double, Int), IdmFlux] ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the `IdmFlux` for these parameters, building it the first time only.
+     */
+    def of (v0: Double, tau: Double, s0: Double, len: Double, delta: Double, nTab: Int = 2001): IdmFlux =
+        tables.getOrElseUpdate ((v0, tau, s0, len, delta, nTab), new IdmFlux (v0, tau, s0, len, delta, nTab))
+    end of
+
 end IdmFlux
 
 

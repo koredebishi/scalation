@@ -142,6 +142,55 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     end driveSegment
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Drive one vehicle along segment `seg` with the SIMPLE (pre-MOBIL) lane rule:
+     *  if its leader is almost stopped (< 0.1 vmax), try one lane over (left, or
+     *  right from lane 0), only when the target lane has a safety-distance gap ahead
+     *  and behind; then car-follow.  Drop-in alternative to `driveSegment` (MOBIL).
+     *  @param car  the vehicle (in one of this route's lanes)
+     *  @param seg  the segment index it is about to drive
+     */
+    def driveSegmentSimple (car: Vehicle, seg: Int): Unit =
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //  Decide: leader almost stopped -> try one lane over (the old rule)
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        val lane     = car.laneID
+        val carAhead = car.leader                                     // ahead of the car, current lane
+        if carAhead != null && carAhead.velocity < 0.1 * car.vmax then
+            val target = if lane > 0 then lane - 1 else lane + 1      // left, or right from lane 0
+            if target < pathway.length && gapsClear (car, target, seg) then
+                changeLane (lane, target, car, seg)                   // move only (no decision inside)
+            end if
+        end if
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //  Car-follow on the (possibly new) lane
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        pathway(car.laneID).seg(seg).move ()
+    end driveSegmentSimple
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The pre-MOBIL safety test: true when lane `target` has at least the segment's
+     *  `safetydist` of bumper-to-bumper gap ahead of and behind the car's position.
+     *  @param car     the vehicle wanting to change
+     *  @param target  the lane it wants to move into
+     *  @param seg     the segment it is on
+     */
+    private def gapsClear (car: Vehicle, target: Int, seg: Int): Boolean =
+        val toPath    = pathway(target)
+        val pos       = car.corridorPos                               // same frame in every lane
+        val safe      = toPath.seg(seg).safetydist                    // 20 m
+        val vAhead    = toPath.leaderAt (pos)                         // first car ahead of pos in the target lane
+        val vBehind   = if vAhead != null then vAhead.follower        // the car just behind pos, or
+                        else toPath.getFirst                          //   nobody ahead -> the front car is behind pos
+        val gapAhead  = if vAhead != null then vAhead.corridorPos - pos - Vehicle.len
+                        else Double.PositiveInfinity
+        val gapBehind = if vBehind != null then pos - vBehind.corridorPos - Vehicle.len
+                        else Double.PositiveInfinity
+        gapAhead >= safe && gapBehind >= safe
+    end gapsClear
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     /**
      * A forcemerge that allows a vehicle to make mandatory lane changes,

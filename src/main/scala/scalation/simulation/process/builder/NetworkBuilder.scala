@@ -100,14 +100,6 @@ object NetworkBuilder:
     private val NODE     = 4.0                                          // drawn size of a junction or sink disc, in pixels (the default is 20)
     private val JUNCTION_DELAY = 0.0                                    // ordinary imported nodes have no uncalibrated delay
 
-    private val flux = scala.collection.mutable.Map [Double, IdmFlux] ()
-
-    /** The IDM equilibrium diagram for a supplied edge speed. */
-    private def fluxOf (speed: Double): IdmFlux =
-        flux.getOrElseUpdate (speed,
-            new IdmFlux (speed, Vehicle.T, Vehicle.s, Vehicle.len, Vehicle.del))
-    end fluxOf
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read every edge of an `edges.geojson` file written by `build_osm_network.py`.
      *  @param edgesPath  path to `data/network/<name>/edges.geojson`
@@ -274,7 +266,7 @@ object NetworkBuilder:
                     for f <- grouped do builtLink(f) = MicroLink (r, grouped)
                 end if
             else
-                val fd   = fluxOf (p.speed)
+                val fd   = IdmFlux.of (p.speed, Vehicle.T, Vehicle.s, Vehicle.len, Vehicle.del)   // shared table per edge speed
                 val dx   = at(to(e))._1 - at(from(e))._1                // lane offset as in Route: perpendicular to the edge
                 val dy   = at(to(e))._2 - at(from(e))._2
                 val hyp  = math.hypot (dx, dy)

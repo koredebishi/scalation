@@ -42,7 +42,7 @@ import scalation.{cfor, debugf}
  *  @param autoRun    run immediately for standalone use; false lets an evaluation adapter own the run
  */
 class CalRoute101_3_fullMeso(name: String = "CalRoute101_3_fullMeso", reps: Int = 1,
-                             animating: Boolean = true, aniRatio: Double = 500.0, autoRun: Boolean = true)
+                             animating: Boolean = true, aniRatio: Double = 500.0)
   extends Model (name, reps, animating, aniRatio)
            with RowTimeLoader
            with CalRouteReadings:
@@ -328,11 +328,10 @@ class CalRoute101_3_fullMeso(name: String = "CalRoute101_3_fullMeso", reps: Int 
 
 //      private val wallBuilt = System.nanoTime ()             // everything constructed, nothing simulated yet
 //
-//      if autoRun then
-//          simulate ()
-//          waitFinished ()
-//          val wallEnd = System.nanoTime ()
-//          println (f"[wall] setup ${(wallBuilt - wallStart) / 1e9}%.1f s   run ${(wallEnd - wallBuilt) / 1e9}%.1f s   total ${(wallEnd - wallStart) / 1e9}%.1f s")
-//          Model.shutdown ()
+//      simulate ()
+//      waitFinished ()
+//      //val wallEnd = System.nanoTime ()
+//      //println (f"[wall] setup ${(wallBuilt - wallStart) / 1e9}%.1f s   run ${(wallEnd - wallBuilt) / 1e9}%.1f s   total ${(wallEnd - wallStart) / 1e9}%.1f s")
+//      Model.shutdown ()
 
   end CalRoute101_3_fullMeso
