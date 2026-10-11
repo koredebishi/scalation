@@ -152,13 +152,15 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     def driveSegmentSimple (car: Vehicle, seg: Int): Unit =
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        //  Decide: leader almost stopped -> try one lane over (the old rule)
+        //  Decide: only the ramp (rightmost) lane spreads inward, when its
+        //  leader is below 0.9 of my desired speed
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         val lane     = car.laneID
+        val rampLane = pathway.length - 1                             // rightmost lane: where ramp cars merge in
         val carAhead = car.leader                                     // ahead of the car, current lane
-        if carAhead != null && carAhead.velocity < 0.1 * car.vmax then
-            val target = if lane > 0 then lane - 1 else lane + 1      // left, or right from lane 0
-            if target < pathway.length && gapsClear (car, target, seg) then
+        if lane == rampLane && carAhead != null && carAhead.velocity < 0.9 * car.vmax then
+            val target = lane - 1                                     // one lane inward
+            if target >= 0 && gapsClear (car, target, seg) then
                 changeLane (lane, target, car, seg)                   // move only (no decision inside)
             end if
         end if

@@ -203,20 +203,104 @@ end flowBySensor
 end speedBySensor
 
 
+@main def speedProfile(): Unit =
+
+  
+    // get the path in which the data is located for all the models
+    val pemsFiles = Array("1-401112ML.csv", "2-401104ML.csv", "3-400712ML.csv",
+        "4-400450ML.csv", "5-407463ML.csv")
+    
+    val pems_file = for s <- 1 to 5 yield MatrixD.load("Mainline_VDS_Donald_Doyle/" + pemsFiles(s - 1))
+    
 
 
-@main def flowMap(): Unit =
+//  val mixed_path =  "../log/simulation/mixed/run_1791222266530_a76f5cae-06c7-46e9-96cf-108f273fe97e_validation_data.csv"   // SIMPLE, after speed fix
+//  val micro_path =  "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // SIMPLE
+//  val meso_path =   "../log/simulation/meso/run_1791222291028_bfac4e3a-74e3-4ee1-a7d5-aab9ec8c1240_validation_data.csv"    // after speed fix
+    val mixed_path =  "../log/simulation/mixed/mobile-run/run_1791752551105_fa12a8cd-9974-45b3-9430-686815b0df9c_validation_data.csv"   // MOBIL, after speed fix
+    val micro_path =  "../log/simulation/micro/mobile-run/run_1791752505189_b315dc01-910a-48d9-8ba0-ceeb1b5892d0_validation_data.csv"   // MOBIL
+    val meso_path =   "../log/simulation/meso/mobile-run/run_1791752571728_92ba9140-5635-4d1b-8436-d335b8ca414b_validation_data.csv"    // after speed fix (no lane changes)
 
-    // The path to the cvs
-    val data = "Mainline_VDS_Donald_Doyle/1-401112ML.csv"
+    //load this into a MatrixD (simulation files: once, outside the loop)
+    val micro_Mat  =  MatrixD.load(micro_path , skip = 1)
+    val meso_Mat  =  MatrixD.load(meso_path , skip = 1)
+    val mixe_Mat  =  MatrixD.load(mixed_path , skip = 1)
 
-    val flowLine = MatrixD.load(data, skipCol = 1)
+    val lane = 3                                                // 0..3: which lane (1 = lane 2)
 
-    val flowCol  = flowLine(?, 5)
+    // one point per sensor: the day's mean speed for this lane
+    val pems_prof  = new VectorD (5)
+    val micro_prof = new VectorD (5)
+    val meso_prof  = new VectorD (5)
+    val mixe_prof  = new VectorD (5)
 
-    println(s"The flowLine $flowLine")
-    // load the csv
+    for s <- 1 to 5 do
+        val colSpeed = 20 + (s - 1) * 4 until 20 + s * 4                  // sim lane speeds for sensor s
 
-    // use the csv
+        val pems_speed_col  = pems_file(s - 1)(?, VectorI (2, 4, 6, 8)) * 0.44704   // PeMS speeds, mph -> m/s
+        val micro_speed_col = micro_Mat (?, colSpeed)
+        val meso_speed_col  = meso_Mat (?, colSpeed)
+        val mixe_speed_col  = mixe_Mat (?, colSpeed)
 
-    // graph the csv
+        pems_prof(s - 1)  = pems_speed_col.mean(lane)                    // column means, then pick the lane
+        micro_prof(s - 1) = micro_speed_col.mean(lane)
+        meso_prof(s - 1)  = meso_speed_col.mean(lane)
+        mixe_prof(s - 1)  = mixe_speed_col.mean(lane)
+    end for
+
+    val x    = VectorD (1, 2, 3, 4, 5)                           // sensor number along the corridor
+    val zero = new VectorD (5)                                   // baseline so the y-axis starts at 0
+    new PlotM (x, MatrixD (pems_prof, micro_prof, meso_prof, mixe_prof, zero),
+               Array ("PeMS", "Micro", "Meso", "Mixed"), s"Lane ${lane + 1}: Mean Speed by Sensor (m/s)", lines = true)
+
+end speedProfile
+
+
+@main def flowProfile(): Unit =
+
+    // get the path in which the data is located for all the models
+    val pemsFiles = Array("1-401112ML.csv", "2-401104ML.csv", "3-400712ML.csv",
+        "4-400450ML.csv", "5-407463ML.csv")
+
+    val pems_file = for s <- 1 to 5 yield MatrixD.load("Mainline_VDS_Donald_Doyle/" + pemsFiles(s - 1))
+
+//  val mixed_path =  "../log/simulation/mixed/run_1791222266530_a76f5cae-06c7-46e9-96cf-108f273fe97e_validation_data.csv"   // SIMPLE, after speed fix
+//  val micro_path =  "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // SIMPLE
+//  val meso_path =   "../log/simulation/meso/run_1791222291028_bfac4e3a-74e3-4ee1-a7d5-aab9ec8c1240_validation_data.csv"    // after speed fix
+    val mixed_path =  "../log/simulation/mixed/mobile-run/run_1791752551105_fa12a8cd-9974-45b3-9430-686815b0df9c_validation_data.csv"   // MOBIL, after speed fix
+    val micro_path =  "../log/simulation/micro/mobile-run/run_1791752505189_b315dc01-910a-48d9-8ba0-ceeb1b5892d0_validation_data.csv"   // MOBIL
+    val meso_path =   "../log/simulation/meso/mobile-run/run_1791752571728_92ba9140-5635-4d1b-8436-d335b8ca414b_validation_data.csv"    // after speed fix (no lane changes)
+
+    //load this into a MatrixD
+    val micro_Mat  =  MatrixD.load(micro_path , skip = 1)
+    val meso_Mat  =  MatrixD.load(meso_path , skip = 1)
+    val mixe_Mat  =  MatrixD.load(mixed_path , skip = 1)
+
+    val lane = 3                                                // 0..3: which lane (1 = lane 2)
+
+    // one point per sensor: the day's mean flow (veh per 15 min) for this lane
+    val pems_prof  = new VectorD (5)
+    val micro_prof = new VectorD (5)
+    val meso_prof  = new VectorD (5)
+    val mixe_prof  = new VectorD (5)
+
+    for s <- 1 to 5 do
+        val colFlow = (s - 1) * 4 until s * 4                             // sim lane flows for sensor s
+
+        val pems_flow_col  = pems_file(s - 1)(?, VectorI (1, 3, 5, 7))    // PeMS flows, same unit as sim
+        val micro_flow_col = micro_Mat (?, colFlow)
+        val meso_flow_col  = meso_Mat (?, colFlow)
+        val mixe_flow_col  = mixe_Mat (?, colFlow)
+
+        pems_prof(s - 1)  = pems_flow_col.mean(lane)                     // column means, then pick the lane
+        micro_prof(s - 1) = micro_flow_col.mean(lane)
+        meso_prof(s - 1)  = meso_flow_col.mean(lane)
+        mixe_prof(s - 1)  = mixe_flow_col.mean(lane)
+    end for
+
+    val x    = VectorD (1, 2, 3, 4, 5)                           // sensor number along the corridor
+    val zero = new VectorD (5)                                   // baseline so the y-axis starts at 0
+    new PlotM (x, MatrixD (pems_prof, micro_prof, meso_prof, mixe_prof, zero),
+               Array ("PeMS", "Micro", "Meso", "Mixed"), s"Lane ${lane + 1}: Mean Flow by Sensor (veh/15 min)", lines = true)
+
+end flowProfile
