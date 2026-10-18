@@ -31,7 +31,14 @@ object EatonMiniConfig:
 
     val rampStationIds = Array (716596, 716588, 716586, 770402)
 
-    /** Eaton's OSM highway-to-resolution and speed policy. */
+    /** Eaton's OSM highway-to-resolution and speed policy. 
+     * Korede 10/18/2026 Need Fixing.
+     * Idea is sound for Eaton when we do not have data from Pems source 
+     * but this is too deterministic and may need randomness
+     * A random variate may be preferred for each road type policy where 
+     * Variate sets (60 -75mph), all the way down to (20-35mph) for the roads 
+     * in these cases to mirror slow and fast driver heterogenienty. 
+     * */
     val edgePolicy: EdgePolicy = new EdgePolicy:
         def profile (edge: NetEdge): EdgeProfile = edge.highway match
             case "motorway"      => EdgeProfile ("motorway", true, 65.0 * 0.44704)

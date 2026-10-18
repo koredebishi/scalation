@@ -14,6 +14,12 @@ case class NetEdge (u: Long, v: Long, highway: String, lanes: Int, length: Doubl
                     ref: String = "", key: Int = 0, osmid: String = "")
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** A place on one edge: the edge index, metres along it (OSM length), the
+ *  distance from the located point, and the road heading there (degrees, 0 = north).
+ */
+case class EdgeSpot (edge: Int, offset: Double, distance: Double, heading: Double)
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Generic edge behavior selected by the consuming model. */
 case class EdgeProfile (group: String, micro: Boolean, speed: Double)
 

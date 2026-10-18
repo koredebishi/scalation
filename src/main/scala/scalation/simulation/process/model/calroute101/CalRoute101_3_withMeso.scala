@@ -136,42 +136,15 @@ class CalRoute101_3_withMeso(name: String = "CalRoute101_3_withMeso", reps: Int 
       // Route and sources
       //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+      // Segments 0, 3 and 4 are mesoscopic; the Route builds and owns their meso lanes
+      // (same ends, drawn offset and length as its micro lanes).
+      private val flowDiagram = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T,
+                                             s0 = Vehicle.s, len = Vehicle.len, delta = Vehicle.del)
       private val intermediateJunc = junc.slice (1, junc.length - 1)
       debug ("init", s"Creating route with ${intermediateJunc.length} intermediate junctions")
-      private val route = Route ("Rte", numLanes, intermediateJunc, junc(0), junc.last, motion)
+      private val route = Route ("Rte", numLanes, intermediateJunc, junc(0), junc.last, motion,
+                                 mesoSegs = Set (0, 3, 4), flowDiagram = Some (flowDiagram))
       debug ("init", s"Route created with ${route.pathway.length} pathways")
-
-      // Keep the legacy route and replace only the selected sections with mesoscopic links.
-      private val mesoSegments = Set (0, 3, 4)
-      private val mesoLinks = Array.fill (numSegments) (Array.empty [MesoVTransport])  // mesoLinks(seg)(lane) = MesoVTransport for segment seg and lane
-      private val flowDiagram = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T,
-                                             s0 = Vehicle.s, len = Vehicle.len, delta = Vehicle.del)  //
-
-      // Same perpendicular-offset formula as Route.calcShift2, against the same
-      // from/to Route itself was built with (junc(0), junc.last) -- calcShift2 is
-      // private, so this mirrors it rather than reimplementing a different one.
-      // Same GAP as Route's own default (no laneGap was passed to Route below).
-      private val corridorDx  = junc.last.at(0) - junc(0).at(0)
-      private val corridorDy  = junc.last.at(1) - junc(0).at(1)
-      private val corridorHyp = math.hypot (corridorDx, corridorDy)
-      private val laneUnit    = VectorD (corridorDy / corridorHyp, -corridorDx / corridorHyp)
-      private val LANE_GAP    = 50.0
-      private def laneShift (lane: Int): VectorD =
-          val physicalLane = numLanes - 1 - lane
-          laneUnit * ((physicalLane - (numLanes - 1) / 2.0) * LANE_GAP)
-      end laneShift
-
-      for seg <- mesoSegments do
-          mesoLinks(seg) = Array.tabulate (numLanes) { lane =>
-              val shift = laneShift (lane)
-              val link = new MesoVTransport (s"meso-$seg-$lane", junc(seg), junc(seg + 1),
-                                             Vehicle.vmax, flowDiagram.q_max * 3600.0,
-                                             shift1 = shift, shift2 = shift,
-                                             flowDiagram = Some (flowDiagram))
-              link.length = route.pathway(lane).seg(seg).length
-              link
-          }
-      end for
 
       // Sinks
       private val (x0, y0) = (aniCoords_Main.last._1 - 100.0, aniCoords_Main.last._2 - 100.0)
@@ -208,7 +181,7 @@ class CalRoute101_3_withMeso(name: String = "CalRoute101_3_withMeso", reps: Int 
       // Register components
       debug ("init", "Registering components with model...")
       addComponents (sources, junc.toList ++ ramp_sensors.toList, sinks, ramps.toList,
-                     mesoLinks.flatten.toList)
+                     route.mesoLink.flatten.filter (_ != null).toList)
       route.pathway.foreach (addComponent (_))
       debug ("init", "Component registration complete")
 
@@ -246,12 +219,13 @@ class CalRoute101_3_withMeso(name: String = "CalRoute101_3_withMeso", reps: Int 
 
               var inMicro = false
               cfor (joinSeg, highway_length) { seg =>
-                  if mesoLinks(seg).nonEmpty then          // Meso link for this segment
+                  if route.mesoSegs.contains (seg) then    // Meso link for this segment
                       if inMicro then
-                          route.pathway(laneID).removeFromAlist (this)  // Remove car from micro simulation
+                          route.pathway(laneID).removeFromAlist (this)  // leave the micro lane BEFORE choosing a lane
                           inMicro = false
                       end if
-                      mesoLinks(seg)(laneID).move ()
+                      if seg > 0 then laneID = route.rampLaneMove (this, seg)   // SIMPLE ramp-lane rule (same as micro)
+                      route.mesoLink(laneID)(seg).move ()
                   else
                       if ! inMicro then
                           val carAhead = route.pathway(laneID).mergeLeaderAt (seg)
@@ -261,12 +235,12 @@ class CalRoute101_3_withMeso(name: String = "CalRoute101_3_withMeso", reps: Int 
 
 //                    route.driveSegment (this, seg)            // MOBIL ON: lane choice + car-follow this segment
 //                    route.pathway(laneID).seg(seg).move ()    // MOBIL OFF: no lane changes (swap with the line above)
-                      route.driveSegmentSimple (this, seg)      // SIMPLE: old rule (leader < 0.1 vmax + 20 m gaps)
+                      route.driveSegmentSimple (this, seg)      // SIMPLE: ramp-lane rule (Route.rampLaneMove)
                   end if
 
                   if junc(seg + 1).name.startsWith ("sensor") then
-                      if mesoLinks(seg).nonEmpty then
-                          val link = mesoLinks(seg)(laneID)
+                      if route.mesoSegs.contains (seg) then
+                          val link = route.mesoLink(laneID)(seg)
                           junc(seg + 1).jump (Some (link.density))
                       else junc(seg + 1).jump ()
               }

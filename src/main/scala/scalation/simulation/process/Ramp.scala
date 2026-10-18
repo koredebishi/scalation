@@ -74,6 +74,7 @@ class Ramp(name: String, val from: Component, val to: Component,motion: Dynamics
     */
     def addToAlist(actor: Vehicle, other: Vehicle): Unit =
         val otherNode = if other != null then other.myPathNode.asInstanceOf[vList.Node] else null
+        if isOn then actor.fromRamp = true      // this car joins the mainline from a ramp
         actor.myRamp = this
         actor.myPathway = null                  // not on a pathway
         actor.myFFConnector = null                   // not on an FFConnector

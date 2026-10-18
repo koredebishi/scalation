@@ -72,6 +72,17 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     def releasedCount: Long = released
     def blockedCount: Int = blocked.size
 
+    /** Whether a vehicle arriving now would be admitted without waiting. */
+    def hasRoom: Boolean = occupancy + reservedSlots < admissionCapacity && blocked.isEmpty
+
+    /** The speed a vehicle with desired speed `vmax` would be given if it entered now
+     *  (same rule as `move`: IdmFlux at the running density, v0 = min (road, car)). */
+    def entrySpeed (vmax: Double): Double =
+        flowDiagram match
+            case Some (fd) => fd.withV0 (min (fd.v0, vmax)).speed (runningDensity)
+            case None      => min (freeFlowSpeed, vmax)
+    end entrySpeed
+
     /** Number of vehicles on this link right now (running + queued). */
     def vehicleCount: Int = occupancy
 

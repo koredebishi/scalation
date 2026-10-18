@@ -225,7 +225,7 @@ class CalRoute101_3 (name: String = "CalRoute101_3", reps: Int = 1,
                 if seg == 0 then route.pathway(laneID).seg(seg).move ()   // warm-up: keep the PeMS lane up to sensor 1
 //              else route.driveSegment (this, seg)             // MOBIL ON: lane choice + car-follow this segment
 //              else route.pathway(laneID).seg(seg).move ()     // MOBIL OFF: no lane changes (swap with the line above)
-                else route.driveSegmentSimple (this, seg)       // SIMPLE: old rule (leader < 0.1 vmax + 20 m gaps)
+                else route.driveSegmentSimple (this, seg)       // SIMPLE: ramp-lane rule (Route.rampLaneMove)
 
                 if junc(seg + 1).name.startsWith ("sensor") then
                     junc(seg + 1).jump ()

@@ -44,6 +44,7 @@ abstract class Vehicle (name_ : String, director: Model)
 
     var key  = -0.0
     var laneID: Int = -1
+    var fromRamp = false                   // joined the mainline from an on-ramp (set by the ramp)
     var pathInfo : String = ""
     var segId : Int = -1
     var prevSegId: Int = -1                // previous segment id (before current segId)

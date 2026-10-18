@@ -72,6 +72,14 @@ class RampMeso (name: String, val from: Component, val to: Component,
     override def display (): Unit = lane.display ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Drive the vehicle along this ramp; an on-ramp marks it as joining from a ramp.
+     */
+    def drive (car: Vehicle): Unit =
+        if isOn then car.fromRamp = true
+        lane.move ()
+    end drive
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check if this is an on-ramp.
      */
     inline def isOn: Boolean = mode == RampMesoMode.On

@@ -16,8 +16,10 @@ import scalation.mathstat.*
 //    val micro_flow = "../log/simulation/micro/run_1791041931586_155e8ba9-b6f4-4649-b119-3348d5948a65_validation_data.csv"   // CalRoute101_3 (asymmetric MOBIL)
 
 
-    val meso_flow = "../log/simulation/meso/baseline/run_1790647033619_0fa8971d-7647-49f1-bd18-d342645cee83_validation_data.csv" // CalRoute101_3_fullMeso
-    val micro_flow = "../log/simulation/micro/baseline/run_1790646441479_53003381-ec03-4d22-8b60-71050120ba06_validation_data.csv"
+//  val meso_flow = "../log/simulation/meso/baseline/run_1790647033619_0fa8971d-7647-49f1-bd18-d342645cee83_validation_data.csv" // CalRoute101_3_fullMeso
+    val meso_flow = "../log/simulation/meso/run_1791757507836_8ca00560-ae0e-4125-affe-ca6d5b07d68e_validation_data.csv"   // 0.1 + ramp spreading
+//  val micro_flow = "../log/simulation/micro/baseline/run_1790646441479_53003381-ec03-4d22-8b60-71050120ba06_validation_data.csv"
+    val micro_flow = "../log/simulation/micro/run_1791757440805_1129c921-68de-409d-adb9-1588f31764c0_validation_data.csv"   // 0.1 + ramp spreading
     //val mixed_flow = "../log/simulation/mixed/run_1791042146806_e4eb2909-4d50-4882-91c1-3b9ac1eabe12_validation_data.csv"   // CalRoute101_3_withMeso (asymmetric MOBIL)
 
     val readPems  = MatrixD.load (pems_sensor1)                 // col 0 = date, then (flow, speed) per lane, total, avg
@@ -86,8 +88,10 @@ end flowMesoVsMicro
 
 //  val meso_flow = "../log/simulation/meso/baseline/run_1790647033619_0fa8971d-7647-49f1-bd18-d342645cee83_validation_data.csv" // baseline full meso
 //  val micro_flow = "../log/simulation/micro/baseline/run_1790646441479_53003381-ec03-4d22-8b60-71050120ba06_validation_data.csv"  // baseline micro
-    val meso_flow  = "../log/simulation/meso/run_1791222291028_bfac4e3a-74e3-4ee1-a7d5-aab9ec8c1240_validation_data.csv"    // CalRoute101_3_fullMeso (car v0, running part, queue bound)
-    val micro_flow = "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // CalRoute101_3 (simple lane rule)
+//  val meso_flow  = "../log/simulation/meso/run_1791222291028_bfac4e3a-74e3-4ee1-a7d5-aab9ec8c1240_validation_data.csv"    // CalRoute101_3_fullMeso (car v0, running part, queue bound)
+    val meso_flow  = "../log/simulation/meso/run_1791757507836_8ca00560-ae0e-4125-affe-ca6d5b07d68e_validation_data.csv"   // 0.1 + ramp spreading
+//  val micro_flow = "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // CalRoute101_3 (simple lane rule)
+    val micro_flow = "../log/simulation/micro/run_1791757440805_1129c921-68de-409d-adb9-1588f31764c0_validation_data.csv"   // 0.1 + ramp spreading
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //  Load and slice: 4 lane-flow columns for this sensor
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -162,7 +166,7 @@ end flowBySensor
  */
 @main def speedBySensor (): Unit =
 
-    val sensor = 3                                              // which detector to plot: 1 .. 5
+    val sensor = 5                                              // which detector to plot: 1 .. 5
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //  Files: PeMS file for this sensor + the simulation runs (meso speed cap, simple lane rule)
@@ -172,9 +176,12 @@ end flowBySensor
     val pems_file  = "Mainline_VDS_Donald_Doyle/" + pemsFiles(sensor - 1)    // pick this sensor's file
 //  val meso_file  = "../log/simulation/meso/baseline/run_1790647033619_0fa8971d-7647-49f1-bd18-d342645cee83_validation_data.csv"   // baseline full meso
 //  val micro_file = "../log/simulation/micro/baseline/run_1790646441479_53003381-ec03-4d22-8b60-71050120ba06_validation_data.csv"  // baseline micro
-    val meso_file  = "../log/simulation/meso/run_1791222291028_bfac4e3a-74e3-4ee1-a7d5-aab9ec8c1240_validation_data.csv"    // CalRoute101_3_fullMeso (car v0, running part, queue bound)
-    val micro_file = "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // CalRoute101_3 (simple lane rule)
-    val mixed_file = "../log/simulation/mixed/run_1791222266530_a76f5cae-06c7-46e9-96cf-108f273fe97e_validation_data.csv"   // CalRoute101_3_withMeso (car v0, running part, queue bound)
+//  val meso_file  = "../log/simulation/meso/run_1791222291028_bfac4e3a-74e3-4ee1-a7d5-aab9ec8c1240_validation_data.csv"    // CalRoute101_3_fullMeso (car v0, running part, queue bound)
+    val meso_file  = "../log/simulation/meso/run_1791757507836_8ca00560-ae0e-4125-affe-ca6d5b07d68e_validation_data.csv"   // 0.1 + ramp spreading
+//  val micro_file = "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // CalRoute101_3 (simple lane rule)
+    val micro_file = "../log/simulation/micro/run_1791757440805_1129c921-68de-409d-adb9-1588f31764c0_validation_data.csv"   // 0.1 + ramp spreading
+//  val mixed_file = "../log/simulation/mixed/run_1791222266530_a76f5cae-06c7-46e9-96cf-108f273fe97e_validation_data.csv"   // CalRoute101_3_withMeso (car v0, running part, queue bound)
+    val mixed_file = "../log/simulation/mixed/run_1791757485079_fe335649-15c1-4479-b77e-f050a04e9259_validation_data.csv"   // 0.1 + ramp spreading
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //  Load and slice: 4 lane-speed columns for this sensor
@@ -188,7 +195,7 @@ end flowBySensor
     val pemsSpeed  = readPems(?, VectorI (2, 4, 6, 8)) * 0.44704   // PeMS lane speeds, mph -> m/s (sim is m/s)
     val mesoSpeed  = readMeso(?, colSpeed)
     val microSpeed = readMicro(?, colSpeed)
-    val mixedSpeed = readMixed(?, colSpeed)
+//    val mixedSpeed = readMixed(?, colSpeed)
 
     val time = VectorD.range (0, pemsSpeed.dim) * 15.0          // minutes after 6:00, one point per 15-min bin
     val zero = new VectorD (time.dim)                           // baseline so the y-axis starts at 0
@@ -197,7 +204,7 @@ end flowBySensor
     //  Plot: one window per lane
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     for lane <- 0 until 4 do
-        new PlotM (time, MatrixD (pemsSpeed(?, lane), microSpeed(?, lane), mesoSpeed(?, lane), mixedSpeed(?, lane), zero),
+        new PlotM (time, MatrixD (pemsSpeed(?, lane), microSpeed(?, lane), mesoSpeed(?, lane), zero),
                    Array ("PeMS", "Micro", "Meso", "Mixed"), s"Sensor $sensor Lane ${lane + 1}: Speed Over Time (m/s)", lines = true)
 
 end speedBySensor
@@ -217,16 +224,19 @@ end speedBySensor
 //  val mixed_path =  "../log/simulation/mixed/run_1791222266530_a76f5cae-06c7-46e9-96cf-108f273fe97e_validation_data.csv"   // SIMPLE, after speed fix
 //  val micro_path =  "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // SIMPLE
 //  val meso_path =   "../log/simulation/meso/run_1791222291028_bfac4e3a-74e3-4ee1-a7d5-aab9ec8c1240_validation_data.csv"    // after speed fix
-    val mixed_path =  "../log/simulation/mixed/mobile-run/run_1791752551105_fa12a8cd-9974-45b3-9430-686815b0df9c_validation_data.csv"   // MOBIL, after speed fix
-    val micro_path =  "../log/simulation/micro/mobile-run/run_1791752505189_b315dc01-910a-48d9-8ba0-ceeb1b5892d0_validation_data.csv"   // MOBIL
-    val meso_path =   "../log/simulation/meso/mobile-run/run_1791752571728_92ba9140-5635-4d1b-8436-d335b8ca414b_validation_data.csv"    // after speed fix (no lane changes)
+//  val mixed_path =  "../log/simulation/mixed/mobile-run/run_1791752551105_fa12a8cd-9974-45b3-9430-686815b0df9c_validation_data.csv"   // MOBIL, after speed fix
+    val mixed_path =  "../log/simulation/mixed/run_1791757485079_fe335649-15c1-4479-b77e-f050a04e9259_validation_data.csv"   // 0.1 + ramp spreading
+//  val micro_path =  "../log/simulation/micro/mobile-run/run_1791752505189_b315dc01-910a-48d9-8ba0-ceeb1b5892d0_validation_data.csv"   // MOBIL
+    val micro_path =  "../log/simulation/micro/run_1791757440805_1129c921-68de-409d-adb9-1588f31764c0_validation_data.csv"   // 0.1 + ramp spreading
+//  val meso_path =   "../log/simulation/meso/mobile-run/run_1791752571728_92ba9140-5635-4d1b-8436-d335b8ca414b_validation_data.csv"    // after speed fix (no lane changes)
+    val meso_path =   "../log/simulation/meso/run_1791757507836_8ca00560-ae0e-4125-affe-ca6d5b07d68e_validation_data.csv"   // 0.1 + ramp spreading
 
     //load this into a MatrixD (simulation files: once, outside the loop)
     val micro_Mat  =  MatrixD.load(micro_path , skip = 1)
     val meso_Mat  =  MatrixD.load(meso_path , skip = 1)
     val mixe_Mat  =  MatrixD.load(mixed_path , skip = 1)
 
-    val lane = 3                                                // 0..3: which lane (1 = lane 2)
+    val lane = 1                                                // 0..3: which lane (1 = lane 2)
 
     // one point per sensor: the day's mean speed for this lane
     val pems_prof  = new VectorD (5)
@@ -267,9 +277,12 @@ end speedProfile
 //  val mixed_path =  "../log/simulation/mixed/run_1791222266530_a76f5cae-06c7-46e9-96cf-108f273fe97e_validation_data.csv"   // SIMPLE, after speed fix
 //  val micro_path =  "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // SIMPLE
 //  val meso_path =   "../log/simulation/meso/run_1791222291028_bfac4e3a-74e3-4ee1-a7d5-aab9ec8c1240_validation_data.csv"    // after speed fix
-    val mixed_path =  "../log/simulation/mixed/mobile-run/run_1791752551105_fa12a8cd-9974-45b3-9430-686815b0df9c_validation_data.csv"   // MOBIL, after speed fix
-    val micro_path =  "../log/simulation/micro/mobile-run/run_1791752505189_b315dc01-910a-48d9-8ba0-ceeb1b5892d0_validation_data.csv"   // MOBIL
-    val meso_path =   "../log/simulation/meso/mobile-run/run_1791752571728_92ba9140-5635-4d1b-8436-d335b8ca414b_validation_data.csv"    // after speed fix (no lane changes)
+//  val mixed_path =  "../log/simulation/mixed/mobile-run/run_1791752551105_fa12a8cd-9974-45b3-9430-686815b0df9c_validation_data.csv"   // MOBIL, after speed fix
+    val mixed_path =  "../log/simulation/mixed/run_1791757485079_fe335649-15c1-4479-b77e-f050a04e9259_validation_data.csv"   // 0.1 + ramp spreading
+//  val micro_path =  "../log/simulation/micro/mobile-run/run_1791752505189_b315dc01-910a-48d9-8ba0-ceeb1b5892d0_validation_data.csv"   // MOBIL
+    val micro_path =  "../log/simulation/micro/run_1791757440805_1129c921-68de-409d-adb9-1588f31764c0_validation_data.csv"   // 0.1 + ramp spreading
+//  val meso_path =   "../log/simulation/meso/mobile-run/run_1791752571728_92ba9140-5635-4d1b-8436-d335b8ca414b_validation_data.csv"    // after speed fix (no lane changes)
+    val meso_path =   "../log/simulation/meso/run_1791757507836_8ca00560-ae0e-4125-affe-ca6d5b07d68e_validation_data.csv"   // 0.1 + ramp spreading
 
     //load this into a MatrixD
     val micro_Mat  =  MatrixD.load(micro_path , skip = 1)

@@ -14,7 +14,9 @@ package simulation
 package process
 
 
+import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
+import scalation.simulation.process.meso.MesoVTransport
 import scala.math.abs
 //import scalation.random.Variate
 
@@ -34,11 +36,15 @@ import scala.math.abs
  *  @param geometry projected centerline shared by the lane pathways
  *  @param segmentGeometry projected centerline for each pathway segment
  *  @param laneGap  pixels between adjacent drawn lanes (default 50, the original spacing)
+ *  @param mesoSegs the segments driven mesoscopically (empty = all micro)
+ *  @param flowDiagram the IDM equilibrium diagram for the meso segments (required when
+ *                  `mesoSegs` is not empty); sets their free-flow speed and capacity
  */
 class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component, to: Component,
              motion: Dynamics, isSpeed: Boolean = false, bend: Double = 0.0,
              geometry: Array [(Double, Double)] = Array.empty, laneGap: Double = 50.0,
-             segmentGeometry: Array [Array [(Double, Double)]] = Array.empty)
+             segmentGeometry: Array [Array [(Double, Double)]] = Array.empty,
+             val mesoSegs: Set [Int] = Set.empty, flowDiagram: Option [IdmFlux] = None)
     extends Component ():
 
 
@@ -46,6 +52,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
 
     val pathway = Array.ofDim[Pathway](numLanes)      // create array of parallel Pathways
     private val GAP = laneGap  // pixel between lanes
+    private val laneShift = new Array [VectorD] (numLanes)   // drawn offset of each lane (shared by micro and meso)
 
     private def shiftGeometry (points: Array [(Double, Double)], shift: VectorD): Array [(Double, Double)] =
         points.map (point => (point._1 + shift (0), point._2 + shift (1)))
@@ -64,11 +71,36 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
         val laneGeometry = geometry.map (p => (p._1 + shift (0), p._2 + shift (1)))
         val laneSegmentGeometry: Array [Array [(Double, Double)]] =
             segmentGeometry.map (points => shiftGeometry (points, shift))
+        laneShift(i) = shift
         pathway(i) = new Pathway(s"${name}_$i", junc, from, to, motion, isSpeed, bend,
                                  laneShift = shift, geometry = laneGeometry,
                                  segmentGeometry = laneSegmentGeometry)
         subpart += pathway(i)
     end for
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //  MESO LANES: one MesoVTransport per lane x meso segment, built here so it
+    //  shares the micro lane's ends, drawn offset and length.  null = micro segment.
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    require (mesoSegs.isEmpty || flowDiagram.nonEmpty, s"Route $name: meso segments need a flowDiagram")
+
+    val mesoLink: Array [Array [MesoVTransport]] =
+        Array.tabulate (numLanes) { lane =>
+            Array.tabulate (pathway(lane).seg.length) { s =>
+                if ! mesoSegs.contains (s) then null
+                else
+                    val fd    = flowDiagram.get
+                    val micro = pathway(lane).seg(s)                  // the micro segment it stands for
+                    val shift = laneShift(lane)
+                    val link  = new MesoVTransport (s"${name}_meso-$s-$lane", micro.from, micro.to,
+                                                    fd.v0, fd.q_max * 3600.0,
+                                                    shift1 = shift, shift2 = shift,
+                                                    flowDiagram = flowDiagram)
+                    link.length = micro.length                       // same physical length as the micro lane
+                    subpart += link
+                    link
+            }
+        }
 
 
     initComponent(name, from.at)   // using from.at for the initComponent
@@ -93,6 +125,62 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     @inline def toCumulative(segId: Int, disp: Double): Double =
         segmentOffsets(segId) + disp
     end toCumulative
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the link a car drives on lane `lane`, segment `seg`: the meso link
+     *  if `seg` is a meso segment, else the micro segment.
+     */
+    def link (lane: Int, seg: Int): TrafficLink =
+        if mesoSegs.contains (seg) then mesoLink(lane)(seg) else pathway(lane).seg(seg)
+    end link
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Rule 1, SIMPLE lane change (all cars, micro segments): if the car ahead is
+     *  slower than 0.1 of my desired speed, try one lane over (inward, or out from
+     *  lane 0) when the target lane has a safety-distance gap.  Decides only.
+     *  @param car  the vehicle about to drive segment `seg`
+     *  @param seg  the segment index
+     *  @return the lane to drive `seg` on
+     */
+    def laneChangeMove (car: Vehicle, seg: Int): Int =
+        val lane     = car.laneID
+        val carAhead = car.leader                                     // ahead of the car, current lane
+        if carAhead != null && carAhead.velocity < 0.1 * car.vmax then
+            val target = if lane > 0 then lane - 1 else lane + 1      // inward, or out from lane 0
+            if target < pathway.length && gapsClear (car, target, seg) then target else lane
+        else lane
+    end laneChangeMove
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Rule 2, ramp cars spread inward (micro and meso segments alike): a car that
+     *  joined from an on-ramp moves one lane inward whenever the inner lane is faster
+     *  than its own and has room; it stops once the inner lane is no faster.
+     *  Decides only; the caller makes the move.
+     *      micro segment: lane speed = car ahead in that lane,        room = `gapsClear`
+     *      meso  segment: lane speed = next link's entry speed,       room = `hasRoom`
+     *  @param car  the vehicle about to drive segment `seg`
+     *  @param seg  the segment index
+     *  @return the lane to drive `seg` on
+     */
+    def rampLaneMove (car: Vehicle, seg: Int): Int =
+        val lane = car.laneID
+        if ! car.fromRamp || lane == 0 then return lane
+        val target = lane - 1                                         // one lane inward
+
+        val (mySpeed, innerSpeed, hasRoom) =
+            if mesoSegs.contains (seg) then
+                val mine  = mesoLink(lane)(seg)
+                val inner = mesoLink(target)(seg)
+                (mine.entrySpeed (car.vmax), inner.entrySpeed (car.vmax), inner.hasRoom)
+            else
+                val ahead      = car.leader                           // car ahead in my lane
+                val innerAhead = pathway(target).leaderAt (car.corridorPos)   // car ahead in the inner lane
+                (if ahead != null then ahead.velocity else car.vmax,
+                 if innerAhead != null then innerAhead.velocity else car.vmax,
+                 gapsClear (car, target, seg))
+
+        if innerSpeed > mySpeed && hasRoom then target else lane
+    end rampLaneMove
 
     // ----------------------------------------------------------------------------
 
@@ -152,18 +240,13 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
     def driveSegmentSimple (car: Vehicle, seg: Int): Unit =
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        //  Decide: only the ramp (rightmost) lane spreads inward, when its
-        //  leader is below 0.9 of my desired speed
+        //  Decide (rule 1, then rule 2), then move (changeLane)
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        val lane     = car.laneID
-        val rampLane = pathway.length - 1                             // rightmost lane: where ramp cars merge in
-        val carAhead = car.leader                                     // ahead of the car, current lane
-        if lane == rampLane && carAhead != null && carAhead.velocity < 0.9 * car.vmax then
-            val target = lane - 1                                     // one lane inward
-            if target >= 0 && gapsClear (car, target, seg) then
-                changeLane (lane, target, car, seg)                   // move only (no decision inside)
-            end if
-        end if
+        val lane   = car.laneID
+        var target = lane
+        target = laneChangeMove (car, seg)                            // rule 1: SIMPLE lane change, all cars
+        if target == lane then target = rampLaneMove (car, seg)       // rule 2: ramp cars spread inward
+        if target != lane then changeLane (lane, target, car, seg)    // move only (no decision inside)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         //  Car-follow on the (possibly new) lane
@@ -308,6 +391,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
      */
     override def display(): Unit =
         for l <- pathway if l != null do l.display()
+        for lane <- mesoLink; link <- lane if link != null do link.display()
     end display
 
 end Route

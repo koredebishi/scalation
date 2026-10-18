@@ -96,9 +96,10 @@ import scalation.simulation.process.meso.MesoVTransport
  */
 object NetworkBuilder:
 
-    private val LANE_GAP = 10.0                                         // pixels between drawn lanes: passed to Route as laneGap and used for meso lanes
+    val LANE_WIDTH = 3.6576                                             // metres: US standard 12 ft lane, drawn at map scale
     private val NODE     = 4.0                                          // drawn size of a junction or sink disc, in pixels (the default is 20)
     private val JUNCTION_DELAY = 0.0                                    // ordinary imported nodes have no uncalibrated delay
+    private val M_PER_DEG = 111320.0                                    // metres per degree of latitude
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read every edge of an `edges.geojson` file written by `build_osm_network.py`.
@@ -148,6 +149,177 @@ object NetworkBuilder:
     end edgesAlong
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return where point b lies from point a, in metres east and north
+     *  (flat earth, fine over a few kilometres).
+     *  @param a  from (lat, lon)
+     *  @param b  to (lat, lon)
+     */
+    private def metres (a: (Double, Double), b: (Double, Double)): (Double, Double) =
+        val east  = (b._2 - a._2) * M_PER_DEG * math.cos (math.toRadians (a._1))
+        val north = (b._1 - a._1) * M_PER_DEG
+        (east, north)
+    end metres
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the compass heading from point a to point b (degrees, 0 = north, clockwise).
+     *  @param a  from (lat, lon)
+     *  @param b  to (lat, lon)
+     */
+    def heading (a: (Double, Double), b: (Double, Double)): Double =
+        val (east, north) = metres (a, b)
+        (math.toDegrees (math.atan2 (east, north)) + 360.0) % 360.0
+    end heading
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the pixels between drawn lanes: a real lane width at the map scale,
+     *  times `widthScale`, so at 1.0 roads are drawn as wide as they are.
+     *  The scale (pixels per metre) is taken from the projector on the longest edge.
+     *  @param edges       the edges to be drawn
+     *  @param project     latitude, longitude -> screen (x, y)
+     *  @param widthScale  how many times wider than real the lanes are drawn
+     */
+    def laneGap (edges: Array [NetEdge], project: (Double, Double) => (Double, Double),
+                 widthScale: Double = 1.0): Double =
+        def straight (e: NetEdge): Double =                             // metres from u to v
+            val (east, north) = metres ((e.uLat, e.uLon), (e.vLat, e.vLon))
+            math.hypot (east, north)
+        val longest  = edges.maxBy (straight)
+        val (x1, y1) = project (longest.uLat, longest.uLon)
+        val (x2, y2) = project (longest.vLat, longest.vLon)
+        val pxPerM   = math.hypot (x2 - x1, y2 - y1) / straight (longest)
+        LANE_WIDTH * pxPerM * widthScale
+    end laneGap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the screen position of every node.  When lanes are drawn wider than
+     *  real (`widthScale > 1`), each node is pushed to the right of its travel
+     *  direction by the extra half width, so a carriageway widens away from the
+     *  median: its median-side edge stays where it really is and lengths are kept.
+     *  Where travel directions cancel (both directions of a two-way street share
+     *  the node), the node is not pushed.
+     *  @param edges       the edges to be drawn
+     *  @param project     latitude, longitude -> screen (x, y)
+     *  @param widthScale  how many times wider than real the lanes are drawn
+     */
+    def drawAt (edges: Array [NetEdge], project: (Double, Double) => (Double, Double),
+                widthScale: Double = 1.0): Map [Long, (Double, Double)] =
+        val realGap = laneGap (edges, project)
+        val pos     = scala.collection.mutable.Map [Long, (Double, Double)] ()
+        val dir     = scala.collection.mutable.Map [Long, (Double, Double)] ().withDefaultValue ((0.0, 0.0))
+        val widest  = scala.collection.mutable.Map [Long, Int] ().withDefaultValue (0)
+
+        for ed <- edges do
+            val (x1, y1) = project (ed.uLat, ed.uLon)
+            val (x2, y2) = project (ed.vLat, ed.vLon)
+            pos (ed.u) = (x1, y1)
+            pos (ed.v) = (x2, y2)
+            val hyp = math.hypot (x2 - x1, y2 - y1)
+            if hyp > 0.0 then                                           // lane-weighted travel direction
+                val (ux, uy) = (ed.lanes * (x2 - x1) / hyp, ed.lanes * (y2 - y1) / hyp)
+                for id <- Array (ed.u, ed.v) do
+                    val (sx, sy) = dir (id)
+                    dir (id) = (sx + ux, sy + uy)
+            widest (ed.u) = math.max (widest (ed.u), ed.lanes)
+            widest (ed.v) = math.max (widest (ed.v), ed.lanes)
+        end for
+
+        pos.map { (id, p) =>
+            val (tx, ty) = dir (id)
+            val h = math.hypot (tx, ty)
+            if widthScale == 1.0 || h < 1.0e-6 then id -> p
+            else
+                val push = (widthScale - 1.0) * widest (id) * realGap / 2.0
+                id -> (p._1 - ty / h * push, p._2 + tx / h * push)      // (-ty, tx) = right of travel on screen
+        }.toMap
+    end drawAt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the angle between two headings (degrees, 0 to 180). */
+    private def turn (a: Double, b: Double): Double = math.abs ((a - b + 540.0) % 360.0 - 180.0)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the shape points of an edge (its end points when it has no geometry). */
+    private def shape (ed: NetEdge): Array [(Double, Double)] =
+        if ed.geometry.length >= 2 then ed.geometry
+        else Array ((ed.uLat, ed.uLon), (ed.vLat, ed.vLon))
+    end shape
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Locate a point on edge e: project it onto the nearest piece of the edge's shape.
+     *  The offset is scaled to the OSM length, so offsets and lengths use one measure.
+     *  @param edges  the edges
+     *  @param e      the edge index
+     *  @param point  the point to locate (lat, lon)
+     */
+    def locate (edges: Array [NetEdge], e: Int, point: (Double, Double)): EdgeSpot =
+        val pts   = shape (edges(e))
+        var best  = EdgeSpot (e, 0.0, Double.MaxValue, 0.0)
+        var along = 0.0                                                 // shape metres up to piece i
+        for i <- 0 until pts.length - 1 do
+            val (bx, by) = metres (pts(i), pts(i + 1))                  // piece i
+            val (px, py) = metres (pts(i), point)                       // the point, from the piece start
+            val len2  = bx * bx + by * by
+            val t     = if len2 > 0.0 then math.max (0.0, math.min (1.0, (px * bx + py * by) / len2)) else 0.0
+            val dist  = math.hypot (px - t * bx, py - t * by)
+            if dist < best.distance then
+                best = EdgeSpot (e, along + t * math.sqrt (len2), dist, heading (pts(i), pts(i + 1)))
+            along += math.sqrt (len2)
+        end for
+        if along > 0.0 then best.copy (offset = best.offset * edges(e).length / along) else best
+    end locate
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the nearest accepted edge to a point whose road heading there agrees
+     *  with the wanted heading.  A divided road's other carriageway is never matched.
+     *  @param edges    the edges
+     *  @param point    the point to match (lat, lon)
+     *  @param wanted   the travel heading (degrees)
+     *  @param accept   which edges may match (e.g., motorway only)
+     *  @param maxTurn  the largest heading difference accepted (degrees)
+     */
+    def matchEdge (edges: Array [NetEdge], point: (Double, Double), wanted: Double,
+                   accept: NetEdge => Boolean, maxTurn: Double = 45.0): EdgeSpot =
+        var best: EdgeSpot = null
+        for e <- edges.indices if accept (edges(e)) do
+            val spot = locate (edges, e, point)
+            if turn (spot.heading, wanted) <= maxTurn && (best == null || spot.distance < best.distance) then
+                best = spot
+        end for
+        require (best != null, s"no edge heading $wanted near $point")
+        best
+    end matchEdge
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Split one edge in two at a spot, joined by a new node.  The two pieces keep
+     *  the edge's tags; their lengths add up to the OSM length.
+     *  @param edges  the edges
+     *  @param spot   where to split (from `locate` or `matchEdge`)
+     *  @param newId  the id of the new node (must not be an OSM id)
+     */
+    def splitAt (edges: Array [NetEdge], spot: EdgeSpot, newId: Long): Array [NetEdge] =
+        val ed = edges (spot.edge)
+        require (spot.offset > 0.0 && spot.offset < ed.length,
+                 s"split at ${spot.offset} m is not inside edge ${ed.u}->${ed.v} (${ed.length} m)")
+        val pts      = shape (ed)
+        val pieceLen = Array.tabulate (pts.length - 1) { i =>
+            val (bx, by) = metres (pts(i), pts(i + 1)); math.hypot (bx, by) }
+        var rest = spot.offset * pieceLen.sum / ed.length               // shape metres to the cut
+        var i    = 0
+        while i < pieceLen.length - 1 && rest > pieceLen(i) do
+            rest -= pieceLen(i)
+            i += 1
+        end while
+        val t   = if pieceLen(i) > 0.0 then math.min (1.0, rest / pieceLen(i)) else 0.0
+        val cut = (pts(i)._1 + t * (pts(i + 1)._1 - pts(i)._1),
+                   pts(i)._2 + t * (pts(i + 1)._2 - pts(i)._2))
+        val first  = ed.copy (v = newId, vLat = cut._1, vLon = cut._2, length = spot.offset,
+                              geometry = pts.take (i + 1) :+ cut)
+        val second = ed.copy (u = newId, uLat = cut._1, uLon = cut._2, length = ed.length - spot.offset,
+                              geometry = cut +: pts.drop (i + 1))
+        edges.patch (spot.edge, Array (first, second), 1)
+    end splitAt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build the components for a set of edges.
      *   - one `Junction` per node (or a `Sink` for a sink node), with `nl` = the largest
      *     lane count of the edges touching it
@@ -162,15 +334,19 @@ object NetworkBuilder:
      *  @param stream     retained for builder-call compatibility
      *  @param sourceComponents optional source components keyed by their OSM node id;
      *                          these replace the generated node at that location
+     *  @param widthScale how many times wider than real the lanes are drawn (lengths are kept)
      */
     def build (edges: Array [NetEdge], sinkNodes: Array [Long], project: (Double, Double) => (Double, Double),
                motion: Dynamics, nt: Int, edgePolicy: EdgePolicy, stream: Int = 0,
-               sourceComponents: Map [Long, Component] = Map.empty): BuiltGraph =
+               sourceComponents: Map [Long, Component] = Map.empty, widthScale: Double = 1.0): BuiltGraph =
         require (edges.nonEmpty, "no edges to build")
+        val gap     = laneGap (edges, project, widthScale)              // drawn lane width in pixels
+        val drawn   = drawAt (edges, project, widthScale)               // node screen positions
         val profile = edges.map (edgePolicy.profile)
 
         val nodeId = (edges.map (_.u) ++ edges.map (_.v)).distinct.sorted
         val n      = nodeId.length
+        val indexOf: Map [Long, Int] = nodeId.indices.map (i => nodeId(i) -> i).toMap   // OSM node id -> node index
         val at     = new Array [(Double, Double)] (n)                   // screen position of each node
         val nl     = Array.fill (n) (1)                                 // junction lane count
         val from   = new Array [Int] (edges.length)
@@ -178,10 +354,10 @@ object NetworkBuilder:
 
         cfor (0, edges.length) { e =>
             val ed = edges (e)
-            from(e) = java.util.Arrays.binarySearch (nodeId, ed.u)
-            to(e)   = java.util.Arrays.binarySearch (nodeId, ed.v)
-            at (from(e)) = project (ed.uLat, ed.uLon)
-            at (to(e))   = project (ed.vLat, ed.vLon)
+            from(e) = indexOf (ed.u)
+            to(e)   = indexOf (ed.v)
+            at (from(e)) = drawn (ed.u)
+            at (to(e))   = drawn (ed.v)
             nl (from(e)) = math.max (nl (from(e)), ed.lanes)
             nl (to(e))   = math.max (nl (to(e)), ed.lanes)
         }
@@ -260,7 +436,7 @@ object NetworkBuilder:
                     val junctions = grouped.dropRight (1).map (f => node(to(f)).asInstanceOf [Junction])
                     val segmentGeometry = grouped.map (f => edges(f).geometry.map (p => project (p._1, p._2)))
                     val r = Route ("MR", ed.lanes, junctions, node(from(e)), node(to(grouped.last)), motion,
-                                   laneGap = LANE_GAP, segmentGeometry = segmentGeometry)
+                                   laneGap = gap, segmentGeometry = segmentGeometry)
                     for i <- grouped.indices do
                         for pathway <- r.pathway do pathway.seg(i).length = edges(grouped(i)).length
                     for f <- grouped do builtLink(f) = MicroLink (r, grouped)
@@ -273,7 +449,7 @@ object NetworkBuilder:
                 val perp = if hyp > 0.0 then VectorD (dy / hyp, -dx / hyp) else VectorD (0.0, 0.0)
                 val lanes = Array.tabulate (ed.lanes) { k =>
                     val physicalLane = ed.lanes - 1 - k                 // lane k is Route's pathway (k)
-                    val shift = perp * ((physicalLane - (ed.lanes - 1) / 2.0) * LANE_GAP)
+                    val shift = perp * ((physicalLane - (ed.lanes - 1) / 2.0) * gap)
                     val centerline = ed.geometry.map (p => project (p._1, p._2))
                     val laneGeometry = centerline.map (p => (p._1 + shift (0), p._2 + shift (1)))
                     val link = new MesoVTransport ("ML", node(from(e)), node(to(e)),

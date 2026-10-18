@@ -42,15 +42,17 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
     private val fill = outStart.clone ()
     cfor (0, edge.length) { e => outEdge (fill (from(e))) = e; fill (from(e)) += 1 }
 
+    /** OSM node id -> node index. */
+    private val indexOf: Map [Long, Int] = nodeId.indices.map (i => nodeId(i) -> i).toMap
+
     /** The routing table used by `drive`; set by `routeTo`. */
     var table: RoutingTable = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the index of a node given its OSM id. */
     def nodeIndex (id: Long): Int =
-        val i = java.util.Arrays.binarySearch (nodeId, id)
-        require (i >= 0, s"node $id is not in this graph")
-        i
+        require (indexOf.contains (id), s"node $id is not in this graph")
+        indexOf (id)
     end nodeIndex
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -102,6 +104,7 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
                  s"destination node ${nodeId (destination)} is not a Sink")
         var here = startNode
         var previousLanes = 0
+        var factor = Double.NaN                                 // driver speed factor = source speed / first edge limit
         while here != destination do
             val next = table.next (here, destination)
             require (next >= 0, s"no route from node ${nodeId (here)} to node ${nodeId (destination)}")
@@ -109,7 +112,8 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
             val lanes = link (e).laneCount
             car.laneID = handoffLane (car, previousLanes, lanes)
             previousLanes = lanes
-            car.vmax = profile (e).speed
+            if factor.isNaN then factor = car.vmax / profile (e).speed
+            car.vmax = factor * profile (e).speed               // the driver keeps its factor on every edge
 
             link (e) match
                 case MicroLink (route, group) =>
@@ -119,8 +123,9 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
                     pathway.joinAt (car, pathway.mergeLeaderAt (firstSegment), firstSegment)
                     var i = firstSegment
                     while i < group.length do
-                        car.vmax = profile (group (i)).speed
-                        route.driveSegment (car, i)             // MOBIL lane choice + car-follow this segment
+                        car.vmax = factor * profile (group (i)).speed
+//                      route.driveSegment (car, i)             // MOBIL lane choice + car-follow this segment
+                        route.driveSegmentSimple (car, i)       // SIMPLE lane choice + car-follow this segment
                         if i < pathway.junc.length then pathway.junc (i).jump ()
                         i += 1
                     end while
