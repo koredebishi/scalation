@@ -55,16 +55,16 @@ class CrossMesoIdm (name: String = "CrossMesoIdm", reps: Int = 1,
 
     private val westIn = MesoVTransport ("west-in", west, center, freeFlowSpeed,
                                          capacity, storageCapacity = storageCapacity,
-                                         flowDiagram = Some (flowDiagram), traceSpeed = true)
+                                         flowDiagram = flowDiagram, traceSpeed = true)
     private val eastOut = MesoVTransport ("east-out", center, east, freeFlowSpeed,
                                           capacity, storageCapacity = storageCapacity,
-                                          flowDiagram = Some (flowDiagram), traceSpeed = true)
+                                          flowDiagram = flowDiagram, traceSpeed = true)
     private val southIn = MesoVTransport ("south-in", south, center, freeFlowSpeed,
                                           capacity, storageCapacity = storageCapacity,
-                                          flowDiagram = Some (flowDiagram), traceSpeed = true)
+                                          flowDiagram = flowDiagram, traceSpeed = true)
     private val northOut = MesoVTransport ("north-out", center, north, freeFlowSpeed,
                                            capacity, storageCapacity = storageCapacity,
-                                           flowDiagram = Some (flowDiagram), traceSpeed = true)
+                                           flowDiagram = flowDiagram, traceSpeed = true)
 
     private val links = Array (westIn, eastOut, southIn, northOut)
     for link <- links do link.length = linkLength

@@ -18,6 +18,7 @@ import scalation.{banner, gauge}
 import scalation.simulation.process.{Model, Vehicle}
 import scalation.mathstat.{FunctionV2S, VectorD}
 import scalation.simulation.process.config.{CarFollowingModel, CFParams, DynamicsConfig, ODESolverType, PeMSDemand}
+import scalation.simulation.process.model.calrouteMix101.CalRouteMix101_3
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Trait for simulation models that can be calibrated through optimization.
@@ -234,18 +235,18 @@ end CalibrationDefaults
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CalRouteVariant` enum selects which CalRoute101_3 model a calibration
- *  adapter builds: pure micro, mixed micro/meso, or full meso.
+ *  adapter builds: pure micro, mixed micro/meso, full meso, or mixed on the OSM builder.
  */
 enum CalRouteVariant:
-    case Micro, Mixed, FullMeso
+    case Micro, Mixed, FullMeso, OsmMix
 end CalRouteVariant
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Calibration adapter for CalRoute101_3 model.
  *  Implements CalibratableModel trait to enable optimization.
  *  @param animating  whether to animate
- *  @param variant    which model to build: CalRoute101_3 (Micro), CalRoute101_3_withMeso (Mixed)
- *                    or CalRoute101_3_fullMeso (FullMeso)
+ *  @param variant    which model to build: CalRoute101_3 (Micro), CalRoute101_3_withMeso (Mixed),
+ *                    CalRoute101_3_fullMeso (FullMeso) or CalRouteMix101_3 (OsmMix)
  */
 class CalibrateCalRoute101_3 (animating: Boolean = false, variant: CalRouteVariant = CalRouteVariant.Micro)
       extends CalibratableModel:
@@ -259,6 +260,7 @@ class CalibrateCalRoute101_3 (animating: Boolean = false, variant: CalRouteVaria
             case CalRouteVariant.Micro    => new CalRoute101_3 (animating = animating)
             case CalRouteVariant.Mixed    => new CalRoute101_3_withMeso (animating = animating)
             case CalRouteVariant.FullMeso => new CalRoute101_3_fullMeso (animating = animating)
+            case CalRouteVariant.OsmMix   => new CalRouteMix101_3 (animating = animating, autoRun = false)
         hasRun = false
     end applyParameters
     
@@ -311,16 +313,19 @@ end CalibrateCalRoute101_3
 @main def eval (): Unit         = evalRun (CalRouteVariant.Micro)      // micro
 @main def evalWithMeso (): Unit = evalRun (CalRouteVariant.Mixed)      // mixed micro/meso
 @main def evalFullMeso (): Unit = evalRun (CalRouteVariant.FullMeso)   // full meso
+@main def evalOsmMix (): Unit   = evalRun (CalRouteVariant.OsmMix)     // mixed micro/meso on the OSM builder
 
 private def evalRun (variant: CalRouteVariant): Unit =
     val modelLabel = variant match
         case CalRouteVariant.Micro    => "CalRoute101_3"
         case CalRouteVariant.Mixed    => "CalRoute101_3_withMeso"
         case CalRouteVariant.FullMeso => "CalRoute101_3_fullMeso"
+        case CalRouteVariant.OsmMix   => "CalRouteMix101_3"
     val folder = variant match                                              // existing log/simulation/ sub-folder
         case CalRouteVariant.Micro    => "micro"
         case CalRouteVariant.Mixed    => "mixed"
         case CalRouteVariant.FullMeso => "meso"
+        case CalRouteVariant.OsmMix   => "osmMix"
     banner (s"EVALUATION RUN - $modelLabel (Unoptimized)")
 
     // Get the dynamics config to determine which model and its default params

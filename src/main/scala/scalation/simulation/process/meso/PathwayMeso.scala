@@ -29,15 +29,14 @@ import scalation.mathstat.VectorD
  *  @param bend            curvature of the displayed lane
  *  @param laneShift       display shift applied to each segment's endpoints
  *  @param storageCapacity maximum admitted vehicles on each segment
- *  @param flowDiagram    optional density-sensitive equilibrium speed relation applied to every
- *                        segment; when absent, all segments keep the fixed `freeFlowSpeed`
+ *  @param flowDiagram    density-sensitive equilibrium speed relation applied to every segment
  *  @param traceSpeed     print each IDM density/speed lookup
  */
 class PathwayMeso (name: String, val junc: Array [Junction], val from: Component, val to: Component,
                    segmentLengths: VectorD, freeFlowSpeed: Double, capacity: Double,
                    bend: Double = 0.0, laneShift: VectorD = VectorD (0.0, 0.0),
                    storageCapacity: Int = Int.MaxValue,
-                   flowDiagram: Option [IdmFlux] = None, traceSpeed: Boolean = false)
+                   flowDiagram: IdmFlux, traceSpeed: Boolean = false)
     extends Component:
 
     val points = from +: junc.toList :+ to

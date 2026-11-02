@@ -73,7 +73,7 @@ end flowMesoVsMicro
  */
 @main def flowBySensor (): Unit =
 
-    val sensor = 1                                              // which detector to plot: 1 .. 5
+    val sensor = 2                                              // which detector to plot: 1 .. 5
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //  Files: PeMS file for this sensor + the three simulation runs
@@ -92,20 +92,24 @@ end flowMesoVsMicro
     val meso_flow  = "../log/simulation/meso/run_1791757507836_8ca00560-ae0e-4125-affe-ca6d5b07d68e_validation_data.csv"   // 0.1 + ramp spreading
 //  val micro_flow = "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // CalRoute101_3 (simple lane rule)
     val micro_flow = "../log/simulation/micro/run_1791757440805_1129c921-68de-409d-adb9-1588f31764c0_validation_data.csv"   // 0.1 + ramp spreading
+    val mixed_flow = "../log/simulation/mixed/run_1791757485079_fe335649-15c1-4479-b77e-f050a04e9259_validation_data.csv"   // 0.1 + ramp spreading
+    val osmMix_flow = "../log/simulation/osmMix/run_1792472358910_6c379f15-ccc9-4317-ac2e-b2b2168279ae_validation_data.csv" // CalRouteMix101_3 (OSM builder)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //  Load and slice: 4 lane-flow columns for this sensor
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    val readPems  = MatrixD.load (pems_file)                    // col 0 = date, then (flow, speed) per lane
-    val readMeso  = MatrixD.load (meso_flow, skip = 1)          // skip the header row
-    val readMicro = MatrixD.load (micro_flow, skip = 1)
-    //val readMixed = MatrixD.load (mixed_flow, skip = 1)
+    val readPems   = MatrixD.load (pems_file)                   // col 0 = date, then (flow, speed) per lane
+    val readMeso   = MatrixD.load (meso_flow, skip = 1)         // skip the header row
+    val readMicro  = MatrixD.load (micro_flow, skip = 1)
+    val readMixed  = MatrixD.load (mixed_flow, skip = 1)
+    val readOsmMix = MatrixD.load (osmMix_flow, skip = 1)
 
     val cols      = (sensor - 1) * 4 until sensor * 4           // this sensor's lane flows: S1 = 0-3, S2 = 4-7, …
 
-    val pemsFlow  = readPems(?, VectorI (1, 3, 5, 7))           // same columns in every PeMS file
-    val mesoFlow  = readMeso(?, cols)
-    val microFlow = readMicro(?, cols)
-    //val mixedFlow = readMixed(?, cols)
+    val pemsFlow   = readPems(?, VectorI (1, 3, 5, 7))          // same columns in every PeMS file
+    val mesoFlow   = readMeso(?, cols)
+    val microFlow  = readMicro(?, cols)
+    val mixedFlow  = readMixed(?, cols)
+    val osmMixFlow = readOsmMix(?, cols)
 
     // actual - mean
 
@@ -152,9 +156,17 @@ end flowMesoVsMicro
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //  Plot: one window per lane
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    for lane <- 0 until 4 do
+//        new PlotM (time, MatrixD (pemsFlow(?, lane), microFlow(?, lane), mesoFlow(?, lane),
+//                                  mixedFlow(?, lane), osmMixFlow(?, lane), zero),
+//                   Array ("PeMS", "Micro", "Meso", "Mixed", "OSM Mix"),
+//                   s"Sensor $sensor Lane ${lane + 1}: Flow Over Time", lines = true)
+
     for lane <- 0 until 4 do
-        new PlotM (time, MatrixD (pemsFlow(?, lane), microFlow(?, lane), mesoFlow(?, lane), zero),
-                   Array ("PeMS", "Micro", "Meso"), s"Sensor $sensor Lane ${lane + 1}: Flow Over Time", lines = true)
+        new PlotM (time, MatrixD (pemsFlow(?, lane), microFlow(?, lane), mesoFlow(?, lane),
+            mixedFlow(?, lane), osmMixFlow(?, lane), zero),
+            Array ("PeMS", "Micro", "Meso", "Mixed", "OSM Mix"),
+            s"Sensor $sensor Lane ${lane + 1}: Flow Over Time", lines = true)
 
 end flowBySensor
 
@@ -166,7 +178,7 @@ end flowBySensor
  */
 @main def speedBySensor (): Unit =
 
-    val sensor = 5                                              // which detector to plot: 1 .. 5
+    val sensor = 2                                              // which detector to plot: 1 .. 5
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //  Files: PeMS file for this sensor + the simulation runs (meso speed cap, simple lane rule)
@@ -181,21 +193,24 @@ end flowBySensor
 //  val micro_file = "../log/simulation/micro/run_1791212068490_d2a4030c-d320-479a-8344-2ab535ce0104_validation_data.csv"   // CalRoute101_3 (simple lane rule)
     val micro_file = "../log/simulation/micro/run_1791757440805_1129c921-68de-409d-adb9-1588f31764c0_validation_data.csv"   // 0.1 + ramp spreading
 //  val mixed_file = "../log/simulation/mixed/run_1791222266530_a76f5cae-06c7-46e9-96cf-108f273fe97e_validation_data.csv"   // CalRoute101_3_withMeso (car v0, running part, queue bound)
-    val mixed_file = "../log/simulation/mixed/run_1791757485079_fe335649-15c1-4479-b77e-f050a04e9259_validation_data.csv"   // 0.1 + ramp spreading
+    //val mixed_file = "../log/simulation/mixed/run_1791757485079_fe335649-15c1-4479-b77e-f050a04e9259_validation_data.csv"   // 0.1 + ramp spreading
+    //val osmMix_file = "../log/simulation/osmMix/run_1792472358910_6c379f15-ccc9-4317-ac2e-b2b2168279ae_validation_data.csv" // CalRouteMix101_3 (OSM builder)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //  Load and slice: 4 lane-speed columns for this sensor
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    val readPems  = MatrixD.load (pems_file)                    // col 0 = date, then (flow, speed) per lane
-    val readMeso  = MatrixD.load (meso_file, skip = 1)          // skip the header row
-    val readMicro = MatrixD.load (micro_file, skip = 1)
-    val readMixed = MatrixD.load (mixed_file, skip = 1)
+    val readPems   = MatrixD.load (pems_file)                   // col 0 = date, then (flow, speed) per lane
+    val readMeso   = MatrixD.load (meso_file, skip = 1)         // skip the header row
+    val readMicro  = MatrixD.load (micro_file, skip = 1)
+    //val readMixed  = MatrixD.load (mixed_file, skip = 1)
+    //val readOsmMix = MatrixD.load (osmMix_file, skip = 1)
 
-    val colSpeed   = 20 + (sensor - 1) * 4 until 20 + sensor * 4   // sim lane speeds: S1 = 20-23, S2 = 24-27, …
-    val pemsSpeed  = readPems(?, VectorI (2, 4, 6, 8)) * 0.44704   // PeMS lane speeds, mph -> m/s (sim is m/s)
-    val mesoSpeed  = readMeso(?, colSpeed)
-    val microSpeed = readMicro(?, colSpeed)
-//    val mixedSpeed = readMixed(?, colSpeed)
+    val colSpeed    = 20 + (sensor - 1) * 4 until 20 + sensor * 4   // sim lane speeds: S1 = 20-23, S2 = 24-27, …
+    val pemsSpeed   = readPems(?, VectorI (2, 4, 6, 8)) * 0.44704   // PeMS lane speeds, mph -> m/s (sim is m/s)
+    val mesoSpeed   = readMeso(?, colSpeed)
+    val microSpeed  = readMicro(?, colSpeed)
+    //val mixedSpeed  = readMixed(?, colSpeed)
+    //val osmMixSpeed = readOsmMix(?, colSpeed)
 
     val time = VectorD.range (0, pemsSpeed.dim) * 15.0          // minutes after 6:00, one point per 15-min bin
     val zero = new VectorD (time.dim)                           // baseline so the y-axis starts at 0
@@ -203,9 +218,16 @@ end flowBySensor
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //  Plot: one window per lane
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    for lane <- 0 until 4 do
+//        new PlotM (time, MatrixD (pemsSpeed(?, lane), microSpeed(?, lane), mesoSpeed(?, lane),
+//                                  mixedSpeed(?, lane), osmMixSpeed(?, lane), zero),
+//                   Array ("PeMS", "Micro", "Meso", "Mixed", "OSM Mix"),
+//                   s"Sensor $sensor Lane ${lane + 1}: Speed Over Time (m/s)", lines = true)
+
     for lane <- 0 until 4 do
         new PlotM (time, MatrixD (pemsSpeed(?, lane), microSpeed(?, lane), mesoSpeed(?, lane), zero),
-                   Array ("PeMS", "Micro", "Meso", "Mixed"), s"Sensor $sensor Lane ${lane + 1}: Speed Over Time (m/s)", lines = true)
+            Array ("PeMS", "Micro", "Meso"),
+            s"Sensor $sensor Lane ${lane + 1}: Speed Over Time (m/s)", lines = true)
 
 end speedBySensor
 
@@ -230,11 +252,13 @@ end speedBySensor
     val micro_path =  "../log/simulation/micro/run_1791757440805_1129c921-68de-409d-adb9-1588f31764c0_validation_data.csv"   // 0.1 + ramp spreading
 //  val meso_path =   "../log/simulation/meso/mobile-run/run_1791752571728_92ba9140-5635-4d1b-8436-d335b8ca414b_validation_data.csv"    // after speed fix (no lane changes)
     val meso_path =   "../log/simulation/meso/run_1791757507836_8ca00560-ae0e-4125-affe-ca6d5b07d68e_validation_data.csv"   // 0.1 + ramp spreading
+    val osmMix_path = "../log/simulation/osmMix/run_1792472358910_6c379f15-ccc9-4317-ac2e-b2b2168279ae_validation_data.csv" // CalRouteMix101_3 (OSM builder)
 
     //load this into a MatrixD (simulation files: once, outside the loop)
     val micro_Mat  =  MatrixD.load(micro_path , skip = 1)
     val meso_Mat  =  MatrixD.load(meso_path , skip = 1)
     val mixe_Mat  =  MatrixD.load(mixed_path , skip = 1)
+    val osm_Mat   =  MatrixD.load(osmMix_path , skip = 1)
 
     val lane = 1                                                // 0..3: which lane (1 = lane 2)
 
@@ -243,6 +267,7 @@ end speedBySensor
     val micro_prof = new VectorD (5)
     val meso_prof  = new VectorD (5)
     val mixe_prof  = new VectorD (5)
+    val osm_prof   = new VectorD (5)
 
     for s <- 1 to 5 do
         val colSpeed = 20 + (s - 1) * 4 until 20 + s * 4                  // sim lane speeds for sensor s
@@ -251,17 +276,19 @@ end speedBySensor
         val micro_speed_col = micro_Mat (?, colSpeed)
         val meso_speed_col  = meso_Mat (?, colSpeed)
         val mixe_speed_col  = mixe_Mat (?, colSpeed)
+        val osm_speed_col   = osm_Mat (?, colSpeed)
 
         pems_prof(s - 1)  = pems_speed_col.mean(lane)                    // column means, then pick the lane
         micro_prof(s - 1) = micro_speed_col.mean(lane)
         meso_prof(s - 1)  = meso_speed_col.mean(lane)
         mixe_prof(s - 1)  = mixe_speed_col.mean(lane)
+        osm_prof(s - 1)   = osm_speed_col.mean(lane)
     end for
 
     val x    = VectorD (1, 2, 3, 4, 5)                           // sensor number along the corridor
     val zero = new VectorD (5)                                   // baseline so the y-axis starts at 0
-    new PlotM (x, MatrixD (pems_prof, micro_prof, meso_prof, mixe_prof, zero),
-               Array ("PeMS", "Micro", "Meso", "Mixed"), s"Lane ${lane + 1}: Mean Speed by Sensor (m/s)", lines = true)
+    new PlotM (x, MatrixD (pems_prof, micro_prof, meso_prof, mixe_prof, osm_prof, zero),
+               Array ("PeMS", "Micro", "Meso", "Mixed", "OSM Mix"), s"Lane ${lane + 1}: Mean Speed by Sensor (m/s)", lines = true)
 
 end speedProfile
 
@@ -283,11 +310,13 @@ end speedProfile
     val micro_path =  "../log/simulation/micro/run_1791757440805_1129c921-68de-409d-adb9-1588f31764c0_validation_data.csv"   // 0.1 + ramp spreading
 //  val meso_path =   "../log/simulation/meso/mobile-run/run_1791752571728_92ba9140-5635-4d1b-8436-d335b8ca414b_validation_data.csv"    // after speed fix (no lane changes)
     val meso_path =   "../log/simulation/meso/run_1791757507836_8ca00560-ae0e-4125-affe-ca6d5b07d68e_validation_data.csv"   // 0.1 + ramp spreading
+    val osmMix_path = "../log/simulation/osmMix/run_1792472358910_6c379f15-ccc9-4317-ac2e-b2b2168279ae_validation_data.csv" // CalRouteMix101_3 (OSM builder)
 
     //load this into a MatrixD
     val micro_Mat  =  MatrixD.load(micro_path , skip = 1)
     val meso_Mat  =  MatrixD.load(meso_path , skip = 1)
     val mixe_Mat  =  MatrixD.load(mixed_path , skip = 1)
+    val osm_Mat   =  MatrixD.load(osmMix_path , skip = 1)
 
     val lane = 3                                                // 0..3: which lane (1 = lane 2)
 
@@ -296,6 +325,7 @@ end speedProfile
     val micro_prof = new VectorD (5)
     val meso_prof  = new VectorD (5)
     val mixe_prof  = new VectorD (5)
+    val osm_prof   = new VectorD (5)
 
     for s <- 1 to 5 do
         val colFlow = (s - 1) * 4 until s * 4                             // sim lane flows for sensor s
@@ -304,16 +334,48 @@ end speedProfile
         val micro_flow_col = micro_Mat (?, colFlow)
         val meso_flow_col  = meso_Mat (?, colFlow)
         val mixe_flow_col  = mixe_Mat (?, colFlow)
+        val osm_flow_col   = osm_Mat (?, colFlow)
 
         pems_prof(s - 1)  = pems_flow_col.mean(lane)                     // column means, then pick the lane
         micro_prof(s - 1) = micro_flow_col.mean(lane)
         meso_prof(s - 1)  = meso_flow_col.mean(lane)
         mixe_prof(s - 1)  = mixe_flow_col.mean(lane)
+        osm_prof(s - 1)   = osm_flow_col.mean(lane)
     end for
 
     val x    = VectorD (1, 2, 3, 4, 5)                           // sensor number along the corridor
     val zero = new VectorD (5)                                   // baseline so the y-axis starts at 0
-    new PlotM (x, MatrixD (pems_prof, micro_prof, meso_prof, mixe_prof, zero),
-               Array ("PeMS", "Micro", "Meso", "Mixed"), s"Lane ${lane + 1}: Mean Flow by Sensor (veh/15 min)", lines = true)
+    new PlotM (x, MatrixD (pems_prof, micro_prof, meso_prof, mixe_prof, osm_prof, zero),
+               Array ("PeMS", "Micro", "Meso", "Mixed", "OSM Mix"), s"Lane ${lane + 1}: Mean Flow by Sensor (veh/15 min)", lines = true)
 
 end flowProfile
+//
+////
+////My idea: for the paper .
+////We will discuss micro simulation and meso simulation,
+////we will then talk about the mixed resolution and the advantange
+////  of using this two models to save coomputation.
+////
+////I have a simple table on the paper that shows time, memory etc
+////  We will present out meso model concept and the mizee resolution concept
+////  we will then present the algo
+////we will then compare mixed, micro and meso using the Donald Doyde corrirror
+////  and present all the 3 results using all the sensors
+////  We will then present the Full EatonMini Model (no contra flow) to show
+////proof of concepts, We will report all these time to load etc
+////because Pems does not hav all data we might not do more than than
+////we will show that on a single computer (this one) we are able to
+////run all these (I have the list of the table and we will benchmark it).
+////  this is enough for this paper for now. WSC or ANNSIM or A Jornal will take the contra flwo
+//////
+//Limits to state in the paper (from the code and data, so nobody finds them for you):
+//    - SR-134 ramps have no PeMS data, and several I-210 ramps are filled with the mean of same-direction ramps.
+//    - Every source takes its starting speed from the westbound anchor.
+//    - Eastbound starts at its first station, not at the box edge.
+//      - Sinks are area exits only, with no home destinations yet.
+//    - Eaton is shown for scale, not validated against PeMS. Your outline already frames it that way, which is the honest position.
+//
+//      Two points on the outline
+//
+//    1. Consider adding the OSM mix result. CalRouteMix101_3, built automatically from OSM, reproduces the hand-built classic mixed model on the same sensors: fitness 7.19 against 7.61, and flow NRMSE 1.72 for both, from your run summaries. That's the bridge between the Donald Doyle validation and the Eaton scale demo. It shows the builder that makes Eaton produces a valid corridor, not just a large one. Without it, a reviewer can fairly ask whether Eaton's network is trustworthy.
+//    2. Leaving Eaton validation for later is sound for this paper. It's still worth noting for the journal version: PeMS has mainline data at 27 I-210 W, 23 I-210 E and 13 SR-134 W stations, so a later Eaton validation is possible. It would need sensors split onto edges, the same way CalRouteMix does it.

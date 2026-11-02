@@ -26,14 +26,13 @@ end RampMesoMode
  *  @param bend           curvature of the displayed ramp
  *  @param offset         lateral display offset
  *  @param storageCapacity maximum admitted vehicles on the ramp link
- *  @param flowDiagram    optional density-sensitive equilibrium speed relation for the ramp link;
- *                        when absent, the link keeps the fixed `freeFlowSpeed`
+ *  @param flowDiagram    density-sensitive equilibrium speed relation for the ramp link
  */
 class RampMeso (name: String, val from: Component, val to: Component,
                 length: Double, freeFlowSpeed: Double, capacity: Double, val mode: RampMesoMode,
                 bend: Double = 0.10, offset: Double = 0.0,
                 storageCapacity: Int = Int.MaxValue,
-                flowDiagram: Option [IdmFlux] = None)
+                flowDiagram: IdmFlux)
     extends Component:
 
     private val shift = calculateShift ()
@@ -101,12 +100,14 @@ object RampMeso:
      *  @param length         physical length of each ramp (metres)
      *  @param freeFlowSpeed  free-flow speed for all ramps (metres/second)
      *  @param capacity       discharge capacity for each ramp (vehicles/hour)
+     *  @param flowDiagram    density-sensitive equilibrium speed relation for all ramps
      *  @param RampMesoInfo   ramp name, endpoints, mode, bend and offset
      */
-    def group (length: Double, freeFlowSpeed: Double, capacity: Double,
+    def group (length: Double, freeFlowSpeed: Double, capacity: Double, flowDiagram: IdmFlux,
                RampMesoInfo: (String, Component, Component, RampMesoMode, Double, Double)*): Array [RampMeso] =
         RampMesoInfo.map { case (name, from, to, mode, bend, offset) =>
-            new RampMeso (name, from, to, length, freeFlowSpeed, capacity, mode, bend, offset)
+            new RampMeso (name, from, to, length, freeFlowSpeed, capacity, mode, bend, offset,
+                          flowDiagram = flowDiagram)
         }.toArray
     end group
 
@@ -116,13 +117,15 @@ object RampMeso:
      *  @param freeFlowSpeed    free-flow speed for all ramps (metres/second)
      *  @param capacity         discharge capacity for each ramp (vehicles/hour)
      *  @param storageCapacity  maximum admitted vehicles on each ramp
+     *  @param flowDiagram      density-sensitive equilibrium speed relation for all ramps
      *  @param RampMesoInfo     ramp name, endpoints, mode, bend and offset
      */
     def group (length: Double, freeFlowSpeed: Double, capacity: Double, storageCapacity: Int,
+               flowDiagram: IdmFlux,
                RampMesoInfo: (String, Component, Component, RampMesoMode, Double, Double)*): Array [RampMeso] =
         RampMesoInfo.map { case (name, from, to, mode, bend, offset) =>
             new RampMeso (name, from, to, length, freeFlowSpeed, capacity, mode,
-                          bend, offset, storageCapacity)
+                          bend, offset, storageCapacity, flowDiagram)
         }.toArray
     end group
 

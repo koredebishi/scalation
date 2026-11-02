@@ -49,12 +49,15 @@ end SimulationMetricSummary
 case class SimulationExperimentSummary (model: String, warmupReplications: Int,
                                         measuredReplications: Int, vehiclesPerReplication: Int,
                                         completedVehiclesPerReplication: SimulationMetricSummary,
-                                        link0SpeedMps: SimulationMetricSummary,
+                                        link0SpeedMps: Option [SimulationMetricSummary],
                                         meanTravelTimeS: SimulationMetricSummary,
                                         simulationTimeS: SimulationMetricSummary,
                                         computationTimeMs: SimulationMetricSummary,
                                         agendaActivationsPerReplication: SimulationMetricSummary,
-                                        activationsPerVehicle: SimulationMetricSummary):
+                                        activationsPerVehicle: SimulationMetricSummary,
+                                        heapUsedMB: Option [SimulationMetricSummary] = None,
+                                        setupTimeMs: Option [Double] = None,
+                                        scale: Seq [(String, Int)] = Seq.empty):
 
     def prettyJson: String = SimulationExperimentSummaryJson.pretty (this)
 
@@ -64,6 +67,23 @@ case class SimulationExperimentSummary (model: String, warmupReplications: Int,
         if parent != null then Files.createDirectories (parent)
         Files.writeString (path, prettyJson, StandardCharsets.UTF_8)
     end writeJson
+
+end SimulationExperimentSummary
+
+object SimulationExperimentSummary:
+
+    /** Count a model's components by kind: its registered parts and their subparts. */
+    def scaleOf (model: Model): Seq [(String, Int)] =
+        def visit (p: Component): List [Component] =
+            p :: (0 until p.subpart.size).toList.flatMap (i => visit (p.subpart(i)))
+        val all = model.getComponents.toList.flatMap (visit).distinct
+        Seq ("junctions"         -> all.count (_.isInstanceOf [Junction]),
+             "sinks"             -> all.count (_.isInstanceOf [Sink]),
+             "sources"           -> all.count (_.isInstanceOf [Source]),
+             "routes"            -> all.count (_.isInstanceOf [Route]),
+             "microLaneSegments" -> all.count (_.isInstanceOf [VTransport]),
+             "mesoLanes"         -> all.count (_.isInstanceOf [meso.MesoVTransport]))
+    end scaleOf
 
 end SimulationExperimentSummary
 
@@ -179,12 +199,20 @@ object SimulationExperimentSummaryJson:
         root.addProperty ("measuredReplications", summary.measuredReplications)
         root.addProperty ("vehiclesPerReplication", summary.vehiclesPerReplication)
         root.add ("completedVehiclesPerReplication", encodeMetric (summary.completedVehiclesPerReplication))
-        root.add ("link0SpeedMps", encodeMetric (summary.link0SpeedMps))
+        summary.link0SpeedMps match
+            case Some (m) => root.add ("link0SpeedMps", encodeMetric (m))
+            case None     => root.add ("link0SpeedMps", com.google.gson.JsonNull.INSTANCE)
         root.add ("meanTravelTimeS", encodeMetric (summary.meanTravelTimeS))
         root.add ("simulationTimeS", encodeMetric (summary.simulationTimeS))
         root.add ("computationTimeMs", encodeMetric (summary.computationTimeMs))
         root.add ("agendaActivationsPerReplication", encodeMetric (summary.agendaActivationsPerReplication))
         root.add ("activationsPerVehicle", encodeMetric (summary.activationsPerVehicle))
+        for m <- summary.heapUsedMB do root.add ("heapUsedMB", encodeMetric (m))
+        for t <- summary.setupTimeMs do root.addProperty ("setupTimeMs", t)
+        if summary.scale.nonEmpty then
+            val scale = new JsonObject ()
+            for (kind, count) <- summary.scale do scale.addProperty (kind, count)
+            root.add ("scale", scale)
         new com.google.gson.GsonBuilder ().setPrettyPrinting ().create ().toJson (root)
     end pretty
 

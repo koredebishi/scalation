@@ -183,7 +183,7 @@ class OneWayPathwayTest(name: String = "OneWayVehicle", reps: Int = 1, animating
 
     val experimentSummary = SimulationExperimentSummary (name, warmups, reps - warmups, nStop,
         SimulationMetricSummary.from (completedPerRepStat),
-        SimulationMetricSummary.from (link0SpeedStat),
+        Some (SimulationMetricSummary.from (link0SpeedStat)),
         SimulationMetricSummary.from (meanTravelTimeStat),
         SimulationMetricSummary.from (simulationTimeStat),
         SimulationMetricSummary.from (computationTimeStat),

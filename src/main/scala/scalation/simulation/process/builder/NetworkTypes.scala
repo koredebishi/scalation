@@ -7,11 +7,14 @@ package process
 package builder
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** One directed road segment read from `edges.geojson`. */
+/** One directed road segment read from `edges.geojson`.  `maxspeed` is the OSM
+ *  posted limit in metres/second, NaN when the edge is untagged.
+ */
 case class NetEdge (u: Long, v: Long, highway: String, lanes: Int, length: Double,
                     uLat: Double, uLon: Double, vLat: Double, vLon: Double, name: String,
                     geometry: Array [(Double, Double)] = Array.empty,
-                    ref: String = "", key: Int = 0, osmid: String = "")
+                    ref: String = "", key: Int = 0, osmid: String = "",
+                    maxspeed: Double = Double.NaN)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** A place on one edge: the edge index, metres along it (OSM length), the

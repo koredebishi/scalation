@@ -159,16 +159,16 @@ class Junction (name: String, jTime: Variate, at: Array [Double], nt: Int, nl: I
         accum(onJunction)
         record(actor, ctime)
 
-        // Snapshot density from the segment the vehicle just finished.
-        // A caller leaving a link this junction cannot see (e.g., a meso link) supplies it;
-        // otherwise actor.segId is the segment index and actor.myPathway.seg(segId) is that VTransport.
+        // Snapshot density from the road the vehicle just left (micro or meso).
+        // That road stamps itself on the vehicle as it exits (actor.lastLink); it counts
+        // only when its `to` is this junction.  A caller may still supply the density.
         // Recorder columns identify lanes at this junction, not segment indices.
         linkDensity match
             case Some (k) => recordDensity(ctime, k, actor.laneID)     // veh/km per lane
             case None =>
-                if actor.myPathway != null && actor.segId >= 0 && actor.segId < actor.myPathway.seg.length then
-                    val k = actor.myPathway.seg(actor.segId).density    // veh/km per lane
-                    recordDensity(ctime, k, actor.laneID)
+                val link = actor.lastLink
+                if link != null && (link.to eq this) then
+                    recordDensity(ctime, link.density, actor.laneID)    // veh/km per lane
 
         onJunction += 1
         director.log.trace(this, s"jump for $duration", actor, director.clock)

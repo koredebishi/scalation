@@ -14,6 +14,7 @@ package process
 package meso
 package example_meso                                    // One-Shot
 
+import scalation.dynamics.IdmFlux
 import scalation.random.Sharp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -46,6 +47,9 @@ class OneWayVehicleMeso (name: String = "OneWayVehicleMeso", reps: Int = 1, anim
     val freeFlowSpeed   = 10.0                          // metres/second: 50-second traversal
     val capacity        = 1800.0                        // vehicles/hour: two-second release headway
     val storageCapacity = 2                             // admitted vehicles
+    private val flowDiagram = new IdmFlux (v0 = freeFlowSpeed, tau = Vehicle.T,
+                                           s0 = Vehicle.s, len = Vehicle.len,
+                                           delta = Vehicle.del)
 
     //--------------------------------------------------
     // Create Random Variables (RVs)
@@ -58,7 +62,8 @@ class OneWayVehicleMeso (name: String = "OneWayVehicleMeso", reps: Int = 1, anim
     val entry = VSource ("entry", this, () => Car (), 0, nStop, iArrivalRV, (100, 290))
     val exit  = Sink ("exit", (600, 290))
     val lane  = MesoVTransport ("lane", entry, exit, freeFlowSpeed, capacity,
-                                bend = 0.0, storageCapacity = storageCapacity)
+                                bend = 0.0, storageCapacity = storageCapacity,
+                                flowDiagram = flowDiagram)
     lane.length = linkLength
 
     addComponent (entry, exit, lane)                     // add endpoints before transport

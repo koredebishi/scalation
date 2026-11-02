@@ -317,7 +317,7 @@ end MesoSpecNetworkScalationModel
     assert (sinkMap("east").durationStat.num == model.nStop)
     assert (junctionMap("merge").durationStat.num == total)
     assert (junctionMap("split").durationStat.num == total)
-    val fluxes = model.network.links.map (_.flowDiagram.get)
+    val fluxes = model.network.links.map (_.flowDiagram)
     assert (fluxes.forall (_ eq fluxes(0)))                    // all links share one IDM relation
     assert (fluxes(0).v0 == 10.0)                              // use the source MicroIR speed
     cfor (0, model.network.links.length) { i =>

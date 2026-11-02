@@ -19,22 +19,31 @@ import scalation.mathstat.VectorD
 import scala.math.min
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MesoVTransport` class models one lane using sparse vehicle activations.
- *  Free-flow traversal makes a vehicle ready; FIFO and capacity govern departure.
+ *  Traversal of the running part makes a vehicle ready; FIFO and capacity govern departure.
  *  Finite storage blocks excess vehicles in a native FIFO `WaitQueue` and wakes
  *  one blocked vehicle whenever a departure frees one reserved slot.
+ *
+ *  How the `IdmFlux` table is used (derivation in `IdmFlux`, LWR.scala):
+ *      L = length, n_r = runningCount, n_q = queuedCount, N = occupancy, h = releaseHeadway
+ *      table      -> V_e (rho)           speed read at entry             `IdmFlux.speed`
+ *      table      -> h = 1 / q_max       discharge headway               `capacity` -> `releaseHeadway`
+ *      table      -> rho_m               queue spacing, storage limit    `jamSpacing`, `admissionCapacity`
+ *  Running part and queue, and speed from running density: Burghout (2004), pp. 52, 55-56.
+ *  The steady state is a Treiber & Kesting result (2025, p. 218); using it in this link is our step.
+ *  The equations are written out at `runningDensity`, `admissionCapacity` and `move`.
+ *
  *  @param name           the name of the transport
  *  @param from_          the starting component
  *  @param to_            the ending component
  *  @param freeFlowSpeed  free-flow speed (metres/second)
- *  @param capacity       discharge capacity (vehicles/hour for this lane)
+ *  @param capacity       discharge capacity (vehicles/hour for this lane); q_max * 3600 from `Route`
  *  @param bend           curvature of the displayed road
  *  @param shift1         display shift at the starting component
  *  @param shift2         display shift at the ending component
- *  @param storageCapacity configured upper bound on admitted vehicles; with a flow diagram,
- *                         physical storage is also bounded by link length and jam density
- *  @param flowDiagram    optional density-sensitive equilibrium speed relation (`IdmFlux`,
- *                        derived from the corridor's own IDM parameters).  When absent, traversal
- *                        speed remains the fixed `freeFlowSpeed`, unchanged from prior behavior.
+ *  @param storageCapacity configured upper bound on admitted vehicles; physical storage
+ *                         is also bounded by link length and jam density
+ *  @param flowDiagram    density-sensitive equilibrium speed relation (`IdmFlux`,
+ *                        derived from the corridor's own IDM parameters)
  *  @param traceSpeed     print the density and equilibrium speed for each IDM traversal
  */
 class MesoVTransport (name: String, from_ : Component, to_ : Component,
@@ -42,7 +51,7 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
                       bend: Double = 0.0, shift1: VectorD = VectorD (0, 0),
                       shift2: VectorD = VectorD (0, 0),
                       val storageCapacity: Int = Int.MaxValue,
-                      val flowDiagram: Option [IdmFlux] = None,
+                      val flowDiagram: IdmFlux,
                       traceSpeed: Boolean = false,
                       geometry: Array [(Double, Double)] = Array.empty)
       extends Transport (name, from_, to_, null, false, bend, shift1, shift2, geometry), TrafficLink:
@@ -52,7 +61,7 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     require (storageCapacity > 0, "mesoscopic link storage capacity must be positive")
 
     def freeFlowTime = length / freeFlowSpeed                   // seconds until readiness (live: length may be set after construction)
-    val releaseHeadway = 3600.0 / capacity                     // seconds between departures
+    val releaseHeadway = 3600.0 / capacity                     // h = 3600 / capacity = 1 / q_max: seconds between departures (1.377 s at 2615 veh/h)
 
     /** Distinguish a sleeping ready vehicle from one with readiness on the agenda. */
     private class Entry (val actor: Vehicle):
@@ -78,9 +87,7 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     /** The speed a vehicle with desired speed `vmax` would be given if it entered now
      *  (same rule as `move`: IdmFlux at the running density, v0 = min (road, car)). */
     def entrySpeed (vmax: Double): Double =
-        flowDiagram match
-            case Some (fd) => fd.withV0 (min (fd.v0, vmax)).speed (runningDensity)
-            case None      => min (freeFlowSpeed, vmax)
+        flowDiagram.withV0 (min (flowDiagram.v0, vmax)).speed (runningDensity)
     end entrySpeed
 
     /** Number of vehicles on this link right now (running + queued). */
@@ -117,33 +124,35 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     /** Number of vehicles that have reached the downstream queue. */
     def queuedCount: Int = vdeque.count (_.ready)
 
-    /** Physical spacing at the jam density specified by the IDM diagram. */
-    private def jamSpacing: Double = flowDiagram.map (fd => 1.0 / fd.rho_m).getOrElse (0.0)
+    /** Physical spacing at the jam density specified by the IDM diagram: 1 / rho_m = s0 + len. */
+    private def jamSpacing: Double = 1.0 / flowDiagram.rho_m
 
-    /** Length occupied by vehicles waiting for link discharge. */
+    /** Length occupied by vehicles waiting for link discharge: n_q / rho_m. */
     private def queueLength: Double = queuedCount * jamSpacing
 
     /** Physical storage limit for this link, bounded by its own length.
      * Compute the max physical vehicle that can fit on this Vtransport.
      * by choosing between the: Storage Cap, and the length of the Vtransport * jam density.
      * While ensuring the vehcle can hold at min 1 vehicle.
-     * If no flow diagram is provided, we use the configured storage capacity.
-     *
+     *     N_max = min (N_store, max (floor (L rho_m), 1))
+     * Example: L = 156 m and s0 + len = 6 m hold 156 / 6 = 26 vehicles.
      * */
     private def admissionCapacity: Int =
-        flowDiagram match
-            case Some (fd) => min (storageCapacity, (length * fd.rho_m).toInt.max (1))
-            case None      => storageCapacity  // the free-flow speed counterpath.
+        min (storageCapacity, (length * flowDiagram.rho_m).toInt.max (1))
     end admissionCapacity
 
     /** Density on the moving part of this link (vehicles/metre).
-     *
-     *
+     *     L_r   = L - n_q / rho_m            the queue takes s0 + len metres per vehicle
+     *     rho_r = 0                          if n_r = 0
+     *             rho_m                      if L_r <= 1 / rho_m (no room for one vehicle)
+     *             n_r / L_r                  otherwise
+     * n_r / L_r can exceed rho_m; `IdmFlux.speed` then reads it as rho_m.
+     * Read at entry, before the entering vehicle is added, so that vehicle is not counted.
      * */
     private def runningDensity: Double =
         val running = length - queueLength                          // the running (moving) part of the link
         if runningCount == 0 then 0.0
-        else if running <= jamSpacing then flowDiagram.map (_.rho_m).getOrElse (0.0)   // queue fills the link: jam density
+        else if running <= jamSpacing then flowDiagram.rho_m        // queue fills the link: jam density
         else runningCount / running
     end runningDensity
 
@@ -173,37 +182,54 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     /** Traverse the link on the existing process agenda with the same vehicle.
      *  FIFO follows entry execution order, including simultaneous arrivals.
      *  A ready non-head vehicle sleeps until its predecessor releases it.
-     *  how the flow diaram helps speed calculation:
+     *  how the flow diagram helps speed calculation:
      *
-     *
+     *  1. Storage: enter only if N + reserved < N_max (`awaitAdmission`).
+     *  2. Density at entry: rho = rho_r (`runningDensity`), L_r = max (L - n_q / rho_m, 0) (`runningLength`).
+     *  3. Speed from the table, with v0 = min (road v0, car's vmax):
+     *         u_i = V_e (rho_r)              `flowDiagram.withV0 (v0).speed (rho)`
+     *  4. Crossing.  u_i is constant, so dv_i/dt = 0 and dx_i/dt = u_i integrate exactly:
+     *         x_i (t) = x_i (t_in) + u_i (t - t_in),  which takes L_r / u_i = `fluxTime`
+     *     This one event replaces the ballistic steps of the micro model.
+     *  5. Limit on the crossing, which is our addition and not from the IDM.  A jam empties from
+     *     its front one vehicle every h (Newell, 1993), so the N vehicles ahead take N h:
+     *         `queueTime` = L_r / vmax + N h
+     *         t_cross     = min (L_r / u_i, L_r / vmax + N h) = `traversalTime`
+     *     This uses the car's own vmax, even if vmax is above the road's v0.
+     *  6. Leaving: the vehicle waits to be the FIFO head and for h after the previous release:
+     *         t_out = max (t_in + t_cross, t_out_prev + h)
+     *  7. Speed on exit, averaged over the whole link: v_bar = L / (t_out - t_in) = `actor.velocity`.
      */
     override def move (): Unit =
+
         val actor = director.theActor.asInstanceOf [Vehicle]
         awaitAdmission (actor)          // wait until storage is available 
         val entryTime = director.clock
-        val rho = flowDiagram.map (_ => runningDensity).getOrElse (0.0)
-        val runningLength = math.max (length - queueLength, 0.0)    // the car crosses the running part; the queue is the FIFO's job
-        val traversalTime = flowDiagram match
-            case Some (fd) =>
-                val v0    = min (fd.v0, actor.vmax)                 // the car's desired speed, never above the road's
-                val speed = fd.withV0 (v0).speed (rho)              // IDM steady state with that v0 (same v0 as micro's IDM)
-                if traceSpeed then
-                    println (s"IDM_FLUX_SPEED vehicle=${actor.displayLabel}, link=$name, " +
-                             s"density=$rho veh/m, speed=$speed m/s")
-                val fluxTime  = if speed <= 0.0 then 0.0            // jam density: no running part to cross, join the queue
-                                else runningLength / speed          // time (s) to cross the running part
-                val queueTime = runningLength / actor.vmax + occupancy * releaseHeadway   // cars ahead leave at capacity: a jam empties from its front
-                min (fluxTime, queueTime)
-            case None => runningLength / min(freeFlowSpeed, actor.vmax)   // fixed free-flow speed, capped at the car's desired speed
+
+        val rho = runningDensity               
+        val runningLength = max (length - queueLength, 0.0)    // the car crosses the running part; the queue is the FIFO's job
+
+        val v0    = min (flowDiagram.v0, actor.vmax)                // the car's desired speed, never above the road's
+        val speed = flowDiagram.withV0 (v0).speed (rho)             // IDM steady state with that v0 (same v0 as micro's IDM)
+
+        val fluxTime  = if speed <= 0.0 then 0.0                    // jam density: no running part to cross, join the queue
+                        else runningLength / speed                  // time (s) to cross the running part
+        val queueTime = runningLength / actor.vmax + occupancy * releaseHeadway   // cars ahead leave at capacity: a jam empties from its front
+        val traversalTime = min (fluxTime, queueTime)
+
         val entry = new Entry (actor)     
         entry.speed = if traversalTime > 0.0 then runningLength / traversalTime else 0.0   // derived: the speed this car crosses at
+
         accum (occupancy)                        // existing time-persistent occupancy statistic
         vdeque += entry                          // add the vehicle to the end of the FIFO
         entered += 1                             // increment vehicle count on this Vtranport. need to keep track of this for the statistics
+
         debug ("ADMIT", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
                s"reserved=$reservedSlots, blocked=${blocked.size}")
+
         assert (occupancy + reservedSlots <= admissionCapacity,
                 "mesoscopic link occupancy plus reservations exceeds storage")
+
         director.animateTraversal (actor, this, traversalTime)        // animate the vehicle's traversal of this Vtransport
         actor.schedule (traversalTime)                               // schedule the vehicle's next activation after the traversal time
         actor.yieldToDirector ()                                     // yield to the director until the traversal time has passed
@@ -215,6 +241,7 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         if vdeque.head ne entry then
             actor.yieldToDirector ()                            // sleep until head releases
         end if
+
         assert (vdeque.head eq entry, "only the FIFO head may release") // sanity check
 
         val delay = nextReleaseTime - director.clock           // seconds until next release
@@ -226,10 +253,14 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         nextReleaseTime = director.clock + releaseHeadway         // schedule next release time
         accum (occupancy)                                         // 
         vdeque.removeHead ()
+
+        actor.lastLink = this                                   // the junction ahead reads this road's density
         released += 1
+
         val linkTime = director.clock - entryTime               // time on this link: traversal + FIFO wait + headway
         tally (linkTime)                                        // complete link travel time
         actor.velocity = length / linkTime                      // leave the link at the speed averaged across it
+
         debug ("RELEASE", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
                s"reserved=$reservedSlots, blocked=${blocked.size}")
 
@@ -262,17 +293,18 @@ end MesoVTransport
 //
 //    vehicles currently on link
 //
-//    running density  // measure the running desity
+//    running density  // measure the running desity: rho_r = n_r / L_r
 //      ↓
-//    IdmFlux.speed(rho)   // get the equilibrium speed from the flow diagram
+//    IdmFlux.speed(rho)   // get the equilibrium speed from the flow diagram: V_e (rho_r)
 //    ↓
-//    equilibrium speed     // the speed that the vehicle will travel at
+//    equilibrium speed     // the speed that the vehicle will travel at: u_i
 //      ↓
-//    link length / speed   // get the time it will take to traverse the link at that speed
+//    running length / speed   // get the time it will take to cross the running part: L_r / u_i
 //      ↓
-//    vehicle traversal time  // vehicle travel time on the Vtransport
-//
-//    If flowDiagram is None, the link uses its
-//  fixed free-flow traversal time instead.
+//    min with L_r / vmax + N h  // limit from the queue discharging at capacity: t_cross
+//      ↓
+//    wait for FIFO head and h  // t_out = max (t_in + t_cross, t_out_prev + h)
+//      ↓
+//    vehicle link time  // t_out - t_in, recorded with `tally`; exit speed L / (t_out - t_in)
 
 

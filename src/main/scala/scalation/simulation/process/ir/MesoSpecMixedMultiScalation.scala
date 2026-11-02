@@ -286,8 +286,6 @@ end MesoSpecMixedMultiScalation
     spec.validateAgainst (micro)
 
     val model = new MesoSpecMixedMultiScalationModel (spec, micro)
-    require (model.mesoLinks.forall (_.flowDiagram.nonEmpty),
-             "each mesoscopic link must receive the IDM flux relation")
     banner ("Multi-link mixed MesoSpec to ScalaTion test: PASS")
     println ("mesospec_sha256 = " + spec.sha256)
     println ("micro segments=2, meso links=" + model.mesoLinks.length + ", micro segments=2")

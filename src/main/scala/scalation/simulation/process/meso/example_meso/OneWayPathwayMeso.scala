@@ -24,7 +24,7 @@ import java.nio.file.Path
  *  > runMain scalation.simulation.process.meso.example_meso.runOneWayPathwayMeso
  */
 @main def runOneWayPathwayMeso (): Unit =
-    new OneWayPathwayMeso (name = "Fixed meso")
+    new OneWayPathwayMeso (name = "IDM meso")
 end runOneWayPathwayMeso
 
 
@@ -38,7 +38,7 @@ end runOneWayPathwayMeso
 @main def runOneWayPathwayMesoIdm (): Unit =
     val fd = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T, s0 = Vehicle.s,
                           len = Vehicle.len, delta = Vehicle.del)
-    new OneWayPathwayMeso (name = "IDM meso", flowDiagram = Some (fd), traceSpeeds = true)
+    new OneWayPathwayMeso (name = "IDM meso", flowDiagram = fd, traceSpeeds = true)
 end runOneWayPathwayMesoIdm
 
 
@@ -51,15 +51,16 @@ end runOneWayPathwayMesoIdm
  *  @param aniRatio   the ratio of simulation speed vs. animation speed
  *  @param nStop      the number of arrivals before stopping
  *  @param stream     the base random number stream (0 to 999)
- *  @param flowDiagram optional density-sensitive equilibrium speed relation; when absent,
- *                     every segment keeps the fixed `freeFlowSpeed`, unchanged from prior behavior
+ *  @param flowDiagram density-sensitive equilibrium speed relation for every segment
  *  @param traceSpeeds  print each IDM density/speed lookup
  *  @param warmups    initial runs omitted from the summary; for 10 measured runs,
  *                    set `reps = 12, warmups = 2`. Defaults preserve one ordinary run.
  */
 class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 12, animating: Boolean = false,
                         aniRatio: Double = 500.0, nStop: Int = 30, stream: Int = 0,
-                        flowDiagram: Option [IdmFlux] = None, warmups: Int = 2,
+                        flowDiagram: IdmFlux = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T, s0 = Vehicle.s,
+                                                            len = Vehicle.len, delta = Vehicle.del),
+                        warmups: Int = 2,
                         traceSpeeds: Boolean = false)
     extends Model (name, reps, animating, aniRatio, warmupReps = warmups):
 
@@ -191,13 +192,13 @@ class OneWayPathwayMeso (name: String = "OneWayPathwayMeso", reps: Int = 12, ani
 
     val experimentSummary = SimulationExperimentSummary (name, warmups, reps - warmups, nStop,
         SimulationMetricSummary.from (completedPerRepStat),
-        SimulationMetricSummary.from (link0SpeedStat),
+        Some (SimulationMetricSummary.from (link0SpeedStat)),
         SimulationMetricSummary.from (meanTravelTimeStat),
         SimulationMetricSummary.from (simulationTimeStat),
         SimulationMetricSummary.from (computationTimeStat),
         SimulationMetricSummary.from (agendaActivationsStat),
         SimulationMetricSummary.from (activationsPerVehicleStat))
-    val summaryFile = if flowDiagram.isDefined then "idm_meso.json" else "fixed_meso.json"
+    val summaryFile = "idm_meso.json"
     val summaryPath = Path.of ("log", "simulation", "Simulation-plot", summaryFile)
     experimentSummary.writeJson (summaryPath)
     println (s"simulation_experiment_json = ${summaryPath}")

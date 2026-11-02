@@ -29,7 +29,10 @@ object EatonMiniConfig:
     val i210Sink  = 356052035L
     val sr134Sink = 27568007L
 
-    val rampStationIds = Array (716596, 716588, 716586, 770402)
+    val boxEdgeTolerance   = 0.002      // degrees (~200 m): a cut road ends this close to the box edge
+    val maxStationDistance = 150.0      // metres: farthest a PeMS station may sit from its matched edge
+    val rampTurn           = 90.0       // degrees: ramps curve, so they may turn this far from the freeway heading
+    val rampInfluence      = 457.0      // metres (HCM 1,500 ft): micro freeway past a merge / before a diverge
 
     /** Eaton's OSM highway-to-resolution and speed policy. 
      * Korede 10/18/2026 Need Fixing.
@@ -40,13 +43,16 @@ object EatonMiniConfig:
      * in these cases to mirror slow and fast driver heterogenienty. 
      * */
     val edgePolicy: EdgePolicy = new EdgePolicy:
-        def profile (edge: NetEdge): EdgeProfile = edge.highway match
-            case "motorway"      => EdgeProfile ("motorway", true, 65.0 * 0.44704)
-            case "motorway_link" => EdgeProfile ("motorway_link", true, 65.0 * 0.44704)
-            case "primary"       => EdgeProfile ("primary", false, 35.0 * 0.44704)
-            case "secondary"     => EdgeProfile ("secondary", false, 35.0 * 0.44704)
-            case "tertiary"      => EdgeProfile ("tertiary", false, 30.0 * 0.44704)
-            case "residential"   => EdgeProfile ("residential", false, 25.0 * 0.44704)
-            case _               => EdgeProfile ("other", false, 25.0 * 0.44704)
+        def profile (edge: NetEdge): EdgeProfile =
+            val typed = edge.highway match                         // road-type default limit
+                case "motorway"      => EdgeProfile ("motorway", true, 65.0 * 0.44704)
+                case "motorway_link" => EdgeProfile ("motorway_link", true, 65.0 * 0.44704)
+                case "primary"       => EdgeProfile ("primary", false, 35.0 * 0.44704)
+                case "secondary"     => EdgeProfile ("secondary", false, 35.0 * 0.44704)
+                case "tertiary"      => EdgeProfile ("tertiary", false, 30.0 * 0.44704)
+                case "residential"   => EdgeProfile ("residential", false, 25.0 * 0.44704)
+                case _               => EdgeProfile ("other", false, 25.0 * 0.44704)
+            if edge.maxspeed.isNaN then typed                      // untagged: road-type default
+            else typed.copy (speed = edge.maxspeed)                // OSM posted limit
     end edgePolicy
 end EatonMiniConfig

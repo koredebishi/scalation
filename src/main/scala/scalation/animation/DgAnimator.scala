@@ -274,6 +274,10 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
     @volatile private var hudSegLabels: Array [String]    = Array.empty  // e.g. "S0","S1",...
     @volatile private var hudSpeedLimitMph: Int = 65                    // corridor speed limit for signs
     @volatile private var hudLaneChanges: Long  = 0L                    // lane changes so far (all lanes)
+    @volatile private var edgeLabels: Boolean   = true                  // draw each edge's name at its centre
+
+    /** Show or hide the edge (lane segment) name text.  Default on. */
+    def setEdgeLabels (on: Boolean): Unit = edgeLabels = on
 
     /** Set the dynamics model name shown on the HUD (e.g., "IDM", "Gipps"). */
     def setHudModelName (name: String): Unit = hudModelName = name
@@ -837,7 +841,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                 val x = edge.shape.getCenterX.asInstanceOf [Float]
                 val y = edge.shape.getCenterY.asInstanceOf [Float]
                 g2d.setPaint (fgColor)
-                g2d.drawString (edge.label, x, y)
+                if edgeLabels then g2d.drawString (edge.label, x, y)
                 val edge_tokens = edge.tokens.toList
                 for token <- edge_tokens if token.shape.getWidth () > 0.0 do
                     drawTokenGlow (g2d, token)

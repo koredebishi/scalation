@@ -73,6 +73,7 @@ abstract class Vehicle (name_ : String, director: Model)
     var myRamp        : Ramp        = null   // current ramp this vehicle is on (null if not on a ramp)
     var myPathway     : Pathway     = null   // current pathway/lane this vehicle is on (null if not on a pathway)
     var myFFConnector : FFConnector = null   // current FF connector this vehicle is on (null if not on an FF)
+    var lastLink      : Transport & TrafficLink = null   // the road this vehicle last left (null before its first)
     private [process] var myPathNode: DoublyLinkedList[Vehicle]#Node = null   // DLL node: pred <-> me <-> succ
 
 

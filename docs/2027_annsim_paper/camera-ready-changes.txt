@@ -1,0 +1,95 @@
+Camera-Ready Changes — ANNSIM 2026, Submission #62
+====================================================
+"Beyond Corridor Averages: Lane-Level Validation of Microscopic
+Freeway Simulation with Empirically Parameterized Arrivals"
+
+Authors: Korede R. Bishi, Casey Bowman, John A. Miller
+Date: March 20, 2026
+
+We thank the reviewers for the reviews. Below is a summary of what changed
+in the camera-ready version.
+
+We thank all three reviewers for their constructive feedback.
+Below we summarize how each comment has been addressed in the
+camera-ready version.
+
+-------------------------------------------------------------
+REVIEWER #1
+-------------------------------------------------------------
+Comment: Section 4.3 — "Could you say something more? Which
+simulation framework did you use? Are the implementation and
+results available under an open source license?"
+
+---------------------------------------------------------
+Good point. Section 4.3 now names ScalaTion 2.0 explicitly,
+cites [miller2010using, miller2017advanced], and describes
+the paradigm (process-oriented, coroutine-based vehicle actors).
+
+-------------------------------------------------------------
+REVIEWER #2
+-------------------------------------------------------------
+Comment 1: "There should be a presentation of the architecture
+of the simulation: how do numerical integration, discrete events
+simulation and arrival processes interplay?"
+
+---------------------------------------------------------
+Added a new system architecture diagram (Figure 3) in Section
+4.3. which shows the three external configurations feeding into the
+TrafficModelBuilder, which assembles the engine. Inside the
+engine, two panels sit side by side: Arrival & Network
+(per-lane VSource, Poisson/Erlang2S, Route, Junction sensors)
+and Vehicle Physics (car-following models, eight integrators).
+A scheduler strip at the bottom shows the hybrid
+discrete-continuous time model.
+
+Comment 2: "The experimental data set is limited: is this road
+section representative? Does the approach work well on other
+types of roads?"
+
+---------------------------------------------------------
+We address this in Section 7 (Limitations) which now acknowledges this
+directly and identifies additional road types and sensor
+stations as future validation targets.
+
+-------------------------------------------------------------
+REVIEWER #3
+-------------------------------------------------------------
+Comment 1: "The phrase 'data-driven arrivals' in the title may
+be misleading... consider clarifying the simulation-centric
+nature of the work."
+
+---------------------------------------------------------
+Changed the title from "...WITH DATA-DRIVEN ARRIVALS" to
+"...WITH EMPIRICALLY PARAMETERIZED ARRIVALS" to avoid implying
+a machine-learning approach.
+
+Comment 2: "Briefly discuss whether IDM parameters are global or
+lane-specific, and how arrival parameters are calibrated per lane
+and interval."
+
+---------------------------------------------------------
+Clarified in two places. Section 3.1 now states that IDM
+parameters (s0, a_max, b, T) are global, while v_max is set
+per lane and interval from PeMS speed data. Section 3.3
+specifies the per-lane per-interval Erlang parameterization:
+
+Comment 3: "Add a short discussion on whether the
+integrator-insensitivity result is expected to hold beyond
+IDM-like continuous models."
+
+---------------------------------------------------------
+Added to the Discussion (Section 6). The integrator
+insensitivity is tied to IDM's smooth ODE formulation. In preliminary study we ran
+a comparison with Gipps, which is piecewise — it matched flow
+(NRMSE 2.11% vs 2.12%) but degraded speed significantly
+(17.23% vs 12.56%). So the result does not generalize to all
+car-following models with respect to speed.
+
+Comment 4: "Abstract discrepancy: the abstract shown in the
+submission system differs from the abstract in the PDF."
+
+---------------------------------------------------------
+That was our mistake — we entered a draft summary into START
+instead of the actual abstract. The camera-ready PDF has the
+correct final abstract.
+

@@ -176,7 +176,8 @@ object AggregatedDemand:
         orFile      = Some ("eaton_i210_E_baseline_Dec03-10-17_OR.csv"),
         frFile      = Some ("eaton_i210_E_baseline_Dec03-10-17_FR.csv"),
         ffFile      = Some ("eaton_i210_E_baseline_Dec03-10-17_FF.csv"),
-        intervalMin = 5
+        intervalMin = 5,
+        startTime   = "17:00:00"
     )
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

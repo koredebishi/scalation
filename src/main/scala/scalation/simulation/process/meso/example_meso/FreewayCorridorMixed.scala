@@ -29,7 +29,7 @@ import scalation.random.Exponential
 @main def runFreewayMesoIdm (): Unit =
     val fd = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T, s0 = Vehicle.s,
         len = Vehicle.len, delta = Vehicle.del)
-    new FreewayCorridorMixed (name = "FreewayMixIdmFlux", flowDiagram = Some (fd), traceSpeeds = true)
+    new FreewayCorridorMixed (name = "FreewayMixIdmFlux", flowDiagram = fd, traceSpeeds = true)
 end runFreewayMesoIdm
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `FreewayCorridorMixed` class sends each `Vehicle` actor through this
@@ -46,13 +46,15 @@ end runFreewayMesoIdm
  *  @param aniRatio   the ratio of simulation speed versus animation speed
  *  @param nStop      the number of arrivals before stopping
  *  @param stream     the base random-number stream
- *  @param flowDiagram optional IDM equilibrium speed relation shared by all mesoscopic links
+ *  @param flowDiagram IDM equilibrium speed relation shared by all mesoscopic links
  *  @param traceSpeeds print each IDM density/speed lookup
  */
 class FreewayCorridorMixed (name: String = "FreewayCorridorMixed", reps: Int = 1,
                             animating: Boolean = true, aniRatio: Double = 500.0,
                             nStop: Int = 130, stream: Int = 0,
-                            flowDiagram: Option [IdmFlux] = None, traceSpeeds: Boolean = false)
+                            flowDiagram: IdmFlux = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T, s0 = Vehicle.s,
+                                                                len = Vehicle.len, delta = Vehicle.del),
+                            traceSpeeds: Boolean = false)
     extends Model (name, reps, animating, aniRatio):
 
     private val debug = debugf ("FreewayCorridorMixed", true)

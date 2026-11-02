@@ -11,6 +11,7 @@ package meso
 package example_meso
 
 import scala.collection.immutable.Map
+import scalation.dynamics.IdmFlux
 import scalation.mathstat.{MatrixD, VectorD}
 import scalation.random.Sharp
 
@@ -42,6 +43,9 @@ class DestinationRoutingMixed (name: String = "DestinationRoutingMixed", reps: I
     val mesoCapacity = 1800.0
     val storageCapacity = 10
     Vehicle.setInitialSpeed (freeFlowSpeed)
+    private val flowDiagram = new IdmFlux (v0 = freeFlowSpeed, tau = Vehicle.T,
+                                           s0 = Vehicle.s, len = Vehicle.len,
+                                           delta = Vehicle.del)
 
     // Both sources assign the same destination in each clock round. Clock-based
     // alternation is deterministic and resets with every replication.
@@ -63,7 +67,8 @@ class DestinationRoutingMixed (name: String = "DestinationRoutingMixed", reps: I
     private def link (name: String, from: Component, to: Component, length: Double,
                       shift1: VectorD = VectorD (0.0, 0.0), shift2: VectorD = VectorD (0.0, 0.0)): MesoVTransport =
         val x = MesoVTransport (name, from, to, freeFlowSpeed, mesoCapacity,
-                                shift1 = shift1, shift2 = shift2, storageCapacity = storageCapacity)
+                                shift1 = shift1, shift2 = shift2, storageCapacity = storageCapacity,
+                                flowDiagram = flowDiagram)
         x.length = length; x
     end link
 

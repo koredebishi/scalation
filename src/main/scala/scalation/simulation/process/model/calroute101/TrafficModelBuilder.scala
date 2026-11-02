@@ -80,7 +80,13 @@ class TrafficModelBuilder (network: NetworkConfig, demand: PeMSDemand,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the junction indices where ramps join.
      */
-    def rampJoinSegments: Array [Int] = network.ramps.map (_.joinSegment).toArray
+    def rampJoinSegments: Array [Int] = onRamps.map (_.joinSegment).toArray
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The on-ramps only: they are the ramps with arrival sources.  Off-ramps
+     *  are built by the model (their `to` is a sink the builder does not own).
+     */
+    private def onRamps: List [RampSpec] = network.ramps.filter (_.mode == scalation.simulation.process.config.RampMode.On)   // config.RampMode, not process.RampMode
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the number of lanes.
@@ -181,10 +187,10 @@ class TrafficModelBuilder (network: NetworkConfig, demand: PeMSDemand,
                           offsets: Array [(Int, Int)]): List [VSource] =
         import scala.collection.mutable.ListBuffer
 
-        debug ("buildRampSources", s"building ${network.ramps.length} ramp sources")
+        debug ("buildRampSources", s"building ${onRamps.length} ramp sources")
         val sources = new ListBuffer [VSource] ()
         val arrivalSources = rampArrivalSources
-        val rampConfigs = network.ramps
+        val rampConfigs = onRamps
 
         cfor (0, rampConfigs.length) { r =>
             val ramp = rampConfigs(r)
@@ -212,7 +218,7 @@ class TrafficModelBuilder (network: NetworkConfig, demand: PeMSDemand,
      */
     def buildRamps (motion: Dynamics, rampSources: List [VSource],
                     rampSensors: Array [Junction]): Array [Ramp] =
-        val rampConfigs = network.ramps
+        val rampConfigs = onRamps
         val ramps = new Array [Ramp] (rampConfigs.length)
 
         debug ("buildRamps", s"building ${rampConfigs.length} ramps")

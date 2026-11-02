@@ -26,11 +26,9 @@ object MesoSpecMaude:
      *  @param spec   the accepted mesoscopic specification
      *  @param micro  the source microscopic model
      */
-    def idmSpeedTableModule (spec: MesoSpec, micro: MicroIR): Option [String] =
+    def idmSpeedTableModule (spec: MesoSpec, micro: MicroIR): String =
         spec.validateAgainst (micro)                            // verify the declared source model
-        MesoSpecScalation.flowDiagram (spec, micro).map { flux =>
-            idmSpeedTableModule (flux, micro.sha256)
-        }
+        idmSpeedTableModule (MesoSpecScalation.flowDiagram (spec, micro), micro.sha256)
     end idmSpeedTableModule
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

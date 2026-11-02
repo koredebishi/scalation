@@ -95,7 +95,7 @@ class Route (name: String, numLanes: Int, junc: Array[Junction], from: Component
                     val link  = new MesoVTransport (s"${name}_meso-$s-$lane", micro.from, micro.to,
                                                     fd.v0, fd.q_max * 3600.0,
                                                     shift1 = shift, shift2 = shift,
-                                                    flowDiagram = flowDiagram)
+                                                    flowDiagram = fd)
                     link.length = micro.length                       // same physical length as the micro lane
                     subpart += link
                     link

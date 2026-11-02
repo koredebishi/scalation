@@ -15,7 +15,7 @@ import scalation.random.Exponential
 @main def runFreewayRouteMesoIdm (): Unit =
     val fd = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T, s0 = Vehicle.s,
         len = Vehicle.len, delta = Vehicle.del)
-    new FreewayRouteMixed (name = "FreewayRouteMixIdmFlux", flowDiagram = Some (fd), traceSpeeds = true)
+    new FreewayRouteMixed (name = "FreewayRouteMixIdmFlux", flowDiagram = fd, traceSpeeds = true)
 end runFreewayRouteMesoIdm
 
 /** Parallel three-lane version of the repeated mixed-resolution freeway.
@@ -25,7 +25,8 @@ end runFreewayRouteMesoIdm
 class FreewayRouteMixed (name: String = "FreewayRouteMixed", reps: Int = 1,
                          animating: Boolean = true, aniRatio: Double = 500.0,
                          nStop: Int = 30, stream: Int = 0,
-                         flowDiagram: Option [IdmFlux] = None,
+                         flowDiagram: IdmFlux = new IdmFlux (v0 = Vehicle.vmax, tau = Vehicle.T, s0 = Vehicle.s,
+                                                             len = Vehicle.len, delta = Vehicle.del),
                          traceSpeeds: Boolean = false)
     extends Model (name, reps, animating, aniRatio):
 
@@ -129,7 +130,7 @@ class FreewayRouteMixed (name: String = "FreewayRouteMixed", reps: Int = 1,
 
     banner ("Three-lane mixed-resolution Route corridor")
     println ("Meso[3] -> Route[3] micro -> Meso[3] -> Route[3] micro -> Meso[3]")
-    println (s"vehicles=$nStop, lanes=$numLanes, idmFlux=${flowDiagram.isDefined}")
+    println (s"vehicles=$nStop, lanes=$numLanes")
 
     simulate ()
     waitFinished ()

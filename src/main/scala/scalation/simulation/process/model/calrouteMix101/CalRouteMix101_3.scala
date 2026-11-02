@@ -9,6 +9,7 @@ import scalation.simulation.process.arrival.ArrivalSource
 import scalation.simulation.process.builder.*
 import scalation.simulation.process.config.{BoundingBox, CarFollowingModel, OsmSpec, PeMSDataHelper}
 import scalation.simulation.process.*
+import scalation.simulation.process.model.calroute101.CalRouteReadings
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -22,7 +23,7 @@ class CalRouteMix101_3 (name: String = "CalRouteMix101_3", reps: Int = 1,
                         animating: Boolean = true, aniRatio: Double = 500.0,
                         autoRun: Boolean = true, traceSpeeds: Boolean = false)
       extends Model (name, reps, animating, aniRatio)
-         with RowTimeLoader:
+         with RowTimeLoader with CalRouteReadings:
 
     //--------------------------------------------------
     // Load only the CalRouteMix data specification; OSM supplies topology.
@@ -41,6 +42,9 @@ class CalRouteMix101_3 (name: String = "CalRouteMix101_3", reps: Int = 1,
         case KraussDynamics => KraussDynamics.integratorType = IntegratorType.Ballistic
         case _              =>
 
+    // Every OSM lane segment would draw its name; hide that text so the cars stay readable
+    if animating && dgAni != null then dgAni.setEdgeLabels (false)
+
     //--------------------------------------------------
     // Prepare the OSM artifact from the CalRoute GPS anchors
     private val gps = CalRouteMixData.mainlineGPS
@@ -57,13 +61,7 @@ class CalRouteMix101_3 (name: String = "CalRouteMix101_3", reps: Int = 1,
         (3000.0 * viewScale, 2000.0 * viewScale), "CalRouteMix101_3")
 
     //--------------------------------------------------
-    // Match the corridor on OSM: direction-aware, sensors on edges, ramps from topology
-    private def squaredDistance (a: (Double, Double), b: (Double, Double)): Double =
-        val dLat = a._1 - b._1
-        val dLon = a._2 - b._2
-        dLat * dLat + dLon * dLon
-    end squaredDistance
-
+    // Match the corridor on OSM: direction-aware, sensors and merge points on edges
     private def isMotorway (e: NetEdge): Boolean = e.highway == "motorway"
     private def isLink (e: NetEdge): Boolean     = e.highway == "motorway_link"
     private val corridorHeading = NetworkBuilder.heading (gps(1), gps.last)      // S1 -> S5 travel direction
@@ -72,47 +70,51 @@ class CalRouteMix101_3 (name: String = "CalRouteMix101_3", reps: Int = 1,
     private val sourceSpot   = NetworkBuilder.matchEdge (roadEdges, gps.head, corridorHeading, isMotorway)
     private val sourceNodeId = roadEdges (sourceSpot.edge).u
 
-    // Sensors: split the matched edge at each sensor; sensor i gets the new node id -(i+1)
+    // Split the corridor at the classic CalRoute points; each split gets a new negative node id:
+    //   sensors S1..S5 -> -1..-5, merge points 1, 2 -> -6, -7, sink (SINK_GAP past S5) -> -8.
+    // Ramp cars join at the classic merge points, as classic's Ramp does; the real OSM
+    // ramp roads stay drawn but carry no cars.
     private val sensorNodeIds = Array.tabulate (CalRouteMixData.sensors.length) (i => -(i + 1).toLong)
-    private val edges =
-        var out = roadEdges
-        for i <- CalRouteMixData.sensors.indices do
-            val point = gps (CalRouteMixData.sensors(i)._2)
-            val spot  = NetworkBuilder.matchEdge (out, point, corridorHeading, isMotorway)
-            out = NetworkBuilder.splitAt (out, spot, sensorNodeIds(i))
-        end for
-        out
+    private val mergeNodeIds  = Array.tabulate (CalRouteMixData.rampGPS.length) (r => -(sensorNodeIds.length + r + 1).toLong)
+    private val sinkNodeId    = -(sensorNodeIds.length + mergeNodeIds.length + 1).toLong
+    private val SINK_GAP      = 10.0                                    // metres S5 -> sink (S5 must stay a recording Junction)
 
-    // Corridor: follow the motorway from the source until it ends; the end is the sink
-    private def nextOnMotorway (node: Long): Option [NetEdge] = edges.find (e => e.u == node && isMotorway (e))
+    private val splitEdges =
+        var out    = roadEdges
+        val points = CalRouteMixData.sensors.map (s => gps (s._2)) ++ CalRouteMixData.rampGPS
+        val ids    = sensorNodeIds ++ mergeNodeIds
+        for i <- points.indices do
+            val spot = NetworkBuilder.matchEdge (out, points(i), corridorHeading, isMotorway)
+            out = NetworkBuilder.splitAt (out, spot, ids(i))
+        end for
+        val afterS5 = out.indexWhere (e => e.u == sensorNodeIds.last && isMotorway (e))
+        require (afterS5 >= 0, "the motorway does not continue past S5")
+        NetworkBuilder.splitAt (out, EdgeSpot (afterS5, SINK_GAP, 0.0, 0.0), sinkNodeId)
+
+    // Corridor: follow the motorway from the source to the sink
+    private def nextOnMotorway (node: Long): Option [NetEdge] = splitEdges.find (e => e.u == node && isMotorway (e))
     private val corridor =
         val path = ArrayBuffer (sourceNodeId)
         var next = nextOnMotorway (sourceNodeId)
-        while next.nonEmpty && ! path.contains (next.get.v) do
+        while path.last != sinkNodeId && next.nonEmpty && ! path.contains (next.get.v) do
             path += next.get.v
             next = nextOnMotorway (next.get.v)
         end while
         path.toArray
-    private val sinkNodeId = corridor.last
-    require (! edges.exists (_.u == sinkNodeId), s"corridor end $sinkNodeId has an outgoing edge, so it cannot be a sink")
-    require (sensorNodeIds.forall (corridor.contains), "a sensor is not on the corridor")
+    require (corridor.last == sinkNodeId, "the corridor does not reach the sink")
 
-    // On-ramps: each motorway_link entering the corridor, walked back to the ramp's first node
-    private def rampStart (link: NetEdge): Long =
-        val seen = ArrayBuffer (link.v)
-        var node = link.u
-        var back = edges.find (e => e.v == node && isLink (e))
-        while back.nonEmpty && ! seen.contains (back.get.u) do
-            seen += node
-            node = back.get.u
-            back = edges.find (e => e.v == node && isLink (e))
+    // The classic road ends at S5: drop the motorway past the sink (not built, not drawn)
+    private val pastSink =
+        val drop = ArrayBuffer [NetEdge] ()
+        var next = nextOnMotorway (sinkNodeId)
+        while next.nonEmpty && ! drop.contains (next.get) do
+            drop += next.get
+            next = nextOnMotorway (next.get.v)
         end while
-        node
-    end rampStart
-    private val rampNodeIds = edges.filter (e => isLink (e) && corridor.contains (e.v))
-                                   .sortBy (e => corridor.indexOf (e.v))        // travel order = ramp 1, ramp 2
-                                   .map (rampStart)
-    require (rampNodeIds.distinct.length == rampNodeIds.length, "CalRoute ramp sources share one OSM node")
+        drop
+    private val edges = splitEdges.filterNot (pastSink.contains)
+    require (! edges.exists (_.u == sinkNodeId), s"sink $sinkNodeId has an outgoing edge")
+    require ((sensorNodeIds ++ mergeNodeIds).forall (corridor.contains), "a sensor or merge point is not on the corridor")
     private val networkLanes = edges.filter (e => (e.u == sourceNodeId || e.v == sourceNodeId) && e.highway == "motorway")
         .map (_.lanes).max
     private val demandLanes = PeMSDataHelper.loadMainlineSensor (demand, 0, demand.window, demand.layout)._1.dim2
@@ -122,26 +124,35 @@ class CalRouteMix101_3 (name: String = "CalRouteMix101_3", reps: Int = 1,
     private val (mainlineArrivalSources, rampArrivalSources) = ArrivalSource.allSources (demand, numLanes)
 
     //--------------------------------------------------
-    // Supply CalRoute's resolution policy to the generic OSM builder
-    private val microSegments = Set (1, 2, 5, 6)
+    // Supply CalRoute's resolution policy to the generic OSM builder.
+    // Mirror the classic mixed model (mesoSegs = 0, 3, 4) by position on the corridor:
+    //   meso source -> S1, micro S1 -> S2, meso S2 -> merge 2, micro merge 2 -> S5
+    private def place (node: Long): Int = corridor.indexOf (node)       // travel order on the corridor (-1 = off it)
 
-    private def nearestAnchor (edge: NetEdge): Int =
-        val point = if edge.geometry.nonEmpty then edge.geometry(edge.geometry.length / 2)
-                    else (0.5 * (edge.uLat + edge.vLat), 0.5 * (edge.uLon + edge.vLon))
-        gps.indices.minBy (i => squaredDistance (point, gps(i)))
-    end nearestAnchor
+    private val microStretches = Array (
+        (place (sensorNodeIds(0)), place (sensorNodeIds(1))),            // S1 -> S2 (merge 1 inside)
+        (place (mergeNodeIds(1)),  place (sensorNodeIds.last)))          // merge 2 -> S5
+
+    private def onMicroStretch (edge: NetEdge): Boolean =
+        val a = place (edge.u)
+        val b = place (edge.v)
+        a >= 0 && b == a + 1 && microStretches.exists ((lo, hi) => a >= lo && b <= hi)
+    end onMicroStretch
 
     private val edgePolicy: EdgePolicy = new EdgePolicy:
         def profile (edge: NetEdge): EdgeProfile =
-            val anchor = nearestAnchor (edge)
-            val micro = edge.highway == "motorway" && microSegments.contains (anchor)
-            EdgeProfile (s"calroute-$anchor-${edge.highway}", micro, freeFlowSpeed)
+            val micro = isLink (edge) ||                                  // ramps micro: cars visible on them
+                        isMotorway (edge) && onMicroStretch (edge)
+            EdgeProfile (s"calroute-${edge.highway}", micro, freeFlowSpeed)
     end edgePolicy
 
     //--------------------------------------------------
     // Destination policy and vehicle actor
     case class Car (originId: Long, destinationId: Long) extends Vehicle ("c", this):
         override def act (): Unit =
+            if mergeNodeIds.contains (originId) then                    // ramp car: joins the outer lane at the merge, as classic
+                laneID   = numLanes - 1
+                fromRamp = true
             graph.drive (this, graph.nodeIndex (originId), graph.nodeIndex (destinationId))
         end act
     end Car
@@ -183,11 +194,11 @@ class CalRouteMix101_3 (name: String = "CalRouteMix101_3", reps: Int = 1,
                      Array (sourceX + shift (0), sourceY + shift (1), 20.0, 20.0), s"M$lane")
     }
 
-    require (rampNodeIds.length == rampArrivalSources.length,
-             s"OSM has ${rampNodeIds.length} on-ramps into the corridor, PeMS has ${rampArrivalSources.length}")
-    private val rampSources = Array.tabulate (rampNodeIds.length) { r =>
-        val (x, y) = nodePosition (rampNodeIds(r))
-        new VSource (s"srcRamp${r + 1}", this, () => Car (rampNodeIds(r), sinkNodeId),
+    require (mergeNodeIds.length == rampArrivalSources.length,
+             s"CalRoute has ${mergeNodeIds.length} merge points, PeMS has ${rampArrivalSources.length} ramps")
+    private val rampSources = Array.tabulate (mergeNodeIds.length) { r =>
+        val (x, y) = nodePosition (mergeNodeIds(r))
+        new VSource (s"srcRamp${r + 1}", this, () => Car (mergeNodeIds(r), sinkNodeId),
                      numLanes + r, rampArrivalSources(r).getTotalVehicles (0),
                      rampArrivalSources(r).getDistribution,
                      Array (x, y, 20.0, 20.0), s"R${r + 1}")

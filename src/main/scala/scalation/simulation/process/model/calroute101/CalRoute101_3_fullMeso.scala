@@ -182,7 +182,7 @@ class CalRoute101_3_fullMeso(name: String = "CalRoute101_3_fullMeso", reps: Int 
       private val ramps: Array [RampMeso] = Array.tabulate (rampSources.length) { r =>
           new RampMeso (s"onRamp${r + 1}", rampSources(r), ramp_sensors(r), 0.0,
                         Vehicle.vmax, flowDiagram.q_max * 3600.0, RampMesoMode.On,
-                        bend = 0.0, offset = 0.0, flowDiagram = Some (flowDiagram))
+                        bend = 0.0, offset = 0.0, flowDiagram = flowDiagram)
       }
       debug ("init", s"Created ${ramps.length} ramps")
 

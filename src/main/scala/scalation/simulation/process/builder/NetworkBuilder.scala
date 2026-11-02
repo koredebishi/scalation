@@ -58,8 +58,10 @@
  *    - A microscopic chain is one Route with one Pathway/DLL per lane.
  *    - A mesoscopic edge creates one MesoVTransport per lane and derives its
  *      flow diagram, capacity, and storage from the supplied profile speed.
- *    - Resolution boundaries, branches, ramps, lane changes, and source nodes
- *      stop microscopic grouping so that handoffs remain explicit.
+ *    - Resolution boundaries, branches, ramps, and lane changes stop
+ *      microscopic grouping so that handoffs remain explicit.
+ *    - Sources are never graph nodes: a model registers its sources itself and
+ *      starts its vehicles at a node index (`BuiltGraph.drive`).
  *    - The supplied projector is used for every node and edge geometry, keeping
  *      the simulation components aligned with the model's background map.
  *
@@ -100,6 +102,7 @@ object NetworkBuilder:
     private val NODE     = 4.0                                          // drawn size of a junction or sink disc, in pixels (the default is 20)
     private val JUNCTION_DELAY = 0.0                                    // ordinary imported nodes have no uncalibrated delay
     private val M_PER_DEG = 111320.0                                    // metres per degree of latitude
+    private val MAX_DRIVER_FACTOR = 1.5                                 // fastest driver / road limit a meso speed table allows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read every edge of an `edges.geojson` file written by `build_osm_network.py`.
@@ -131,10 +134,22 @@ object NetworkBuilder:
                             p.get ("lanes_effective").getAsInt, p.get ("length").getAsDouble,
                             first.get (1).getAsDouble, first.get (0).getAsDouble,
                             last.get (1).getAsDouble, last.get (0).getAsDouble, text ("name"), geometry,
-                            ref = text ("ref"), key = p.get ("key").getAsInt, osmid = text ("osmid"))
+                            ref = text ("ref"), key = p.get ("key").getAsInt, osmid = text ("osmid"),
+                            maxspeed = speedOf (text ("maxspeed")))
         end for
         out.toArray
     end read
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return an OSM `maxspeed` tag in metres/second, NaN when untagged or unreadable.
+     *  OSM rule: "65 mph" is miles per hour, a bare number is km/h.
+     *  @param tag  the tag text, e.g. "65 mph", "50", ""
+     */
+    private def speedOf (tag: String): Double =
+        "[0-9]+(\\.[0-9]+)?".r.findFirstIn (tag) match
+            case Some (n) => if tag.contains ("mph") then n.toDouble * 0.44704 else n.toDouble / 3.6
+            case None     => Double.NaN
+    end speedOf
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the edges that run along a path of node ids, in order.
@@ -332,13 +347,11 @@ object NetworkBuilder:
      *  @param motion     the car-following dynamics for micro edges
      *  @param nt         number of time intervals for junction recording
      *  @param stream     retained for builder-call compatibility
-     *  @param sourceComponents optional source components keyed by their OSM node id;
-     *                          these replace the generated node at that location
      *  @param widthScale how many times wider than real the lanes are drawn (lengths are kept)
      */
     def build (edges: Array [NetEdge], sinkNodes: Array [Long], project: (Double, Double) => (Double, Double),
                motion: Dynamics, nt: Int, edgePolicy: EdgePolicy, stream: Int = 0,
-               sourceComponents: Map [Long, Component] = Map.empty, widthScale: Double = 1.0): BuiltGraph =
+               widthScale: Double = 1.0): BuiltGraph =
         require (edges.nonEmpty, "no edges to build")
         val gap     = laneGap (edges, project, widthScale)              // drawn lane width in pixels
         val drawn   = drawAt (edges, project, widthScale)               // node screen positions
@@ -365,8 +378,7 @@ object NetworkBuilder:
         val node = new Array [Component] (n)
         cfor (0, n) { i =>
             node(i) =
-                if sourceComponents.contains (nodeId(i)) then sourceComponents (nodeId(i))
-                else if sinkNodes.contains (nodeId(i)) then new Sink ("SK", Array (at(i)._1, at(i)._2, NODE, NODE))
+                if sinkNodes.contains (nodeId(i)) then new Sink ("SK", Array (at(i)._1, at(i)._2, NODE, NODE))
                 else new Junction ("JC", Sharp (JUNCTION_DELAY), Array (at(i)._1, at(i)._2, NODE, NODE), nt, nl(i))
         }
 
@@ -389,8 +401,7 @@ object NetworkBuilder:
             val hasMicroPredecessor = incoming(tail).exists { f =>
                 profile(f) == profile(e) && edges(f).lanes == edges(e).lanes
             }
-            val startsChain = sourceComponents.contains (nodeId(tail)) ||
-                              incoming(tail).size != 1 || outgoing(tail).size != 1 || !hasMicroPredecessor
+            val startsChain = incoming(tail).size != 1 || outgoing(tail).size != 1 || !hasMicroPredecessor
             if profile(e).micro && !visited(e) && startsChain then
                 val chain = ArrayBuffer [Int] (e)
                 visited(e) = true
@@ -405,8 +416,7 @@ object NetworkBuilder:
                         profile(f) == profile(current) && edges(f).lanes == edges(current).lanes
                     }
                     if outgoing(nodeAt).size == 1 && incoming(nodeAt).size == 1 &&
-                       next.length == 1 && prev.length == 1 &&
-                       !sourceComponents.contains (nodeId(nodeAt)) then
+                       next.length == 1 && prev.length == 1 then
                         val f = next(0)
                         if !visited(f) then
                             chain += f
@@ -442,7 +452,10 @@ object NetworkBuilder:
                     for f <- grouped do builtLink(f) = MicroLink (r, grouped)
                 end if
             else
-                val fd   = IdmFlux.of (p.speed, Vehicle.T, Vehicle.s, Vehicle.len, Vehicle.del)   // shared table per edge speed
+                // Capacity comes from the road's limit; the speed table has room above it, so a
+                // driver faster than the limit (factor > 1) is not capped on meso but free on micro.
+                val limitFd = IdmFlux.of (p.speed, Vehicle.T, Vehicle.s, Vehicle.len, Vehicle.del)
+                val fd   = IdmFlux.of (p.speed * MAX_DRIVER_FACTOR, Vehicle.T, Vehicle.s, Vehicle.len, Vehicle.del)
                 val dx   = at(to(e))._1 - at(from(e))._1                // lane offset as in Route: perpendicular to the edge
                 val dy   = at(to(e))._2 - at(from(e))._2
                 val hyp  = math.hypot (dx, dy)
@@ -453,8 +466,8 @@ object NetworkBuilder:
                     val centerline = ed.geometry.map (p => project (p._1, p._2))
                     val laneGeometry = centerline.map (p => (p._1 + shift (0), p._2 + shift (1)))
                     val link = new MesoVTransport ("ML", node(from(e)), node(to(e)),
-                                                   p.speed, fd.q_max * 3600.0,
-                                                   shift1 = shift, shift2 = shift, flowDiagram = Some (fd),
+                                                   p.speed, limitFd.q_max * 3600.0,
+                                                   shift1 = shift, shift2 = shift, flowDiagram = fd,
                                                    geometry = laneGeometry)
                     link.length = ed.length
                     link

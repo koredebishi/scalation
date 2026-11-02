@@ -33,7 +33,7 @@ end MesoEventPhase
  *  traversal speed.  `IdmEquilibrium` uses the linked source MicroIR parameters.
  */
 enum MesoSpeedRelation:
-    case Fixed, IdmEquilibrium
+    case IdmEquilibrium
 end MesoSpeedRelation
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1228,14 +1228,12 @@ object MesoSpecJson:
     /** Return the canonical label for a mesoscopic speed relation.
      */
     private def speedRelation (relation: MesoSpeedRelation): String = relation match
-        case MesoSpeedRelation.Fixed         => "fixed"
         case MesoSpeedRelation.IdmEquilibrium => "idmEquilibrium"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Parse the canonical label for a mesoscopic speed relation.
      */
     private def parseSpeedRelation (relation: String): MesoSpeedRelation = relation match
-        case "fixed"         => MesoSpeedRelation.Fixed
         case "idmEquilibrium" => MesoSpeedRelation.IdmEquilibrium
         case _ => throw new IllegalArgumentException (s"unknown speed relation '$relation'")
 
@@ -1330,7 +1328,10 @@ end MesoSpecJson
         CarFollowingModel.IDM,
         ODESolverType.Ballistic,
         Array (MicroParameter ("minimumGap", 2.0),
-               MicroParameter ("timeHeadway", 1.5)), 0.5)
+               MicroParameter ("timeHeadway", 1.5),
+               MicroParameter ("maximumSpeed", 30.0),
+               MicroParameter ("vehicleLength", 4.0),
+               MicroParameter ("delta", 4.0)), 0.5)
     val microObservables = Array (
         MicroObservable (MicroMeasure.Flow, "micro-exit-1"),
         MicroObservable (MicroMeasure.Density, "micro-exit-1"),
@@ -1375,7 +1376,7 @@ end MesoSpecJson
         MesoSpec.version,
         micro.version,
         micro.sha256,
-        MesoSpeedRelation.Fixed,
+        MesoSpeedRelation.IdmEquilibrium,
         Array (west, ramp, merge, exit),
         Array (westLink, rampLink, exitLink),
         Array (westMove, rampMove),
@@ -1415,9 +1416,10 @@ end MesoSpecJson
     val semanticChange = spec.copy (links = Array (
         westLink, rampLink, exitLink.copy (capacity = exitLink.capacity + 1.0)))
     assert (semanticChange.sha256 != spec.sha256)                // semantics change identity
-    val idmMode = spec.copy (speedRelation = MesoSpeedRelation.IdmEquilibrium)
-    assert (idmMode.sha256 != spec.sha256)                        // speed law is semantic
-    assert (rejectsAgainst (idmMode, micro))                      // source must provide its IDM parameters
+    val noIdmMicro = micro.copy (vehicleDynamics = microMotion.copy (parameters = Array (
+        MicroParameter ("minimumGap", 2.0), MicroParameter ("timeHeadway", 1.5))))
+    val noIdmSpec = spec.copy (microIRSha256 = noIdmMicro.sha256)
+    assert (rejectsAgainst (noIdmSpec, noIdmMicro))               // source must provide its IDM parameters
 
     val unknownField = JsonParser.parseString (json).getAsJsonObject
     unknownField.addProperty ("extra", true)

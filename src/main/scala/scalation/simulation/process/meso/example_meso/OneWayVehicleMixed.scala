@@ -13,6 +13,7 @@ package process
 package meso
 package example_meso                                    // One-Shot
 
+import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
 import scalation.random.Sharp
 
@@ -51,6 +52,9 @@ class OneWayVehicleMixed (name: String = "OneWayVehicleMixed", reps: Int = 1,
     val storageCapacity = 2                             // vehicles
 
     Vehicle.setInitialSpeed (freeFlowSpeed)
+    private val flowDiagram = new IdmFlux (v0 = freeFlowSpeed, tau = Vehicle.T,
+                                           s0 = Vehicle.s, len = Vehicle.len,
+                                           delta = Vehicle.del)
 
     //--------------------------------------------------
     // Existing Scalation components
@@ -65,7 +69,8 @@ class OneWayVehicleMixed (name: String = "OneWayVehicleMixed", reps: Int = 1,
                            IDMDynamics, laneShift = VectorD (0.0, 0.0))
     val meso = MesoVTransport ("meso", boundary1, boundary2,
                                freeFlowSpeed, mesoCapacity,
-                               bend = 0.0, storageCapacity = storageCapacity)
+                               bend = 0.0, storageCapacity = storageCapacity,
+                               flowDiagram = flowDiagram)
     val microOut = Pathway ("micro-out", Array.empty [Junction], boundary2, exit,
                             IDMDynamics, laneShift = VectorD (0.0, 0.0))
 

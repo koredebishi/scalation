@@ -80,21 +80,42 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
     end edgeBetween
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Choose a lane at a graph-edge boundary.  On the first edge (`previousLanes
-     *  <= 0`), a source that already assigned a valid lane keeps it; a car with
-     *  no such lane (or a convention value out of this edge's range, e.g. a
-     *  ramp's `numLanes - 1`) draws one from its id.  On a later edge, a same
-     *  width keeps the lane and a width change redistributes deterministically.
+    /** Choose a lane at a graph-edge boundary (lane 0 = median side).
+     *   - first edge (`previousEdge < 0`): a source that already assigned a valid
+     *     lane keeps it; a car with none (e.g. a ramp's subtype) draws one from its id
+     *   - on-ramp merge (a `motorway_link` into a non-link edge): the outer lane,
+     *     as the classic `Ramp` does; rule 2 then spreads the car inward
+     *   - any other boundary: keep the lane; a car in a dropped lane shifts over
+     *  @param car           the vehicle
+     *  @param previousEdge  the edge just driven (-1 on the first edge)
+     *  @param e             the edge about to be driven
      */
-    private def handoffLane (car: Vehicle, previousLanes: Int, targetLanes: Int): Int =
+    private def handoffLane (car: Vehicle, previousEdge: Int, e: Int): Int =
+        val targetLanes = link (e).laneCount
         require (targetLanes > 0, "a transport must have at least one lane")
-        val validIncoming = car.laneID >= 0 && car.laneID < targetLanes
-        if previousLanes <= 0 then
-            if validIncoming then car.laneID else Math.floorMod (car.id, targetLanes)
-        else if car.laneID < 0 then Math.floorMod (car.id, targetLanes)
-        else if previousLanes == targetLanes then math.min (car.laneID, targetLanes - 1)
-        else Math.floorMod (car.id + car.laneID, targetLanes)
+        if previousEdge < 0 then
+            if car.laneID >= 0 && car.laneID < targetLanes then car.laneID
+            else Math.floorMod (car.id, targetLanes)
+        else if edge (previousEdge).highway == "motorway_link" && edge (e).highway != "motorway_link" then
+            targetLanes - 1
+        else math.min (math.max (car.laneID, 0), targetLanes - 1)
     end handoffLane
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Rule 2 on a meso edge, the same as `Route.rampLaneMove`'s meso branch: a car
+     *  that joined from an on-ramp moves one lane inward when the inner lane's entry
+     *  speed is higher than its own lane's and the inner lane has room.
+     *  (Duplicates Route's meso branch until Route owns the OSM meso lanes, step 5.)
+     *  @param car    the vehicle about to enter the edge
+     *  @param lanes  the edge's meso lanes
+     */
+    private def rampLaneMove (car: Vehicle, lanes: Array [MesoVTransport]): Int =
+        val lane = car.laneID
+        if ! car.fromRamp || lane == 0 then return lane
+        val mine  = lanes (lane)
+        val inner = lanes (lane - 1)
+        if inner.entrySpeed (car.vmax) > mine.entrySpeed (car.vmax) && inner.hasRoom then lane - 1 else lane
+    end rampLaneMove
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Drive one vehicle from a start node to a destination sink. */
@@ -103,16 +124,16 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
         require (node (destination).isInstanceOf [Sink],
                  s"destination node ${nodeId (destination)} is not a Sink")
         var here = startNode
-        var previousLanes = 0
+        var previousEdge = -1
         var factor = Double.NaN                                 // driver speed factor = source speed / first edge limit
         while here != destination do
             val next = table.next (here, destination)
             require (next >= 0, s"no route from node ${nodeId (here)} to node ${nodeId (destination)}")
             val e = edgeBetween (here, next)
-            val lanes = link (e).laneCount
-            car.laneID = handoffLane (car, previousLanes, lanes)
-            previousLanes = lanes
-            if factor.isNaN then factor = car.vmax / profile (e).speed
+            car.laneID = handoffLane (car, previousEdge, e)
+            if factor.isNaN then                                // first edge
+                factor = car.vmax / profile (e).speed
+                if edge (e).highway == "motorway_link" then car.fromRamp = true   // starts on an on-ramp
             car.vmax = factor * profile (e).speed               // the driver keeps its factor on every edge
 
             link (e) match
@@ -130,10 +151,16 @@ class BuiltGraph (val nodeId: Array [Long], val node: Array [Component], val edg
                         i += 1
                     end while
                     here = to (group.last)
+                    previousEdge = group.last
                     route.pathway (car.laneID).removeFromAlist (car)   // the car may have changed lanes
+                    node (here) match                                   // cross the route's end node
+                        case j: Junction => j.jump ()
+                        case _           =>
                 case MesoLink (lanes) =>
+                    car.laneID = rampLaneMove (car, lanes)      // rule 2: ramp cars spread inward
                     lanes (car.laneID).move ()
                     here = next
+                    previousEdge = e
                     node (here) match
                         case j: Junction => j.jump ()
                         case _           =>

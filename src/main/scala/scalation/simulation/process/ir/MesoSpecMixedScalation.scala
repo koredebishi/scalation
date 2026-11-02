@@ -338,7 +338,6 @@ end MesoSpecMixedScalation
     spec.validateAgainst (micro)
     val model = new MesoSpecMixedScalationModel (spec, micro)
     require (model.completed == model.nStop, "not all vehicles completed the mixed route")
-    require (model.meso.flowDiagram.nonEmpty, "the IDM-derived flux table was not attached")
 
     banner ("Mixed MesoSpec to ScalaTion test: PASS")
     println ("mesospec_sha256 = " + spec.sha256)

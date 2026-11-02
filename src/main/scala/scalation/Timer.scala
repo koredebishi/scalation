@@ -181,6 +181,16 @@ def memoryUsed: Array [Long] =
     Array (runtime.freeMemory / MB, runtime.totalMemory / MB, runtime.maxMemory / MB)
 end memoryUsed
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Return the heap in use in MB (actually MiB): total minus free memory, read after
+ *  asking the JVM to collect garbage (a request, so this is a snapshot, not a peak).
+ */
+def heapUsed: Long =
+    System.gc ()
+    val mem = memoryUsed
+    mem(1) - mem(0)
+end heapUsed
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `timerTest` main function tests the timer methods.

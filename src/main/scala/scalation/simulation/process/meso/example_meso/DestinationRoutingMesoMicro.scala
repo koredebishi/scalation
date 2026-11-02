@@ -10,6 +10,7 @@ package meso
 package example_meso
 
 import scala.collection.immutable.Map
+import scalation.dynamics.IdmFlux
 import scalation.mathstat.{MatrixD, VectorD}
 import scalation.random.Sharp
 
@@ -30,6 +31,9 @@ class DestinationRoutingMesoMicro (name: String = "DestinationRoutingMesoMicro",
     private val nodeCount = 9; private val destinations = Array (northNode, eastNode)
     val freeFlowSpeed = 68.0 / 2.23694; val mesoCapacity = 1800.0; val storageCapacity = 10
     Vehicle.setInitialSpeed (freeFlowSpeed)
+    private val flowDiagram = new IdmFlux (v0 = freeFlowSpeed, tau = Vehicle.T,
+                                           s0 = Vehicle.s, len = Vehicle.len,
+                                           delta = Vehicle.del)
 
     private def makeCar (origin: Int): Vehicle =
         val i = math.round (director.clock / interval).toInt
@@ -45,7 +49,8 @@ class DestinationRoutingMesoMicro (name: String = "DestinationRoutingMesoMicro",
     val sinkNorth = Sink ("sink-north", (1500, 100)); val sinkEast = Sink ("sink-east", (1350, 600))
 
     private def meso (n: String, a: Component, b: Component, len: Double): MesoVTransport =
-        val x = MesoVTransport (n, a, b, freeFlowSpeed, mesoCapacity, storageCapacity = storageCapacity)
+        val x = MesoVTransport (n, a, b, freeFlowSpeed, mesoCapacity, storageCapacity = storageCapacity,
+                                flowDiagram = flowDiagram)
         x.length = len; x
 
     val fromWest = meso ("from-west", sourceWest, split, 300.0)

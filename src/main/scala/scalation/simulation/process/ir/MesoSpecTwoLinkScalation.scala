@@ -288,7 +288,7 @@ end MesoSpecTwoLinkScalationModel
         assert (model.links(i).persistentStat.max <= model.links(i).storageCapacity)
     }
     assert (completed == model.nStop)
-    val fluxes = model.links.map (_.flowDiagram.get)
+    val fluxes = model.links.map (_.flowDiagram)
     assert (fluxes.forall (_ eq fluxes(0)))                    // translated links share one IDM relation
     assert (fluxes(0).v0 == 10.0)                              // derived from source MicroIR parameters
 

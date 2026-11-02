@@ -142,6 +142,7 @@ class VTransport (name: String, from_ : Component, to_ : Component,
                 done = true
                 accum (vdeque.size)                        // occupancy held since the preceding entry/exit event
                 vdeque -= actor
+                actor.lastLink = this                      // the junction ahead reads this road's density
             end if
 
             if !done then

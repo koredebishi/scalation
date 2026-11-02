@@ -76,16 +76,13 @@ object MesoSpecScalation:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build the one IDM equilibrium relation shared by all links in a translation.
-     *  The MicroIR is the parameter authority; the MesoSpec only selects its use.
+     *  The MicroIR is the parameter authority.
      */
-    private [ir] def flowDiagram (spec: MesoSpec, micro: MicroIR): Option [IdmFlux] =
-        spec.speedRelation match
-            case MesoSpeedRelation.Fixed => None
-            case MesoSpeedRelation.IdmEquilibrium =>
-                val parameters = micro.vehicleDynamics.parameters.map (p => p.name -> p.value).toMap
-                Some (new IdmFlux (parameters("maximumSpeed"), parameters("timeHeadway"),
-                                   parameters("minimumGap"), parameters("vehicleLength"),
-                                   parameters("delta")))
+    private [ir] def flowDiagram (spec: MesoSpec, micro: MicroIR): IdmFlux =
+        val parameters = micro.vehicleDynamics.parameters.map (p => p.name -> p.value).toMap
+        new IdmFlux (parameters("maximumSpeed"), parameters("timeHeadway"),
+                     parameters("minimumGap"), parameters("vehicleLength"),
+                     parameters("delta"))
     end flowDiagram
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -196,7 +193,10 @@ end MesoSpecScalationModel
         CarFollowingModel.IDM,
         ODESolverType.Ballistic,
         Array (MicroParameter ("timeHeadway", 1.5),
-               MicroParameter ("minimumGap", 2.0)),
+               MicroParameter ("minimumGap", 2.0),
+               MicroParameter ("maximumSpeed", 10.0),
+               MicroParameter ("vehicleLength", 4.0),
+               MicroParameter ("delta", 4.0)),
         0.5)
     val micro = MicroIR (
         MicroIR.version,
@@ -213,7 +213,7 @@ end MesoSpecScalationModel
         MesoSpec.version,
         micro.version,
         micro.sha256,
-        MesoSpeedRelation.Fixed,
+        MesoSpeedRelation.IdmEquilibrium,
         Array (MesoNode ("entry", MicroNodeKind.Source),
                MesoNode ("exit", MicroNodeKind.Sink)),
         Array (MesoLink ("link-0", Array ("micro-link-0"), "entry", "exit",
@@ -234,7 +234,7 @@ end MesoSpecScalationModel
     assert (model.link.occupancy == 0)
     assert (model.link.blockedCount == 0)
     assert (model.link.persistentStat.max <= model.link.storageCapacity)
-    assert (model.link.flowDiagram.isEmpty)                     // fixed-speed one-link baseline stays unchanged
+    assert (model.link.flowDiagram.v0 == 10.0)                  // derived from source MicroIR parameters
 
     banner ("MesoSpec to ScalaTion test: PASS")
     println (s"mesospec_sha256 = ${spec.sha256}")

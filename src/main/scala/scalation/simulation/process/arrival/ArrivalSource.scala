@@ -151,7 +151,8 @@ object AggregatedArrivalSource:
     def clearCache(): Unit = mlCache.clear()
 
     /** Load mainline entry station data from aggregated CSV (cached).
-     *  For WB direction, entry = highest postmile station.
+     *  The entry is the first station in travel order: highest postmile for WB,
+     *  lowest for EB (taken from the CSV's Direction column).
      *  @return (laneTotals array, muArray for the specified lane)
      */
     def loadMainlineEntry(demand: AggregatedDemand, laneIdx: Int, nLanes: Int,
@@ -192,6 +193,7 @@ object AggregatedArrivalSource:
             val cols = header.split(",").map(_.trim)
             val pmIdx = cols.indexWhere(_.contains("Abs_PM"))
             val laneTypeIdx = cols.indexWhere(c => c.toLowerCase.contains("lane") && c.toLowerCase.contains("type"))
+            val directionIdx = cols.indexWhere(_ == "Direction")
             val laneFlowIndices = (1 to nLanes).map { l =>
                 cols.indexWhere(c => c.contains(s"Lane$l Flow") && !c.contains("Speed"))
             }.toArray
@@ -199,10 +201,12 @@ object AggregatedArrivalSource:
             // Read all rows, group by station (by postmile)
             // Filter by startTime AND lane type = "ML" (exclude HV/HOV)
             val stationData = HashMap[Double, ArrayBuffer[Array[Double]]]()
+            var direction = "W"
             var line = reader.readLine()
             while line != null do
                 val parts = line.split(",").map(_.trim)
                 val timestamp = parts(0)
+                if directionIdx >= 0 && directionIdx < parts.length then direction = parts(directionIdx)
                 val laneType = if laneTypeIdx >= 0 && laneTypeIdx < parts.length then parts(laneTypeIdx) else "ML"
                 if timestamp >= demand.startTime && laneType == "ML" && parts.length > pmIdx && pmIdx >= 0 then
                     val pm = parts(pmIdx).toDoubleOption.getOrElse(0.0)
@@ -216,8 +220,8 @@ object AggregatedArrivalSource:
 
             if stationData.isEmpty then return (ArrayBuffer.empty, Array.fill(nLanes)(0))
 
-            // Find entry station (highest PM for WB)
-            val entryPM = stationData.keys.max
+            // Find entry station: EB enters at the lowest PM, WB at the highest
+            val entryPM = if direction == "E" then stationData.keys.min else stationData.keys.max
             val entryRows = stationData(entryPM)
             debug ("parseMainlineCSV", s"Entry station PM=$entryPM, rows=${entryRows.length}")
 
@@ -241,10 +245,13 @@ object AggregatedArrivalSource:
      *
      *  @param demand     AggregatedDemand pointing to the corridor CSV
      *  @param stationId  PeMS VDS station ID (e.g., 717634)
+     *  @param file       which of the demand's CSVs to read (default: the ML_HV file)
+     *  @param laneType   the station lane type to keep ("ML", "FR", ...)
      *  @return array of total flow per 5-min interval, ordered by timestamp
      */
-    def extractStationFlow (demand: AggregatedDemand, stationId: Int): Array[Double] =
-        val filePath = s"${demand.dataDir}/${demand.mlFile}"
+    def extractStationFlow (demand: AggregatedDemand, stationId: Int,
+                            file: String = null, laneType: String = "ML"): Array[Double] =
+        val filePath = s"${demand.dataDir}/${if file == null then demand.mlFile else file}"
         try
             val reader = new BufferedReader (new FileReader (filePath))
             val header = reader.readLine ()
@@ -262,9 +269,9 @@ object AggregatedArrivalSource:
                 val timestamp = parts (0)
                 val sid       = if stationIdx >= 0 && stationIdx < parts.length
                                 then parts (stationIdx).toIntOption.getOrElse (0) else 0
-                val laneType  = if laneTypeIdx >= 0 && laneTypeIdx < parts.length
+                val rowType   = if laneTypeIdx >= 0 && laneTypeIdx < parts.length
                                 then parts (laneTypeIdx) else "ML"
-                if sid == stationId && laneType == "ML" && timestamp >= demand.startTime then
+                if sid == stationId && rowType == laneType && timestamp >= demand.startTime then
                     val flow = if totalFlowIdx >= 0 && totalFlowIdx < parts.length
                                then parts (totalFlowIdx).toDoubleOption.getOrElse (0.0) else 0.0
                     flows += flow
