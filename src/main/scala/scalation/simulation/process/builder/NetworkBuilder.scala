@@ -47,7 +47,7 @@
  *  resolution, speed, and the grouping identity used to preserve micro DLLs.
  *  The builder derives the mesoscopic parameters from that speed:
  *    fd       = IdmFlux (v0 = profile.speed, tau = Vehicle.T, s0 = Vehicle.s,
- *                        len = Vehicle.len, delta = Vehicle.del)   -- dynamics/LWR.scala:85
+ *                        len = Vehicle.len, delta = Vehicle.del)   -- dynamics/IdmFlux.scala
  *    capacity = lanes * fd.q_max * 3600            (veh/h)
  *    storage  = floor (lanes * length * fd.rho_m)  (vehicles; rho_m = 1/(s0+len))
  *    lanes    = lanes_effective from the file (flag edges where lanes_is_default)

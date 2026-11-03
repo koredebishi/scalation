@@ -77,11 +77,20 @@ end CalibratableModel
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Readings a calibration adapter takes from a CalRoute101_3 model variant. */
-trait CalRouteReadings:
+trait CalRouteReadings extends Model:
     def getJunctions: Array [Junction]
     def getPemsSensorIndices: Array [Int]
     def getDemandConfig: PeMSDemand
     def getDynamicsConfig: DynamicsConfig
+
+    /** Called after each replication, before `Model` resets statistics and recorders.
+     *  Set by a replication runner (`ReplicationRun`); does nothing by default.
+     */
+    var onReplication: (Int, Double) => Unit = (_, _) => ()
+
+    override protected def replicationCompleted (rep: Int, computationTimeMs: Double): Unit =
+        onReplication (rep, computationTimeMs)
+    end replicationCompleted
 end CalRouteReadings
 
 

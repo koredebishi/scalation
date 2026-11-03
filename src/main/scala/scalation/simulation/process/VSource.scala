@@ -178,6 +178,8 @@ class VSource (name: String, director: Model, makeEntity: () => Vehicle,
                                 iArrivalTime.gen1(mu)
 
                     tally(duration) // tally duration
+                    if director.clock + duration > director.getStopTime then
+                        break()                           // next arrival is past the stop time: end this replication's generation
                     schedule(duration)
                     yieldToDirector() // yield and wait duration time units
                 end if

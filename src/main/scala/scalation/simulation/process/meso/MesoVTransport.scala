@@ -16,14 +16,14 @@ import scala.collection.mutable.ArrayDeque
 import scalation.animation.CommandType.MoveToken
 import scalation.dynamics.IdmFlux
 import scalation.mathstat.VectorD
-import scala.math.min
+import scala.math.{min,max}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MesoVTransport` class models one lane using sparse vehicle activations.
  *  Traversal of the running part makes a vehicle ready; FIFO and capacity govern departure.
  *  Finite storage blocks excess vehicles in a native FIFO `WaitQueue` and wakes
  *  one blocked vehicle whenever a departure frees one reserved slot.
  *
- *  How the `IdmFlux` table is used (derivation in `IdmFlux`, LWR.scala):
+ *  How the `IdmFlux` table is used (derivation in `IdmFlux`, IdmFlux.scala):
  *      L = length, n_r = runningCount, n_q = queuedCount, N = occupancy, h = releaseHeadway
  *      table      -> V_e (rho)           speed read at entry             `IdmFlux.speed`
  *      table      -> h = 1 / q_max       discharge headway               `capacity` -> `releaseHeadway`
@@ -212,7 +212,8 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         val v0    = min (flowDiagram.v0, actor.vmax)                // the car's desired speed, never above the road's
         val speed = flowDiagram.withV0 (v0).speed (rho)             // IDM steady state with that v0 (same v0 as micro's IDM)
 
-        val fluxTime  = if speed <= 0.0 then 0.0                    // jam density: no running part to cross, join the queue
+        val fluxTime  = if runningLength <= 0.0 then 0.0            // queue fills the link: no running part, join the queue
+                        else if speed <= 0.0 then Double.PositiveInfinity   // cannot cross at zero speed: the min picks queueTime
                         else runningLength / speed                  // time (s) to cross the running part
         val queueTime = runningLength / actor.vmax + occupancy * releaseHeadway   // cars ahead leave at capacity: a jam empties from its front
         val traversalTime = min (fluxTime, queueTime)
