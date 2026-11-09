@@ -31,9 +31,12 @@ import scala.math.{abs, sqrt}
  *  @param nrmse   Normalized RMSE (as percentage, *100)
  *  @param smape   Symmetric Mean Absolute Percentage Error
  *  @param simMean Mean of simulated values, computed the same way as `mean`
+ *  @param seriesRmse RMSE between the observed and simulated station series over the
+ *                    time rows (flow: lane sum; speed: flow-weighted lane mean); for a
+ *                    single lane it equals `rmse`
  */
 case class MacroMetrics (r2: Double, mae: Double, rmse: Double, mean: Double, nrmse: Double, smape: Double,
-                         simMean: Double)
+                         simMean: Double, seriesRmse: Double)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SensorValidation` case class holds validation results for one sensor.
@@ -97,22 +100,36 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
     /** Compute macro-level validation metrics for two matrices.
      *  @param sim     simulated data matrix
      *  @param obs     observed data matrix (PeMS)
-     *  @param isFlow  true for flow (sum across lanes), false for speed (average across lanes)
+     *  @param isFlow  true for flow (sum across lanes), false for speed (flow-weighted
+     *                 mean across lanes, as PeMS computes its station speed)
+     *  @param simW    simulated flow matrix, the weights for speed (ignored for flow)
+     *  @param obsW    observed flow matrix, the weights for speed (ignored for flow)
      */
-    private def macroValidation (sim: MatrixD, obs: MatrixD, isFlow: Boolean = true): MacroMetrics =
+    private def macroValidation (sim: MatrixD, obs: MatrixD, isFlow: Boolean = true,
+                                 simW: MatrixD = null, obsW: MatrixD = null): MacroMetrics =
         val n = obs.dim * obs.dim2
         val e = obs - sim
-        
-        // Mean of observed values:
-        //   Flow  → sum across lanes (total corridor flow per interval), then average over time
-        //   Speed → average across lanes (mean corridor speed per interval), then average over time
-        val obsRowSums = obs.sumVr                                   // sum across lanes per row (VectorD)
-        val obsMeanTotal = if isFlow then obsRowSums.mean            // flow: mean of row sums
-                           else obsRowSums.mean / nLanes             // speed: mean of row averages
-        val simRowSums   = sim.sumVr                                 // same aggregation for the simulated side
-        val simMeanTotal = if isFlow then simRowSums.mean
-                           else simRowSums.mean / nLanes
-        
+
+        // Station series per time row:
+        //   Flow  → sum across lanes (total station flow per interval)
+        //   Speed → flow-weighted mean across lanes (PeMS station speed); a lane with no
+        //           flow has no weight, so an absent lane does not lower the mean
+        def stationSeries (m: MatrixD, w: MatrixD): VectorD =
+            if isFlow then m.sumVr
+            else
+                val v = new VectorD (m.dim)
+                cfor (0, m.dim) { i =>
+                    var num = 0.0; var den = 0.0
+                    cfor (0, m.dim2) { j => num += w(i, j) * m(i, j); den += w(i, j) }
+                    v(i) = if den > 0.0 then num / den else 0.0
+                }
+                v
+        val obsSeries    = stationSeries (obs, obsW)
+        val simSeries    = stationSeries (sim, simW)
+        val obsMeanTotal = obsSeries.mean                            // mean over time of the station series
+        val simMeanTotal = simSeries.mean
+        val seriesRmse   = sqrt ((obsSeries - simSeries).normSq / obs.dim)
+
         // R² - Coefficient of determination (use per-cell calculation)
         val obsCellMean = obs.mean.sum / obs.dim2                    // per-cell mean for R²
         val sse = e.normFSq
@@ -131,8 +148,12 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
         // RMSE - Root Mean Squared Error (per cell)
         val rmse = sqrt(sse / n)
         
-        // NRMSE*100 - Normalized RMSE as percentage (use obsMeanTotal to match displayed mean)
-        val nrmse100 = if obsMeanTotal != 0.0 then (rmse / obsMeanTotal) * 100.0 else rmse * 100.0
+        // NRMSE*100 - station error in percent: the error of the station series (lane sum
+        // for flow, flow-weighted lane mean for speed) over the mean of the observed series,
+        // so numerator and denominator are on the same scale.  The per-cell `rmse` above is
+        // a one-lane error and must not be divided by a four-lane total.  Lane NRMSE is in
+        // `microValidation`, where a lane is its own series.
+        val nrmse100 = if obsMeanTotal != 0.0 then (seriesRmse / obsMeanTotal) * 100.0 else seriesRmse * 100.0
 
         // SMAPE - Symmetric Mean Absolute Percentage Error
         var smapeSum = 0.0
@@ -145,7 +166,7 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
         }
         val smape = 100.0 * smapeSum / n
 
-        MacroMetrics(r2, mae, rmse, obsMeanTotal, nrmse100, smape, simMeanTotal)
+        MacroMetrics(r2, mae, rmse, obsMeanTotal, nrmse100, smape, simMeanTotal, seriesRmse)
     end macroValidation
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -166,7 +187,7 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
             val smape = d(7)
             val obsMean = obsCol.mean
             val nrmse100 = if obsMean != 0.0 then (rmse / obsMean) * 100.0 else rmse * 100.0
-            results(lane) = MacroMetrics(r2, mae, rmse, obsMean, nrmse100, smape, simCol.mean)
+            results(lane) = MacroMetrics(r2, mae, rmse, obsMean, nrmse100, smape, simCol.mean, rmse)
         }
         results
     end microValidation
@@ -191,7 +212,7 @@ class SimulationReport (simFlow: Array [MatrixD], simSpeed: Array [MatrixD],
             debug ("validate", s"    Sim data: flow=${simFlow(s).dim}x${simFlow(s).dim2}, speed=${simSpeed(s).dim}x${simSpeed(s).dim2}")
 
             val flowMacro = macroValidation (simFlow(s), pemsFlow, isFlow = true)
-            val speedMacro = macroValidation (simSpeed(s), pemsSpeed, isFlow = false)
+            val speedMacro = macroValidation (simSpeed(s), pemsSpeed, isFlow = false, simFlow(s), pemsFlow)
             val flowMicro = microValidation (simFlow(s), pemsFlow)
             val speedMicro = microValidation (simSpeed(s), pemsSpeed)
 

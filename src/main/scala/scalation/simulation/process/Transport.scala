@@ -50,6 +50,11 @@ class Transport (name: String, val from: Component, val to: Component,
     private val STEP_SIZE   = 5                                         // number of units/pixels to move per step
     private var onTransport = 0                                         // the number of entities/sim-actors on this Transport
 
+    /** Drawing only: false keeps this transport off the animation (e.g., a lane
+     *  that does not exist on this stretch).  No effect on the simulation.
+     */
+    var visible = true
+
     private [process] val curve    = QCurve ()                          // shadow QCurve for computing locations as tokens move along curve
     private [process] val (p1, p2) = calcEndPoints                      // first and second endpoints
     /** Use the middle of the supplied centerline as the quadratic control point.
@@ -119,6 +124,7 @@ class Transport (name: String, val from: Component, val to: Component,
     /** Tell the animation engine to display this transport.
      */
     def display (): Unit =
+        if ! visible then return
 //      director.animate (this, CreateEdge, blue, QCurve (), from, to, Array (bend))
         director.animate (this, CreateEdge, blue, QCurve (), from, to,
                           Array (p1(0), p1(1), pc(0), pc(1), p2(0), p2(1)))

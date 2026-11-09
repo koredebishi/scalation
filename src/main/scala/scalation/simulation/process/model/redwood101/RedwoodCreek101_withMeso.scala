@@ -158,6 +158,12 @@ class RedwoodCreek101_withMeso (name: String = "RedwoodCreek101_withMeso", reps:
                                mesoSegs = Set (0, 1, 3, 4, 6), flowDiagram = Some (flowDiagram))
     debug ("init", s"Route created with ${route.pathway.length} pathways")
 
+    // L5 does not exist from offR_merge to onR_merge1 (segments 3-4): do not draw it there
+    private val outer = numLanes - 1
+    for s <- offJunc until rampJoinSeg(0) do
+        route.pathway(outer).seg(s).visible = false
+        if route.mesoLink(outer)(s) != null then route.mesoLink(outer)(s).visible = false
+
     // Sinks: sinkMain past sensor5, sinkOff at the end of the off-ramp
     private val (x0, y0) = (aniCoords_Main.last._1 - 100.0, aniCoords_Main.last._2 - 100.0)
     private val offEnd   = RedwoodCreekConfig.getOffRampEnd ((w, h))
@@ -231,11 +237,17 @@ class RedwoodCreek101_withMeso (name: String = "RedwoodCreek101_withMeso", reps:
             val divergeSeg = if joinSeg < offJunc then offJunc else highway_length
             driveSegments (joinSeg, divergeSeg)
 
-            if divergeSeg == offJunc && rand.gen < exitFraction (getCurrentRow (director.clock) min (nt - 1)) then
+            // L5 ends at offR_merge: an L5 car exits with share p(k), otherwise it merges into L4
+            val inOuterLane = divergeSeg == offJunc && laneID == numLanes - 1
+            if inOuterLane && rand.gen < exitFraction (getCurrentRow (director.clock) min (nt - 1)) then
                 leaveMicro ()                               // leave the mainline at offR_merge
                 driveRamp (offRamp)
                 sinks(1).leave ()
             else
+                if inOuterLane then                         // through car: move to L4 (driveSegments joins it)
+                    leaveMicro ()                           // leave L5 before laneID changes
+                    laneID = numLanes - 2
+                end if
                 driveSegments (divergeSeg, highway_length)
                 leaveMicro ()
                 sinks.head.leave ()

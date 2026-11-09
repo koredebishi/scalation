@@ -150,6 +150,12 @@ class RedwoodCreek101 (name: String = "RedwoodCreek101", reps: Int = 1,
     private val route = Route ("Rte", numLanes, intermediateJunc, junc(0), junc.last, motion)
     debug ("init", s"Route created with ${route.pathway.length} pathways")
 
+    // L5 does not exist from offR_merge to onR_merge1 (segments 3-4): do not draw it there
+    private val outer = numLanes - 1
+    for s <- offJunc until rampJoinSeg(0) do
+        route.pathway(outer).seg(s).visible = false
+        if route.mesoLink(outer)(s) != null then route.mesoLink(outer)(s).visible = false
+
     // Sinks: sinkMain past sensor5, sinkOff at the end of the off-ramp
     private val (x0, y0) = (aniCoords_Main.last._1 - 100.0, aniCoords_Main.last._2 - 100.0)
     private val offEnd   = RedwoodCreekConfig.getOffRampEnd ((w, h))
@@ -227,11 +233,19 @@ class RedwoodCreek101 (name: String = "RedwoodCreek101", reps: Int = 1,
             val divergeSeg = if joinSeg < offJunc then offJunc else highway_length
             driveSegments (joinSeg, divergeSeg)
 
-            if divergeSeg == offJunc && rand.gen < exitFraction (getCurrentRow (director.clock) min (nt - 1)) then
+            // L5 ends at offR_merge: an L5 car exits with share p(k), otherwise it merges into L4
+            val inOuterLane = divergeSeg == offJunc && laneID == numLanes - 1
+            if inOuterLane && rand.gen < exitFraction (getCurrentRow (director.clock) min (nt - 1)) then
                 route.pathway(laneID).removeFromAlist (this)   // leave the mainline at offR_merge
                 driveRamp (offRamp)
                 sinks(1).leave ()
             else
+                if inOuterLane then                         // through car: merge into L4, as a ramp car joins
+                    route.pathway(laneID).removeFromAlist (this)
+                    laneID = numLanes - 2
+                    val carAhead = route.pathway(laneID).mergeLeaderAt (offJunc)
+                    route.pathway(laneID).joinAt (this, carAhead, offJunc)
+                end if
                 driveSegments (divergeSeg, highway_length)
                 route.pathway(laneID).removeFromAlist (this)
                 sinks.head.leave ()

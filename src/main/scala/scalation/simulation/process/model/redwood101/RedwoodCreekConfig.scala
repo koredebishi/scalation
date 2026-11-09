@@ -32,6 +32,15 @@ import scalation.simulation.process.config.{MainlineSpec, NetworkConfig, PeMSArr
  *
  *  Junction indices: 0 warm_up, 1 sensor1, 2 sensor2, 3 offR_merge, 4 sensor3,
  *                    5 onR_merge1, 6 sensor4, 7 onR_merge2, 8 sensor5
+ *
+ *  Outer lane L5 ends at the off-ramp and restarts at on-ramp 410095 (PeMS day totals:
+ *  S2 - FR = 69,594 vs S3's 4 lanes 68,165; OR1 = 11,356 vs S4 L5 = 11,609):
+ *      sensor2 ---- offR_merge ---- sensor3 ---- onR_merge1 ---- sensor4
+ *      L1-L4 ===========================================================
+ *      L5 ===========\                          /=======================
+ *                     -> off-ramp         on-ramp 410095
+ *  The Route keeps 5 lanes; L5 stays empty on segments 3-4 because at offR_merge
+ *  every L5 car either exits or merges into L4, and no lane rule moves a car into L5.
  */
 object RedwoodCreekConfig:
 
@@ -102,13 +111,16 @@ object RedwoodCreekConfig:
     val offRampFile = "Ramps_VDS_Redwood_Creek_US101-N/1-410094FR.csv"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Off-ramp exit fraction per 15-min row: p(k) = FR(k) / S2(k), where S2 is
-     *  the last mainline sensor before the diverge.
+    /** Off-ramp exit fraction per 15-min row for cars in the outer lane (L5):
+     *  p(k) = FR(k) / S2_L5(k), where S2 is the last mainline sensor before the
+     *  diverge.  L5 ends at the off-ramp (S3 has 4 lanes), so every exiting car
+     *  comes from L5; in PeMS, FR is 47-87% of S2's L5 flow, never more.
      *  @param dem  the demand (gives S2's file, window and layout)
      */
     def exitFraction (dem: PeMSDemand): VectorD =
+        val outer = network.mainline.lanesPerSegment - 1                       // L5 (lane 0 = median side)
         val fr = PeMSDataLoader.loadRampSensor (offRampFile, dem.window)(?, 0)
-        val s2 = PeMSDataHelper.loadMainlineSensor (dem, 1, dem.window, dem.layout)._1.sumVr
+        val s2 = PeMSDataHelper.loadMainlineSensor (dem, 1, dem.window, dem.layout)._1(?, outer)
         val n  = s2.dim
         new VectorD (n, Array.tabulate (n) { k => if s2(k) > 0.0 then fr(k) / s2(k) else 0.0 })
     end exitFraction

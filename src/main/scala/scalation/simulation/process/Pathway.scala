@@ -274,7 +274,7 @@ class Pathway (name: String, val junc: Array [Junction], val from: Component, va
     /** Display this pathway.
      */
     override def display (): Unit =
-        for s <- seg.indices do
+        for s <- seg.indices if seg(s).visible do
             val segment = seg(s)
             director.animate (segment, CreateEdge, blue, segment.curve, segment.from, segment.to,
                 Array (segment.p1(0), segment.p1(1),

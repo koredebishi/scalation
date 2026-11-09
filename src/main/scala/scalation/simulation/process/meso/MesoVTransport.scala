@@ -130,13 +130,11 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
     /** Length occupied by vehicles waiting for link discharge: n_q / rho_m. */
     private def queueLength: Double = queuedCount * jamSpacing
 
-    /** Physical storage limit for this link, bounded by its own length.
-     * Compute the max physical vehicle that can fit on this Vtransport.
-     * by choosing between the: Storage Cap, and the length of the Vtransport * jam density.
-     * While ensuring the vehcle can hold at min 1 vehicle.
-     *     N_max = min (N_store, max (floor (L rho_m), 1))
-     * Example: L = 156 m and s0 + len = 6 m hold 156 / 6 = 26 vehicles.
-     * */
+    /** Vehicles this link can hold: its length L over the IDM standstill spacing s0 + len
+     *  (rho_m = 1 / (s0 + len), the jam density), never below one, and never above the
+     *  configured `storageCapacity` (unset in the corridor models, so L rho_m decides).
+     *      N_max = min (N_store, max (floor (L rho_m), 1)),  e.g. 156 m / (2 + 4) m = 26 vehicles.
+     */
     private def admissionCapacity: Int =
         min (storageCapacity, (length * flowDiagram.rho_m).toInt.max (1))
     end admissionCapacity
@@ -206,9 +204,15 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
         awaitAdmission (actor)          // wait until storage is available 
         val entryTime = director.clock
 
-        val rho = runningDensity               
-        val runningLength = max (length - queueLength, 0.0)    // the car crosses the running part; the queue is the FIFO's job
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //Once a vehicle enters a link, we need a snapshot of moving
+        //vehicle on the link / the meters they have to travel
+        // return 0 if nothing is moving and rho_max if at full running.
+        val rho = runningDensity               
+        val runningLength = max (length - queueLength, 0.0)    // The meter this vehicle has to drive before getting to the back of queue.
+
+        // our v0 is a choice between the vmax of the vehicle or the v0 we used in the table.
         val v0    = min (flowDiagram.v0, actor.vmax)                // the car's desired speed, never above the road's
         val speed = flowDiagram.withV0 (v0).speed (rho)             // IDM steady state with that v0 (same v0 as micro's IDM)
 
@@ -223,6 +227,7 @@ class MesoVTransport (name: String, from_ : Component, to_ : Component,
 
         accum (occupancy)                        // existing time-persistent occupancy statistic
         vdeque += entry                          // add the vehicle to the end of the FIFO
+
         entered += 1                             // increment vehicle count on this Vtranport. need to keep track of this for the statistics
 
         debug ("ADMIT", s"t=${director.clock}, actor=${actor.displayLabel}, occupancy=$occupancy, " +
