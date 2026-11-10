@@ -24,6 +24,7 @@ import scalation.mathstat.{MatrixD, Statistic, VectorD}
 import scalation.simulation.process.config.{DynamicsConfig, PeMSDemand}
 import scalation.simulation.process.model.redwood101.{RedwoodCreek101, RedwoodCreek101_fullMeso,
                                                      RedwoodCreek101_withMeso}
+import scalation.simulation.process.model.i210w.{I210W, I210WConfig, I210W_fullMeso, I210W_withMeso}
 
 /** Number of measured replications per model. */
 private val REPS = 10
@@ -130,6 +131,21 @@ end repsDonaldDoyle
 end repsRedwood
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Replications for I-210 Westbound Pasadena, written to log/simulation/pads_reps/i210w/<day>.
+ *  Calibration day is `I210WConfig.DEFAULT_DAY`; the other two days are held out.
+ *  > runMain scalation.simulation.process.model.calroute101.repsI210W
+ *  > runMain scalation.simulation.process.model.calroute101.repsI210W 2024-12-10
+ *  @param day  the PeMS data folder (one of `I210WConfig.DAYS`)
+ */
+@main def repsI210W (day: String = I210WConfig.DEFAULT_DAY): Unit =
+    require (I210WConfig.DAYS.contains (day), s"unknown day $day, expected one of ${I210WConfig.DAYS.mkString (", ")}")
+    runReplications (s"i210w/$day", DynamicsConfig.idmDefault, Seq (
+        "micro" -> (() => new I210W (reps = REPS, animating = false, day = day)),
+        "mixed" -> (() => new I210W_withMeso (reps = REPS, animating = false, day = day)),
+        "meso"  -> (() => new I210W_fullMeso (reps = REPS, animating = false, day = day))))
+end repsI210W
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Run each model for `REPS` replications, write its results, then compare
  *  every model with the first (micro) by paired differences.
  *  @param corridor  the sub-folder of log/simulation/pads_reps/ (must exist)
@@ -164,7 +180,7 @@ end runReplications
  */
 private def writeComparison (folder: String, results: Seq [ReplicationResults]): Unit =
     val base     = results.head
-    val corridor = folder.split ('/').last
+    val corridor = folder.stripPrefix ("pads_reps/").replace ('/', ' ')
     val ew       = new EasyWriter ("simulation", s"$folder/comparison.txt")
     def emit (line: String): Unit = { println (line); ew.println (line) }
 
@@ -249,7 +265,7 @@ private class ReplicationResults (val label: String):
             table.println (s"${k + 1}," + (0 until row.dim).map (j => row(j).toString).mkString (","))
         table.close ()
 
-        val corridor = folder.split ('/').last
+        val corridor = folder.stripPrefix ("pads_reps/").replace ('/', ' ')
         val summary  = new EasyWriter ("simulation", s"$folder/${label}_summary.txt")
         def emit (line: String): Unit = { println (line); summary.println (line) }
         blockHeader ("REPLICATION SUMMARY",
@@ -265,7 +281,7 @@ private class ReplicationResults (val label: String):
             emit ("%-26s".format (name) + s"%16.${dec}f%14.${dec}f%18.${dec}f".format (stat.mean, stat.stdev, stat.interval ()))
         emit (RULE)
         summary.close ()
-        writeMetrics (folder)
+        writeMetrics (folder, demand.window.binSeconds / MINUTE)
 
         val n = rows.size.toDouble
         val nSensors = sumFlow.length
@@ -282,8 +298,8 @@ private class ReplicationResults (val label: String):
      *  speed, lane flow, lane speed), each headed by its source and formulas.
      *  @param folder  the output sub-folder of log/simulation/
      */
-    private def writeMetrics (folder: String): Unit =
-        val corridor = folder.split ('/').last
+    private def writeMetrics (folder: String, binMinutes: Double): Unit =
+        val corridor = folder.stripPrefix ("pads_reps/").replace ('/', ' ')
         def cells (m: MacroMetrics): Array [Double] =                           // METRICS order
             Array (m.r2, m.mae, m.rmse, m.seriesRmse, m.nrmse, m.smape, m.mean, m.simMean)
 
@@ -317,7 +333,7 @@ private class ReplicationResults (val label: String):
 
         // ---- the report: four blocks, one header each
         val report = new EasyWriter ("simulation", s"$folder/${label}_validation_report.txt")
-        val units  = Map ("flow" -> "veh / 15 min", "speed" -> "m/s")
+        val units  = Map ("flow" -> f"veh / $binMinutes%.0f min", "speed" -> "m/s")
         def block (title: String, source: String, laneLevel: Boolean, quantity: String,
                    rows: Seq [(String, Array [SimulationMetricSummary])]): Unit =
             val formulas = METRICS.toSeq.map { case (key, name, _, formula) =>

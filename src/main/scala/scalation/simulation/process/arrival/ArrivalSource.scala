@@ -77,7 +77,7 @@ class PeMSRampArrivalSource(arrivals: PeMSArrivals, demand: PeMSDemand,
     private val debug = debugf ("PeMSRampArrivalSource", false)
 
     // Load flow data for this ramp
-    private val flowMatrix = PeMSDataHelper.loadRampSensor(demand, rampIdx)
+    private val flowMatrix = PeMSDataHelper.loadRampSensor(demand, rampIdx, demand.window)   // the demand's window, not the 48-row default
     
     // Total vehicles: sum of flow across all time rows
     private val rampTotal: Int = flowMatrix.sumVr.sum.toInt
