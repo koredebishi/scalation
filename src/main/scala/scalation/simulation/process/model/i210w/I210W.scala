@@ -152,6 +152,7 @@ class I210W (name: String = "I210W", reps: Int = 1,
         if route.mesoLink(l)(s) != null then route.mesoLink(l)(s).length = I210WConfig.segmentLengthsM(s)
 
     private val (x0, y0) = (aniCoords_Main.last._1 - 100.0, aniCoords_Main.last._2 - 100.0)
+
     private val sinks = Sink.group ((0, 0),
         ("sinkMain", (x0.toInt, y0.toInt)),
         ("sinkOff1", I210WConfig.getOffRampEnd ((w, h), 0)),
@@ -221,7 +222,7 @@ class I210W (name: String = "I210W", reps: Int = 1,
             end while
             if ! exited then
                 driveSegments (seg, highway_length)
-                route.pathway(laneID).removeFromAlist (this)
+                route.pathway(laneID).removeFromAlist (this)     // leave the mainline at the end of the corridor
                 sinks.head.leave ()
             end if
         end driveHighway

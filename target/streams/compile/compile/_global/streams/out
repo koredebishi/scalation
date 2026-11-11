@@ -1,7 +1,7 @@
-[warn] -- [E198] Unused Symbol Warning: C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\Route.scala:18:19 
-[warn] 18 |import scala.math.{min,abs}
-[warn]    |                   ^^^
-[warn]    |                   unused import
+[warn] -- [E198] Unused Symbol Warning: C:\Simulation\scalation_2.0\src\main\scala\scalation\simulation\process\model\i210w\I210WConfig.scala:22:27 
+[warn] 22 |import scalation.mathstat.{MatrixD, VectorD}
+[warn]    |                           ^^^^^^^
+[warn]    |                           unused import
 [error] No warnings can be incurred under -Werror
 [warn] one warning found
 [error] one error found

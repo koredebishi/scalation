@@ -250,5 +250,6 @@ end I210WConfig
     val L = I210WConfig.segmentLengthsM
     println ("I-210 W Pasadena: segment lengths (m)")
     for s <- 0 until L.dim do println (f"  seg $s%2d  ${names(s)}%-14s -> ${names(s + 1)}%-14s ${L(s)}%7.1f m")
-    println (f"  total ${L.sum}%.0f m, sensor1 to sensor4 ${L(1 until L.dim).sum}%.0f m (${L(1 until L.dim).sum / 1609.344}%.2f mi)")
+    val s1s4 = L(1 until L.dim).sum                                              // sensor1 to sensor4, without the warm-up
+    println (f"  total ${L.sum}%.0f m, sensor1 to sensor4 $s1s4%.0f m (${s1s4 / 1609.344}%.2f mi)")
 end i210wConfigTest
